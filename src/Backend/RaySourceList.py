@@ -261,7 +261,7 @@ class RaySourceList:
             snums = None
         else:
             ind = np.nonzero(ch)[0]
-            snums = np.zero_like(ind, dtype=int)
+            snums = np.zeros_like(ind, dtype=int)
             for i in np.arange(len(self.List)):
                 Ns, Ne = self.B_List[i:i+2]
                 snums[(ind >= Ns) & (ind < Ne)] = i
