@@ -22,6 +22,7 @@ from Backend.Misc import random_from_distribution
 import numexpr as ne
 from typing import Callable
 
+from Backend.Misc import timer as timer
 
 # TODO check light_type=Function
 # TODO remove BW_Image, ersetzen durch emittance_type = "Constant", "Image"
@@ -316,7 +317,7 @@ class RaySource:
             xs, xe, ys, ye = self.Surface.getExtent()[:4]
             Iy, Ix = self.Image.shape[:2]
 
-            p = np.empty((N, 3), dtype=np.float64, order='F')
+            p = np.zeros((N, 3), dtype=np.float64, order='F')
             p[:, 2] = self.pos[2]
 
             ne.evaluate("(xe-xs)/Ix * (PX + rx) + xs", out=p[:, 0])
@@ -369,7 +370,7 @@ class RaySource:
                 # Rotation Matrix for a rotation around an arbitrary axis,
                 # source: https://de.wikipedia.org/wiki/Drehmatrix#Drehmatrizen_des_Raumes_%E2%84%9D%C2%B3
 
-                s = np.empty_like(s_or, dtype=np.float64, order='F')
+                s = np.zeros_like(s_or, dtype=np.float64, order='F')
 
                 # rotate in second cone dimension
                 ne.evaluate("(n1**2*mca + ca)*s1    + (n1*n2*mca - n3*sa)*s2 + (n1*n3*mca + n2*sa)*s3", out=s[:, 0])
@@ -389,7 +390,7 @@ class RaySource:
             pols = np.full(p.shape, np.nan, np.float64, order='F')
 
         else:
-            pols = np.empty_like(p, np.float64, order='F')
+            pols = np.zeros_like(p, np.float64, order='F')
             
             match self.polarization_type:
 

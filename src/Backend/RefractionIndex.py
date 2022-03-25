@@ -98,7 +98,6 @@ class RefractionIndex:
             if (nsm := np.min(ns)) < 1.0:
                 raise ValueError(f"Refraction indices ns need to be >= 1.0, but minimum is {nsm}")
 
-
     def __call__(self, wl: np.ndarray | list | float) -> np.ndarray:
         """
         Returns the refractive index at specified wavelengths.

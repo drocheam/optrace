@@ -1,3 +1,4 @@
+#!/bin/env python3
 
 import sys
 sys.path.append('./src/')
@@ -6,6 +7,7 @@ from Backend import *
 
 import copy
 import time
+
 
 start = time.time()
 
@@ -76,18 +78,7 @@ def func2(N2):
     # Im = RT.DetectorImage(500, extent="auto")
 
 
-
 N = 1000000
-
-# Nt = 1 # multiprocessing.cpu_count() - 1
-# threads = []
-# for i in range(Nt):
-    # process = Process(target=func2, args=[int(N/Nt)])
-    # process.start()
-    # threads.append(process)
-
-# for process in threads:
-    # process.join()
 func2(N)
 print(time.time()-start)
 

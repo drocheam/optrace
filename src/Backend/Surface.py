@@ -392,7 +392,7 @@ class Surface:
                 rho, k = self.rho, self.k
                 n_r = ne.evaluate("-rho*r/sqrt(1 - k*r**2*rho**2)")
 
-                n = np.empty((x.shape[0], 3), dtype=np.float64, order='F')
+                n = np.zeros((x.shape[0], 3), dtype=np.float64, order='F')
 
                 # n_r is rotated by phi to get n_x, n_y
                 ne.evaluate("n_r*cos(phi)",     out=n[:, 0])
@@ -408,7 +408,7 @@ class Surface:
                 # uz is the surface change in x direction, vz in y-direction, the normal vector 
                 # of derivative vectors u = (ds, 0, uz) and v = (0, ds, vz) is n = (-uz*ds, -ds*vz, ds*ds)
                 # this can be rescaled to n = (-uz, -vz, ds)
-                n = np.empty((x.shape[0], 3), dtype=np.float64, order='F')
+                n = np.zeros((x.shape[0], 3), dtype=np.float64, order='F')
                 n[:, 0] = self.getValues(x - ds/2, y) - self.getValues(x + ds/2, y) # -uz
                 n[:, 1] = self.getValues(x, y - ds/2) - self.getValues(x, y + ds/2) # -vz
                 n[:, 2] = ds
@@ -461,7 +461,7 @@ class Surface:
         :return:
         """
 
-        p = np.empty((N, 3), dtype=np.float64, order='F')
+        p = np.zeros((N, 3), dtype=np.float64, order='F')
         
         match self.surface_type:
 

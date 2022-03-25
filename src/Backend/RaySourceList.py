@@ -72,7 +72,6 @@ class RaySourceList:
         :param threading:
         :param no_pol:
         """
-        # self.free() 
         self.N_List = N_List
         self.B_List = np.concatenate(([0], np.cumsum(self.N_List)))
         N           = np.sum(N_List)
@@ -80,11 +79,11 @@ class RaySourceList:
 
         # weights, polarization and wavelengths don't need double precision, this way we save some RAM
         # fortran order='F' speeds things up around 20% in our application
-        self.p_list      = np.empty((N, nt, 3), dtype=np.float64, order='F')
-        self.s0_list     = np.empty((N, 3),     dtype=np.float64, order='F')
-        self.pol_list    = np.empty((N, nt, 3), dtype=np.float32, order='F')
-        self.w_list      = np.empty((N, nt),    dtype=np.float32, order='F')
-        self.wavelengths = np.empty((N,),       dtype=np.float32)        
+        self.p_list      = np.zeros((N, nt, 3), dtype=np.float64, order='F')
+        self.s0_list     = np.zeros((N, 3),     dtype=np.float64, order='F')
+        self.pol_list    = np.zeros((N, nt, 3), dtype=np.float32, order='F')
+        self.w_list      = np.zeros((N, nt),    dtype=np.float32, order='F')
+        self.wavelengths = np.zeros((N,),       dtype=np.float32)        
 
         def addSourceRays(i: int) -> None:
 
@@ -262,7 +261,7 @@ class RaySourceList:
             snums = None
         else:
             ind = np.nonzero(ch)[0]
-            snums = np.empty_like(ind, dtype=int)
+            snums = np.zero_like(ind, dtype=int)
             for i in np.arange(len(self.List)):
                 Ns, Ne = self.B_List[i:i+2]
                 snums[(ind >= Ns) & (ind < Ne)] = i

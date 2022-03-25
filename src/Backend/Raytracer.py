@@ -656,7 +656,7 @@ class Raytracer:
         c = ~w  # bool array for which ray has converged
 
         # arrays for estimated hit points
-        p_hit = np.empty_like(s, dtype=np.float64, order='F')
+        p_hit = np.zeros_like(s, dtype=np.float64, order='F')
         p_hit[c] = p1[c]  # assign already converged rays
 
         it = 1  # number of iteration
@@ -749,7 +749,7 @@ class Raytracer:
                                                             ret=[True, True, False, True, True, False])
 
         # init ph (position of hit) and is_hit bool array
-        ph = np.empty_like(p, dtype=np.float64)
+        ph = np.zeros_like(p, dtype=np.float64)
         ish = np.zeros_like(rs, dtype=bool)
 
         rs[rs2 < 0] = False  # section index rs < 0 means ray does not reach that far
