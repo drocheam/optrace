@@ -10,12 +10,11 @@ import copy
 
 from Backend.RefractionIndex import RefractionIndex as RefractionIndex
 from Backend.Surface import Surface
+from Backend.SObject import SObject
 
-
-# TODO Function for estimation of focal length
 # TODO error message when surface is point or line
 
-class Lens:
+class Lens(SObject):
 
     def __init__(self, 
                  front: Surface, 
@@ -41,99 +40,19 @@ class Lens:
         :param pos: 3D position of lens center (list or numpy array)
         """
 
-        self.front = front.copy()
-        self.back = back.copy()
         self.n = n
         self.n2 = n2
-        self.d1 = float(d1) if d1 is not None else d1
-        self.d2 = float(d2) if d2 is not None else d2
+        d1 = float(d1) if d1 is not None else d1
+        d2 = float(d2) if d2 is not None else d2
 
-        if de is not None and self.d1 is None and self.d2 is None:
-            self.d1 = de / 2. + self.front.maxz - self.front.pos[2]
-            self.d2 = de / 2. + self.back.pos[2] - self.back.minz
+        if de is not None and d1 is None and d2 is None:
+            d1 = de / 2. + front.maxz - front.pos[2]
+            d2 = de / 2. + back.pos[2] - back.minz
 
         elif d1 is None or d2 is None:
             raise ValueError("Both thicknesses d1, d2 need to be specified")
 
-        if self.d1 < 0 or self.d2 < 0:
-            raise ValueError("Thicknesses de, d1, d2 need to be non-negative.")
-
-        self.moveTo(pos)
-
-    # TODO include d1 parameter to move surface
-    def setFrontSurface(self, surf: Surface) -> None:
-        """
-
-        :param surf:
-        """
-        pos = self.front.pos
-        self.front = surf.copy()
-        self.front.moveTo(pos)
-
-    # TODO include d2 parameter to move surface
-    def setBackSurface(self, surf: Surface) -> None:
-        """
-
-        :param surf:
-        """
-        pos = self.back.pos
-        self.back = surf.copy()
-        self.back.moveTo(pos)
-
-    def moveTo(self, pos: (list | np.ndarray)) -> None:
-        """
-        Moves the lens in 3D space.
-
-        :param pos: new 3D position of filter center (list or numpy array)
-        """
-        pos = np.array(pos, dtype=np.float64)
-
-        self.front.moveTo(pos - [0, 0, self.d1])
-        self.back.moveTo(pos + [0, 0, self.d2])
-
-    def copy(self) -> 'Lens':
-        """
-        Return a fully independent copy of the Lens object.
-
-        :return: copy
-        """
-        return copy.deepcopy(self)
-
-    @property
-    def pos(self) -> np.ndarray:
-        """ position of lens center """
-        return self.front.pos + [0, 0, self.d1]
-
-    @property
-    def extent(self) -> tuple[float, float, float, float, float, float]:
-        """ 3D extent of Lens"""
-        front_ext = self.front.getExtent()[:4]
-        back_ext = self.back.getExtent()[:4]
-
-        return min(front_ext[0], back_ext[0]),\
-               max(front_ext[1], back_ext[1]),\
-               min(front_ext[2], back_ext[2]),\
-               max(front_ext[3], back_ext[3]),\
-               self.front.minz,\
-               self.back.maxz
-    
-    def getCylinderSurface(self, nc: int = 100) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Get a 3D surface representation of the lens side cylinder for plotting.
-
-        :param nc: number of surface edge points (int)
-        :return: coordinate arrays X, Y, Z (2D numpy arrays)
-        """
-
-        X1, Y1, Z1 = self.front.getEdge(nc)
-        X2, Y2, Z2 = self.back.getEdge(nc)
-
-        X = np.column_stack((X1, X2))
-        Y = np.column_stack((Y1, Y2))
-        Z = np.column_stack((Z1, Z2))
-
-        return X, Y, Z
-
+        super().__init__(front, pos, back, d1, d2)
 
     def estimateFocalLength(self, wl: float=555., n0: RefractionIndex=RefractionIndex("Constant", n=1.)) -> float:
         """
@@ -144,17 +63,17 @@ class Lens:
         :param n0: ambient refraction index
         :return: focal length
         """
-        match self.front.surface_type:
+        match self.FrontSurface.surface_type:
             case ("Sphere" | "Asphere"):
-                R1 = 1/self.front.rho
+                R1 = 1/self.FrontSurface.rho
             case "Circle":
                 R1 = np.inf
             case _:
                 raise RuntimeError("Calculation only possible with surface_type 'Circle', 'Sphere' or 'Asphere'.")
 
-        match self.back.surface_type:
+        match self.BackSurface.surface_type:
             case ("Sphere" | "Asphere"):
-                R2 = 1/self.back.rho
+                R2 = 1/self.BackSurface.rho
             case "Circle":
                 R2 = np.inf
             case _:
@@ -162,7 +81,7 @@ class Lens:
 
         n = self.n(wl)
         n0_ = n0(wl)
-        d = self.back.pos[2] - self.front.pos[2]  # thickness along the optical axis
+        d = self.BackSurface.pos[2] - self.FrontSurface.pos[2]  # thickness along the optical axis
 
         # lensmaker equation
         D = (n-n0_)/n0_ * (1/R1 - 1/R2 + (n - n0_) * d /(n*R1*R2))

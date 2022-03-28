@@ -5,15 +5,14 @@ rectangular plane perpendicular to optical axis for creation of Detector Images
 """
 
 import numpy as np
-
 import numexpr as ne  # for speeding up the calculations
-import copy  # for copy.deepcopy
 
 from Backend.Surface import Surface  # for the Detector surface
+from Backend.SObject import SObject
 
 # TODO reference point for the angle calculation
 
-class Detector:
+class Detector(SObject):
 
     def __init__(self,
                  Surface:   Surface,
@@ -25,70 +24,10 @@ class Detector:
         :param Surface: the Detector surface
         :param pos: position in 3D space
         """
-        # use a Surface copy, since we change its position in 3D space
-        self.Surface = Surface.copy()
+        super().__init__(Surface, pos)
 
         if not self.Surface.hasHitFinding:
             raise RuntimeError(f"surface_type '{Surface.surface_type}' has no hit finding functionality.")
-
-        self.moveTo(pos)
-
-    def moveTo(self, pos: (list | np.ndarray)) -> None:
-        """
-        Moves the Detector in 3D space.
-
-        :param pos: new 3D position of Detector center (list or numpy array)
-        """
-        self.Surface.moveTo(pos)
-
-    def setSurface(self, surf: Surface) -> None:
-        """
-        Assign a new Surface to the Detector.
-
-        :param surf: Surface to assign
-        """
-        pos = self.Surface.pos
-        self.Surface = surf.copy()
-        self.Surface.moveTo(pos)
-    
-    def copy(self) -> 'Detector':
-        """
-        Return a fully independent copy of the Detector object.
-
-        :return: copy
-        """
-        return copy.deepcopy(self)
-
-    @property
-    def pos(self) -> np.ndarray:
-        """ position of the Detector center """
-        return self.Surface.pos
-   
-    @property
-    def extent(self) -> tuple[float, float, float, float, float, float]:
-        """ 3D extent of the Detector"""
-        return self.Surface.getExtent()
-    
-    def getCylinderSurface(self, nc: int = 100, d: float = 0.1) \
-            -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Get a 3D surface representation of the Detector cylinder for plotting.
-
-        :param nc: number of surface edge points (int)
-        :param d: thickness for visualization (float)
-        :return: tuple of coordinate arrays X, Y, Z (2D numpy arrays)
-        """
-
-        # get Surface edge. The edge is the same for both cylinder sides
-        X1, Y1, Z1 = self.Surface.getEdge(nc)
-
-        # create coordinates for cylinder front edge and back edge
-        X = np.column_stack((X1, X1))
-        Y = np.column_stack((Y1, Y1))
-        Z = np.column_stack((Z1, Z1 + d))  # shift back edge by d
-
-        return X, Y, Z
-
 
     def getAngleExtent(self) -> np.ndarray:
         """

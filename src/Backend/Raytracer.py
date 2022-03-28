@@ -224,9 +224,9 @@ class Raytracer:
                     n2_l = n2(wavelengths) 
 
                     hw_front = hw.copy()
-                    p[hw, i+1], hit_front = self.findSurfaceHit(Element.front, p[hw, i], s[hw])
+                    p[hw, i+1], hit_front = self.findSurfaceHit(Element.FrontSurface, p[hw, i], s[hw])
                     hwh, _ = misc.partMask(hw, hit_front)  # rays having power and hitting lens front
-                    self.refraction(Element.front, p, s, weights, n0_l, n1_l, pols, hwh, i)
+                    self.refraction(Element.FrontSurface, p, s, weights, n0_l, n1_l, pols, hwh, i)
 
                     # treat rays that go outside outline
                     hwnh, _ = misc.partMask(hw, ~hit_front)  # rays having power and not hitting lens front
@@ -236,9 +236,9 @@ class Raytracer:
                     p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
 
                     hw = weights[:, i] > 0
-                    p[hw, i+1], hit_back = self.findSurfaceHit(Element.back, p[hw, i], s[hw])
+                    p[hw, i+1], hit_back = self.findSurfaceHit(Element.BackSurface, p[hw, i], s[hw])
                     hwb, _ = misc.partMask(hw, hit_back)  # rays having power and hitting lens back
-                    self.refraction(Element.back, p, s, weights, n1_l, n2_l, pols, hwb, i)
+                    self.refraction(Element.BackSurface, p, s, weights, n1_l, n2_l, pols, hwb, i)
 
                     # since we don't model the behaviour of the lens side cylinder, we need to absorb all rays passing
                     # through the cylinder

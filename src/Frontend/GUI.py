@@ -260,36 +260,7 @@ class GUI(HasTraits):
         :param Lens:
         :param num:
         """
-        # lens front side
-        X, Y, Z = Lens.front.getPlottingMesh(N=self.SURFACE_RES)
-        a = self.scene.mlab.mesh(X, Y, Z, color=self.LENS_COLOR, opacity=self.LENS_ALPHA,
-                                 name=f"Lens {num} front side")
-
-        # plot cylinder jacket
-        Xj, Yj, Zj = Lens.getCylinderSurface(nc=self.SURFACE_RES)
-        b = self.scene.mlab.mesh(Xj, Yj, Zj, color=self.LENS_COLOR, opacity=self.LENS_ALPHA,
-                                 name=f"Lens {num} cylinder")
-
-        # add refraction index label
-        text = self.scene.mlab.text(Lens.front.r, 0, z=Lens.pos[2], text=f"L{num}", name=f"Label")
-
-        text.actor.text_scale_mode = 'none'
-        text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
-                                justification="center")
-
-        # lens back side
-        X2, Y2, Z2 = Lens.back.getPlottingMesh(N=self.SURFACE_RES)
-        c = self.scene.mlab.mesh(X2, Y2, Z2, color=self.LENS_COLOR,  opacity=self.LENS_ALPHA,
-                                 name=f"Lens {num} back side")
-
-        # make non pickable so it does not interfere with our ray picker
-        a.actor.actor.pickable = False
-        b.actor.actor.pickable = False
-        c.actor.actor.pickable = False
-
-        a.actor.property.trait_set(specular=0.5, ambient=0.25)
-        b.actor.property.trait_set(specular=0.5, ambient=0.25)
-        c.actor.property.trait_set(specular=0.5, ambient=0.25)
+        self.plotSObject(Lens, num, "Lens", "L", self.LENS_COLOR, self.LENS_ALPHA)
 
     def plotFilter(self, filter_: Filter, num: int) -> None:
         """
@@ -298,7 +269,7 @@ class GUI(HasTraits):
         :param num:
         """
         Fcolor = filter_.getColor()
-        self.plotSingleSurfaceObject(filter_, num, "Filter", "F", Fcolor, self.FILTER_ALPHA)    
+        self.plotSObject(filter_, num, "Filter", "F", Fcolor, self.FILTER_ALPHA)    
 
     def plotDetector(self, Det: Detector, num: int) -> None:
         """
@@ -306,20 +277,53 @@ class GUI(HasTraits):
         :return:
         """
 
-        a, b, text = self.plotSingleSurfaceObject(Det, num, "Detector", "DET", 
+        a, b, c, text = self.plotSObject(Det, num, "Detector", "DET", 
                                                   self.DETECTOR_COLOR, self.DETECTOR_ALPHA)    
 
         self.DetectorPlot.append(a)
         self.DetectorCylinderPlot.append(b)
         self.DetText.append(text)
 
-    def plotAxes(self, extent: list | np.ndarray) -> None:
+    def plotRaySource(self, RS: RaySource, num: int) -> None:
         """
 
-        :param extent:
-        :return:
+        :param RS:
+        :param num:
         """
-        # separate axes for separate scalings
+
+        self.plotSObject(RS, num, "RaySource", "RS", RS.getColor(), self.RAYSOURCE_ALPHA, 
+                                     d=-self.D_VIS, spec=False, light=False)   
+
+        if RS.light_type in ["RGB_Image", "BW_Image"]:
+            RS_Image_Text = self.scene.mlab.text3d(RS.pos[0]-0.5, RS.pos[1], RS.pos[2], "Image", color=(0, 0, 0),
+                                                   orient_to_camera=False, scale=0.25, name=f"Image Text")
+            RS_Image_Text.actor.actor.pickable = False
+            RS_Image_Text.actor.actor.property.lighting = False
+
+    def plotOutline(self) -> None:
+        """plot the raytracer outline"""
+
+        self.scene.engine.add_source(ParametricSurface(name="Outline"), self.scene)
+        a = self.scene.mlab.outline(extent=self.Raytracer.outline.copy(), opacity=self.OUTLINE_ALPHA)
+        a.actor.actor.pickable = False  # only rays should be pickablw
+
+    def plotOrientationAxes(self) -> None:
+        """plot orientation axes"""
+
+        self.scene.engine.add_source(ParametricSurface(name="Orientation Axes"), self.scene)
+        
+        # show axes indicator
+        self.oaxes = self.scene.mlab.orientation_axes()
+        self.oaxes.text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
+        self.oaxes.marker.interactive = 0  # make orientation axes non-interactive
+
+        # turn of text scaling of oaxes
+        self.oaxes.widgets[0].orientation_marker.x_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
+        self.oaxes.widgets[0].orientation_marker.y_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
+        self.oaxes.widgets[0].orientation_marker.z_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
+
+    def plotAxes(self) -> None:
+        """plot cartesian axes"""
 
         # find label number for axis so that step size is an int*10^k 
         # or any of [0.25, 0.5, 0.75, 1.25, 2.5]*10^k with k being an integer
@@ -335,71 +339,45 @@ class GUI(HasTraits):
 
             return max_s+1
 
-        Rext = self.Raytracer.outline
+        def drawAxis(obj, ext: list, lnum: int, name: str, lform: str, vis_x: bool, vis_y: bool, vis_z: bool):
 
-        # add X Axis
-        lnum = getLabelNum(Rext[1]-Rext[0], 5, 16)
-        extent_x = extent.copy()
-        extent_x[3] = Rext[2]
-        self.scene.engine.add_source(ParametricSurface(name="X-Axis"), self.scene)
-        self.ax_x = self.scene.mlab.axes(extent=extent_x, nb_labels=lnum, z_axis_visibility=False, y_axis_visibility=False)
-        self.ax_x.axes.trait_set(font_factor=0.7, fly_mode='none', label_format='%-#.4g', x_label='x / mm')
-        self.ax_x.property.trait_set(display_location='background', opacity=0.5)
-        self.ax_x.title_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
-        self.ax_x.label_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
-        self.ax_x.actors[0].pickable = False
-        
-        # add Y Axis
-        lnum = getLabelNum(Rext[3]-Rext[2], 5, 16)
-        self.scene.engine.add_source(ParametricSurface(name="Y-Axis"), self.scene)
-        self.ax_y = self.scene.mlab.axes(extent=extent.copy(), nb_labels=lnum, z_axis_visibility=False, x_axis_visibility=False)
-        self.ax_y.axes.trait_set(font_factor=0.7, fly_mode='none', label_format='%-#.4g', y_label='y / mm')
-        self.ax_y.property.trait_set(display_location='background', opacity=0.5)
-        self.ax_y.title_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
-        self.ax_y.label_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
-        self.ax_y.actors[0].pickable = False
+            self.scene.engine.add_source(ParametricSurface(name=f"{name}-Axis"), self.scene)
 
-        # add Z Axis
-        lnum = getLabelNum(Rext[5]-Rext[4], 5, 24)
-        self.scene.engine.add_source(ParametricSurface(name="Z-Axis"), self.scene)
-        extent_z = extent.copy()
-        extent_z[3] = Rext[2]
-        self.ax_z = self.scene.mlab.axes(extent=extent_z, nb_labels=lnum, x_axis_visibility=False, y_axis_visibility=False)
-        self.ax_z.axes.trait_set(font_factor=0.7, fly_mode='none', label_format='%-#.5g', z_label='z / mm', layer_number=1)
-        self.ax_z.property.trait_set(display_location='background', opacity=0.5)
-        self.ax_z.title_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
-        self.ax_z.label_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
-        self.ax_z.actors[0].pickable = False
+            obj = self.scene.mlab.axes(extent=ext, nb_labels=lnum, x_axis_visibility=vis_x, 
+                                       y_axis_visibility=vis_y, z_axis_visibility=vis_z)
+
+            label=f"{name} / mm"
+            obj.axes.trait_set(font_factor=0.7, fly_mode='none', label_format=lform, x_label=label, 
+                               y_label=label, z_label=label, layer_number=1)
+
+            obj.property.trait_set(display_location='background', opacity=0.5)
+            obj.title_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
+            obj.label_text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
+            obj.actors[0].pickable = False
+
+        # place axes at outline
+        ext = self.Raytracer.outline
+
+        # enforce placement of x- and z-axis at y=ys (=RT.outline[2]) by shrinking extent
+        ext_ys = ext.copy()
+        ext_ys[3] = ext_ys[2]
+
+        # X-Axis
+        lnum = getLabelNum(ext[1] - ext[0], 5, 16)
+        drawAxis(self.ax_x, ext_ys, lnum, "x", '%-#.4g', True, False, False)
+
+        # Y-Axis
+        lnum = getLabelNum(ext[3] - ext[2], 5, 16)
+        drawAxis(self.ax_y, ext.copy(), lnum, "y", '%-#.4g', False, True, False)
+
+        # Z-Axis
+        lnum = getLabelNum(ext[5] - ext[4], 5, 24)
+        drawAxis(self.ax_z, ext_ys, lnum, "z", '%-#.5g', False, False, True)
+
     
-    def plotOutline(self, extent: list) -> None:
-        """
-
-        :param extent:
-        """
-        self.scene.engine.add_source(ParametricSurface(name="Outline"), self.scene)
-        a = self.scene.mlab.outline(extent=extent.copy(), opacity=self.OUTLINE_ALPHA)
-        a.actor.actor.pickable = False  # only rays should be pickablw
-
-    def plotOrientationAxes(self) -> None:
-        """
-
-        """
-        self.scene.engine.add_source(ParametricSurface(name="Orientation Axes"), self.scene)
-        
-        # show axes indicator
-        self.oaxes = self.scene.mlab.orientation_axes()
-        self.oaxes.text_property.trait_set(font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
-        self.oaxes.marker.interactive = 0  # make orientation axes non-interactive
-
-        # turn of text scaling of oaxes
-        self.oaxes.widgets[0].orientation_marker.x_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
-        self.oaxes.widgets[0].orientation_marker.y_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
-        self.oaxes.widgets[0].orientation_marker.z_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
-
     def plotRefractionIndexBoxes(self) -> None:
-        """
+        """plot outlines for ambient refraction index regions"""
 
-        """
         # sort Element list in z order
         Lenses = sorted(self.Raytracer.LensList, key=lambda Element: Element.pos[2])
 
@@ -443,31 +421,12 @@ class GUI(HasTraits):
             text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW, 
                                     justification="center", frame=True, frame_color=self.SUBTLE_COLOR)
 
-
-    def plotRaySource(self, RS: RaySource, num: int) -> None:
-        """
-
-        :param RS:
-        :param num:
-        """
-
-        self.plotSingleSurfaceObject(RS, num, "RaySource", "RS", RS.getColor(), self.RAYSOURCE_ALPHA, 
-                                     spec=False, light=False)   
-
-        if RS.light_type in ["RGB_Image", "BW_Image"]:
-            RS_Image_Text = self.scene.mlab.text3d(RS.pos[0]-0.5, RS.pos[1], RS.pos[2], "Image", color=(0, 0, 0),
-                                                   orient_to_camera=False, scale=0.25, name=f"Image Text")
-            RS_Image_Text.actor.actor.pickable = False
-            RS_Image_Text.actor.actor.property.lighting = False
-
-    def plotSingleSurfaceObject(self, obj, num, name, shortname, color, alpha, spec=True, light=True):
-        """
-
-        """
+    def plotSObject(self, obj, num, name, shortname, color, alpha, d=D_VIS, spec=True, light=True):
+        """plotting of a SObject. Gets called from plotting for Lens, Filter, Detector, RaySource."""
         # plot surface
-        X, Y, Z = obj.Surface.getPlottingMesh(N=self.SURFACE_RES)
+        X, Y, Z = obj.FrontSurface.getPlottingMesh(N=self.SURFACE_RES)
         a = self.scene.mlab.mesh(X, Y, Z, color=color, opacity=alpha,
-                                 name=f"{name} {num} surface")
+                                 name=f"{name} {num} front surface")
 
         # make non pickable so it does not interfere with our ray picker
         a.actor.actor.pickable = False
@@ -476,10 +435,10 @@ class GUI(HasTraits):
             a.actor.property.trait_set(specular=0.5, ambient=0.25)
 
         # if surface is a plane, plot a cylinder for side viewing
-        if obj.Surface.isPlanar():
-            Xj, Yj, Zj = obj.getCylinderSurface(nc=self.SURFACE_RES, d=self.D_VIS)
+        if obj.hasBackSurface() or obj.Surface.isPlanar():
+            Xj, Yj, Zj = obj.getCylinderSurface(nc=self.SURFACE_RES, d=d)
             b = self.scene.mlab.mesh(Xj, Yj, Zj, color=color, opacity=alpha,
-                                     name=f"${name} {num} cylinder")
+                                     name=f"{name} {num} cylinder")
             b.actor.actor.pickable = False
             b.actor.actor.property.lighting = light
             if spec:
@@ -488,7 +447,7 @@ class GUI(HasTraits):
             b = None
 
         # calculate middle center z-position
-        zl = (obj.extent[4] + obj.extent[5])/2
+        zl = (obj.extent[4] + obj.extent[5])/2 if not obj.hasBackSurface() else obj.pos[2]
         zl = zl + self.D_VIS/2 if obj.Surface.isPlanar() else zl
 
         # filter label
@@ -496,15 +455,22 @@ class GUI(HasTraits):
         text.actor.text_scale_mode = 'none'
         text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
                                 justification="center")
+        
+        if obj.hasBackSurface():
+            X2, Y2, Z2 = obj.BackSurface.getPlottingMesh(N=self.SURFACE_RES)
+            c = self.scene.mlab.mesh(X2, Y2, Z2, color=color,  opacity=alpha,
+                                     name=f"{name} {num} back surface")
+            c.actor.actor.pickable = False
+            c.actor.actor.property.lighting = light
+            if spec:
+                c.actor.property.trait_set(specular=0.5, ambient=0.25)
+        else:
+            c = None
 
-        return a, b, text
+        return a, b, c, text
 
-
-    # @timer
     def plotRays(self) -> None:
-        """
-
-        """
+        """Ray/Point Plotting with a specified scalar coloring"""
         p_, _, pol_, w_, wl_, snum_ = self.Raytracer.RaySources.getRaysByMask(self.subset, 
                                                                 ret=[True, False, True, True, True, True])
 
@@ -585,7 +551,6 @@ class GUI(HasTraits):
         # plot the lines between points
         self.RaysPlot = self.scene.mlab.pipeline.surface(self.RaysPlotScatter, colormap=cm,
                                                          line_width=self.Ray_width, opacity=10**self.Ray_alpha)
-
         self.RaysPlot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True)
 
         # lut legend settings
@@ -643,9 +608,7 @@ class GUI(HasTraits):
         self.RaysPlot.actor.actor.force_translucent = True
 
     def plotGeometry(self) -> None:
-        """
-
-        """
+        """plot Background, Objects (Lenses, RaySources, Detectors, Filters), Outlines and Axes"""
         # plot RaySources
         [self.plotRaySource(RS, num+1) for num, RS in enumerate(self.Raytracer.RaySources.List)]
 
@@ -665,10 +628,10 @@ class GUI(HasTraits):
             self.Pos_Det = self.Raytracer.outline[5]
 
         # plot axes
-        self.plotAxes(self.Raytracer.outline)
+        self.plotAxes()
         self.plotOrientationAxes()
 
-        self.plotOutline(self.Raytracer.outline)
+        self.plotOutline()
 
         # plot refraction index boxes
         self.plotRefractionIndexBoxes()
@@ -677,9 +640,7 @@ class GUI(HasTraits):
         self.scene.background = self.BACKGROUND_COLOR
 
     def initRayInfoText(self) -> None:
-        """
-
-        """
+        """init detection of ray point clicks and the info display"""
         # init point pickers
         self.scene.mlab.gcf().on_mouse_pick(self.onRayPick, button='Left')
         self.scene.mlab.gcf().on_mouse_pick(self.onSpacePick, button='Right')
@@ -689,9 +650,7 @@ class GUI(HasTraits):
         self.onRayPick()  # call to set default text
 
     def initStatusText(self) -> None:
-        """
-
-        """
+        """init GUI status text display"""
         # add status text
         self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
         self.StatusText = self.scene.mlab.text(0.97, 0.01, "Status Text")
@@ -700,23 +659,17 @@ class GUI(HasTraits):
                                            font_family=self.FONT_STYLE, vertical_justification=0, justification=2)
     
     def initSourceList(self) -> None:
-        """
-
-        """
+        """generate a descriptive list of RaySource names"""
         self.SourceNames = [f"RS{num+1}: {RS.Surface.surface_type} at {RS.pos}"
                             for num, RS in enumerate(self.Raytracer.RaySources.List) ]
 
     def initDetectorList(self) -> None:
-        """
-
-        """
+        """generate a descriptive list of Detector names"""
         self.DetectorNames = [f"DET{num+1}: {Det.Surface.surface_type} at z={Det.pos[2]}" 
                               for num, Det in enumerate(self.Raytracer.DetectorList) ]
 
     def initCamera(self) -> None:
-        """
-
-        """
+        """initialize the scene view and the camera"""
         # set camera position
         self.scene.mlab.view(0, 0)
         dz = self.Raytracer.outline[5] - self.Raytracer.outline[4]
@@ -735,7 +688,8 @@ class GUI(HasTraits):
 
     def onSpacePick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker') -> None:
         """
-
+        3D Space Clicking Handler. 
+        Shows Click Coordinates or moves Detector to this position when Shift is pressed.
         :param picker_obj:
         """
 
@@ -757,7 +711,8 @@ class GUI(HasTraits):
 
     def onRayPick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker'=None) -> None:
         """
-
+        Ray Picking Handler.
+        Shows ray properties on screen.
         :param picker_obj:
         """
         if not self.RayText:
@@ -812,10 +767,8 @@ class GUI(HasTraits):
         self.RayText.property.trait_set(font_family=self.FONT_STYLE, vertical_justification=2, font_size=13,
                                         shadow=self.FONT_SHADOW)
 
-    def setDetectorClick(self) -> None:
-        """
-
-        """
+    def initShiftPressDetector(self) -> None:
+        """Init shift key press detection"""
         self.ShiftPressed = False
 
         def on_press(key):
@@ -831,6 +784,7 @@ class GUI(HasTraits):
 
 
     def close(self) -> None:
+        """close the GUI"""
         # close all ui frames
         app = QtGui.QApplication.instance()
         for widget in app.topLevelWidgets():
@@ -840,7 +794,11 @@ class GUI(HasTraits):
         QtCore.QCoreApplication.quit()
 
     # wait while 'key' in StatusList is set
-    def waitWhile(self, key):
+    def waitWhile(self, key: str):
+        """
+        wait while the GUI is busy doing 'key'
+        :param key: string key from GUI.Status
+        """
         time.sleep(0.001)  # wait for flags to be set
         # wait for tasks to finish
         while self.Status[key]:
@@ -851,9 +809,7 @@ class GUI(HasTraits):
 
     @on_trait_change('Rays_s')
     def filterRays(self) -> None:
-        """
-
-        """
+        """chose a subset of all Raytracer rays and plot them with :obj:`GUI.drawRays`"""
 
         # don's use self.Rays as ray number, since the raytracer could still be raytracing
         # instead use the last saved number
@@ -879,9 +835,8 @@ class GUI(HasTraits):
 
     @on_trait_change('ColoringType')
     def drawRays(self) -> None:
-        """
+        """remove old ray view, call :obj:`GUI.plotRays` and restore scene view"""
 
-        """
         if not self.Raytracer.RaySources.hasSources():
             print("WARNING: RaySource Missing")
 
@@ -917,9 +872,8 @@ class GUI(HasTraits):
 
     @on_trait_change('Rays, AbsorbMissing')
     def setRays(self) -> None:
-        """
+        """raytrace in separate thread, after that call :obj:`GUI.filterRays`"""
 
-        """
         # return if value should only be set
         if self.set_only or self.Status["Init"]:
             return
@@ -959,7 +913,6 @@ class GUI(HasTraits):
                 self.Rays = self.Raytracer.RaySources.N
                 self.set_only = False
 
-
                 if self.exit:
                     self.close()
 
@@ -970,9 +923,8 @@ class GUI(HasTraits):
 
     @on_trait_change('Ray_alpha')
     def setRayAlpha(self) -> None:
-        """
+        """change opacity of visible rays"""
 
-        """
         if self.RaysPlot:
             self.Status["Drawing"] = True
             self.RaysPlot.actor.property.trait_set(opacity=10**self.Ray_alpha)
@@ -980,9 +932,8 @@ class GUI(HasTraits):
 
     @on_trait_change('Pos_Det')
     def setDetector(self) -> None:
-        """
+        """move and replot chosen Detector"""
 
-        """
         if self.set_only:
             return
 
@@ -1004,9 +955,8 @@ class GUI(HasTraits):
 
     @on_trait_change('DetectorImageButton')
     def showDetectorImage(self) -> None:
-        """
+        """render a DetectorImage at the chosen Detector, uses a separate thread"""
 
-        """
         # prevent race conditions
         if self.Status["Tracing"]:
             self.StatusText.text += "Can't do this while raytracing.\n"
@@ -1029,9 +979,8 @@ class GUI(HasTraits):
 
     @on_trait_change('SourceImageButton')
     def showSourceImage(self) -> None:
-        """
+        """render a SourceImage for the chosen Source, uses a separate thread"""
 
-        """
         # prevent race conditions
         if self.Status["Tracing"]:
             self.StatusText.text += "Can't do this while raytracing.\n"
@@ -1058,8 +1007,12 @@ class GUI(HasTraits):
     @on_trait_change('AutoFocusButton')
     def moveToFocus(self) -> None:
         """
-
+        Find a Focus.
+        The chosen Detector defines the search range for focus finding. 
+        Searches are always between lenses aor the next outline. 
+        Search takes place in a separate thread, after that the Detector is moved to the focus 
         """
+
         # prevent race conditions
         if self.Status["Tracing"]:
             self.StatusText.text += "Can't do this while raytracing.\n"
@@ -1088,9 +1041,8 @@ class GUI(HasTraits):
 
     @on_trait_change('scene.activated')
     def plotScene(self) -> None:
-        """
+        """Initialize the GUI. Inits a variety of things."""
 
-        """
         self.plotGeometry()
 
         self.initCamera()
@@ -1100,7 +1052,7 @@ class GUI(HasTraits):
         self.initRayInfoText()
         self.initStatusText()
 
-        self.setDetectorClick()
+        self.initShiftPressDetector()
 
         self.Status["Init"] = False
 
@@ -1111,9 +1063,7 @@ class GUI(HasTraits):
 
     @on_trait_change('Status[]')
     def changeStatus(self) -> None:
-        """
-
-        """
+        """Update the status info text."""
 
         if self.Status["Init"]:
             return
@@ -1133,9 +1083,8 @@ class GUI(HasTraits):
 
     @on_trait_change('Ray_width')
     def changeRayWidth(self) -> None:
-        """
+        """ set the ray width for the visible rays."""
 
-        """
         if self.RaysPlot:
             self.Status["Drawing"] = True
             self.RaysPlot.actor.property.trait_set(line_width=self.Ray_width, point_size=self.Ray_width)
@@ -1144,9 +1093,8 @@ class GUI(HasTraits):
 
     @on_trait_change('PlottingType')
     def changePlottingType(self) -> None:
-        """
+        """Change the PlottingType. Removes the visual rays/points and replots using :obj:`GUI.drawRays`"""
 
-        """
         # remove ray/point plot
         if self.PlottingType == "None" and self.RaysPlot is not None:
             self.Status["Drawing"] = True
@@ -1162,6 +1110,7 @@ class GUI(HasTraits):
 
     @on_trait_change('DetectorSelection')
     def changeDetector(self) -> None:
+        """Updates the Detector Selection and the corresponding properties"""
 
         # surface number for selected source
         self.DetInd = int(self.DetectorSelection.split(":", 1)[0].split("DET")[1]) - 1
@@ -1178,9 +1127,8 @@ class GUI(HasTraits):
     # for some reasons these are the only ones having no text_scaling_mode = 'none' option
     @on_trait_change('scene:scene_editor:interactor:size')
     def size_change(self) -> None:
-        """
+        """Handles GUI window size changes. Fixes incorrect scaling by mayavi"""
 
-        """
         scene_size = self.scene.scene_editor.interactor.size
 
         # init scene size

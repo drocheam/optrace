@@ -50,6 +50,9 @@ Backend.RefractionIndex
 _________________________________
 .. automodule:: Backend.RefractionIndex
 
+Backend.SObject
+_________________________________
+.. automodule:: Backend.SObject
 
 Backend.Surface
 _________________________________

@@ -9,26 +9,26 @@ The RaySource object also holds all rays and ray sections generated in raytracin
 
 # Why random sampling? Sampling the source, "sampling" the lens areas or aperture by the rays can lead to Nyquist Theorem violation. Also, this ensures that when you run it repeatedly, you get a different version of the image, and not the same one. E.g. with image compositions by several raytraces.
 
-
 import numpy as np
-import copy
+import numexpr as ne
+
+from typing import Callable
 
 from PIL import Image as PILImage
 from scipy.spatial.transform import Rotation
 
 import Backend.Color as Color
 from Backend.Surface import Surface as Surface
+from Backend.SObject import SObject
 from Backend.Misc import random_from_distribution
-import numexpr as ne
-from typing import Callable
-
 from Backend.Misc import timer as timer
+
 
 # TODO check light_type=Function
 # TODO remove BW_Image, ersetzen durch emittance_type = "Constant", "Image"
 # TODO welche lines sind typisch?
 # TODO Check: check image dimensions
-class RaySource:
+class RaySource(SObject):
 
     def __init__(self,
 
@@ -84,6 +84,8 @@ class RaySource:
                 specified as path (string) or RGB array (numpy 3D array)
         """
 
+        super().__init__(Surface, pos)
+
         if direction_type not in ["Parallel", "Diverging"]:
             raise ValueError(f"Invalid direction_type '{direction_type}'.")
 
@@ -102,8 +104,6 @@ class RaySource:
         self.light_type = light_type
         self.polarization_type = polarization_type
 
-        self.Surface = Surface.copy()
-        
         if not Surface.isPlanar():
             raise ValueError("Currently only planar surfaces are supported for RaySources.")
 
@@ -150,58 +150,6 @@ class RaySource:
 
         if self.orientation_type == "Function" and or_func is None:
             raise ValueError("orientation_type='Function', but or_func not specified.")
-
-        self.moveTo(pos)
-
-    def moveTo(self, pos: (list | np.ndarray)) -> None:
-        """
-
-        :param pos:
-        """
-        self.Surface.moveTo(pos)
-
-    def setSurface(self, surf: Surface) -> None:
-        """
-
-        :param surf:
-        """
-        pos = self.Surface.pos
-        self.Surface = surf.copy()
-        self.Surface.moveTo(pos)
-
-    def copy(self) -> 'RaySource':
-        """
-
-        :return:
-        """
-        return copy.deepcopy(self)
-
-    @property
-    def pos(self) -> np.ndarray:
-        """ position of the RaySource """
-        return self.Surface.pos
-   
-    @property
-    def extent(self) -> tuple[float, float, float, float, float, float]:
-        """ 3D extent of RaySource"""
-        return self.Surface.getExtent()
-
-    def getCylinderSurface(self, nc: int = 100, d: float = 0.1) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Get a 3D surface representation of the RaySource cylinder for plotting.
-
-        :param nc: number of surface edge points (int)
-        :param d: thickness for visualization
-        :return: coordinate arrays X, Y, Z (2D numpy arrays)
-        """
-
-        X1, Y1, Z1 = self.Surface.getEdge(nc)
-
-        X = np.column_stack((X1, X1))
-        Y = np.column_stack((Y1, Y1))
-        Z = np.column_stack((Z1, Z1 - d))
-
-        return X, Y, Z
 
 
     def getColor(self) -> tuple[float, float, float]:
@@ -428,5 +376,4 @@ class RaySource:
         ################################################################################################################
 
         return p, s, pols, weights, wavelengths
-
 

@@ -5,4 +5,4 @@ current=$(git describe)
 
 out=$(printf 'Current Version: %s \n\n%s' "$current" "$history")
 
-echo "$out" > ./docs/source/changelog.txt
+echo "$out" > ./source/changelog.txt
