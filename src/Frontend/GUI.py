@@ -35,6 +35,7 @@ import time
 
 
 
+
 #TODO aufräumen mehrere Detektoren, bessere Variablennamen etc
 
 class GUI(HasTraits):
@@ -201,44 +202,44 @@ class GUI(HasTraits):
         """
         self.Raytracer = RT
 
+        # ray properties
         self.RaysPlotScatter = None  # plot for scalar ray values
         self.RaysPlot = None  # plot for visualization of rays/points
         self.RayText = None  # textbox for ray information
         self.subset = np.array([])  # indices for subset of all rays in Raytracer
-        self.DetectorPlot = []  # object for visual representation of the Detector in the Raytracer object
-        self.DetectorCylinderPlot = [] # object for visual representation of the Detector Cylinder in the Raytracer object
+
+        # Detector properties
+        self.DetectorPlot = []  # visual representation of the Detectord
+        self.DetectorCylinderPlot = [] # visual representation of the Detectors' Cylinder
         self.DetText = []
-        
         self.SourceNames = []
         self.DetectorNames = []
-
-        self.set_only = False
-
-        # will hold scene size
-        self.scene_size = [0, 0]
-
-        self.ax_x = None
-        self.ax_y = None
-        self.ax_z = None
-
-        self.ShiftPressed = False
-
+        self.DetInd = 0
+        
         # minimal/maximal z-positions of Detector_obj
         self.Pos_Det_min = self.Raytracer.outline[4]
         self.Pos_Det_max = self.Raytracer.outline[5]
 
-        self.DetInd = 0
-        self.DetPos = []
+        # holds scene size, gets set on scene.activated
+        self.scene_size = [0, 0]
 
-        if not AbsorbMissing:
-            self.AbsorbMissing = []
+        # hold axes objects
+        self.ax_x = None
+        self.ax_y = None
+        self.ax_z = None
 
-        self.Status["Init"]             = True 
-        self.Status["Tracing"]          = False
-        self.Status["Drawing"]          = False
-        self.Status["Focussing"]        = False
-        self.Status["DetectorImage"]    = False
-        self.Status["SourceImage"]      = False
+        # shift press indicator
+        self.ShiftPressed = False
+
+        # workaround to exit trait functions
+        self.set_only = False
+        
+        # set AbsorbMissing parameter from bool to list
+        self.AbsorbMissing = self.AbsorbMissing if AbsorbMissing else []
+
+        # define Status dict
+        self.Status.update(dict(Init=True, Tracing=False, Drawing=False, Focussing=False,
+                                DetectorImage=False, SourceImage=False))
 
         super().__init__(*args, **kwargs)
         
@@ -347,13 +348,12 @@ class GUI(HasTraits):
             self.DetectorCylinderPlot.append(None)
 
         # get detector geometry
-        x0, xe, y0, ye, z0, dz = Det.extent
+        x0, xe, y0, ye, z0, ze = Det.extent
 
-        self.DetText.append(self.scene.mlab.text(xe, 0, z=z0, text=f"DET{num}", name=f"Label"))
+        self.DetText.append(self.scene.mlab.text(xe, 0, z=(z0+ze)/2, text=f"DET{num}", name=f"Label"))
         self.DetText[-1].actor.text_scale_mode = 'none'
         self.DetText[-1].property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
     
-        self.DetPos.append(z0)
 
     def plotAxes(self, extent: list | np.ndarray) -> None:
         """
@@ -685,7 +685,7 @@ class GUI(HasTraits):
         if not self.Raytracer.DetectorList:
             self.Pos_Det = [self.Raytracer.DetectorList[0].pos[2]]
         else:
-            self.Pos_Det = self.DetPos[self.DetInd]
+            self.Pos_Det = self.Raytracer.outline[5]
 
         # plot axes
         self.plotAxes(self.Raytracer.outline)
@@ -1021,7 +1021,6 @@ class GUI(HasTraits):
                 self.DetectorCylinderPlot[self.DetInd].mlab_source.trait_set(z=Cyl)
 
             self.DetText[self.DetInd].z_position = self.Pos_Det
-            self.DetPos[self.DetInd] = self.Pos_Det
 
         elif not self.Raytracer or not self.Raytracer.DetectorList:
             print("WARNING: Detector missing.")
@@ -1190,7 +1189,7 @@ class GUI(HasTraits):
         # surface number for selected source
         self.DetInd = int(self.DetectorSelection.split(":", 1)[0].split("DET")[1]) - 1
         self.set_only = True
-        self.Pos_Det = self.DetPos[self.DetInd]
+        self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]
         self.set_only = False
 
     # better lighting on y+ starting view

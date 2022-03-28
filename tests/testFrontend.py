@@ -5,6 +5,7 @@ sys.path.append('./src/')
 
 import unittest
 import warnings
+import time
 
 import numpy as np
 from Backend import *
@@ -150,16 +151,91 @@ class FrontendTests(unittest.TestCase):
         sim = GUI(RT)
 
         def interact():
-            import time
 
             sim.waitWhile("Init")
             sim.waitWhile("Tracing")
             sim.waitWhile("Drawing")
 
             # check if Detector is moving
-            sim.Pos_Det = 5
+            sim.Pos_Det = 5.3
             self.assertEqual(sim.Pos_Det, RT.DetectorList[0].pos[2])
+        
+            # Source Image Tests
+            sim.showSourceImage()
+            sim.SourceSelection = sim.SourceNames[1]
+            sim.showSourceImage()
+            
+            # Detector Image Tests
+            sim.showDetectorImage()
+            sim.DetectorSelection = sim.DetectorNames[1]
+            time.sleep(0.001)  # wait for parameters to be set
+            self.assertTrue(sim.DetInd == 1)
+            self.assertTrue(sim.Pos_Det == sim.Raytracer.DetectorList[1].pos[2])
+            sim.showDetectorImage()
 
+            # Image Type Tests standard
+            sim.ImageType = "Irradiance"
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+            sim.ImageType = "Illuminance"
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+            sim.ImageType = "sRGB"
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+
+            # Image Type Tests log scaling
+            sim.LogImage = ['Logarithmic Scaling']
+            sim.ImageType = "Irradiance"
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+            sim.ImageType = "Illuminance"
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+            sim.ImageType = "sRGB"
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+
+            # Image Tests Flip
+            sim.LogImage = []
+            sim.FlipImage = ['Flip Image']
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+
+            # Image Tests Higher Res
+            sim.ImagePixels = 300
+            sim.showDetectorImage()
+            sim.waitWhile("DetectorImage")
+
+            # Image Test Source, but actually we should test all parameter combinations,
+            sim.showSourceImage()
+
+            # Focus Test 1
+            pos0 = sim.Raytracer.DetectorList[1].pos
+            sim.DetectorSelection = sim.DetectorNames[1]
+            sim.FocusType = "Position Variance"
+            sim.moveToFocus()
+            sim.waitWhile("Focussing")
+            sim.Pos_Det = pos0[2]
+            
+            # Focus Test 2
+            sim.FocusType = "Irradiance Variance"
+            sim.moveToFocus()
+            sim.waitWhile("Focussing")
+            sim.Pos_Det = pos0[2]
+            
+            # Focus Tests 3
+            sim.FocusType = "Irradiance Variance"
+            sim.moveToFocus()
+            sim.waitWhile("Focussing")
+            sim.Pos_Det = pos0[2]
+
+            # Focus Test 4, show Debug Plot
+            sim.FocusDebugPlot = ['Show Cost Function']
+            sim.moveToFocus()
+            sim.waitWhile("Focussing")
+
+            # Ray Coloring Tests
             sim.ColoringType = "Power"
             sim.waitWhile("Drawing")
             sim.ColoringType = "White"
@@ -171,13 +247,20 @@ class FrontendTests(unittest.TestCase):
             sim.ColoringType = "Source"
             sim.waitWhile("Drawing")
 
+            # PlottingType Tests
             sim.PlottingType = "Points"
             sim.waitWhile("Drawing")
             sim.PlottingType = "None"
             sim.waitWhile("Drawing")
             sim.PlottingType = "Rays"
             sim.waitWhile("Drawing")
-           
+          
+            # AbsorbMissing test
+            sim.AbsorbMissing = []
+            sim.waitWhile("Tracing")
+            sim.waitWhile("Drawing")
+
+            # retrace Tests
             sim.Rays = 100000
             sim.waitWhile("Tracing")
             sim.waitWhile("Drawing")
