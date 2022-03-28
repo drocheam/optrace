@@ -1,2 +1,4 @@
 Changelog
 -----------------
+
+.. literalinclude:: changelog.txt

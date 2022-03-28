@@ -274,7 +274,8 @@ class GUI(HasTraits):
         text = self.scene.mlab.text(Lens.front.r, 0, z=Lens.pos[2], text=f"L{num}", name=f"Label")
 
         text.actor.text_scale_mode = 'none'
-        text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
+        text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
+                                justification="center")
 
         # lens back side
         X2, Y2, Z2 = Lens.back.getPlottingMesh(N=self.SURFACE_RES)
@@ -318,12 +319,15 @@ class GUI(HasTraits):
             b.actor.actor.pickable = False
             b.actor.property.trait_set(specular=0.5, ambient=0.25)
 
-        # Filter label
-        text = self.scene.mlab.text(filter_.Surface.r, 0, z=filter_.Surface.pos[2],
-                                    text=f"F{num}", name=f"Label")
+        # calculate middle center z-position
+        zl = (filter_.extent[4] + filter_.extent[5])/2
+        zl = zl + self.D_VIS/2 if filter_.Surface.isPlanar() else zl
 
+        # filter label
+        text = self.scene.mlab.text(filter_.Surface.r, 0, z=zl, text=f"F{num}", name=f"Label")
         text.actor.text_scale_mode = 'none'
-        text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
+        text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
+                                justification="center")
 
     def plotDetector(self, Det: Detector, num: int) -> None:
         """
@@ -340,19 +344,23 @@ class GUI(HasTraits):
         if Det.Surface.isPlanar():
             # plot cylinder of filter
             Xj, Yj, Zj = Det.getCylinderSurface(nc=self.SURFACE_RES, d=self.D_VIS)
-            self.DetectorCylinderPlot.append(self.scene.mlab.mesh(Xj, Yj, Zj, color=self.DETECTOR_COLOR, 
-                                                             opacity=self.DETECTOR_ALPHA, name=f"Detector {num} cylinder"))
+            self.DetectorCylinderPlot.append(
+                    self.scene.mlab.mesh(Xj, Yj, Zj, color=self.DETECTOR_COLOR, 
+                                         opacity=self.DETECTOR_ALPHA, name=f"Detector {num} cylinder"))
 
             self.DetectorCylinderPlot[-1].actor.actor.pickable = False
         else:
             self.DetectorCylinderPlot.append(None)
 
-        # get detector geometry
-        x0, xe, y0, ye, z0, ze = Det.extent
+        # calculate middle center z-position
+        zl = (Det.extent[4] + Det.extent[5])/2
+        zl = zl + self.D_VIS/2 if Det.Surface.isPlanar() else zl
 
-        self.DetText.append(self.scene.mlab.text(xe, 0, z=(z0+ze)/2, text=f"DET{num}", name=f"Label"))
+        # draw detector
+        self.DetText.append(self.scene.mlab.text(Det.extent[1], 0, z=zl, text=f"DET{num}", name=f"Label"))
         self.DetText[-1].actor.text_scale_mode = 'none'
-        self.DetText[-1].property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
+        self.DetText[-1].property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
+                                            justification="center")
     
 
     def plotAxes(self, extent: list | np.ndarray) -> None:
@@ -471,7 +479,7 @@ class GUI(HasTraits):
             # plot outline
             self.scene.engine.add_source(ParametricSurface(name=f"Refraction Index Outline {i}"), self.scene)
             outline = self.scene.mlab.outline(extent=[*self.Raytracer.outline[:4], BoundList[i], BoundList[i+1]],
-                                                opacity=self.OUTLINE_ALPHA)
+                                              opacity=self.OUTLINE_ALPHA)
             outline.outline_mode = 'cornered'
             outline.actor.actor.pickable = False  # only rays should be pickablw
 
@@ -479,12 +487,11 @@ class GUI(HasTraits):
             label = str(nList[i].n) if nList[i].n_type == "Constant" else "function"
             x_pos = self.Raytracer.outline[0] + (self.Raytracer.outline[1]-self.Raytracer.outline[0])*0.05
             z_pos = (BoundList[i+1]+BoundList[i])/2
-            text  = self.scene.mlab.text(x_pos, 0, z=z_pos,
-                                        text=f"ambient\nn={label}", name=f"Refraction Index Outline {i} label")
+            text  = self.scene.mlab.text(x_pos, 0, z=z_pos, text=f"ambient\nn={label}", name=f"Label")
 
             text.actor.text_scale_mode = 'none'
-            text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW, justification=1, 
-                                    frame=True, frame_color=self.SUBTLE_COLOR)
+            text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW, 
+                                    justification="center", frame=True, frame_color=self.SUBTLE_COLOR)
 
 
     def plotRaySource(self, RS: RaySource, num: int) -> None:
@@ -518,9 +525,14 @@ class GUI(HasTraits):
             RS_Cylinder_Plot.actor.actor.pickable = False
             RS_Cylinder_Plot.actor.actor.property.lighting = False
 
-        RS_Text = self.scene.mlab.text(RS.extent[1], 0, z=RS.pos[2], text=f"RS{num}", name=f"Label")
+        # calculate middle center z-position
+        zl = (RS.extent[4] + RS.extent[5])/2
+        zl = zl - self.D_VIS/2 if RS.Surface.isPlanar() else zl
+
+        RS_Text = self.scene.mlab.text(RS.extent[1], 0, z=zl, text=f"RS{num}", name=f"Label")
         RS_Text.actor.text_scale_mode = 'none'
-        RS_Text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW)
+        RS_Text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
+                                   justification="center")
 
 
     # @timer

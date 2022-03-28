@@ -1,0 +1,4 @@
+Current Version: 0.7.2 
+
+0.7.2           Testing: More GUI Tests added. GUI class: Minor Cleanup.
+0.7.1           First named version
