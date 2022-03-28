@@ -291,43 +291,14 @@ class GUI(HasTraits):
         b.actor.property.trait_set(specular=0.5, ambient=0.25)
         c.actor.property.trait_set(specular=0.5, ambient=0.25)
 
-
     def plotFilter(self, filter_: Filter, num: int) -> None:
         """
 
         :param filter_:
         :param num:
         """
-        # get filter color under daylight
         Fcolor = filter_.getColor()
-
-        # plot filter surface
-        X, Y, Z = filter_.Surface.getPlottingMesh(N=self.SURFACE_RES)
-        a = self.scene.mlab.mesh(X, Y, Z, color=Fcolor, opacity=self.FILTER_ALPHA,
-                                 name=f"Filter {num} front side")
-
-        # make non pickable so it does not interfere with our ray picker
-        a.actor.actor.pickable = False
-        a.actor.property.trait_set(specular=0.5, ambient=0.25)
-
-        # if surface is a plane, plot a cylinder for side viewing
-        if filter_.Surface.isPlanar():
-            # plot cylinder of filter
-            Xj, Yj, Zj = filter_.getCylinderSurface(nc=self.SURFACE_RES, d=self.D_VIS)
-            b = self.scene.mlab.mesh(Xj, Yj, Zj, color=Fcolor, opacity=self.FILTER_ALPHA,
-                                     name=f"Filter {num} cylinder")
-            b.actor.actor.pickable = False
-            b.actor.property.trait_set(specular=0.5, ambient=0.25)
-
-        # calculate middle center z-position
-        zl = (filter_.extent[4] + filter_.extent[5])/2
-        zl = zl + self.D_VIS/2 if filter_.Surface.isPlanar() else zl
-
-        # filter label
-        text = self.scene.mlab.text(filter_.Surface.r, 0, z=zl, text=f"F{num}", name=f"Label")
-        text.actor.text_scale_mode = 'none'
-        text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
-                                justification="center")
+        self.plotSingleSurfaceObject(filter_, num, "Filter", "F", Fcolor, self.FILTER_ALPHA)    
 
     def plotDetector(self, Det: Detector, num: int) -> None:
         """
@@ -335,33 +306,12 @@ class GUI(HasTraits):
         :return:
         """
 
-        # plot filter surface
-        X, Y, Z = Det.Surface.getPlottingMesh(N=self.SURFACE_RES)
-        self.DetectorPlot.append(self.scene.mlab.mesh(X, Y, Z, color=self.DETECTOR_COLOR, opacity=self.DETECTOR_ALPHA,
-                                                 name=f"Detector {num} area"))
-        self.DetectorPlot[-1].actor.actor.pickable = False
+        a, b, text = self.plotSingleSurfaceObject(Det, num, "Detector", "DET", 
+                                                  self.DETECTOR_COLOR, self.DETECTOR_ALPHA)    
 
-        if Det.Surface.isPlanar():
-            # plot cylinder of filter
-            Xj, Yj, Zj = Det.getCylinderSurface(nc=self.SURFACE_RES, d=self.D_VIS)
-            self.DetectorCylinderPlot.append(
-                    self.scene.mlab.mesh(Xj, Yj, Zj, color=self.DETECTOR_COLOR, 
-                                         opacity=self.DETECTOR_ALPHA, name=f"Detector {num} cylinder"))
-
-            self.DetectorCylinderPlot[-1].actor.actor.pickable = False
-        else:
-            self.DetectorCylinderPlot.append(None)
-
-        # calculate middle center z-position
-        zl = (Det.extent[4] + Det.extent[5])/2
-        zl = zl + self.D_VIS/2 if Det.Surface.isPlanar() else zl
-
-        # draw detector
-        self.DetText.append(self.scene.mlab.text(Det.extent[1], 0, z=zl, text=f"DET{num}", name=f"Label"))
-        self.DetText[-1].actor.text_scale_mode = 'none'
-        self.DetText[-1].property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
-                                            justification="center")
-    
+        self.DetectorPlot.append(a)
+        self.DetectorCylinderPlot.append(b)
+        self.DetText.append(text)
 
     def plotAxes(self, extent: list | np.ndarray) -> None:
         """
@@ -501,15 +451,8 @@ class GUI(HasTraits):
         :param num:
         """
 
-        color = RS.getColor()
-
-        # plot filter surface
-        X, Y, Z = RS.Surface.getPlottingMesh(N=self.SURFACE_RES)
-        RS_Plot = self.scene.mlab.mesh(X, Y, Z, color=color, opacity=self.RAYSOURCE_ALPHA,
-                                                 name=f"RaySource {num} area")
-
-        RS_Plot.actor.actor.pickable = False
-        RS_Plot.actor.actor.property.lighting = False
+        self.plotSingleSurfaceObject(RS, num, "RaySource", "RS", RS.getColor(), self.RAYSOURCE_ALPHA, 
+                                     spec=False, light=False)   
 
         if RS.light_type in ["RGB_Image", "BW_Image"]:
             RS_Image_Text = self.scene.mlab.text3d(RS.pos[0]-0.5, RS.pos[1], RS.pos[2], "Image", color=(0, 0, 0),
@@ -517,22 +460,44 @@ class GUI(HasTraits):
             RS_Image_Text.actor.actor.pickable = False
             RS_Image_Text.actor.actor.property.lighting = False
 
-        if RS.Surface.isPlanar():
-            # plot cylinder of filter
-            Xj, Yj, Zj = RS.getCylinderSurface(nc=self.SURFACE_RES, d=self.D_VIS)
-            RS_Cylinder_Plot = self.scene.mlab.mesh(Xj, Yj, Zj, color=color, 
-                                                    opacity=self.RAYSOURCE_ALPHA, name=f"RaySource {num} cylinder")
-            RS_Cylinder_Plot.actor.actor.pickable = False
-            RS_Cylinder_Plot.actor.actor.property.lighting = False
+    def plotSingleSurfaceObject(self, obj, num, name, shortname, color, alpha, spec=True, light=True):
+        """
+
+        """
+        # plot surface
+        X, Y, Z = obj.Surface.getPlottingMesh(N=self.SURFACE_RES)
+        a = self.scene.mlab.mesh(X, Y, Z, color=color, opacity=alpha,
+                                 name=f"{name} {num} surface")
+
+        # make non pickable so it does not interfere with our ray picker
+        a.actor.actor.pickable = False
+        a.actor.actor.property.lighting = light
+        if spec:
+            a.actor.property.trait_set(specular=0.5, ambient=0.25)
+
+        # if surface is a plane, plot a cylinder for side viewing
+        if obj.Surface.isPlanar():
+            Xj, Yj, Zj = obj.getCylinderSurface(nc=self.SURFACE_RES, d=self.D_VIS)
+            b = self.scene.mlab.mesh(Xj, Yj, Zj, color=color, opacity=alpha,
+                                     name=f"${name} {num} cylinder")
+            b.actor.actor.pickable = False
+            b.actor.actor.property.lighting = light
+            if spec:
+                b.actor.property.trait_set(specular=0.5, ambient=0.25)
+        else:
+            b = None
 
         # calculate middle center z-position
-        zl = (RS.extent[4] + RS.extent[5])/2
-        zl = zl - self.D_VIS/2 if RS.Surface.isPlanar() else zl
+        zl = (obj.extent[4] + obj.extent[5])/2
+        zl = zl + self.D_VIS/2 if obj.Surface.isPlanar() else zl
 
-        RS_Text = self.scene.mlab.text(RS.extent[1], 0, z=zl, text=f"RS{num}", name=f"Label")
-        RS_Text.actor.text_scale_mode = 'none'
-        RS_Text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
-                                   justification="center")
+        # filter label
+        text = self.scene.mlab.text(obj.extent[1], 0, z=zl, text=f"{shortname}{num}", name=f"Label")
+        text.actor.text_scale_mode = 'none'
+        text.property.trait_set(font_size=11, font_family=self.FONT_STYLE, shadow=self.FONT_SHADOW,
+                                justification="center")
+
+        return a, b, text
 
 
     # @timer
