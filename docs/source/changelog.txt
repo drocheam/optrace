@@ -1,5 +1,6 @@
-Current Version: 0.8.0 
+Current Version: 0.8.1 
 
+0.8.1           List of RaySources now belongs to Raytracer. Renamed RaySourceList to RayStorage. Globally defined wavelength range. Own Misc.calc() instead of numexpr.evaluate().
 0.8.0           Restructuring: Lens, Filter, Detector, RaySource now have a common parent class 'SObject'
 0.7.4           GUI class: Now plotting with a common function for RaySource, Filter, Detector
 0.7.3           GUI Object Labels are now centered.
