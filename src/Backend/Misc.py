@@ -9,8 +9,9 @@ import scipy.special
 
 from functools import wraps
 import time
+import sys
 
-from typing import Callable, Any
+from typing import Callable, Any, Dict
 
 
 def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
@@ -33,6 +34,26 @@ def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
 
     return ne.evaluate("(1-ind0+ind1)*ya + (ind0-ind1)*yb")
 
+def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
+    """"""
+
+    base = dict(pi=np.pi, nan=np.nan, inf=np.inf, ninf=np.NINF, euler_gamma=np.euler_gamma, euler=np.e)
+
+    # get variables from local frame of caller
+    # this is the way numexpr does it too
+    loc = sys._getframe(2).f_locals | sys._getframe(1).f_locals
+
+    # dictonary from additional keyword arguments
+    kw = dict(**kwargs) if kwargs is not None else dict()
+
+    # join local dict and keyword dict
+    dict_ = base | loc | kw
+
+    return ne.evaluate(expr, local_dict=dict_, out=out)
+
+def getCoreCount() -> int:
+    """get CPU Core Count"""
+    return ne.detect_number_of_cores()
 
 def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarray:
     """

@@ -3,8 +3,8 @@ import numpy as np
 
 import Backend.Color as Color  # for Tristimulus curves and sRGB conversions
 from Backend.Misc import timer as timer  # for benchmarking
+import Backend.Misc as misc
 from threading import Thread  # for multithreading
-import numexpr as ne
 
 # TODO functions for saving and loading the Image object from disc
 
@@ -234,7 +234,7 @@ class Image:
 
         # init parameter for multithreading
         N_rays = wl.shape[0]
-        N_threads = ne.detect_number_of_cores() if threading and N_rays > 1e5 else 1
+        N_threads = misc.getCoreCount() if threading and N_rays > 1e5 else 1
         N_step = int(N_rays/N_threads)
 
         # multithreading function

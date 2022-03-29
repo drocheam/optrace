@@ -6,7 +6,7 @@ Backend module
 from Backend.SurfaceFunction import SurfaceFunction
 from Backend.Surface import Surface 
 from Backend.Lens import Lens
-from Backend.RaySource import RaySource
+from Backend.RayStorage import RaySource
 from Backend.Image import Image
 from Backend.Raytracer import Raytracer
 from Backend.Detector import Detector

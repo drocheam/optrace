@@ -1,4 +1,9 @@
 Changelog
 -----------------
+.. highlight:: none
 
-.. literalinclude:: changelog.txt
+.. include:: changelog.txt
+   :literal:
+
+.. highlight:: default
+

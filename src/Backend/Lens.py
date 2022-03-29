@@ -8,9 +8,9 @@ A refractive index is specified for the material and one for the area behind the
 import numpy as np
 import copy
 
-from Backend.RefractionIndex import RefractionIndex as RefractionIndex
-from Backend.Surface import Surface
-from Backend.SObject import SObject
+from Backend.RefractionIndex import *
+from Backend.Surface import *
+from Backend.SObject import *
 
 # TODO error message when surface is point or line
 

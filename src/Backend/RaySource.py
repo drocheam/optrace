@@ -10,18 +10,15 @@ The RaySource object also holds all rays and ray sections generated in raytracin
 # Why random sampling? Sampling the source, "sampling" the lens areas or aperture by the rays can lead to Nyquist Theorem violation. Also, this ensures that when you run it repeatedly, you get a different version of the image, and not the same one. E.g. with image compositions by several raytraces.
 
 import numpy as np
-import numexpr as ne
-
 from typing import Callable
-
-from PIL import Image as PILImage
 from scipy.spatial.transform import Rotation
+from PIL import Image as PILImage
 
-import Backend.Color as Color
-from Backend.Surface import Surface as Surface
-from Backend.SObject import SObject
-from Backend.Misc import random_from_distribution
+from Backend.Surface import * 
+from Backend.SObject import *
 from Backend.Misc import timer as timer
+import Backend.Misc as misc
+import Backend.Color as Color
 
 
 # TODO check light_type=Function
@@ -32,8 +29,9 @@ class RaySource(SObject):
 
     def __init__(self,
 
-                 # Surface Parameter
+                 # Surface Parameters
                  Surface:           Surface,
+                 pos:               (list | np.ndarray) = [0., 0., 0.],
                 
                  # Direction Parameters
                  direction_type:    str = "Parallel",
@@ -55,10 +53,7 @@ class RaySource(SObject):
                 
                  # Polarization Parameters
                  polarization_type: str = "Random",
-                 pol_ang:           float = 0,
-
-                 # Misc
-                 pos:               (list | np.ndarray) = [0., 0., 0.])\
+                 pol_ang:           float = 0)\
             -> None:
         """
         Create a RaySource with a specific source_type, direction_type and light_type.
@@ -99,9 +94,9 @@ class RaySource(SObject):
         if polarization_type not in ["x", "y", "xy", "Random", "Angle"]:
             raise ValueError(f"Invalid polarization_type '{polarization_type}'.")
 
+        self.light_type = light_type
         self.direction_type = direction_type
         self.orientation_type = orientation_type
-        self.light_type = light_type
         self.polarization_type = polarization_type
 
         if not Surface.isPlanar():
@@ -109,11 +104,12 @@ class RaySource(SObject):
 
         self.sr_angle = float(sr_angle)
         self.pol_ang = float(pol_ang)
+        self.power = float(power)
+        self.wl = float(wl)
+        self.T = float(T)
+
         self.or_func = or_func
         self.spec_func = spec_func
-        self.power = float(power)
-        self.T = float(T)
-        self.wl = float(wl)
 
         # assign arrays, force conversion to np.array
         self.s = np.array(s, dtype=np.float64) / np.linalg.norm(s)  # normalize
@@ -133,17 +129,18 @@ class RaySource(SObject):
         if power <= 0:
             raise ValueError(f"Source power needs to be positive, but is {power}.")
 
-        if sr_angle <= 0:
-            raise ValueError(f"Cone angle sr_angle needs to be positive, but is {sr_angle}.")
-
         if T <= 0:
             raise ValueError(f"Blackbody temperature T needs to be positive, but is {T}.")
+        
+        if sr_angle <= 0:
+            raise ValueError(f"Cone angle sr_angle needs to be positive, but is {sr_angle}.")
 
         if self.lines.shape[0] == 0:
             raise ValueError("'lines' can't be empty.")
 
-        if (wlo := np.min(self.lines)) < 380 or (wlo := np.max(self.lines)) > 780:
-            raise ValueError(f"'lines' need to be inside visible range [380nm, 780nm], but got a value of {wlo}nm.")
+        if (wlo := np.min(self.lines)) < Color.WL_MIN or (wlo := np.max(self.lines)) > Color.WL_MAX:
+            raise ValueError(f"'lines' need to be inside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]"\
+                             f", but got a value of {wlo}nm.")
 
         if self.light_type == "Function" and spec_func is None:
             raise ValueError("light_type='Function', but spec_func not specified.")
@@ -166,15 +163,15 @@ class RaySource(SObject):
                        np.mean(self.Image[:, :, 2])
 
             case ("A" | "C" | "D50" | "D55" | "D65" | "D75" | "E" | "F2" | "F7" | "F11"):
-                wl = np.linspace(380, 780, 4000)
+                wl = Color.wavelengths(4000)
                 spec = Color.Illuminant(wl, self.light_type)
                 
             case "Blackbody":
-                wl = np.linspace(380, 780, 4000)
+                wl = Color.wavelengths(4000)
                 spec = Color.Blackbody(wl, T=self.T)
             
             case "Function":
-                wl = np.linspace(380, 780, 4000)
+                wl = Color.wavelengths(4000)
                 spec = self.spec_func(wl)
 
             case "Monochromatic":
@@ -188,11 +185,10 @@ class RaySource(SObject):
             case _:
                 raise RuntimeError(f"light_type '{self.light_type}' not handled in getColor()")
 
-        Xc = np.sum(spec * Color.Tristimulus(wl, "X"))
-        Yc = np.sum(spec * Color.Tristimulus(wl, "Y"))
-        Zc = np.sum(spec * Color.Tristimulus(wl, "Z"))
+        XYZ = np.array([[[np.sum(spec * Color.Tristimulus(wl, "X")),\
+                          np.sum(spec * Color.Tristimulus(wl, "Y")),\
+                          np.sum(spec * Color.Tristimulus(wl, "Z"))]]])
 
-        XYZ = np.array([[[Xc, Yc, Zc]]])
         RGB = Color.XYZ_to_sRGB(XYZ)[0, 0]
 
         return tuple(RGB)
@@ -224,19 +220,19 @@ class RaySource(SObject):
                 wavelengths = np.random.choice(self.lines, N)
 
             case ("A" | "C" | "D50" | "D55" | "D65" | "D75" | "E" | "F2" | "F7" | "F11"):
-                wl = np.linspace(380, 780, 4000)
-                wavelengths = random_from_distribution(wl, Color.Illuminant(wl, self.light_type), N)
+                wl = Color.wavelengths(4000)
+                wavelengths = misc.random_from_distribution(wl, Color.Illuminant(wl, self.light_type), N)
 
             case "Blackbody":
-                wl = np.linspace(380, 780, 4000)
-                wavelengths = random_from_distribution(wl, Color.Blackbody(wl, T=self.T), N)
+                wl = Color.wavelengths(4000)
+                wavelengths = misc.random_from_distribution(wl, Color.Blackbody(wl, T=self.T), N)
             
             case "Function":
                 if self.spec_func is None:
                     raise ValueError("spec_func not defined for light_type='Function'")
 
-                wl = np.linspace(380, 780, 10000)
-                wavelengths = random_from_distribution(wl, self.spec_func(wl), N)
+                wl = Color.wavelengths(10000)
+                wavelengths = misc.random_from_distribution(wl, self.spec_func(wl), N)
 
             case "RGB_Image":
                 pass  # will be handled later
@@ -249,6 +245,7 @@ class RaySource(SObject):
 
         if self.light_type != "RGB_Image":
             p = self.Surface.getRandomPositions(N)
+
         else:
             if self.Surface.surface_type != "Rectangle":
                 raise RuntimeError("Images can only be used with surface_type='Rectangle'")
@@ -268,8 +265,8 @@ class RaySource(SObject):
             p = np.zeros((N, 3), dtype=np.float64, order='F')
             p[:, 2] = self.pos[2]
 
-            ne.evaluate("(xe-xs)/Ix * (PX + rx) + xs", out=p[:, 0])
-            ne.evaluate("(ye-ys)/Iy * (PY + ry) + ys", out=p[:, 1])
+            misc.calc("(xe-xs)/Ix * (PX + rx) + xs", out=p[:, 0])
+            misc.calc("(ye-ys)/Iy * (PY + ry) + ys", out=p[:, 1])
 
             wavelengths = Color.randomWavelengthFromRGB(self.Image[PY, PX])
 
@@ -321,9 +318,9 @@ class RaySource(SObject):
                 s = np.zeros_like(s_or, dtype=np.float64, order='F')
 
                 # rotate in second cone dimension
-                ne.evaluate("(n1**2*mca + ca)*s1    + (n1*n2*mca - n3*sa)*s2 + (n1*n3*mca + n2*sa)*s3", out=s[:, 0])
-                ne.evaluate("(n2*n1*mca + n3*sa)*s1 + (n2**2*mca + ca)*s2    + (n2*n3*mca - n1*sa)*s3", out=s[:, 1])
-                ne.evaluate("(n3*n1*mca - n2*sa)*s1 + (n3*n2*mca + n1*sa)*s2 + (n3**2*mca + ca)*s3",    out=s[:, 2])
+                misc.calc("(n1**2*mca + ca)*s1    + (n1*n2*mca - n3*sa)*s2 + (n1*n3*mca + n2*sa)*s3", out=s[:, 0])
+                misc.calc("(n2*n1*mca + n3*sa)*s1 + (n2**2*mca + ca)*s2    + (n2*n3*mca - n1*sa)*s3", out=s[:, 1])
+                misc.calc("(n3*n1*mca - n2*sa)*s1 + (n3*n2*mca + n1*sa)*s2 + (n3**2*mca + ca)*s3",    out=s[:, 2])
 
             case _:
                 raise RuntimeError(f"direction_type '{self.direction_type}' not handled.")
@@ -368,9 +365,9 @@ class RaySource(SObject):
 
             # polarization vector is pol = cos(a)*sh + sin(a)*sv
             sx, sy, sz = s[:, 0], s[:, 1], s[:, 2]
-            ne.evaluate("(sz*cos(ang) + -sx*sy*sin(ang))/sqrt(1-sy**2)",  out=pols[:, 0])
-            ne.evaluate("sin(ang)*sqrt(1-sy**2)",                         out=pols[:, 1])
-            ne.evaluate("(-sx*cos(ang) + -sy*sz*sin(ang))/sqrt(1-sy**2)", out=pols[:, 2])
+            misc.calc("(sz*cos(ang) + -sx*sy*sin(ang))/sqrt(1-sy**2)",  out=pols[:, 0])
+            misc.calc("sin(ang)*sqrt(1-sy**2)",                         out=pols[:, 1])
+            misc.calc("(-sx*cos(ang) + -sy*sz*sin(ang))/sqrt(1-sy**2)", out=pols[:, 2])
 
         ## return ray properties
         ################################################################################################################

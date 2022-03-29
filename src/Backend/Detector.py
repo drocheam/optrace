@@ -5,10 +5,10 @@ rectangular plane perpendicular to optical axis for creation of Detector Images
 """
 
 import numpy as np
-import numexpr as ne  # for speeding up the calculations
 
-from Backend.Surface import Surface  # for the Detector surface
-from Backend.SObject import SObject
+from Backend.Surface import *  # for the Detector surface
+from Backend.SObject import *
+import Backend.Misc as misc
 
 # TODO reference point for the angle calculation
 
@@ -62,14 +62,13 @@ class Detector(SObject):
         x0, y0, z0 = Surf.pos
 
         zm = z0 + 2/Surf.rho
-        r = ne.evaluate("sqrt((x-x0)**2  + (y-y0)**2)")
+        r = misc.calc("sqrt((x-x0)**2  + (y-y0)**2)")
 
-        pi = np.pi
-        theta = ne.evaluate("arctan(r/abs(z-zm))*180/pi")
-        phi = ne.evaluate("arctan2(y-y0, x-x0)")
+        theta = misc.calc("arctan(r/abs(z-zm))*180/pi")
+        phi = misc.calc("arctan2(y-y0, x-x0)")
 
         p_hit = p.copy()
-        p_hit[:, 0] = ne.evaluate("theta*cos(phi)")
-        p_hit[:, 1] = ne.evaluate("theta*sin(phi)")
+        p_hit[:, 0] = misc.calc("theta*cos(phi)")
+        p_hit[:, 1] = misc.calc("theta*sin(phi)")
 
         return p_hit

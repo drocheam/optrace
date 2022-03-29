@@ -1,46 +1,18 @@
 
 from threading import Thread
-import numexpr as ne
 
 import numpy as np
-from Backend.RaySource import RaySource
+from Backend.RaySource import *
 import Backend.Misc as misc
 
-class RaySourceList:
+class RayStorage:
 
     def __init__(self) -> None:
         """
 
         """
-        self.List = []
         self.N_List = []
         self.B_List = []
-
-    def add(self, RS: RaySource) -> None:
-        """
-
-        :param RS:
-        """
-        self.List.append(RS)
-
-    def remove(self, ident: int) -> bool:
-        """
-        Removes the RaySources specified by id.
-        Returns True if element(s) have been found and removes, False otherwise.
-
-        :param ident:
-        """
-        success = False
-        [(self.List.remove(El), success := True) for El in self.List if id(El) == ident]
-        return success
-
-
-    def hasSources(self) -> bool:
-        """
-
-        :return:
-        """
-        return len(self.List) > 0
 
     def hasRays(self) -> bool:
         """
@@ -60,13 +32,15 @@ class RaySourceList:
         return self.p_list.shape[1] if self.hasRays() else None
 
     def createRays(self,
-                   N_List:      list[int],
-                   nt:          int,
-                   threading:   bool = False,
-                   no_pol:      bool = False) \
+                   RaySourceList:   list[RaySource],
+                   N_List:          list[int],
+                   nt:              int,
+                   threading:       bool = False,
+                   no_pol:          bool = False) \
             -> None:
         """
 
+        :param RaySourceList:
         :param N_List:
         :param nt:
         :param threading:
@@ -95,18 +69,18 @@ class RaySourceList:
             self.pol_list[sl1, 0],\
             self.w_list[sl1, 0],   \
             self.wavelengths[sl1]   \
-                                     = self.List[i].createRays(N_List[i], no_pol=no_pol)
+                                     = RaySourceList[i].createRays(N_List[i], no_pol=no_pol)
 
         # don't use multithreading if there are to many ray sources
-        if threading and len(self.List) < 2*ne.detect_number_of_cores():
+        if threading and len(RaySourceList) < 2*misc.getCoreCount():
 
-            thread_list = [Thread(target=addSourceRays, args=[N_t]) for N_t in np.arange(len(self.List))]
+            thread_list = [Thread(target=addSourceRays, args=[N_t]) for N_t in np.arange(len(RaySourceList))]
             
             [thread.start() for thread in thread_list]
             [thread.join()  for thread in thread_list]
 
         else:
-            for i in np.arange(len(self.List)):
+            for i in np.arange(len(RaySourceList)):
                 addSourceRays(i)
 
     def getThreadRays(self, N_threads: int, Nt: int) \
@@ -196,7 +170,7 @@ class RaySourceList:
             raise ValueError("Number exceeds number of rays")
 
         snum = -1
-        for i in np.arange(len(self.List)):
+        for i in np.arange(len(self.N_List)):
             Ns, Ne = self.B_List[i:i+2]
             if Ns <= num < Ne:
                 snum = i 
@@ -262,7 +236,7 @@ class RaySourceList:
         else:
             ind = np.nonzero(ch)[0]
             snums = np.zeros_like(ind, dtype=int)
-            for i in np.arange(len(self.List)):
+            for i in np.arange(len(self.N_List)):
                 Ns, Ne = self.B_List[i:i+2]
                 snums[(ind >= Ns) & (ind < Ne)] = i
             snums += 1

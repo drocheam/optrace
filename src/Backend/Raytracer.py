@@ -9,7 +9,6 @@ Provides the functionality for raytracing, autofocussing and rendering of source
 """
 import warnings
 import numpy as np
-import numexpr as ne
 
 import time
 import scipy.optimize
@@ -17,16 +16,16 @@ import scipy.optimize
 from threading import Thread
 from typing import Callable
 
-from Backend.Filter import Filter as Filter
-from Backend.Detector import Detector as Detector
-from Backend.Lens import Lens as Lens
-from Backend.RaySource import RaySource as RaySource
-from Backend.Surface import Surface as Surface
-from Backend.RefractionIndex import RefractionIndex as RefractionIndex
-from Backend.RaySourceList import RaySourceList as RaySourceList
-from Backend.Image import Image as Image
-from Backend.Misc import timer as timer
+from Backend.Filter import * 
+from Backend.Detector import * 
+from Backend.Lens import * 
+from Backend.RaySource import * 
+from Backend.Surface import * 
+from Backend.RefractionIndex import * 
+from Backend.RayStorage import * 
+from Backend.Image import *
 
+from Backend.Misc import timer as timer
 import Backend.Misc as misc
 
 
@@ -75,13 +74,12 @@ class Raytracer:
         self.LensList = []
         self.FilterList = []
         self.DetectorList = []
-        self.RaySources = RaySourceList() 
+        self.RaySourceList = []
+        self.Rays = RayStorage() 
 
         # check outline
-        if self.outline.shape[0] != 6 or \
-           self.outline[0] >= self.outline[1] or \
-           self.outline[2] >= self.outline[3] or \
-           self.outline[4] >= self.outline[5]:
+        o = self.outline
+        if o.shape[0] != 6 or o[0] >= o[1] or o[2] >= o[3] or o[4] >= o[5]:
             raise ValueError("Outline needs to be specified as [x1, x2, y1, y2, z1, z2] "
                              "with x2 > x1, y2 > y1, z2 > z1.")
 
@@ -99,7 +97,7 @@ class Raytracer:
             self.FilterList.append(el)
 
         elif isinstance(el, RaySource):
-            self.RaySources.add(el)
+            self.RaySourceList.append(el)
 
         elif isinstance(el, Detector):
             self.DetectorList.append(el)
@@ -121,7 +119,7 @@ class Raytracer:
         [Elr := El for El in self.LensList if id(El) == ident]
         [Elr := El for El in self.FilterList if id(El) == ident]
         [Elr := El for El in self.DetectorList if id(El) == ident]
-        [Elr := El for El in self.RaySources.List if id(El) == ident]
+        [Elr := El for El in self.RaySourceList if id(El) == ident]
 
         return Elr
 
@@ -136,9 +134,8 @@ class Raytracer:
         [(self.LensList.remove(El), success := True) for El in self.LensList if id(El) == ident]
         [(self.FilterList.remove(El), success := True) for El in self.FilterList if id(El) == ident]
         [(self.DetectorList.remove(El), success := True) for El in self.DetectorList if id(El) == ident]
+        [(self.RaySourceList.remove(El), success := True) for El in self.RaySourceList if id(El) == ident]
 
-        if not success:
-            return self.RaySources.remove(ident)
         return success
 
     def trace(self, N: int) -> None:
@@ -148,7 +145,7 @@ class Raytracer:
         :param N: number of rays (int)
         """
 
-        if not self.RaySources.hasSources():
+        if not self.RaySourceList:
             raise RuntimeError("RaySource Missing")
 
         if (N := int(N)) <= 0:
@@ -163,7 +160,7 @@ class Raytracer:
         # all rays have the same starting power.
         # The rays are distributed between the sources according to the ray source power
         # get source powers and overall power
-        P_list = np.array([RS.power for RS in self.RaySources.List])
+        P_list = np.array([RS.power for RS in self.RaySourceList])
         P_all = np.sum(P_list)
 
         # calculate int ray number from power ratio
@@ -194,14 +191,14 @@ class Raytracer:
         # and +1 for the ray starting points
         nt = 2*len(self.LensList) + len(self.FilterList) + 1 + 1
     
-        cores = ne.detect_number_of_cores()
+        cores = misc.getCoreCount()
         N_threads = cores if N/cores >= 10000 and self.multithreading else 1
 
-        self.RaySources.createRays(N_list, nt, threading=N_threads>1, no_pol=self.no_pol)
+        self.Rays.createRays(self.RaySourceList, N_list, nt, threading=N_threads>1, no_pol=self.no_pol)
 
         def sub_trace(N_threads: int, N_t: int) -> None:
 
-            p, s0, pols, weights, wavelengths = self.RaySources.getThreadRays(N_threads, N_t)
+            p, s0, pols, weights, wavelengths = self.Rays.getThreadRays(N_threads, N_t)
             s = s0.copy()
 
             n0_l = self.n0(wavelengths) 
@@ -314,15 +311,14 @@ class Raytracer:
         :param Elements: element list from makeElementList()
         """
 
-        def isinside(ext: list | np.ndarray) -> bool:
-            return (self.outline[0] <= ext[0] and ext[1] <= self.outline[1] and
-                    self.outline[2] <= ext[2] and ext[3] <= self.outline[3] and
-                    self.outline[4] <= ext[4] and ext[5] <= self.outline[5])
+        def isinside(e: list | np.ndarray) -> bool:
+            o = self.outline
+            return o[0] <= e[0] and e[1] <= o[1] and o[2] <= e[2] and e[3] <= o[3] and o[4] <= e[4] and e[5] <= o[5]
 
         enum = 1
         z_max_old = self.outline[4]
 
-        if not self.RaySources.hasSources():
+        if not self.RaySourceList:
             raise RuntimeError("RaySource Missing")
 
         # check if objects collide in z-direction and if all objects are inside outline
@@ -341,7 +337,7 @@ class Raytracer:
             enum += 1
 
 
-        for RS in self.RaySources.List:
+        for RS in self.RaySourceList:
 
             if not isinside(RS.extent):
                 raise RuntimeError(f"RaySource {RS} outside outline")
@@ -408,7 +404,7 @@ class Raytracer:
 
             p[abnormal_back, i] = p[abnormal_back, i-1]
             weights[abnormal_back, i] = 0
-    # @timer
+    
     def outlineIntersection(self,
                             p:           np.ndarray,
                             s:           np.ndarray,
@@ -433,7 +429,7 @@ class Raytracer:
         # check if examine points pe are inside outlines
         xs, xe, ys, ye, zs, ze = self.outline
         x, y, z = p[hw, i+1, 0], p[hw, i+1, 1], p[hw, i+1, 2]
-        inside = ne.evaluate("(xs < x) & (x < xe) & (ys < y) & (y < ye) & (zs < z) & (z < ze)")
+        inside = misc.calc("(xs < x) & (x < xe) & (ys < y) & (y < ye) & (zs < z) & (z < ze)")
 
         # number of rays going outside
         n_out = np.count_nonzero(~inside)
@@ -448,8 +444,7 @@ class Raytracer:
 
             # calculate t Parameter for every outline coordinate and ray
             # replace zeros with nan for division
-            nan = np.nan
-            T_arr = ne.evaluate("(OT-P)/where(S != 0, S, nan)")
+            T_arr = misc.calc("(OT-P)/where(S != 0, S, nan)")
 
             # exclude negative t
             T_arr[T_arr <= 0] = np.nan
@@ -509,10 +504,8 @@ class Raytracer:
         N = n1_h/n2_h  # ray wise refraction index quotient
        
         # rays with TIR mean an imaginary W, we'll handle this later
-        W = ne.evaluate("sqrt(1 - N**2 * (1-ns**2))") # equals cos(beta), we'll need this later
-        
-        N_m, ns_m, W_m = N[:, np.newaxis], ns[:, np.newaxis], W[:, np.newaxis]
-        s_ = ne.evaluate("s_h*N_m - n*(N_m*ns_m - W_m)")
+        W = misc.calc("sqrt(1 - N**2 * (1-ns**2))") 
+        s_ = misc.calc("s_h*N_m - n*(N_m*ns_m - W_m)", N_m=N[:, np.newaxis], ns_m=ns[:, np.newaxis], W_m=W[:, np.newaxis])
 
         # reflection coefficients for non-magnetic (µ_r=1) and non-absorbing materials (κ=0)
         # according to the Fresnel equations
@@ -551,16 +544,16 @@ class Raytracer:
 
             # transmittance for s and p component
             cos_alpha, cos_beta = ns, W
-            ts = ne.evaluate("2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)")
-            tp = ne.evaluate("2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)")
+            ts = misc.calc("2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)")
+            tp = misc.calc("2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)")
 
             # overall transmittivity
-            T = ne.evaluate("n2_h*cos_beta / (n1_h*cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)")
+            T = misc.calc("n2_h*cos_beta / (n1_h*cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)")
 
         else:
             cos_alpha, cos_beta = ns, W
-            T = ne.evaluate("2*n2_h*cos_beta*n1_h*cos_alpha * "\
-                            "( 1 / (n1_h*cos_alpha + n2_h*cos_beta)**2 + 1/(n2_h*cos_alpha + n1_h*cos_beta)**2)")
+            T = misc.calc("2*n2_h*cos_beta*n1_h*cos_alpha * ( 1 / (n1_h*cos_alpha + n2_h*cos_beta)**2"\
+                          "+ 1/(n2_h*cos_alpha + n1_h*cos_beta)**2)")
 
         # handle rays with total internal reflection
         TIR = ~np.isfinite(W)
@@ -569,7 +562,7 @@ class Raytracer:
 
             if not self.silent:
                 TIR_count = np.count_nonzero(TIR)
-                print(f"{TIR_count} rays ({100*TIR_count/self.RaySources.N:.3g}% "\
+                print(f"{TIR_count} rays ({100*TIR_count/self.Rays.N:.3g}% "\
                       f"of rays on surface) with total reflection at surface {i}, treating as absorbed.")
 
         weights[hwh, i+1] = weights[hwh, i]*T
@@ -610,7 +603,7 @@ class Raytracer:
             
             if not self.silent:
                 m_count = np.count_nonzero(mask)
-                print(f"{m_count} rays ({100*m_count/self.RaySources.N:.3g}% of all rays) "\
+                print(f"{m_count} rays ({100*m_count/self.Rays.N:.3g}% of all rays) "\
                       f"with transmittivity at filter surface {i+1} below threshold of "\
                       f"{self.T_TH*100:.3g}%, setting to absorbed.")
 
@@ -665,7 +658,7 @@ class Raytracer:
 
             # secant root
             t1w, t2w, f1w, f2w = t1[w], t2[w], f1[w], f2[w]
-            ts = ne.evaluate("t1w - f1w/(f2w-f1w)*(t2w-t1w)")
+            ts = misc.calc("t1w - f1w/(f2w-f1w)*(t2w-t1w)")
 
             # position of root on rays
             pl = p[w] + s[w]*ts[:, np.newaxis]
@@ -728,24 +721,24 @@ class Raytracer:
         if not self.DetectorList:
             raise RuntimeError("Detector Missing")
 
-        if not self.RaySources.hasSources():
+        if not self.RaySourceList:
             raise RuntimeError("Raysource Missing")
 
         # starting position of hit search
         z = self.DetectorList[ind].extent[4]
 
         # current rays for loop iteration, this rays are used in hit finding for the next section
-        rs = np.ones(self.RaySources.N, dtype=bool) # gets updated at every iteration
+        rs = np.ones(self.Rays.N, dtype=bool) # gets updated at every iteration
 
         # section index rs for each ray for section before z
         # rs2 == -1 can mean mask is true everywhere (ray starts after surface.minz) or false everywhere (rays don't reach surface),
         # so we need to check which case we're in. In the later case we don't need to calculate ray hits.
-        mask = z <= self.RaySources.p_list[:, :, 2]
+        mask = z <= self.Rays.p_list[:, :, 2]
         rs2 = np.argmax(mask, axis=1) - 1
         mask2 = np.all(mask, axis=1) & (rs2 < 0)
         rs2[mask2] = 0
 
-        p, s, _, w, wl, _ = self.RaySources.getRaysByMask(rs, rs2, normalize=True, 
+        p, s, _, w, wl, _ = self.Rays.getRaysByMask(rs, rs2, normalize=True, 
                                                             ret=[True, True, False, True, True, False])
 
         # init ph (position of hit) and is_hit bool array
@@ -760,7 +753,7 @@ class Raytracer:
         while np.any(rs):
 
             rs2 += 1  # increment next-section-indices
-            inv = rs2 >= self.RaySources.nt  # invalid-array, indices are above section count
+            inv = rs2 >= self.Rays.nt  # invalid-array, indices are above section count
             # these rays have no intersection, since they end at the last outline surface
 
             if np.any(inv):
@@ -771,12 +764,12 @@ class Raytracer:
 
             ph[rs], ish[rs] = self.findSurfaceHit(self.DetectorList[ind].Surface, p, s)
 
-            p2z = self.RaySources.p_list[rs, rs2, 2]
+            p2z = self.Rays.p_list[rs, rs2, 2]
             rs, rsn = misc.partMask(rs, ph[rs, 2] > p2z)
 
             if np.any(rs):
                 rs2 = rs2[rsn]
-                p, s, _, w[rs], _, _ = self.RaySources.getRaysByMask(rs, rs2, normalize=True,
+                p, s, _, w[rs], _, _ = self.Rays.getRaysByMask(rs, rs2, normalize=True,
                                                                      ret=[True, True, False, True, False, False])
 
         hitw = ish & (w > 0)
@@ -921,16 +914,16 @@ class Raytracer:
         :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
         """
 
-        if not self.RaySources.hasSources():
+        if not self.RaySourceList:
             raise RuntimeError("RaySource Missing")
 
         if (N := int(N)) <= 0:
             raise ValueError(f"Pixel number N needs to be a positive int, but is {N}.")
 
-        extent = self.RaySources.List[sindex].extent[:4]
-        p, _, _, w, wavelengths = self.RaySources.getSourceRays(sindex)
+        extent = self.RaySourceList[sindex].extent[:4]
+        p, _, _, w, wavelengths = self.Rays.getSourceRays(sindex)
 
-        Im = Image(z=self.RaySources.List[sindex].pos[2], extent=extent, image_type="Cartesian", index=sindex+1)
+        Im = Image(z=self.RaySourceList[sindex].pos[2], extent=extent, image_type="Cartesian", index=sindex+1)
         Im.makeImage(N, p, w, wavelengths)
 
         return Im
@@ -960,7 +953,7 @@ class Raytracer:
         x, y = ph[:, 0], ph[:, 1]
 
         if mode == "Airy Disc Weighting":
-            expr = ne.evaluate("w * exp(-0.5*(x**2 + y**2)/ (0.42*r0)**2)")
+            expr = misc.calc("w * exp(-0.5*(x**2 + y**2)/ (0.42*r0)**2)")
             return 1 - np.sum(expr)/np.sum(w)
 
         elif mode == "Position Variance":
@@ -1015,7 +1008,7 @@ class Raytracer:
         :return: position of focus (float)
         """
 
-        if not self.RaySources.hasSources():
+        if not self.RaySourceList:
             raise RuntimeError("RaySource Missing.")
 
         if not (self.outline[4] <= z_start <= self.outline[5]):
@@ -1038,7 +1031,7 @@ class Raytracer:
             bounds = [self.outline[4], Lenses[0].extent[4]]
 
             # start position needs to be behind all raysources
-            for RS in self.RaySources.List:
+            for RS in self.RaySourceList:
                 if RS.pos[2] > bounds[0]:
                     bounds[0] = RS.pos[2] + self.EPS
 
@@ -1064,7 +1057,7 @@ class Raytracer:
         # get rays and properties
         ########################################################################################################
         
-        _, p, s, _, weights, _, _ = self.RaySources.getRaysAtZ(bounds[0]+self.EPS, normalize=True)
+        _, p, s, _, weights, _, _ = self.Rays.getRaysAtZ(bounds[0]+self.EPS, normalize=True)
 
         # use only rays with weight
         hw = weights > 0

@@ -5,8 +5,9 @@ Provides the creation and computation of constant or wavelength depended refract
 """
 
 import numpy as np
-import numexpr as ne
 import scipy.interpolate
+import Backend.Misc as misc
+import Backend.Color as Color
 
 from typing import Callable
 
@@ -90,8 +91,8 @@ class RefractionIndex:
             raise ValueError(f"Refraction index n needs to be >= 1.0, but is {n}.")
    
         if wls is not None:
-            if (wlo := np.min(wls)) < 380. or (wlo := np.max(wls)) > 780.:
-                raise ValueError(f"Got wavelength value {wlo}nm outside visible range [380nm, 780nm]."
+            if (wlo := np.min(wls)) < Color.WL_MIN or (wlo := np.max(wls)) > Color.WL_MAX:
+                raise ValueError(f"Got wavelength value {wlo}nm outside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]."
                                  "Make sure to pass the list in nm values, not in m values.")
 
         if ns is not None:
@@ -111,9 +112,8 @@ class RefractionIndex:
         match self.n_type:
 
             case ("SiO2" | "BK7" | "K5" | "BaK4" | "BaF10" | "SF10" | "Cauchy"):
-                l = wl_ * 1e-3  # parameters are specified in 1/µm^n, so convert nm wavelengths to µm
-                A, B, C, D = self.A, self.B, self.C, self.D
-                return ne.evaluate("A + B/l**2 + C/l**4 + D/l**6")
+                # parameters are specified in 1/µm^n, so convert nm wavelengths to µm with factor 1e-3
+                return misc.calc("A + B/l**2 + C/l**4 + D/l**6", l=wl_*1e-3, A=self.A, B=self.B, C=self.C, D=self.D)
 
             case "List":
                 func = scipy.interpolate.interp1d(self.wls, self.ns, bounds_error=True)

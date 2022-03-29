@@ -7,12 +7,11 @@ Useful for color filters or apertures.
 
 
 import numpy as np
-
-from Backend.Surface import Surface  # for the Filter surface
-import Backend.Color as Color  # for the calculation of the filter color 
-from Backend.SObject import SObject
-
 from typing import Callable  # for function type hints
+
+from Backend.SObject import *
+from Backend.Surface import *  # for the Filter surface
+import Backend.Color as Color  # for the calculation of the filter color 
 
 
 class Filter(SObject):

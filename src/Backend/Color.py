@@ -5,10 +5,24 @@ Color conversion and processing functions
 
 import numpy as np
 import colorio
-import numexpr as ne
 import Backend.Misc as misc
 from typing import Callable
 
+WL_MIN: float = 380.
+"""lower bound of wavelength range in nm
+the wavelength range. Needs to be inside [380, 780] for the Tristimulus and Illuminant functions to work
+Note that shrinking that range may lead to color deviations"""
+
+WL_MAX: float = 780.
+"""upper bound of wavelength range in nm"""
+
+def wavelengths(N: int) -> np.ndarray:
+    """
+    Get wavelength range array with equal spacing and N points.
+    :param N:
+    :return:
+    """
+    return np.linspace(WL_MIN, WL_MAX, N)
 
 def Blackbody(wl: np.ndarray, T: (int | float) = 6504) -> np.ndarray:
     """
@@ -24,14 +38,19 @@ def Blackbody(wl: np.ndarray, T: (int | float) = 6504) -> np.ndarray:
     h = 6.62607015e-34
     k_B = 1.380649e-23
 
-    spec = ne.evaluate("2 * h * c ** 2 / (wl*1e-9) ** 5 / (exp(h * c / (wl * 1e-9 * k_B * T)) - 1)")
+    spec = misc.calc("2 * h * c ** 2 / (wl*1e-9) ** 5 / (exp(h * c / (wl * 1e-9 * k_B * T)) - 1)")
     return spec
 
 
 def Gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
+    """
+    normalized Gauss Function
+    :param x:
+    :param mu:
+    :param sig:
+    :return:
+    """
     return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 * (x - mu) ** 2 / sig ** 2)
-
-
 
 def Tristimulus(wl: np.ndarray, name: str) -> np.ndarray:
     """
@@ -230,7 +249,7 @@ def randomWavelengthFromRGB(RGB: np.ndarray) -> np.ndarray:
     # but in our case we use the RGB primaries and the RGBLinear values
 
     # use wavelengths in nm, otherwise the numeric range would be too large
-    wl = np.linspace(380, 780, 3000)
+    wl = wavelengths(3000)
 
     # spectra that lie at the sRGB primaries position in the xy-CIE Diagram
     r =  88.4033043 * (Gauss(wl, 660.255528, 35.6986569) + 0.0665761658 * Gauss(wl, 552.077348, 150.000000))
@@ -274,7 +293,7 @@ def randomWavelengthFromRGB(RGB: np.ndarray) -> np.ndarray:
     return wl_out
 
 
-def spectralCM(N: int, wl0: float = 380, wl1: float = 780) -> np.ndarray:
+def spectralCM(N: int, wl0: float = WL_MIN, wl1: float = WL_MAX) -> np.ndarray:
     """
     Get a spectral colormap with N steps
 
@@ -349,7 +368,7 @@ def ColorUnderDaylight(spec: Callable[[np.ndarray], np.ndarray]) -> np.ndarray:
     :return: RGB value (list with 3 elements)
     """
 
-    wl      = np.linspace(380, 780, 1000)
+    wl      = wavelengths(1000)
     bb_spec = Illuminant(wl, "D65")
     prod    = bb_spec * spec(wl)
 

@@ -1,4 +1,7 @@
-Current Version: 0.7.2 
+Current Version: 0.8.0 
 
+0.8.0           Restructuring: Lens, Filter, Detector, RaySource now have a common parent class 'SObject'
+0.7.4           GUI class: Now plotting with a common function for RaySource, Filter, Detector
+0.7.3           GUI Object Labels are now centered.
 0.7.2           Testing: More GUI Tests added. GUI class: Minor Cleanup.
 0.7.1           First named version

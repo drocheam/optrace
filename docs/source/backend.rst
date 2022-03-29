@@ -38,9 +38,9 @@ _________________________________
 .. automodule:: Backend.RaySource
 
 
-Backend.RaySourceList
+Backend.RayStorage
 _________________________________
-.. automodule:: Backend.RaySourceList
+.. automodule:: Backend.RayStorage
 
 Backend.Raytracer
 _________________________________

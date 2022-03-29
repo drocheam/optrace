@@ -6,12 +6,10 @@ The class contains methods for interpolation, surface masking and normal calcula
 """
 
 
+import copy
 import numpy as np
 import Backend.Misc as misc
-import numexpr as ne
-import copy
-
-from Backend.SurfaceFunction import SurfaceFunction
+from Backend.SurfaceFunction import *
 
 # TODO Mode Data: check if working
 
@@ -212,14 +210,14 @@ class Surface:
             case ("Asphere" | "Sphere"):
 
                 x0, y0, z0 = self.pos
-                r2 = ne.evaluate("(x-x0)**2 + (y-y0)**2")
+                r2 = misc.calc("(x-x0)**2 + (y-y0)**2")
 
                 inside = r2 <= self.r**2
 
                 z = np.full_like(r2, self.maxz, dtype=np.float64)
 
-                rho, k, r2i = self.rho, self.k, r2[inside]
-                z[inside] = ne.evaluate("z0 + rho*r2i/(1 + sqrt(1 - (k+1)* rho**2 *r2i))")
+                rho, k = self.rho, self.k
+                z[inside] = misc.calc("z0 + rho*r2i/(1 + sqrt(1 - (k+1)* rho**2 *r2i))", r2i=r2[inside])
 
                 return z
 
@@ -336,8 +334,7 @@ class Surface:
 
             case ("Circle" | "Ring" | "Sphere" | "Asphere"):
                 # use r^2 instead of r, saves sqrt calculation for all points
-                x0, y0 = self.pos[:2]
-                r2 = ne.evaluate("(x - x0) ** 2 + (y - y0) ** 2")
+                r2 = misc.calc("(x - x0) ** 2 + (y - y0) ** 2", x0=self.pos[0], y0=self.pos[1])
 
                 if self.surface_type == "Ring":
                     return (self.ri**2 < r2) & (r2 < self.r**2)
@@ -374,8 +371,8 @@ class Surface:
             case ("Sphere" | "Asphere"):
 
                 x0, y0 = self.pos[:2]
-                r = ne.evaluate("sqrt((x-x0)**2 + (y-y0)**2)")
-                phi = ne.evaluate("arctan2(y, x)")
+                r = misc.calc("sqrt((x-x0)**2 + (y-y0)**2)")
+                phi = misc.calc("arctan2(y, x)")
 
                 # the derivative of a conic section formula is
                 #       m := dz/dr = rho*r/sqrt(1 - (k+1)*rho**2*r**2)
@@ -390,14 +387,14 @@ class Surface:
                 # this holds true since n_z is always positive in our raytracer
 
                 rho, k = self.rho, self.k
-                n_r = ne.evaluate("-rho*r/sqrt(1 - k*r**2*rho**2)")
+                n_r = misc.calc("-rho*r/sqrt(1 - k*r**2*rho**2)")
 
                 n = np.zeros((x.shape[0], 3), dtype=np.float64, order='F')
 
                 # n_r is rotated by phi to get n_x, n_y
-                ne.evaluate("n_r*cos(phi)",     out=n[:, 0])
-                ne.evaluate("n_r*sin(phi)",     out=n[:, 1])
-                ne.evaluate("sqrt(1 - n_r**2)", out=n[:, 2])
+                misc.calc("n_r*cos(phi)",     out=n[:, 0])
+                misc.calc("n_r*sin(phi)",     out=n[:, 1])
+                misc.calc("sqrt(1 - n_r**2)", out=n[:, 2])
 
                 return n
            
@@ -473,8 +470,8 @@ class Surface:
 
                 x0, y0, r = self.pos[0], self.pos[1], self.r
 
-                ne.evaluate("x0 + r0*r*cos(theta)", out=p[:, 0])
-                ne.evaluate("y0 + r0*r*sin(theta)", out=p[:, 1])
+                misc.calc("x0 + r0*r*cos(theta)", out=p[:, 0])
+                misc.calc("y0 + r0*r*sin(theta)", out=p[:, 1])
                 p[:, 2] = self.pos[2]
 
             case "Rectangle":
@@ -534,23 +531,23 @@ class Surface:
                 sx, sy, sz = s[:, 0], s[:, 1], s[:, 2]
                 k, rho = self.k, self.rho
 
-                A = ne.evaluate("1 + k*sz**2")
-                B = ne.evaluate("sx*ox + sy*oy + sz*(oz*(k+1) - 1/rho)")
-                C = ne.evaluate("oy**2 + ox**2 + oz*(oz*(k+1) - 2/rho)")
+                A = misc.calc("1 + k*sz**2")
+                B = misc.calc("sx*ox + sy*oy + sz*(oz*(k+1) - 1/rho)")
+                C = misc.calc("oy**2 + ox**2 + oz*(oz*(k+1) - 2/rho)")
 
                 # if there are not hits, this term gets imaginary
                 # we'll handle this case afterwards
-                D = ne.evaluate("sqrt(B**2 - C*A)")
+                D = misc.calc("sqrt(B**2 - C*A)")
 
                 # we get two possible ray parameters
                 # nan values for A == 0, we'll handle them later
-                t1 = ne.evaluate("(-B - D) / A")
-                t2 = ne.evaluate("(-B + D) / A")
+                t1 = misc.calc("(-B - D) / A")
+                t2 = misc.calc("(-B + D) / A")
 
                 # choose t that leads to z-position inside z-range of surface
                 z1 = p[:, 2] + sz*t1
                 minz, maxz = self.minz, self.maxz
-                t = ne.evaluate("where((minz <= z1) & (z1 <= maxz), t1, t2)")
+                t = misc.calc("where((minz <= z1) & (z1 <= maxz), t1, t2)")
 
                 # calculate hit points and hit mask
                 p_hit = p + s*t[:, np.newaxis]

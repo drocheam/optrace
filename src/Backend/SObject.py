@@ -25,7 +25,7 @@ Properties with FrontSurface + BackSurface:
 """
 
 
-from Backend.Surface import Surface  # for the SObject surface
+from Backend.Surface import *  # for the SObject surface
 
 from typing import Callable  # for function type hints
 import copy  # for copy.deepcopy
@@ -35,7 +35,7 @@ import numpy as np
 class SObject:
 
     def __init__(self, 
-                 FrontSurface:       Surface, 
+                 FrontSurface:  Surface, 
                  pos:           (list | np.ndarray),
                  BackSurface:   Surface=None,
                  d1:            float=None,
