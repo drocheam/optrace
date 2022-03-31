@@ -36,7 +36,7 @@ class Raytracer:
 
     T_TH: float = 1e-4
     """ threshold for the transmission Filter
-    values below this are seen as absorbed
+    values below this are handled as absorbed
     needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power"""
 
     MAX_RAYS: int = 10000000
@@ -90,20 +90,18 @@ class Raytracer:
         :param el: Element to add to Raytracer 
         :return: identifier of object
         """
-        if isinstance(el, Lens):
-            self.LensList.append(el)
 
-        elif isinstance(el, Filter):
-            self.FilterList.append(el)
-
-        elif isinstance(el, RaySource):
-            self.RaySourceList.append(el)
-
-        elif isinstance(el, Detector):
-            self.DetectorList.append(el)
-
-        else:
-            raise TypeError("Invalid element type.")
+        match el:
+            case Lens():
+                self.LensList.append(el)
+            case Filter():
+                self.FilterList.append(el)
+            case RaySource():
+                self.RaySourceList.append(el)
+            case Detector():
+                self.DetectorList.append(el)
+            case _:
+                raise TypeError("Invalid element type.")
 
         return id(el)
     
@@ -247,7 +245,7 @@ class Raytracer:
                         miss_count = np.count_nonzero(miss_mask)
                         weights[miss_mask, i+1] = 0
                         if not self.silent:
-                            print(f"{miss_count} rays ({miss_count/self.RaySources.N:.3g}% of all rays) "\
+                            print(f"{miss_count} rays ({miss_count/self.Rays.N:.3g}% of all rays) "\
                                   f"missing surface {i+1}, setting to absorbed because of parameter AbsorbMissing=True.")
 
                     # set n after object as next n before next object
@@ -391,7 +389,7 @@ class Raytracer:
 
         if ab_count_front:
             if not self.silent:
-                print(f"{ab_count_front} rays ({100*ab_count_front/self.RaySources.N:.3g}% "\
+                print(f"{ab_count_front} rays ({100*ab_count_front/self.Rays.N:.3g}% "\
                       f"of all rays) hitting lens front but missing back, setting to absorbed.")
 
             weights[abnormal_front, i] = 0
@@ -399,7 +397,7 @@ class Raytracer:
 
         if ab_count_back:
             if not self.silent:
-                print(f"{ab_count_back} rays ({100*ab_count_back/self.RaySources.N:.3g}% "\
+                print(f"{ab_count_back} rays ({100*ab_count_back/self.Rays.N:.3g}% "\
                       f"of all rays) missing lens front but hitting back, setting to absorbed.")
 
             p[abnormal_back, i] = p[abnormal_back, i-1]
@@ -458,7 +456,7 @@ class Raytracer:
 
             if not self.silent:
                 coll_count = np.count_nonzero(hwi)
-                print(f"{coll_count} rays ({100*coll_count/self.RaySources.N:.3g}% "\
+                print(f"{coll_count} rays ({100*coll_count/self.Rays.N:.3g}% "\
                       f"of all rays) hitting outline, setting to absorbed.")
 
     def refraction(self,
@@ -1020,15 +1018,10 @@ class Raytracer:
         # sort list in z order
         Lenses = sorted(self.LensList, key=lambda Element: Element.pos[2])
         
-        # no lenses
-        if not Lenses:
+        # no lenses or region lies before first lens
+        if not Lenses or z_start < Lenses[0].pos[2]:
             n_ambient = self.n0(550)
-            bounds = [self.outline[4], self.outline[5]]
-
-        # region lies before the first lens
-        elif z_start < Lenses[0].pos[2]:
-            n_ambient = self.n0(550)
-            bounds = [self.outline[4], Lenses[0].extent[4]]
+            bounds = [self.outline[4], self.outline[5]] if not Lenses else [self.outline[4], Lenses[0].extent[4]]
 
             # start position needs to be behind all raysources
             for RS in self.RaySourceList:

@@ -15,13 +15,13 @@ from threading import Thread
 
 class FrontendTests(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         warnings.simplefilter("ignore")
     
-    def tearDown(self):
+    def tearDown(self) -> None:
         warnings.simplefilter("default")
     
-    def test_GUI_inits(self):
+    def test_GUI_inits(self) -> None:
 
         Image = './src/tv-test-pattern.png'
 
@@ -79,11 +79,7 @@ class FrontendTests(unittest.TestCase):
                 ColoringType="Wavelength", PlottingType="Points", Pos_Det=8.9)
 
 
-    def test_MultipleSourceDetectors(self):
-        pass
-        # these are checked in the More_Complex_Example
-
-    def test_Interaction(self):
+    def RT_Example(self) -> Raytracer:
 
         # make Raytracer
         RT = Raytracer(outline=[-5, 5, -5, 5, -5, 60], silent=True)
@@ -139,7 +135,6 @@ class FrontendTests(unittest.TestCase):
 
         RT.add(Filter(ap, pos=[0, 0, 45.2], filter_type="Function", func=func))
 
-
         # add Detector
         Det = Detector(Surface("Rectangle", dim=[2,2]), pos=[0,0,60])
         RT.add(Det)
@@ -147,14 +142,18 @@ class FrontendTests(unittest.TestCase):
         Det2 = Detector(Surface("Sphere", rho=-1/1.1, r=1), pos=[0, 0, 40])
         RT.add(Det2)
 
+        return RT
+
+    def test_Interaction(self) -> None:
+
+        RT = self.RT_Example()
+
         # Instantiate the GUI and start it.
-        sim = GUI(RT)
+        sim = GUI(RT, silent=True)
 
-        def interact():
+        def interact(sim):
 
-            sim.waitWhile("Init")
-            sim.waitWhile("Tracing")
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
 
             # check if Detector is moving
             sim.Pos_Det = 5.3
@@ -176,36 +175,36 @@ class FrontendTests(unittest.TestCase):
             # Image Type Tests standard
             sim.ImageType = "Irradiance"
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
             sim.ImageType = "Illuminance"
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
             sim.ImageType = "sRGB"
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
 
             # Image Type Tests log scaling
             sim.LogImage = ['Logarithmic Scaling']
             sim.ImageType = "Irradiance"
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
             sim.ImageType = "Illuminance"
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
             sim.ImageType = "sRGB"
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
 
             # Image Tests Flip
             sim.LogImage = []
             sim.FlipImage = ['Flip Image']
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
 
             # Image Tests Higher Res
             sim.ImagePixels = 300
             sim.showDetectorImage()
-            sim.waitWhile("DetectorImage")
+            sim.waitForIdle()
 
             # Image Test Source, but actually we should test all parameter combinations,
             sim.showSourceImage()
@@ -215,71 +214,110 @@ class FrontendTests(unittest.TestCase):
             sim.DetectorSelection = sim.DetectorNames[1]
             sim.FocusType = "Position Variance"
             sim.moveToFocus()
-            sim.waitWhile("Focussing")
+            sim.waitForIdle()
             sim.Pos_Det = pos0[2]
             
             # Focus Test 2
             sim.FocusType = "Irradiance Variance"
             sim.moveToFocus()
-            sim.waitWhile("Focussing")
+            sim.waitForIdle()
             sim.Pos_Det = pos0[2]
             
             # Focus Tests 3
             sim.FocusType = "Irradiance Variance"
             sim.moveToFocus()
-            sim.waitWhile("Focussing")
+            sim.waitForIdle()
             sim.Pos_Det = pos0[2]
 
             # Focus Test 4, show Debug Plot
             sim.FocusDebugPlot = ['Show Cost Function']
             sim.moveToFocus()
-            sim.waitWhile("Focussing")
+            sim.waitForIdle()
 
             # Ray Coloring Tests
             sim.ColoringType = "Power"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
             sim.ColoringType = "White"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
             sim.ColoringType = "Wavelength"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
             sim.ColoringType = "Polarization"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
             sim.ColoringType = "Source"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
 
             # PlottingType Tests
             sim.PlottingType = "Points"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
             sim.PlottingType = "None"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
             sim.PlottingType = "Rays"
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
           
             # AbsorbMissing test
             sim.AbsorbMissing = []
-            sim.waitWhile("Tracing")
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
 
             # retrace Tests
             sim.Rays = 100000
-            sim.waitWhile("Tracing")
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
             
             sim.Rays_s = -2.5
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
 
             sim.Rays_s = -2.
-            sim.waitWhile("Drawing")
+            sim.waitForIdle()
 
             sim.close()
-            time.sleep(0.1)  # wait for it actually being closed
 
-        th = Thread(target=interact)
-        th.start()
-        sim()
+        sim.interact(func=interact, args=(sim,))
 
-        th.join()
+    def test_Missing(self) -> None:
+        """test GUI operation when Filter, Lenses, Detectors or Sources are missing"""
 
+        def testFeatures(RT):
+            sim = GUI(RT, silent=True)
+            def interact(sim):
+                sim.waitForIdle()
+                sim.showDetectorImage()
+                sim.waitForIdle()
+                sim.moveToFocus()
+                sim.waitForIdle()
+                sim.Pos_Det = 10.
+                sim.waitForIdle()
+                sim.showSourceImage()
+                sim.waitForIdle()
+                sim.Rays = 100000
+                sim.waitForIdle()
+                sim.AbsorbMissing = []
+                sim.waitForIdle()
+                sim.Rays_s = -3.
+                sim.waitForIdle()
+                sim.ColoringType = "Power"
+                sim.waitForIdle()
+                sim.PlottingType = "Points"
+                sim.waitForIdle()
+                sim.close()
+            sim.interact(func=interact, args=(sim,))
+
+        RT = self.RT_Example()
+
+        [RT.remove(id(F)) for F in RT.FilterList.copy()]
+        self.assertTrue(not RT.FilterList)
+        testFeatures(RT)
+
+        [RT.remove(id(L)) for L in RT.LensList.copy()]
+        RT.trace(N=RT.Rays.N)
+        self.assertTrue(not RT.LensList)
+        testFeatures(RT)
+
+        [RT.remove(id(D)) for D in RT.DetectorList.copy()]
+        self.assertTrue(not RT.DetectorList)
+        testFeatures(RT)
+
+        [RT.remove(id(RS)) for RS in RT.RaySourceList.copy()]
+        self.assertTrue(not RT.RaySourceList)
+        testFeatures(RT)
 
 if __name__ == '__main__':
     unittest.main()

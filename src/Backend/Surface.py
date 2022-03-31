@@ -259,10 +259,12 @@ class Surface:
             X, Y = np.meshgrid(x, y)
             Z = np.full_like(Y, self.pos[2], dtype=np.float64)
             return X, Y, Z
+    
+        if self.surface_type in ["Point", "Line"]:
+            raise RuntimeError("PlottingMesh not defined for types 'Point' and 'Line'")
 
-        else:
-            x = self.pos[0] + np.linspace(-self.r, self.r, N)
-            y = self.pos[1] + np.linspace(-self.r, self.r, N)
+        x = self.pos[0] + np.linspace(-self.r, self.r, N)
+        y = self.pos[1] + np.linspace(-self.r, self.r, N)
 
         X, Y = np.meshgrid(x, y)
         z = self.getValues(X.ravel(), Y.ravel())
@@ -274,26 +276,35 @@ class Surface:
         mask = R.ravel() >= r
         mask2 = R >= r
 
-        # set values outside surface to surface edge
+        # move values outside surface to surface edge
+        # this defines the edge with more points, making it more circular instead of steplike
         z[mask] = self.getValues(self.pos[0] + r*np.cos(Phi.ravel()[mask]), self.pos[1] + r*np.sin(Phi.ravel()[mask]))
         X[mask2] = self.pos[0] + r*np.cos(Phi[mask2])
         Y[mask2] = self.pos[1] + r*np.sin(Phi[mask2])
 
         # extra precautions to plot the inner ring
+        # otherwise the inner circle or the ring could be too small to resolve, depending on the plotting resolution
         if self.surface_type == "Ring":
-            # move values inside first 1/3 of surface ring slightly below ri
-            # to plot the hole
-            mask4 = (R > self.ri) & (R < (self.ri + (self.r-self.ri)*1/3))
-            ris = self.ri - self.eps
-            X[mask4] = self.pos[0] + ris*np.cos(Phi[mask4])
-            Y[mask4] = self.pos[1] + ris*np.sin(Phi[mask4])
 
-            # move values inside second 1/3 of ring slightly above ri
-            # to plot ring edge
-            mask5 = ~mask4 & (R < (self.ri + (self.r-self.ri)*2/3))
-            rie = self.ri+self.eps
-            X[mask5] = self.pos[0] + rie*np.cos(Phi[mask5])
-            Y[mask5] = self.pos[1] + rie*np.sin(Phi[mask5])
+            # move points near inner edge towards the edge line
+            # create two circles, one slightly outside the edge (mask5)
+            # and one slightly below (mask4)
+
+            # ring larger
+            if self.ri < self.r/2:
+                rr = self.r - self.ri  # diameter of ring area
+                mask4 = (R > self.ri) & (R < (self.ri + rr/3))
+                mask5 = (R > (self.ri + rr/3)) & (R < (self.ri + 2/3*rr))
+            # diameter of inner circle larger
+            else:
+                mask4 = (R < self.ri/3) 
+                mask5 = (R < self.ri) & (R > 2/3*self.ri)
+
+            # move points onto the two circles
+            X[mask4] = self.pos[0] + (self.ri - self.eps)*np.cos(Phi[mask4])
+            Y[mask4] = self.pos[1] + (self.ri - self.eps)*np.sin(Phi[mask4])
+            X[mask5] = self.pos[0] + (self.ri + self.eps)*np.cos(Phi[mask5])
+            Y[mask5] = self.pos[1] + (self.ri + self.eps)*np.sin(Phi[mask5])
 
         # plot nan values inside
         mask3 = self.getMask(X.ravel(), Y.ravel())
@@ -343,7 +354,7 @@ class Surface:
             case _:
                 raise RuntimeError(f"Mask function not defined for surface_type {self.surface_type}.")
 
-    # TODO funktioniert das für konkave Flächen? woher minus in n_r
+
     def getNormals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get normal vectors of the surface.
@@ -415,8 +426,6 @@ class Surface:
 
                 return n
 
-    # TODO rectangular edge
-    # TODO use case rectangular edge for surface_type = Data?
     def getEdge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get surface values of the surface edge, assumes a circular edge.
@@ -424,32 +433,37 @@ class Surface:
         :param nc: number of points on edge (int)
         :return: X, Y, Z coordinate arrays (all numpy 2D array)
         """
-        if self.surface_type ==  "Rectangle":
-            N4 = int(nc/4)
-            dn = nc - 4*N4
-            xs, xe, ys, ye, _, _ = self.getExtent()
+        match self.surface_type:
 
-            x = np.concatenate((np.linspace(xs, xe, N4), 
-                                np.full((N4,), xe), 
-                                np.flip(np.linspace(xs, xe, N4)), 
-                                np.full((N4+dn, ), xs)))
+            case "Rectangle":
+                N4 = int(nc/4)
+                dn = nc - 4*N4
+                xs, xe, ys, ye, _, _ = self.getExtent()
 
-            y = np.concatenate((np.full((N4,), ys), 
-                                np.linspace(ys, ye, N4), 
-                                np.full((N4, ), ye),
-                                np.flip(np.linspace(ys, ye, N4+dn))))
+                x = np.concatenate((np.linspace(xs, xe, N4), 
+                                    np.full(N4, xe), 
+                                    np.flip(np.linspace(xs, xe, N4)), 
+                                    np.full(N4+dn, xs)))
 
-            return x, y, np.full_like(y, self.pos[2])
+                y = np.concatenate((np.full(N4, ys), 
+                                    np.linspace(ys, ye, N4), 
+                                    np.full(N4, ye),
+                                    np.flip(np.linspace(ys, ye, N4+dn))))
 
-        else:
-            r = self.r - self.eps
+                return x, y, np.full_like(y, self.pos[2])
 
-            theta = np.linspace(0, 2 * np.pi, nc)
-            xd = self.pos[0] + r * np.cos(theta)
-            yd = self.pos[1] + r * np.sin(theta)
-            zd = self.getValues(xd, yd)
+            case ("Line" | "Point"):
+                raise RuntimeError("Edge not defined for surface_types 'Point' and 'Line'")
 
-            return xd, yd, zd
+            case _:
+                r = self.r - self.eps
+
+                theta = np.linspace(0, 2 * np.pi, nc)
+                xd = self.pos[0] + r * np.cos(theta)
+                yd = self.pos[1] + r * np.sin(theta)
+                zd = self.getValues(xd, yd)
+
+                return xd, yd, zd
 
     def getRandomPositions(self, N: int) -> np.ndarray:
         """

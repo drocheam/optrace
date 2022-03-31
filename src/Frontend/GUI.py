@@ -32,10 +32,14 @@ from typing import Callable
 from pynput.keyboard import Key, Listener
 
 import time
+import traceback  # for printing traceback
+import readline  # enables cursor movements in input()
 
+# TODO Farben der RaySources passen sich ColoringType an
+# Whites -> RS sind White, Power -> maximale Farbe der Skala, Wavelength -> RS.getColor()
+# Polarization -> Weiß wenn zufällig, sonst nach Farbskala. Source -> Farbe der Quelle
 
-
-#TODO aufräumen mehrere Detektoren, bessere Variablennamen etc
+# TODO Filter-opacity ergibt sich nach durchschnittlichem tau. Farbe wie bekannt
 
 class GUI(HasTraits):
 
@@ -81,7 +85,7 @@ class GUI(HasTraits):
     MAX_RAYS_SHOWN: int = 10000
     """Maximum of rays shown in visualization"""
    
-    TEXT_STYLE = dict(font_size=11, color=(1, 1, 1), font_family="courier", shadow=True)
+    TEXT_STYLE: dict = dict(font_size=11, color=(1, 1, 1), font_family="courier", shadow=True)
     """Standard Text Style. Used for object labels, legends and axes"""
 
     INFO_STYLE: dict = dict(font_size=13, bold=True, color=(1, 1, 1), font_family="courier", shadow=True)
@@ -92,58 +96,89 @@ class GUI(HasTraits):
 
     ##########
     # The mayavi scene.
-    scene = Instance(MlabSceneModel, args=())
+    scene: Instance = Instance(MlabSceneModel, args=())
+    """the mayavi scene"""
 
     # Ranges
 
-    Rays = Range(5, 10000000, 200000, desc='Number of Rays for Simulation', enter_set=True,
+    Rays: Range = Range(5, 10000000, 200000, desc='Number of Rays for Simulation', enter_set=True,
                  auto_set=False, label="N_rays", mode='text')
+    """Number of rays for raytracing"""
 
-    Rays_s = Range(-5.0, -1.0, -2, desc='Percentage of N Which is Drawn', enter_set=True,
+    Rays_s: Range = Range(-5.0, -1.0, -2, desc='Percentage of N Which is Drawn', enter_set=True,
                    auto_set=False, label="N_vis (log)", mode='slider')
+    """Number of rays shown in mayavi scenen. log10 value."""
 
-    Pos_Det = Range(low='Pos_Det_min', high='Pos_Det_max', value='Pos_Det_max', mode='slider',
+    Pos_Det: Range = Range(low='Pos_Det_min', high='Pos_Det_max', value='Pos_Det_max', mode='slider',
                     desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_pos")
+    """z-Position of Detector. Lies inside z-range of :obj:`Backend.Raytracer.outline`"""
 
-    Ray_alpha = Range(-5.0, 0.0, np.log10(RAY_ALPHA), desc='Opacity of the Rays/Points', enter_set=True,
+    Ray_alpha: Range = Range(-5.0, 0.0, np.log10(RAY_ALPHA), desc='Opacity of the Rays/Points', enter_set=True,
                       auto_set=True, label="Alpha (log)", mode='slider')
+    """opacity of shown rays. log10 values"""
 
-    Ray_width = Range(1.0, 20.0, 1, desc='Ray Linewidth or Point Size', enter_set=True,
+    Ray_width: Range = Range(1.0, 20.0, 1, desc='Ray Linewidth or Point Size', enter_set=True,
                       auto_set=True, label="Width")
+    """Width of rays shown."""
 
-    ImagePixels = Range(1, 1000, 100, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
+    ImagePixels: Range = Range(1, 1000, 100, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
                         auto_set=True, label="Pixels_xy", mode='text')
+    """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
     # Checklists (with capitalization workaround from https://stackoverflow.com/a/23783351)
-    AbsorbMissing = List(editor=CheckListEditor(values=["Absorb Rays Missing Lens"], format_func=lambda x: x),
-                         desc="if Rays are Absorbed when not Hitting a Lens")
-    LogImage = List(editor=CheckListEditor(values=['Logarithmic Scaling'], format_func=lambda x: x),
-                    desc="if Logarithmic Values are Plotted")
 
-    FlipImage = List(editor=CheckListEditor(values=['Flip Image'], format_func=lambda x: x),
+    AbsorbMissing: List = List(editor=CheckListEditor(values=["Absorb Rays Missing Lens"], format_func=lambda x: x),
+                         desc="if Rays are Absorbed when not Hitting a Lens")
+    """Boolean value for absorbing rays missing Lens. Packed as Checkbox into a :obj:`List`"""
+
+    LogImage: List = List(editor=CheckListEditor(values=['Logarithmic Scaling'], format_func=lambda x: x),
+                    desc="if Logarithmic Values are Plotted")
+    """Boolean value for a logarithmic image visualization. Packed as Checkbox into a :obj:`List`"""
+
+    FlipImage: List = List(editor=CheckListEditor(values=['Flip Image'], format_func=lambda x: x),
                     desc="if imaged should be rotated by 180 degrees")
+    """Boolean value for flipping the image (rotating it by 180°). Packed as Checkbox into a :obj:`List`"""
 
     FocusDebugPlot = List(editor=CheckListEditor(values=['Show Cost Function'], format_func=lambda x: x),
                     desc="if cost function is shown")
 
     # Enums
-    PlottingType        = Enum('Rays', 'Points', 'None', desc="Ray Representation")
-    ColoringType        = Enum('White', 'Power', 'Wavelength', 'Polarization', 'Source', desc="Ray Property to Color the Rays With")
-    ImageType           = Enum('Irradiance', 'Illuminance', 'sRGB', desc="Image Type Presented")
-    FocusType           = Enum('Position Variance', 'Airy Disc Weighting', 'Irradiance Variance', desc="Method for Autofocus")
-    SourceSelection     = Enum(values='SourceNames', desc="Source Selection for Source Image")
-    DetectorSelection   = Enum(values='DetectorNames', desc="Detector Selection")
+
+    PlottingType: Enum = Enum('Rays', 'Points', 'None', desc="Ray Representation")
+    """Ray Plotting Type. One of ['Rays', 'Points', 'None']"""
+
+    ColoringType: Enum = Enum('White', 'Power', 'Wavelength', 'Polarization', 'Source', desc="Ray Property to Color the Rays With")
+    """Ray Coloring Mode. One of ['White', 'Power', 'Wavelength', 'Polarization', 'Source']"""
+
+    ImageType: Enum = Enum('Irradiance', 'Illuminance', 'sRGB', desc="Image Type Presented")
+    """Image Type. One of ['Irradiance', 'Illuminance', 'sRGB']"""
+
+    FocusType: Enum = Enum('Position Variance', 'Airy Disc Weighting', 'Irradiance Variance', desc="Method for Autofocus")
+    """Focus Finding Mode. One of ['Position Variance', 'Airy Disc Weighting', 'Irradiance Variance']"""
+
+    SourceSelection: Enum = Enum(values='SourceNames', desc="Source Selection for Source Image")
+    """Source Selection. Holds the name of one of the Sources."""
+
+    DetectorSelection: Enum = Enum(values='DetectorNames', desc="Detector Selection")
+    """Detector Selection. Holds the name of one of the Detectors."""
 
     # Buttons
-    DetectorImageButton = Button(label="Show Detector Image", desc="Generating a Detector Image")
-    SourceImageButton   = Button(label="Show Source Image", desc="Generating a Source Image of the Chosen Source")
-    AutoFocusButton     = Button(label="Find Focus", desc="Finding the Focus Between the Lenses in Front and Behind the Detector")
+    DetectorImageButton: Button = Button(label="Show Detector Image", desc="Generating a Detector Image")
+    SourceImageButton:   Button = Button(label="Show Source Image", desc="Generating a Source Image of the Chosen Source")
+    AutoFocusButton:     Button = Button(label="Find Focus", desc="Finding the Focus Between the Lenses in Front and Behind the Detector")
 
     # Labels
     Whitespace_Label    = Str('\n')
     Separator           = Item("Whitespace_Label", style='readonly', show_label=False)
 
-    Status=Dict(Str())
+    Status: Dict=Dict(Str())
+    """ 
+    Status dictionary. Consisting of key string and bool value.
+         * InitScene: Set when Initializing mlab scene. Excludes displaying of rays and initial tracing
+         * DisplayingGUI: Set if pyqt GUI is not fully loaded
+         * Drawing: Set if Rays/Points/Detector etc. is updated
+         * Tracing, Focussing, DetectorImage, SourceImage: Set if operation is active 
+    """
 
     ####################################################################################################################
     # UI view creation
@@ -188,18 +223,21 @@ class GUI(HasTraits):
                     ),
                 resizable=True
                 )
+    """the UI view"""
+
 
     ####################################################################################################################
     # Class constructor
 
-    def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, *args, **kwargs) -> None:
+    def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, silent: bool=False, *args, **kwargs) -> None:
         """
 
         :param RT:
         :param args:
         :param kwargs:
         """
-        self.Raytracer = RT
+        self.Raytracer: Backend.Raytracer = RT
+        """reference to the Raytracer"""
 
         # ray properties
         self.RaysPlotScatter = None  # plot for scalar ray values
@@ -208,7 +246,7 @@ class GUI(HasTraits):
         self.subset = np.array([])  # indices for subset of all rays in Raytracer
 
         # Detector properties
-        self.DetectorPlot = []  # visual representation of the Detectord
+        self.DetectorPlot = []  # visual representation of the Detector
         self.DetectorCylinderPlot = [] # visual representation of the Detectors' Cylinder
         self.DetText = []
         self.SourceNames = []
@@ -231,15 +269,19 @@ class GUI(HasTraits):
         # workaround to exit trait functions
         self.set_only = False
         
+        # show info and warning messages
+        self.silent = silent
+
         # set AbsorbMissing parameter from bool to list
         self.AbsorbMissing = self.AbsorbMissing if AbsorbMissing else []
 
         # define Status dict
-        self.Status.update(dict(Init=True, Tracing=False, Drawing=False, Focussing=False,
+        self.Status.update(dict(InitScene=True, DisplayingGUI=True, Tracing=False, Drawing=False, Focussing=False,
                                 DetectorImage=False, SourceImage=False))
 
+        self.threads = []
+
         super().__init__(*args, **kwargs)
-        
 
     def __call__(self, exit=False) -> None:
         """
@@ -432,24 +474,27 @@ class GUI(HasTraits):
                 a.actor.property.trait_set(specular=0.5, ambient=0.25)
             return a
 
-        # plot surface
-        a = plot(obj.FrontSurface.getPlottingMesh(N=self.SURFACE_RES), "front")
+        # decide what to plot
+        plotFront = obj.FrontSurface.surface_type not in ["Point", "Line"]
+        plotCyl = obj.hasBackSurface() or obj.Surface.isPlanar()
+        plotBack  = obj.BackSurface is not None and obj.BackSurface.surface_type not in ["Point", "Line"]
+
+        a = plot(obj.FrontSurface.getPlottingMesh(N=self.SURFACE_RES), "front") if plotFront else None
 
         # if surface is a plane or object a lens, plot a cylinder for side viewing
-        plotCyl = obj.hasBackSurface() or obj.Surface.isPlanar()
         b = plot(obj.getCylinderSurface(nc=self.SURFACE_RES, d=d), "cylinder") if plotCyl else None
 
         # calculate middle center z-position
         zl = (obj.extent[4] + obj.extent[5])/2 if not obj.hasBackSurface() else obj.pos[2]
-        zl = zl + self.D_VIS/2 if obj.Surface.isPlanar() else zl
+        zl = zl + self.D_VIS/2 if obj.Surface.isPlanar() and not obj.hasBackSurface() else zl
 
         # object label
-        text = self.scene.mlab.text(obj.extent[1], 0, z=zl, text=f"{shortname}{num}", name=f"Label")
-        text.actor.text_scale_mode = 'none'
+        text = self.scene.mlab.text(x=obj.extent[1], y=0., z=zl, text=f"{shortname}{num}", name=f"Label")
         text.property.trait_set(**self.TEXT_STYLE, justification="center")
+        text.actor.text_scale_mode = 'none'
        
         # plot BackSurface if one exists
-        c = plot(obj.BackSurface.getPlottingMesh(N=self.SURFACE_RES), "back") if obj.hasBackSurface() else None
+        c = plot(obj.BackSurface.getPlottingMesh(N=self.SURFACE_RES), "back") if plotBack else None
 
         return a, b, c, text
 
@@ -601,7 +646,7 @@ class GUI(HasTraits):
         [self.plotDetector(D, num+1) for num, D in enumerate(self.Raytracer.DetectorList)]
 
         # assign detector position
-        if not self.Raytracer.DetectorList:
+        if self.Raytracer.DetectorList:
             self.Pos_Det = [self.Raytracer.DetectorList[0].pos[2]]
         else:
             self.Pos_Det = self.Raytracer.outline[5]
@@ -622,16 +667,16 @@ class GUI(HasTraits):
         self.scene.mlab.gcf().on_mouse_pick(self.onSpacePick, button='Right')
 
         # add ray info text
-        self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
-        self.onRayPick()  # call to set default text
+        self.RayTextParent = self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
+        self.RayText = self.scene.mlab.text(0.02, 0.97, "") 
 
     def initStatusText(self) -> None:
         """init GUI status text display"""
         # add status text
-        self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
+        self.StatusTextParent = self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
         self.StatusText = self.scene.mlab.text(0.97, 0.01, "Status Text")
-        self.StatusText.actor.text_scale_mode = 'none'
         self.StatusText.property.trait_set(**self.INFO_STYLE, justification="right")
+        self.StatusText.actor.text_scale_mode = 'none'
     
     def initSourceList(self) -> None:
         """generate a descriptive list of RaySource names"""
@@ -690,8 +735,6 @@ class GUI(HasTraits):
         Shows ray properties on screen.
         :param picker_obj:
         """
-        if not self.RayText:
-            self.RayText = self.scene.mlab.text(0.02, 0.97, "") 
 
         # it seems that picker_obj.point_id is only present for the first element in the picked list,
         # so we only can use it when the RayPlot is first in the list
@@ -738,8 +781,8 @@ class GUI(HasTraits):
             self.RayText.property.trait_set(**self.SUBTLE_INFO_STYLE, background_opacity=0)
 
         # text settings
-        self.RayText.actor.text_scale_mode = 'none'
         self.RayText.property.trait_set(vertical_justification="top")
+        self.RayText.actor.text_scale_mode = 'none'
 
     def initShiftPressDetector(self) -> None:
         """Init shift key press detection"""
@@ -756,9 +799,102 @@ class GUI(HasTraits):
         listener = Listener(on_press=on_press, on_release=on_release)
         listener.start()
 
+    def setGUILoaded(self) -> None:
+        """sets GUILoaded Status. Exits GUI if self.exit set."""
+
+        self.Status["DisplayingGUI"] = False
+        
+        if self.exit:
+            self.close()
+
+    def hasDetector(self) -> bool:
+        """
+        Prints message if Detectors are missing.
+        :return: if the Raytracer has Detectors
+        """
+        if not self.Raytracer.DetectorList:
+            if not self.silent:
+                print("Detector Missing, skipping this action.")
+            return False
+        return True
+
+    def hasRaySource(self) -> bool:
+        """
+        Prints message if RaySources are missing.
+        :return: if the Raytracer has RaySources
+        """
+        if not self.Raytracer.RaySourceList:
+            if not self.silent:
+                print("RaySource Missing, skipping this action.")
+            return False
+        return True
+
+    def noRaceCondition(self) -> bool:
+        """
+        Prints a message if the raytracer is tracing and therefore a race condition would occur.
+        :return: if the Raytracer is tracing
+        """
+        if self.Status["Tracing"]:
+            self.StatusText.text += "Can't do this while raytracing.\n"
+            if not self.silent:
+                print("Raytracing in progress, skipping this action because of a race condition risk.")
+            return False
+        return True
+
+    ###############################################################################################################
+    # Interface functions
+    ###############################################################################################################
+
+    def replot(self):
+        self.scene.scene.disable_render  = True
+        self.Status["InitScene"] = True
+        cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
+                                                    "clipping_range", "parallel_scale")
+
+        # ray properties
+        self.RaysPlotScatter = None  # plot for scalar ray values
+        self.RaysPlot = None  # plot for visualization of rays/points
+
+        # Detector properties
+        self.DetectorPlot = []  # visual representation of the Detector
+        self.DetectorCylinderPlot = [] # visual representation of the Detectors' Cylinder
+        self.DetText = []
+        self.DetInd = 0
+        
+        # minimal/maximal z-positions of Detector_obj
+        self.Pos_Det_min = self.Raytracer.outline[4]
+        self.Pos_Det_max = self.Raytracer.outline[5]
+
+        # we cant use mlab.clf() since the on_mouse_pick would be unusable
+        # see https://stackoverflow.com/a/23476093
+        # instead delete every object, but don't delete StatusText and RayText
+        for child in self.scene.mayavi_scene.children.copy():
+            obj = child.children[0].children[0]
+            if obj not in [self.RayText, self.StatusText]:
+                child.remove()
+                pyfaceGUI().process_events()
+
+        self.plotGeometry()
+
+        self.initSourceList()
+        self.initDetectorList()
+
+        self.scene.camera.trait_set(**cc_traits_org)
+
+        self.Status["InitScene"] = False
+
+        self.setRays()
+        
+        self.scene.scene.disable_render = False
+        self.scene.scene.render()
+        pyfaceGUI().process_events()
+
 
     def close(self) -> None:
-        """close the GUI"""
+        """close the GUI after it is loaded"""
+
+        pyfaceGUI().process_events()
+
         # close all ui frames
         app = QtGui.QApplication.instance()
         for widget in app.topLevelWidgets():
@@ -766,17 +902,63 @@ class GUI(HasTraits):
 
         # exit application
         QtCore.QCoreApplication.quit()
+        time.sleep(0.1)  # wait for it actually being closed
+
+    def waitForIdle(self) -> None:
+        """wait until the GUI is Idle. Only call this from another thread"""
+       
+        for th in self.threads:
+            th.join()
+        
+        time.sleep(0.001)  # wait for flags to be set
+
+        while True:
+            busy = False
+            [busy := True for key in self.Status.keys() if self.Status[key]]
+
+            if not busy:
+                break
+
+            time.sleep(0.02)
+
+        # fixes a pyface bug where the GUI is shown as busy
+        # see https://github.com/enthought/mayavi/issues/59
+        pyfaceGUI().process_events()
+        pyfaceGUI().set_busy(False)
 
     # wait while 'key' in StatusList is set
-    def waitWhile(self, key: str):
-        """
-        wait while the GUI is busy doing 'key'
-        :param key: string key from GUI.Status
-        """
-        time.sleep(0.001)  # wait for flags to be set
-        # wait for tasks to finish
-        while self.Status[key]:
-            time.sleep(0.02)
+    # def waitWhile(self, key: str):
+        # """
+        # wait while the GUI is busy doing 'key'.
+        # Only call this from another thread.
+        # :param key: string key from GUI.Status
+        # """
+        # time.sleep(0.001)  # wait for flags to be set
+        # # wait for tasks to finish
+        # while self.Status[key]:
+            # time.sleep(0.02)
+
+    def interact(self, func=None, args=tuple()):
+
+        if func is None:
+            def func(self):
+                self.waitForIdle()
+                while True:
+
+                    cmd = input(">>")
+                    
+                    try:
+                        exec(cmd)
+                        self.waitForIdle()
+                    except Exception:
+                        traceback.print_exc()
+
+            args=(self,)
+
+        th = Thread(target=func, args=args)
+        th.start()
+        self()
+        th.join()
 
     ####################################################################################################################
     # Trait handlers.
@@ -785,123 +967,120 @@ class GUI(HasTraits):
     def filterRays(self) -> None:
         """chose a subset of all Raytracer rays and plot them with :obj:`GUI.drawRays`"""
 
-        # don's use self.Rays as ray number, since the raytracer could still be raytracing
-        # instead use the last saved number
-        N = self.Raytracer.Rays.N
+        if self.hasRaySource():
+            # don's use self.Rays as ray number, since the raytracer could still be raytracing
+            # instead use the last saved number
+            N = self.Raytracer.Rays.N
 
-        if self.PlottingType == "None" or N == 0:
-            return
+            if self.PlottingType == "None" or N == 0:
+                return
 
-        # currently busy, settings will be applied after current task
-        if self.Status["Init"] or self.Status["Tracing"]:
-            return
+            # currently busy, settings will be applied after current task
+            if self.Status["InitScene"] or self.Status["Tracing"]:
+                return
 
-        self.Status["Drawing"] = True
+            self.Status["Drawing"] = True
 
-        set_size = int(1 + 10**self.Rays_s*N)  # number of shown rays
-        sindex = np.random.choice(N, size=set_size, replace=False)  # random choice
+            set_size = int(1 + 10**self.Rays_s*N)  # number of shown rays
+            sindex = np.random.choice(N, size=set_size, replace=False)  # random choice
 
-        # make bool array with chosen rays set to true
-        self.subset = np.zeros((N,), dtype=bool)
-        self.subset[sindex] = True
+            # make bool array with chosen rays set to true
+            self.subset = np.zeros(N, dtype=bool)
+            self.subset[sindex] = True
 
-        self.drawRays()
+            self.drawRays()
 
-        self.Status["Drawing"] = False
+            self.Status["Drawing"] = False
 
     @on_trait_change('ColoringType')
     def drawRays(self) -> None:
         """remove old ray view, call :obj:`GUI.plotRays` and restore scene view"""
 
-        if not self.Raytracer.RaySourceList:
-            print("WARNING: RaySource Missing")
+        if self.hasRaySource():
 
-        # currently busy, but next plotting will use the current settings
-        elif self.Status["Init"] or self.Status["Tracing"]:
-            return
+            # currently busy, but next plotting will use the current settings
+            if self.Status["InitScene"] or self.Status["Tracing"]:
+                return
 
-        # only draw if source has rays and scene renderer is initialized
-        elif self.Raytracer.Rays.hasRays() and not self.Status["Init"]:
+            # only draw if source has rays and scene renderer is initialized
+            elif self.Raytracer.Rays.hasRays() and not self.Status["InitScene"]:
 
-            self.Status["Drawing"] = True
+                self.Status["Drawing"] = True
 
-            # we could set the ray traits instead of removing and creating a new object,
-            # but unfortunately the allocated numpy arrays (x, y, z, ..) of the objects are fixed in size
-            if self.RaysPlot:
-                self.RaysPlot.remove()
-            if self.RaysPlotScatter:
-                self.RaysPlotScatter.remove()
+                # we could set the ray traits instead of removing and creating a new object,
+                # but unfortunately the allocated numpy arrays (x, y, z, ..) of the objects are fixed in size
+                if self.RaysPlot:
+                    self.RaysPlot.remove()
+                if self.RaysPlotScatter:
+                    self.RaysPlotScatter.remove()
 
-            # save camera
-            cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
-                                                        "clipping_range", "parallel_scale")
-            self.plotRays()
-          
-            # reset camera
-            self.scene.camera.trait_set(**cc_traits_org)
-           
-            # show picker text 
-            self.onRayPick()
+                # save camera
+                cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
+                                                            "clipping_range", "parallel_scale")
+                self.plotRays()
+              
+                # reset camera
+                self.scene.camera.trait_set(**cc_traits_org)
+               
+                # show picker text 
+                self.onRayPick()
 
-            self.Status["Drawing"] = False
-
+                self.Status["Drawing"] = False
 
     @on_trait_change('Rays, AbsorbMissing')
     def setRays(self) -> None:
         """raytrace in separate thread, after that call :obj:`GUI.filterRays`"""
 
         # return if value should only be set
-        if self.set_only or self.Status["Init"]:
+        if self.set_only or self.Status["InitScene"]:
             return
 
-        if self.Raytracer.RaySourceList:
+        if self.hasRaySource():
 
             for key in self.Status.keys():
-                if self.Status[key] and key != "InitTracing":
+                if self.Status[key] and key != "DisplayingGUI":
                     self.StatusText.text += "Can't trace while other background tasks are running.\n"
                     return
-
-            self.Raytracer.AbsorbMissing = self.AbsorbMissing
 
             self.Status["Tracing"] = True
 
             # run this in background thread
-            def background(RT: Raytracer, N: int, func: Callable) -> None:
-                # trace if not already
-                if not RT.Rays.hasRays() or self.Rays != RT.Rays.N:
-                    RT.trace(N=N)
-                pyfaceGUI.invoke_later(func)
+            def background(RT: Raytracer, N: int) -> None:
+                RT.AbsorbMissing = self.AbsorbMissing
+                RT.trace(N=N)
 
-            # execute this after thread has finished
-            def after() -> None:
+                # execute this after thread has finished
+                def on_finish() -> None:
 
-                self.Status["Tracing"] = False
+                    self.Status["Tracing"] = False
 
-                # lower the ratio of rays shown so that the GUI does not become to slow
-                if 10**self.Rays_s*self.Rays > self.MAX_RAYS_SHOWN:
-                    self.Rays_s = np.log10(self.MAX_RAYS_SHOWN/self.Rays)
-                else: # in the other case self.filterRays() is called because of the self.Rays_s change
-                    self.filterRays()
+                    # lower the ratio of rays shown so that the GUI does not become to slow
+                    if 10**self.Rays_s*self.Rays > self.MAX_RAYS_SHOWN:
+                        self.Rays_s = np.log10(self.MAX_RAYS_SHOWN/self.Rays)
+                    else: # in the other case self.filterRays() is called because of the self.Rays_s change
+                        self.filterRays()
 
-                # set parameters to current value, since they could be changed by the user while tracing
-                self.set_only = True
-                self.AbsorbMissing = ["Absorb Rays Missing Lens"] if self.Raytracer.AbsorbMissing else []
-                self.Rays = self.Raytracer.Rays.N
-                self.set_only = False
+                    # set parameters to current value, since they could be changed by the user while tracing
+                    self.set_only = True
+                    self.AbsorbMissing = ["Absorb Rays Missing Lens"] if self.Raytracer.AbsorbMissing else []
+                    self.Rays = self.Raytracer.Rays.N
+                    self.set_only = False
 
-                if self.exit:
-                    self.close()
+                    pyfaceGUI.invoke_later(self.setGUILoaded)
 
-            action = Thread(target=background, args=(self.Raytracer, self.Rays, after))
+                pyfaceGUI.invoke_later(on_finish)
+
+            action = Thread(target=background, args=(self.Raytracer, self.Rays))
             action.start()
+            self.threads.append(action)
         else:
-            print("WARNING: RaySource Missing")
-
+            pyfaceGUI.invoke_later(self.setGUILoaded)
+             
     @on_trait_change('Ray_alpha')
     def setRayAlpha(self) -> None:
         """change opacity of visible rays"""
 
-        if self.RaysPlot:
+        if self.hasRaySource() and self.RaysPlot:
             self.Status["Drawing"] = True
             self.RaysPlot.actor.property.trait_set(opacity=10**self.Ray_alpha)
             self.Status["Drawing"] = False
@@ -910,10 +1089,8 @@ class GUI(HasTraits):
     def setDetector(self) -> None:
         """move and replot chosen Detector"""
 
-        if self.set_only:
-            return
+        if self.hasDetector() and self.DetectorPlot and not self.set_only:
 
-        if self.DetectorPlot:
             xp, yp, zp = self.Raytracer.DetectorList[self.DetInd].pos
             self.Raytracer.DetectorList[self.DetInd].moveTo([xp, yp, self.Pos_Det])
             
@@ -926,59 +1103,49 @@ class GUI(HasTraits):
 
             self.DetText[self.DetInd].z_position = self.Pos_Det
 
-        elif not self.Raytracer or not self.Raytracer.DetectorList:
-            print("WARNING: Detector missing.")
-
     @on_trait_change('DetectorImageButton')
     def showDetectorImage(self) -> None:
         """render a DetectorImage at the chosen Detector, uses a separate thread"""
 
-        # prevent race conditions
-        if self.Status["Tracing"]:
-            self.StatusText.text += "Can't do this while raytracing.\n"
-            return
+        if self.hasDetector() and self.noRaceCondition():
 
-        self.Status["DetectorImage"] = True
+            self.Status["DetectorImage"] = True
 
-        ret = [0]
+            def background(RT: Raytracer, N: int) -> None:
+                res = RT.DetectorImage(N=N, ind=self.DetInd)
 
-        def background(RT: Raytracer, N: int, ret: list, func: Callable) -> None:
-            ret[0] = RT.DetectorImage(N=N, ind=self.DetInd)
-            pyfaceGUI.invoke_later(func)
+                def on_finish() -> None:
+                    DetectorPlot(res, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType)
+                    self.Status["DetectorImage"] = False
+                
+                pyfaceGUI.invoke_later(on_finish)
 
-        def after() -> None:
-            DetectorPlot(ret[0], log=self.LogImage, flip=self.FlipImage, mode=self.ImageType)
-            self.Status["DetectorImage"] = False
-
-        action = Thread(target=background, args=(self.Raytracer, self.ImagePixels, ret, after))
-        action.start()
+            action = Thread(target=background, args=(self.Raytracer, self.ImagePixels))
+            action.start()
+            self.threads.append(action)
 
     @on_trait_change('SourceImageButton')
     def showSourceImage(self) -> None:
         """render a SourceImage for the chosen Source, uses a separate thread"""
 
-        # prevent race conditions
-        if self.Status["Tracing"]:
-            self.StatusText.text += "Can't do this while raytracing.\n"
-            return
+        if self.hasRaySource() and self.noRaceCondition():
+            # surface number for selected source
+            snum = int(self.SourceSelection.split(":", 1)[0].split("RS")[1])
 
-        # surface number for selected source
-        snum = int(self.SourceSelection.split(":", 1)[0].split("RS")[1])
+            self.Status["SourceImage"] = True
 
-        self.Status["SourceImage"] = True
+            def background(RT: Raytracer, N: int, snum: int) -> None:
+                res = RT.SourceImage(N=N, sindex=snum-1)
 
-        ret = [0]
+                def on_finish() -> None:
+                    SourcePlot(res, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType)
+                    self.Status["SourceImage"] = False
+                
+                pyfaceGUI.invoke_later(on_finish)
 
-        def background(RT: Raytracer, N: int, snum: int, ret: list, func: Callable) -> None:
-            ret[0] = RT.SourceImage(N=N, sindex=snum-1)
-            pyfaceGUI.invoke_later(func)
-
-        def after() -> None:
-            SourcePlot(ret[0], log=self.LogImage, flip=self.FlipImage, mode=self.ImageType)
-            self.Status["SourceImage"] = False
-
-        action = Thread(target=background, args=(self.Raytracer, self.ImagePixels, snum, ret, after))
-        action.start()
+            action = Thread(target=background, args=(self.Raytracer, self.ImagePixels, snum))
+            action.start()
+            self.threads.append(action)
 
     @on_trait_change('AutoFocusButton')
     def moveToFocus(self) -> None:
@@ -988,32 +1155,27 @@ class GUI(HasTraits):
         Searches are always between lenses aor the next outline. 
         Search takes place in a separate thread, after that the Detector is moved to the focus 
         """
+        if self.hasDetector() and self.hasRaySource() and self.noRaceCondition():
+                
+            self.Status["Focussing"] = True
 
-        # prevent race conditions
-        if self.Status["Tracing"]:
-            self.StatusText.text += "Can't do this while raytracing.\n"
-            return
-            
-        self.Status["Focussing"] = True
-        
-        r = [0]
-        vals = [0]
+            # run this in background thread
+            def background(RT: Raytracer, z: float, method: str) -> None:
+                zf, r, vals = RT.autofocus(method, z, ret_cost=self.FocusDebugPlot)
+                RT.DetectorList[self.DetInd].moveTo([*RT.DetectorList[self.DetInd].pos[:2], zf])
 
-        # run this in background thread
-        def background(RT: Raytracer, z: float, method: str, r: list, vals: list, func: Callable) -> None:
-            zf, r[0], vals[0] = RT.autofocus(method, z, ret_cost=self.FocusDebugPlot)
-            RT.DetectorList[self.DetInd].moveTo([*RT.DetectorList[self.DetInd].pos[:2], zf])
-            pyfaceGUI.invoke_later(func)
+                # execute this function after thread has finished
+                def on_finish() -> None:
+                    if self.FocusDebugPlot:
+                        AutoFocusDebugPlot(r, vals)
+                    self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]  # setDetector() is called
+                    self.Status["Focussing"] = False
+                
+                pyfaceGUI.invoke_later(on_finish)
 
-        # execute this function after thread has finished
-        def after() -> None:
-            if self.FocusDebugPlot:
-                AutoFocusDebugPlot(r[0], vals[0])
-            self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]  # setDetector() is called
-            self.Status["Focussing"] = False
-       
-        action = Thread(target=background, args=(self.Raytracer, self.Pos_Det, self.FocusType, r, vals, after))
-        action.start()
+            action = Thread(target=background, args=(self.Raytracer, self.Pos_Det, self.FocusType))
+            action.start()
+            self.threads.append(action)
 
     @on_trait_change('scene.activated')
     def plotScene(self) -> None:
@@ -1030,7 +1192,7 @@ class GUI(HasTraits):
 
         self.initShiftPressDetector()
 
-        self.Status["Init"] = False
+        self.Status["InitScene"] = False
 
         # set absorb rays missing to true by default, side effect is calling setRays()
         self.AbsorbMissing = ["Absorb Rays Missing Lens"]
@@ -1041,7 +1203,7 @@ class GUI(HasTraits):
     def changeStatus(self) -> None:
         """Update the status info text."""
 
-        if self.Status["Init"]:
+        if self.Status["InitScene"]:
             return
 
         text = ""
@@ -1057,7 +1219,7 @@ class GUI(HasTraits):
     def changeRayWidth(self) -> None:
         """ set the ray width for the visible rays."""
 
-        if self.RaysPlot:
+        if self.hasRaySource() and self.RaysPlot:
             self.Status["Drawing"] = True
             self.RaysPlot.actor.property.trait_set(line_width=self.Ray_width, point_size=self.Ray_width)
             self.Status["Drawing"] = False
@@ -1067,28 +1229,28 @@ class GUI(HasTraits):
     def changePlottingType(self) -> None:
         """Change the PlottingType. Removes the visual rays/points and replots using :obj:`GUI.drawRays`"""
 
-        # remove ray/point plot
-        if self.PlottingType == "None" and self.RaysPlot is not None:
-            self.Status["Drawing"] = True
-            self.RaysPlot.remove()
-            self.RaysPlotScatter.remove()
-            self.RaysPlot = None
-            self.RaysPlotScatter = None
-            self.Status["Drawing"] = False
-
-        # replot rays/points
-        else:
-            self.drawRays()
+        if self.hasRaySource():
+            # remove ray/point plot
+            if self.PlottingType == "None" and self.RaysPlot is not None:
+                self.Status["Drawing"] = True
+                self.RaysPlot.remove()
+                self.RaysPlotScatter.remove()
+                self.RaysPlot = None
+                self.RaysPlotScatter = None
+                self.Status["Drawing"] = False
+            # replot rays/points
+            else:
+                self.drawRays()
 
     @on_trait_change('DetectorSelection')
     def changeDetector(self) -> None:
         """Updates the Detector Selection and the corresponding properties"""
-
-        # surface number for selected source
-        self.DetInd = int(self.DetectorSelection.split(":", 1)[0].split("DET")[1]) - 1
-        self.set_only = True
-        self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]
-        self.set_only = False
+        if self.hasDetector():
+            # surface number for selected source
+            self.DetInd = int(self.DetectorSelection.split(":", 1)[0].split("DET")[1]) - 1
+            self.set_only = True
+            self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]
+            self.set_only = False
 
     # rescale axes texts when the window was resized
     # for some reasons these are the only ones having no text_scaling_mode = 'none' option

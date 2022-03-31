@@ -206,7 +206,7 @@ class RaySource(SObject):
 
         ## Generate ray weights
         ################################################################################################################
-        weights = np.full((N, ), self.power/N, dtype=np.float32)
+        weights = np.full(N, self.power/N, dtype=np.float32)
 
         ## Generate ray wavelengths
         ################################################################################################################
@@ -214,7 +214,7 @@ class RaySource(SObject):
         match self.light_type:
 
             case "Monochromatic":
-                wavelengths = np.full((N,), self.wl, dtype=np.float32)
+                wavelengths = np.full(N, self.wl, dtype=np.float32)
 
             case"Lines":
                 wavelengths = np.random.choice(self.lines, N)

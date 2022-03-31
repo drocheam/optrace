@@ -40,7 +40,7 @@ def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
     base = dict(pi=np.pi, nan=np.nan, inf=np.inf, ninf=np.NINF, euler_gamma=np.euler_gamma, euler=np.e)
 
     # get variables from local frame of caller
-    # this is the way numexpr does it too
+    # this is the way numexpr does it too (see https://github.com/pydata/numexpr/blob/master/numexpr/necompiler.py)
     loc = sys._getframe(2).f_locals | sys._getframe(1).f_locals
 
     # dictonary from additional keyword arguments
