@@ -358,30 +358,4 @@ def spectralCM(N: int, wl0: float = WL_MIN, wl1: float = WL_MAX) -> np.ndarray:
     return RGB
 
 
-def ColorUnderDaylight(spec: Callable[[np.ndarray], np.ndarray]) -> np.ndarray:
-    """
-    Estimate color of an object under daylight using the transmittance/reflectance spectrum.
-    The spectrum function needs to give out values between 0 and 1,
-    where the input parameter is the wavelength in nm (not m!)
-
-    :param spec: transmittance/reflectance spectrum function
-    :return: RGB value (list with 3 elements)
-    """
-
-    wl      = wavelengths(1000)
-    bb_spec = Illuminant(wl, "D65")
-    prod    = bb_spec * spec(wl)
-
-    Y0 = np.sum(bb_spec * Tristimulus(wl, "Y"))
-
-    Xc = np.sum(prod * Tristimulus(wl, "X"))
-    Yc = np.sum(prod * Tristimulus(wl, "Y"))
-    Zc = np.sum(prod * Tristimulus(wl, "Z"))
-
-    XYZn = np.array([[[Xc, Yc, Zc]]] / Y0)
-
-    RGBL = XYZ_to_sRGBLinear(XYZn, normalize=False)
-    RGB = sRGBLinear_to_sRGB(RGBL, normalize=False)[0, 0]
-
-    return RGB
 

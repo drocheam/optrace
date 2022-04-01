@@ -945,52 +945,58 @@ class Raytracer:
         :param r0:
         :return:
         """
+        
         t = (z_pos - p[:, 2]) / s[:, 2] 
         ph = p + s*t[:, np.newaxis]
-
         x, y = ph[:, 0], ph[:, 1]
 
         if mode == "Airy Disc Weighting":
-            expr = misc.calc("w * exp(-0.5*(x**2 + y**2)/ (0.42*r0)**2)")
+            p0, p1, p2 = p[:, 0], p[:, 1], p[:, 2]
+            s0, s1, s2 = s[:, 0], s[:, 1], s[:, 2]
+            # one long ugly expression that speeds things up
+            xm = np.average(x, weights=w)
+            ym = np.average(y, weights=w)
+
+            expr = misc.calc("w * exp(-0.5*((x - xm)**2 + (y-ym)**2)/ (0.42*r0)**2)")
             return 1 - np.sum(expr)/np.sum(w)
-
-        elif mode == "Position Variance":
-            var_x = np.cov(x, aweights=w)
-            var_y = np.cov(y, aweights=w)
-
-            # use pythagoras for overall variance
-            return np.sqrt(var_x + var_y)
-
-        elif mode == "Irradiance Variance":
-
-            x0, x1, y0, y1, _, _ = self.outline
-            inside = (x0 < x) & (x < x1) & (y0 < y) & (y < y1)
-            x, y, w = x[inside], y[inside], w[inside]
-
-            N_px = 201
-            extent = np.min(x), np.max(x), np.min(y), np.max(y)
-
-            # get hit pixel coordinate, subtract 1e-12 from N so all values are 0 <= xcor < N
-            xcor = (N_px - 1e-12) / (extent[1] - extent[0]) * (x - extent[0]) 
-            ycor = (N_px - 1e-12) / (extent[3] - extent[2]) * (y - extent[2])  
-
-            # image can be 1D for standard deviation, speed things up a little bit
-            ind = N_px*ycor.astype(int) + xcor.astype(int)
-
-            Im = np.zeros(N_px**2, dtype=np.float64)
-            np.add.at(Im, ind, w)
-
-            return 1/np.std(Im[Im > 0])
-
         else:
-            raise ValueError(f"Invalid Autofocus Mode '{mode}'.")
+            
+            if mode == "Position Variance":
+                var_x = np.cov(x, aweights=w)
+                var_y = np.cov(y, aweights=w)
 
-    # TODO show information about search range?
+                # use pythagoras for overall variance
+                return np.sqrt(var_x + var_y)
+
+            elif mode == "Irradiance Variance":
+
+                x0, x1, y0, y1, _, _ = self.outline
+                inside = (x0 < x) & (x < x1) & (y0 < y) & (y < y1)
+                x, y, w = x[inside], y[inside], w[inside]
+
+                N_px = 101
+                extent = np.min(x), np.max(x), np.min(y), np.max(y)
+
+                # get hit pixel coordinate, subtract 1e-12 from N so all values are 0 <= xcor < N
+                xcor = (N_px - 1e-12) / (extent[1] - extent[0]) * (x - extent[0]) 
+                ycor = (N_px - 1e-12) / (extent[3] - extent[2]) * (y - extent[2])  
+
+                # image can be 1D for standard deviation, speed things up a little bit
+                ind = N_px*ycor.astype(int) + xcor.astype(int)
+
+                Im = np.zeros(N_px**2, dtype=np.float64)
+                np.add.at(Im, ind, w)
+
+                return np.sqrt(1/np.std(Im[Im > 0]))  # sqrt for better value range
+
+            else:
+                raise ValueError(f"Invalid Autofocus Mode '{mode}'.")
+
     # TODO use source_index to focus for only one source
     def autofocus(self,
                   method,
                   z_start:      float,
-                  N:            int = 100000,
+                  N:            int = 75000,
                   ret_cost:     bool = True)\
             -> tuple[float, np.ndarray, np.ndarray]:
         """
@@ -1084,11 +1090,6 @@ class Raytracer:
                                              options={'maxiter': 500, 'xatol':1e-6},
                                              bounds=bounds, method='Bounded')
 
-        db = (bounds[1] - bounds[0])/8  # use result of Position Variance mode
-        rs = max(res.x-db, bounds[0])  # make sure it's inside bounds
-        re = min(res.x+db, bounds[1])  # make sure it's inside bounds
-
-
         if method == "Airy Disc Weighting":
             # calculate size of airy disc for method Airy Disc Weighting 
             s_z = np.nanquantile(s[:, 2], 0.95)
@@ -1099,11 +1100,25 @@ class Raytracer:
         else:
             r0 = 1e-3
 
+        Nt = 1000
+
         if method != "Position Variance" or ret_cost:
             # sample smaller region around minimum with proper method
-            Nt = 150
-            r = np.linspace(rs, re, Nt)
-            vals = [self.autofocus_cost_func(rs, method, p, s, weights, r0=r0) for rs in r]
+            r = np.linspace(bounds[0], bounds[1], Nt)
+            vals = np.zeros_like(r)
+            N_th = misc.getCoreCount()
+
+            def threaded(N_th, N_is, Nt, *afargs):
+                Ns = N_is*int(Nt/N_th)
+                Ne = (N_is+1)*int(Nt/N_th) if N_is != N_th-1 else Nt
+                vals[Ns:Ne] = [self.autofocus_cost_func(rs, *afargs) for rs in r[Ns:Ne]]
+            
+            if self.multithreading:   
+                threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, p, s, weights, r0)) for N_is in range(N_th)]
+                [th.start() for th in threads]
+                [th.join() for th in threads]
+            else:
+                threaded(1, 0, method, p, s, weights, r0)
         else:
             r = None
             vals = None
@@ -1116,9 +1131,13 @@ class Raytracer:
             res = scipy.optimize.minimize(cost_func2, r[pos], args=method, tol=None, callback=None,
                                           options={'maxiter': 300}, bounds=[bounds])
 
-        # debug plots
+        # print warning if result is near bounds
         ########################################################################################################
 
-        # return position of minimum
-        return res.x, r, vals
+        rrl = (res.x - bounds[0]) < 10*(bounds[1] - bounds[0]) / Nt
+        rrr = (bounds[1] - res.x) < 10*(bounds[1] - bounds[0]) / Nt
+        if (rrl or rrr) and not self.silent:
+            print("WARNING: Found minimum near search bounds, this could mean the focus is outside the search range")
+
+        return res.x, res.fun, r, vals
 

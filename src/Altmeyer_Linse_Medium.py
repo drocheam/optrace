@@ -5,7 +5,7 @@ from Backend import *
 from Frontend import *
 
 # make Raytracer
-RT = Raytracer(outline=[-5, 5, -5, 5, -40, 120], n0=RefractionIndex("Constant", n=1.1))
+RT = Raytracer(outline=[-5, 5, -5, 5, -40, 40], n0=RefractionIndex("Constant", n=1.3))
 
 # add Raysource1
 RSS1 = Surface("Circle", r=0.00001)
@@ -15,7 +15,7 @@ RT.add(RS1)
 
 # Refraction Indices
 nL1 = RefractionIndex("Constant", n=1.5)
-nL2 = RefractionIndex("Constant", n=1.0)
+nL2 = RefractionIndex("Constant", n=1.3)
 
 # add Lens 1
 front = Surface("Sphere", r=0.1, rho=1/8)

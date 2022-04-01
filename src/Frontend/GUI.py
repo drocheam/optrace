@@ -46,32 +46,26 @@ class GUI(HasTraits):
     ####################################################################################################################
     # UI objects
 
-    DETECTOR_COLOR: tuple[float, float, float] = (0.1, 0.1, 0.1) 
+    DETECTOR_COLOR: tuple[float, float, float] = (0.10, 0.10, 0.10) 
     """RGB Color for the Detector visualization"""
 
     DETECTOR_ALPHA: float = 0.8
     """Alpha value for the Detector visualization"""
 
-    BACKGROUND_COLOR: tuple[float, float, float] = (0.408, 0.4, 0.4)
+    BACKGROUND_COLOR: tuple[float, float, float] = (0.41, 0.40, 0.40)
     """RGB Color for the Scene background"""
 
-    LENS_COLOR: tuple[float, float, float] = (0.37, 0.69, 1.00)
+    LENS_COLOR: tuple[float, float, float] = (0.63, 0.79, 1.00)
     """RGB Color for the Lens surface visualization"""
 
     LENS_ALPHA: float = 0.32
     """Alpha value for the Lens visualization"""
-
-    RAYSOURCE_COLOR: tuple[float, float, float] = (1.00, 1.00, 1.00)
-    """RGB Color for the Lens surface visualization"""
 
     RAYSOURCE_ALPHA: float = 0.5
     """Alpha value for the RaySource visualization"""
 
     RAY_ALPHA: float = 0.01
     """Alpha value for the ray visualization"""
-
-    FILTER_ALPHA: float = 0.9
-    """Alpha value for the Filter visualization"""
 
     OUTLINE_ALPHA: float = 0.25
     """ Alpha value for outline visualization """
@@ -252,7 +246,9 @@ class GUI(HasTraits):
         self.SourceNames = []
         self.DetectorNames = []
         self.DetInd = 0
-        
+       
+        self.RaySourcePlots = []
+
         # minimal/maximal z-positions of Detector_obj
         self.Pos_Det_min = self.Raytracer.outline[4]
         self.Pos_Det_max = self.Raytracer.outline[5]
@@ -308,7 +304,8 @@ class GUI(HasTraits):
         :param num:
         """
         Fcolor = filter_.getColor()
-        self.plotSObject(filter_, num, "Filter", "F", Fcolor, self.FILTER_ALPHA)    
+        alpha = 0.1 + 0.899*Fcolor[1]  # offset in both directions, ensures visibility and see-through
+        self.plotSObject(filter_, num, "Filter", "F", Fcolor[0], alpha)    
 
     def plotDetector(self, Det: Detector, num: int) -> None:
         """
@@ -330,8 +327,10 @@ class GUI(HasTraits):
         :param num:
         """
 
-        self.plotSObject(RS, num, "RaySource", "RS", RS.getColor(), self.RAYSOURCE_ALPHA, 
+        a, b, _, _ = self.plotSObject(RS, num, "RaySource", "RS", (1, 1, 1), self.RAYSOURCE_ALPHA, 
                                      d=-self.D_VIS, spec=False, light=False)   
+
+        self.RaySourcePlots.append((a, b))
 
         if RS.light_type in ["RGB_Image", "BW_Image"]:
             RS_Image_Text = self.scene.mlab.text3d(RS.pos[0]-0.5, RS.pos[1], RS.pos[2], "Image", color=(0, 0, 0),
@@ -598,13 +597,21 @@ class GUI(HasTraits):
         lutm.scalar_bar_widget.process_events           = False  # make non-interactive
         lutm.scalar_bar_representation.border_thickness = 0  # no ugly borders 
 
+        if len(self.Raytracer.RaySourceList) != len(self.RaySourcePlots):
+            raise RuntimeError("Number of RaySourcePlots differs from actual Sources. Maybe the GUI was not updated properly?")
+        
         # custom lut for wavelengths
         match self.ColoringType:
+
+            case "White":
+                RSColor = [(1, 1, 1) for RSp in self.RaySourcePlots]
 
             case 'Wavelength':
                 lutm.lut.table = Color.spectralCM(255)
                 lutm.data_range = [Color.WL_MIN, Color.WL_MAX]
                 lutm.number_of_labels = 11
+
+                RSColor = [RS.getColor() for RS in self.Raytracer.RaySourceList]
 
             case 'Polarization':
                 if self.Raytracer.no_pol:
@@ -619,17 +626,44 @@ class GUI(HasTraits):
                     lutm.data_range = [0, lutm.data_range[1]]
 
                 lutm.number_of_labels = 11
-            
+          
+                # Color from polarization projection on yz-plane
+                RSColor = []
+                for RS in self.Raytracer.RaySourceList:
+                    match RS.polarization_type:
+                        case "x":
+                            col = lutm.lut.table[0]
+                        case "y":
+                            col = lutm.lut.table[-1]
+                        case "Angle":
+                            yzpr = (np.sin(np.deg2rad(RS.pol_ang)) - lutm.data_range[0]) / lrange
+                            col = lutm.lut.table[int(yzpr*255)]
+                        case _:  # no single axis -> show white
+                            col = (255, 255, 255)
+
+                    RSColor.append(np.array(col[:3])/255.)
+
             case 'Source':
                 lutm.number_of_labels = len(self.Raytracer.RaySourceList)
                 lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-#6.f"
                 if lutm.number_of_labels > 1:
                     # set color steps, smaller 420-650nm range for  larger color contrast
                     lutm.lut.table = Color.spectralCM(lutm.number_of_labels, 420, 650)
+        
+                RSColor = [np.array(lutm.lut.table[i][:3])/255. for i, _ in enumerate(self.RaySourcePlots)]
 
             case 'Power':
                 if lutm.data_range[0]/(lutm.data_range[1]-lutm.data_range[0]) < 0.05: 
                     lutm.data_range = [0, lutm.data_range[1]]
+
+                # set to maximum ray power, this is the same for all sources
+                RSColor = [np.array(lutm.lut.table[-1][:3])/255. for RSp in self.RaySourcePlots]
+
+        # set RaySource Colors
+        for i, RSp in enumerate(self.RaySourcePlots):
+            for RSi in RSp:
+                if RSi:
+                    RSi.actor.actor.property.trait_set(color=tuple(RSColor[i]))
 
         # set visual ray properties
         self.RaysPlot.actor.property.representation = 'points' if self.PlottingType == 'Points' else 'surface'
@@ -759,18 +793,40 @@ class GUI(HasTraits):
             # get properties of this ray section
             p_, s_, pols_, pw_, wv, snum = self.Raytracer.Rays.getRay(pos)
             p, s, pols, pw = p_[n2_], s_[n2_], pols_[n2_], pw_[n2_]
-            pl = (pw_[0]-pw)/pw_[0]  # power loss
+
+            pw0 = pw_[n2_-1] if n2_ > 0 else None
+            s0 = s_[n2_-1] if n2_ > 0 else None
+            pols0 = pols_[n2_-1] if n2_ > 0 else None
+            pl = (pw0-pw)/pw0 if n2_ > 0 else None  # power loss
+
+            sh = self.ShiftPressed
+
+            def toSphCoords(s):
+                return np.array([np.rad2deg(np.arctan2(s[1], s[0])), np.rad2deg(np.arccos(s[2])), 1])
+
+            s_sph = toSphCoords(s)
+            s0_sph = toSphCoords(s0) if n2_ > 0 else None
+            pols_sph = toSphCoords(pols)
+            pols0_sph = toSphCoords(pols0) if n2_ > 0 else None
 
             # generate text
-            text = f"Ray {pos}" +  \
-                   f" from Source {snum}" +  \
+            text =  f"Ray {pos}" +  \
+                    f" from Source {snum}" +  \
                    (f" at surface {n2_}\n" if n2_> 0 else f" at ray source\n") + \
-                   f"Position:     ({p[0]:>10.5g}, {p[1]:>10.5g}, {p[2]:>10.5g})\n" + \
-                   f"Direction     ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})\n" + \
-                   f"Polarization: ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})\n" + \
-                   f"Wavelength:  {wv:>10.2f}nm\n" + \
-                   f"Ray Power:   {pw*1e6:>10.5g}µW\n" + \
-                   f"Power Loss:  {pl*100:>10.5g}%"
+                    f"Position:             ({p[0]:>10.5g}, {p[1]:>10.5g}, {p[2]:>10.5g})\n" + \
+                   (f"Direction Before:     ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})" if n2_ and sh else "") + \
+                   (f"      ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°, {s0_sph[2]:>10.5f})\n" if n2_ and sh else "") + \
+                    f"Direction After:      ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})" + \
+                   (f"      ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°, {s_sph[2]:>10.5f})\n" if sh else "\n") + \
+                   (f"Polarization Before:  ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})" if n2_ and sh else "") + \
+                   (f"      ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°, {pols0_sph[2]:>10.5f})\n" if n2_ and sh else "") + \
+                    f"Polarization After:   ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})" + \
+                   (f"      ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°, {pols_sph[2]:>10.5f})\n" if sh else "\n") + \
+                    f"Wavelength:            {wv:>10.2f} nm\n" + \
+                   (f"Ray Power Before:      {pw0*1e6:>10.5g} µW\n" if n2_ > 0 and sh else "") + \
+                    f"Ray Power After:       {pw*1e6:>10.5g} µW\n" + \
+                   (f"Power Loss on Surface: {pl*100:>10.5g} %" if n2_ > 0 and sh else "") + \
+                   (f"Pick using Shift+Left Mouse Button for more info" if not sh else "")
             
             self.RayText.text = text
             self.RayText.property.trait_set(**self.INFO_STYLE, background_opacity=0.2)
@@ -854,6 +910,8 @@ class GUI(HasTraits):
         # ray properties
         self.RaysPlotScatter = None  # plot for scalar ray values
         self.RaysPlot = None  # plot for visualization of rays/points
+
+        self.RaySourcePlots = []
 
         # Detector properties
         self.DetectorPlot = []  # visual representation of the Detector
@@ -1161,13 +1219,13 @@ class GUI(HasTraits):
 
             # run this in background thread
             def background(RT: Raytracer, z: float, method: str) -> None:
-                zf, r, vals = RT.autofocus(method, z, ret_cost=self.FocusDebugPlot)
+                zf, zff, r, vals = RT.autofocus(method, z, ret_cost=self.FocusDebugPlot)
                 RT.DetectorList[self.DetInd].moveTo([*RT.DetectorList[self.DetInd].pos[:2], zf])
 
                 # execute this function after thread has finished
                 def on_finish() -> None:
                     if self.FocusDebugPlot:
-                        AutoFocusDebugPlot(r, vals)
+                        AutoFocusDebugPlot(r, vals, zf, zff, f"Focus Finding Using the {method} Method")
                     self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]  # setDetector() is called
                     self.Status["Focussing"] = False
                 

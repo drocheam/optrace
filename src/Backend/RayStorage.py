@@ -175,7 +175,7 @@ class RayStorage:
             if Ns <= num < Ne:
                 snum = i 
 
-        s = self.p_list[num, :-1] - self.p_list[num, 1:]
+        s = self.p_list[num, 1:] - self.p_list[num, :-1]
         s = np.concatenate((s, [s[-1]]))
 
         if normalize:
@@ -248,7 +248,7 @@ class RayStorage:
         else:
             if ch2 is None:
                 ch2 = slice(None)
-                s = self.p_list[ch, :-1] - self.p_list[ch, 1:]
+                s = self.p_list[ch, 1:] - self.p_list[ch, :-1]
                 s = np.hstack((s, s[:, np.newaxis, -1]))
 
                 if normalize:

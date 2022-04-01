@@ -77,5 +77,26 @@ class Filter(SObject):
 
         :return: sRGB color tuple, with each channel in range [0, 1]
         """
-        return tuple(Color.ColorUnderDaylight(self.__call__))
+        # Estimate color of an object under daylight using the transmittance/reflectance spectrum.
+
+        wl      = Color.wavelengths(1000)
+        bb_spec = Color.Illuminant(wl, "D65")
+        prod    = bb_spec * self.__call__(wl)
+
+        Y0 = np.sum(bb_spec * Color.Tristimulus(wl, "Y"))
+
+        Xc = np.sum(prod * Color.Tristimulus(wl, "X"))
+        Yc = np.sum(prod * Color.Tristimulus(wl, "Y"))
+        Zc = np.sum(prod * Color.Tristimulus(wl, "Z"))
+
+        XYZn = np.array([[[Xc, Yc, Zc]]] / Y0)
+
+        RGBL = Color.XYZ_to_sRGBLinear(XYZn, normalize=False)
+        RGB = Color.sRGBLinear_to_sRGB(RGBL, normalize=False)[0, 0]
+
+        # 1 - Yc/Y0 is the ratio of visble ambient light coming through the filter
+        # gamma correct for non-linear human vision
+        alpha = (1 - Yc/Y0) ** (1/2.2)
+
+        return tuple(RGB), alpha
 

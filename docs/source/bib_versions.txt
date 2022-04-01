@@ -1,0 +1,16 @@
+ Python Version: Python 3.10.2
+ 
+ Library Versions:
+  
+ colorio                       0.10.2
+ matplotlib                    3.5.1
+ mayavi                        4.7.4
+ numexpr                       2.8.1
+ numpy                         1.22.3
+ Pillow                        9.0.1
+ pyface                        7.3.0
+ pynput                        1.7.6
+ PyQt5                         5.15.6
+ scipy                         1.8.0
+ traits                        6.2.0
+ traitsui                      7.2.1
