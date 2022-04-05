@@ -30,6 +30,6 @@ RT.add(Det)
 
 # Instantiate the GUI
 sim = GUI(RT)
-sim()
+sim.run()
 
 

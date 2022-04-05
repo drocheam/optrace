@@ -41,11 +41,20 @@ class Surface:
         :param ri: radius of inner circle for surface_type="Ring" (float)
         :param func:
         """
-
+        self._lock = False
         self.surface_type = surface_type
 
         self.pos = np.array([0., 0., 0.], dtype=np.float64)
+        self.pos.flags.writeable = False
+        
         self.dim = np.array(dim, dtype=np.float64)
+        self.dim.flags.writeable = False
+
+        self.Mask = np.array([], dtype=np.float64)
+        self.Mask.flags.writeable = False
+
+        self.Z = np.array([], dtype=np.float64)
+        self.Z.flags.writeable = False
 
         self.r, self.ri = float(r), float(ri)
         self.rho, self.k = float(rho), float(k)
@@ -94,6 +103,7 @@ class Surface:
    
                 self.Z = np.array(Data, dtype=np.float64)
                 self.Mask = np.isfinite(self.Z)
+                self.Mask.flags.writeable = False
                 self.Z = misc.interpolateNan(self.Z)
 
                 ny, nx = self.Z.shape
@@ -111,6 +121,7 @@ class Surface:
 
                 # remove offset at center
                 self.Z -= misc.ValueAt(self.xy, self.xy, self.Z, 0, 0)
+                self.Z.flags.writeable = False
 
             case "Function":
                 self.minz = self.pos[2] + self.func.minz
@@ -137,6 +148,8 @@ class Surface:
 
             case _:
                 raise ValueError("Invalid surface_type")
+
+        self._lock = True
 
     def copy(self) -> 'Surface':
         """
@@ -167,12 +180,15 @@ class Surface:
         :param pos: 3D position to move to (list or numpy 1D array)
         """
 
+        self._lock = False
         self.minz += pos[2] - self.pos[2]
         self.maxz += pos[2] - self.pos[2]
 
         # update position
         self.pos = np.array(pos, dtype=np.float64)
-    
+        self.pos.flags.writeable = False
+        self._lock = True
+
     def getExtent(self) -> tuple[float, float, float, float, float, float]:
         """
 
@@ -574,9 +590,16 @@ class Surface:
                     p_hit[mask] = p[mask] + s[mask]*t[:, np.newaxis]
                     is_hit[mask] = self.getMask(p_hit[mask, 0], p_hit[mask, 1])
 
-                # no intersection, set intesection to imaginary plane z = maxz
-                # no hit when ~is_hit, D imaginary, (A == 0 and B == 0), or hit point behind starting point (-z direction)
-                nh = ~is_hit | ~np.isfinite(D) | ((A == 0) & (B == 0)) | (p_hit[:, 2] < p[:, 2])
+                # cases with no hit:
+                # D imaginary, means no hit with whole surface function
+                # (p_hit[:, 2] < minz) | (p_hit[:, 2] > maxz): Hit with surface function, 
+                #               but for the wrong side or outside our surfaces definition region
+                # (A == 0) | (B == 0) : Surface is a Line => not hit (technically infinite hits for C == 0, but we'll ignore this) 
+                #   simplest case: ray shooting straight at center of a parabola with 1/rho = 0, which is so steep, it's a line
+                # the ray follows the parabola line exactly => infinite solutions
+                #   s = (0, 0, 1), o = (0, 0, oz), k = -1, 1/rho = inf  => A = 0, B = 0, C = 0 => infinite solutions
+                nh = ~is_hit | ~np.isfinite(D) | ((A == 0) & (B == 0)) | (p_hit[:, 2] < minz) | (p_hit[:, 2] > maxz)
+                # set intersection to plane z = maxz
                 tnh = (self.maxz - p[nh, 2])/s[nh, 2]
                 p_hit[nh] = p[nh] + s[nh]*tnh[:, np.newaxis]
                 is_hit[nh] = False
@@ -586,3 +609,22 @@ class Surface:
             case _:
                 raise RuntimeError(f"Hit finding not defined for surface_type {self.surface_type}.")
 
+
+    def crepr(self):
+        """
+
+        """
+
+        return [self.surface_type, self.r, self.ri, self.k, self.rho, self.ang, self.minz, 
+                self.maxz, self.pos, self.dim, id(self.Z), 
+                id(self.Mask), self.eps, (self.func.crepr() if self.func is not None else None)]
+
+    def __str__(self):
+        return f"{self.__class__.__name__} at {hex(id(self))} with {self.__dict__}"
+
+    def __setattr__(self, key, val):
+
+        if "_lock" in self.__dict__ and self._lock and key != "_lock":
+            raise RuntimeError("Changing Surface properties after initialization is prohibited. Create a new Surface and assign it to the parent object.")
+        
+        self.__dict__[key] = val

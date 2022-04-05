@@ -26,8 +26,13 @@ class Detector(SObject):
         """
         super().__init__(Surface, pos)
 
+        self.name = "Detector"
+        self.short_name = "DET"
+        
         if not self.Surface.hasHitFinding:
             raise RuntimeError(f"surface_type '{Surface.surface_type}' has no hit finding functionality.")
+
+        self._new_lock = True
 
     def getAngleExtent(self) -> np.ndarray:
         """
@@ -72,3 +77,4 @@ class Detector(SObject):
         p_hit[:, 1] = misc.calc("theta*sin(phi)")
 
         return p_hit
+

@@ -170,7 +170,7 @@ class Image:
 
         return Im
 
-    def fixExtent(self) -> None:
+    def __fixExtent(self) -> None:
         """
         Fix image extent. Point images are given a valid 2D extent. 
         Line images or images with a large side-to-side ratio are adapted.
@@ -212,13 +212,13 @@ class Image:
         :param p: ray position matrix, xyz components in columns, (numpy 1D array)
         :param w: ray weight array (numpy 1D array)
         :param wl: ray wavelength array (numpy 1D array)
-        :param keep_extent: True if :obj:`Image.fixExtent` shouldn't be called before image calculation
+        :param keep_extent: True if :obj:`Image.__fixExtent` shouldn't be called before image calculation
         :param threading: True if multithreading should be enabled.
         """
 
         # fix point and line images as well as ones with a too large side ratio
         if not keep_extent:
-            self.fixExtent()
+            self.__fixExtent()
         
         # N is provided for smaller side of image, get the other one by scaling
         # note that the resulting pixel size is not square, since we are limited to int values
@@ -288,3 +288,5 @@ class Image:
 
         # scale radiant and luminous flux by pixel area to get irradiance and illuminance
         self.Im[:, :, 3:] *= 1 / self.Apx
+
+

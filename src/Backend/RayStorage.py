@@ -5,21 +5,18 @@ import numpy as np
 from Backend.RaySource import *
 import Backend.Misc as misc
 
+
 class RayStorage:
 
-    def __init__(self) -> None:
-        """
-
-        """
-        self.N_List = []
-        self.B_List = []
+    N_list = []
+    B_list = []
 
     def hasRays(self) -> bool:
         """
 
         :return:
         """
-        return len(self.N_List) > 0
+        return len(self.N_list) > 0
 
     @property
     def N(self) -> int:
@@ -33,7 +30,7 @@ class RayStorage:
 
     def createRays(self,
                    RaySourceList:   list[RaySource],
-                   N_List:          list[int],
+                   N_list:          list[int],
                    nt:              int,
                    threading:       bool = False,
                    no_pol:          bool = False) \
@@ -46,9 +43,10 @@ class RayStorage:
         :param threading:
         :param no_pol:
         """
-        self.N_List = N_List
-        self.B_List = np.concatenate(([0], np.cumsum(self.N_List)))
-        N           = np.sum(N_List)
+        self._locked = False
+        self.N_list = N_list
+        self.B_list = np.concatenate(([0], np.cumsum(self.N_list)))
+        N           = np.sum(N_list)
        
 
         # weights, polarization and wavelengths don't need double precision, this way we save some RAM
@@ -57,25 +55,24 @@ class RayStorage:
         self.s0_list     = np.zeros((N, 3),     dtype=np.float64, order='F')
         self.pol_list    = np.zeros((N, nt, 3), dtype=np.float32, order='F')
         self.w_list      = np.zeros((N, nt),    dtype=np.float32, order='F')
-        self.wavelengths = np.zeros((N,),       dtype=np.float32)        
+        self.wl_list     = np.zeros((N,),       dtype=np.float32)        
 
         def addSourceRays(i: int) -> None:
 
-            Ns, Ne = self.B_List[i:i+2]
+            Ns, Ne = self.B_list[i:i+2]
             sl1 = slice(Ns, Ne)
 
             self.p_list[sl1, 0],\
             self.s0_list[sl1],   \
             self.pol_list[sl1, 0],\
             self.w_list[sl1, 0],   \
-            self.wavelengths[sl1]   \
-                                     = RaySourceList[i].createRays(N_List[i], no_pol=no_pol)
+            self.wl_list[sl1]   \
+                                     = RaySourceList[i].createRays(N_list[i], no_pol=no_pol)
 
         # don't use multithreading if there are to many ray sources
         if threading and len(RaySourceList) < 2*misc.getCoreCount():
 
             thread_list = [Thread(target=addSourceRays, args=[N_t]) for N_t in np.arange(len(RaySourceList))]
-            
             [thread.start() for thread in thread_list]
             [thread.join()  for thread in thread_list]
 
@@ -104,7 +101,7 @@ class RayStorage:
                self.s0_list[Ns:Ne], \
                self.pol_list[Ns:Ne], \
                self.w_list[Ns:Ne],    \
-               self.wavelengths[Ns:Ne]
+               self.wl_list[Ns:Ne]
 
     def getRaysAtZ(self,
                    z:           float,
@@ -144,14 +141,14 @@ class RayStorage:
         # and we don't need to do that
 
         # get Ray parts
-        p, s, pol, weights, wavelengths, snum = self.getRaysByMask(rays_pos, pos, normalize=normalize)
+        p, s, pol, w, wl, snum = self.getRaysByMask(rays_pos, pos, normalize=normalize)
 
         # get positions of rays at the detector
-        hw = weights > 0
+        hw = w > 0
         t = (z - p[hw, 2])/s[hw, 2]
         ph = p[hw] + s[hw] * t[:, np.newaxis]
 
-        return ph, p, s, pol, weights, wavelengths, snum
+        return ph, p, s, pol, w, wl, snum
 
     # TODO use last known s instead nan
     def getRay(self, num: int, normalize: bool = True) \
@@ -170,8 +167,8 @@ class RayStorage:
             raise ValueError("Number exceeds number of rays")
 
         snum = -1
-        for i in np.arange(len(self.N_List)):
-            Ns, Ne = self.B_List[i:i+2]
+        for i in np.arange(len(self.N_list)):
+            Ns, Ne = self.B_list[i:i+2]
             if Ns <= num < Ne:
                 snum = i 
 
@@ -183,7 +180,7 @@ class RayStorage:
             s[norms == 0] = np.nan
             s[norms != 0] = s[norms != 0] / norms[norms != 0, np.newaxis]
 
-        return self.p_list[num], s, self.pol_list[num], self.w_list[num], self.wavelengths[num], snum+1
+        return self.p_list[num], s, self.pol_list[num], self.w_list[num], self.wl_list[num], snum+1
 
     def getSourceRays(self, index: int)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -197,13 +194,13 @@ class RayStorage:
         if not self.hasRays():
             raise RuntimeError("RaySourceList has no rays stored.")
         
-        Ns, Ne = self.B_List[index:index+2] 
+        Ns, Ne = self.B_list[index:index+2] 
 
         return self.p_list[Ns:Ne, 0], \
                self.s0_list[Ns:Ne],    \
                self.pol_list[Ns:Ne, 0], \
                self.w_list[Ns:Ne, 0],    \
-               self.wavelengths[Ns:Ne]
+               self.wl_list[Ns:Ne]
 
     # TODO schöner machen
     # TODO was bei s = [0, 0, 0] und normalize=False?
@@ -236,8 +233,8 @@ class RayStorage:
         else:
             ind = np.nonzero(ch)[0]
             snums = np.zeros_like(ind, dtype=int)
-            for i in np.arange(len(self.N_List)):
-                Ns, Ne = self.B_List[i:i+2]
+            for i in np.arange(len(self.N_list)):
+                Ns, Ne = self.B_list[i:i+2]
                 snums[(ind >= Ns) & (ind < Ne)] = i
             snums += 1
 
@@ -273,8 +270,36 @@ class RayStorage:
         p   = self.p_list[ch, ch2]   if ret[0] else None
         pol = self.pol_list[ch, ch2] if ret[2] else None
         w   = self.w_list[ch, ch2]   if ret[3] else None
-        wl  = self.wavelengths[ch]   if ret[4] else None
+        wl  = self.wl_list[ch]       if ret[4] else None
 
         return p, s, pol, w, wl, snums
 
+    def crepr(self):
+        """
 
+        """
+
+        return [self.N, self.nt, self.N_list, self.B_list, 
+                    id(self.p_list), id(self.s0_list), id(self.pol_list), id(self.w_list), id(self.wl_list)]
+    
+
+    # methods for signalising the user to not edit rays after raytracing
+    # since it's python he could find a workaround for this, but maybe knowing there's maybe a reason for locking stops him doing so
+
+    def lock(self):
+        """make storage read only"""
+
+        if self.p_list is not None:         self.p_list.flags.writeable = False
+        if self.s0_list is not None:        self.s0_list.flags.writeable = False
+        if self.w_list is not None:         self.w_list.flags.writeable = False
+        if self.wl_list is not None:        self.wl_list.flags.writeable = False
+        if self.pol_list is not None:       self.pol_list.flags.writeable = False
+
+        self._locked = True
+
+    def __setattr__(self, key, val):
+
+        if "_locked" in self.__dict__ and self._locked and key != "_locked":
+            raise RuntimeError("Operation not permitted since RayStorage is read-only outside raytracing.")
+
+        self.__dict__[key] = val

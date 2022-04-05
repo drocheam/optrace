@@ -9,7 +9,7 @@ from testFrontend import FrontendTests
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(BackendModuleTests))
-    suite.addTest(unittest.makeSuite(ExampleTests))
+    # suite.addTest(unittest.makeSuite(ExampleTests))
     suite.addTest(unittest.makeSuite(FrontendTests))
     return suite
 

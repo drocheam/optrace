@@ -12,4 +12,5 @@ from Backend.Raytracer import Raytracer
 from Backend.Detector import Detector
 from Backend.RefractionIndex import RefractionIndex
 from Backend.Filter import Filter
+from Backend.Aperture import Aperture
 

@@ -14,6 +14,8 @@ from Backend.SObject import *
 
 # TODO error message when surface is point or line
 
+# TODO setattr handling
+
 class Lens(SObject):
 
     def __init__(self, 
@@ -52,7 +54,12 @@ class Lens(SObject):
         elif d1 is None or d2 is None:
             raise ValueError("Both thicknesses d1, d2 need to be specified")
 
+        self.name = "Lens"
+        self.short_name = "L"
+        
         super().__init__(front, pos, back, d1, d2)
+
+        self._new_lock = True
 
     def estimateFocalLength(self, wl: float=555., n0: RefractionIndex=RefractionIndex("Constant", n=1.)) -> float:
         """
@@ -86,4 +93,12 @@ class Lens(SObject):
         # lensmaker equation
         D = (n-n0_)/n0_ * (1/R1 - 1/R2 + (n - n0_) * d /(n*R1*R2))
 
-        return 1 / D
+        return 1 / D    
+
+
+    def crepr(self):
+
+        """
+
+        """
+        return [self.FrontSurface.crepr(), self.BackSurface.crepr(), self.d1, self.d2, self.n.crepr(), (self.n2.crepr() if self.n2 is not None else None)]

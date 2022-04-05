@@ -47,6 +47,7 @@ class SObject:
         :param FrontSurface: Surface object
         :param pos: 3D position of SObject center (numpy array or list)
         """
+        self._geometry_lock = False
 
         # use a Surface copy, since we change its position in 3D space
         self.FrontSurface = FrontSurface.copy()
@@ -64,6 +65,7 @@ class SObject:
                 raise ValueError("Thicknesses de, d1, d2 need to be non-negative.")
         
         self.moveTo(pos)
+        self._geometry_lock = True
 
     def hasBackSurface(self) -> bool:
         """:return: if the SObject has a BackSurface"""
@@ -79,9 +81,11 @@ class SObject:
 
         :param surf: Surface to assign
         """
+        self._geometry_lock = False
         pos = self.FrontSurface.pos
         self.FrontSurface = surf.copy()
         self.FrontSurface.moveTo(pos)
+        self._geometry_lock = True
 
     def setBackSurface(self, surf: Surface) -> None:
         """
@@ -89,9 +93,11 @@ class SObject:
 
         :param surf: Surface to assign
         """
+        self._geometry_lock = False
         pos = self.BackSurface.pos
         self.BackSurface = surf.copy()
         self.BackSurface.moveTo(pos)
+        self._geometry_lock = True
 
     def moveTo(self, pos: (list | np.ndarray)) -> None:
         """
@@ -167,3 +173,40 @@ class SObject:
         Z = np.column_stack((Z1, Z2))
 
         return X, Y, Z
+
+    def __setattr__(self, key, val):
+
+        # lock assignment of new properties
+        if "_new_lock" in self.__dict__ and self._new_lock:
+            if key not in self.__dict__:
+                raise AttributeError(f"Invalid property '{key}'")
+
+        # lock changing of geometry directly
+        if "_geometry_lock" in self.__dict__ and self._geometry_lock:
+            if key in ["d1", "d2", "FrontSurface", "Surface", "BackSurface"]:
+                raise RuntimeError("Use Functions setFrontSurface and setBackSurface to reassign a new Surface or its thickness.")
+            if key == "pos":
+                raise RuntimeError("Use moveTo(pos) to move the Object")
+
+        if key in ["name", "short_name"] and not isinstance(val, str):
+            raise TypeError(f"{key} needs to be of type str.")
+
+        if key in ["FrontSurface", "BackSurface"] and not isinstance(val, Surface | None):
+            raise TypeError(f"{key} needs to be of type Surface.")
+
+        if key in ["d1", "d2"]:
+            if not isinstance(val, int | float | None):
+                raise TypeError(f"{key} needs to be a number.")
+
+            if val is not None:
+                val = float(val)
+
+        self.__dict__[key] = val
+    
+    def crepr(self):
+        """"""
+        return [self.FrontSurface.crepr(), (self.BackSurface.crepr() if self.BackSurface is not None else None), self.d1, self.d2]
+
+    def __str__(self):
+        return f"\t{self.__class__} at {hex(id(self))} with {self.__dict__}"
+

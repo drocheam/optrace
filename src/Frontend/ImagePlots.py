@@ -10,7 +10,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
-import PyQt5
+# import PyQt5
 
 from Backend.Image import *
 
@@ -31,7 +31,8 @@ def DetectorPlot(Im:        Image,
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
     clabel = "Irradiance in W/mm²" if mode == "Irradiance" else "Illuminance in lm/mm²"
-    text = f"Detector at z = {Im.z:.5g} mm"
+    index = f" {Im.index}" if Im.index is not None else ""
+    text = f"Detector{index} at z = {Im.z:.5g} mm"
 
     if mode == "Irradiance":
         text += f"\n Total Radiant Flux at Detector: {Im.getPower():.5g} W"
@@ -58,7 +59,7 @@ def SourcePlot(Im:      Image,
     """
 
     clabel = "Radiant Emittance in W/mm²" if mode == "Irradiance" else "Luminous Emittance in lm/mm²"
-    index = f" {Im.index}" if Im.index else ""
+    index = f" {Im.index}" if Im.index is not None else ""
     text = f"Source{index} at z = {Im.z:.5g} mm"
 
     if mode == "Irradiance":
@@ -112,9 +113,6 @@ def showImage(Im_in:    Image,
         extent = Im_in.extent[[1, 0, 3, 2]]
     else:
         extent = Im_in.extent
-
-    # enforce plotting backend to show plots interactive and in separate windows
-    matplotlib.use('Qt5Agg')
 
     # better fonts to make everything look more professional
     matplotlib.rcParams['mathtext.fontset'] = 'stix'

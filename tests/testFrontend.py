@@ -52,7 +52,7 @@ class FrontendTests(unittest.TestCase):
             GUI_Run.i += 1
             with self.subTest(i=GUI_Run.i, args=kwargs):
                 sim = GUI(RT, **kwargs)
-                sim(exit=True)
+                sim.run(exit=True, no_server=True, silent=True)
         GUI_Run.i = 0
 
 
@@ -66,7 +66,6 @@ class FrontendTests(unittest.TestCase):
 
         GUI_Run(PlottingType="Points")
         GUI_Run(PlottingType="Rays")
-        GUI_Run(PlottingType="None")
 
         GUI_Run(Rays=100000)
         GUI_Run(Rays_s=-2.)
@@ -149,7 +148,7 @@ class FrontendTests(unittest.TestCase):
         RT = self.RT_Example()
 
         # Instantiate the GUI and start it.
-        sim = GUI(RT, silent=True)
+        sim = GUI(RT)
 
         def interact(sim):
 
@@ -157,20 +156,26 @@ class FrontendTests(unittest.TestCase):
 
             # check if Detector is moving
             sim.Pos_Det = 5.3
+            sim.waitForIdle()
             self.assertEqual(sim.Pos_Det, RT.DetectorList[0].pos[2])
         
             # Source Image Tests
             sim.showSourceImage()
+            sim.waitForIdle()
             sim.SourceSelection = sim.SourceNames[1]
+            sim.waitForIdle()
             sim.showSourceImage()
+            sim.waitForIdle()
             
             # Detector Image Tests
             sim.showDetectorImage()
+            sim.waitForIdle()
             sim.DetectorSelection = sim.DetectorNames[1]
-            time.sleep(0.001)  # wait for parameters to be set
+            sim.waitForIdle()
             self.assertTrue(sim.DetInd == 1)
             self.assertTrue(sim.Pos_Det == sim.Raytracer.DetectorList[1].pos[2])
             sim.showDetectorImage()
+            sim.waitForIdle()
 
             # Image Type Tests standard
             sim.ImageType = "Irradiance"
@@ -249,8 +254,6 @@ class FrontendTests(unittest.TestCase):
             # PlottingType Tests
             sim.PlottingType = "Points"
             sim.waitForIdle()
-            sim.PlottingType = "None"
-            sim.waitForIdle()
             sim.PlottingType = "Rays"
             sim.waitForIdle()
           
@@ -270,13 +273,13 @@ class FrontendTests(unittest.TestCase):
 
             sim.close()
 
-        sim.interact(func=interact, args=(sim,))
+        sim.run(func=interact, no_server=True, silent=True, args=(sim,))
 
     def test_Missing(self) -> None:
         """test GUI operation when Filter, Lenses, Detectors or Sources are missing"""
 
         def testFeatures(RT):
-            sim = GUI(RT, silent=True)
+            sim = GUI(RT)
             def interact(sim):
                 sim.waitForIdle()
                 sim.showDetectorImage()
@@ -298,7 +301,7 @@ class FrontendTests(unittest.TestCase):
                 sim.PlottingType = "Points"
                 sim.waitForIdle()
                 sim.close()
-            sim.interact(func=interact, args=(sim,))
+            sim.run(func=interact, no_server=True, silent=True, args=(sim,))
 
         RT = self.RT_Example()
 

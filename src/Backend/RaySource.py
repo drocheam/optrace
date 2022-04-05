@@ -78,21 +78,9 @@ class RaySource(SObject):
         :param Image: image for modes source_type="BW_Image" or "RGB_Image",
                 specified as path (string) or RGB array (numpy 3D array)
         """
+        self._new_lock = False
 
         super().__init__(Surface, pos)
-
-        if direction_type not in ["Parallel", "Diverging"]:
-            raise ValueError(f"Invalid direction_type '{direction_type}'.")
-
-        if light_type not in ["Monochromatic", "Blackbody", "Function", "Lines", "RGB_Image",\
-                              "A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]:
-            raise ValueError(f"Invalid light_type '{light_type}'.")
-
-        if orientation_type not in ["Constant", "Function"]:
-            raise ValueError(f"Invalid orientation_type '{orientation_type}'.")
-
-        if polarization_type not in ["x", "y", "xy", "Random", "Angle"]:
-            raise ValueError(f"Invalid polarization_type '{polarization_type}'.")
 
         self.light_type = light_type
         self.direction_type = direction_type
@@ -111,9 +99,14 @@ class RaySource(SObject):
         self.or_func = or_func
         self.spec_func = spec_func
 
+        self.name = "RaySource"
+        self.short_name = "RS"
+
         # assign arrays, force conversion to np.array
         self.s = np.array(s, dtype=np.float64) / np.linalg.norm(s)  # normalize
         self.lines = np.array(lines, dtype=np.float32)
+
+        self.Image = np.array([], dtype=np.float64)
 
         if light_type == "RGB_Image":
             if isinstance(Image, str):
@@ -124,29 +117,9 @@ class RaySource(SObject):
                 raise ValueError("Invalid image format")
 
             self.Image = np.flipud(self.Image)
-
-        # check parameters
-        if power <= 0:
-            raise ValueError(f"Source power needs to be positive, but is {power}.")
-
-        if T <= 0:
-            raise ValueError(f"Blackbody temperature T needs to be positive, but is {T}.")
-        
-        if sr_angle <= 0:
-            raise ValueError(f"Cone angle sr_angle needs to be positive, but is {sr_angle}.")
-
-        if self.lines.shape[0] == 0:
-            raise ValueError("'lines' can't be empty.")
-
-        if (wlo := np.min(self.lines)) < Color.WL_MIN or (wlo := np.max(self.lines)) > Color.WL_MAX:
-            raise ValueError(f"'lines' need to be inside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]"\
-                             f", but got a value of {wlo}nm.")
-
-        if self.light_type == "Function" and spec_func is None:
-            raise ValueError("light_type='Function', but spec_func not specified.")
-
-        if self.orientation_type == "Function" and or_func is None:
-            raise ValueError("orientation_type='Function', but or_func not specified.")
+       
+        # lock assignment of new properties. New properties throw an error.
+        self._new_lock = True
 
 
     def getColor(self) -> tuple[float, float, float]:
@@ -280,6 +253,9 @@ class RaySource(SObject):
                 s_or = np.tile(self.s, (N, 1))
 
             case "Function":
+                if self.or_func is None:
+                    raise RuntimeError("orientation_type='Function' but or_func is None")
+
                 s_or = self.or_func(p[:, 0], p[:, 1])
 
             case _:
@@ -373,4 +349,61 @@ class RaySource(SObject):
         ################################################################################################################
 
         return p, s, pols, weights, wavelengths
+
+
+    def crepr(self):
+        """"""
+        # use id on self.lines and self.Image, for large array it would take too long otherwise.
+        # disadvantage: reassigning the same array change the id
+        return [self.FrontSurface.crepr(), self.direction_type, self.light_type, self.orientation_type, 
+                     self.polarization_type, self.sr_angle, self.pol_ang, self.power, self.wl, self.T, id(self.or_func), 
+                      id(self.spec_func), tuple(self.s), id(self.lines), id(self.Image)]
+
+
+    # handle assignment of properties and check values
+    def __setattr__(self, key, val):
+
+        if key == "s":
+            if not isinstance(val, list | np.ndarray):
+                raise TypeError("s needs to be of type list or numpy.ndarray")
+            val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
+
+        if key == "direction_type" and (not isinstance(val, str) or val not in ["Parallel", "Diverging"]):
+            raise ValueError(f"Invalid direction_type '{val}'.")
+
+        if key == "light_type" and (not isinstance(val, str) or val not in ["Monochromatic", "Blackbody", "Function", "Lines", "RGB_Image",\
+                              "A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]):
+            raise ValueError(f"Invalid light_type '{val}'.")
+
+        if key == "orientation_type" and (not isinstance(val, str) or val not in ["Constant", "Function"]):
+            raise ValueError(f"Invalid orientation_type '{val}'.")
+
+        if key == "polarization_type" and (not isinstance(val, str) or val not in ["x", "y", "xy", "Random", "Angle"]):
+            raise ValueError(f"Invalid polarization_type '{val}'.")
+
+        if key == "power" and (val <= 0 or not isinstance(val, int|float)):
+            raise ValueError(f"Source power needs to be positive, but is {val}.")
+
+        if key == "T" and (val <= 0 or not isinstance(val, int|float)):
+            raise ValueError(f"Blackbody temperature T needs to be a positive number, but is {val}.")
+        
+        if key == "sr_angle" and (val <= 0 or not isinstance(val, int|float)):
+            raise ValueError(f"Cone angle sr_angle needs to be positive number, but is {val}.")
+
+        if key == "lines":
+            if not isinstance(val, list | np.ndarray):
+                raise TypeError("lines needs to be of type list or np.ndarray")
+
+            val = np.array(val, dtype=np.float32)
+            if val.shape[0] == 0:
+                raise ValueError("'lines' can't be empty.")
+
+            if (wlo := np.min(val)) < Color.WL_MIN or (wlo := np.max(val)) > Color.WL_MAX:
+                raise ValueError(f"'lines' need to be inside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]"\
+                                 f", but got a value of {wlo}nm.")
+
+        if key == "Image" and not isinstance(val, np.ndarray):
+            raise ValueError("Invalid image format")
+
+        super().__setattr__(key, val)
 

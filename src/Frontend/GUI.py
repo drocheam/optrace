@@ -31,15 +31,23 @@ from threading import Thread
 from typing import Callable
 from pynput.keyboard import Key, Listener
 
+import sys
 import time
 import traceback  # for printing traceback
-import readline  # enables cursor movements in input()
 
 # TODO Farben der RaySources passen sich ColoringType an
 # Whites -> RS sind White, Power -> maximale Farbe der Skala, Wavelength -> RS.getColor()
 # Polarization -> Weiß wenn zufällig, sonst nach Farbskala. Source -> Farbe der Quelle
 
 # TODO Filter-opacity ergibt sich nach durchschnittlichem tau. Farbe wie bekannt
+
+import wx
+
+from twisted.python import log, util
+
+import Frontend.TCPServer as Server
+
+from twisted.internet import reactor
 
 class GUI(HasTraits):
 
@@ -52,13 +60,13 @@ class GUI(HasTraits):
     DETECTOR_ALPHA: float = 0.8
     """Alpha value for the Detector visualization"""
 
-    BACKGROUND_COLOR: tuple[float, float, float] = (0.41, 0.40, 0.40)
+    BACKGROUND_COLOR: tuple[float, float, float] = (0.36, 0.35, 0.35)
     """RGB Color for the Scene background"""
 
     LENS_COLOR: tuple[float, float, float] = (0.63, 0.79, 1.00)
     """RGB Color for the Lens surface visualization"""
 
-    LENS_ALPHA: float = 0.32
+    LENS_ALPHA: float = 0.3
     """Alpha value for the Lens visualization"""
 
     RAYSOURCE_ALPHA: float = 0.5
@@ -85,11 +93,10 @@ class GUI(HasTraits):
     INFO_STYLE: dict = dict(font_size=13, bold=True, color=(1, 1, 1), font_family="courier", shadow=True)
     """Info Text Style. Used for status messages and interaction overlay"""
 
-    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.65, 0.65, 0.65), font_family="courier", shadow=True)
+    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.60, 0.60, 0.60), font_family="courier", shadow=True)
     """Style for hidden info text. The color is used for the refraction index boxes frame"""
 
     ##########
-    # The mayavi scene.
     scene: Instance = Instance(MlabSceneModel, args=())
     """the mayavi scene"""
 
@@ -138,17 +145,20 @@ class GUI(HasTraits):
 
     # Enums
 
-    PlottingType: Enum = Enum('Rays', 'Points', 'None', desc="Ray Representation")
-    """Ray Plotting Type. One of ['Rays', 'Points', 'None']"""
+    PlottingType: Enum = Enum('Rays', 'Points', desc="Ray Representation")
+    """Ray Plotting Type. One of ['Rays', 'Points']"""
 
     ColoringType: Enum = Enum('White', 'Power', 'Wavelength', 'Polarization', 'Source', desc="Ray Property to Color the Rays With")
     """Ray Coloring Mode. One of ['White', 'Power', 'Wavelength', 'Polarization', 'Source']"""
 
-    ImageType: Enum = Enum('Irradiance', 'Illuminance', 'sRGB', desc="Image Type Presented")
-    """Image Type. One of ['Irradiance', 'Illuminance', 'sRGB']"""
+    ImageType: Enum = Enum('sRGB', 'Irradiance', 'Illuminance', desc="Image Type Presented")
+    """Image Type. One of ['sRGB', 'Irradiance', 'Illuminance']"""
 
     FocusType: Enum = Enum('Position Variance', 'Airy Disc Weighting', 'Irradiance Variance', desc="Method for Autofocus")
     """Focus Finding Mode. One of ['Position Variance', 'Airy Disc Weighting', 'Irradiance Variance']"""
+
+    SourceNames = List()
+    DetectorNames = List()
 
     SourceSelection: Enum = Enum(values='SourceNames', desc="Source Selection for Source Image")
     """Source Selection. Holds the name of one of the Sources."""
@@ -174,6 +184,9 @@ class GUI(HasTraits):
          * Tracing, Focussing, DetectorImage, SourceImage: Set if operation is active 
     """
 
+    # wx App. Needed for the tcp server
+    app = wx.App(False)
+   
     ####################################################################################################################
     # UI view creation
 
@@ -182,7 +195,7 @@ class GUI(HasTraits):
                     # add mayavi scene
                     Group(
                         Item('scene', editor=SceneEditor(scene_class=MayaviScene),
-                             height=850, width=1100, show_label=False)
+                             height=875, width=1100, show_label=False)
                         ),
                     # add UI Elements
                     Group(
@@ -191,13 +204,16 @@ class GUI(HasTraits):
                         Item('AbsorbMissing', style="custom", show_label=False),
                         Separator,
                         Item("PlottingType", label='Plotting'),
-                        Item("ColoringType", label='Coloring', visible_when="PlottingType != 'None'"),
-                        Item('Rays_s', visible_when="PlottingType != 'None'"),
-                        Item('Ray_alpha', visible_when="PlottingType != 'None'"),
-                        Item('Ray_width', visible_when="PlottingType != 'None'"),
+                        Item("ColoringType", label='Coloring'),
+                        Item('Rays_s'),
+                        Item('Ray_alpha'),
+                        Item('Ray_width'),
                         Separator,
-                        Item('DetectorSelection', label="Detector", visible_when="len(DetectorNames) > 1"),
+                        Item('SourceSelection', label="Source"),
+                        Separator,
+                        Item('DetectorSelection', label="Detector"),
                         Item('Pos_Det', label="Det_z"),
+                        Separator,
                         Item('FocusType', label='AF Mode'),
                         Item('FocusDebugPlot', style="custom", show_label=False),
                         Item('AutoFocusButton', show_label=False),
@@ -206,9 +222,8 @@ class GUI(HasTraits):
                         Item('ImagePixels'),
                         Item('LogImage', style="custom", show_label=False),
                         Item('FlipImage', style="custom", show_label=False),
+                        Item('SourceImageButton', show_label=False),
                         Item('DetectorImageButton', show_label=False),
-                        Item('SourceSelection', label="Source", visible_when="len(SourceNames) > 1"),
-                        Item('SourceImageButton', show_label=False)
                         ),
                     # add spacing right of UI Elements
                     Group(
@@ -223,13 +238,14 @@ class GUI(HasTraits):
     ####################################################################################################################
     # Class constructor
 
-    def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, silent: bool=False, *args, **kwargs) -> None:
+    def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, *args, **kwargs) -> None:
         """
 
         :param RT:
         :param args:
         :param kwargs:
         """
+
         self.Raytracer: Backend.Raytracer = RT
         """reference to the Raytracer"""
 
@@ -239,15 +255,17 @@ class GUI(HasTraits):
         self.RayText = None  # textbox for ray information
         self.subset = np.array([])  # indices for subset of all rays in Raytracer
 
-        # Detector properties
-        self.DetectorPlot = []  # visual representation of the Detector
-        self.DetectorCylinderPlot = [] # visual representation of the Detectors' Cylinder
-        self.DetText = []
-        self.SourceNames = []
-        self.DetectorNames = []
         self.DetInd = 0
-       
-        self.RaySourcePlots = []
+      
+        self.RaySourcePlotObjects = []
+        self.FilterPlotObjects = []
+        self.LensPlotObjects = []
+        self.AperturePlotObjects = []
+        self.DetectorPlotObjects = []
+        self.AxisPlotObjects = []
+        self.OutlinePlotObjects = []
+        self.RefractionIndexPlotObjects = []
+        self.oaxes = None
 
         # minimal/maximal z-positions of Detector_obj
         self.Pos_Det_min = self.Raytracer.outline[4]
@@ -256,17 +274,15 @@ class GUI(HasTraits):
         # holds scene size, gets set on scene.activated
         self.scene_size = [0, 0]
 
-        # hold axes objects
-        self.axes = [None, None, None]
-
         # shift press indicator
         self.ShiftPressed = False
 
-        # workaround to exit trait functions
-        self.set_only = False
+        self.exit = False
         
         # show info and warning messages
-        self.silent = silent
+        self.silent = False
+
+        self.set_only = False
 
         # set AbsorbMissing parameter from bool to list
         self.AbsorbMissing = self.AbsorbMissing if AbsorbMissing else []
@@ -274,79 +290,123 @@ class GUI(HasTraits):
         # define Status dict
         self.Status.update(dict(InitScene=True, DisplayingGUI=True, Tracing=False, Drawing=False, Focussing=False,
                                 DetectorImage=False, SourceImage=False))
+        self.StatusText = None
 
         self.threads = []
 
         super().__init__(*args, **kwargs)
 
-    def __call__(self, exit=False) -> None:
-        """
-        start the GUI
-        """
-        self.exit = exit
-        self.configure_traits()
+        # wx Frame, see https://docs.enthought.com/mayavi/mayavi/auto/example_wx_mayavi_embed_in_notebook.html#example-wx-mayavi-embed-in-notebook
+        self.wxF = wx.Frame(None, wx.ID_ANY, 'Mayavi with Wx')
+
 
     ####################################################################################################################
     # Plotting functions
 
-    def plotLens(self, Lens: Lens, num: int) -> None:
+    def removeObjects(self, objs):
+        for obj in objs:
+            for obji in obj:
+                if obji is not None:
+
+                    if obji.parent.parent.parent in self.scene.mayavi_scene.children:
+                        obji.parent.parent.parent.remove()
+                    if obji.parent.parent in self.scene.mayavi_scene.children:
+                        obji.parent.parent.remove()
+                    if obji.parent in self.scene.mayavi_scene.children:
+                        obji.parent.remove()
+                    if obji in self.scene.mayavi_scene.children:
+                        obji.remove()
+
+        objs[:] = [] 
+
+    def plotLenses(self) -> None:
         """
 
         :param Lens:
         :param num:
         """
-        self.plotSObject(Lens, num, "Lens", "L", self.LENS_COLOR, self.LENS_ALPHA)
+        self.removeObjects(self.LensPlotObjects)
+      
+        for num, L in enumerate(self.Raytracer.LensList):
+            a, b, c, d = self.plotSObject(L, num, self.LENS_COLOR, self.LENS_ALPHA)
+            self.LensPlotObjects.append((a, b, c, d))
 
-    def plotFilter(self, filter_: Filter, num: int) -> None:
+    def plotApertures(self) -> None:
+        """
+
+        :param Lens:
+        :param num:
+        """
+        self.removeObjects(self.AperturePlotObjects)
+        
+        for num, AP in enumerate(self.Raytracer.ApertureList):
+            a, b, c, d = self.plotSObject(AP, num, (0, 0, 0), 1)
+            self.AperturePlotObjects.append((a, b, c, d))
+
+    def plotFilters(self) -> None:
         """
 
         :param filter_:
         :param num:
         """
-        Fcolor = filter_.getColor()
-        alpha = 0.1 + 0.899*Fcolor[1]  # offset in both directions, ensures visibility and see-through
-        self.plotSObject(filter_, num, "Filter", "F", Fcolor[0], alpha)    
+        self.removeObjects(self.FilterPlotObjects)
+        
+        for num, F in enumerate(self.Raytracer.FilterList):
+            Fcolor = F.getColor()
+            alpha = 0.1 + 0.899*Fcolor[1]  # offset in both directions, ensures visibility and see-through
+            a, b, c, d = self.plotSObject(F, num, Fcolor[0], alpha)    
+            self.FilterPlotObjects.append((a, b, c, d))
 
-    def plotDetector(self, Det: Detector, num: int) -> None:
+    def plotDetectors(self) -> None:
         """
 
         :return:
         """
+        self.removeObjects(self.DetectorPlotObjects)
 
-        a, b, c, text = self.plotSObject(Det, num, "Detector", "DET", 
-                                                  self.DETECTOR_COLOR, self.DETECTOR_ALPHA)    
+        for num, Det in enumerate(self.Raytracer.DetectorList):
+            a, b, c, text = self.plotSObject(Det, num, self.DETECTOR_COLOR, self.DETECTOR_ALPHA)    
+            self.DetectorPlotObjects.append((a, b, c, text))
 
-        self.DetectorPlot.append(a)
-        self.DetectorCylinderPlot.append(b)
-        self.DetText.append(text)
-
-    def plotRaySource(self, RS: RaySource, num: int) -> None:
+    def plotRaySources(self) -> None:
         """
 
         :param RS:
         :param num:
         """
+        self.removeObjects(self.RaySourcePlotObjects)
 
-        a, b, _, _ = self.plotSObject(RS, num, "RaySource", "RS", (1, 1, 1), self.RAYSOURCE_ALPHA, 
-                                     d=-self.D_VIS, spec=False, light=False)   
+        for num, RS in enumerate(self.Raytracer.RaySourceList):
+        
+            a, b, c, d = self.plotSObject(RS, num, (1, 1, 1), self.RAYSOURCE_ALPHA, 
+                                         d=-self.D_VIS, spec=False, light=False)   
 
-        self.RaySourcePlots.append((a, b))
+            if RS.light_type in ["RGB_Image", "BW_Image"]:
+                RS_Image_Text = self.scene.mlab.text3d(RS.pos[0]-0.5, RS.pos[1], RS.pos[2], "Image", color=(0, 0, 0),
+                                                       orient_to_camera=False, scale=0.25, name=f"Image Text")
+                RS_Image_Text.actor.actor.pickable = False
+                RS_Image_Text.actor.actor.property.lighting = False
+            else:
+                RS_Image_Text = None
 
-        if RS.light_type in ["RGB_Image", "BW_Image"]:
-            RS_Image_Text = self.scene.mlab.text3d(RS.pos[0]-0.5, RS.pos[1], RS.pos[2], "Image", color=(0, 0, 0),
-                                                   orient_to_camera=False, scale=0.25, name=f"Image Text")
-            RS_Image_Text.actor.actor.pickable = False
-            RS_Image_Text.actor.actor.property.lighting = False
+            self.RaySourcePlotObjects.append((a, b, c, d, RS_Image_Text))
 
     def plotOutline(self) -> None:
         """plot the raytracer outline"""
+
+        self.removeObjects(self.OutlinePlotObjects)
 
         self.scene.engine.add_source(ParametricSurface(name="Outline"), self.scene)
         a = self.scene.mlab.outline(extent=self.Raytracer.outline.copy(), opacity=self.OUTLINE_ALPHA)
         a.actor.actor.pickable = False  # only rays should be pickablw
 
+        self.OutlinePlotObjects.append((a,))
+
     def plotOrientationAxes(self) -> None:
         """plot orientation axes"""
+
+        if self.oaxes is not None:
+            oaxes.remove()
 
         self.scene.engine.add_source(ParametricSurface(name="Orientation Axes"), self.scene)
         
@@ -362,6 +422,11 @@ class GUI(HasTraits):
 
     def plotAxes(self) -> None:
         """plot cartesian axes"""
+
+        # save old font factor. This is the one we adapted constantly in self.size_change()
+        ff_old = self.AxisPlotObjects[0][0].axes.font_factor if self.AxisPlotObjects else 0.65
+
+        self.removeObjects(self.AxisPlotObjects)
 
         # find label number for axis so that step size is an int*10^k 
         # or any of [0.25, 0.5, 0.75, 1.25, 2.5]*10^k with k being an integer
@@ -381,17 +446,19 @@ class GUI(HasTraits):
 
             self.scene.engine.add_source(ParametricSurface(name=f"{name}-Axis"), self.scene)
 
-            objs[ind] = self.scene.mlab.axes(extent=ext, nb_labels=lnum, x_axis_visibility=vis_x, 
+            a = self.scene.mlab.axes(extent=ext, nb_labels=lnum, x_axis_visibility=vis_x, 
                                        y_axis_visibility=vis_y, z_axis_visibility=vis_z)
 
             label=f"{name} / mm"
-            objs[ind].axes.trait_set(font_factor=0.7, fly_mode='none', label_format=lform, x_label=label, 
+            a.axes.trait_set(font_factor=ff_old, fly_mode='none', label_format=lform, x_label=label, 
                                y_label=label, z_label=label, layer_number=1)
 
-            objs[ind].property.trait_set(display_location='background', opacity=0.5)
-            objs[ind].title_text_property.trait_set(**self.TEXT_STYLE)
-            objs[ind].label_text_property.trait_set(**self.TEXT_STYLE)
-            objs[ind].actors[0].pickable = False
+            a.property.trait_set(display_location='background', opacity=0.5)
+            a.title_text_property.trait_set(**self.TEXT_STYLE)
+            a.label_text_property.trait_set(**self.TEXT_STYLE)
+            a.actors[0].pickable = False
+
+            objs.append((a,))
 
         # place axes at outline
         ext = self.Raytracer.outline
@@ -402,19 +469,22 @@ class GUI(HasTraits):
 
         # X-Axis
         lnum = getLabelNum(ext[1] - ext[0], 5, 16)
-        drawAxis(self.axes, 0, ext_ys, lnum, "x", '%-#.4g', True, False, False)
+        drawAxis(self.AxisPlotObjects, 0, ext_ys, lnum, "x", '%-#.4g', True, False, False)
 
         # Y-Axis
         lnum = getLabelNum(ext[3] - ext[2], 5, 16)
-        drawAxis(self.axes, 1, ext.copy(), lnum, "y", '%-#.4g', False, True, False)
+        drawAxis(self.AxisPlotObjects, 1, ext.copy(), lnum, "y", '%-#.4g', False, True, False)
 
         # Z-Axis
         lnum = getLabelNum(ext[5] - ext[4], 5, 24)
-        drawAxis(self.axes, 2, ext_ys, lnum, "z", '%-#.5g', False, False, True)
+        drawAxis(self.AxisPlotObjects, 2, ext_ys, lnum, "z", '%-#.5g', False, False, True)
 
     
     def plotRefractionIndexBoxes(self) -> None:
         """plot outlines for ambient refraction index regions"""
+
+
+        self.removeObjects(self.RefractionIndexPlotObjects)
 
         # sort Element list in z order
         Lenses = sorted(self.Raytracer.LensList, key=lambda Element: Element.pos[2])
@@ -458,12 +528,24 @@ class GUI(HasTraits):
             text.actor.text_scale_mode = 'none'
             text.property.trait_set(**self.TEXT_STYLE, justification="center", frame=True, frame_color=self.SUBTLE_INFO_STYLE["color"])
 
-    def plotSObject(self, obj, num, name, shortname, color, alpha, d=D_VIS, spec=True, light=True):
+            if len(BoundList) > 2 and nList[i] != RefractionIndex("Constant", n=1):
+                opacity = (nList[i](550) - 0.8) / 5
+                points = self.scene.mlab.points3d(0, 0, 0, name=f"Refraction Index Box {i}", mode='cube', scale_factor=1, opacity=opacity)
+                ou=self.Raytracer.outline
+                points.trait_set(name="Box")
+                points.actor.actor.trait_set(position=((ou[1]+ou[0])/2,  (ou[3]+ou[2])/2, (BoundList[i+1]+BoundList[i])/2))
+                points.actor.actor.trait_set(scale=((ou[1]-ou[0]),  (ou[3]-ou[2]), (BoundList[i+1]-BoundList[i])))
+            else:
+                points = None
+
+            self.RefractionIndexPlotObjects.append((outline, text, points))
+
+    def plotSObject(self, obj, num, color, alpha, d=D_VIS, spec=True, light=True):
         """plotting of a SObject. Gets called from plotting for Lens, Filter, Detector, RaySource."""
 
         def plot(C, surf_type):
             # plot surface
-            a = self.scene.mlab.mesh(C[0], C[1], C[2], color=color, opacity=alpha, name=f"{name} {num} {surf_type} surface")
+            a = self.scene.mlab.mesh(C[0], C[1], C[2], color=color, opacity=alpha, name=f"{obj.name} {num} {surf_type} surface")
 
             # make non pickable so it does not interfere with our ray picker
             a.actor.actor.pickable = False
@@ -488,7 +570,7 @@ class GUI(HasTraits):
         zl = zl + self.D_VIS/2 if obj.Surface.isPlanar() and not obj.hasBackSurface() else zl
 
         # object label
-        text = self.scene.mlab.text(x=obj.extent[1], y=0., z=zl, text=f"{shortname}{num}", name=f"Label")
+        text = self.scene.mlab.text(x=obj.extent[1], y=0., z=zl, text=f"{obj.short_name}{num}", name=f"Label")
         text.property.trait_set(**self.TEXT_STYLE, justification="center")
         text.actor.text_scale_mode = 'none'
        
@@ -597,14 +679,14 @@ class GUI(HasTraits):
         lutm.scalar_bar_widget.process_events           = False  # make non-interactive
         lutm.scalar_bar_representation.border_thickness = 0  # no ugly borders 
 
-        if len(self.Raytracer.RaySourceList) != len(self.RaySourcePlots):
+        if len(self.Raytracer.RaySourceList) != len(self.RaySourcePlotObjects):
             raise RuntimeError("Number of RaySourcePlots differs from actual Sources. Maybe the GUI was not updated properly?")
         
         # custom lut for wavelengths
         match self.ColoringType:
 
             case "White":
-                RSColor = [(1, 1, 1) for RSp in self.RaySourcePlots]
+                RSColor = [(1, 1, 1) for RSp in self.RaySourcePlotObjects]
 
             case 'Wavelength':
                 lutm.lut.table = Color.spectralCM(255)
@@ -650,49 +732,26 @@ class GUI(HasTraits):
                     # set color steps, smaller 420-650nm range for  larger color contrast
                     lutm.lut.table = Color.spectralCM(lutm.number_of_labels, 420, 650)
         
-                RSColor = [np.array(lutm.lut.table[i][:3])/255. for i, _ in enumerate(self.RaySourcePlots)]
+                RSColor = [np.array(lutm.lut.table[i][:3])/255. for i, _ in enumerate(self.RaySourcePlotObjects)]
 
             case 'Power':
                 if lutm.data_range[0]/(lutm.data_range[1]-lutm.data_range[0]) < 0.05: 
                     lutm.data_range = [0, lutm.data_range[1]]
 
                 # set to maximum ray power, this is the same for all sources
-                RSColor = [np.array(lutm.lut.table[-1][:3])/255. for RSp in self.RaySourcePlots]
+                RSColor = [np.array(lutm.lut.table[-1][:3])/255. for RSp in self.RaySourcePlotObjects]
 
         # set RaySource Colors
-        for i, RSp in enumerate(self.RaySourcePlots):
-            for RSi in RSp:
-                if RSi:
-                    RSi.actor.actor.property.trait_set(color=tuple(RSColor[i]))
+        for i, RSp in enumerate(self.RaySourcePlotObjects):
+            RSp[0].actor.actor.property.trait_set(color=tuple(RSColor[i]))
+            if RSp[1] is not None:
+                RSp[1].actor.actor.property.trait_set(color=tuple(RSColor[i]))
 
         # set visual ray properties
         self.RaysPlot.actor.property.representation = 'points' if self.PlottingType == 'Points' else 'surface'
-        self.RaysPlot.actor.property.trait_set(line_width=self.Ray_width, point_size=self.Ray_width)
+        self.RaysPlot.actor.property.trait_set(line_width=self.Ray_width, 
+                                               point_size=self.Ray_width if self.PlottingType == "Points" else 1)
         self.RaysPlot.actor.actor.force_translucent = True
-
-    def plotGeometry(self) -> None:
-        """plot Background, Objects (Lenses, RaySources, Detectors, Filters), Outlines and Axes"""
-        
-        # plot SObjects
-        [self.plotRaySource(RS, num+1) for num, RS in enumerate(self.Raytracer.RaySourceList)]
-        [self.plotLens(L, num+1) for num, L in enumerate(self.Raytracer.LensList)]
-        [self.plotFilter(F, num+1) for num, F in enumerate(self.Raytracer.FilterList)]
-        [self.plotDetector(D, num+1) for num, D in enumerate(self.Raytracer.DetectorList)]
-
-        # assign detector position
-        if self.Raytracer.DetectorList:
-            self.Pos_Det = [self.Raytracer.DetectorList[0].pos[2]]
-        else:
-            self.Pos_Det = self.Raytracer.outline[5]
-
-        # plot axes and outlines
-        self.plotAxes()
-        self.plotOrientationAxes()
-        self.plotOutline()
-        self.plotRefractionIndexBoxes()
-
-        # set background color
-        self.scene.background = self.BACKGROUND_COLOR
 
     def initRayInfoText(self) -> None:
         """init detection of ray point clicks and the info display"""
@@ -714,12 +773,12 @@ class GUI(HasTraits):
     
     def initSourceList(self) -> None:
         """generate a descriptive list of RaySource names"""
-        self.SourceNames = [f"RS{num+1}: {RS.Surface.surface_type} at {RS.pos}"
+        self.SourceNames = [f"RS{num}: {RS.Surface.surface_type} at {RS.pos}"
                             for num, RS in enumerate(self.Raytracer.RaySourceList) ]
 
     def initDetectorList(self) -> None:
         """generate a descriptive list of Detector names"""
-        self.DetectorNames = [f"DET{num+1}: {Det.Surface.surface_type} at z={Det.pos[2]}" 
+        self.DetectorNames = [f"DET{num}: {Det.Surface.surface_type} at z={Det.pos[2]}" 
                               for num, Det in enumerate(self.Raytracer.DetectorList) ]
 
     def initCamera(self) -> None:
@@ -750,15 +809,16 @@ class GUI(HasTraits):
         pos = picker_obj.pick_position
 
         if self.ShiftPressed:
-            # set outside position to inside of outline
-            pos_z = max(self.Pos_Det_min, pos[2])
-            pos_z = min(self.Pos_Det_max, pos_z)
-            
-            # assign detector position, calls moveDetector()
-            self.Pos_Det = pos_z
-            
-            # call with no parameter resets text
-            self.onRayPick()
+            if self.hasDetector():
+                # set outside position to inside of outline
+                pos_z = max(self.Pos_Det_min, pos[2])
+                pos_z = min(self.Pos_Det_max, pos_z)
+                
+                # assign detector position, calls moveDetector()
+                self.Pos_Det = pos_z
+                
+                # call with no parameter resets text
+                self.onRayPick()
         else:
             self.RayText.text = f"Pick Position: ({pos[0]:>9.6g}, {pos[1]:>9.6g}, {pos[2]:>9.6g})"
             self.RayText.property.trait_set(**self.INFO_STYLE, background_opacity=0.2)
@@ -769,6 +829,9 @@ class GUI(HasTraits):
         Shows ray properties on screen.
         :param picker_obj:
         """
+
+        if not self.RayText:
+            return
 
         # it seems that picker_obj.point_id is only present for the first element in the picked list,
         # so we only can use it when the RayPlot is first in the list
@@ -859,9 +922,42 @@ class GUI(HasTraits):
         """sets GUILoaded Status. Exits GUI if self.exit set."""
 
         self.Status["DisplayingGUI"] = False
-        
+       
         if self.exit:
             self.close()
+
+    def close(self):
+
+        # calls closing method and scene as well as self.stop_tcp
+        self.scene.closing = True
+       
+        # close widgets
+        app = QtGui.QApplication.instance()
+        for widget in app.topLevelWidgets():
+            widget.close()
+
+        # close Application
+        QtCore.QCoreApplication.quit()
+        time.sleep(0.1) # wait for it actually being closed
+
+    def serve(self):
+
+        sdict = dict(
+                        mlab = self.scene.mlab,
+                        engine = self.scene.engine,
+                        scene = self.scene.scene,
+                        camera = self.scene.scene.camera,
+                        close = self.close,
+                        GUI = self,
+                        RT = self.Raytracer,
+                        LL = self.Raytracer.LensList,
+                        FL = self.Raytracer.FilterList,
+                        AL = self.Raytracer.ApertureList,
+                        RSL = self.Raytracer.RaySourceList,
+                        DL = self.Raytracer.DetectorList,
+                    )
+
+        Server.serve_tcp(self, dict_=sdict)
 
     def hasDetector(self) -> bool:
         """
@@ -891,7 +987,8 @@ class GUI(HasTraits):
         :return: if the Raytracer is tracing
         """
         if self.Status["Tracing"]:
-            self.StatusText.text += "Can't do this while raytracing.\n"
+            if self.StatusText is not None:
+                self.StatusText.text += "Can't do this while raytracing.\n"
             if not self.silent:
                 print("Raytracing in progress, skipping this action because of a race condition risk.")
             return False
@@ -901,74 +998,78 @@ class GUI(HasTraits):
     # Interface functions
     ###############################################################################################################
 
-    def replot(self):
-        self.scene.scene.disable_render  = True
-        self.Status["InitScene"] = True
+    def replot(self, change=None):
+        
+        self.Status["Drawing"] = True
+        pyfaceGUI().process_events()
+        self.scene.scene.disable_render = True
         cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
                                                     "clipping_range", "parallel_scale")
 
-        # ray properties
-        self.RaysPlotScatter = None  # plot for scalar ray values
-        self.RaysPlot = None  # plot for visualization of rays/points
+        all_ = change is None
 
-        self.RaySourcePlots = []
-
-        # Detector properties
-        self.DetectorPlot = []  # visual representation of the Detector
-        self.DetectorCylinderPlot = [] # visual representation of the Detectors' Cylinder
-        self.DetText = []
-        self.DetInd = 0
+        # RaySources need to be plotted first, since plotRays() colors them
+        if all_ or change["RaySources"]:
+            self.plotRaySources()
+            self.initSourceList()
         
-        # minimal/maximal z-positions of Detector_obj
-        self.Pos_Det_min = self.Raytracer.outline[4]
-        self.Pos_Det_max = self.Raytracer.outline[5]
+        rdh = False  # if Drawing Status should be reset in this function
+        if all_ or change["Filters"] or change["Lenses"] or change ["Apertures"] or change["Ambient"]\
+                or change["RaySources"] or change["TraceSettings"]:
+            self.trace()
+        elif change["Rays"]:
+            self.chooseRays()
+        else: # change["Detectors"]
+            rdh = True
 
-        # we cant use mlab.clf() since the on_mouse_pick would be unusable
-        # see https://stackoverflow.com/a/23476093
-        # instead delete every object, but don't delete StatusText and RayText
-        for child in self.scene.mayavi_scene.children.copy():
-            obj = child.children[0].children[0]
-            if obj not in [self.RayText, self.StatusText]:
-                child.remove()
-                pyfaceGUI().process_events()
+        if all_ or change["Filters"]:
+            self.plotFilters()
+        
+        if all_ or change["Lenses"]:
+            self.plotLenses()
 
-        self.plotGeometry()
+        if all_ or change["Apertures"]:
+            self.plotApertures()
 
-        self.initSourceList()
-        self.initDetectorList()
+        if all_ or change["Detectors"]:
+            self.plotDetectors()
+            self.initDetectorList()
+
+            if self.DetInd >= len(self.Raytracer.DetectorList):
+                self.DetInd = 0
+            if len(self.Raytracer.DetectorList):
+                self.DetectorSelection = self.DetectorNames[self.DetInd]
 
         self.scene.camera.trait_set(**cc_traits_org)
-
-        self.Status["InitScene"] = False
-
-        self.setRays()
         
+        if all_ or change["Ambient"]:
+
+            self.plotRefractionIndexBoxes()
+
+            self.scene_size = [0, 0]
+            self.plotAxes()
+            self.plotOutline()
+
+            # minimal/maximal z-positions of Detector_obj
+            self.Pos_Det_min = self.Raytracer.outline[4]
+            self.Pos_Det_max = self.Raytracer.outline[5]
+
         self.scene.scene.disable_render = False
-        self.scene.scene.render()
+        self.scene.camera.trait_set(**cc_traits_org)
         pyfaceGUI().process_events()
-
-
-    def close(self) -> None:
-        """close the GUI after it is loaded"""
-
-        pyfaceGUI().process_events()
-
-        # close all ui frames
-        app = QtGui.QApplication.instance()
-        for widget in app.topLevelWidgets():
-            widget.close()
-
-        # exit application
-        QtCore.QCoreApplication.quit()
-        time.sleep(0.1)  # wait for it actually being closed
-
+        
+        if rdh:
+            self.Status["Drawing"] = False
+    
     def waitForIdle(self) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
        
+        time.sleep(0.004)  # wait for flags to be set
+        
         for th in self.threads:
             th.join()
         
-        time.sleep(0.001)  # wait for flags to be set
+        time.sleep(0.004)  # wait for flags to be set
 
         while True:
             busy = False
@@ -979,50 +1080,38 @@ class GUI(HasTraits):
 
             time.sleep(0.02)
 
-        # fixes a pyface bug where the GUI is shown as busy
-        # see https://github.com/enthought/mayavi/issues/59
         pyfaceGUI().process_events()
-        pyfaceGUI().set_busy(False)
 
-    # wait while 'key' in StatusList is set
-    # def waitWhile(self, key: str):
-        # """
-        # wait while the GUI is busy doing 'key'.
-        # Only call this from another thread.
-        # :param key: string key from GUI.Status
-        # """
-        # time.sleep(0.001)  # wait for flags to be set
-        # # wait for tasks to finish
-        # while self.Status[key]:
-            # time.sleep(0.02)
+    @property
+    def busy(self):
+        busy = False
+        [busy := True for key in self.Status.keys() if self.Status[key]]
+        return busy
+    
+    def run(self, exit=False, silent=False, no_server=False, func=None, args=tuple()):
 
-    def interact(self, func=None, args=tuple()):
+        self.exit = exit
+        self.silent = silent
+        self.Raytracer.silent = silent
+        
+        if not self.silent:
+            log.startLogging(sys.stdout)
 
-        if func is None:
-            def func(self):
-                self.waitForIdle()
-                while True:
+        if func is not None:
+            th = Thread(target=func, args=args, daemon=True)
+            th.start()
 
-                    cmd = input(">>")
-                    
-                    try:
-                        exec(cmd)
-                        self.waitForIdle()
-                    except Exception:
-                        traceback.print_exc()
-
-            args=(self,)
-
-        th = Thread(target=func, args=args)
-        th.start()
-        self()
-        th.join()
+        if no_server or exit:
+            self.configure_traits()
+        else:
+            self.edit_traits()
+            self.serve()
 
     ####################################################################################################################
     # Trait handlers.
 
     @on_trait_change('Rays_s')
-    def filterRays(self) -> None:
+    def chooseRays(self) -> None:
         """chose a subset of all Raytracer rays and plot them with :obj:`GUI.drawRays`"""
 
         if self.hasRaySource():
@@ -1030,7 +1119,7 @@ class GUI(HasTraits):
             # instead use the last saved number
             N = self.Raytracer.Rays.N
 
-            if self.PlottingType == "None" or N == 0:
+            if N == 0:
                 return
 
             # currently busy, settings will be applied after current task
@@ -1038,6 +1127,7 @@ class GUI(HasTraits):
                 return
 
             self.Status["Drawing"] = True
+            pyfaceGUI().process_events()
 
             set_size = int(1 + 10**self.Rays_s*N)  # number of shown rays
             sindex = np.random.choice(N, size=set_size, replace=False)  # random choice
@@ -1046,12 +1136,13 @@ class GUI(HasTraits):
             self.subset = np.zeros(N, dtype=bool)
             self.subset[sindex] = True
 
-            self.drawRays()
+            self.replotRays()
 
             self.Status["Drawing"] = False
 
-    @on_trait_change('ColoringType')
-    def drawRays(self) -> None:
+
+    @on_trait_change('ColoringType,PlottingType')
+    def replotRays(self) -> None:
         """remove old ray view, call :obj:`GUI.plotRays` and restore scene view"""
 
         if self.hasRaySource():
@@ -1064,6 +1155,12 @@ class GUI(HasTraits):
             elif self.Raytracer.Rays.hasRays() and not self.Status["InitScene"]:
 
                 self.Status["Drawing"] = True
+
+                # set parameters to current value, since they could be changed by the user while tracing
+                self.set_only = True
+                self.AbsorbMissing = ["Absorb Rays Missing Lens"] if self.Raytracer.AbsorbMissing else []
+                self.Rays = self.Raytracer.Rays.N
+                self.set_only = False
 
                 # we could set the ray traits instead of removing and creating a new object,
                 # but unfortunately the allocated numpy arrays (x, y, z, ..) of the objects are fixed in size
@@ -1086,25 +1183,25 @@ class GUI(HasTraits):
                 self.Status["Drawing"] = False
 
     @on_trait_change('Rays, AbsorbMissing')
-    def setRays(self) -> None:
+    def trace(self) -> None:
         """raytrace in separate thread, after that call :obj:`GUI.filterRays`"""
 
-        # return if value should only be set
-        if self.set_only or self.Status["InitScene"]:
+        if self.set_only or self.Status["Tracing"]:
             return
 
         if self.hasRaySource():
 
             for key in self.Status.keys():
-                if self.Status[key] and key != "DisplayingGUI":
-                    self.StatusText.text += "Can't trace while other background tasks are running.\n"
+                if self.Status[key] and key != "DisplayingGUI" and key != "Drawing" and key != "InitScene":
+                    if self.StatusText is not None:
+                        self.StatusText.text += "Can't trace while other background tasks are running.\n"
                     return
 
             self.Status["Tracing"] = True
 
             # run this in background thread
             def background(RT: Raytracer, N: int) -> None:
-                RT.AbsorbMissing = self.AbsorbMissing
+                RT.AbsorbMissing = bool(self.AbsorbMissing)
                 RT.trace(N=N)
 
                 # execute this after thread has finished
@@ -1116,13 +1213,7 @@ class GUI(HasTraits):
                     if 10**self.Rays_s*self.Rays > self.MAX_RAYS_SHOWN:
                         self.Rays_s = np.log10(self.MAX_RAYS_SHOWN/self.Rays)
                     else: # in the other case self.filterRays() is called because of the self.Rays_s change
-                        self.filterRays()
-
-                    # set parameters to current value, since they could be changed by the user while tracing
-                    self.set_only = True
-                    self.AbsorbMissing = ["Absorb Rays Missing Lens"] if self.Raytracer.AbsorbMissing else []
-                    self.Rays = self.Raytracer.Rays.N
-                    self.set_only = False
+                        self.chooseRays()
 
                     pyfaceGUI.invoke_later(self.setGUILoaded)
 
@@ -1131,6 +1222,7 @@ class GUI(HasTraits):
             action = Thread(target=background, args=(self.Raytracer, self.Rays))
             action.start()
             self.threads.append(action)
+            pyfaceGUI().process_events()
         else:
             pyfaceGUI.invoke_later(self.setGUILoaded)
              
@@ -1147,19 +1239,26 @@ class GUI(HasTraits):
     def setDetector(self) -> None:
         """move and replot chosen Detector"""
 
-        if self.hasDetector() and self.DetectorPlot and not self.set_only:
+        if self.set_only:
+            return
+
+        if self.hasDetector() and self.DetectorPlotObjects:
 
             xp, yp, zp = self.Raytracer.DetectorList[self.DetInd].pos
             self.Raytracer.DetectorList[self.DetInd].moveTo([xp, yp, self.Pos_Det])
             
             Surf = self.Raytracer.DetectorList[self.DetInd].Surface.getPlottingMesh(N=self.SURFACE_RES)[2]
-            self.DetectorPlot[self.DetInd].mlab_source.trait_set(z=Surf)
+            self.DetectorPlotObjects[self.DetInd][0].mlab_source.trait_set(z=Surf)
 
-            if self.DetectorCylinderPlot[self.DetInd]:
+            if self.DetectorPlotObjects[self.DetInd][1]:
                 Cyl = self.Raytracer.DetectorList[self.DetInd].getCylinderSurface(nc=self.SURFACE_RES)[2] 
-                self.DetectorCylinderPlot[self.DetInd].mlab_source.trait_set(z=Cyl)
+                self.DetectorPlotObjects[self.DetInd][1].mlab_source.trait_set(z=Cyl)
+                zl = self.Pos_Det + self.D_VIS/2
+            else:            
+                obj = self.Raytracer.DetectorList[self.DetInd]
+                zl = (obj.extent[4] + obj.extent[5])/2 
 
-            self.DetText[self.DetInd].z_position = self.Pos_Det
+            self.DetectorPlotObjects[self.DetInd][3].z_position = zl
 
     @on_trait_change('DetectorImageButton')
     def showDetectorImage(self) -> None:
@@ -1182,6 +1281,11 @@ class GUI(HasTraits):
             action.start()
             self.threads.append(action)
 
+    @on_trait_change('scene.closing')
+    def stop_tcp(self):
+        if reactor.running:
+            reactor.stop()
+
     @on_trait_change('SourceImageButton')
     def showSourceImage(self) -> None:
         """render a SourceImage for the chosen Source, uses a separate thread"""
@@ -1193,7 +1297,7 @@ class GUI(HasTraits):
             self.Status["SourceImage"] = True
 
             def background(RT: Raytracer, N: int, snum: int) -> None:
-                res = RT.SourceImage(N=N, sindex=snum-1)
+                res = RT.SourceImage(N=N, sindex=snum)
 
                 def on_finish() -> None:
                     SourcePlot(res, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType)
@@ -1239,7 +1343,33 @@ class GUI(HasTraits):
     def plotScene(self) -> None:
         """Initialize the GUI. Inits a variety of things."""
 
-        self.plotGeometry()
+        # RaySources need to be ploted first, since plotRays() colors them
+        self.plotRaySources()
+        
+        # set absorb rays missing to true by default, side effect is calling setRays()
+        self.AbsorbMissing = ["Absorb Rays Missing Lens"]
+        # self.setRays()
+ 
+        self.plotLenses()
+        self.plotApertures()
+        self.plotFilters()
+        self.plotDetectors()
+        self.plotRefractionIndexBoxes()
+        
+        # plot axes and outlines
+        self.plotOutline()
+        self.plotAxes()
+        self.plotOrientationAxes()
+
+        # set background color
+        self.scene.background = self.BACKGROUND_COLOR
+
+        # assign detector position
+        if self.Raytracer.DetectorList:
+            self.DetInd = 0 if self.DetInd >= len(self.Raytracer.DetectorList) else self.DetInd
+            self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]
+        else:
+            self.Pos_Det = self.Raytracer.outline[5]       
 
         self.initCamera()
         self.initSourceList()
@@ -1252,16 +1382,11 @@ class GUI(HasTraits):
 
         self.Status["InitScene"] = False
 
-        # set absorb rays missing to true by default, side effect is calling setRays()
-        self.AbsorbMissing = ["Absorb Rays Missing Lens"]
-        # self.setRays()
-
-
     @on_trait_change('Status[]')
     def changeStatus(self) -> None:
         """Update the status info text."""
 
-        if self.Status["InitScene"]:
+        if self.Status["InitScene"] or self.StatusText is None:
             return
 
         text = ""
@@ -1269,7 +1394,7 @@ class GUI(HasTraits):
         if self.Status["Focussing"]:        text += "Focussing...\n"
         if self.Status["DetectorImage"]:    text += "Generating Detector Image...\n"
         if self.Status["SourceImage"]:      text += "Generating Source Image...\n"
-        if self.Status["Drawing"]:          text += "Drawing Rays...\n"
+        if self.Status["Drawing"]:          text += "Drawing...\n"
 
         self.StatusText.text = text
 
@@ -1282,33 +1407,13 @@ class GUI(HasTraits):
             self.RaysPlot.actor.property.trait_set(line_width=self.Ray_width, point_size=self.Ray_width)
             self.Status["Drawing"] = False
 
-
-    @on_trait_change('PlottingType')
-    def changePlottingType(self) -> None:
-        """Change the PlottingType. Removes the visual rays/points and replots using :obj:`GUI.drawRays`"""
-
-        if self.hasRaySource():
-            # remove ray/point plot
-            if self.PlottingType == "None" and self.RaysPlot is not None:
-                self.Status["Drawing"] = True
-                self.RaysPlot.remove()
-                self.RaysPlotScatter.remove()
-                self.RaysPlot = None
-                self.RaysPlotScatter = None
-                self.Status["Drawing"] = False
-            # replot rays/points
-            else:
-                self.drawRays()
-
     @on_trait_change('DetectorSelection')
     def changeDetector(self) -> None:
         """Updates the Detector Selection and the corresponding properties"""
         if self.hasDetector():
             # surface number for selected source
-            self.DetInd = int(self.DetectorSelection.split(":", 1)[0].split("DET")[1]) - 1
-            self.set_only = True
+            self.DetInd = int(self.DetectorSelection.split(":", 1)[0].split("DET")[1])
             self.Pos_Det = self.Raytracer.DetectorList[self.DetInd].pos[2]
-            self.set_only = False
 
     # rescale axes texts when the window was resized
     # for some reasons these are the only ones having no text_scaling_mode = 'none' option
@@ -1327,11 +1432,13 @@ class GUI(HasTraits):
             # average of x and y size
             ch1 = (self.scene_size[0]+self.scene_size[1])/2
             ch2 = (scene_size[0]+scene_size[1])/2
+
+            print(ch2/ch1)
            
             # update font factor so font size stays the same
-            self.axes[0].axes.trait_set(font_factor=self.axes[0].axes.font_factor*ch1/ch2)
-            self.axes[1].axes.trait_set(font_factor=self.axes[1].axes.font_factor*ch1/ch2)
-            self.axes[2].axes.trait_set(font_factor=self.axes[2].axes.font_factor*ch1/ch2)
+            self.AxisPlotObjects[0][0].axes.trait_set(font_factor=self.AxisPlotObjects[0][0].axes.font_factor*ch1/ch2)
+            self.AxisPlotObjects[1][0].axes.trait_set(font_factor=self.AxisPlotObjects[1][0].axes.font_factor*ch1/ch2)
+            self.AxisPlotObjects[2][0].axes.trait_set(font_factor=self.AxisPlotObjects[2][0].axes.font_factor*ch1/ch2)
 
             # rescale orientation axes
             self.oaxes.widgets[0].zoom = self.oaxes.widgets[0].zoom * ch1/ch2

@@ -33,10 +33,11 @@ class Filter(SObject):
         :param func: transmittance function, used for filter_type="Function"
         """
 
-        # use a Surface copy, since we change its position in 3D space
-        # self.Surface = Surface.copy()
         super().__init__(Surface, pos)
 
+        self.name = "Filter"
+        self.short_name = "F"
+        
         self.filter_type = filter_type
         self.tau = float(tau)
         self.func = func
@@ -53,6 +54,7 @@ class Filter(SObject):
             case _:
                 raise ValueError(f"Invalid filter_type '{filter_type}'.")
 
+        self._new_lock = True
 
     def __call__(self, wl: np.ndarray) -> np.ndarray:        
         """
@@ -100,3 +102,11 @@ class Filter(SObject):
 
         return tuple(RGB), alpha
 
+
+    def crepr(self):
+
+        """
+
+        """
+
+        return [self.FrontSurface.crepr(), self.filter_type, self.tau, id(self.func)]

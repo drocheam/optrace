@@ -173,8 +173,10 @@ class BackendModuleTests(unittest.TestCase):
         # check exceptions
         self.assertRaises(TypeError, RefractionIndex)  # no type
         self.assertRaises(ValueError, RefractionIndex, "ABC")  # invalid type
-        self.assertRaises(ValueError, RefractionIndex, "List")  # wls, ns missing
-        self.assertRaises(ValueError, RefractionIndex, "Function")  # func missing
+        n = RefractionIndex("List")
+        n2 = RefractionIndex("Function")
+        self.assertRaises(RuntimeError, n, 550)  # wls, ns missing
+        self.assertRaises(RuntimeError, n2, 550)  # func missing
         self.assertRaises(ValueError, RefractionIndex, "Constant", n=0.99)  # n < 1
         self.assertRaises(ValueError, RefractionIndex, "Cauchy", A=0.99)  # A < 1
         self.assertRaises(ValueError, RefractionIndex,"List", wls=np.array([300, 500, 780]), 

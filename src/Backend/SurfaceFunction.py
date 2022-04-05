@@ -38,11 +38,12 @@ class SurfaceFunction:
         if maxz is None or minz is None:
             warnings.warn("WARNING: minz or maxz missing, the values will be determined automatically."
                   "This is however less accurate than specifying them.")
-            self.minz, self.maxz = self.findBounds()
+            self.minz, self.maxz = self.__findBounds()
             self.minz, self.maxz = self.minz - self.off, self.maxz - self.off
         else:
             self.minz, self.maxz = minz - self.off, maxz - self.off
 
+        self._lock = True
 
     def hasDerivative(self) -> bool:
         """
@@ -105,7 +106,7 @@ class SurfaceFunction:
     
         return z
 
-    def findBounds(self) -> tuple[float, float]:
+    def __findBounds(self) -> tuple[float, float]:
         """
 
         :return:
@@ -151,3 +152,17 @@ class SurfaceFunction:
 
         return minz, maxz
 
+
+    def crepr(self):
+        """
+
+        """
+
+        return [self.r, self.off, self.minz, self.maxz, id(self.derivative), id(self.func), id(self.hits), id(self.mask)]
+
+    def __setattr__(self, key, val):
+
+        if "_lock" in self.__dict__ and self._lock: # and key != "_lock":
+            raise RuntimeError("Changing SurfaceFunction properties after initialization is prohibited. Create a new SurfaceFunction and assign it to the parent Surface.")
+        
+        self.__dict__[key] = val
