@@ -8,6 +8,8 @@ from threading import Thread  # for multithreading
 
 # TODO functions for saving and loading the Image object from disc
 
+# TODO settattr
+
 class Image:
 
     EPS: float = 1e-9
@@ -229,7 +231,7 @@ class Image:
         self.Im = np.zeros((Ny, Nx, 5), dtype=np.float64)
 
         # return if there are no rays
-        if not w.shape[0]:
+        if p is None or not p.shape[0]:
             return
 
         # init parameter for multithreading
@@ -277,8 +279,7 @@ class Image:
 
         # main thread mode
         else:
-            Ims = [self.Im]
-            makeImages(0, Ims)
+            makeImages(0, [self.Im])
 
         # conversion from Y to luminous flux
         self.Im[:, :, 4] = 683 * self.Im[:, :, 1]

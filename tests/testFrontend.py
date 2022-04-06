@@ -55,7 +55,6 @@ class FrontendTests(unittest.TestCase):
                 sim.run(exit=True, no_server=True, silent=True)
         GUI_Run.i = 0
 
-
         GUI_Run()  # default init
 
         GUI_Run(ColoringType="Wavelength")
@@ -67,15 +66,15 @@ class FrontendTests(unittest.TestCase):
         GUI_Run(PlottingType="Points")
         GUI_Run(PlottingType="Rays")
 
-        GUI_Run(Rays=100000)
-        GUI_Run(Rays_s=-2.)
+        GUI_Run(RayCount=100000)
+        GUI_Run(RayAmountShown=-2.)
         GUI_Run(AbsorbMissing=False)
-        GUI_Run(Ray_alpha=-1.)
-        GUI_Run(Ray_width=5)
-        GUI_Run(Pos_Det=8.9)
+        GUI_Run(RayAlpha=-1.)
+        GUI_Run(RayWidth=5)
+        GUI_Run(PosDet=8.9)
 
-        GUI_Run(Rays=100000, Rays_s=-2., AbsorbMissing=False, Ray_alpha=-1., Ray_width=5,
-                ColoringType="Wavelength", PlottingType="Points", Pos_Det=8.9)
+        GUI_Run(RayCount=100000, RaysAmountShown=-2., AbsorbMissing=False, RayAlpha=-1., RayWidth=5,
+                ColoringType="Wavelength", PlottingType="Points", PosDet=8.9)
 
 
     def RT_Example(self) -> Raytracer:
@@ -155,9 +154,9 @@ class FrontendTests(unittest.TestCase):
             sim.waitForIdle()
 
             # check if Detector is moving
-            sim.Pos_Det = 5.3
+            sim.PosDet = 5.3
             sim.waitForIdle()
-            self.assertEqual(sim.Pos_Det, RT.DetectorList[0].pos[2])
+            self.assertEqual(sim.PosDet, RT.DetectorList[0].pos[2])
         
             # Source Image Tests
             sim.showSourceImage()
@@ -173,7 +172,7 @@ class FrontendTests(unittest.TestCase):
             sim.DetectorSelection = sim.DetectorNames[1]
             sim.waitForIdle()
             self.assertTrue(sim.DetInd == 1)
-            self.assertTrue(sim.Pos_Det == sim.Raytracer.DetectorList[1].pos[2])
+            self.assertTrue(sim.PosDet == sim.Raytracer.DetectorList[1].pos[2])
             sim.showDetectorImage()
             sim.waitForIdle()
 
@@ -220,19 +219,19 @@ class FrontendTests(unittest.TestCase):
             sim.FocusType = "Position Variance"
             sim.moveToFocus()
             sim.waitForIdle()
-            sim.Pos_Det = pos0[2]
+            sim.PosDet = pos0[2]
             
             # Focus Test 2
             sim.FocusType = "Irradiance Variance"
             sim.moveToFocus()
             sim.waitForIdle()
-            sim.Pos_Det = pos0[2]
+            sim.PosDet = pos0[2]
             
             # Focus Tests 3
             sim.FocusType = "Irradiance Variance"
             sim.moveToFocus()
             sim.waitForIdle()
-            sim.Pos_Det = pos0[2]
+            sim.PosDet = pos0[2]
 
             # Focus Test 4, show Debug Plot
             sim.FocusDebugPlot = ['Show Cost Function']
@@ -262,13 +261,13 @@ class FrontendTests(unittest.TestCase):
             sim.waitForIdle()
 
             # retrace Tests
-            sim.Rays = 100000
+            sim.RayCount = 100000
             sim.waitForIdle()
             
-            sim.Rays_s = -2.5
+            sim.RaysAmountShown = -2.5
             sim.waitForIdle()
 
-            sim.Rays_s = -2.
+            sim.RaysAmountShown = -2.
             sim.waitForIdle()
 
             sim.close()
@@ -286,15 +285,15 @@ class FrontendTests(unittest.TestCase):
                 sim.waitForIdle()
                 sim.moveToFocus()
                 sim.waitForIdle()
-                sim.Pos_Det = 10.
+                sim.PosDet = 10.
                 sim.waitForIdle()
                 sim.showSourceImage()
                 sim.waitForIdle()
-                sim.Rays = 100000
+                sim.RayCount = 100000
                 sim.waitForIdle()
                 sim.AbsorbMissing = []
                 sim.waitForIdle()
-                sim.Rays_s = -3.
+                sim.RaysAmountShown = -3.
                 sim.waitForIdle()
                 sim.ColoringType = "Power"
                 sim.waitForIdle()

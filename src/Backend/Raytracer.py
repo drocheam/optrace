@@ -160,8 +160,8 @@ class Raytracer:
                     RaySources=[D.crepr() for D in self.RaySourceList],
                     Detectors=[D.crepr() for D in self.DetectorList],
                     Rays=self.Rays.crepr(),
-                    Ambient=[self.outline, self.n0.crepr()])
-       
+                    Ambient=[tuple(self.outline), self.n0.crepr()])
+      
         return snap
 
     def comparePropertySnapshot(self, h1, h2):

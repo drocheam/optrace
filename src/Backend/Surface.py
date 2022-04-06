@@ -616,7 +616,7 @@ class Surface:
         """
 
         return [self.surface_type, self.r, self.ri, self.k, self.rho, self.ang, self.minz, 
-                self.maxz, self.pos, self.dim, id(self.Z), 
+                self.maxz, tuple(self.pos), tuple(self.dim), id(self.Z), 
                 id(self.Mask), self.eps, (self.func.crepr() if self.func is not None else None)]
 
     def __str__(self):

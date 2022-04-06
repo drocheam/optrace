@@ -8,8 +8,8 @@ import Backend.Misc as misc
 
 class RayStorage:
 
-    N_list = []
-    B_list = []
+    N_list = np.array([])
+    B_list = np.array([])
 
     def hasRays(self) -> bool:
         """
@@ -44,7 +44,7 @@ class RayStorage:
         :param no_pol:
         """
         self._locked = False
-        self.N_list = N_list
+        self.N_list = np.array(N_list, dtype=int)
         self.B_list = np.concatenate(([0], np.cumsum(self.N_list)))
         N           = np.sum(N_list)
        
@@ -279,7 +279,7 @@ class RayStorage:
 
         """
 
-        return [self.N, self.nt, self.N_list, self.B_list, 
+        return [self.N, self.nt, tuple(self.N_list), tuple(self.B_list), 
                     id(self.p_list), id(self.s0_list), id(self.pol_list), id(self.w_list), id(self.wl_list)]
     
 
