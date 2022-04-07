@@ -1,14 +1,18 @@
 
 import numpy as np
 
-import Backend.Color as Color  # for Tristimulus curves and sRGB conversions
-from Backend.Misc import timer as timer  # for benchmarking
-import Backend.Misc as misc
+import optrace.Backend.Color as Color  # for Tristimulus curves and sRGB conversions
+from optrace.Backend.Misc import timer as timer  # for benchmarking
+import optrace.Backend.Misc as misc
 from threading import Thread  # for multithreading
 
 # TODO functions for saving and loading the Image object from disc
 
 # TODO settattr
+
+# TODO save image internally in a higher dimension (e.g. at least 1000x1000), which is a integer multiple
+# -> easy and explicit reducing operation possible
+# use pil_image = Image.fromarray(np_array); p2 = pil_image.reduce(10); n2 = np.array(p2)
 
 class Image:
 

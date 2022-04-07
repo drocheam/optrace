@@ -20,8 +20,8 @@ from typing import Callable
 
 from pynput.keyboard import Key, Listener
 
-from traits.api import HasTraits, Range, Instance, on_trait_change, Str, Button, Enum, List, Dict
 from traitsui.api import View, Item, HSplit, Group, CheckListEditor
+from traits.api import HasTraits, Range, Instance, on_trait_change, Str, Button, Enum, List, Dict
 from pyface.api import GUI as pyfaceGUI
 from pyface.qt import QtCore, QtGui
 
@@ -30,12 +30,12 @@ from mayavi.sources.builtin_surface import BuiltinSurface
 from mayavi.modules.surface import Surface as mayaviSurface
 from mayavi.sources.parametric_surface import ParametricSurface
 
-from Backend import *
-from Backend.Misc import timer as timer
-from Frontend.ImagePlots import DetectorPlot, SourcePlot
-from Frontend.DebuggingPlots import AutoFocusDebugPlot
+from optrace.Backend import *
+from optrace.Backend.Misc import timer as timer
+from optrace.Frontend.ImagePlots import DetectorPlot, SourcePlot
+from optrace.Frontend.DebuggingPlots import AutoFocusDebugPlot
 
-import Frontend.TCPServer as TCPServer
+import optrace.Frontend.TCPServer as TCPServer
 from twisted.internet import reactor
 from twisted.python import log, util
 

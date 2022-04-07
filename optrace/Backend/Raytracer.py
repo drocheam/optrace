@@ -16,18 +16,18 @@ import scipy.optimize
 from threading import Thread
 from typing import Callable
 
-from Backend.Filter import * 
-from Backend.Aperture import * 
-from Backend.Detector import * 
-from Backend.Lens import * 
-from Backend.RaySource import * 
-from Backend.Surface import * 
-from Backend.RefractionIndex import * 
-from Backend.RayStorage import * 
-from Backend.Image import *
+from optrace.Backend.Filter import * 
+from optrace.Backend.Aperture import * 
+from optrace.Backend.Detector import * 
+from optrace.Backend.Lens import * 
+from optrace.Backend.RaySource import * 
+from optrace.Backend.Surface import * 
+from optrace.Backend.RefractionIndex import * 
+from optrace.Backend.RayStorage import * 
+from optrace.Backend.Image import *
 
-from Backend.Misc import timer as timer
-import Backend.Misc as misc
+from optrace.Backend.Misc import timer as timer
+import optrace.Backend.Misc as misc
 
 
 # TODO unified messages from all tracing threads
@@ -111,25 +111,6 @@ class Raytracer:
                 raise TypeError("Invalid element type.")
 
         return id(el)
-
-    # TODO needed?
-
-    # def get(self, ident: int) -> (Lens | Aperture | Filter | RaySource | Detector):
-        # """
-        # Get a reference to the element in the raytracing geometry specified by id.
-        # Returns None if element not found.
-
-        # :param ident:
-        # :return:
-        # """
-        # Elr = None
-        # [Elr := El for El in self.LensList if id(El) == ident]
-        # [Elr := El for El in self.ApertureList if id(El) == ident]
-        # [Elr := El for El in self.FilterList if id(El) == ident]
-        # [Elr := El for El in self.DetectorList if id(El) == ident]
-        # [Elr := El for El in self.RaySourceList if id(El) == ident]
-
-        # return Elr
 
     def remove(self, ident: int | SObject) -> bool:
         """
@@ -907,6 +888,9 @@ class Raytracer:
 
         time_start = time.time()
 
+        if not silent:
+            print("Render started.")
+
         # for all render iterations
         for i in np.arange(iterations+extra):
 
@@ -937,7 +921,7 @@ class Raytracer:
                         time.strftime('%H:%M:%S', time.gmtime(int(time_remaining))))
 
         if not silent:
-            print("Finished Rendering.")
+            print("Render finished.")
        
         # revert silent to its state
         self.silent = silent_old

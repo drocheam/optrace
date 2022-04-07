@@ -5,7 +5,7 @@ Color conversion and processing functions
 
 import numpy as np
 import colorio
-import Backend.Misc as misc
+import optrace.Backend.Misc as misc
 from typing import Callable
 
 WL_MIN: float = 380.

@@ -12,7 +12,9 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../src'))
+# sys.path.append(['../../optrace', '../../'
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../..'))
 
 
 
@@ -90,7 +92,7 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
 autodoc_default_options = {
 	'members': True,
     'undoc-members': True,
-    'special-members' : '__call__, __eq__, __ne__',
+    'special-members' : '__call__, __eq__, __ne__, __setattr__',
     'exclude-members': '__weakref__'
 }
 

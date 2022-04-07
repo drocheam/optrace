@@ -1,16 +1,22 @@
 Frontend Module
 ----------------------------
 
-.. automodule:: Frontend
+.. automodule:: optrace.Frontend
 
 Frontend.ImagePlots
 __________________________
-.. automodule:: Frontend.ImagePlots
+.. automodule:: optrace.Frontend.ImagePlots
 
 Frontend.DebuggingPlots
 __________________________
-.. automodule:: Frontend.DebuggingPlots
+.. automodule:: optrace.Frontend.DebuggingPlots
+
+
+Frontend.TCPServer
+__________________________
+.. automodule:: optrace.Frontend.TCPServer
+
 
 Frontend.GUI
 __________________________
-.. automodule:: Frontend.GUI
+.. automodule:: optrace.Frontend.GUI

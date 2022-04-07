@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 import sys
-sys.path.append('./src/')
+sys.path.append(['./optrace/', './'])
 
 import unittest
 import subprocess
@@ -18,16 +18,16 @@ class ExampleTests(unittest.TestCase):
 
     def test_0Complex(self):
 
-        self.execute(["python", "./src/More_Complex_Example.py"])
+        self.execute(["python", "./examples/More_Complex_Example.py"])
 
     def test_3RGBRender(self):
-        self.execute(["python", "./src/Image_RGB_Render_Example.py"], 90)
+        self.execute(["python", "./examples/Image_RGB_Render_Example.py"], 90)
 
     def test_2RGB(self):
-        self.execute(["python", "./src/Image_RGB_Example.py"])
+        self.execute(["python", "./examples/Image_RGB_Example.py"])
 
     def test_1Prism(self):
-        self.execute(["python", "./src/Double_Prism_Example.py"])
+        self.execute(["python", "./examples/Double_Prism_Example.py"])
 
 
 if __name__ == '__main__':

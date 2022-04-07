@@ -12,7 +12,7 @@ import numpy as np
 import copy
 # import PyQt5
 
-from Backend.Image import *
+from optrace.Backend.Image import *
 
 
 def DetectorPlot(Im:        Image,

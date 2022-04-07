@@ -6,9 +6,9 @@ rectangular plane perpendicular to optical axis for creation of Detector Images
 
 import numpy as np
 
-from Backend.Surface import *  # for the Detector surface
-from Backend.SObject import *
-import Backend.Misc as misc
+from optrace.Backend.Surface import *  # for the Detector surface
+from optrace.Backend.SObject import *
+import optrace.Backend.Misc as misc
 
 # TODO reference point for the angle calculation
 

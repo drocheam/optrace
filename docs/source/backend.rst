@@ -1,63 +1,68 @@
 Backend Module
 ----------------------------
 
-.. automodule:: Backend
+.. automodule:: optrace.Backend
 
 Backend.Colors
 _________________________________
-.. automodule:: Backend.Color
+.. automodule:: optrace.Backend.Color
+
+
+Backend.Aperture
+_________________________________
+.. automodule:: optrace.Backend.Aperture
 
 
 Backend.Detector
 _________________________________
-.. automodule:: Backend.Detector
+.. automodule:: optrace.Backend.Detector
 
 
 Backend.Filter
 _________________________________
-.. automodule:: Backend.Filter
+.. automodule:: optrace.Backend.Filter
 
 
 Backend.Image
 _________________________________
-.. automodule:: Backend.Image
+.. automodule:: optrace.Backend.Image
 
 
 Backend.Lens
 _________________________________
-.. automodule:: Backend.Lens
+.. automodule:: optrace.Backend.Lens
 
 
 Backend.Misc
 _________________________________
-.. automodule:: Backend.Misc
+.. automodule:: optrace.Backend.Misc
 
 
 Backend.RaySource
 _________________________________
-.. automodule:: Backend.RaySource
+.. automodule:: optrace.Backend.RaySource
 
 
 Backend.RayStorage
 _________________________________
-.. automodule:: Backend.RayStorage
+.. automodule:: optrace.Backend.RayStorage
 
 Backend.Raytracer
 _________________________________
-.. automodule:: Backend.Raytracer
+.. automodule:: optrace.Backend.Raytracer
 
 Backend.RefractionIndex
 _________________________________
-.. automodule:: Backend.RefractionIndex
+.. automodule:: optrace.Backend.RefractionIndex
 
 Backend.SObject
 _________________________________
-.. automodule:: Backend.SObject
+.. automodule:: optrace.Backend.SObject
 
 Backend.Surface
 _________________________________
-.. automodule:: Backend.Surface
+.. automodule:: optrace.Backend.Surface
 
 Backend.SurfaceFunction
 _________________________________
-.. automodule:: Backend.SurfaceFunction
+.. automodule:: optrace.Backend.SurfaceFunction
