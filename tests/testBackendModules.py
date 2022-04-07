@@ -118,14 +118,14 @@ class BackendModuleTests(unittest.TestCase):
 
         # check if position and extent is set correctly
         self.assertTrue(np.all(pos0 == F0.pos))
-        self.assertTrue(np.all(F0.ot.Surface.getExtent() == F0.extent))
+        self.assertTrue(np.all(F0.Surface.getExtent() == F0.extent))
 
         F0.copy()
         F0.getColor()
-        F0.getCylinderot.Surface()
+        F0.getCylinderSurface()
         F0.setSurface(S1)
         self.assertTrue(np.all(pos0 == F0.pos))
-        self.assertTrue(F0.ot.Surface is not S1)  # check if internal surface is a copy
+        self.assertTrue(F0.Surface is not S1)  # check if internal surface is a copy
 
         # check exceptions
         self.assertRaises(ValueError, ot.Filter, S0, pos0, filter_type="ABC")  # invalid filter_type
@@ -202,10 +202,10 @@ class BackendModuleTests(unittest.TestCase):
 
         
     def test_Color(self):
-        doctest.testmod(Backend.Color)
+        doctest.testmod(ot.Backend.Color)
 
     def test_Misc(self):
-        doctest.testmod(Backend.Misc)
+        doctest.testmod(ot.Backend.Misc)
 
 
 if __name__ == '__main__':

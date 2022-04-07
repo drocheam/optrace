@@ -1,9 +1,9 @@
 #!/bin/env python3
 
 import unittest
+from testFrontend import FrontendTests
 from testExamples import ExampleTests
 from testBackendModules import BackendModuleTests
-from testFrontend import FrontendTests
 
 
 def suite():

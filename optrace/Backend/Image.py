@@ -13,6 +13,9 @@ from threading import Thread  # for multithreading
 # TODO save image internally in a higher dimension (e.g. at least 1000x1000), which is a integer multiple
 # -> easy and explicit reducing operation possible
 # use pil_image = Image.fromarray(np_array); p2 = pil_image.reduce(10); n2 = np.array(p2)
+# see /bak/reduceTest.py
+
+# Image.at() function, makes x or y cuts
 
 class Image:
 

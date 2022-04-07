@@ -20,10 +20,10 @@ from typing import Callable
 
 from pynput.keyboard import Key, Listener
 
+from pyface.qt import QtCore, QtGui
+from pyface.api import GUI as pyfaceGUI
 from traitsui.api import View, Item, HSplit, Group, CheckListEditor
 from traits.api import HasTraits, Range, Instance, on_trait_change, Str, Button, Enum, List, Dict
-from pyface.api import GUI as pyfaceGUI
-from pyface.qt import QtCore, QtGui
 
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from mayavi.sources.builtin_surface import BuiltinSurface
