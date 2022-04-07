@@ -1,5 +1,10 @@
-Current Version: 0.8.1 
+Current Version: 0.8.6-1-g8b536f2 
 
+0.8.6           Project restructuring.
+0.8.5           New 'Cleaner View'-option in GUI. Simpler and more cleaned up GUI code. Minor bug fixes.
+0.8.4           TCP Server for controlling the GUI. Automatic RT change detection and GUI replotting. New restrictions to when the user can define or assign some class properties.
+0.8.3           Improvement of Autofocus and Debug Plot. Opacity simulation of filter in GUI. RaySource Color adapts to Ray Coloring Mode. GUI now has an advanced picking mode.
+0.8.2           GUI shell interface and interface functions. Additional GUI Tests.
 0.8.1           List of RaySources now belongs to Raytracer. Renamed RaySourceList to RayStorage. Globally defined wavelength range. Own Misc.calc() instead of numexpr.evaluate().
 0.8.0           Restructuring: Lens, Filter, Detector, RaySource now have a common parent class 'SObject'
 0.7.4           GUI class: Now plotting with a common function for RaySource, Filter, Detector
