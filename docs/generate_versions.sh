@@ -22,6 +22,9 @@ out2+=$(echo "$pkgs" | grep "traitsui " && echo " ")
 out2+=$(echo "$pkgs" | grep "mayavi " && echo " ")
 out2+=$(echo "$pkgs" | grep "vtk " && echo " ")
 out2+=$(echo "$pkgs" | grep "scipy " && echo " ")
+out2+=$(echo "$pkgs" | grep "wxPython " && echo " ")
+out2+=$(echo "$pkgs" | grep "Twisted " && echo " ")
+out2+=$(echo "$pkgs" | grep "progressbar2 " && echo " ")
 
 out2=$(echo "$out2" | sort)
 

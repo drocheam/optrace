@@ -9,12 +9,11 @@ Provides the functionality for raytracing, autofocussing and rendering of source
 """
 import warnings
 import numpy as np
-
-import time
 import scipy.optimize
 
 from threading import Thread
 from typing import Callable
+from progressbar import progressbar, ProgressBar, NullBar
 
 from optrace.Backend.Filter import * 
 from optrace.Backend.Aperture import * 
@@ -28,7 +27,6 @@ from optrace.Backend.Image import *
 
 from optrace.Backend.Misc import timer as timer
 import optrace.Backend.Misc as misc
-
 
 # TODO unified messages from all tracing threads
 # TODO Position variance prefocus finding nicht mehr benötigt?
@@ -131,10 +129,9 @@ class Raytracer:
 
         return success
 
-    @timer
     def PropertySnapshot(self):
 
-        snap = dict(TraceSettings=[self.no_pol, self.EPS, self.T_TH, self.AbsorbMissing],
+        return dict(TraceSettings=[self.no_pol, self.EPS, self.T_TH, self.AbsorbMissing],
                     Lenses=[D.crepr() for D in self.LensList],
                     Filters=[D.crepr() for D in self.FilterList],
                     Apertures=[D.crepr() for D in self.ApertureList],
@@ -142,8 +139,6 @@ class Raytracer:
                     Detectors=[D.crepr() for D in self.DetectorList],
                     Rays=self.Rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()])
-      
-        return snap
 
     def comparePropertySnapshot(self, h1, h2):
        
@@ -168,9 +163,6 @@ class Raytracer:
 
         if N > self.MAX_RAYS:
             raise ValueError(f"Ray number exceeds maximum of {self.MAX_RAYS}")
-
-        if not self.silent:
-            print("Raytracing...")
 
         # all rays have the same starting power.
         # The rays are distributed between the sources according to the ray source power
@@ -209,7 +201,11 @@ class Raytracer:
         cores = misc.getCoreCount()
         N_threads = cores if N/cores >= 10000 and self.multithreading else 1
 
+        steps = len(Elements)+1
+        bar = ProgressBar(prefix="Raytracing: ", max_value=steps, redirect_stdout=True).start() if not self.silent else NullBar()
+
         self.Rays.createRays(self.RaySourceList, N_list, nt, threading=N_threads>1, no_pol=self.no_pol)
+        bar.update(1)
 
         def sub_trace(N_threads: int, N_t: int) -> None:
 
@@ -219,7 +215,7 @@ class Raytracer:
             n0_l = self.n0(wavelengths) 
 
             i = 0
-            for Element in Elements:
+            for eli, Element in enumerate(Elements):
     
                 p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
 
@@ -275,7 +271,6 @@ class Raytracer:
                 
                 elif isinstance(Element, Filter | Aperture):
                     p[hw, i+1], hit = self.__findSurfaceHit(Element.Surface, p[hw, i], s[hw])
-
                     hwh, _ = misc.partMask(hw, hit)  # rays having power and hitting filter
                     
                     if isinstance(Element, Filter):
@@ -291,6 +286,7 @@ class Raytracer:
                     raise RuntimeError(f"Invalid element type '{type(Element).__name__}' in raytracing")
 
                 i += 1
+                bar.update(eli+2)
 
         if N_threads > 1:
             thread_list = [Thread(target=sub_trace, args=(N_threads, N_t)) for N_t in np.arange(N_threads)]
@@ -302,9 +298,7 @@ class Raytracer:
 
         # lock Storage
         self.Rays.lock()
-
-        if not self.silent:
-            print("Raytracing Finished.\n")
+        bar.finish()
 
     def __makeElementList(self) -> list[Lens | Filter | Aperture]:
         """
@@ -747,6 +741,8 @@ class Raytracer:
         if not self.RaySourceList:
             raise RuntimeError("Raysource Missing")
 
+        bar = ProgressBar(prefix="Detector Image: ", max_value=3).start() if not self.silent else NullBar()
+
         # starting position of hit search
         z = self.DetectorList[ind].extent[4]
 
@@ -772,6 +768,7 @@ class Raytracer:
         rs2 = rs2[rs2 >= 0]
         # weights[~rs] = 0  # not needed rs < 0 means ray is already absorbed
         p, s = p[rs], s[rs]
+        bar.update(1)
 
         while np.any(rs):
 
@@ -794,9 +791,9 @@ class Raytracer:
                 rs2 = rs2[rsn]
                 p, s, _, w[rs], _, _ = self.Rays.getRaysByMask(rs, rs2, normalize=True,
                                                                      ret=[True, True, False, True, False, False])
-
         hitw = ish & (w > 0)
         ph, w, wl = ph[hitw], w[hitw], wl[hitw]
+        bar.update(2)
 
         if self.DetectorList[ind].Surface.isPlanar():
             extent_out = np.array(self.DetectorList[ind].extent[:4])
@@ -835,6 +832,7 @@ class Raytracer:
         # init image and extent, these are the default values when no rays hit the detector
         Im = Image(z=self.DetectorList[ind].pos[2], extent=extent_out, image_type=image_type, index=ind)
         Im.makeImage(N, ph, w, wl, threading=self.multithreading)
+        bar.finish()
 
         return Im
 
@@ -873,7 +871,6 @@ class Raytracer:
         if not len(pos):
             pos = [self.DetectorList[ind].pos[2]]
 
-        rays = 0
         rays_step = self.ITER_RAYS_STEP
         iterations = int(N_rays / rays_step)
         diff = int(N_rays - iterations*rays_step) # remaining rays for last iteration
@@ -886,13 +883,11 @@ class Raytracer:
         # image list
         Im_res = []
 
-        time_start = time.time()
-
-        if not silent:
-            print("Render started.")
+        iter_ = range(iterations+extra)
+        iterator = progressbar(iter_, prefix="Rendering: ") if not silent else iter_
 
         # for all render iterations
-        for i in np.arange(iterations+extra):
+        for i in iterator:
 
             # only true in extra step
             if i == iterations:
@@ -912,17 +907,6 @@ class Raytracer:
                 else:
                     Im_res[j].Im += rays_step/N_rays * Imi.Im
 
-            # print render percentage and remaining time
-            rays += rays_step
-            time_remaining = (time.time() - time_start) * (N_rays - rays) / rays
-
-            if not silent:
-                print(f"Rendered {100*rays/N_rays:.1f}%, Estimated time remaining:", 
-                        time.strftime('%H:%M:%S', time.gmtime(int(time_remaining))))
-
-        if not silent:
-            print("Render finished.")
-       
         # revert silent to its state
         self.silent = silent_old
 
@@ -946,11 +930,14 @@ class Raytracer:
         if (N := int(N)) <= 0:
             raise ValueError(f"Pixel number N needs to be a positive int, but is {N}.")
 
+        bar = ProgressBar(prefix="Source Image: ", max_value=2).start() if not self.silent else NullBar()
         extent = self.RaySourceList[sindex].extent[:4]
         p, _, _, w, wavelengths = self.Rays.getSourceRays(sindex)
+        bar.update(1)
 
         Im = Image(z=self.RaySourceList[sindex].pos[2], extent=extent, image_type="Cartesian", index=sindex)
         Im.makeImage(N, p, w, wavelengths)
+        bar.finish()
 
         return Im
 
@@ -1112,6 +1099,11 @@ class Raytracer:
         # find focus
         ########################################################################################################
         
+        Nt = 1000
+        N_th = misc.getCoreCount()
+        steps = np.ceil(Nt/N_th/10).astype(int) if self.multithreading else np.ceil(Nt/10).astype(int)
+        bar = ProgressBar(prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start() if not self.silent else NullBar()
+        
         # all methods start with Position Variance mode
         # find minimum for position variance
 
@@ -1131,19 +1123,20 @@ class Raytracer:
         else:
             r0 = 1e-3
 
-        Nt = 1000
-
         if method != "Position Variance" or ret_cost:
             # sample smaller region around minimum with proper method
             r = np.linspace(bounds[0], bounds[1], Nt)
             vals = np.zeros_like(r)
-            N_th = misc.getCoreCount()
 
             def threaded(N_th, N_is, Nt, *afargs):
                 Ns = N_is*int(Nt/N_th)
                 Ne = (N_is+1)*int(Nt/N_th) if N_is != N_th-1 else Nt
-                vals[Ns:Ne] = [self.__autofocus_cost_func(rs, *afargs) for rs in r[Ns:Ne]]
-            
+
+                for i, Ni in enumerate(np.arange(Ns, Ne)):
+                    if not i % 10:
+                        bar.update(int(i/10+1))
+                    vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
+
             if self.multithreading:   
                 threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, p, s, weights, r0)) for N_is in range(N_th)]
                 [th.start() for th in threads]
@@ -1161,6 +1154,9 @@ class Raytracer:
             cost_func2 = lambda z, method: self.__autofocus_cost_func(z[0], method, p, s, weights, r0=r0)
             res = scipy.optimize.minimize(cost_func2, r[pos], args=method, tol=None, callback=None,
                                           options={'maxiter': 300}, bounds=[bounds])
+            res.x = res.x[0]
+
+        bar.finish()
 
         # print warning if result is near bounds
         ########################################################################################################

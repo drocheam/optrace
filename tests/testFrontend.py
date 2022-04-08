@@ -22,7 +22,7 @@ class FrontendTests(unittest.TestCase):
     def tearDown(self) -> None:
         warnings.simplefilter("default")
     
-    def test_TraceGUI_inits(self) -> None:
+    def test_GUI_inits(self) -> None:
 
         Image = './examples/tv-test-pattern.png'
 

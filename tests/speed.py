@@ -1,9 +1,9 @@
 #!/bin/env python3
 
 import sys
-sys.path.append('./src/')
+sys.path.append('./')
 
-from Backend import *
+from optrace import *
 
 import copy
 import time

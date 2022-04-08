@@ -8,9 +8,12 @@
  numexpr                       2.8.1
  numpy                         1.22.3
  Pillow                        9.0.1
+ progressbar2                  4.0.0
  pyface                        7.3.0
  pynput                        1.7.6
  PyQt5                         5.15.6
  scipy                         1.8.0
  traits                        6.2.0
  traitsui                      7.2.1
+ Twisted                       21.7.0
+ wxPython                      4.0.7.post2

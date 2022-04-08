@@ -78,7 +78,7 @@ class GUI(HasTraits):
     INFO_STYLE: dict = dict(font_size=13, bold=True, color=(1, 1, 1), font_family="courier", shadow=True, italic=False)
     """Info Text Style. Used for status messages and interaction overlay"""
 
-    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.55, 0.55, 0.55), font_family="courier", shadow=True)
+    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.60, 0.60, 0.60), font_family="courier", shadow=True)
     
     """Style for hidden info text. The color is used for the refraction index boxes frame"""
     
@@ -507,7 +507,8 @@ class GUI(HasTraits):
             label = str(nList[i].n) if nList[i].n_type == "Constant" else "function"
             x_pos = self.Raytracer.outline[0] + (self.Raytracer.outline[1]-self.Raytracer.outline[0])*0.05
             z_pos = (BoundList[i+1]+BoundList[i])/2
-            text  = self.Scene.mlab.text(x_pos, 0, z=z_pos, text=f"ambient\nn={label}", name=f"Label")
+            text_ = f"ambient\nn={label}" if not self.CleanerView else f"n={label}"
+            text  = self.Scene.mlab.text(x_pos, 0, z=z_pos, text=text_, name=f"Label")
 
             text.actor.text_scale_mode = 'none'
             text.property.trait_set(**self.TEXT_STYLE, justification="center", frame=True, frame_color=self.SUBTLE_INFO_STYLE["color"])
@@ -1350,6 +1351,13 @@ class GUI(HasTraits):
 
         if self.OrientationAxes is not None:
             self.OrientationAxes.visible = show
+
+        for rio in self.RefractionIndexPlotObjects:
+            if rio[1] is not None:
+                if not show:
+                    rio[1].text = rio[1].text.replace("ambient\n", "")
+                else:
+                    rio[1].text = "ambient\n" + rio[1].text
 
         # replot Ray Pick Text, opacity of default text gets set
         self.onRayPick()
