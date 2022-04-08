@@ -5,7 +5,7 @@ import sys
 sys.path.append('./')
 
 import optrace as ot
-from optrace.Frontend import GUI as TraceGUI
+from optrace.gui import GUI as TraceGUI
 
 Image = './examples/tv-test-pattern.png'
 

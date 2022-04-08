@@ -8,8 +8,8 @@ The class contains methods for interpolation, surface masking and normal calcula
 
 import copy
 import numpy as np
-import optrace.Backend.Misc as misc
-from optrace.Backend.SurfaceFunction import *
+import optrace.tracer.Misc as misc
+from optrace.tracer.SurfaceFunction import *
 
 # TODO Mode Data: check if working
 

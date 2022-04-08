@@ -30,12 +30,12 @@ from mayavi.sources.builtin_surface import BuiltinSurface
 from mayavi.modules.surface import Surface as mayaviSurface
 from mayavi.sources.parametric_surface import ParametricSurface
 
-from optrace.Backend import *
-from optrace.Backend.Misc import timer as timer
-from optrace.Frontend.ImagePlots import DetectorPlot, SourcePlot
-from optrace.Frontend.DebuggingPlots import AutoFocusDebugPlot
+from optrace.tracer import *
+from optrace.tracer.Misc import timer as timer
+from optrace.plots.ImagePlots import DetectorPlot, SourcePlot
+from optrace.plots.DebugPlots import AutoFocusDebugPlot
 
-import optrace.Frontend.TCPServer as TCPServer
+import optrace.gui.TCPServer as TCPServer
 from twisted.internet import reactor
 from twisted.python import log, util
 

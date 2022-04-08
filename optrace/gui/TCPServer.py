@@ -7,7 +7,7 @@ import warnings
 import numpy as np
 import time
 
-from optrace.Backend import *
+from optrace.tracer import *
 
 warnings.simplefilter("ignore")
 

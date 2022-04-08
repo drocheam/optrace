@@ -2,8 +2,8 @@
 from threading import Thread
 
 import numpy as np
-from optrace.Backend.RaySource import *
-import optrace.Backend.Misc as misc
+from optrace.tracer.RaySource import *
+import optrace.tracer.Misc as misc
 
 
 class RayStorage:

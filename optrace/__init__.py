@@ -1,2 +1,2 @@
 
-from optrace.Backend import *
+from optrace.tracer import *

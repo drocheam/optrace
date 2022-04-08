@@ -13,7 +13,7 @@ Optrace Documentation
 
    overview
    installation
-   scripting
+   usage
    API
    Development
 

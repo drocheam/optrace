@@ -202,10 +202,10 @@ class BackendModuleTests(unittest.TestCase):
 
         
     def test_Color(self):
-        doctest.testmod(ot.Backend.Color)
+        doctest.testmod(ot.tracer.Color)
 
     def test_Misc(self):
-        doctest.testmod(ot.Backend.Misc)
+        doctest.testmod(ot.tracer.Misc)
 
 
 if __name__ == '__main__':

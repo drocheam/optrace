@@ -5,7 +5,7 @@ import sys
 sys.path.append('./')
 
 import optrace as ot
-from optrace.Frontend import DetectorPlot as DetectorPlot
+from optrace.plots import *
 import numpy as np
 
 

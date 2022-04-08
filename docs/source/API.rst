@@ -5,6 +5,7 @@ API
 .. toctree::
    math
    dependencies
-   backend
-   frontend
+   optrace_tracer
+   optrace_plots
+   optrace_gui
 

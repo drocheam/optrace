@@ -6,8 +6,8 @@ Provides the creation and computation of constant or wavelength depended refract
 
 import numpy as np
 import scipy.interpolate
-import optrace.Backend.Misc as misc
-import optrace.Backend.Color as Color
+import optrace.tracer.Misc as misc
+import optrace.tracer.Color as Color
 
 from typing import Callable
 

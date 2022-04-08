@@ -7,8 +7,8 @@ Aperture class:
 import numpy as np
 from typing import Callable  # for function type hints
 
-from optrace.Backend.SObject import *
-from optrace.Backend.Surface import *  # for the Aperture surface
+from optrace.tracer.SObject import *
+from optrace.tracer.Surface import *  # for the Aperture surface
 
 
 class Aperture(SObject):

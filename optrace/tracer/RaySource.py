@@ -14,11 +14,11 @@ from typing import Callable
 from scipy.spatial.transform import Rotation
 from PIL import Image as PILImage
 
-from optrace.Backend.Surface import * 
-from optrace.Backend.SObject import *
-from optrace.Backend.Misc import timer as timer
-import optrace.Backend.Misc as misc
-import optrace.Backend.Color as Color
+from optrace.tracer.Surface import * 
+from optrace.tracer.SObject import *
+from optrace.tracer.Misc import timer as timer
+import optrace.tracer.Misc as misc
+import optrace.tracer.Color as Color
 
 
 # TODO check light_type=Function

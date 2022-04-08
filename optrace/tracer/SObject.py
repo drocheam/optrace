@@ -25,7 +25,7 @@ Properties with FrontSurface + BackSurface:
 """
 
 
-from optrace.Backend.Surface import *  # for the SObject surface
+from optrace.tracer.Surface import *  # for the SObject surface
 
 from typing import Callable  # for function type hints
 import copy  # for copy.deepcopy

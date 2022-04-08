@@ -1,5 +1,6 @@
-Current Version: 0.8.6-1-g8b536f2 
+Current Version: 0.8.7 
 
+0.8.7           Backend now has a progress bar for operations.
 0.8.6           Project restructuring.
 0.8.5           New 'Cleaner View'-option in GUI. Simpler and more cleaned up GUI code. Minor bug fixes.
 0.8.4           TCP Server for controlling the GUI. Automatic RT change detection and GUI replotting. New restrictions to when the user can define or assign some class properties.

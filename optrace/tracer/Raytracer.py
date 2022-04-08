@@ -15,18 +15,18 @@ from threading import Thread
 from typing import Callable
 from progressbar import progressbar, ProgressBar, NullBar
 
-from optrace.Backend.Filter import * 
-from optrace.Backend.Aperture import * 
-from optrace.Backend.Detector import * 
-from optrace.Backend.Lens import * 
-from optrace.Backend.RaySource import * 
-from optrace.Backend.Surface import * 
-from optrace.Backend.RefractionIndex import * 
-from optrace.Backend.RayStorage import * 
-from optrace.Backend.Image import *
+from optrace.tracer.Filter import * 
+from optrace.tracer.Aperture import * 
+from optrace.tracer.Detector import * 
+from optrace.tracer.Lens import * 
+from optrace.tracer.RaySource import * 
+from optrace.tracer.Surface import * 
+from optrace.tracer.RefractionIndex import * 
+from optrace.tracer.RayStorage import * 
+from optrace.tracer.Image import *
 
-from optrace.Backend.Misc import timer as timer
-import optrace.Backend.Misc as misc
+from optrace.tracer.Misc import timer as timer
+import optrace.tracer.Misc as misc
 
 # TODO unified messages from all tracing threads
 # TODO Position variance prefocus finding nicht mehr benötigt?

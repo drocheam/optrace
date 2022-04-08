@@ -1,9 +1,9 @@
 
 import numpy as np
 
-import optrace.Backend.Color as Color  # for Tristimulus curves and sRGB conversions
-from optrace.Backend.Misc import timer as timer  # for benchmarking
-import optrace.Backend.Misc as misc
+import optrace.tracer.Color as Color  # for Tristimulus curves and sRGB conversions
+from optrace.tracer.Misc import timer as timer  # for benchmarking
+import optrace.tracer.Misc as misc
 from threading import Thread  # for multithreading
 
 # TODO functions for saving and loading the Image object from disc

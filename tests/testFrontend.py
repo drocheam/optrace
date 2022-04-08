@@ -10,7 +10,7 @@ import time
 import numpy as np
 
 import optrace as ot
-import optrace.Frontend.GUI as TraceGUI
+import optrace.gui.GUI as TraceGUI
 
 from threading import Thread
 

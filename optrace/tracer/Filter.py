@@ -9,9 +9,9 @@ Useful for color filters or apertures.
 import numpy as np
 from typing import Callable  # for function type hints
 
-from optrace.Backend.SObject import *
-from optrace.Backend.Surface import *  # for the Filter surface
-import optrace.Backend.Color as Color  # for the calculation of the filter color 
+from optrace.tracer.SObject import *
+from optrace.tracer.Surface import *  # for the Filter surface
+import optrace.tracer.Color as Color  # for the calculation of the filter color 
 
 
 class Filter(SObject):

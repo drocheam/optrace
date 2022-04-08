@@ -8,9 +8,9 @@ A refractive index is specified for the material and one for the area behind the
 import numpy as np
 import copy
 
-from optrace.Backend.RefractionIndex import *
-from optrace.Backend.Surface import *
-from optrace.Backend.SObject import *
+from optrace.tracer.RefractionIndex import *
+from optrace.tracer.Surface import *
+from optrace.tracer.SObject import *
 
 # TODO error message when surface is point or line
 
