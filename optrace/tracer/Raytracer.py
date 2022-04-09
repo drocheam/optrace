@@ -7,7 +7,6 @@
 Raytracer class:
 Provides the functionality for raytracing, autofocussing and rendering of source and detector images.
 """
-import warnings
 import numpy as np
 import scipy.optimize
 
@@ -28,8 +27,9 @@ from optrace.tracer.Image import *
 from optrace.tracer.Misc import timer as timer
 import optrace.tracer.Misc as misc
 
-# TODO unified messages from all tracing threads
-# TODO Position variance prefocus finding nicht mehr benötigt?
+from enum import IntEnum
+import warnings
+
 
 class Raytracer:
 
@@ -46,6 +46,15 @@ class Raytracer:
 
     ITER_RAYS_STEP: int = 1000000
     """ number of rays per iteration in :obj:`Raytracer.iterativeDetectorImage` """
+
+    # enum for info messages while tracing
+    class __infos(IntEnum):
+        AbsorbMissing = 0
+        TIR = 1
+        OutlineIntersection = 2
+        OnlyHitFront = 3
+        OnlyHitBack = 4
+        TBelowTTH = 5
 
     def __init__(self,
                  outline:        (list | np.ndarray),
@@ -147,7 +156,39 @@ class Raytracer:
             diff[d] = h1[d] != h2[d]
 
         return diff
-    
+   
+    def __showMessages(self, msgs, N):
+
+        # join messages from all threads
+        msga = np.zeros_like(msgs[0], dtype=int)
+        for msg in msgs:
+            msga += msg
+
+        # print messages
+        for type_ in range(msga.shape[0]):
+            for surf in range(msga.shape[1]):
+                if count := msga[type_, surf]:
+                    match type_:
+                        case self.__infos.TIR:
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                                  f"with total inner reflection at surface {surf}, treating as absorbed.")
+                        case self.__infos.AbsorbMissing:
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                                  f"missing surface {surf}, set to absorbed because of parameter AbsorbMissing=True.")
+                        case self.__infos.OutlineIntersection:
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays)"\
+                                  f"hitting outline, set to absorbed.")
+                        case self.__infos.TBelowTTH:
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                                  f"with transmittivity at filter surface {surf} below threshold of "\
+                                  f"{self.T_TH*100:.3g}%, setting to absorbed.")
+                        case self.__infos.OnlyHitFront:
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                                  f"hitting lens front but missing back, setting to absorbed.")
+                        case self.__infos.OnlyHitBack:
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                                  f"missing lens front but hitting back, setting to absorbed.")
+
     def trace(self, N: int) -> None:
         """
         Execute raytracing, saves all Rays in the internal RaySource object
@@ -164,24 +205,6 @@ class Raytracer:
         if N > self.MAX_RAYS:
             raise ValueError(f"Ray number exceeds maximum of {self.MAX_RAYS}")
 
-        # all rays have the same starting power.
-        # The rays are distributed between the sources according to the ray source power
-        # get source powers and overall power
-        P_list = np.array([RS.power for RS in self.RaySourceList])
-        P_all = np.sum(P_list)
-
-        # calculate int ray number from power ratio
-        N_list = (N*P_list/P_all).astype(int)
-        dN = N-np.sum(N_list)  # difference to ray number
-
-        # distribute difference dN randomly on all sources, with the power being the probability
-        index_add = np.random.choice(N_list.shape[0], size=dN, p=P_list/P_all)
-        np.add.at(N_list, index_add, np.ones(index_add.shape))
-
-        if np.any(np.array(N_list) == 0):
-            warnings.warn("There are RaySources that have no rays assigned. "\
-                    "Change the power ratio or raise the overall ray number", RuntimeWarning)
-
         # AbsorbMissing = False is only possible, if all ambient refraction indices are the same
         if not self.AbsorbMissing:
             for Lens_ in self.LensList:
@@ -197,25 +220,32 @@ class Raytracer:
         # reserve space for all surface points, +1 for invisible aperture at the outline z-end
         # and +1 for the ray starting points
         nt = 2*len(self.LensList) + len(self.FilterList) + len(self.ApertureList) + 1 + 1
-    
+  
         cores = misc.getCoreCount()
         N_threads = cores if N/cores >= 10000 and self.multithreading else 1
 
-        steps = len(Elements)+1
-        bar = ProgressBar(prefix="Raytracing: ", max_value=steps, redirect_stdout=True).start() if not self.silent else NullBar()
+        # will hold info messages from each thread
+        msgs = [np.zeros((len(self.__infos), nt), dtype=int) for i in range(N_threads)]
 
-        self.Rays.createRays(self.RaySourceList, N_list, nt, threading=N_threads>1, no_pol=self.no_pol)
-        bar.update(1)
+        # start a progressbar
+        bar = ProgressBar(prefix="Raytracing: ", max_value=nt, redirect_stdout=True).start() if not self.silent else NullBar()
 
+        # create Rays from RaySources
+        self.Rays.init(self.RaySourceList, N, nt)
+       
         def sub_trace(N_threads: int, N_t: int) -> None:
 
-            p, s0, pols, weights, wavelengths = self.Rays.getThreadRays(N_threads, N_t)
+            p, s0, pols, weights, wavelengths = self.Rays.makeThreadRays(N_threads, N_t, no_pol=self.no_pol)
+            if N_t == 0:
+                bar.update(1)
+
             s = s0.copy()
 
             n0_l = self.n0(wavelengths) 
+            msg = msgs[N_t]
 
             i = 0
-            for eli, Element in enumerate(Elements):
+            for Element in Elements:
     
                 p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
 
@@ -234,23 +264,25 @@ class Raytracer:
                     hw_front = hw.copy()
                     p[hw, i+1], hit_front = self.__findSurfaceHit(Element.FrontSurface, p[hw, i], s[hw])
                     hwh, _ = misc.partMask(hw, hit_front)  # rays having power and hitting lens front
-                    self.__refraction(Element.FrontSurface, p, s, weights, n0_l, n1_l, pols, hwh, i)
+                    self.__refraction(Element.FrontSurface, p, s, weights, n0_l, n1_l, pols, hwh, i, msg)
 
                     # treat rays that go outside outline
                     hwnh, _ = misc.partMask(hw, ~hit_front)  # rays having power and not hitting lens front
-                    self.__outlineIntersection(p, s, weights, hwnh, i)
+                    self.__outlineIntersection(p, s, weights, hwnh, i, msg)
 
                     i += 1
+                    if N_t == 0:
+                        bar.update(i+1)
                     p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
 
                     hw = weights[:, i] > 0
                     p[hw, i+1], hit_back = self.__findSurfaceHit(Element.BackSurface, p[hw, i], s[hw])
                     hwb, _ = misc.partMask(hw, hit_back)  # rays having power and hitting lens back
-                    self.__refraction(Element.BackSurface, p, s, weights, n1_l, n2_l, pols, hwb, i)
+                    self.__refraction(Element.BackSurface, p, s, weights, n1_l, n2_l, pols, hwb, i, msg)
 
                     # since we don't model the behaviour of the lens side cylinder, we need to absorb all rays passing
                     # through the cylinder
-                    self.__absorbCylinderRays(p, weights, hw_front, hw, hit_front, hit_back, i)
+                    self.__absorbCylinderRays(p, weights, hw_front, hw, hit_front, hit_back, i, msg)
 
                     # absorb rays missing lens, overwrite p to last ray starting point (=end of lens front surface)
                     if self.AbsorbMissing and not np.all(hit_back):
@@ -258,35 +290,34 @@ class Raytracer:
                         miss_count = np.count_nonzero(miss_mask)
                         weights[miss_mask, i+1] = 0
                         p[miss_mask, i+1] = p[miss_mask, i]
-                        if not self.silent:
-                            print(f"{miss_count} rays ({miss_count/self.Rays.N:.3g}% of all rays) "\
-                                  f"missing surface {i+1}, setting to absorbed because of parameter AbsorbMissing=True.")
+                        msg[self.__infos.AbsorbMissing, i] += miss_count
 
                     # set n after object as next n before next object
                     n0_l = n2_l
 
                     # treat rays that go outside outline
                     hwnb, _ = misc.partMask(hw, ~hit_back)  # rays having power and not hitting lens back
-                    self.__outlineIntersection(p, s, weights, hwnb, i)
+                    self.__outlineIntersection(p, s, weights, hwnb, i, msg)
                 
                 elif isinstance(Element, Filter | Aperture):
                     p[hw, i+1], hit = self.__findSurfaceHit(Element.Surface, p[hw, i], s[hw])
                     hwh, _ = misc.partMask(hw, hit)  # rays having power and hitting filter
                     
                     if isinstance(Element, Filter):
-                        self.__filter(Element, weights, wavelengths, hwh, i)
+                        self.__filter(Element, weights, wavelengths, hwh, i, msg)
                     else:
                         weights[hwh, i+1] = 0
 
                     # treat rays that go outside outline
                     hwnh, _ = misc.partMask(hw, ~hit)  # rays having power and not hitting filter
-                    self.__outlineIntersection(p, s, weights, hwnh, i)
+                    self.__outlineIntersection(p, s, weights, hwnh, i, msg)
 
                 else:
                     raise RuntimeError(f"Invalid element type '{type(Element).__name__}' in raytracing")
 
                 i += 1
-                bar.update(eli+2)
+                if N_t == 0:
+                    bar.update(i+1)
 
         if N_threads > 1:
             thread_list = [Thread(target=sub_trace, args=(N_threads, N_t)) for N_t in np.arange(N_threads)]
@@ -300,6 +331,10 @@ class Raytracer:
         self.Rays.lock()
         bar.finish()
 
+        # show info messages from tracing
+        if not self.silent:
+            self.__showMessages(msgs, N)
+
     def __makeElementList(self) -> list[Lens | Filter | Aperture]:
         """
         Creates a sorted element list from filters and lenses.
@@ -309,9 +344,9 @@ class Raytracer:
 
         # add a invisible (the filter is not in self.FilterList) to the outline area at +z
         # it absorbs all light at this surface
-        EndFilter = Aperture(Surface(surface_type="Rectangle", 
-                                   dim=[self.outline[1]-self.outline[0], self.outline[3] - self.outline[2]]),
-                           pos=[(self.outline[1]+self.outline[0])/2, (self.outline[2]+self.outline[3])/2, self.outline[5]])
+        o = self.outline
+        EndFilter = Aperture(Surface(surface_type="Rectangle", dim=[o[1] - o[0], o[3] - o[2]]),
+                             pos=[(o[1] + o[0])/2, (o[2] + o[3])/2, o[5]])
 
         # add filters and lenses into one list,
         Elements = self.LensList + self.FilterList + self.ApertureList + [EndFilter]
@@ -377,7 +412,8 @@ class Raytracer:
                            hw_back:     np.ndarray,
                            hit_front:   np.ndarray,
                            hit_back:    np.ndarray,
-                           i:           int)\
+                           i:           int,
+                           msg:         np.ndarray)\
             -> None:
         """
         Checks if rays intersect with the lens side cylinder. Since the cylinder is not used for raytracing,
@@ -407,18 +443,12 @@ class Raytracer:
         ab_count_back    = np.count_nonzero(abnormal_back)
 
         if ab_count_front:
-            if not self.silent:
-                print(f"{ab_count_front} rays ({100*ab_count_front/self.Rays.N:.3g}% "\
-                      f"of all rays) hitting lens front but missing back, setting to absorbed.")
-
+            msg[self.__infos.OnlyHitFront, i] += ab_count_front
             weights[abnormal_front, i] = 0
             p[abnormal_front, i] = p[abnormal_front, i]
 
         if ab_count_back:
-            if not self.silent:
-                print(f"{ab_count_back} rays ({100*ab_count_back/self.Rays.N:.3g}% "\
-                      f"of all rays) missing lens front but hitting back, setting to absorbed.")
-
+            msg[self.__infos.OnlyHitBack, i] += ab_count_back
             p[abnormal_back, i] = p[abnormal_back, i]
             weights[abnormal_back, i] = 0
     
@@ -427,7 +457,8 @@ class Raytracer:
                             s:           np.ndarray,
                             weights:     np.ndarray,
                             hw:          np.ndarray,
-                            i:           int)\
+                            i:           int,
+                            msg:         np.ndarray)\
             -> None:
         """
         Checks if the rays intersect with the outline, finds intersections points.
@@ -473,10 +504,8 @@ class Raytracer:
             p[hwi, i+1] = p[hwi, i] + s[hwi]*t[:, np.newaxis]
             weights[hwi, i+1] = 0
 
-            if not self.silent:
-                coll_count = np.count_nonzero(hwi)
-                print(f"{coll_count} rays ({100*coll_count/self.Rays.N:.3g}% "\
-                      f"of all rays) hitting outline, setting to absorbed.")
+            coll_count = np.count_nonzero(hwi)
+            msg[self.__infos.OutlineIntersection, i] += coll_count
 
     def __refraction(self,
                    surface:      Surface,
@@ -487,7 +516,8 @@ class Raytracer:
                    n2:           np.ndarray,
                    pols:         np.ndarray,
                    hwh:          np.ndarray,
-                   i:            int)\
+                   i:            int,
+                   msg:          np.ndarray)\
             -> None:
         """
         Calculate directions and weights after refraction. Rays with total inner r\eflection are treated as absorbed.
@@ -576,11 +606,8 @@ class Raytracer:
         TIR = ~np.isfinite(W)
         if np.any(TIR):
             T[TIR] = 0
-
-            if not self.silent:
-                TIR_count = np.count_nonzero(TIR)
-                print(f"{TIR_count} rays ({100*TIR_count/self.Rays.N:.3g}% "\
-                      f"of rays on surface) with total reflection at surface {i}, treating as absorbed.")
+            TIR_count = np.count_nonzero(TIR)
+            msg[self.Infos.TIR, i] += TIR_count
 
         weights[hwh, i+1] = weights[hwh, i]*T
         s[hwh] = s_
@@ -593,7 +620,8 @@ class Raytracer:
                weights:     np.ndarray,
                wl:          np.ndarray,
                hwh:         np.ndarray,
-               i:           int)\
+               i:           int,
+               msg:         np.ndarray)\
             -> None:
         """
         Get ray weights from positions on Filter and wavelengths.
@@ -617,12 +645,8 @@ class Raytracer:
 
         if np.any(mask):
             T[mask] = 0
-            
-            if not self.silent:
-                m_count = np.count_nonzero(mask)
-                print(f"{m_count} rays ({100*m_count/self.Rays.N:.3g}% of all rays) "\
-                      f"with transmittivity at filter surface {i+1} below threshold of "\
-                      f"{self.T_TH*100:.3g}%, setting to absorbed.")
+            m_count = np.count_nonzero(mask)
+            msg[self.__infos.TBelowTTH, i] += m_count
 
         weights[hwh, i+1] = weights[hwh, i]*T
 
@@ -741,7 +765,7 @@ class Raytracer:
         if not self.RaySourceList:
             raise RuntimeError("Raysource Missing")
 
-        bar = ProgressBar(prefix="Detector Image: ", max_value=3).start() if not self.silent else NullBar()
+        bar = ProgressBar(prefix="Detector Image: ", max_value=4).start() if not self.silent else NullBar()
 
         # starting position of hit search
         z = self.DetectorList[ind].extent[4]
@@ -756,6 +780,7 @@ class Raytracer:
         rs2 = np.argmax(mask, axis=1) - 1
         mask2 = np.all(mask, axis=1) & (rs2 < 0)
         rs2[mask2] = 0
+        bar.update(1)
 
         p, s, _, w, wl, _ = self.Rays.getRaysByMask(rs, rs2, normalize=True, 
                                                             ret=[True, True, False, True, True, False])
@@ -768,7 +793,7 @@ class Raytracer:
         rs2 = rs2[rs2 >= 0]
         # weights[~rs] = 0  # not needed rs < 0 means ray is already absorbed
         p, s = p[rs], s[rs]
-        bar.update(1)
+        bar.update(2)
 
         while np.any(rs):
 
@@ -793,7 +818,7 @@ class Raytracer:
                                                                      ret=[True, True, False, True, False, False])
         hitw = ish & (w > 0)
         ph, w, wl = ph[hitw], w[hitw], wl[hitw]
-        bar.update(2)
+        bar.update(3)
 
         if self.DetectorList[ind].Surface.isPlanar():
             extent_out = np.array(self.DetectorList[ind].extent[:4])
@@ -989,7 +1014,7 @@ class Raytracer:
                 inside = (x0 < x) & (x < x1) & (y0 < y) & (y < y1)
                 x, y, w = x[inside], y[inside], w[inside]
 
-                N_px = 101
+                N_px = 151
                 extent = np.min(x), np.max(x), np.min(y), np.max(y)
 
                 # get hit pixel coordinate, subtract 1e-12 from N so all values are 0 <= xcor < N
@@ -1069,14 +1094,26 @@ class Raytracer:
             if bounds[0] <= F.pos[2] <= bounds[1]:
                 warnings.warn("WARNING: The influence of the filters/apertures in the autofocus range will be ignored. ")
 
+        # start progress bar
+        ########################################################################################################
+
+        Nt = 1000
+        N_th = misc.getCoreCount()
+        steps = np.ceil(Nt/N_th/10).astype(int) if self.multithreading else np.ceil(Nt/10).astype(int)
+        steps += 2
+        bar = ProgressBar(prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start() if not self.silent else NullBar()
+
         # get rays and properties
         ########################################################################################################
         
+        # TODO why are we getting all instead of a subset?
+
         _, p, s, _, weights, _, _ = self.Rays.getRaysAtZ(bounds[0]+self.EPS, normalize=True)
 
         # use only rays with weight
         hw = weights > 0
         p, s, weights = p[hw], s[hw], weights[hw]
+        bar.update(1)
 
         # select rays
         ########################################################################################################
@@ -1095,18 +1132,11 @@ class Raytracer:
         else:
             pass # just use all rays
 
+        bar.update(2)
 
         # find focus
         ########################################################################################################
         
-        Nt = 1000
-        N_th = misc.getCoreCount()
-        steps = np.ceil(Nt/N_th/10).astype(int) if self.multithreading else np.ceil(Nt/10).astype(int)
-        bar = ProgressBar(prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start() if not self.silent else NullBar()
-        
-        # all methods start with Position Variance mode
-        # find minimum for position variance
-
         if method == "Position Variance":
             res = scipy.optimize.minimize_scalar(self.__autofocus_cost_func, 
                                                  args=("Position Variance", p, s, weights),
@@ -1134,7 +1164,7 @@ class Raytracer:
 
                 for i, Ni in enumerate(np.arange(Ns, Ne)):
                     if not i % 10:
-                        bar.update(int(i/10+1))
+                        bar.update(2+int(i/10+1))
                     vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
 
             if self.multithreading:   

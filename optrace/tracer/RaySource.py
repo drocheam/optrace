@@ -166,7 +166,7 @@ class RaySource(SObject):
 
         return tuple(RGB)
 
-    def createRays(self, N: int, no_pol: bool = False)\
+    def createRays(self, N: int, no_pol: bool = False, power: float=None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Generate N rays and save them internally.
@@ -179,7 +179,8 @@ class RaySource(SObject):
 
         ## Generate ray weights
         ################################################################################################################
-        weights = np.full(N, self.power/N, dtype=np.float32)
+        power = self.power if power is None else power
+        weights = np.full(N, power/N, dtype=np.float32)
 
         ## Generate ray wavelengths
         ################################################################################################################

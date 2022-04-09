@@ -79,7 +79,6 @@ class GUI(HasTraits):
     """Info Text Style. Used for status messages and interaction overlay"""
 
     SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.60, 0.60, 0.60), font_family="courier", shadow=True)
-    
     """Style for hidden info text. The color is used for the refraction index boxes frame"""
     
     AXIS_STYLE: dict = dict(font_size=11, bold=False, italic=False, color=(1, 1, 1), font_family="courier", shadow=True)
@@ -115,6 +114,9 @@ class GUI(HasTraits):
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
     # Checklists (with capitalization workaround from https://stackoverflow.com/a/23783351)
+    # this should basically be bool values, but because we want to have checkboxes with text right of them
+    # we need to embed a CheckListEditor in a List. 
+    # To assign bool values we need the workaround function self.__CheckValFromBool
 
     AbsorbMissing: List = List(editor=CheckListEditor(values=["Absorb Rays Missing Lens"], format_func=lambda x: x),
                          desc="if Rays are Absorbed when not Hitting a Lens")
@@ -180,7 +182,7 @@ class GUI(HasTraits):
     App = wx.App(False)
 
     # size of the mlab scene
-    SceneSize = [1200, 900]
+    SceneSize = [1200, 880] # with the mayavi toolbar this should be too big for 16000x900 screens
 
     ####################################################################################################################
     # UI view creation
@@ -206,7 +208,6 @@ class GUI(HasTraits):
                         Item('CleanerView', style="custom", show_label=False),
                         Separator,
                         Item('SourceSelection', label="Source"),
-                        Separator,
                         Item('DetectorSelection', label="Detector"),
                         Item('PosDet', label="Det_z"),
                         Separator,
@@ -234,8 +235,11 @@ class GUI(HasTraits):
     ####################################################################################################################
     # Class constructor
 
-    def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, *args, **kwargs) -> None:
+    def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, CleanerView: bool=False, LogImage: bool=False,
+            FlipImage: bool=False, FocusDebugPlot: bool=False, **kwargs) -> None:
         """
+        The extra bool parameters are needed to assign the List-Checklisteditor to bool values in the GUI.__init__. 
+        Otherwise the user would assign bool values to a string list.
 
         :param RT:
         :param args:
@@ -251,13 +255,13 @@ class GUI(HasTraits):
         self.RaysPlot = None  # plot for visualization of rays/points
         self.RayText = None  # textbox for ray information
 
-        self.RaySourcePlotObjects = []
-        self.FilterPlotObjects = []
         self.LensPlotObjects = []
+        self.AxisPlotObjects = []
+        self.FilterPlotObjects = []
+        self.OutlinePlotObjects = []
         self.AperturePlotObjects = []
         self.DetectorPlotObjects = []
-        self.AxisPlotObjects = []
-        self.OutlinePlotObjects = []
+        self.RaySourcePlotObjects = []
         self.RefractionIndexPlotObjects = []
         self.OrientationAxes = None
 
@@ -267,13 +271,18 @@ class GUI(HasTraits):
         self.DetInd = 0
 
         # shift press indicator
-        self.ShiftPressed = False
-        self.exit = False
-        self.silent = False
-        self.set_only = False
+        self.ShiftPressed   = False
+        self.exit           = False
+        self.silent         = False
+        self.set_only       = False
 
+        # convert bool parameters to values of ChecklistEditor
         self.set_only = True
-        self.AbsorbMissing = ["Absorb Rays Missing Lens"] if AbsorbMissing else []
+        self.AbsorbMissing  = self.__CheckValFromBool(self.AbsorbMissing,   AbsorbMissing)
+        self.CleanerView    = self.__CheckValFromBool(self.CleanerView,     CleanerView)
+        self.LogImage       = self.__CheckValFromBool(self.LogImage,        LogImage)
+        self.FlipImage      = self.__CheckValFromBool(self.FlipImage,       FlipImage)
+        self.FocusDebugPlot = self.__CheckValFromBool(self.FocusDebugPlot,  FocusDebugPlot)
         self.set_only = False
 
         # define Status dict
@@ -281,16 +290,18 @@ class GUI(HasTraits):
         self.Status.update(dict(InitScene=True, DisplayingGUI=True, Tracing=False, Drawing=False, Focussing=False,
                                 DetectorImage=False, SourceImage=False))
 
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
 
         # wx Frame, see https://docs.enthought.com/mayavi/mayavi/auto/example_wx_mayavi_embed_in_notebook.html#example-wx-mayavi-embed-in-notebook
         self.wxF = wx.Frame(None, wx.ID_ANY, 'Mayavi with Wx')
 
-
     ####################################################################################################################
-    # Plotting functions
+    # Helpers
 
-    def removeObjects(self, objs):
+    def __CheckValFromBool(self, obj, bool_): 
+        return [obj.trait._metadata["editor"].values[0]] if bool_ else []
+
+    def __removeObjects(self, objs):
         for obj in objs:
             for obji in obj:
                 if obji is not None:
@@ -301,13 +312,16 @@ class GUI(HasTraits):
 
         objs[:] = [] 
 
+    ####################################################################################################################
+    # Plotting functions
+
     def plotLenses(self) -> None:
         """
 
         :param Lens:
         :param num:
         """
-        self.removeObjects(self.LensPlotObjects)
+        self.__removeObjects(self.LensPlotObjects)
       
         for num, L in enumerate(self.Raytracer.LensList):
             a, b, c, d = self.plotSObject(L, num, self.LENS_COLOR[:3], self.LENS_COLOR[3])
@@ -319,7 +333,7 @@ class GUI(HasTraits):
         :param Lens:
         :param num:
         """
-        self.removeObjects(self.AperturePlotObjects)
+        self.__removeObjects(self.AperturePlotObjects)
         
         for num, AP in enumerate(self.Raytracer.ApertureList):
             a, b, c, d = self.plotSObject(AP, num, (0, 0, 0), 1)
@@ -331,7 +345,7 @@ class GUI(HasTraits):
         :param filter_:
         :param num:
         """
-        self.removeObjects(self.FilterPlotObjects)
+        self.__removeObjects(self.FilterPlotObjects)
         
         for num, F in enumerate(self.Raytracer.FilterList):
             Fcolor = F.getColor()
@@ -344,7 +358,7 @@ class GUI(HasTraits):
 
         :return:
         """
-        self.removeObjects(self.DetectorPlotObjects)
+        self.__removeObjects(self.DetectorPlotObjects)
 
         for num, Det in enumerate(self.Raytracer.DetectorList):
             a, b, c, text = self.plotSObject(Det, num, self.DETECTOR_COLOR[:3], self.DETECTOR_COLOR[3])    
@@ -356,7 +370,7 @@ class GUI(HasTraits):
         :param RS:
         :param num:
         """
-        self.removeObjects(self.RaySourcePlotObjects)
+        self.__removeObjects(self.RaySourcePlotObjects)
 
         for num, RS in enumerate(self.Raytracer.RaySourceList):
         
@@ -376,7 +390,7 @@ class GUI(HasTraits):
     def plotOutline(self) -> None:
         """plot the raytracer outline"""
 
-        self.removeObjects(self.OutlinePlotObjects)
+        self.__removeObjects(self.OutlinePlotObjects)
 
         self.Scene.engine.add_source(ParametricSurface(name="Outline"), self.Scene)
         a = self.Scene.mlab.outline(extent=self.Raytracer.outline.copy(), opacity=self.OUTLINE_ALPHA)
@@ -409,7 +423,7 @@ class GUI(HasTraits):
         # save old font factor. This is the one we adapted constantly in self.size_change()
         ff_old = self.AxisPlotObjects[0][0].axes.font_factor if self.AxisPlotObjects else 0.65
 
-        self.removeObjects(self.AxisPlotObjects)
+        self.__removeObjects(self.AxisPlotObjects)
 
         # find label number for axis so that step size is an int*10^k 
         # or any of [0.25, 0.5, 0.75, 1.25, 2.5]*10^k with k being an integer
@@ -468,7 +482,7 @@ class GUI(HasTraits):
         """plot outlines for ambient refraction index regions"""
 
 
-        self.removeObjects(self.RefractionIndexPlotObjects)
+        self.__removeObjects(self.RefractionIndexPlotObjects)
 
         # sort Element list in z order
         Lenses = sorted(self.Raytracer.LensList, key=lambda Element: Element.pos[2])
@@ -530,7 +544,8 @@ class GUI(HasTraits):
 
         def plot(C, surf_type):
             # plot surface
-            a = self.Scene.mlab.mesh(C[0], C[1], C[2], color=color, opacity=alpha, name=f"{obj.name} {num} {surf_type} surface")
+            a = self.Scene.mlab.mesh(C[0], C[1], C[2], color=color, opacity=alpha, 
+                                     name=f"{obj.name} {num} {surf_type} surface")
 
             # make non pickable so it does not interfere with our ray picker
             a.actor.actor.pickable = False
@@ -734,10 +749,10 @@ class GUI(HasTraits):
                 RSp[1].actor.actor.property.trait_set(color=tuple(RSColor[i]))
 
         # set visual ray properties
+        self.RaysPlot.actor.actor.force_translucent = True
         self.RaysPlot.actor.property.representation = 'points' if self.PlottingType == 'Points' else 'surface'
         self.RaysPlot.actor.property.trait_set(line_width=self.RayWidth, 
-                                               point_size=self.RayWidth if self.PlottingType == "Points" else 1)
-        self.RaysPlot.actor.actor.force_translucent = True
+                                               point_size=self.RayWidth if self.PlottingType == "Points" else 0.1)
 
     def initRayInfoText(self) -> None:
         """init detection of ray point clicks and the info display"""
@@ -981,7 +996,7 @@ class GUI(HasTraits):
     # Interface functions
     ###############################################################################################################
 
-    def replot(self, change=None, noDecor=False):
+    def replot(self, change=None):
         
         self.Status["Drawing"] = True
         pyfaceGUI().process_events()
@@ -997,15 +1012,15 @@ class GUI(HasTraits):
             self.initSourceList()
         
         rdh = False  # if Drawing Status should be reset in this function
-        if all_ or change["Filters"] or change["Lenses"] or change ["Apertures"] or change["Ambient"]\
-                or change["RaySources"] or change["TraceSettings"]:
-            self.trace()
-        elif change["Rays"]:
-            self.chooseRays()
-        else: # change["Detectors"]
-            rdh = True
-
-        if all_ and not self.Raytracer.RaySourceList:
+        if self.Raytracer.RaySourceList:
+            if all_ or change["Filters"] or change["Lenses"] or change ["Apertures"] or change["Ambient"]\
+                    or change["RaySources"] or change["TraceSettings"]:
+                self.trace()
+            elif change["Rays"]:
+                self.chooseRays()
+            else: # change["Detectors"]
+                rdh = True
+        else:
             rdh = True
 
         if all_ or change["Filters"]:
@@ -1029,12 +1044,9 @@ class GUI(HasTraits):
         self.Scene.camera.trait_set(**cc_traits_org)
         
         if all_ or change["Ambient"]:
-
             self.plotRefractionIndexBoxes()
-
-            if not noDecor:
-                self.plotAxes()
-                self.plotOutline()
+            self.plotAxes()
+            self.plotOutline()
 
             # minimal/maximal z-positions of Detector_obj
             self.PosDetMin = self.Raytracer.outline[4]
@@ -1046,6 +1058,10 @@ class GUI(HasTraits):
         
         if rdh:
             self.Status["Drawing"] = False
+
+            # this only gets invoked after raytracing, but with no sources we need to do it here
+            if not self.Raytracer.RaySourceList:
+                pyfaceGUI().invoke_later(self.setGUILoaded)
 
     def waitForIdle(self) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
@@ -1133,7 +1149,7 @@ class GUI(HasTraits):
 
                 # set parameters to current value, since they could be changed by the user while tracing
                 self.set_only = True
-                self.AbsorbMissing = ["Absorb Rays Missing Lens"] if self.Raytracer.AbsorbMissing else []
+                self.AbsorbMissing = self.__CheckValFromBool(self.AbsorbMissing, self.Raytracer.AbsorbMissing)
                 self.RayCount= self.Raytracer.Rays.N
                 self.set_only = False
 
@@ -1354,10 +1370,7 @@ class GUI(HasTraits):
 
         for rio in self.RefractionIndexPlotObjects:
             if rio[1] is not None:
-                if not show:
-                    rio[1].text = rio[1].text.replace("ambient\n", "")
-                else:
-                    rio[1].text = "ambient\n" + rio[1].text
+                rio[1].text = rio[1].text.replace("ambient\n", "") if not show else ("ambient\n" + rio[1].text)
 
         # replot Ray Pick Text, opacity of default text gets set
         self.onRayPick()

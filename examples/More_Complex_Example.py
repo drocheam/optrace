@@ -68,6 +68,6 @@ Det2 = ot.Detector(ot.Surface("Sphere", rho=-1/1.1, r=1), pos=[0, 0, 40])
 RT.add(Det2)
 
 # Instantiate the GUI and start it.
-sim = TraceGUI(RT)
+sim = TraceGUI(RT, CleanerView=True)
 sim.run()
 

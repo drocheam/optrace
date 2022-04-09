@@ -76,7 +76,7 @@ def Tristimulus(wl: np.ndarray, name: str) -> np.ndarray:
     ind = choices.index(name)
 
     observer = colorio.observers.cie_1931_2()
-    return misc.interp1d(observer.lmbda_nm, observer.data[ind], wl)
+    return np.interp(wl, observer.lmbda_nm, observer.data[ind])
 
 
 def Illuminant(wl: np.ndarray, name: str) -> np.ndarray:
@@ -99,7 +99,7 @@ def Illuminant(wl: np.ndarray, name: str) -> np.ndarray:
         raise ValueError("Invalid Illuminant Type")
 
     illu = eval(f"colorio.illuminants.{name.lower()}()")
-    return misc.interp1d(illu.lmbda_nm, illu.data, wl)
+    return np.interp(wl, illu.lmbda_nm, illu.data)
     
 
 def sRGB_to_sRGBLinear(RGB_in: np.ndarray) -> np.ndarray:

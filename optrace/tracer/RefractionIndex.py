@@ -83,7 +83,7 @@ class RefractionIndex:
             case "List":
                 if self.ns is None or self.wls is None:
                     raise RuntimeError("n_type='List', but ns or wls not specified.")
-                func = scipy.interpolate.interp1d(self.wls, self.ns, bounds_error=True)
+                func = scipy.interpolate.interp1d(self.wls, self.ns, bounds_error=True, assume_sorted=True)
                 return func(wl_)
 
             case "Constant":

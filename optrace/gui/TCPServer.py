@@ -3,13 +3,10 @@
 # can I use this?
 
 import wx
-import warnings
 import numpy as np
 import time
 
 from optrace.tracer import *
-
-warnings.simplefilter("ignore")
 
 # Install wxreactor; must be done before the reactor is imported below.
 from twisted.internet import wxreactor
@@ -19,8 +16,6 @@ wxreactor.install()
 from twisted.internet.protocol import Protocol, DatagramProtocol, Factory
 from twisted.internet import reactor
 from twisted.python import log
-
-warnings.simplefilter("default")
 
 
 class M2TCP(Protocol):

@@ -1,10 +1,11 @@
 
 from threading import Thread
 
+import warnings
 import numpy as np
 from optrace.tracer.RaySource import *
 import optrace.tracer.Misc as misc
-
+from optrace.tracer.Misc import timer as timer
 
 class RayStorage:
 
@@ -28,26 +29,31 @@ class RayStorage:
         """number of ray sections"""
         return self.p_list.shape[1] if self.hasRays() else None
 
-    def createRays(self,
-                   RaySourceList:   list[RaySource],
-                   N_list:          list[int],
-                   nt:              int,
-                   threading:       bool = False,
-                   no_pol:          bool = False) \
-            -> None:
+    def init(self, RaySourceList, N, nt):
         """
-
-        :param RaySourceList:
-        :param N_List:
-        :param nt:
-        :param threading:
-        :param no_pol:
         """
         self._locked = False
-        self.N_list = np.array(N_list, dtype=int)
+        
+        # all rays have the same starting power.
+        # The rays are distributed between the sources according to the ray source power
+        # get source powers and overall power
+        P_list = np.array([RS.power for RS in RaySourceList])
+        P_all = np.sum(P_list)
+
+        # calculate int ray number from power ratio
+        self.N_list = (N*P_list/P_all).astype(int)
+        dN = N-np.sum(self.N_list)  # difference to ray number
+
+        # distribute difference dN randomly on all sources, with the power being the probability
+        index_add = np.random.choice(self.N_list.shape[0], size=dN, p=P_list/P_all)
+        np.add.at(self.N_list, index_add, np.ones(index_add.shape))
+
+        if np.any(np.array(self.N_list) == 0):
+            warnings.warn("There are RaySources that have no rays assigned. "\
+                    "Change the power ratio or raise the overall ray number", RuntimeWarning)
+        
         self.B_list = np.concatenate(([0], np.cumsum(self.N_list)))
-        N           = np.sum(N_list)
-       
+        self.RaySourceList = RaySourceList
 
         # weights, polarization and wavelengths don't need double precision, this way we save some RAM
         # fortran order='F' speeds things up around 20% in our application
@@ -55,32 +61,9 @@ class RayStorage:
         self.s0_list     = np.zeros((N, 3),     dtype=np.float64, order='F')
         self.pol_list    = np.zeros((N, nt, 3), dtype=np.float32, order='F')
         self.w_list      = np.zeros((N, nt),    dtype=np.float32, order='F')
-        self.wl_list     = np.zeros((N,),       dtype=np.float32)        
+        self.wl_list     = np.zeros((N,),       dtype=np.float32)     
 
-        def addSourceRays(i: int) -> None:
-
-            Ns, Ne = self.B_list[i:i+2]
-            sl1 = slice(Ns, Ne)
-
-            self.p_list[sl1, 0],\
-            self.s0_list[sl1],   \
-            self.pol_list[sl1, 0],\
-            self.w_list[sl1, 0],   \
-            self.wl_list[sl1]   \
-                                     = RaySourceList[i].createRays(N_list[i], no_pol=no_pol)
-
-        # don't use multithreading if there are to many ray sources
-        if threading and len(RaySourceList) < 2*misc.getCoreCount():
-
-            thread_list = [Thread(target=addSourceRays, args=[N_t]) for N_t in np.arange(len(RaySourceList))]
-            [thread.start() for thread in thread_list]
-            [thread.join()  for thread in thread_list]
-
-        else:
-            for i in np.arange(len(RaySourceList)):
-                addSourceRays(i)
-
-    def getThreadRays(self, N_threads: int, Nt: int) \
+    def makeThreadRays(self, N_threads: int, Nt: int, no_pol: bool=False) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
 
@@ -88,14 +71,31 @@ class RayStorage:
         :param Nt:
         :return:
         """
-        # get subset of rays for multithreading
-        
+
         if not self.hasRays():
             raise RuntimeError("RaySourceList has no rays stored.")
-
+        
         Np = int(self.N/N_threads) # rays per thread
         Ns = Nt*Np
         Ne = Ns + Np if Nt != N_threads-1 else self.N  # last threads also gets remainder
+
+        i = np.argmax(np.array(self.B_list) >= Ns) - 1
+        i = max(i, 0)  # enfore i >= 0
+
+        while self.B_list[i] < Ne:
+      
+            Nsi = max(Ns, self.B_list[i])
+            Nei = min(self.B_list[i+1], Ne)
+            sl1 = slice(Nsi, Nei)
+
+            power = (Nei - Nsi)/self.N_list[i] * self.RaySourceList[i].power
+            self.p_list[sl1, 0],\
+            self.s0_list[sl1],   \
+            self.pol_list[sl1, 0],\
+            self.w_list[sl1, 0],   \
+            self.wl_list[sl1]       \
+                                     = self.RaySourceList[i].createRays(Nei-Nsi, no_pol=no_pol, power=power)
+            i += 1
 
         return self.p_list[Ns:Ne], \
                self.s0_list[Ns:Ne], \

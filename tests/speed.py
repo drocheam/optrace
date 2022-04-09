@@ -9,8 +9,6 @@ import copy
 import time
 
 
-start = time.time()
-
 def func2(N2):
     # make Raytracer
     RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60],  AbsorbMissing=True, silent=True)
@@ -21,11 +19,9 @@ def func2(N2):
                    pos=[0, 0, 0], s=[0, 0, 1], polarization_type='y')
     RT.add(RS)
 
-
     RS2 = RaySource(RSS, direction_type="Parallel", light_type="D65",
                    pos=[0, 1, 0], s=[0, 0, 1], polarization_type='x', power=2)
     RT.add(RS2)
-
 
     front = Surface(surface_type="Circle", r=3, rho=1/10, k=-0.444)
     back = Surface(surface_type="Circle", r=3, rho=-1/10, k=-7.25)
@@ -74,11 +70,12 @@ def func2(N2):
     Det = Detector(Surface(surface_type="Rectangle", dim=[3, 3]), pos=[0, 0, 60])
     RT.add(Det)
 
+    start = time.time()    
     RT.trace(N=N2)
+    print(time.time()-start)
     # Im = RT.DetectorImage(500, extent="auto")
 
 
 N = 1000000
 func2(N)
-print(time.time()-start)
 

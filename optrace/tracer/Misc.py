@@ -7,32 +7,32 @@ import numpy as np
 import numexpr as ne
 import scipy.special
 
+from typing import Callable, Any, Dict
 from functools import wraps
 import time
 import sys
 
-from typing import Callable, Any, Dict
-
-
-def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
-    """ 
-    fast alternative to :obj:`scipy.interpolate.interp1d` with equally spaced x-values 
-
-    >>> interp1d(np.array([1, 2, 3, 4]), np.array([5, 6, 5, 4]), np.array([1, 1.5, 3.5, 2.5]))
-    array([5. , 5.5, 4.5, 5.5])
+# with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
+# can be used as decorator @timer around a function
+def timer(func: Callable) -> Any:
     """
-    x0, x1 = x[0], x[1]
-    ind0 = ne.evaluate("(1-1e-12)/(x1-x0)*(xs-x0)")
-    ind1 = ind0.astype(int)
 
-    # multiplication with (1-1e-12) to avoid case xs = x[-1], 
-    # which would lead to y[ind1 + 1] being an access violation
-    # we could circumvent this using comparisons, masks or cases, but this would decreas performance
+    :param func:
+    :return:
+    """
+    @wraps(func)
+    def _time_it(*args, **kwargs) -> Any:
+        start = time.time()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            diff = time.time() - start
+            if diff < 0.1:
+                print(f"Timing: {1000*diff:.3f} ms for {func}")
+            else:
+                print(f"Timing: {diff:.3f} s for {func}")
 
-    ya = y[ind1]
-    yb = y[ind1+1]
-
-    return ne.evaluate("(1-ind0+ind1)*ya + (ind0-ind1)*yb")
+    return _time_it
 
 def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
     """"""
@@ -80,32 +80,8 @@ def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarr
     X = np.random.sample(N)
 
     # unfortunately we can't use out own interp1d, since cdf is not equally spaced
-    icdf = scipy.interpolate.interp1d(cdf, xc)
+    icdf = scipy.interpolate.interp1d(cdf, xc, assume_sorted=True)
     return icdf(X)
-
-
-# with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
-# can be used as decorator @timer around a function
-def timer(func: Callable) -> Any:
-    """
-
-    :param func:
-    :return:
-    """
-    @wraps(func)
-    def _time_it(*args, **kwargs) -> Any:
-        start = time.time()
-        try:
-            return func(*args, **kwargs)
-        finally:
-            diff = time.time() - start
-            if diff < 0.1:
-                print(f"Timing: {1000*diff:.3f} ms for {func}")
-            else:
-                print(f"Timing: {diff:.3f} s for {func}")
-
-    return _time_it
-
 
 def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """ 
@@ -119,7 +95,6 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
     return ne.evaluate("x*x2 + y*y2 + z*z2")
 
-
 def partMask(cond1: np.ndarray, cond2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """ 
     set True values of bool mask cond1 to values of cond2, returns resulting mask and cond2 
@@ -130,7 +105,6 @@ def partMask(cond1: np.ndarray, cond2: np.ndarray) -> tuple[np.ndarray, np.ndarr
     wc = np.zeros(cond1.shape, dtype=bool)
     wc[cond1] = cond2
     return wc, cond2.copy()
-
 
 def normalize(a: np.ndarray) -> None:
     """ 
@@ -143,14 +117,11 @@ def normalize(a: np.ndarray) -> None:
     array([[0.26726124, 0.53452248, 0.80178373],
            [0.45584231, 0.56980288, 0.68376346]])
     """
+    x, y, z = a[:, 0, np.newaxis], a[:, 1, np.newaxis], a[:, 2, np.newaxis]
+    valid = ~((x == 0) & (y == 0) & (z == 0))
 
-    x, y, z = a[:, 0], a[:, 1], a[:, 2]
-
-    norms = ne.evaluate("sqrt(x**2 + y**2 + z**2)")[:, np.newaxis]
-
-    # save normalization to initial array a
     nan = np.nan
-    ne.evaluate("a/where(norms>0, norms, nan)", out=a)
+    a[:] = ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
 
 def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """ 
@@ -163,7 +134,7 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     x, y, z    = a[:, 0], a[:, 1], a[:, 2]
     x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
 
-    n = np.zeros((a.shape[0], 3), dtype=np.float64, order='F')
+    n = np.zeros_like(a, dtype=np.float64, order='F')
 
     # using ne is ~2x faster than np.cross
     ne.evaluate("y*z2 - z*y2", out=n[:, 0])
@@ -171,34 +142,6 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     ne.evaluate("x*y2 - y*x2", out=n[: ,2])
 
     return n
-
-# def blueNoise(a, b, N):
-#     # create random phase and amplitude
-#     phase = np.random.uniform(0, 2 * np.pi, N)
-#     amp = np.random.uniform(0, 1, N)
-#
-#     # frequency vector
-#     f = np.arange(-np.ceil(N / 2), np.floor(N / 2))
-#
-#     # create blue noise spectrum (blue noise: spectrum ~ f^0.5, since power ~ f)
-#     spec = np.abs(f)**5 * amp * np.exp(-1j * phase)
-#
-#     # tranform to original domain
-#     noise = np.real(np.fft.ifft(np.fft.ifftshift(spec)))
-#
-#     # remove mean and normalize to standard deviation
-#     noise = (noise - np.mean(noise)) / np.std(noise)
-#
-#     # due to the central limit theorem (https://en.wikipedia.org/wiki/Central_limit_theorem)
-#     # the noise amplitude is normal distributed. For uniform distribution we need to insert it
-#     # in the normal distribution function inverse
-#     noise = scipy.special.erf(noise / np.sqrt(2))
-#
-#     # rescale to range [a, b]
-#     noise = a + (b - a) / 2 * (1 + noise)
-#
-#     return noise
-
 
 def ValueAt(x:  np.ndarray,
             y:  np.ndarray,
@@ -238,6 +181,7 @@ def ValueAt(x:  np.ndarray,
 
 
 # TODO improve speed
+# TODO use np.interp
 # TODO Bug: Remaining "nan islands". Example: h_data with isnan = [[0, 1, 1, 1], [0, 0, 1, 0], [0, 0, 1, 1], [0, 0, 0, 0]]
 #  creates remaining nan at isnan[3,3]. Execute function multiple times to solve this issue?
 def interpolateNan(h_data: np.ndarray) -> np.ndarray:
