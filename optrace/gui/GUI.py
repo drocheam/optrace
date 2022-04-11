@@ -166,7 +166,7 @@ class GUI(HasTraits):
     AutoFocusButton:     Button = Button(label="Find Focus", desc="Finding the Focus Between the Lenses in Front and Behind the Detector")
 
     # Labels
-    WhitespaceLabel     = Str('\n')
+    WhitespaceLabel     = Str('')
     Separator           = Item("WhitespaceLabel", style='readonly', show_label=False)
 
     Status: Dict = Dict(Str())
@@ -182,7 +182,7 @@ class GUI(HasTraits):
     App = wx.App(False)
 
     # size of the mlab scene
-    SceneSize = [1200, 880] # with the mayavi toolbar this should be too big for 16000x900 screens
+    SceneSize = [1150, 800] # with the mayavi toolbar this should be too big for a 720p screen
 
     ####################################################################################################################
     # UI view creation
@@ -935,6 +935,7 @@ class GUI(HasTraits):
                 widget.close()
             time.sleep(0.2)
 
+        pyfaceGUI().process_events()
         pyfaceGUI().invoke_later(self.Scene.close)
         pyfaceGUI().invoke_later(widgetClose)
 
@@ -1066,12 +1067,10 @@ class GUI(HasTraits):
     def waitForIdle(self) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
        
-        time.sleep(0.004)  # wait for flags to be set
+        time.sleep(0.01)  # wait for flags to be set
 
         while self.busy:
             time.sleep(0.02)
-
-        pyfaceGUI().process_events()
 
     @property
     def busy(self):

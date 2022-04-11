@@ -244,7 +244,6 @@ class RaySource(SObject):
 
             wavelengths = Color.randomWavelengthFromRGB(self.Image[PY, PX])
 
-
         ## Generate orientations
         ################################################################################################################
 
@@ -273,8 +272,8 @@ class RaySource(SObject):
             # TODO sind die Strahlen gleichmäßig diverging?
             case "Diverging":
                 # random direction inside cone, described with two angles
-                alpha = self.sr_angle / 180 * np.pi * np.sqrt(np.random.sample(N))
-                theta = np.random.uniform(0, 2 * np.pi, N)
+                alpha = np.radians(self.sr_angle) * np.sqrt(np.random.sample(N))
+                theta = np.random.uniform(0, 2*np.pi, N)
 
                 # create rotation vectors
                 rv = np.zeros_like(s_or, dtype=np.float64, order='F')
@@ -312,8 +311,6 @@ class RaySource(SObject):
             pols = np.full(p.shape, np.nan, np.float64, order='F')
 
         else:
-            pols = np.zeros_like(p, np.float64, order='F')
-            
             match self.polarization_type:
 
                 case "x":
@@ -326,7 +323,7 @@ class RaySource(SObject):
                     ang = np.random.choice([0, np.pi/2], N)
 
                 case "Angle":
-                    ang = np.full(N, self.pol_ang/360*2*np.pi, dtype=np.float64)
+                    ang = np.full(N, np.radians(self.pol_ang), dtype=np.float64)
 
                 case "Random":
                     ang = np.random.uniform(0, 2*np.pi, N)
@@ -334,31 +331,54 @@ class RaySource(SObject):
                 case _:
                     raise RuntimeError(f"polarization_type '{self.polarization_type}' not handled.")
 
-            # sh is the unity polarization vector in xz-plane perpendicular to the ray direction
-            # sh = 1/sqrt(sx^2 + sz^2)*[sz, 0, -sx] with ray direction s = [sx, sy, sz]
-            # sv is perpendicular to s and sh
-            # sv = 1/sqrt(sx^2 + sz^2)*[-sx*sy, sx^2 + sz^2, -sy*sz]
-            # sx^2 + sy**2 is the same as 1-sy**2 since s is unity vector
+            # pol is rotated by an axis perpendicular to the plane of base direction s = [0, 0, 1] and the current direction s_
+            # let's call this axis ps. The resulting polarization pol_ is perpendicular to s_ and has the same component at ps
+            ####
+            # this is equivalent to a imaginary lens having focused pol-polarized parallel light. 
+            # The resulting pol_ for each ray is the same as ours.
 
-            # polarization vector is pol = cos(a)*sh + sin(a)*sv
-            sx, sy, sz = s[:, 0], s[:, 1], s[:, 2]
-            misc.calc("(sz*cos(ang) + -sx*sy*sin(ang))/sqrt(1-sy**2)",  out=pols[:, 0])
-            misc.calc("sin(ang)*sqrt(1-sy**2)",                         out=pols[:, 1])
-            misc.calc("(-sx*cos(ang) + -sy*sz*sin(ang))/sqrt(1-sy**2)", out=pols[:, 2])
+            # ps = s_ x s = s x [0, 0, 1] = [s_1, -s_0, 0]/sqrt(s_0**2 + s_1**2)
+            # pp = ps x s = ps x [0, 0, 1] = [-s_0, s_1, 0]/sqrt(s_0**2 + s_1**2)
+            # pp_ = ps x s_
+
+            # A_ts = ps * pol
+            # A_tp = pp * pol
+            # pol_ = A_ts*ps + A_tp*pp_
+
+            mask = s[:, 2] != 1
+            pols = np.zeros_like(s, dtype=np.float64, order='F')
+
+            sm = s[mask]
+            ps = np.zeros_like(sm, dtype=np.float64, order='F')
+            s_0, s_1, s_2 = sm[:, 0], sm[:, 1], sm[:, 2]
+            
+            # sqrt(s0**2 + s1**2) equals sqrt(1-s2**2) for a unity vector
+            misc.calc("s_1/sqrt(1-s_2**2)", out=ps[:, 0])
+            misc.calc("-s_0/sqrt(1-s_2**2)", out=ps[:, 1])
+
+            pols[:, 0] = misc.calc("cos(ang)")
+            pols[:, 1] = misc.calc("sin(ang)")
+
+            ps0, ps1 = ps[:, 0], ps[:, 1]
+            pol0m, pol1m = pols[mask, 0], pols[mask, 1]
+            A_ts = misc.calc("ps0*pol0m + ps1*pol1m")[:, np.newaxis]
+            A_tp = misc.calc("ps1*pol0m + ps0*pol1m")[:, np.newaxis]
+
+            pp_ = misc.cross(ps, sm)
+            pols[mask] = misc.calc("A_ts*ps + A_tp*pp_")
 
         ## return ray properties
         ################################################################################################################
 
         return p, s, pols, weights, wavelengths
 
-
     def crepr(self):
         """"""
         # use id on self.lines and self.Image, for large array it would take too long otherwise.
         # disadvantage: reassigning the same array change the id
         return [self.FrontSurface.crepr(), self.direction_type, self.light_type, self.orientation_type, 
-                     self.polarization_type, self.sr_angle, self.pol_ang, self.power, self.wl, self.T, id(self.or_func), 
-                      id(self.spec_func), tuple(self.s), id(self.lines), id(self.Image)]
+                self.polarization_type, self.sr_angle, self.pol_ang, self.power, self.wl, self.T,
+                id(self.or_func), id(self.spec_func), tuple(self.s), id(self.lines), id(self.Image)]
 
 
     # handle assignment of properties and check values

@@ -34,7 +34,7 @@ RT.add(Det)
 
 # render and show detector image
 pos = [27., 30., 33., 36.]
-Ims = RT.iterativeDetectorImage(N_rays=10e6, N_px=500, pos=pos)
+Ims = RT.iterativeDetectorImage(N_rays=15e6, N_px=300, pos=pos)
 
 for i in np.arange(len(Ims)-1):
     DetectorPlot(Ims[i], block=False, mode="sRGB")

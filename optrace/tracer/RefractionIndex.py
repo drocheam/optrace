@@ -41,26 +41,23 @@ class RefractionIndex:
         :param C: C coefficient for ntype="Cauchy" in 1/µm^4
         :param D: D coefficient for ntype="Cauchy" in 1/µm^6
         """
-
         # self._new_lock = False
-
         self.n_type = n_type
         self.n = n
         self.func = func
         self.wls, self.ns = wls, ns
         self.A, self.B, self.C, self.D = A, B, C, D
 
+        # presets from https://en.wikipedia.org/wiki/Cauchy%27s_equation
+        #############################################################################
         match n_type:
-
-            # presets from https://en.wikipedia.org/wiki/Cauchy%27s_equation
-            ##########################################################################
             case "SiO2":    self.A, self.B, self.C, self.D  = 1.4580, 0.00354, 0., 0.
             case "BK7":     self.A, self.B, self.C, self.D  = 1.5046, 0.00420, 0., 0.
             case "K5":      self.A, self.B, self.C, self.D  = 1.5220, 0.00459, 0., 0.
             case "BaK4":    self.A, self.B, self.C, self.D  = 1.5690, 0.00531, 0., 0.
             case "BaF10":   self.A, self.B, self.C, self.D  = 1.6700, 0.00743, 0., 0.
             case "SF10":    self.A, self.B, self.C, self.D  = 1.7280, 0.01342, 0., 0.
-            ##########################################################################
+        #############################################################################
 
         self._new_lock = True
 

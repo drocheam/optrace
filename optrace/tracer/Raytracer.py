@@ -12,7 +12,7 @@ import scipy.optimize
 
 from threading import Thread
 from typing import Callable
-from progressbar import progressbar, ProgressBar, NullBar
+from progressbar import progressbar, ProgressBar
 
 from optrace.tracer.Filter import * 
 from optrace.tracer.Aperture import * 
@@ -102,7 +102,6 @@ class Raytracer:
         :param el: Element to add to Raytracer 
         :return: identifier of object
         """
-
         match el:
             case Lens():
                 self.LensList.append(el)
@@ -228,7 +227,7 @@ class Raytracer:
         msgs = [np.zeros((len(self.__infos), nt), dtype=int) for i in range(N_threads)]
 
         # start a progressbar
-        bar = ProgressBar(prefix="Raytracing: ", max_value=nt, redirect_stdout=True).start() if not self.silent else NullBar()
+        bar = ProgressBar(prefix="Raytracing: ", max_value=nt, redirect_stdout=True).start() if not self.silent else None
 
         # create Rays from RaySources
         self.Rays.init(self.RaySourceList, N, nt)
@@ -236,7 +235,7 @@ class Raytracer:
         def sub_trace(N_threads: int, N_t: int) -> None:
 
             p, s0, pols, weights, wavelengths = self.Rays.makeThreadRays(N_threads, N_t, no_pol=self.no_pol)
-            if N_t == 0:
+            if not self.silent and N_t == 0:
                 bar.update(1)
 
             s = s0.copy()
@@ -266,12 +265,12 @@ class Raytracer:
                     hwh, _ = misc.partMask(hw, hit_front)  # rays having power and hitting lens front
                     self.__refraction(Element.FrontSurface, p, s, weights, n0_l, n1_l, pols, hwh, i, msg)
 
-                    # treat rays that go outside outline
+                    # treat rays that go outside outlin                    
                     hwnh, _ = misc.partMask(hw, ~hit_front)  # rays having power and not hitting lens front
                     self.__outlineIntersection(p, s, weights, hwnh, i, msg)
 
                     i += 1
-                    if N_t == 0:
+                    if not self.silent and N_t == 0:
                         bar.update(i+1)
                     p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
 
@@ -316,7 +315,7 @@ class Raytracer:
                     raise RuntimeError(f"Invalid element type '{type(Element).__name__}' in raytracing")
 
                 i += 1
-                if N_t == 0:
+                if not self.silent and N_t == 0:
                     bar.update(i+1)
 
         if N_threads > 1:
@@ -329,10 +328,10 @@ class Raytracer:
 
         # lock Storage
         self.Rays.lock()
-        bar.finish()
 
         # show info messages from tracing
         if not self.silent:
+            bar.finish()
             self.__showMessages(msgs, N)
 
     def __makeElementList(self) -> list[Lens | Filter | Aperture]:
@@ -507,6 +506,7 @@ class Raytracer:
             coll_count = np.count_nonzero(hwi)
             msg[self.__infos.OutlineIntersection, i] += coll_count
 
+    # @timer
     def __refraction(self,
                    surface:      Surface,
                    p:            np.ndarray,
@@ -561,47 +561,48 @@ class Raytracer:
 
         if not self.no_pol:
             # calculate s polarization vector
-            mask = ns != 1  # ns==1 means surface normal is parallel to ray direction, exclude these rays for now
+            mask = ns < 1-1e-9  # ns==1 means surface normal is parallel to ray direction, exclude these rays for now
             mask2, _ = misc.partMask(hwh, mask)
 
             # reduce slicing by storing separately
             polsm = pols[mask2, i]
             s_m = s_[mask]
 
-            ps = misc.cross(n[mask], s_m)
+            # s polarization vector
+            ps = misc.cross(s_m, n[mask])
             misc.normalize(ps)
-
-            # calculate p polarization vector
-            pp = misc.cross(ps, s[mask2])
 
             # init arrays
             # default for A_ts, A_tp are 1/sqrt(2)
             A_ts = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
             A_tp = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
 
-            # amplitude components of ray polarization in s and p
+            # A_ts is component of pol in ps
             A_ts[mask] = misc.rdot(ps, polsm)
-            A_tp[mask] = misc.rdot(pp, polsm)
+
+            # A_tp is component of pol in pp (p-polarization vector)
+            # A_tp = pp * pols = (ps x s) * pols  rewritten as one line
+            x, y, z = ps[:, 0], ps[:, 1], ps[:, 2]
+            x2, y2, z2 = s[mask2, 0], s[mask2, 1], s[mask2, 2]
+            p1, p2, p3 = polsm[:, 0], polsm[:, 1], polsm[:, 2]
+            A_tp[mask] = misc.calc("(y*z2 - z*y2)*p1 + (z*x2 - x*z2)*p2 + (x*y2 - y*x2)*p3")
 
             # new polarization vector after refraction
-            pp_ = misc.cross(ps, s_m)
-            pols_ = ps*A_ts[mask, np.newaxis] + pp_*A_tp[mask, np.newaxis]
-        
-            pols[mask2, i+1] = pols_
-
-            # transmittance for s and p component
-            cos_alpha, cos_beta = ns, W
-            ts = misc.calc("2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)")
-            tp = misc.calc("2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)")
-
-            # overall transmittivity
-            T = misc.calc("n2_h*cos_beta / (n1_h*cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)")
+            pp_ = misc.cross(ps, s_m)  # ps and s_m are unity vectors and perpendicular, so we need no normalization
+            pols[mask2, i+1] = misc.calc("ps*A_tsm + pp_*A_tpm", A_tsm=A_ts[mask, np.newaxis], A_tpm=A_tp[mask, np.newaxis])
 
         else:
-            cos_alpha, cos_beta = ns, W
-            T = misc.calc("2*n2_h*cos_beta*n1_h*cos_alpha * ( 1 / (n1_h*cos_alpha + n2_h*cos_beta)**2"\
-                          "+ 1/(n2_h*cos_alpha + n1_h*cos_beta)**2)")
+            A_ts, A_tp = 1/np.sqrt(2), 1/np.sqrt(2)
 
+        # using this formulas:
+        # ts = 2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)
+        # tp = 2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)
+        # T = n2_h*cos_beta / (n1_h*cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)
+        # we get this monster formula:
+        cos_alpha, cos_beta = ns, W
+        T = misc.calc("4*n2_h*cos_beta*n1_h*cos_alpha * ( ( A_ts / (n1_h*cos_alpha + n2_h*cos_beta))**2"\
+                      "+ (A_tp /(n2_h*cos_alpha + n1_h*cos_beta))**2)")
+        
         # handle rays with total internal reflection
         TIR = ~np.isfinite(W)
         if np.any(TIR):
@@ -612,7 +613,7 @@ class Raytracer:
         weights[hwh, i+1] = weights[hwh, i]*T
         s[hwh] = s_
 
-        if np.any(s[hwh, 2] <= 0):
+        if np.any(s_[:, 2] <= 0):
             raise RuntimeError(f"Non-positive ray z-direction after refraction on surface {i}.")
 
     def __filter(self,
@@ -765,7 +766,7 @@ class Raytracer:
         if not self.RaySourceList:
             raise RuntimeError("Raysource Missing")
 
-        bar = ProgressBar(prefix="Detector Image: ", max_value=4).start() if not self.silent else NullBar()
+        bar = ProgressBar(prefix="Detector Image: ", max_value=4).start() if not self.silent else None
 
         # starting position of hit search
         z = self.DetectorList[ind].extent[4]
@@ -780,7 +781,8 @@ class Raytracer:
         rs2 = np.argmax(mask, axis=1) - 1
         mask2 = np.all(mask, axis=1) & (rs2 < 0)
         rs2[mask2] = 0
-        bar.update(1)
+        if bar is not None:
+            bar.update(1)
 
         p, s, _, w, wl, _ = self.Rays.getRaysByMask(rs, rs2, normalize=True, 
                                                             ret=[True, True, False, True, True, False])
@@ -793,7 +795,8 @@ class Raytracer:
         rs2 = rs2[rs2 >= 0]
         # weights[~rs] = 0  # not needed rs < 0 means ray is already absorbed
         p, s = p[rs], s[rs]
-        bar.update(2)
+        if bar is not None:
+            bar.update(2)
 
         while np.any(rs):
 
@@ -818,7 +821,8 @@ class Raytracer:
                                                                      ret=[True, True, False, True, False, False])
         hitw = ish & (w > 0)
         ph, w, wl = ph[hitw], w[hitw], wl[hitw]
-        bar.update(3)
+        if bar is not None:
+            bar.update(3)
 
         if self.DetectorList[ind].Surface.isPlanar():
             extent_out = np.array(self.DetectorList[ind].extent[:4])
@@ -857,7 +861,8 @@ class Raytracer:
         # init image and extent, these are the default values when no rays hit the detector
         Im = Image(z=self.DetectorList[ind].pos[2], extent=extent_out, image_type=image_type, index=ind)
         Im.makeImage(N, ph, w, wl, threading=self.multithreading)
-        bar.finish()
+        if bar is not None:
+            bar.finish()
 
         return Im
 
@@ -925,12 +930,13 @@ class Raytracer:
                 pos_new = np.concatenate((self.DetectorList[ind].pos[:2], [pos[j]]))
                 self.DetectorList[ind].moveTo(pos_new)
                 Imi = self.DetectorImage(N=N_px, ind=ind, extent=extent)
+                Imi.Im *= rays_step/N_rays
                 
                 # append image to list in first iteration, after that just add image content
                 if i == 0:
                     Im_res.append(Imi)
                 else:
-                    Im_res[j].Im += rays_step/N_rays * Imi.Im
+                    Im_res[j].Im += Imi.Im
 
         # revert silent to its state
         self.silent = silent_old
@@ -955,14 +961,16 @@ class Raytracer:
         if (N := int(N)) <= 0:
             raise ValueError(f"Pixel number N needs to be a positive int, but is {N}.")
 
-        bar = ProgressBar(prefix="Source Image: ", max_value=2).start() if not self.silent else NullBar()
+        bar = ProgressBar(prefix="Source Image: ", max_value=2).start() if not self.silent else None
         extent = self.RaySourceList[sindex].extent[:4]
         p, _, _, w, wavelengths = self.Rays.getSourceRays(sindex)
-        bar.update(1)
+        if bar is not None:
+            bar.update(1)
 
         Im = Image(z=self.RaySourceList[sindex].pos[2], extent=extent, image_type="Cartesian", index=sindex)
         Im.makeImage(N, p, w, wavelengths)
-        bar.finish()
+        if bar is not None:
+            bar.finish()
 
         return Im
 
@@ -1101,7 +1109,7 @@ class Raytracer:
         N_th = misc.getCoreCount()
         steps = np.ceil(Nt/N_th/10).astype(int) if self.multithreading else np.ceil(Nt/10).astype(int)
         steps += 2
-        bar = ProgressBar(prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start() if not self.silent else NullBar()
+        bar = ProgressBar(prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start() if not self.silent else None
 
         # get rays and properties
         ########################################################################################################
@@ -1113,7 +1121,8 @@ class Raytracer:
         # use only rays with weight
         hw = weights > 0
         p, s, weights = p[hw], s[hw], weights[hw]
-        bar.update(1)
+        if bar is not None:
+            bar.update(1)
 
         # select rays
         ########################################################################################################
@@ -1132,7 +1141,8 @@ class Raytracer:
         else:
             pass # just use all rays
 
-        bar.update(2)
+        if bar is not None:
+            bar.update(2)
 
         # find focus
         ########################################################################################################
@@ -1163,7 +1173,7 @@ class Raytracer:
                 Ne = (N_is+1)*int(Nt/N_th) if N_is != N_th-1 else Nt
 
                 for i, Ni in enumerate(np.arange(Ns, Ne)):
-                    if not i % 10:
+                    if not i % 10 and bar is not None:
                         bar.update(2+int(i/10+1))
                     vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
 
@@ -1186,7 +1196,8 @@ class Raytracer:
                                           options={'maxiter': 300}, bounds=[bounds])
             res.x = res.x[0]
 
-        bar.finish()
+        if bar is not None:
+            bar.finish()
 
         # print warning if result is near bounds
         ########################################################################################################

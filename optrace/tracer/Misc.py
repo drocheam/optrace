@@ -34,6 +34,7 @@ def timer(func: Callable) -> Any:
 
     return _time_it
 
+# @timer
 def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
     """"""
 
@@ -55,6 +56,7 @@ def getCoreCount() -> int:
     """get CPU Core Count"""
     return ne.detect_number_of_cores()
 
+# @timer
 def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarray:
     """
     Get randomly distributed values with pdf(x) as probability distribution function
@@ -79,8 +81,8 @@ def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarr
 
     X = np.random.sample(N)
 
-    # unfortunately we can't use out own interp1d, since cdf is not equally spaced
-    icdf = scipy.interpolate.interp1d(cdf, xc, assume_sorted=True)
+    # unfortunately we can't use np.interp1d, since cdf is not equally spaced
+    icdf = scipy.interpolate.interp1d(cdf, xc, assume_sorted=True, kind='linear')
     return icdf(X)
 
 def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -93,6 +95,10 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     x, y, z    = a[:, 0], a[:, 1], a[:, 2]
     x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
+    
+    if a.shape[0] < 1000:
+        return x*x2 + y*y2 + z*z2
+    
     return ne.evaluate("x*x2 + y*y2 + z*z2")
 
 def partMask(cond1: np.ndarray, cond2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -117,6 +123,10 @@ def normalize(a: np.ndarray) -> None:
     array([[0.26726124, 0.53452248, 0.80178373],
            [0.45584231, 0.56980288, 0.68376346]])
     """
+    if a.shape[0] < 1000:
+        a[:] = a/np.linalg.norm(a, axis=1)[:, np.newaxis]
+        return
+
     x, y, z = a[:, 0, np.newaxis], a[:, 1, np.newaxis], a[:, 2, np.newaxis]
     valid = ~((x == 0) & (y == 0) & (z == 0))
 
@@ -131,6 +141,9 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     array([[-12.,   0.,   4.],
            [ -3.,   6.,  -3.]])
     """
+    if a.shape[0] < 1000:
+        return np.cross(a, b, axis=1)
+
     x, y, z    = a[:, 0], a[:, 1], a[:, 2]
     x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
 
@@ -139,7 +152,7 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     # using ne is ~2x faster than np.cross
     ne.evaluate("y*z2 - z*y2", out=n[:, 0])
     ne.evaluate("z*x2 - x*z2", out=n[:, 1])
-    ne.evaluate("x*y2 - y*x2", out=n[: ,2])
+    ne.evaluate("x*y2 - y*x2", out=n[:, 2])
 
     return n
 

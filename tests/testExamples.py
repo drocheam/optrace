@@ -17,17 +17,16 @@ class ExampleTests(unittest.TestCase):
             process.kill()
 
     def test_0Complex(self):
-
         self.execute(["python", "./examples/More_Complex_Example.py"])
 
     def test_3RGBRender(self):
-        self.execute(["python", "./examples/Image_RGB_Render_Example.py"], 90)
+        self.execute(["python", "./examples/Image_RGB_Render.py"], 90)
 
     def test_2RGB(self):
-        self.execute(["python", "./examples/Image_RGB_Example.py"])
+        self.execute(["python", "./examples/Image_RGB.py"])
 
     def test_1Prism(self):
-        self.execute(["python", "./examples/Double_Prism_Example.py"])
+        self.execute(["python", "./examples/Double_Prism.py"])
 
 
 if __name__ == '__main__':

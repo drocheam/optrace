@@ -9,15 +9,15 @@ from optrace.tracer.Misc import timer as timer
 
 class RayStorage:
 
-    N_list = np.array([])
-    B_list = np.array([])
+    N_list = np.array([], dtype=int)
+    B_list = np.array([], dtype=int)
 
     def hasRays(self) -> bool:
         """
 
         :return:
         """
-        return len(self.N_list) > 0
+        return self.N_list.shape[0] > 0
 
     @property
     def N(self) -> int:
@@ -41,8 +41,8 @@ class RayStorage:
         P_all = np.sum(P_list)
 
         # calculate int ray number from power ratio
-        self.N_list = (N*P_list/P_all).astype(int)
-        dN = N-np.sum(self.N_list)  # difference to ray number
+        self.N_list = (N * P_list / P_all).astype(int)
+        dN = N - np.sum(self.N_list)  # difference to ray number
 
         # distribute difference dN randomly on all sources, with the power being the probability
         index_add = np.random.choice(self.N_list.shape[0], size=dN, p=P_list/P_all)
@@ -61,7 +61,7 @@ class RayStorage:
         self.s0_list     = np.zeros((N, 3),     dtype=np.float64, order='F')
         self.pol_list    = np.zeros((N, nt, 3), dtype=np.float32, order='F')
         self.w_list      = np.zeros((N, nt),    dtype=np.float32, order='F')
-        self.wl_list     = np.zeros((N,),       dtype=np.float32)     
+        self.wl_list     = np.zeros((N,),       dtype=np.float32, order='F')     
 
     def makeThreadRays(self, N_threads: int, Nt: int, no_pol: bool=False) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -80,15 +80,15 @@ class RayStorage:
         Ne = Ns + Np if Nt != N_threads-1 else self.N  # last threads also gets remainder
 
         i = np.argmax(np.array(self.B_list) >= Ns) - 1
-        i = max(i, 0)  # enfore i >= 0
+        i = max(i, 0)  # enforce i >= 0
 
         while self.B_list[i] < Ne:
       
             Nsi = max(Ns, self.B_list[i])
             Nei = min(self.B_list[i+1], Ne)
             sl1 = slice(Nsi, Nei)
+            power = (Nei - Nsi) / self.N_list[i] * self.RaySourceList[i].power
 
-            power = (Nei - Nsi)/self.N_list[i] * self.RaySourceList[i].power
             self.p_list[sl1, 0],\
             self.s0_list[sl1],   \
             self.pol_list[sl1, 0],\
@@ -128,13 +128,12 @@ class RayStorage:
         N = self.N
 
         if choice != []:
-            rays_pos = np.zeros((N,), dtype=bool)
+            rays_pos = np.zeros(N, dtype=bool)
             rays_pos[choice] = True
             pos = np.argmax(z < self.p_list[rays_pos, :, 2], axis=1) - 1
         else:
             pos = np.argmax(z < self.p_list[:, :, 2], axis=1) - 1
-            rays_pos = np.ones((N, ), dtype=bool)
-
+            rays_pos = np.ones(N, dtype=bool)
 
         # when z lies before the RaySource, pos gets set to -1. 
         # Since the last surface absorbs all rays, the weight is set to 0 correctly
@@ -278,7 +277,6 @@ class RayStorage:
         """
 
         """
-
         return [self.N, self.nt, tuple(self.N_list), tuple(self.B_list), 
                     id(self.p_list), id(self.s0_list), id(self.pol_list), id(self.w_list), id(self.wl_list)]
     

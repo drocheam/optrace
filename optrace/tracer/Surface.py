@@ -382,7 +382,7 @@ class Surface:
         match self.surface_type:
 
             case ("Circle" | "Ring" | "Rectangle"):
-                n = np.zeros((x.shape[0], 3), dtype=np.float64)
+                n = np.zeros((x.shape[0], 3), dtype=np.float64, order='F')
                 n[:, 2] = 1
                 return n
 

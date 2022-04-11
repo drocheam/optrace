@@ -72,8 +72,8 @@ def func2(N2):
 
     start = time.time()    
     RT.trace(N=N2)
-    print(time.time()-start)
     # Im = RT.DetectorImage(500, extent="auto")
+    print(time.time()-start)
 
 
 N = 1000000
