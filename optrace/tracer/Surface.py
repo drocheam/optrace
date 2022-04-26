@@ -611,10 +611,7 @@ class Surface:
 
 
     def crepr(self):
-        """
-
-        """
-
+        """ Compact state representation using only lists and immutable types """
         return [self.surface_type, self.r, self.ri, self.k, self.rho, self.ang, self.minz, 
                 self.maxz, tuple(self.pos), tuple(self.dim), id(self.Z), 
                 id(self.Mask), self.eps, (self.func.crepr() if self.func is not None else None)]

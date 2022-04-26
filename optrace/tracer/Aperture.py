@@ -3,7 +3,6 @@
 Aperture class:
 """
 
-
 import numpy as np
 from typing import Callable  # for function type hints
 

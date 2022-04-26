@@ -13,7 +13,7 @@ RT = ot.Raytracer(outline=[-4, 5, -3, 5, -1, 27.5])
 
 # add Raysource
 RSS = ot.Surface("Circle", r=0.05)
-RS = ot.RaySource(RSS, direction_type="Parallel", light_type="D65",
+RS = ot.RaySource(RSS, direction_type="Parallel", light_type="Function", spec_func=lambda wl: np.ones_like(wl),
                pos=[-2.5, 0, 0], s=[0.3, 0, 0.7])
 RT.add(RS)
 
@@ -25,7 +25,7 @@ P2 = ot.SurfaceFunction(r=3, func=lambda x, y: -0.5*x, derivative=lambda x, y: (
 front = ot.Surface("Function", func=P1)
 back = ot.Surface("Function", func=P2)
 nL1 = ot.RefractionIndex("SF10")
-L1 = ot.Lens(front, back, de=0.5, pos=[0, 1, 10], n=nL1)
+L1 = ot.Lens(front, back, de=0.5, pos=[0, 0, 10], n=nL1)
 RT.add(L1)
 
 # Prism 2

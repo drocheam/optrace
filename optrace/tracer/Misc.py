@@ -34,6 +34,27 @@ def timer(func: Callable) -> Any:
 
     return _time_it
 
+# TODO use np.interp for small arrays?
+def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
+    """
+    fast alternative to :obj:`scipy.interpolate.interp1d` with equally spaced x-values
+
+    >>> interp1d(np.array([1, 2, 3, 4]), np.array([5, 6, 5, 4]), np.array([1, 1.5, 3.5, 2.5]))
+    array([5. , 5.5, 4.5, 5.5])
+    """
+    x0, x1 = x[0], x[1]
+    ind0 = ne.evaluate("(1-1e-12)/(x1-x0)*(xs-x0)")
+    ind1 = ind0.astype(int)
+
+    # multiplication with (1-1e-12) to avoid case xs = x[-1],
+    # which would lead to y[ind1 + 1] being an access violation
+    # we could circumvent this using comparisons, masks or cases, but this would decreas performance
+
+    ya = y[ind1]
+    yb = y[ind1+1]
+
+    return ne.evaluate("(1-ind0+ind1)*ya + (ind0-ind1)*yb")
+
 # @timer
 def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
     """"""

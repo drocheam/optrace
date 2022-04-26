@@ -204,7 +204,7 @@ class SObject:
         self.__dict__[key] = val
     
     def crepr(self):
-        """"""
+        """ Compact state representation using only lists and immutable types """
         return [self.FrontSurface.crepr(), (self.BackSurface.crepr() if self.BackSurface is not None else None), self.d1, self.d2]
 
     def __str__(self):

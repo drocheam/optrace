@@ -11,7 +11,7 @@ import time
 
 def func2(N2):
     # make Raytracer
-    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60],  AbsorbMissing=True, silent=True)
+    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60],  AbsorbMissing=True, silent=True, no_pol=False)
 
     # add Raysource
     RSS = Surface("Circle", r=1)

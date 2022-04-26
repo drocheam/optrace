@@ -10,66 +10,65 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
-# import PyQt5
 
 from optrace.tracer.Image import *
 
 
-def DetectorPlot(Im:        Image,
-                 block:     bool = False,
-                 log:       bool = False,
-                 flip:      bool = False,
-                 mode:      str = "sRGB")\
-        -> None:
+def DetectorPlot(Im: Image, mode: str = "sRGB", **kwargs) -> None:
     """
     Plot an Detector Image in Irradiance, Illuminance or RGB Mode.
     Also displays image position and flux on detector.
 
     :param Im: Image object
-    :param block: if plot is blocking (bool)
-    :param log: if logarithmic values are shown (bool)
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
-    clabel = "Irradiance in W/mm²" if mode == "Irradiance" else "Illuminance in lm/mm²"
     index = f" {Im.index}" if Im.index is not None else ""
     text = f"Detector{index} at z = {Im.z:.5g} mm"
+    
+    match mode:
+        case "Irradiance":      
+            clabel = "Irradiance in W/mm²"
+            text += f"\n Total Radiant Flux at Detector: {Im.getPower():.5g} W"
 
-    if mode == "Irradiance":
-        text += f"\n Total Radiant Flux at Detector: {Im.getPower():.5g} W"
-    else:
-        text += f"\n Total Luminous Flux at Detector: {Im.getLuminousPower():.5g} lm"
+        case "Illuminance":    
+            clabel = "Illuminance in lm/mm²"
+            text += f"\n Total Luminous Flux at Detector: {Im.getLuminousPower():.5g} lm"
 
-    showImage(Im, block=block, log=log, flip=flip, clabel=clabel, text=text, mode=mode)
+        case _:                 
+            clabel = mode
+            text += f"\n{mode} Image"
+
+    showImage(Im, clabel=clabel, text=text, mode=mode, **kwargs)
 
 
-def SourcePlot(Im:      Image,
-               block:   bool = False,
-               log:     bool = False,
-               flip:    bool = False,
-               mode:    str = "sRGB")\
-        -> None:
+def SourcePlot(Im: Image, mode: str = "sRGB", **kwargs) -> None:
     """
     Plot an Source Image in Irradiance, Illuminance or RGB Mode.
     Also displays image position and flux on detector.
 
     :param Im: Image object
-    :param block: if plot is blocking (bool)
-    :param log: if logarithmic values are shown (bool)
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
-
-    clabel = "Radiant Emittance in W/mm²" if mode == "Irradiance" else "Luminous Emittance in lm/mm²"
     index = f" {Im.index}" if Im.index is not None else ""
     text = f"Source{index} at z = {Im.z:.5g} mm"
+    
+    match mode:
+        case "Irradiance":      
+            clabel = "Radiant Emittance in W/mm²"
+            text += f"\n Total Radiant Flux from Source: {Im.getPower():.5g} W"
 
-    if mode == "Irradiance":
-        text += f"\n Total Radiant Flux from Source: {Im.getPower():.5g} W"
-    else:
-        text += f"\n Total Luminous Flux from Source: {Im.getLuminousPower():.5g} lm"
+        case "Illuminance":    
+            clabel = "Luminous Emittance in lm/mm²"
+            text += f"\n Total Luminous Flux from Source: {Im.getLuminousPower():.5g} lm"
 
-    showImage(Im, block=block, log=log, flip=flip, clabel=clabel, text=text, mode=mode)
+        case _:                 
+            clabel = mode
+            text += f"\n{mode} Image"
+
+    showImage(Im, clabel=clabel, text=text, mode=mode, **kwargs)
 
 
+# TODO outsource mode calculations? takes long for 1MP image size and above
 def showImage(Im_in:    Image,
               block:    bool = False,
               log:      bool = False,
@@ -90,26 +89,24 @@ def showImage(Im_in:    Image,
     """
 
     match mode:
-        case "Irradiance":
-            Im = Im_in.getIrradiance()
-
-        case "Illuminance":
-            Im = Im_in.getIlluminance()
-
-        case "sRGB":
-            Im = Im_in.getRGB(log=log)
-
-        case _:
-            raise ValueError("Invalid image mode.")
+        case "Irradiance":              Im = Im_in.getIrradiance()
+        case "Illuminance":             Im = Im_in.getIlluminance()
+        case "sRGB (Absolute RI)":      Im = Im_in.getRGB(log=log, RI="Absolute")
+        case "sRGB (Perceptual RI)":    Im = Im_in.getRGB(log=log, RI="Perceptual")
+        case "Outside sRGB Gamut":      Im = Im_in.getOutsidesRGB()
+        case "Lightness (CIELUV)":      Im = Im_in.getLuvLightness()
+        case "Hue (CIELUV)":            Im = Im_in.getLuvHue()
+        case "Chroma (CIELUV)":         Im = Im_in.getLuvChroma()
+        case "Saturation (CIELUV)":     Im = Im_in.getLuvSaturation()
+        case _:                         raise ValueError("Invalid image mode.")
 
     # fall back to linear values when all pixels have the same value
-    if log and np.max(Im) == np.min(Im):
+    if log and (np.max(Im) == np.min(Im) or mode == "Outside sRGB Gamut"):
         log = False
 
     # rotate 180 deg
     if flip:
         Im = np.fliplr(np.flipud(Im))
-        # extent needs to be adapted so points are in the correct position
         extent = Im_in.extent[[1, 0, 3, 2]]
     else:
         extent = Im_in.extent
@@ -117,11 +114,6 @@ def showImage(Im_in:    Image,
     # better fonts to make everything look more professional
     matplotlib.rcParams['mathtext.fontset'] = 'stix'
     matplotlib.rcParams['font.family'] = 'STIXGeneral'
-
-    # raise window to front when showing plot
-    matplotlib.rcParams['figure.raise_window'] = True
-
-    plt.figure()
 
     # set colormap and color norm
     current_cmap = copy.copy(matplotlib.cm.get_cmap("Greys_r"))
@@ -132,8 +124,11 @@ def showImage(Im_in:    Image,
     vmin, vmax = None, None
     if np.max(Im) == np.min(Im) == 0:
         vmin, vmax = 0, 1e-16
+    elif not log and not mode.startswith("sRGB"):
+        vmin = 0
 
     # plot image
+    plt.figure()
     plt.imshow(Im, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, vmin=vmin, vmax=vmax)
 
     # plot labels
@@ -144,7 +139,7 @@ def showImage(Im_in:    Image,
         plt.xlabel("x / mm")
         plt.ylabel("y / mm")
 
-    if mode != "sRGB":
+    if not mode.startswith("sRGB") and mode != "Outside sRGB Gamut":
         clb = plt.colorbar(orientation='horizontal', shrink=0.6)
         clb.ax.set_xlabel(clabel)
     plt.title(text)
@@ -155,3 +150,4 @@ def showImage(Im_in:    Image,
     # wait a little to render the plot
     if not block:
         plt.pause(0.05)
+

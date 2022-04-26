@@ -12,23 +12,6 @@ class RayStorage:
     N_list = np.array([], dtype=int)
     B_list = np.array([], dtype=int)
 
-    def hasRays(self) -> bool:
-        """
-
-        :return:
-        """
-        return self.N_list.shape[0] > 0
-
-    @property
-    def N(self) -> int:
-        """number of rays"""
-        return self.p_list.shape[0] if self.hasRays() else None
-
-    @property
-    def nt(self) -> int:
-        """number of ray sections"""
-        return self.p_list.shape[1] if self.hasRays() else None
-
     def init(self, RaySourceList, N, nt):
         """
         """
@@ -52,7 +35,7 @@ class RayStorage:
             warnings.warn("There are RaySources that have no rays assigned. "\
                     "Change the power ratio or raise the overall ray number", RuntimeWarning)
         
-        self.B_list = np.concatenate(([0], np.cumsum(self.N_list)))
+        self.B_list = np.concatenate(([0], np.cumsum(self.N_list))).astype(int)
         self.RaySourceList = RaySourceList
 
         # weights, polarization and wavelengths don't need double precision, this way we save some RAM
@@ -63,6 +46,16 @@ class RayStorage:
         self.w_list      = np.zeros((N, nt),    dtype=np.float32, order='F')
         self.wl_list     = np.zeros((N,),       dtype=np.float32, order='F')     
 
+    @property
+    def N(self) -> int:
+        """number of rays"""
+        return self.p_list.shape[0] if self.N_list.shape[0] else 0
+
+    @property
+    def nt(self) -> int:
+        """number of ray sections"""
+        return self.p_list.shape[1] if self.N_list.shape[0] else 0
+    
     def makeThreadRays(self, N_threads: int, Nt: int, no_pol: bool=False) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -72,7 +65,7 @@ class RayStorage:
         :return:
         """
 
-        if not self.hasRays():
+        if not self.N:
             raise RuntimeError("RaySourceList has no rays stored.")
         
         Np = int(self.N/N_threads) # rays per thread
@@ -103,51 +96,6 @@ class RayStorage:
                self.w_list[Ns:Ne],    \
                self.wl_list[Ns:Ne]
 
-    def getRaysAtZ(self,
-                   z:           float,
-                   choice:      np.ndarray = [],
-                   normalize:   bool = True)\
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Get x, y coordinates of rays at position z. Only rays with weights are returned.
-
-        returns:
-        pz array: numpy 2D array, rays with weights in first dimension, xyz coordinates in second
-        p array, s array (ubsboth numpy 2D array)
-        weights array (numpy 1D array)
-
-        :param z: z-position (float)
-        :param choice: index array for rays (numpy 1D array)
-        :param normalize:
-        :return: pz array, p array, s array, weights array
-        """
-
-        if not self.hasRays():
-            raise RuntimeError("RaySourceList has no rays stored.")
-        
-        N = self.N
-
-        if choice != []:
-            rays_pos = np.zeros(N, dtype=bool)
-            rays_pos[choice] = True
-            pos = np.argmax(z < self.p_list[rays_pos, :, 2], axis=1) - 1
-        else:
-            pos = np.argmax(z < self.p_list[:, :, 2], axis=1) - 1
-            rays_pos = np.ones(N, dtype=bool)
-
-        # when z lies before the RaySource, pos gets set to -1. 
-        # Since the last surface absorbs all rays, the weight is set to 0 correctly
-        # and we don't need to do that
-
-        # get Ray parts
-        p, s, pol, w, wl, snum = self.getRaysByMask(rays_pos, pos, normalize=normalize)
-
-        # get positions of rays at the detector
-        hw = w > 0
-        t = (z - p[hw, 2])/s[hw, 2]
-        ph = p[hw] + s[hw] * t[:, np.newaxis]
-
-        return ph, p, s, pol, w, wl, snum
 
     # TODO use last known s instead nan
     def getRay(self, num: int, normalize: bool = True) \
@@ -159,7 +107,7 @@ class RayStorage:
         :return:
         """
 
-        if not self.hasRays():
+        if not self.N:
             raise RuntimeError("RaySourceList has no rays stored.")
 
         if num > self.N:
@@ -179,7 +127,7 @@ class RayStorage:
             s[norms == 0] = np.nan
             s[norms != 0] = s[norms != 0] / norms[norms != 0, np.newaxis]
 
-        return self.p_list[num], s, self.pol_list[num], self.w_list[num], self.wl_list[num], snum+1
+        return self.p_list[num], s, self.pol_list[num], self.w_list[num], self.wl_list[num], snum
 
     def getSourceRays(self, index: int)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -188,9 +136,8 @@ class RayStorage:
         :param index:
         :return:
         """
-        # get ray properties from source
 
-        if not self.hasRays():
+        if not self.N:
             raise RuntimeError("RaySourceList has no rays stored.")
         
         Ns, Ne = self.B_list[index:index+2] 
@@ -224,7 +171,7 @@ class RayStorage:
         """
         # choice: bool array
 
-        if not self.hasRays():
+        if not self.N:
             raise RuntimeError("RaySourceList has no rays stored.")
         
         if not ret[5]:
@@ -274,12 +221,9 @@ class RayStorage:
         return p, s, pol, w, wl, snums
 
     def crepr(self):
-        """
-
-        """
+        """ Compact state representation using only lists and immutable types """
         return [self.N, self.nt, tuple(self.N_list), tuple(self.B_list), 
                     id(self.p_list), id(self.s0_list), id(self.pol_list), id(self.w_list), id(self.wl_list)]
-    
 
     # methods for signalising the user to not edit rays after raytracing
     # since it's python he could find a workaround for this, but maybe knowing there's maybe a reason for locking stops him doing so
@@ -301,3 +245,4 @@ class RayStorage:
             raise RuntimeError("Operation not permitted since RayStorage is read-only outside raytracing.")
 
         self.__dict__[key] = val
+

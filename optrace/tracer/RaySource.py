@@ -6,12 +6,10 @@ on the specified positional, directional, wavelength and brightness distribution
 The RaySource object also holds all rays and ray sections generated in raytracing from the Raytracer class
 """
 
-
 # Why random sampling? Sampling the source, "sampling" the lens areas or aperture by the rays can lead to Nyquist Theorem violation. Also, this ensures that when you run it repeatedly, you get a different version of the image, and not the same one. E.g. with image compositions by several raytraces.
 
 import numpy as np
 from typing import Callable
-from scipy.spatial.transform import Rotation
 from PIL import Image as PILImage
 
 from optrace.tracer.Surface import * 
@@ -20,12 +18,17 @@ from optrace.tracer.Misc import timer as timer
 import optrace.tracer.Misc as misc
 import optrace.tracer.Color as Color
 
-
 # TODO check light_type=Function
 # TODO remove BW_Image, ersetzen durch emittance_type = "Constant", "Image"
 # TODO welche lines sind typisch?
 # TODO Check: check image dimensions
 class RaySource(SObject):
+
+    direction_types = ["Diverging", "Parallel"]
+    orientation_types = ["Constant", "Function"]
+    polarization_types = ["Angle", "Random", "x", "y", "xy"]
+    light_types = ["Monochromatic", "Blackbody", "Function", "Lines", "BW_Image", "RGB_Image",\
+                    "A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]
 
     def __init__(self,
 
@@ -90,11 +93,11 @@ class RaySource(SObject):
         if not Surface.isPlanar():
             raise ValueError("Currently only planar surfaces are supported for RaySources.")
 
-        self.sr_angle = float(sr_angle)
-        self.pol_ang = float(pol_ang)
-        self.power = float(power)
-        self.wl = float(wl)
-        self.T = float(T)
+        self.sr_angle = sr_angle
+        self.pol_ang = pol_ang
+        self.power = power
+        self.wl = wl
+        self.T = T
 
         self.or_func = or_func
         self.spec_func = spec_func
@@ -166,6 +169,7 @@ class RaySource(SObject):
 
         return tuple(RGB)
 
+    # @timer
     def createRays(self, N: int, no_pol: bool = False, power: float=None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -228,19 +232,18 @@ class RaySource(SObject):
             If = np.sum(RGB, axis=2).flatten()  # brightness is sum of RGBLinear components
 
             # get random pixel number, the pixel brightness is the probability
-            P = np.random.choice(np.arange(If.shape[0]), N, p=If/np.sum(If))
-            PY, PX = np.divmod(P, self.Image.shape[1])  # pixel x, y position from pixel number
+            P = np.random.choice(If.shape[0], N, p=If/np.sum(If))
+            PY, PX = np.divmod(P, RGB.shape[1])  # pixel x, y position from pixel number
 
             # add random position inside pixel and calculate positions in 3D space
             rx, ry = np.random.sample(N), np.random.sample(N)
             xs, xe, ys, ye = self.Surface.getExtent()[:4]
-            Iy, Ix = self.Image.shape[:2]
+            Iy, Ix = RGB.shape[:2]
 
             p = np.zeros((N, 3), dtype=np.float64, order='F')
-            p[:, 2] = self.pos[2]
-
             misc.calc("(xe-xs)/Ix * (PX + rx) + xs", out=p[:, 0])
             misc.calc("(ye-ys)/Iy * (PY + ry) + ys", out=p[:, 1])
+            p[:, 2] = self.pos[2]
 
             wavelengths = Color.randomWavelengthFromRGB(self.Image[PY, PX])
 
@@ -275,28 +278,19 @@ class RaySource(SObject):
                 alpha = np.radians(self.sr_angle) * np.sqrt(np.random.sample(N))
                 theta = np.random.uniform(0, 2*np.pi, N)
 
-                # create rotation vectors
-                rv = np.zeros_like(s_or, dtype=np.float64, order='F')
-                rv[:, 1] = alpha
+                # vector perpendicular to s, created using  sy = [1, 0, 0] x s_or
+                sy = np.zeros_like(s_or, dtype=np.float64, order='F')
+                s_orx, s_ory, s_orz = s_or[:, 0], s_or[:, 1], s_or[:, 2]
+                sy[:, 1] = misc.calc("-s_orz/sqrt(1-s_orx**2)")
+                sy[:, 2] = misc.calc("s_ory/sqrt(1-s_orx**2)")
 
-                # rotate vectors in first cone dimension
-                r1 = Rotation.from_rotvec(rv)
-                s4 = r1.apply(s_or)
+                # vector sx = s x sy
+                sx = misc.cross(s_or, sy)
 
-                # variable aliases
-                s1, s2, s3 = s4[:, 0], s4[:, 1], s4[:, 2]
-                n1, n2, n3 = s_or[:, 0], s_or[:, 1], s_or[:, 2]
-                ca, sa, mca = np.cos(theta), np.sin(theta),  1 - np.cos(theta)
-
-                # Rotation Matrix for a rotation around an arbitrary axis,
-                # source: https://de.wikipedia.org/wiki/Drehmatrix#Drehmatrizen_des_Raumes_%E2%84%9D%C2%B3
-
-                s = np.zeros_like(s_or, dtype=np.float64, order='F')
-
-                # rotate in second cone dimension
-                misc.calc("(n1**2*mca + ca)*s1    + (n1*n2*mca - n3*sa)*s2 + (n1*n3*mca + n2*sa)*s3", out=s[:, 0])
-                misc.calc("(n2*n1*mca + n3*sa)*s1 + (n2**2*mca + ca)*s2    + (n2*n3*mca - n1*sa)*s3", out=s[:, 1])
-                misc.calc("(n3*n1*mca - n2*sa)*s1 + (n3*n2*mca + n1*sa)*s2 + (n3**2*mca + ca)*s3",    out=s[:, 2])
+                # vector s has a component alpha in the sx-sy plane
+                theta_, alpha_ = theta[:, np.newaxis], alpha[:, np.newaxis]
+                s = misc.calc("cos(alpha_)*s_or + sin(alpha_)*(cos(theta_)*sx + sin(theta_)*sy)")
+                # print(np.sqrt(s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2))
 
             case _:
                 raise RuntimeError(f"direction_type '{self.direction_type}' not handled.")
@@ -312,21 +306,13 @@ class RaySource(SObject):
 
         else:
             match self.polarization_type:
-
-                case "x":
-                    ang = np.zeros(N, dtype=np.float64)
-
-                case "y":
-                    ang = np.full(N, np.pi/2, dtype=np.float64)
-
-                case "xy":
-                    ang = np.random.choice([0, np.pi/2], N)
-
-                case "Angle":
-                    ang = np.full(N, np.radians(self.pol_ang), dtype=np.float64)
-
-                case "Random":
-                    ang = np.random.uniform(0, 2*np.pi, N)
+            
+                # polarization can be a value of a vector
+                case "x":       ang = 0.
+                case "y":       ang = np.pi/2
+                case "xy":      ang = np.random.choice([0, np.pi/2], N)
+                case "Angle":   ang = np.radians(self.pol_ang)
+                case "Random":  ang = np.random.uniform(0, 2*np.pi, N)
         
                 case _:
                     raise RuntimeError(f"polarization_type '{self.polarization_type}' not handled.")
@@ -373,9 +359,9 @@ class RaySource(SObject):
         return p, s, pols, weights, wavelengths
 
     def crepr(self):
-        """"""
+        """ Compact state representation using only lists and immutable types """
         # use id on self.lines and self.Image, for large array it would take too long otherwise.
-        # disadvantage: reassigning the same array change the id
+        # disadvantage: reassigning the same array changes the id
         return [self.FrontSurface.crepr(), self.direction_type, self.light_type, self.orientation_type, 
                 self.polarization_type, self.sr_angle, self.pol_ang, self.power, self.wl, self.T,
                 id(self.or_func), id(self.spec_func), tuple(self.s), id(self.lines), id(self.Image)]
@@ -389,26 +375,25 @@ class RaySource(SObject):
                 raise TypeError("s needs to be of type list or numpy.ndarray")
             val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
 
-        if key == "direction_type" and (not isinstance(val, str) or val not in ["Parallel", "Diverging"]):
+        if key == "direction_type" and (not isinstance(val, str) or val not in self.direction_types):
             raise ValueError(f"Invalid direction_type '{val}'.")
 
-        if key == "light_type" and (not isinstance(val, str) or val not in ["Monochromatic", "Blackbody", "Function", "Lines", "RGB_Image",\
-                              "A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]):
+        if key == "light_type" and (not isinstance(val, str) or val not in self.light_types):
             raise ValueError(f"Invalid light_type '{val}'.")
 
-        if key == "orientation_type" and (not isinstance(val, str) or val not in ["Constant", "Function"]):
+        if key == "orientation_type" and (not isinstance(val, str) or val not in self.orientation_types):
             raise ValueError(f"Invalid orientation_type '{val}'.")
 
-        if key == "polarization_type" and (not isinstance(val, str) or val not in ["x", "y", "xy", "Random", "Angle"]):
+        if key == "polarization_type" and (not isinstance(val, str) or val not in self.polarization_types):
             raise ValueError(f"Invalid polarization_type '{val}'.")
 
-        if key == "power" and (val <= 0 or not isinstance(val, int|float)):
+        if key == "power" and (val <= 0 or not isinstance(val, int | float)):
             raise ValueError(f"Source power needs to be positive, but is {val}.")
 
-        if key == "T" and (val <= 0 or not isinstance(val, int|float)):
+        if key == "T" and (val <= 0 or not isinstance(val, int | float)):
             raise ValueError(f"Blackbody temperature T needs to be a positive number, but is {val}.")
         
-        if key == "sr_angle" and (val <= 0 or not isinstance(val, int|float)):
+        if key == "sr_angle" and (val <= 0 or not isinstance(val, int | float)):
             raise ValueError(f"Cone angle sr_angle needs to be positive number, but is {val}.")
 
         if key == "lines":
@@ -425,6 +410,9 @@ class RaySource(SObject):
 
         if key == "Image" and not isinstance(val, np.ndarray):
             raise ValueError("Invalid image format")
+
+        if key in ["sr_angle", "pol_ang", "power", "wl", "T"]:
+            val = float(val)
 
         super().__setattr__(key, val)
 

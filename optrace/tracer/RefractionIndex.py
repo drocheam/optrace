@@ -177,8 +177,7 @@ class RefractionIndex:
         return not self.__eq__(other)
 
     def crepr(self):
-        """
-        """
+        """ Compact state representation using only lists and immutable types """
         return [self.n, self.A, self.B, self.C, self.D, self.n_type,
                      id(self.wls), id(self.ns), id(self.func)]
 

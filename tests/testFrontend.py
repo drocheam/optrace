@@ -184,7 +184,7 @@ class FrontendTests(unittest.TestCase):
             sim.ImageType = "Illuminance"
             sim.showDetectorImage()
             sim.waitForIdle()
-            sim.ImageType = "sRGB"
+            sim.ImageType = "sRGB (Absolute RI)"
             sim.showDetectorImage()
             sim.waitForIdle()
 
@@ -196,7 +196,22 @@ class FrontendTests(unittest.TestCase):
             sim.ImageType = "Illuminance"
             sim.showDetectorImage()
             sim.waitForIdle()
-            sim.ImageType = "sRGB"
+            sim.ImageType = "sRGB (Absolute RI)"
+            sim.showDetectorImage()
+            sim.waitForIdle()
+            sim.ImageType = "sRGB (Perceptual RI)"
+            sim.showDetectorImage()
+            sim.waitForIdle()
+            sim.ImageType = "Hue (CIELUV)"
+            sim.showDetectorImage()
+            sim.waitForIdle()
+            sim.ImageType = "Chroma (CIELUV)"
+            sim.showDetectorImage()
+            sim.waitForIdle()
+            sim.ImageType = "Saturation (CIELUV)"
+            sim.showDetectorImage()
+            sim.waitForIdle()
+            sim.ImageType = "Lightness (CIELUV)"
             sim.showDetectorImage()
             sim.waitForIdle()
 

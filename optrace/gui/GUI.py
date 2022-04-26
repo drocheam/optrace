@@ -51,7 +51,7 @@ class GUI(HasTraits):
     LENS_COLOR: tuple[float, float, float] = (0.63, 0.79, 1.00, 0.30)
     """RGB + Alpha Tuple for the Lens surface visualization"""
 
-    BACKGROUND_COLOR: tuple[float, float, float] = (0.36, 0.35, 0.35)
+    BACKGROUND_COLOR: tuple[float, float, float] = (0.32, 0.30, 0.30)
     """RGB +Color for the Scene background"""
     
     RAYSOURCE_ALPHA: float = 0.5
@@ -78,7 +78,7 @@ class GUI(HasTraits):
     INFO_STYLE: dict = dict(font_size=13, bold=True, color=(1, 1, 1), font_family="courier", shadow=True, italic=False)
     """Info Text Style. Used for status messages and interaction overlay"""
 
-    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.60, 0.60, 0.60), font_family="courier", shadow=True)
+    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.501, 0.501, 0.501), font_family="courier", shadow=True)
     """Style for hidden info text. The color is used for the refraction index boxes frame"""
     
     AXIS_STYLE: dict = dict(font_size=11, bold=False, italic=False, color=(1, 1, 1), font_family="courier", shadow=True)
@@ -136,6 +136,9 @@ class GUI(HasTraits):
     CleanerView = List(editor=CheckListEditor(values=['Cleaner Scene View'], format_func=lambda x: x),
                     desc="if some scene elements should be hidden")
 
+    AFOneSource = List(editor=CheckListEditor(values=['Only For Selected Source'], format_func=lambda x: x),
+                    desc="if autofocus only uses currently selected source")
+    
     # Enums
 
     PlottingType: Enum = Enum('Rays', 'Points', desc="Ray Representation")
@@ -144,8 +147,8 @@ class GUI(HasTraits):
     ColoringType: Enum = Enum('White', 'Power', 'Wavelength', 'Polarization', 'Source', desc="Ray Property to Color the Rays With")
     """Ray Coloring Mode. One of ['White', 'Power', 'Wavelength', 'Polarization', 'Source']"""
 
-    ImageType: Enum = Enum('sRGB', 'Irradiance', 'Illuminance', desc="Image Type Presented")
-    """Image Type. One of ['sRGB', 'Irradiance', 'Illuminance']"""
+    ImageType: Enum = Enum('sRGB (Absolute RI)', 'sRGB (Perceptual RI)', 'Outside sRGB Gamut', 'Irradiance', 'Illuminance', 'Lightness (CIELUV)', "Hue (CIELUV)", "Chroma (CIELUV)", "Saturation (CIELUV)", desc="Image Type Presented")
+    """Image Type"""
 
     FocusType: Enum = Enum('Position Variance', 'Airy Disc Weighting', 'Irradiance Variance', desc="Method for Autofocus")
     """Focus Finding Mode. One of ['Position Variance', 'Airy Disc Weighting', 'Irradiance Variance']"""
@@ -182,7 +185,7 @@ class GUI(HasTraits):
     App = wx.App(False)
 
     # size of the mlab scene
-    SceneSize = [1150, 800] # with the mayavi toolbar this should be too big for a 720p screen
+    SceneSize = [1150, 820] # with the window bar this should still fit on a 900p screen
 
     ####################################################################################################################
     # UI view creation
@@ -212,6 +215,7 @@ class GUI(HasTraits):
                         Item('PosDet', label="Det_z"),
                         Separator,
                         Item('FocusType', label='AF Mode'),
+                        Item('AFOneSource', style="custom", show_label=False),
                         Item('FocusDebugPlot', style="custom", show_label=False),
                         Item('AutoFocusButton', show_label=False),
                         Separator,
@@ -236,7 +240,7 @@ class GUI(HasTraits):
     # Class constructor
 
     def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, CleanerView: bool=False, LogImage: bool=False,
-            FlipImage: bool=False, FocusDebugPlot: bool=False, **kwargs) -> None:
+            FlipImage: bool=False, FocusDebugPlot: bool=False, AFOneSource: bool=False, **kwargs) -> None:
         """
         The extra bool parameters are needed to assign the List-Checklisteditor to bool values in the GUI.__init__. 
         Otherwise the user would assign bool values to a string list.
@@ -283,6 +287,7 @@ class GUI(HasTraits):
         self.LogImage       = self.__CheckValFromBool(self.LogImage,        LogImage)
         self.FlipImage      = self.__CheckValFromBool(self.FlipImage,       FlipImage)
         self.FocusDebugPlot = self.__CheckValFromBool(self.FocusDebugPlot,  FocusDebugPlot)
+        self.AFOneSource    = self.__CheckValFromBool(self.AFOneSource,     AFOneSource)
         self.set_only = False
 
         # define Status dict
@@ -477,7 +482,6 @@ class GUI(HasTraits):
         lnum = getLabelNum(ext[5] - ext[4], 5, 24)
         drawAxis(self.AxisPlotObjects, 2, ext_ys, lnum, "z", '%-#.5g', False, False, True)
 
-    
     def plotRefractionIndexBoxes(self) -> None:
         """plot outlines for ambient refraction index regions"""
 
@@ -771,15 +775,16 @@ class GUI(HasTraits):
         self.StatusText = self.Scene.mlab.text(0.97, 0.01, "Status Text")
         self.StatusText.property.trait_set(**self.INFO_STYLE, justification="right")
         self.StatusText.actor.text_scale_mode = 'none'
-    
+   
     def initSourceList(self) -> None:
         """generate a descriptive list of RaySource names"""
-        self.SourceNames = [f"RS{num}: {RS.Surface.surface_type} at {RS.pos}"
+        self.SourceNames = [f"RS{num}: {RS.Surface.surface_type} at [{RS.pos[2]:.04g}, "
+                            f"{RS.pos[1]:.04g}, {RS.pos[2]:.04g}]"[:35]
                             for num, RS in enumerate(self.Raytracer.RaySourceList) ]
 
     def initDetectorList(self) -> None:
         """generate a descriptive list of Detector names"""
-        self.DetectorNames = [f"DET{num}: {Det.Surface.surface_type} at z={Det.pos[2]}" 
+        self.DetectorNames = [f"DET{num}: {Det.Surface.surface_type} at z={Det.pos[2]:.04g}"[:35] 
                               for num, Det in enumerate(self.Raytracer.DetectorList) ]
 
     def initCamera(self) -> None:
@@ -798,7 +803,6 @@ class GUI(HasTraits):
         # re-render
         self.Scene.renderer.reset_camera()
         self.Scene.scene.render()
-
 
     def onSpacePick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker') -> None:
         """
@@ -858,40 +862,71 @@ class GUI(HasTraits):
             p_, s_, pols_, pw_, wv, snum = self.Raytracer.Rays.getRay(pos)
             p, s, pols, pw = p_[n2_], s_[n2_], pols_[n2_], pw_[n2_]
 
-            pw0 = pw_[n2_-1] if n2_ > 0 else None
-            s0 = s_[n2_-1] if n2_ > 0 else None
-            pols0 = pols_[n2_-1] if n2_ > 0 else None
-            pl = (pw0-pw)/pw0 if n2_ > 0 else None  # power loss
-
-            sh = self.ShiftPressed
+            pw0 = pw_[n2_-1] if n2_ else None
+            s0 = s_[n2_-1] if n2_ else None
+            pols0 = pols_[n2_-1] if n2_ else None
+            pl = (pw0-pw)/pw0 if n2_ else None  # power loss
 
             def toSphCoords(s):
                 return np.array([np.rad2deg(np.arctan2(s[1], s[0])), np.rad2deg(np.arccos(s[2])), 1])
 
             s_sph = toSphCoords(s)
-            s0_sph = toSphCoords(s0) if n2_ > 0 else None
+            s0_sph = toSphCoords(s0) if n2_ else None
             pols_sph = toSphCoords(pols)
-            pols0_sph = toSphCoords(pols0) if n2_ > 0 else None
+            pols0_sph = toSphCoords(pols0) if n2_ else None
 
-            # generate text
-            text =  f"Ray {pos}" +  \
-                    f" from Source {snum}" +  \
-                   (f" at surface {n2_}\n" if n2_> 0 else f" at ray source\n") + \
-                    f"Position:             ({p[0]:>10.5g}, {p[1]:>10.5g}, {p[2]:>10.5g})\n" + \
-                   (f"Direction Before:     ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})" if n2_ and sh else "") + \
-                   (f"      ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°, {s0_sph[2]:>10.5f})\n" if n2_ and sh else "") + \
-                    f"Direction After:      ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})" + \
-                   (f"      ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°, {s_sph[2]:>10.5f})\n" if sh else "\n") + \
-                   (f"Polarization Before:  ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})" if n2_ and sh else "") + \
-                   (f"      ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°, {pols0_sph[2]:>10.5f})\n" if n2_ and sh else "") + \
-                    f"Polarization After:   ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})" + \
-                   (f"      ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°, {pols_sph[2]:>10.5f})\n" if sh else "\n") + \
-                    f"Wavelength:            {wv:>10.2f} nm\n" + \
-                   (f"Ray Power Before:      {pw0*1e6:>10.5g} µW\n" if n2_ > 0 and sh else "") + \
-                    f"Ray Power After:       {pw*1e6:>10.5g} µW\n" + \
-                   (f"Power Loss on Surface: {pl*100:>10.5g} %" if n2_ > 0 and sh else "") + \
-                   (f"Pick using Shift+Left Mouse Button for more info" if not sh else "")
-            
+            Elements = self.Raytracer._makeElementList()
+            lastn = self.Raytracer.n0
+            nList = [lastn]
+            SList = [self.Raytracer.RaySourceList[snum].Surface]
+
+            for El in Elements:
+                SList.append(El.FrontSurface)
+                if isinstance(El, Lens):
+                    nList.append(El.n)
+                    lastn = El.n2 if El.n2 is not None else self.Raytracer.n0
+                    SList.append(El.BackSurface)
+                nList.append(lastn)
+
+            n = nList[n2_](wv)
+            n0 = nList[n2_-1](wv) if n2_ else None
+
+            normal = SList[n2_].getNormals(np.array([p[0]]), np.array([p[1]]))[0]
+            normal_sph = toSphCoords(normal)
+
+            if self.ShiftPressed:
+                text =  f"Ray {pos}" +  \
+                        f" from Source {snum}" +  \
+                       (f" at surface {n2_}\n\n" if n2_ else f" at ray source\n\n") + \
+                        f"Intersection Position: ({p[0]:>10.5g}, {p[1]:>10.5g}, {p[2]:>10.5g})\n\n" + \
+                        f"                       Cartesian (x, y, z)                       Spherical (phi, theta, r)\n" + \
+                       (f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})" if n2_ else "") + \
+                       (f"      ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°, {s0_sph[2]:>10.5f})\n" if n2_ else "") + \
+                        f"Direction After:       ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})" + \
+                        f"      ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°, {s_sph[2]:>10.5f})\n" + \
+                       (f"Polarization Before:   ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})" if n2_ else "") + \
+                       (f"      ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°, {pols0_sph[2]:>10.5f})\n" if n2_ else "") + \
+                        f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})" + \
+                        f"      ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°, {pols_sph[2]:>10.5f})\n" + \
+                       (f"Surface Normal:        ({normal[0]:>10.5f}, {normal[1]:>10.5f}, {normal[2]:>10.5f})" if pw > 0 else "") + \
+                       (f"      ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°, {normal_sph[2]:>10.5f})\n\n" if pw > 0 else "\n")+ \
+                        f"Wavelength:               {wv:>10.2f} nm\n" + \
+                       (f"Refraction Index Before:  {n0:>10.4f}\n" if n2_ else "") + \
+                        f"Refraction Index After:   {n:>10.4f}\n" + \
+                       (f"Ray Power Before:         {pw0*1e6:>10.5g} µW\n" if n2_ else "") + \
+                        f"Ray Power After:          {pw*1e6:>10.5g} µW" + ("\n" if n2_ else "") + \
+                       (f"Power Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "")
+            else:
+                text =  f"Ray {pos}" +  \
+                        f" from Source {snum}" +  \
+                       (f" at surface {n2_}\n" if n2_ else f" at ray source\n") + \
+                        f"Intersection Position: ({p[0]:>10.5g}, {p[1]:>10.5g}, {p[2]:>10.5g})\n" + \
+                        f"Direction After:       ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})\n" + \
+                        f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})\n" + \
+                        f"Wavelength:             {wv:>10.2f} nm\n" + \
+                        f"Ray Power After:        {pw*1e6:>10.5g} µW\n" + \
+                       (f"Pick using Shift+Left Mouse Button for more info")
+
             self.RayText.text = text
             self.RayText.property.trait_set(**self.INFO_STYLE, background_opacity=0.2, opacity=1)
         else:
@@ -997,6 +1032,7 @@ class GUI(HasTraits):
     # Interface functions
     ###############################################################################################################
 
+    # TODO choose last RaySource after replotting
     def replot(self, change=None):
         
         self.Status["Drawing"] = True
@@ -1011,7 +1047,13 @@ class GUI(HasTraits):
         if all_ or change["RaySources"]:
             self.plotRaySources()
             self.initSourceList()
-        
+       
+        if all_ or change["TraceSettings"]:
+            if self.Raytracer.AbsorbMissing != bool(self.AbsorbMissing):
+                self.set_only = True
+                self.AbsorbMissing = self.__CheckValFromBool(self.AbsorbMissing, self.Raytracer.AbsorbMissing)
+                self.set_only = False
+
         rdh = False  # if Drawing Status should be reset in this function
         if self.Raytracer.RaySourceList:
             if all_ or change["Filters"] or change["Lenses"] or change ["Apertures"] or change["Ambient"]\
@@ -1142,7 +1184,7 @@ class GUI(HasTraits):
                 return
 
             # only draw if source has rays and scene renderer is initialized
-            elif self.Raytracer.Rays.hasRays() and not self.Status["InitScene"]:
+            elif self.Raytracer.Rays.N and not self.Status["InitScene"]:
 
                 self.Status["Drawing"] = True
 
@@ -1248,6 +1290,10 @@ class GUI(HasTraits):
 
             self.DetectorPlotObjects[self.DetInd][3].z_position = zl
 
+            # reinit DetectorList and Selection to update z_pos in detector name
+            self.initDetectorList()
+            self.DetectorSelection = self.DetectorNames[self.DetInd]
+
     @on_trait_change('DetectorImageButton')
     def showDetectorImage(self) -> None:
         """render a DetectorImage at the chosen Detector, uses a separate thread"""
@@ -1257,7 +1303,7 @@ class GUI(HasTraits):
             self.Status["DetectorImage"] = True
 
             def background(RT: Raytracer, N: int) -> None:
-                res = RT.DetectorImage(N=N, ind=self.DetInd)
+                res = RT.DetectorImage(N=N, ind=self.DetInd, max_res=True)
 
                 def on_finish() -> None:
                     DetectorPlot(res, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType)
@@ -1284,7 +1330,7 @@ class GUI(HasTraits):
             self.Status["SourceImage"] = True
 
             def background(RT: Raytracer, N: int, snum: int) -> None:
-                res = RT.SourceImage(N=N, sindex=snum)
+                res = RT.SourceImage(N=N, sindex=snum, max_res=True)
 
                 def on_finish() -> None:
                     SourcePlot(res, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType)
@@ -1309,7 +1355,9 @@ class GUI(HasTraits):
 
             # run this in background thread
             def background(RT: Raytracer, z: float, method: str) -> None:
-                zf, zff, r, vals = RT.autofocus(method, z, ret_cost=self.FocusDebugPlot)
+
+                snum = None if not self.AFOneSource else int(self.SourceSelection.split(":", 1)[0].split("RS")[1])
+                zf, zff, r, vals = RT.autofocus(method, z, ret_cost=self.FocusDebugPlot, snum=snum)
                 RT.DetectorList[self.DetInd].moveTo([*RT.DetectorList[self.DetInd].pos[:2], zf])
 
                 # execute this function after thread has finished

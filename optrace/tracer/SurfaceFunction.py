@@ -152,17 +152,14 @@ class SurfaceFunction:
 
         return minz, maxz
 
-
     def crepr(self):
-        """
-
-        """
-
+        """ Compact state representation using only lists and immutable types """
         return [self.r, self.off, self.minz, self.maxz, id(self.derivative), id(self.func), id(self.hits), id(self.mask)]
 
     def __setattr__(self, key, val):
 
         if "_lock" in self.__dict__ and self._lock: # and key != "_lock":
-            raise RuntimeError("Changing SurfaceFunction properties after initialization is prohibited. Create a new SurfaceFunction and assign it to the parent Surface.")
+            raise RuntimeError("Changing SurfaceFunction properties after initialization is prohibited."\
+                               "Create a new SurfaceFunction and assign it to the parent Surface.")
         
         self.__dict__[key] = val

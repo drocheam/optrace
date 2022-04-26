@@ -10,7 +10,7 @@ import numpy as np
 
 
 # Open the image form working directory
-Image = './examples/tv-test-pattern.png'
+Image_path = './examples/tv-test-pattern.png'
 
 # make Raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
@@ -18,7 +18,7 @@ RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 # add Raysource
 RSS = ot.Surface("Rectangle", dim=[4, 4])
 RS = ot.RaySource(RSS, light_type="RGB_Image", direction_type="Diverging", sr_angle=8,
-               Image=Image, s=[0, 0, 1], pos=[0, 0, 0])
+               Image=Image_path, s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 
 # add Lens 1
@@ -34,9 +34,17 @@ RT.add(Det)
 
 # render and show detector image
 pos = [27., 30., 33., 36.]
-Ims = RT.iterativeDetectorImage(N_rays=15e6, N_px=300, pos=pos)
+Ims = RT.iterativeDetectorImage(N_rays=10e6, N_px=300, pos=pos)
+
+# Ims[0].rescale(100)
+# Ims[1].rescale(5)
+# Ims[2].rescale(1000)
+
+
+# Ims[0].save("./saveTest.npz")
 
 for i in np.arange(len(Ims)-1):
-    DetectorPlot(Ims[i], block=False, mode="sRGB")
-DetectorPlot(Ims[-1], block=True, mode="sRGB")
+    DetectorPlot(Ims[i], block=False, mode="sRGB (Absolute RI)")
+# DetectorPlot(ot.Image.load("./saveTest.npz"), block=False, mode="sRGB")
+DetectorPlot(Ims[-1], block=True, mode="sRGB (Absolute RI)")
 

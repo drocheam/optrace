@@ -102,11 +102,6 @@ class Filter(SObject):
 
         return tuple(RGB), alpha
 
-
     def crepr(self):
-
-        """
-
-        """
-
+        """ Compact state representation using only lists and immutable types """
         return [self.FrontSurface.crepr(), self.filter_type, self.tau, id(self.func)]

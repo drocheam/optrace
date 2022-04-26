@@ -97,8 +97,7 @@ class Lens(SObject):
 
 
     def crepr(self):
+        """ Compact state representation using only lists and immutable types """
+        return [self.FrontSurface.crepr(), self.BackSurface.crepr(), self.d1, self.d2,\
+                self.n.crepr(), (self.n2.crepr() if self.n2 is not None else None)]
 
-        """
-
-        """
-        return [self.FrontSurface.crepr(), self.BackSurface.crepr(), self.d1, self.d2, self.n.crepr(), (self.n2.crepr() if self.n2 is not None else None)]
