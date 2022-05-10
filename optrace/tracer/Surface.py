@@ -10,10 +10,11 @@ import copy
 import numpy as np
 import optrace.tracer.Misc as misc
 from optrace.tracer.SurfaceFunction import *
+from optrace.tracer.BaseClass import *
 
-# TODO Mode Data: check if working
+class Surface(BaseClass):
 
-class Surface:
+    surface_types = ["Asphere", "Sphere", "Circle", "Rectangle", "Point", "Line", "Function", "Data", "Ring"]
 
     def __init__(self,
                  surface_type:  str,
@@ -31,7 +32,7 @@ class Surface:
         The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
         adapted inside the lens class
 
-        :param surface_type: "Asphere", "Sphere", "Circle", "Ring" or "Data" (string)
+        :param surface_type: "Asphere", "Sphere", "Circle", "Rectangle", "Function",  "Ring" or "Data" (string)
         :param rho: curvature constant (=1/R) for surface_type="Asphere" or "Sphere" (float)
         :param r: radial size for surface_type="Asphere", "Sphere", "Circle" or "Ring" (float)
         :param k: conic constant for surface_type="Asphere" (float)
@@ -45,39 +46,19 @@ class Surface:
         self.surface_type = surface_type
 
         self.pos = np.array([0., 0., 0.], dtype=np.float64)
-        self.pos.flags.writeable = False
         
         self.dim = np.array(dim, dtype=np.float64)
-        self.dim.flags.writeable = False
 
         self.Mask = np.array([], dtype=np.float64)
-        self.Mask.flags.writeable = False
 
         self.Z = np.array([], dtype=np.float64)
-        self.Z.flags.writeable = False
 
-        self.r, self.ri = float(r), float(ri)
-        self.rho, self.k = float(rho), float(k)
-        self.ang = float(ang)
+        self.r, self.ri = r, ri
+        self.rho, self.k = rho, k
+        self.ang = ang
         self.func = func
 
         self.eps = max(self.r / 1e6, 1e-12)
-
-        if r < 0:
-            raise ValueError("Surface radius r needs to be positive.")
-
-        if ri < 0:
-            raise ValueError("Inner Surface radius ri needs to be non-negative.")
-
-        if not isinstance(func, SurfaceFunction | None):
-            raise TypeError("func needs to be a SurfaceFunction object.")
-
-        if dim[0] <= 0 or dim[1] <= 0:
-            raise ValueError("Dimensions dim need to be positive.")
-
-        if self.rho == 0:
-            raise ValueError("rho needs to be non-zero. For a plane use surface_type=\"Circle\".")
-
 
         match surface_type:
 
@@ -95,15 +76,14 @@ class Surface:
                 self.maxz = None
 
                 self.minz = self.pos[2] if self.rho > 0 \
-                                    else self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
+                                        else self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
                 self.maxz = self.pos[2] if self.rho < 0 \
-                                    else self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
+                                        else self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
 
             case "Data":
    
                 self.Z = np.array(Data, dtype=np.float64)
                 self.Mask = np.isfinite(self.Z)
-                self.Mask.flags.writeable = False
                 self.Z = misc.interpolateNan(self.Z)
 
                 ny, nx = self.Z.shape
@@ -121,7 +101,6 @@ class Surface:
 
                 # remove offset at center
                 self.Z -= misc.ValueAt(self.xy, self.xy, self.Z, 0, 0)
-                self.Z.flags.writeable = False
 
             case "Function":
                 self.minz = self.pos[2] + self.func.minz
@@ -149,28 +128,17 @@ class Surface:
             case _:
                 raise ValueError("Invalid surface_type")
 
-        self._lock = True
-
-    def copy(self) -> 'Surface':
-        """
-
-        :return:
-        """
-        return copy.deepcopy(self)
+        self.lock()
 
     def hasHitFinding(self) -> bool:
-        """
+        """return if this surface has an analytic hit finding method implemented"""
 
-        :return:
-        """
         return self.surface_type in ["Circle", "Ring", "Rectangle", "Sphere", "Asphere"] \
                 or (self.surface_type == "Function" and self.func.hasHits())
 
     def isPlanar(self) -> bool:
-        """
+        """return if the surface has no extent in z-direction"""
 
-        :return:
-        """
         return self.surface_type in ["Circle", "Ring", "Rectangle", "Point", "Line"]
     
     def moveTo(self, pos: (list | np.ndarray)) -> None:
@@ -186,8 +154,8 @@ class Surface:
 
         # update position
         self.pos = np.array(pos, dtype=np.float64)
-        self.pos.flags.writeable = False
-        self._lock = True
+        
+        self.lock()
 
     def getExtent(self) -> tuple[float, float, float, float, float, float]:
         """
@@ -203,12 +171,12 @@ class Surface:
             case "Rectangle":
                 return *(self.pos[:2].repeat(2) + self.dim.repeat(2)/2 * np.array([-1, 1, -1, 1])), \
                         self.minz, self.maxz
-
+                
             case "Line":
-                return self.pos[0] - self.r*np.cos(self.ang),\
-                       self.pos[0] + self.r*np.cos(self.ang),\
-                       self.pos[1] - self.r*np.sin(self.ang),\
-                       self.pos[1] + self.r*np.sin(self.ang),\
+                return self.pos[0] - self.r * np.cos(self.ang),\
+                       self.pos[0] + self.r * np.cos(self.ang),\
+                       self.pos[1] - self.r * np.sin(self.ang),\
+                       self.pos[1] + self.r * np.sin(self.ang),\
                        self.minz,\
                        self.maxz
             case _:
@@ -225,20 +193,16 @@ class Surface:
         match self.surface_type:
             case ("Asphere" | "Sphere"):
 
-                x0, y0, z0 = self.pos
-                r2 = misc.calc("(x-x0)**2 + (y-y0)**2")
+                r2 = misc.calc("(x-x0)**2 + (y-y0)**2", x0=self.pos[0], y0=self.pos[1])
 
                 inside = r2 <= self.r**2
 
                 z = np.full_like(r2, self.maxz, dtype=np.float64)
 
-                rho, k = self.rho, self.k
-                z[inside] = misc.calc("z0 + rho*r2i/(1 + sqrt(1 - (k+1)* rho**2 *r2i))", r2i=r2[inside])
+                z[inside] = misc.calc("z0 + rho*r2i/(1 + sqrt(1 - (k+1)* rho**2 *r2i))",\
+                                      r2i=r2[inside], k=self.k, rho=self.rho, z0=self.pos[2])
 
                 return z
-
-            case "Function":
-                return self.pos[2] + self.func.getValues(x-self.pos[0], y-self.pos[1])
 
             case "Data":
                 xs, xe, ys, ye, _, _ = self.getExtent()
@@ -247,9 +211,13 @@ class Surface:
                 z = np.full(x.shape, self.maxz, dtype=np.float64)
 
                 if np.count_nonzero(inside):
-                    z[inside] = self.pos[2] + misc.interp2d(self.xy, self.xy, self.Z, x[inside] - self.pos[0], y[inside] - self.pos[1])
+                    z[inside] = self.pos[2] + misc.interp2d(self.xy, self.xy, self.Z,\
+                                                            x[inside] - self.pos[0], y[inside] - self.pos[1])
 
                 return z
+            
+            case "Function":
+                return self.pos[2] + self.func.getValues(x-self.pos[0], y-self.pos[1])
 
             case ("Circle" | "Ring" | "Rectangle"):
                 return np.full(x.shape, self.pos[2], dtype=np.float64)
@@ -258,8 +226,6 @@ class Surface:
                 raise RuntimeError(f"Surface value function not defined for surface_type {self.surface_type}")
 
     # TODO Kommentare
-    # TODO Point and Line
-    # TODO im Fall Blende Ringbereich formen in der Mitte
     def getPlottingMesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
@@ -270,10 +236,13 @@ class Surface:
         """
         if self.surface_type == "Rectangle":
             xs, xe, ys, ye, _, _ = self.getExtent()
+
             x = np.linspace(xs, xe, N)
             y = np.linspace(ys, ye, N)
+            
             X, Y = np.meshgrid(x, y)
             Z = np.full_like(Y, self.pos[2], dtype=np.float64)
+            
             return X, Y, Z
     
         if self.surface_type in ["Point", "Line"]:
@@ -317,10 +286,10 @@ class Surface:
                 mask5 = (R < self.ri) & (R > 2/3*self.ri)
 
             # move points onto the two circles
-            X[mask4] = self.pos[0] + (self.ri - self.eps)*np.cos(Phi[mask4])
-            Y[mask4] = self.pos[1] + (self.ri - self.eps)*np.sin(Phi[mask4])
-            X[mask5] = self.pos[0] + (self.ri + self.eps)*np.cos(Phi[mask5])
-            Y[mask5] = self.pos[1] + (self.ri + self.eps)*np.sin(Phi[mask5])
+            X[mask4] = self.pos[0] + (self.ri - self.eps) * np.cos(Phi[mask4])
+            Y[mask4] = self.pos[1] + (self.ri - self.eps) * np.sin(Phi[mask4])
+            X[mask5] = self.pos[0] + (self.ri + self.eps) * np.cos(Phi[mask5])
+            Y[mask5] = self.pos[1] + (self.ri + self.eps) * np.sin(Phi[mask5])
 
         # plot nan values inside
         mask3 = self.getMask(X.ravel(), Y.ravel())
@@ -370,7 +339,6 @@ class Surface:
             case _:
                 raise RuntimeError(f"Mask function not defined for surface_type {self.surface_type}.")
 
-
     def getNormals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get normal vectors of the surface.
@@ -397,8 +365,7 @@ class Surface:
 
             case ("Sphere" | "Asphere"):
 
-                x0, y0 = self.pos[:2]
-                r = misc.calc("sqrt((x-x0)**2 + (y-y0)**2)")
+                r = misc.calc("sqrt((x-x0)**2 + (y-y0)**2)", x0=self.pos[0], y0=self.pos[1])
                 phi = misc.calc("arctan2(y, x)")
 
                 # the derivative of a conic section formula is
@@ -413,8 +380,7 @@ class Surface:
                 #       n_z = +sqrt(1 - n_r**2)
                 # this holds true since n_z is always positive in our raytracer
 
-                rho, k = self.rho, self.k
-                n_r = misc.calc("-rho*r/sqrt(1 - k*r**2*rho**2)")
+                n_r = misc.calc("-rho*r/sqrt(1 - k*r**2*rho**2)", k=self.k, rho=self.rho)
 
                 n = np.zeros((x.shape[0], 3), dtype=np.float64, order='F')
 
@@ -609,19 +575,39 @@ class Surface:
             case _:
                 raise RuntimeError(f"Hit finding not defined for surface_type {self.surface_type}.")
 
-
-    def crepr(self):
-        """ Compact state representation using only lists and immutable types """
-        return [self.surface_type, self.r, self.ri, self.k, self.rho, self.ang, self.minz, 
-                self.maxz, tuple(self.pos), tuple(self.dim), id(self.Z), 
-                id(self.Mask), self.eps, (self.func.crepr() if self.func is not None else None)]
-
-    def __str__(self):
-        return f"{self.__class__.__name__} at {hex(id(self))} with {self.__dict__}"
-
     def __setattr__(self, key, val):
 
-        if "_lock" in self.__dict__ and self._lock and key != "_lock":
-            raise RuntimeError("Changing Surface properties after initialization is prohibited. Create a new Surface and assign it to the parent object.")
+        match key:
+
+            case "surface_type":
+                if not isinstance(val, str):
+                    raise TypeError(f"{key} needs to be of type str.")
+                if val not in self.surface_types:
+                    raise ValueError("Invalid surface_type.")
+
+            case ("r" | "rho" | "k" | "ri" | "ang"):
+                if not isinstance(val, float | int):
+                    raise TypeError(f"{key} needs to be of type int or float.")
+                val = float(val)
+
+                if key == "r" and val < 0:
+                    raise ValueError("Surface radius r needs to be positive.")
+
+                if key == "ri" and val < 0:
+                    raise ValueError("Inner Surface radius ri needs to be non-negative.")
         
-        self.__dict__[key] = val
+                if key == "rho" and val == 0:
+                    raise ValueError("rho needs to be non-zero. For a plane use surface_type=\"Circle\".")
+
+            case "func" if not isinstance(val, SurfaceFunction | None):
+                raise TypeError("func needs to be a SurfaceFunction object.")
+
+            case "dim":
+                if not isinstance(val, np.ndarray):
+                    raise TypeError("dim needs to be of type np.ndarray")
+
+                if val[0] <= 0 or val[1] <= 0:
+                    raise ValueError("Dimensions dim need to be positive.")
+
+        super().__setattr__(key, val)
+

@@ -9,6 +9,7 @@ import optrace.tracer.Misc as misc
 from typing import Callable
 from optrace.tracer.Misc import timer as timer
 
+
 WL_MIN: float = 380.
 """lower bound of wavelength range in nm
 the wavelength range. Needs to be inside [380, 780] for the Tristimulus and Illuminant functions to work
@@ -17,8 +18,14 @@ Note that shrinking that range may lead to color deviations"""
 WL_MAX: float = 780.
 """upper bound of wavelength range in nm"""
 
+
+ILLUMINANTS = ["A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]
+
+TRISTIMULI = ["X", "Y", "Z"]
+
 _WP_D65_XYZ = [0.950489, 1.00000, 1.08840]
 _WP_D65_LUV = [100, 0.1978398248, 0.4683363029]
+
 
 def wavelengths(N: int) -> np.ndarray:
     """
@@ -27,6 +34,7 @@ def wavelengths(N: int) -> np.ndarray:
     :return:
     """
     return np.linspace(WL_MIN, WL_MAX, N)
+
 
 def Blackbody(wl: np.ndarray, T: (int | float) = 6504) -> np.ndarray:
     """
@@ -56,7 +64,7 @@ def Gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     """
     return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 * (x - mu) ** 2 / sig ** 2)
 
-
+# TODO nach 0 und +inf mit 0 erweitern
 def Tristimulus(wl: np.ndarray, name: str) -> np.ndarray:
     """
     Get tristimulus CIE 1931 2° observer data at specified wavelengths.
@@ -73,23 +81,21 @@ def Tristimulus(wl: np.ndarray, name: str) -> np.ndarray:
     array([0.323, 0.631])
     """
 
-    choices = ["X", "Y", "Z"]
-
-    if name not in choices:
+    if name not in TRISTIMULI:
         raise ValueError("Invalid Tristimulus Type")
 
-    ind = choices.index(name)
+    ind = TRISTIMULI.index(name)
     observer = colorio.observers.cie_1931_2()
     return misc.interp1d(observer.lmbda_nm, observer.data[ind], wl)
 
-
+# TODO how to handle wavelengths outside visible range [WL_MIN, WL_MAX]
 def Illuminant(wl: np.ndarray, name: str) -> np.ndarray:
     """
     Get Illuminant data at specified wavelengths.
     Uses :obj:`colorio.illuminants` for curve data with additional interpolation.
 
     :param wl: wavelength vector
-    :param name: One of "A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11".
+    :param name: One of Color.ILLUMINANTS
     :return:    
 
     >>> Illuminant(np.array([500, 600]), "D50")
@@ -99,7 +105,7 @@ def Illuminant(wl: np.ndarray, name: str) -> np.ndarray:
     array([109.3545,  90.0062])
     """
 
-    if name not in ["A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]:
+    if name not in ILLUMINANTS:
         raise ValueError("Invalid Illuminant Type")
 
     illu = eval(f"colorio.illuminants.{name.lower()}()")
@@ -161,11 +167,12 @@ def sRGB_to_XYZ(RGB: np.ndarray) -> np.ndarray:
 
     return XYZ
 
-def outside_sRGB(XYZ):
 
+def outside_sRGB(XYZ: np.ndarray) -> np.ndarray:
+    """"""
     return np.any(XYZ_to_sRGBLinear(XYZ) < 0, axis=2)
 
-# @timer
+
 def XYZ_to_sRGBLinear(XYZ_in: np.ndarray, normalize: bool = True, RI: str="Absolute") -> np.ndarray:
     """
     Conversion XYZ to linear RGB values.
@@ -297,7 +304,7 @@ def XYZ_to_sRGBLinear(XYZ_in: np.ndarray, normalize: bool = True, RI: str="Absol
         Luv = XYZ_to_Luv(XYZ)
 
         # invalid colors with Lightness above 0
-        mi, _ = misc.partMask(inv, Luv[inv, 0] > 0)
+        mi = misc.partMask(inv, Luv[inv, 0] > 0)
 
         Lm, um, vm = Luv[mi, 0], Luv[mi, 1], Luv[mi, 2]
         u_ = misc.calc("1/13 * um / Lm")
@@ -374,8 +381,10 @@ def XYZ_to_sRGB(XYZ: np.ndarray, normalize: bool = True) -> np.ndarray:
     RGB = sRGBLinear_to_sRGB(RGBL, normalize)
     return RGB
 
-# @timer
-def XYZ_to_Luv(XYZ) -> np.ndarray:
+
+def XYZ_to_Luv(XYZ: np.ndarray) -> np.ndarray:
+    """"""
+
     # all XYZ values need to be below that of D65 reference white,
     # we therefore need to normalize
     Xn, Yn, Zn = _WP_D65_XYZ
@@ -403,8 +412,8 @@ def XYZ_to_Luv(XYZ) -> np.ndarray:
     t = 1/nmax/Yn * Y
 
     mask2 = t > e  # t > e for L > 0
-    mask3, _ = misc.partMask(mask, mask2)  # Y > 0 and t > e
-    mask4, _ = misc.partMask(mask, ~mask2) # Y > 0 and not t > e
+    mask3 = misc.partMask(mask, mask2)  # Y > 0 and t > e
+    mask4 = misc.partMask(mask, ~mask2) # Y > 0 and not t > e
 
     Luv[mask3, 0] = misc.calc("116*tm**(1/3) - 16", tm=t[mask2])
     Luv[mask4, 0] = k * t[~mask2]
@@ -419,7 +428,9 @@ def XYZ_to_Luv(XYZ) -> np.ndarray:
 
     return Luv
 
-def Luv_to_XYZ(Luv) -> np.ndarray:
+
+def Luv_to_XYZ(Luv: np.ndarray) -> np.ndarray:
+    """"""
 
     # calculations are a rewritten from of
     # http://www.brucelindbloom.com/Eqn_Luv_to_XYZ.html
@@ -436,8 +447,8 @@ def Luv_to_XYZ(Luv) -> np.ndarray:
     k = 903.3
     e = 0.008856
     mask2 = L_ > k*e
-    mask3, _  = misc.partMask(mask, mask2)
-    mask4, _ = misc.partMask(mask, ~mask2)
+    mask3 = misc.partMask(mask, mask2)
+    mask4 = misc.partMask(mask, ~mask2)
 
     XYZ[mask3, 1] = misc.calc("((Lm+16)/116)**3", Lm=L_[mask2])
     XYZ[mask4, 1] = 1/k * L_[~mask2]
@@ -451,7 +462,8 @@ def Luv_to_XYZ(Luv) -> np.ndarray:
     return XYZ
 
 
-def getLuvSaturation(Luv) -> np.ndarray:
+def getLuvSaturation(Luv: np.ndarray) -> np.ndarray:
+    """"""
     # formula from https://en.wikipedia.org/wiki/Colorfulness#Saturation
     C = getLuvChroma(Luv)
 
@@ -462,13 +474,15 @@ def getLuvSaturation(Luv) -> np.ndarray:
     return Sat
 
 
-def getLuvChroma(Luv) -> np.ndarray:
+def getLuvChroma(Luv: np.ndarray) -> np.ndarray:
+    """"""
     # see https://en.wikipedia.org/wiki/Colorfulness#Chroma
     u, v = Luv[:, :, 1], Luv[:, :, 2]
-    return misc.calc("sqrt(u**2 + v**2)") # geom. mean of a and b
+    return misc.calc("sqrt(u**2 + v**2)")
 
 
-def getLuvHue(Luv) -> np.ndarray:
+def getLuvHue(Luv: np.ndarray) -> np.ndarray:
+    """"""
     # see https://en.wikipedia.org/wiki/Colorfulness#Chroma
     u, v = Luv[:, :, 1], Luv[:, :, 2]
     hue = misc.calc("arctan2(v, u)/pi*180")
@@ -535,7 +549,6 @@ def randomWavelengthFromRGB(RGB: np.ndarray) -> np.ndarray:
     return wl_out
 
 
-# TODO doctest
 def spectralCM(N: int, wl0: float = WL_MIN, wl1: float = WL_MAX) -> np.ndarray:
     """
     Get a spectral colormap with N steps

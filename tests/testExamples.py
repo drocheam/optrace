@@ -8,7 +8,7 @@ import subprocess
 
 class ExampleTests(unittest.TestCase):
 
-    def execute(self, str_, timeout=10):
+    def execute(self, str_, timeout=15):
 
         process = subprocess.Popen(str_)
         try:

@@ -12,19 +12,22 @@ import numpy as np
 import copy
 
 from optrace.tracer.Image import *
+from optrace.tracer.Detector import *
+from optrace.tracer.RaySource import *
 
-
-def DetectorPlot(Im: Image, mode: str = "sRGB", **kwargs) -> None:
+def DetectorPlot(Im: Image, mode: str = Image.display_modes[0], **kwargs) -> None:
     """
     Plot an Detector Image in Irradiance, Illuminance or RGB Mode.
     Also displays image position and flux on detector.
 
     :param Im: Image object
-    :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
+    :param mode: mode from Image.modes (string)
     """
-    index = f" {Im.index}" if Im.index is not None else ""
-    text = f"Detector{index} at z = {Im.z:.5g} mm"
-    
+    # index = f"{Im.index}" if Im.index is not None else ""
+    # text = f"{Detector.abbr}{index} at z = {Im.z:.5g} mm"
+   
+    text = Im.desc
+
     match mode:
         case "Irradiance":      
             clabel = "Irradiance in W/mm²"
@@ -36,21 +39,22 @@ def DetectorPlot(Im: Image, mode: str = "sRGB", **kwargs) -> None:
 
         case _:                 
             clabel = mode
-            text += f"\n{mode} Image"
+            text += f"\nMode: {mode}"
 
     showImage(Im, clabel=clabel, text=text, mode=mode, **kwargs)
 
 
-def SourcePlot(Im: Image, mode: str = "sRGB", **kwargs) -> None:
+def SourcePlot(Im: Image, mode: str = Image.display_modes[0], **kwargs) -> None:
     """
     Plot an Source Image in Irradiance, Illuminance or RGB Mode.
     Also displays image position and flux on detector.
 
     :param Im: Image object
-    :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
+    :param mode: mode from Image.modes (string)
     """
-    index = f" {Im.index}" if Im.index is not None else ""
-    text = f"Source{index} at z = {Im.z:.5g} mm"
+    # index = f"{Im.index}" if Im.index is not None else ""
+    # text = f"{RaySource.abbr}{index} at z = {Im.z:.5g} mm"
+    text = Im.desc
     
     match mode:
         case "Irradiance":      
@@ -63,13 +67,13 @@ def SourcePlot(Im: Image, mode: str = "sRGB", **kwargs) -> None:
 
         case _:                 
             clabel = mode
-            text += f"\n{mode} Image"
+            text += f"\nMode: {mode}"
 
     showImage(Im, clabel=clabel, text=text, mode=mode, **kwargs)
 
 
-# TODO outsource mode calculations? takes long for 1MP image size and above
 def showImage(Im_in:    Image,
+              Imc:      np.ndarray=None,
               block:    bool = False,
               log:      bool = False,
               flip:     bool = False,
@@ -81,6 +85,7 @@ def showImage(Im_in:    Image,
     Shared plotting function for DetectorImage() and SourceImage(), call these functions for plotting instead.
 
     :param Im_in: Image from Raytracer SourceImage/DetectorImage function, numpy 3D array shape (N, N, 5)
+    :param Imc: precalculated Image (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
     :param block: if plot is blocking (bool)
     :param log: if logarithmic values are shown (bool)
     :param text: Title text to display (string)
@@ -88,17 +93,7 @@ def showImage(Im_in:    Image,
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
 
-    match mode:
-        case "Irradiance":              Im = Im_in.getIrradiance()
-        case "Illuminance":             Im = Im_in.getIlluminance()
-        case "sRGB (Absolute RI)":      Im = Im_in.getRGB(log=log, RI="Absolute")
-        case "sRGB (Perceptual RI)":    Im = Im_in.getRGB(log=log, RI="Perceptual")
-        case "Outside sRGB Gamut":      Im = Im_in.getOutsidesRGB()
-        case "Lightness (CIELUV)":      Im = Im_in.getLuvLightness()
-        case "Hue (CIELUV)":            Im = Im_in.getLuvHue()
-        case "Chroma (CIELUV)":         Im = Im_in.getLuvChroma()
-        case "Saturation (CIELUV)":     Im = Im_in.getLuvSaturation()
-        case _:                         raise ValueError("Invalid image mode.")
+    Im = Imc.copy() if Imc is not None else Im_in.getByDisplayMode(mode, log=log)
 
     # fall back to linear values when all pixels have the same value
     if log and (np.max(Im) == np.min(Im) or mode == "Outside sRGB Gamut"):
@@ -132,7 +127,7 @@ def showImage(Im_in:    Image,
     plt.imshow(Im, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, vmin=vmin, vmax=vmax)
 
     # plot labels
-    if Im_in.image_type == "Polar":
+    if Im_in.coordinate_type == "Polar":
         plt.xlabel(r"$\theta_x$ / °")
         plt.ylabel(r"$\theta_y$ / °")
     else:

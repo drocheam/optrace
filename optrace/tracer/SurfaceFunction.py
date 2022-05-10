@@ -3,9 +3,9 @@ import numpy as np
 from typing import Callable
 import warnings
 
+from optrace.tracer.BaseClass import *
 
-# TODO check if working
-class SurfaceFunction:
+class SurfaceFunction(BaseClass):
 
     def __init__(self,
                  func:          Callable[[np.ndarray, np.ndarray], np.ndarray],
@@ -27,7 +27,7 @@ class SurfaceFunction:
         :param maxz:
         """
         self.func = func
-        self.r = float(r)
+        self.r = r
         self.mask = mask
         self.derivative = derivative
         self.hits = hits
@@ -46,43 +46,37 @@ class SurfaceFunction:
         self._lock = True
 
     def hasDerivative(self) -> bool:
-        """
-
-        :return:
-        """
+        """returns if a derivative function is implemented"""
         return self.derivative is not None
 
     def hasHits(self) -> bool:
-        """
-
-        :return:
-        """
+        """returns if a hit fining function is implemented"""
         return self.hits is not None
 
     def getHits(self, p: np.ndarray, s: np.ndarray) -> np.ndarray:
         """
 
-        :param p:
-        :param s:
-        :return:
+        :param p: support vector array, shape (N, 3)
+        :param s: direction vector array, shape (N, 3)
+        :return: hit position vector array, shape (N, 3)
         """
         return self.hits(p, s)
 
     def getDerivative(self, x: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
 
-        :param x:
-        :param y:
-        :return:
+        :param x: x coordinate array
+        :param y: y coordinate array
+        :return: partial derivative in x direction and y direction
         """
         return self.derivative(x, y)
 
     def getMask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
 
-        :param x:
-        :param y:
-        :return:
+        :param x: x coordinate array
+        :param y: y coordinate array
+        :return: bool array
         """
         # values outside circle are masked out
         m = np.zeros_like(x, dtype=bool)
@@ -94,10 +88,11 @@ class SurfaceFunction:
 
     def getValues(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
+        Calculate the Values on the Surface.
 
-        :param x:
-        :param y:
-        :return:
+        :param x: x coordinate array
+        :param y: y coordinate array
+        :return: z coordinate array
         """
         inside = x**2 + y**2 <= self.r**2
 
@@ -108,8 +103,9 @@ class SurfaceFunction:
 
     def __findBounds(self) -> tuple[float, float]:
         """
+        Estimate min and max z-value on Surface by sampling dozen values.
 
-        :return:
+        :return: min and max z-value on Surface
         """
         # how to regularly sample a circle area, while sampling 
         # as much different phi and r values as possible?
@@ -152,14 +148,16 @@ class SurfaceFunction:
 
         return minz, maxz
 
-    def crepr(self):
-        """ Compact state representation using only lists and immutable types """
-        return [self.r, self.off, self.minz, self.maxz, id(self.derivative), id(self.func), id(self.hits), id(self.mask)]
-
     def __setattr__(self, key, val):
 
-        if "_lock" in self.__dict__ and self._lock: # and key != "_lock":
-            raise RuntimeError("Changing SurfaceFunction properties after initialization is prohibited."\
-                               "Create a new SurfaceFunction and assign it to the parent Surface.")
-        
-        self.__dict__[key] = val
+        match key:
+            case ("r" | "off" | "maxz" | "minz"):
+                if not isinstance(val, float | int):
+                    raise TypeError(f"{key} needs to be of type float or int.")
+                val = float(val)
+
+            case ("derivative" | "func" | "hits" | "mask") if val is not None and not callable(val):
+                raise TypeError(f"{key} needs to be callable.")
+
+        super().__setattr__(key, val)
+

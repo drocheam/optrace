@@ -12,9 +12,12 @@ from optrace.tracer.Surface import *  # for the Aperture surface
 
 class Aperture(SObject):
 
+    abbr = "AP"
+
     def __init__(self, 
                  Surface:       Surface, 
-                 pos:           (list | np.ndarray))\
+                 pos:           (list | np.ndarray),
+                 **kwargs)\
             -> None:
         """
         Create a Aperture object.
@@ -23,10 +26,7 @@ class Aperture(SObject):
         :param pos: 3D position of Aperture center (numpy array or list)
         """
 
-        super().__init__(Surface, pos)
-
-        self.name = "Aperture"
-        self.short_name = "AP"
+        super().__init__(Surface, pos, **kwargs)
       
         self._new_lock = True
 

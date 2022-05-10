@@ -10,24 +10,27 @@ from optrace.tracer.Surface import *  # for the Detector surface
 from optrace.tracer.SObject import *
 import optrace.tracer.Misc as misc
 
-# TODO reference point for the angle calculation
 
 class Detector(SObject):
 
+    abbr = "DET"
+
     def __init__(self,
                  Surface:   Surface,
-                 pos:       (list | np.ndarray))\
+                 pos:       (list | np.ndarray),
+                 ar:        float=2.,
+                 **kwargs)\
             -> None:
         """
         Create a Detector object.
 
         :param Surface: the Detector surface
         :param pos: position in 3D space
+        :param ar: rho factor for AngleCoordinate Transformation
         """
-        super().__init__(Surface, pos)
+        super().__init__(Surface, pos, **kwargs)
 
-        self.name = "Detector"
-        self.short_name = "DET"
+        self.ar = float(ar)
         
         if not self.Surface.hasHitFinding:
             raise RuntimeError(f"surface_type '{Surface.surface_type}' has no hit finding functionality.")
@@ -44,12 +47,11 @@ class Detector(SObject):
             raise RuntimeError(f"No angle conversion defined for surface_type '{self.Surface.surface_type}'.")
 
         Surf = self.Surface
-        zm = Surf.pos[2] + 2/Surf.rho
-        ze = Surf.getEdge(nc=1)[2][0]
+        zm = Surf.pos[2] + self.ar/Surf.rho
+        ze = Surf.getEdge(nc=1)[2][0] # TODO what if no rotational symmetry?
 
         theta = np.arctan(Surf.r/np.abs(ze-zm))*180/np.pi
         return np.array([-theta, theta, -theta, theta])
-
 
     def toAngleCoordinates(self, p: np.ndarray) -> np.ndarray:
         """
@@ -66,7 +68,7 @@ class Detector(SObject):
         x, y, z = p[:, 0], p[:, 1], p[:, 2]
         x0, y0, z0 = Surf.pos
 
-        zm = z0 + 2/Surf.rho
+        zm = z0 + self.ar/Surf.rho
         r = misc.calc("sqrt((x-x0)**2  + (y-y0)**2)")
 
         theta = misc.calc("arctan(r/abs(z-zm))*180/pi")

@@ -15,20 +15,20 @@ RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
 # add Raysource
 RSS = ot.Surface("Circle", r=1)
-RS = ot.RaySource(RSS, direction_type="Parallel", light_type="Lines",
-               pos=[0, 0, 0], s=[0, 0, 1], polarization_type="y")
+RS = ot.RaySource(RSS, direction_type="Parallel", spectrum=ot.preset_spec_FDC,
+               pos=[0, 0, 0], s=[0, 0, 1], polarization_type="y", desc="Centered Circle")
 RT.add(RS)
 
 RSS2 = ot.Surface("Circle", r=1)
-RS2 = ot.RaySource(RSS2, direction_type="Parallel", s=[0, 0, 1], light_type="D65",
-                pos=[0, 1, -3], polarization_type="Angle", pol_ang=25, power=2)
+RS2 = ot.RaySource(RSS2, direction_type="Parallel", s=[0, 0, 1], spectrum=ot.preset_spec_D65,
+                pos=[0, 1, -3], polarization_type="Angle", pol_ang=25, power=2, desc="Decentered Circle")
 ident = RT.add(RS2)
 
 
 # add Lens 1
 front = ot.Surface("Asphere", r=3, rho=1/10, k=-0.444)
 back = ot.Surface("Asphere", r=3, rho=-1/10, k=-7.25)
-nL1 = ot.RefractionIndex("Cauchy", A=1.49, B=0.00354)
+nL1 = ot.RefractionIndex("Cauchy", coeff=[1.49, 0.00354])
 L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 10], n=nL1)
 RT.add(L1)
 
@@ -57,7 +57,8 @@ ap = ot.Surface("Circle", r=1, ri=0.005)
 def func(l):
     return np.exp(-0.5*(l-460)**2/20**2)
 
-RT.add(ot.Filter(ap, pos=[0, 0, 45.2], filter_type="Function", func=func))
+fspec = ot.Spectrum("Function", func=func)
+RT.add(ot.Filter(ap, pos=[0, 0, 45.2], spectrum=fspec))
 
 
 # add Detector

@@ -15,11 +15,11 @@ def func2(N2):
 
     # add Raysource
     RSS = Surface("Circle", r=1)
-    RS = RaySource(RSS, direction_type="Parallel", light_type="Blackbody",
+    RS = RaySource(RSS, direction_type="Parallel", spectrum=Spectrum("Blackbody", T=5500),
                    pos=[0, 0, 0], s=[0, 0, 1], polarization_type='y')
     RT.add(RS)
 
-    RS2 = RaySource(RSS, direction_type="Parallel", light_type="D65",
+    RS2 = RaySource(RSS, direction_type="Parallel", spectrum=preset_spec_D65,
                    pos=[0, 1, 0], s=[0, 0, 1], polarization_type='x', power=2)
     RT.add(RS2)
 
@@ -32,7 +32,7 @@ def func2(N2):
     # add Lens 1
     front = Surface(surface_type="Asphere", r=3, rho=1/10, k=-0.444)
     back = Surface(surface_type="Asphere", r=3, rho=-1/10, k=-7.25)
-    nL1 = RefractionIndex("Cauchy", A=1.49, B=0.00354)
+    nL1 = RefractionIndex("Cauchy", coeff=[1.49, 0.00354])
     L1 = Lens(front, back, de=0.1, pos=[0, 0, 10], n=nL1)
     RT.add(L1)
 
@@ -45,7 +45,7 @@ def func2(N2):
 
     # add Aperture
     ap = Surface(surface_type="Ring", r=1, ri=0.01)
-    RT.add(Filter(ap, pos=[0, 0, 20.3]))
+    RT.add(Aperture(ap, pos=[0, 0, 20.3]))
 
     # add Lens 3
     front = Surface(surface_type="Sphere", r=1, rho=1/2.2)
@@ -64,7 +64,8 @@ def func2(N2):
         w[l <= 500] = 1
         return w
 
-    RT.add(Filter(ap, pos=[0, 0, 45.2], filter_type="Function", func=func))
+    fspec = Spectrum("Function", func=func)
+    RT.add(Filter(ap, pos=[0, 0, 45.2], spectrum=fspec))
 
     # add Detector
     Det = Detector(Surface(surface_type="Rectangle", dim=[3, 3]), pos=[0, 0, 60])

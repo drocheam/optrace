@@ -5,18 +5,21 @@ import warnings
 import numpy as np
 from optrace.tracer.RaySource import *
 import optrace.tracer.Misc as misc
+from optrace.tracer.BaseClass import *
 from optrace.tracer.Misc import timer as timer
 
-class RayStorage:
+
+class RayStorage(BaseClass):
 
     N_list = np.array([], dtype=int)
     B_list = np.array([], dtype=int)
+    
+    def init(self, RaySourceList, N, nt, no_pol=False):
+        """
+        """
+        self._lock = False
+        self.no_pol = no_pol
 
-    def init(self, RaySourceList, N, nt):
-        """
-        """
-        self._locked = False
-        
         # all rays have the same starting power.
         # The rays are distributed between the sources according to the ray source power
         # get source powers and overall power
@@ -38,13 +41,16 @@ class RayStorage:
         self.B_list = np.concatenate(([0], np.cumsum(self.N_list))).astype(int)
         self.RaySourceList = RaySourceList
 
+        # save some storage space if we need the space only for nans when self.no_pol = True
+        pol_dtype = np.float32 if not self.no_pol else np.float16
+
         # weights, polarization and wavelengths don't need double precision, this way we save some RAM
         # fortran order='F' speeds things up around 20% in our application
         self.p_list      = np.zeros((N, nt, 3), dtype=np.float64, order='F')
         self.s0_list     = np.zeros((N, 3),     dtype=np.float64, order='F')
-        self.pol_list    = np.zeros((N, nt, 3), dtype=np.float32, order='F')
+        self.pol_list    = np.zeros((N, nt, 3), dtype=pol_dtype,  order='F')
         self.w_list      = np.zeros((N, nt),    dtype=np.float32, order='F')
-        self.wl_list     = np.zeros((N,),       dtype=np.float32, order='F')     
+        self.wl_list     = np.zeros(N,          dtype=np.float32)     
 
     @property
     def N(self) -> int:
@@ -56,7 +62,7 @@ class RayStorage:
         """number of ray sections"""
         return self.p_list.shape[1] if self.N_list.shape[0] else 0
     
-    def makeThreadRays(self, N_threads: int, Nt: int, no_pol: bool=False) \
+    def makeThreadRays(self, N_threads: int, Nt: int) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
 
@@ -80,169 +86,78 @@ class RayStorage:
             Nsi = max(Ns, self.B_list[i])
             Nei = min(self.B_list[i+1], Ne)
             sl1 = slice(Nsi, Nei)
+
             power = (Nei - Nsi) / self.N_list[i] * self.RaySourceList[i].power
 
-            self.p_list[sl1, 0],\
-            self.s0_list[sl1],   \
-            self.pol_list[sl1, 0],\
-            self.w_list[sl1, 0],   \
-            self.wl_list[sl1]       \
-                                     = self.RaySourceList[i].createRays(Nei-Nsi, no_pol=no_pol, power=power)
+            self.p_list[sl1, 0], self.s0_list[sl1], self.pol_list[sl1, 0], self.w_list[sl1, 0], self.wl_list[sl1]\
+                         = self.RaySourceList[i].createRays(Nei-Nsi, no_pol=self.no_pol, power=power)
+
             i += 1
 
-        return self.p_list[Ns:Ne], \
-               self.s0_list[Ns:Ne], \
-               self.pol_list[Ns:Ne], \
-               self.w_list[Ns:Ne],    \
-               self.wl_list[Ns:Ne]
+        return self.p_list[Ns:Ne], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne],  self.w_list[Ns:Ne], self.wl_list[Ns:Ne]
 
-
-    # TODO use last known s instead nan
-    def getRay(self, num: int, normalize: bool = True) \
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, float, int]:
-        """
-
-        :param num:
-        :param normalize:
-        :return:
-        """
-
-        if not self.N:
-            raise RuntimeError("RaySourceList has no rays stored.")
-
-        if num > self.N:
-            raise ValueError("Number exceeds number of rays")
-
-        snum = -1
-        for i in np.arange(len(self.N_list)):
-            Ns, Ne = self.B_list[i:i+2]
-            if Ns <= num < Ne:
-                snum = i 
-
-        s = self.p_list[num, 1:] - self.p_list[num, :-1]
-        s = np.concatenate((s, [s[-1]]))
-
-        if normalize:
-            norms = np.linalg.norm(s, axis=1)
-            s[norms == 0] = np.nan
-            s[norms != 0] = s[norms != 0] / norms[norms != 0, np.newaxis]
-
-        return self.p_list[num], s, self.pol_list[num], self.w_list[num], self.wl_list[num], snum
-
-    def getSourceRays(self, index: int)\
+    def getSourceSections(self, index: int | None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
 
         :param index:
         :return:
         """
-
         if not self.N:
             raise RuntimeError("RaySourceList has no rays stored.")
         
-        Ns, Ne = self.B_list[index:index+2] 
+        Ns, Ne = self.B_list[index:index+2] if index is not None else (0, self.N)
 
-        return self.p_list[Ns:Ne, 0], \
-               self.s0_list[Ns:Ne],    \
-               self.pol_list[Ns:Ne, 0], \
-               self.w_list[Ns:Ne, 0],    \
-               self.wl_list[Ns:Ne]
+        return self.p_list[Ns:Ne, 0], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne, 0],\
+               self.w_list[Ns:Ne, 0], self.wl_list[Ns:Ne]
 
-    # TODO schöner machen
-    # TODO was bei s = [0, 0, 0] und normalize=False?
     def getRaysByMask(self,
                       ch:           np.ndarray,
                       ch2:          np.ndarray = None,
-                      normalize:    bool = True,
-                      ret:          list[bool] = [True, True, True, True, True, True]) \
-            -> tuple[(np.ndarray | None),
-                     (np.ndarray | None),
-                     (np.ndarray | None),
-                     (np.ndarray | None),
-                     (np.ndarray | None),
-                     (np.ndarray | None)]:
+                      snum:         int = None,
+                      ret:          list[bool | int] = [1, 1, 1, 1, 1, 1]) \
+            -> tuple[(np.ndarray | None), (np.ndarray | None), (np.ndarray | None),
+                     (np.ndarray | None), (np.ndarray | None), (np.ndarray | None)]:
         """
 
-        :param ch:
+        :param ch: bool array
         :param ch2:
-        :param normalize:
         :param ret:
         :return:
         """
-        # choice: bool array
 
         if not self.N:
             raise RuntimeError("RaySourceList has no rays stored.")
-        
-        if not ret[5]:
-            snums = None
-        else:
+       
+        ch2 = slice(None) if ch2 is None else ch2
+
+        # calculate source numbers
+        if ret[5]:
             ind = np.nonzero(ch)[0]
             snums = np.zeros_like(ind, dtype=int)
-            for i in np.arange(len(self.N_list)):
+            for i, _ in enumerate(self.N_list):
                 Ns, Ne = self.B_list[i:i+2]
-                snums[(ind >= Ns) & (ind < Ne)] = i
-            snums += 1
+                snums[(Ns <= ind) & (ind < Ne)] = i
 
-        if not ret[1]:
-            s = None
-            if ch2 is None:
-                ch2 = slice(None)
-        else:
-            if ch2 is None:
-                ch2 = slice(None)
-                s = self.p_list[ch, 1:] - self.p_list[ch, :-1]
-                s = np.hstack((s, s[:, np.newaxis, -1]))
+        # calculate s
+        if ret[1]:
+            s = self.p_list[ch, 1:] - self.p_list[ch, :-1]
+            s = np.hstack((s, s[:, np.newaxis, -1]))
 
-                if normalize:
-                    norms = np.linalg.norm(s, axis=2)
-                    mask = norms != 0
-                    s[mask] /= norms[mask][:, np.newaxis]
-                    s[~mask] = np.nan
+            if not isinstance(ch2, slice):
+                s = s[np.ones(s.shape[0], dtype=bool), ch2]
+                misc.normalize(s)
             else:
-                # init s vector
-                s = np.zeros((ch2.shape[0], 3), dtype=np.float64)
+                s_ = s.reshape((s.shape[0]*s.shape[1], 3))
+                misc.normalize(s_)
+                s = s_.reshape(s.shape)
 
-                # rays outside mask have no s vector, since they are absorbed at the last outline area
-                mask = ch2 + 1 < self.nt
-                chm = np.zeros_like(ch, dtype=bool)
-                chm[ch] = mask
-
-                s[mask] = self.p_list[chm, ch2[mask]+1] - self.p_list[chm, ch2[mask]]
-
-                if normalize:
-                    misc.normalize(s)
-
-        p   = self.p_list[ch, ch2]   if ret[0] else None
-        pol = self.pol_list[ch, ch2] if ret[2] else None
-        w   = self.w_list[ch, ch2]   if ret[3] else None
-        wl  = self.wl_list[ch]       if ret[4] else None
+        p     = self.p_list[ch, ch2]    if ret[0] else None
+        s     = s                       if ret[1] else None
+        pol   = self.pol_list[ch, ch2]  if ret[2] else None
+        w     = self.w_list[ch, ch2]    if ret[3] else None
+        wl    = self.wl_list[ch]        if ret[4] else None
+        snums = snums                   if ret[5] else None
 
         return p, s, pol, w, wl, snums
-
-    def crepr(self):
-        """ Compact state representation using only lists and immutable types """
-        return [self.N, self.nt, tuple(self.N_list), tuple(self.B_list), 
-                    id(self.p_list), id(self.s0_list), id(self.pol_list), id(self.w_list), id(self.wl_list)]
-
-    # methods for signalising the user to not edit rays after raytracing
-    # since it's python he could find a workaround for this, but maybe knowing there's maybe a reason for locking stops him doing so
-
-    def lock(self):
-        """make storage read only"""
-
-        if self.p_list is not None:         self.p_list.flags.writeable = False
-        if self.s0_list is not None:        self.s0_list.flags.writeable = False
-        if self.w_list is not None:         self.w_list.flags.writeable = False
-        if self.wl_list is not None:        self.wl_list.flags.writeable = False
-        if self.pol_list is not None:       self.pol_list.flags.writeable = False
-
-        self._locked = True
-
-    def __setattr__(self, key, val):
-
-        if "_locked" in self.__dict__ and self._locked and key != "_locked":
-            raise RuntimeError("Operation not permitted since RayStorage is read-only outside raytracing.")
-
-        self.__dict__[key] = val
 

@@ -14,21 +14,20 @@ from PIL import Image as PILImage
 
 from optrace.tracer.Surface import * 
 from optrace.tracer.SObject import *
+from optrace.tracer.Spectrum import *
 from optrace.tracer.Misc import timer as timer
 import optrace.tracer.Misc as misc
 import optrace.tracer.Color as Color
 
-# TODO check light_type=Function
 # TODO remove BW_Image, ersetzen durch emittance_type = "Constant", "Image"
-# TODO welche lines sind typisch?
 # TODO Check: check image dimensions
 class RaySource(SObject):
 
     direction_types = ["Diverging", "Parallel"]
     orientation_types = ["Constant", "Function"]
     polarization_types = ["Angle", "Random", "x", "y", "xy"]
-    light_types = ["Monochromatic", "Blackbody", "Function", "Lines", "BW_Image", "RGB_Image",\
-                    "A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]
+
+    abbr = "RS"
 
     def __init__(self,
 
@@ -42,12 +41,8 @@ class RaySource(SObject):
                  sr_angle:          float = 20.,
 
                  # Light Parameters
-                 light_type:        str = "Monochromatic",
+                 spectrum:          Spectrum = None,
                  power:             float = 1.,
-                 wl:                float = 550.,
-                 lines:             (list | np.ndarray) = [486.13, 589.29, 656.27],
-                 spec_func:         Callable[[np.ndarray], np.ndarray] = None,
-                 T:                 float = 6504.,
                  Image:             (str | np.ndarray) = None,
                  
                  # Ray Orientation Parameters
@@ -56,7 +51,9 @@ class RaySource(SObject):
                 
                  # Polarization Parameters
                  polarization_type: str = "Random",
-                 pol_ang:           float = 0)\
+                 pol_ang:           float = 0,
+
+                 **kwargs)\
             -> None:
         """
         Create a RaySource with a specific source_type, direction_type and light_type.
@@ -64,18 +61,12 @@ class RaySource(SObject):
         :param Surface:
         :param direction_type: "Diverging" or "Parallel"
         :param orientation_type: "Constant" or "Function"
-        :param light_type: "Monochromatic", "Blackbody", "Function", "Lines", "BW_Image", "RGB_Image" 
-                            or one of "A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11".
         :param s: 3D direction vector
         :param sr_angle: cone opening angle in degree in mode direction_type="Diverging"
         :param pos: 3D position of RaySource center
-        :param wl: light wavelength in nm in mode light_type="Monochromatic"
-        :param spec_func: spectrum function for light_type="Function". Must take an argument in range [380, 780].
-        :param lines: wavelengths of spectral lines
         :param power: total power of RaySource in W
         :param pol: polarisation angle as float. Specify 'x' or 'y' for x- or y-polarisation, 'xy' for both
                     and leave empty for unpolarized light
-        :param T: blackbody color in K for light_type="Blackbody"
         :param or_func: orientation function for orientation_type="Function",
             takes 1D array of x and y coordinates as input, returns (N, 3) numpy 2D array with orientations
         :param Image: image for modes source_type="BW_Image" or "RGB_Image",
@@ -83,93 +74,34 @@ class RaySource(SObject):
         """
         self._new_lock = False
 
-        super().__init__(Surface, pos)
+        super().__init__(Surface, pos, **kwargs)
 
-        self.light_type = light_type
         self.direction_type = direction_type
         self.orientation_type = orientation_type
         self.polarization_type = polarization_type
-
-        if not Surface.isPlanar():
-            raise ValueError("Currently only planar surfaces are supported for RaySources.")
-
+        
         self.sr_angle = sr_angle
         self.pol_ang = pol_ang
         self.power = power
-        self.wl = wl
-        self.T = T
-
+        self.spectrum = spectrum
+        self.s = s
+        self.Image = Image
         self.or_func = or_func
-        self.spec_func = spec_func
 
-        self.name = "RaySource"
-        self.short_name = "RS"
-
-        # assign arrays, force conversion to np.array
-        self.s = np.array(s, dtype=np.float64) / np.linalg.norm(s)  # normalize
-        self.lines = np.array(lines, dtype=np.float32)
-
-        self.Image = np.array([], dtype=np.float64)
-
-        if light_type == "RGB_Image":
-            if isinstance(Image, str):
-                self.Image = np.asarray(PILImage.open(Image).convert("RGB"), dtype=np.float64) / 2**8
-            elif isinstance(Image, np.ndarray):
-                self.Image = np.array(Image, dtype=np.float64)
-            else:
-                raise ValueError("Invalid image format")
-
-            self.Image = np.flipud(self.Image)
-       
         # lock assignment of new properties. New properties throw an error.
         self._new_lock = True
 
-
-    def getColor(self) -> tuple[float, float, float]:
+    def getColor(self) -> tuple[float, float, float, float]:
         """
 
         :return:
         """
-
-        match self.light_type:
-
-            case "RGB_Image":
-                return np.mean(self.Image[:, :, 0]),\
-                       np.mean(self.Image[:, :, 1]),\
-                       np.mean(self.Image[:, :, 2])
-
-            case ("A" | "C" | "D50" | "D55" | "D65" | "D75" | "E" | "F2" | "F7" | "F11"):
-                wl = Color.wavelengths(4000)
-                spec = Color.Illuminant(wl, self.light_type)
+        if self.Image is not None:
+            return np.mean(self.Image[:, :, 0]), np.mean(self.Image[:, :, 1]),\
+                   np.mean(self.Image[:, :, 2]), 1.0
+        else:
+            return self.spectrum.getColor()
                 
-            case "Blackbody":
-                wl = Color.wavelengths(4000)
-                spec = Color.Blackbody(wl, T=self.T)
-            
-            case "Function":
-                wl = Color.wavelengths(4000)
-                spec = self.spec_func(wl)
-
-            case "Monochromatic":
-                wl = np.array([self.wl])
-                spec = np.array([1.])
-
-            case "Lines":
-                wl = np.array(self.lines)
-                spec = np.ones_like(wl)
-
-            case _:
-                raise RuntimeError(f"light_type '{self.light_type}' not handled in getColor()")
-
-        XYZ = np.array([[[np.sum(spec * Color.Tristimulus(wl, "X")),\
-                          np.sum(spec * Color.Tristimulus(wl, "Y")),\
-                          np.sum(spec * Color.Tristimulus(wl, "Z"))]]])
-
-        RGB = Color.XYZ_to_sRGB(XYZ)[0, 0]
-
-        return tuple(RGB)
-
-    # @timer
     def createRays(self, N: int, no_pol: bool = False, power: float=None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -189,44 +121,21 @@ class RaySource(SObject):
         ## Generate ray wavelengths
         ################################################################################################################
 
-        match self.light_type:
-
-            case "Monochromatic":
-                wavelengths = np.full(N, self.wl, dtype=np.float32)
-
-            case"Lines":
-                wavelengths = np.random.choice(self.lines, N)
-
-            case ("A" | "C" | "D50" | "D55" | "D65" | "D75" | "E" | "F2" | "F7" | "F11"):
-                wl = Color.wavelengths(4000)
-                wavelengths = misc.random_from_distribution(wl, Color.Illuminant(wl, self.light_type), N)
-
-            case "Blackbody":
-                wl = Color.wavelengths(4000)
-                wavelengths = misc.random_from_distribution(wl, Color.Blackbody(wl, T=self.T), N)
-            
-            case "Function":
-                if self.spec_func is None:
-                    raise ValueError("spec_func not defined for light_type='Function'")
-
-                wl = Color.wavelengths(10000)
-                wavelengths = misc.random_from_distribution(wl, self.spec_func(wl), N)
-
-            case "RGB_Image":
-                pass  # will be handled later
-
-            case _:
-                raise RuntimeError(f"light_type '{self.light_type}' not handled.")
+        if self.Image is None:
+            wavelengths = self.spectrum.randomWavelengths(N)
 
         ## Generate ray starting points
         ################################################################################################################
 
-        if self.light_type != "RGB_Image":
+        if self.Image is None:
             p = self.Surface.getRandomPositions(N)
 
         else:
             if self.Surface.surface_type != "Rectangle":
                 raise RuntimeError("Images can only be used with surface_type='Rectangle'")
+            
+            if self.Image is None:
+                raise RuntimeError("Image parameter missing")
 
             RGB = Color.sRGB_to_sRGBLinear(self.Image)  # physical brightness is proportional to RGBLinear signal
             If = np.sum(RGB, axis=2).flatten()  # brightness is sum of RGBLinear components
@@ -290,7 +199,6 @@ class RaySource(SObject):
                 # vector s has a component alpha in the sx-sy plane
                 theta_, alpha_ = theta[:, np.newaxis], alpha[:, np.newaxis]
                 s = misc.calc("cos(alpha_)*s_or + sin(alpha_)*(cos(theta_)*sx + sin(theta_)*sy)")
-                # print(np.sqrt(s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2))
 
             case _:
                 raise RuntimeError(f"direction_type '{self.direction_type}' not handled.")
@@ -306,16 +214,12 @@ class RaySource(SObject):
 
         else:
             match self.polarization_type:
-            
-                # polarization can be a value of a vector
                 case "x":       ang = 0.
                 case "y":       ang = np.pi/2
                 case "xy":      ang = np.random.choice([0, np.pi/2], N)
                 case "Angle":   ang = np.radians(self.pol_ang)
                 case "Random":  ang = np.random.uniform(0, 2*np.pi, N)
-        
-                case _:
-                    raise RuntimeError(f"polarization_type '{self.polarization_type}' not handled.")
+                case _:         raise RuntimeError(f"polarization_type '{self.polarization_type}' not handled.")
 
             # pol is rotated by an axis perpendicular to the plane of base direction s = [0, 0, 1] and the current direction s_
             # let's call this axis ps. The resulting polarization pol_ is perpendicular to s_ and has the same component at ps
@@ -323,8 +227,8 @@ class RaySource(SObject):
             # this is equivalent to a imaginary lens having focused pol-polarized parallel light. 
             # The resulting pol_ for each ray is the same as ours.
 
-            # ps = s_ x s = s x [0, 0, 1] = [s_1, -s_0, 0]/sqrt(s_0**2 + s_1**2)
-            # pp = ps x s = ps x [0, 0, 1] = [-s_0, s_1, 0]/sqrt(s_0**2 + s_1**2)
+            # ps = s_ x s = s_ x [0, 0, 1] = [s_1, -s_0, 0]/sqrt(s_0**2 + s_1**2)
+            # pp = ps x s = ps x [0, 0, 1] = [-s_0, -s_1, 0]/sqrt(s_0**2 + s_1**2)
             # pp_ = ps x s_
 
             # A_ts = ps * pol
@@ -348,7 +252,7 @@ class RaySource(SObject):
             ps0, ps1 = ps[:, 0], ps[:, 1]
             pol0m, pol1m = pols[mask, 0], pols[mask, 1]
             A_ts = misc.calc("ps0*pol0m + ps1*pol1m")[:, np.newaxis]
-            A_tp = misc.calc("ps1*pol0m + ps0*pol1m")[:, np.newaxis]
+            A_tp = misc.calc("ps1*pol0m - ps0*pol1m")[:, np.newaxis]
 
             pp_ = misc.cross(ps, sm)
             pols[mask] = misc.calc("A_ts*ps + A_tp*pp_")
@@ -358,61 +262,56 @@ class RaySource(SObject):
 
         return p, s, pols, weights, wavelengths
 
-    def crepr(self):
-        """ Compact state representation using only lists and immutable types """
-        # use id on self.lines and self.Image, for large array it would take too long otherwise.
-        # disadvantage: reassigning the same array changes the id
-        return [self.FrontSurface.crepr(), self.direction_type, self.light_type, self.orientation_type, 
-                self.polarization_type, self.sr_angle, self.pol_ang, self.power, self.wl, self.T,
-                id(self.or_func), id(self.spec_func), tuple(self.s), id(self.lines), id(self.Image)]
+    def __setattr__(self, key, val0):
 
+        # work on copies of ndarray and list, so initial objects are not overwritten
+        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
 
-    # handle assignment of properties and check values
-    def __setattr__(self, key, val):
+        match key:
 
-        if key == "s":
-            if not isinstance(val, list | np.ndarray):
-                raise TypeError("s needs to be of type list or numpy.ndarray")
-            val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
+            case "direction_type" if not isinstance(val, str) or val not in self.direction_types:
+                raise ValueError(f"Invalid direction_type '{val}'.")
 
-        if key == "direction_type" and (not isinstance(val, str) or val not in self.direction_types):
-            raise ValueError(f"Invalid direction_type '{val}'.")
+            case "orientation_type" if not isinstance(val, str) or val not in self.orientation_types:
+                raise ValueError(f"Invalid orientation_type '{val}'.")
 
-        if key == "light_type" and (not isinstance(val, str) or val not in self.light_types):
-            raise ValueError(f"Invalid light_type '{val}'.")
+            case "polarization_type" if not isinstance(val, str) or val not in self.polarization_types:
+                raise ValueError(f"Invalid polarization_type '{val}'.")
 
-        if key == "orientation_type" and (not isinstance(val, str) or val not in self.orientation_types):
-            raise ValueError(f"Invalid orientation_type '{val}'.")
+            case ("power" | "sr_angle" | "pol_ang"):
 
-        if key == "polarization_type" and (not isinstance(val, str) or val not in self.polarization_types):
-            raise ValueError(f"Invalid polarization_type '{val}'.")
+                if not isinstance(val, int | float):
+                    raise TypeError(f"{key} needs to be of type int or float.")
 
-        if key == "power" and (val <= 0 or not isinstance(val, int | float)):
-            raise ValueError(f"Source power needs to be positive, but is {val}.")
+                val = float(val)
 
-        if key == "T" and (val <= 0 or not isinstance(val, int | float)):
-            raise ValueError(f"Blackbody temperature T needs to be a positive number, but is {val}.")
-        
-        if key == "sr_angle" and (val <= 0 or not isinstance(val, int | float)):
-            raise ValueError(f"Cone angle sr_angle needs to be positive number, but is {val}.")
+                if key in ["power", "sr_angle"] and val <= 0:
+                    raise ValueError(f"{key} needs to be positive, but is {val}.")
 
-        if key == "lines":
-            if not isinstance(val, list | np.ndarray):
-                raise TypeError("lines needs to be of type list or np.ndarray")
+            case "s":
+                if not isinstance(val, list | np.ndarray):
+                    raise TypeError("s needs to be of type list or numpy.ndarray")
+                val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
 
-            val = np.array(val, dtype=np.float32)
-            if val.shape[0] == 0:
-                raise ValueError("'lines' can't be empty.")
+            case "spectrum" if not isinstance(val, Spectrum | None):
+                raise TypeError("spectrum needs to be of type Spectrum.")
 
-            if (wlo := np.min(val)) < Color.WL_MIN or (wlo := np.max(val)) > Color.WL_MAX:
-                raise ValueError(f"'lines' need to be inside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]"\
-                                 f", but got a value of {wlo}nm.")
+            case "or_func" if val is not None and not callable(val):
+                raise TypeError(f"{key} needs to be callable.")
 
-        if key == "Image" and not isinstance(val, np.ndarray):
-            raise ValueError("Invalid image format")
+            case "Image" if val is not None:
+                match val:
+                    case str():
+                        val = np.asarray(PILImage.open(val).convert("RGB"), dtype=np.float64) / 2**8
+                    case np.ndarray():
+                        val = np.array(val, dtype=np.float64)
+                    case _:
+                        raise TypeError("Invalid image format")
 
-        if key in ["sr_angle", "pol_ang", "power", "wl", "T"]:
-            val = float(val)
+                val = np.flipud(val)
+
+            case "FrontSurface" if isinstance(val, Surface) and not val.isPlanar():
+                raise ValueError("Currently only planar surfaces are supported for RaySources.")
 
         super().__setattr__(key, val)
 

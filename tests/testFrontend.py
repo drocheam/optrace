@@ -14,6 +14,8 @@ import optrace.gui.GUI as TraceGUI
 
 from threading import Thread
 
+import matplotlib.pyplot as plt
+
 class FrontendTests(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -31,7 +33,7 @@ class FrontendTests(unittest.TestCase):
 
         # add Raysource
         RSS = ot.Surface("Rectangle", dim=[4, 4])
-        RS = ot.RaySource(RSS, direction_type="Diverging", sr_angle=8, light_type="RGB_Image",
+        RS = ot.RaySource(RSS, direction_type="Diverging", sr_angle=8,
                        Image=Image, s=[0, 0, 1], pos=[0, 0, 0])
         RT.add(RS)
 
@@ -47,25 +49,21 @@ class FrontendTests(unittest.TestCase):
         Det = ot.Detector(DetS, pos=[0, 0, 36])
         RT.add(Det)
 
-       
         # subtest function with count and args output
         def TraceGUI_Run(**kwargs):
             TraceGUI_Run.i += 1
             with self.subTest(i=TraceGUI_Run.i, args=kwargs):
                 sim = TraceGUI(RT, **kwargs)
-                sim.run(exit=True, no_server=True, silent=True)
+                sim.run(_exit=True, no_server=True, silent=True)
         TraceGUI_Run.i = 0
 
         TraceGUI_Run()  # default init
 
-        TraceGUI_Run(ColoringType="Wavelength")
-        TraceGUI_Run(ColoringType="Power")
-        TraceGUI_Run(ColoringType="Source")
-        TraceGUI_Run(ColoringType="Polarization")
-        TraceGUI_Run(ColoringType="White")
+        for ctype in TraceGUI.ColoringTypes:
+            TraceGUI_Run(ColoringType=ctype)
 
-        TraceGUI_Run(PlottingType="Points")
-        TraceGUI_Run(PlottingType="Rays")
+        for ptype in TraceGUI.PlottingTypes:
+            TraceGUI_Run(PlottingType=ptype)
 
         TraceGUI_Run(RayCount=100000)
         TraceGUI_Run(RayAmountShown=-2.)
@@ -85,12 +83,12 @@ class FrontendTests(unittest.TestCase):
 
         # add Raysource
         RSS = ot.Surface("Circle", r=1)
-        RS = ot.RaySource(RSS, direction_type="Parallel", light_type="Lines",
+        RS = ot.RaySource(RSS, direction_type="Parallel", spectrum=ot.preset_spec_FDC,
                        pos=[0, 0, 0], s=[0, 0, 1], polarization_type="y")
         RT.add(RS)
 
         RSS2 = ot.Surface("Circle", r=1)
-        RS2 = ot.RaySource(RSS2, direction_type="Parallel", s=[0, 0, 1], light_type="D65",
+        RS2 = ot.RaySource(RSS2, direction_type="Parallel", s=[0, 0, 1], spectrum=ot.preset_spec_D65,
                         pos=[0, 1, -3], polarization_type="Angle", pol_ang=25, power=2)
         RT.add(RS2)
 
@@ -103,7 +101,7 @@ class FrontendTests(unittest.TestCase):
         # add Lens 1
         front = ot.Surface("Asphere", r=3, rho=1/10, k=-0.444)
         back = ot.Surface("Asphere", r=3, rho=-1/10, k=-7.25)
-        nL1 = ot.RefractionIndex("Cauchy", A=1.49, B=0.00354)
+        nL1 = ot.RefractionIndex("Cauchy", coeff=[1.49, 0.00354])
         L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 10], n=nL1)
         RT.add(L1)
 
@@ -116,7 +114,7 @@ class FrontendTests(unittest.TestCase):
 
         # add Aperture
         ap = ot.Surface("Ring", r=1, ri=0.01)
-        RT.add(ot.Filter(ap, pos=[0, 0, 20.3]))
+        RT.add(ot.Aperture(ap, pos=[0, 0, 20.3]))
 
         # add Lens 3
         front = ot.Surface("Sphere", r=1, rho=1/2.2)
@@ -132,7 +130,8 @@ class FrontendTests(unittest.TestCase):
         def func(l):
             return np.exp(-0.5*(l-460)**2/20**2)
 
-        RT.add(ot.Filter(ap, pos=[0, 0, 45.2], filter_type="Function", func=func))
+        fspec = ot.Spectrum("Function", func=func)
+        RT.add(ot.Filter(ap, pos=[0, 0, 45.2], spectrum=fspec))
 
         # add Detector
         Det = ot.Detector(ot.Surface("Rectangle", dim=[2,2]), pos=[0,0,60])
@@ -144,11 +143,6 @@ class FrontendTests(unittest.TestCase):
         return RT
 
     def test_Interaction(self) -> None:
-
-        RT = self.RT_Example()
-
-        # Instantiate the TraceGUI and start it.
-        sim = TraceGUI(RT)
 
         def interact(sim):
 
@@ -178,48 +172,10 @@ class FrontendTests(unittest.TestCase):
             sim.waitForIdle()
 
             # Image Type Tests standard
-            sim.ImageType = "Irradiance"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "Illuminance"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "sRGB (Absolute RI)"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-
-            # Image Type Tests log scaling
-            sim.LogImage = ['Logarithmic Scaling']
-            sim.ImageType = "Irradiance"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "Illuminance"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "sRGB (Absolute RI)"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "sRGB (Perceptual RI)"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "Hue (CIELUV)"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "Chroma (CIELUV)"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "Saturation (CIELUV)"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.ImageType = "Lightness (CIELUV)"
-            sim.showDetectorImage()
-            sim.waitForIdle()
-
-            # Image Tests Flip
-            sim.LogImage = []
-            sim.FlipImage = ['Flip Image']
-            sim.showDetectorImage()
-            sim.waitForIdle()
+            for mode in ot.Image.display_modes:
+                sim.ImageType = mode
+                sim.showDetectorImage()
+                sim.waitForIdle()
 
             # Image Tests Higher Res
             sim.ImagePixels = 300
@@ -229,25 +185,15 @@ class FrontendTests(unittest.TestCase):
             # Image Test Source, but actually we should test all parameter combinations,
             sim.showSourceImage()
 
-            # Focus Test 1
+            # Focus Tests
             pos0 = sim.Raytracer.DetectorList[1].pos
             sim.DetectorSelection = sim.DetectorNames[1]
-            sim.FocusType = "Position Variance"
-            sim.moveToFocus()
-            sim.waitForIdle()
-            sim.PosDet = pos0[2]
-            
-            # Focus Test 2
-            sim.FocusType = "Irradiance Variance"
-            sim.moveToFocus()
-            sim.waitForIdle()
-            sim.PosDet = pos0[2]
-            
-            # Focus Tests 3
-            sim.FocusType = "Irradiance Variance"
-            sim.moveToFocus()
-            sim.waitForIdle()
-            sim.PosDet = pos0[2]
+
+            for mode in ot.Raytracer.AutofocusModes:
+                sim.FocusType = mode
+                sim.moveToFocus()
+                sim.waitForIdle()
+                sim.PosDet = pos0[2]
 
             # Focus Test 4, show Debug Plot
             sim.FocusDebugPlot = ['Show Cost Function']
@@ -255,22 +201,14 @@ class FrontendTests(unittest.TestCase):
             sim.waitForIdle()
 
             # Ray Coloring Tests
-            sim.ColoringType = "Power"
-            sim.waitForIdle()
-            sim.ColoringType = "White"
-            sim.waitForIdle()
-            sim.ColoringType = "Wavelength"
-            sim.waitForIdle()
-            sim.ColoringType = "Polarization"
-            sim.waitForIdle()
-            sim.ColoringType = "Source"
-            sim.waitForIdle()
+            for type_ in sim.ColoringTypes:
+                sim.ColoringType = type_
+                sim.waitForIdle()
 
             # PlottingType Tests
-            sim.PlottingType = "Points"
-            sim.waitForIdle()
-            sim.PlottingType = "Rays"
-            sim.waitForIdle()
+            for type_ in sim.PlottingTypes:
+                sim.PlottingType = type_
+                sim.waitForIdle()
           
             # AbsorbMissing test
             sim.AbsorbMissing = []
@@ -288,7 +226,37 @@ class FrontendTests(unittest.TestCase):
 
             sim.close()
 
-        sim.run(func=interact, no_server=True, silent=True, args=(sim,))
+        RT = self.RT_Example()
+        
+        sim = TraceGUI(RT)
+        sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
+        plt.close('all')
+
+
+        def interact2(sim):
+            
+            sim.waitForIdle()
+
+            # Image Type Tests log scaling
+            sim.LogImage = ['Logarithmic Scaling']
+
+            # display all image modes with log
+            for mode in ot.Image.display_modes:
+                sim.ImageType = mode
+                sim.showDetectorImage()
+                sim.waitForIdle()
+
+            # Image Tests Flip
+            sim.LogImage = []
+            sim.FlipImage = ['Flip Image']
+            sim.showDetectorImage()
+            sim.waitForIdle()
+            sim.close()
+
+        sim = TraceGUI(RT)
+        sim.run(_func=interact2, no_server=True, silent=True, _args=(sim,))
+        plt.close('all')
+
 
     def test_Missing(self) -> None:
         """test TraceGUI operation when Filter, Lenses, Detectors or Sources are missing"""
@@ -316,24 +284,24 @@ class FrontendTests(unittest.TestCase):
                 sim.PlottingType = "Points"
                 sim.waitForIdle()
                 sim.close()
-            sim.run(func=interact, no_server=True, silent=True, args=(sim,))
+            sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
 
         RT = self.RT_Example()
 
-        [RT.remove(id(F)) for F in RT.FilterList.copy()]
+        [RT.remove(F) for F in RT.FilterList.copy()]
         self.assertTrue(not RT.FilterList)
         testFeatures(RT)
 
-        [RT.remove(id(L)) for L in RT.LensList.copy()]
+        [RT.remove(L) for L in RT.LensList.copy()]
         RT.trace(N=RT.Rays.N)
         self.assertTrue(not RT.LensList)
         testFeatures(RT)
 
-        [RT.remove(id(D)) for D in RT.DetectorList.copy()]
+        [RT.remove(D) for D in RT.DetectorList.copy()]
         self.assertTrue(not RT.DetectorList)
         testFeatures(RT)
 
-        [RT.remove(id(RS)) for RS in RT.RaySourceList.copy()]
+        [RT.remove(RS) for RS in RT.RaySourceList.copy()]
         self.assertTrue(not RT.RaySourceList)
         testFeatures(RT)
 

@@ -12,6 +12,7 @@ from functools import wraps
 import time
 import sys
 
+
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function
 def timer(func: Callable) -> Any:
@@ -34,7 +35,7 @@ def timer(func: Callable) -> Any:
 
     return _time_it
 
-# TODO use np.interp for small arrays?
+
 def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
     """
     fast alternative to :obj:`scipy.interpolate.interp1d` with equally spaced x-values
@@ -43,10 +44,10 @@ def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
     array([5. , 5.5, 4.5, 5.5])
     """
     x0, x1 = x[0], x[1]
-    ind0 = ne.evaluate("(1-1e-12)/(x1-x0)*(xs-x0)")
+    ind0 = ne.evaluate("(1-1e-13)/(x1-x0)*(xs-x0)")
     ind1 = ind0.astype(int)
 
-    # multiplication with (1-1e-12) to avoid case xs = x[-1],
+    # multiplication with (1-1e-13) to avoid case xs = x[-1],
     # which would lead to y[ind1 + 1] being an access violation
     # we could circumvent this using comparisons, masks or cases, but this would decreas performance
 
@@ -55,7 +56,7 @@ def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
 
     return ne.evaluate("(1-ind0+ind1)*ya + (ind0-ind1)*yb")
 
-# @timer
+
 def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
     """"""
 
@@ -73,11 +74,12 @@ def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
 
     return ne.evaluate(expr, local_dict=dict_, out=out)
 
+
 def getCoreCount() -> int:
     """get CPU Core Count"""
     return ne.detect_number_of_cores()
 
-# @timer
+
 def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarray:
     """
     Get randomly distributed values with pdf(x) as probability distribution function
@@ -106,6 +108,7 @@ def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarr
     icdf = scipy.interpolate.interp1d(cdf, xc, assume_sorted=True, kind='linear')
     return icdf(X)
 
+
 def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """ 
     row wise scalar product. 
@@ -119,19 +122,21 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     
     if a.shape[0] < 1000:
         return x*x2 + y*y2 + z*z2
-    
-    return ne.evaluate("x*x2 + y*y2 + z*z2")
+    else: 
+        return ne.evaluate("x*x2 + y*y2 + z*z2")
 
-def partMask(cond1: np.ndarray, cond2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+
+def partMask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     """ 
-    set True values of bool mask cond1 to values of cond2, returns resulting mask and cond2 
+    set True values of bool mask cond1 to values of cond2, returns resulting mask
 
     >>> partMask(np.array([True, False, False, True]), np.array([True, False]))
-    (array([ True, False, False, False]), array([ True, False]))
+    array([ True, False, False, False])
     """
     wc = np.zeros(cond1.shape, dtype=bool)
     wc[cond1] = cond2
-    return wc, cond2.copy()
+    return wc
+
 
 def normalize(a: np.ndarray) -> None:
     """ 
@@ -145,14 +150,16 @@ def normalize(a: np.ndarray) -> None:
            [0.45584231, 0.56980288, 0.68376346]])
     """
     if a.shape[0] < 1000:
-        a[:] = a/np.linalg.norm(a, axis=1)[:, np.newaxis]
-        return
+        norms = np.linalg.norm(a, axis=1)
+        a /= np.where(norms != 0, norms, np.full_like(norms, np.nan))[:, np.newaxis]
+    
+    else:
+        x, y, z = a[:, 0, np.newaxis], a[:, 1, np.newaxis], a[:, 2, np.newaxis]
+        valid = ~((x == 0) & (y == 0) & (z == 0))
 
-    x, y, z = a[:, 0, np.newaxis], a[:, 1, np.newaxis], a[:, 2, np.newaxis]
-    valid = ~((x == 0) & (y == 0) & (z == 0))
+        nan = np.nan
+        a[:] = ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
 
-    nan = np.nan
-    a[:] = ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
 
 def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """ 
@@ -164,18 +171,20 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     if a.shape[0] < 1000:
         return np.cross(a, b, axis=1)
+    
+    else:
+        x, y, z    = a[:, 0], a[:, 1], a[:, 2]
+        x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
 
-    x, y, z    = a[:, 0], a[:, 1], a[:, 2]
-    x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
+        n = np.zeros_like(a, dtype=np.float64, order='F')
 
-    n = np.zeros_like(a, dtype=np.float64, order='F')
+        # using ne is ~2x faster than np.cross
+        ne.evaluate("y*z2 - z*y2", out=n[:, 0])
+        ne.evaluate("z*x2 - x*z2", out=n[:, 1])
+        ne.evaluate("x*y2 - y*x2", out=n[:, 2])
 
-    # using ne is ~2x faster than np.cross
-    ne.evaluate("y*z2 - z*y2", out=n[:, 0])
-    ne.evaluate("z*x2 - x*z2", out=n[:, 1])
-    ne.evaluate("x*y2 - y*x2", out=n[:, 2])
+        return n
 
-    return n
 
 def ValueAt(x:  np.ndarray,
             y:  np.ndarray,
@@ -342,8 +351,9 @@ def interp2d(x:         np.ndarray,
     # xc, yc: integer part of xt, yt coordinates (x1, y1 in Wikipedia)
     # xr, yr: float part of xt, yt coordinates ((x-x1)/(x2-x1), (y-y1)/(y2-y1) in Wikipedia)
 
-    xt =  1 / (x[1] - x[0]) * (xp - x[0])
-    yt =  1 / (y[1] - y[0]) * (yp - y[0])
+    xs, xe, ys, ye = x[0], x[1], y[0], y[1]
+    xt =  ne.evaluate("1 / (xe - xs) * (xp - xs)")
+    yt =  ne.evaluate("1 / (ye - ys) * (yp - ys)")
 
     if method == 'linear':
         # this part is faster than using np.divmod

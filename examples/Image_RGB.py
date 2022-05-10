@@ -14,7 +14,7 @@ RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
 # add Raysource
 RSS = ot.Surface("Rectangle", dim=[4, 4])
-RS = ot.RaySource(RSS, direction_type="Diverging", sr_angle=8, light_type="RGB_Image",
+RS = ot.RaySource(RSS, direction_type="Diverging", sr_angle=8,
                Image=Image, s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 

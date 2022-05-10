@@ -1,16 +1,20 @@
 
 import numpy as np
+from datetime import datetime
+import os
 
 import optrace.tracer.Color as Color  # for Tristimulus curves and sRGB conversions
 from optrace.tracer.Misc import timer as timer  # for benchmarking
 import optrace.tracer.Misc as misc
 from threading import Thread  # for multithreading
 
+from optrace.tracer.BaseClass import *
+
 # TODO
 # Image.at() function, makes x or y cuts
 # quantile clip parameter
 
-class Image:
+class Image(BaseClass):
 
     EPS: float = 1e-9
     """ Used for minimal extent """
@@ -18,11 +22,15 @@ class Image:
     MAX_IMAGE_RATIO: float = 5.
     """ maximum ratio of image side lengths. Images with ratios beyond will be corrected """
 
+    display_modes = ["sRGB (Absolute RI)", "sRGB (Perceptual RI)", "Outside sRGB Gamut", "Irradiance", "Illuminance",\
+                     "Lightness (CIELUV)", "Hue (CIELUV)", "Chroma (CIELUV)", "Saturation (CIELUV)"]
+
+    coordinate_types = ["Cartesian", "Polar"]
+    
     def __init__(self, 
-                 extent:        (list | np.ndarray),
-                 z:             float = None,
-                 index:         int = None,
-                 image_type:    str = "Cartesian")\
+                 extent:             (list | np.ndarray),
+                 desc:               str = None,
+                 coordinate_type:    str = "Cartesian")\
             -> None:
         """
         Init an Image object.
@@ -30,65 +38,19 @@ class Image:
         The class also includes information like extent, z-position of image, an image plotting type and an index for tagging.
 
         :param extent: image extent in the form [xs, xe, ys, ye]
-        :param z: position of image.Only used as tag.
-        :param index: index of image for tagging
-        :param image_type: "Cartesian" or "Polar"
+        :param coordinate_type: "Cartesian" or "Polar"
         """
         self._new_lock = False
         self.extent = extent
-        self.index = index
-        self.image_type = image_type
-        self.z = z
+        self.desc = desc
+        self.coordinate_type = coordinate_type
         self.Im = None
         self._Im = None
         self._new_lock = True
 
     def hasImage(self) -> bool:
-        """
-        Check Image objects contains an calculated image.
-
-        :return: True if contains Image, False otherwise
-        """
+        """Check Image objects contains an calculated image."""
         return self.Im is not None
-
-    def getPower(self) -> float:
-        """Calculate total image power"""
-        if not self.hasImage():
-            raise RuntimeError("Image was not calculated.")
-
-        return np.sum(self.Im[:, :, 3])
-
-    def getLuminousPower(self) -> float:
-        """Calculate Total image luminous power"""
-        if not self.hasImage():
-            raise RuntimeError("Image was not calculated.")
-
-        return 683*np.sum(self.Im[:, :, 1])
-
-    def getIrradiance(self) -> np.ndarray:
-        """Get irradiance image (2D np.ndarray)"""
-        if not self.hasImage():
-            raise RuntimeError("Image was not calculated.")
-
-        # return flipped so index (0, 0) is in the bottom left
-        return np.flipud(1/self.Apx*self.Im[:, :, 3])
-
-    def getIlluminance(self) -> np.ndarray:
-        """Get illuminance image (2D np.ndarray)"""
-        if not self.hasImage():
-            raise RuntimeError("Image was not calculated.")
-
-        # return flipped so index (0, 0) is in the bottom left
-        # the Illuminance is just the unnormalized Y scaled by 683 lm/W and the inverse pixel area
-        return np.flipud(683/self.Apx*self.Im[:, :, 1])
-
-    def getXYZ(self) -> np.ndarray:
-        """Get XYZ image (np.ndarray with shape (Ny, Nx, 3))"""
-        if not self.hasImage():
-            raise RuntimeError("Image was not calculated.")
-
-        # return flipped so index (0, 0) is in the bottom left
-        return np.flipud(self.Im[:, :, :3])
 
     @property
     def sx(self) -> float:
@@ -122,8 +84,75 @@ class Image:
         if not self.hasImage():
             raise RuntimeError("Image was not calculated.")
 
-        # pixel are from pixel number and iamge extent
-        return  self.sx * self.sy / (self.Nx * self.Ny)
+        # pixel are from pixel number and image extent
+        return self.sx * self.sy / (self.Nx * self.Ny)
+
+    def getByDisplayMode(self, mode, log=False) -> np.ndarray:
+        """Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ"""
+
+        if not self.hasImage():
+            raise RuntimeError("Image was not calculated.")
+
+        match mode:
+            case "Irradiance":             
+                return np.flipud(1/self.Apx*self.Im[:, :, 3])
+
+            case "Illuminance":     
+                # the Illuminance is just the unnormalized Y scaled by 683 lm/W and the inverse pixel area
+                return np.flipud(683/self.Apx*self.Im[:, :, 1])
+
+            case "sRGB (Absolute RI)":      
+                return self.getRGB(log=log, RI="Absolute")
+
+            case "sRGB (Perceptual RI)":    
+                return self.getRGB(log=log, RI="Perceptual")
+
+            case "Outside sRGB Gamut":
+                return Color.outside_sRGB(self.getXYZ())
+
+            case "Lightness (CIELUV)":      
+                return self.getLuv()[:, :, 0]
+
+            case "Hue (CIELUV)":
+                Luv = self.getLuv()
+                return Color.getLuvHue(Luv)
+
+            case "Chroma (CIELUV)":
+                Luv = self.getLuv()
+                return Color.getLuvChroma(Luv)
+
+            case "Saturation (CIELUV)":     
+                Luv = self.getLuv()
+                return Color.getLuvSaturation(Luv)
+
+            case _:                         
+                raise ValueError("Invalid display_mode.")
+
+    def getPower(self) -> float:
+        """Calculate total image power"""
+        if not self.hasImage():
+            raise RuntimeError("Image was not calculated.")
+
+        return np.sum(self.Im[:, :, 3])
+
+    def getLuminousPower(self) -> float:
+        """Calculate Total image luminous power"""
+        if not self.hasImage():
+            raise RuntimeError("Image was not calculated.")
+
+        return 683*np.sum(self.Im[:, :, 1])
+
+    def getXYZ(self) -> np.ndarray:
+        """Get XYZ image (np.ndarray with shape (Ny, Nx, 3))"""
+        if not self.hasImage():
+            raise RuntimeError("Image was not calculated.")
+
+        return np.flipud(self.Im[:, :, :3])
+
+    def getLuv(self) -> np.ndarray:
+        """CIELAB image"""
+        XYZ = self.getXYZ()
+        return Color.XYZ_to_Luv(XYZ)
 
     def getRGB(self, log: bool = False, RI: str="Absolute") -> np.ndarray:
         """
@@ -151,34 +180,6 @@ class Image:
 
         return Im
 
-    def getLuvLightness(self) -> np.ndarray:
-        """Lightness in CIELAB"""
-        return self.getLuv()[:, :, 0]
-
-    def getLuvSaturation(self) -> np.ndarray:
-        """Saturation in CIELAB"""       
-        Luv = self.getLuv()
-        return Color.getLuvSaturation(Luv)
-
-    def getLuv(self) -> np.ndarray:
-        """CIELAB image"""
-        XYZ = self.getXYZ()
-        return Color.XYZ_to_Luv(XYZ)
-
-    def getLuvChroma(self) -> np.ndarray:
-        """Chroma in CIELUV"""        
-        Luv = self.getLuv()
-        return Color.getLuvChroma(Luv)
-
-    def getLuvHue(self) -> np.ndarray:
-        """Hue in CIELUV"""        
-        Luv = self.getLuv()
-        return Color.getLuvHue(Luv)
-    
-    def getOutsidesRGB(self) -> np.ndarray:
-        """Lightness in CIELAB"""
-        return Color.outside_sRGB(self.getXYZ())
-
     def __fixExtent(self) -> None:
         """
         Fix image extent. Point images are given a valid 2D extent. 
@@ -204,7 +205,6 @@ class Image:
             self.extent[2] = ym - sx/MR/2
             self.extent[3] = ym + sx/MR/2
 
-    # @timer
     def rescale(self, N, threading: bool=True):
 
         Ny, Nx, Nz = self._Im.shape
@@ -252,57 +252,64 @@ class Image:
         else:
             self.Im = self._Im
 
-    # TODO save in current folder if path is invalid
-    def save(self, path):
+    def save(self, path, save32bit=True):
         """save the image object in a numpy archive"""
-        # save in float32 to save some space
-        Im = np.array(self._Im, dtype=np.float32)
 
-        np.savez_compressed(path, Im=Im, extent=self.extent, N=min(self.Im.shape[0], self.Im.shape[1]), 
-                            z=self.z, index=self.index, type_=self.image_type)
+        # save in float32 to save some space
+        Im = np.array(self._Im, dtype=np.float32) if save32bit else self._Im
+
+        sdict = dict(Im=Im, extent=self.extent, N=min(self.Im.shape[0], self.Im.shape[1]), 
+                     desc=self.desc, type_=self.coordinate_type)
+
+        try:
+            np.savez_compressed(path, **sdict)
+            print(f"Saved Image as \"{path}.npz\"")
+
+        except:
+            # create a valid path and filename
+            wd = os.getcwd()
+            filename = "Image_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z')
+            path = os.path.join(wd, filename)
+
+            # resave
+            print(f"Failed saving Image, resaving as \"{path}.npz\"")
+            np.savez_compressed(path, **sdict)
 
     @staticmethod
-    def load(path):
+    def load(path: str) -> "Image":
         """load a saved image object numpy archive to a image object"""
 
         # load npz archive
         Io = np.load(path)
 
-        Im = Image(Io["extent"], z=Io["z"], index=Io["index"], image_type=Io["type_"])
+        Im = Image(Io["extent"], desc=Io["desc"][()], coordinate_type=Io["type_"][()])
 
         Im._Im = np.array(Io["Im"], dtype=np.float64)
         Im.rescale(Io["N"]) # also creates Im from _Im
 
         return Im
 
-    def __setattr__(self, key, val):
+    def __setattr__(self, key, val0):
+       
+        # work on copies of ndarray and list
+        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
+
+        match key:
+          
+            case "extent":
+                if not isinstance(val, list | tuple | np.ndarray):
+                    raise TypeError(f"{key} needs to be of type list, tuple or np.ndarray")
+
+                val = np.array(val, dtype=np.float64)
+
+            case "desc" if not isinstance(val, str | None):
+                raise TypeError("desc needs to be of type str")
+
+            case "coordinate_type" if val not in self.coordinate_types:
+                raise ValueError(f"Invalid coordinate_type '{val}'.")
         
-        if key == "extent":
-
-            if not isinstance(val, list | tuple | np.ndarray):
-                raise TypeError(f"{key} needs to be of type list, tuple or np.ndarray")
-
-            val = np.array(val, dtype=np.float64)
-
-        if key == "index" and not isinstance(val, int | None):
-            raise TypeError(f"{key} needs to be of type int")
-
-        if key == "z" and val is not None:
-            if not isinstance(val, int | float ):
-                raise TypeError(f"{key} needs to be of type int or float.")
-            val = float(val)
-
-        if key == "image_type" and val not in ["Cartesian", "Polar"]:
-            raise ValueError(f"Invalid image_type '{val}'.")
-        
-        if "_new_lock" in self.__dict__ and self._new_lock:
-            if key not in self.__dict__:
-                raise AttributeError(f"Invalid property '{key}'")
-        
-        self.__dict__[key] = val
-
-    # TODO using threading is slower?
-    # @timer
+        super().__setattr__(key, val)
+    
     def makeImage(self, 
                   N:            int, 
                   p:            np.ndarray = None,
@@ -316,7 +323,7 @@ class Image:
         Creates an pixel image from ray positions on the detector.
         The image is saved in self.Im
 
-        :param N: number of image pixels in each dimension (int)
+        :param N: number of image pixels in smallest dimension (int)
         :param p: ray position matrix, xyz components in columns, (numpy 1D array)
         :param w: ray weight array (numpy 1D array)
         :param wl: ray wavelength array (numpy 1D array)
@@ -328,7 +335,7 @@ class Image:
         if not keep_extent:
             self.__fixExtent()
         
-        sx, sy = self.extent[1] - self.extent[0], self.extent[3] - self.extent[2]
+        sx, sy = self.sx, self.sy
        
         if N > 1000:
             raise ValueError("N needs to below 1000")
@@ -340,67 +347,24 @@ class Image:
         Nx = Nrs if sx <= sy else Nrs*int(sx / sy)
         Ny = Nrs if sx > sy  else Nrs*int(sy / sx)
 
-        Apx = sx*sy/Nx/Ny
-
         # init image
         self._Im = np.zeros((Ny, Nx, 4), dtype=np.float64)
 
-        # return if there are no rays
-        if p is None or not p.shape[0]:
-            self.rescale(N, threading)
-            return
-
-        # init parameter for multithreading
-        N_rays = wl.shape[0]
-
-        # threading = False
-        # maximum 4 threads, otherwise there are to many images in RAM
-        N_threads = 1 # min(4, misc.getCoreCount()) if threading and N_rays > 1e5 else 1
-        N_step = int(N_rays/N_threads)
-    
-        # multithreading function
-        def makeImages(i: int, Ims: list[np.ndarray]) -> None:
-
-            # indices for thread rays
-            Ns = i*N_step
-            Ne = (i+1)*N_step if i != N_threads-1 else N_rays
-
+        if p is not None and p.shape[0]:
             # get hit pixel coordinate, subtract 1e-12 from N so all values are 0 <= cor < N
-            px, py, xs, ys = p[Ns:Ne, 0], p[Ns:Ne, 1], self.extent[0], self.extent[2]
+            px, py, xs, ys = p[:, 0], p[:, 1], self.extent[0], self.extent[2]
             xcor = misc.calc("(Nx - 1e-12) / sx * (px - xs)")
             ycor = misc.calc("(Ny - 1e-12) / sy * (py - ys)")
 
             # calculate XYZP values, with P being the power
-            wlt = wl[Ns:Ne]
-            XYZW = np.ones((wlt.shape[0], 4), dtype=np.float64, order='F')
-            XYZW[:, 0] = Color.Tristimulus(wlt, "X")
-            XYZW[:, 1] = Color.Tristimulus(wlt, "Y")
-            XYZW[:, 2] = Color.Tristimulus(wlt, "Z")
-            XYZW *= w[Ns:Ne, np.newaxis]
+            XYZW = np.ones((wl.shape[0], 4), dtype=np.float64, order='F')
+            XYZW[:, 0] = Color.Tristimulus(wl, "X")
+            XYZW[:, 1] = Color.Tristimulus(wl, "Y")
+            XYZW[:, 2] = Color.Tristimulus(wl, "Z")
+            XYZW *= w[:, np.newaxis]
 
             # render image fro positions and XYZW array
-            np.add.at(Ims[i], (ycor.astype(int), xcor.astype(int)), XYZW)
-
-        # multithreading mode
-        if N_threads > 1:
-
-            # create empty images for every thread
-            Ims = [self._Im.copy() for N_t in np.arange(N_threads)]
-        
-            # create threads
-            thread_list = [Thread(target=makeImages, args=[N_t, Ims]) for N_t in np.arange(N_threads)]
-            
-            # start and join threads
-            [thread.start() for thread in thread_list]
-            [thread.join()  for thread in thread_list]
-
-            # add all sub-images together
-            for Imi in Ims:
-                self._Im += Imi
-
-        # main thread mode
-        else:
-            makeImages(0, [self._Im])
+            np.add.at(self._Im, (ycor.astype(int), xcor.astype(int)), XYZW)
 
         self.rescale(N, threading)
 

@@ -109,29 +109,6 @@ class BackendModuleTests(unittest.TestCase):
         warnings.simplefilter("default")
 
     def test_Filter(self):
-
-        S0 = ot.Surface("Circle", r=5)
-        S1 = ot.Surface("Rectangle", dim=[2., 3])
-        pos0 = [0, 1, -2]
-
-        F0 = ot.Filter(S0, pos0)
-
-        # check if position and extent is set correctly
-        self.assertTrue(np.all(pos0 == F0.pos))
-        self.assertTrue(np.all(F0.Surface.getExtent() == F0.extent))
-
-        F0.copy()
-        F0.getColor()
-        F0.getCylinderSurface()
-        F0.setSurface(S1)
-        self.assertTrue(np.all(pos0 == F0.pos))
-        self.assertTrue(F0.Surface is not S1)  # check if internal surface is a copy
-
-        # check exceptions
-        self.assertRaises(ValueError, ot.Filter, S0, pos0, filter_type="ABC")  # invalid filter_type
-        self.assertRaises(ValueError, ot.Filter, S0, pos0, filter_type="Function")  # func missing
-        self.assertRaises(ValueError, ot.Filter, S0, pos0, filter_type="Constant", tau=-1)  # tau outside [0, 1]
-
         pass
 
     def test_Detector(self):
@@ -155,40 +132,25 @@ class BackendModuleTests(unittest.TestCase):
 
         # check __init__
         R = [ot.RefractionIndex("Constant", n=1.2),
-             ot.RefractionIndex("Cauchy", A=1.2, B=0.004),
-             ot.RefractionIndex("List", wls=np.array([380, 500, 780]), ns=np.array([1.5, 1.4, 1.3])),
+             ot.RefractionIndex("Cauchy", coeff=[1.2, 0.004]),
              ot.RefractionIndex("Function", func=func)]
 
-        # presets
-        ot.RefractionIndex("SiO2")
-        ot.RefractionIndex("BK7")
-        ot.RefractionIndex("K5")
-        ot.RefractionIndex("BaK4")
-        ot.RefractionIndex("BaF10")
-        ot.RefractionIndex("SF10")
+        # check presets
+        for material in ot.presets_n:
+            material(550)
 
         # check exceptions
-        self.assertRaises(TypeError, ot.RefractionIndex)  # no type
         self.assertRaises(ValueError, ot.RefractionIndex, "ABC")  # invalid type
-        n = ot.RefractionIndex("List")
         n2 = ot.RefractionIndex("Function")
-        self.assertRaises(RuntimeError, n, 550)  # wls, ns missing
         self.assertRaises(RuntimeError, n2, 550)  # func missing
         self.assertRaises(ValueError, ot.RefractionIndex, "Constant", n=0.99)  # n < 1
-        self.assertRaises(ValueError, ot.RefractionIndex, "Cauchy", A=0.99)  # A < 1
-        self.assertRaises(ValueError, ot.RefractionIndex,"List", wls=np.array([300, 500, 780]), 
-                                                      ns=np.array([1.5, 1.4, 1.3]))  # wls outside [380, 780]
-        self.assertRaises(ValueError, ot.RefractionIndex, "List", wls=np.array([380, 500, 790]), 
-                                                      ns=np.array([1.5, 1.4, 1.3]))  # wls outside [380, 780]
-        self.assertRaises(ValueError, ot.RefractionIndex, "List", wls=np.array([380, 500, 780]), 
-                                                      ns=np.array([0.5, 1.4, 1.3]))  # ns outside [380, 780]
+        # self.assertRaises(ValueError, ot.RefractionIndex, "Cauchy", Cauchy=[0.99])  # A < 1
 
         # check values
 
         wl = np.array([450., 580.])
         Rval = np.array([[1.2, 1.2],
                          [1.219753086, 1.211890606],
-                         [1.44166667, 1.371428571],
                          [1.82, 1.768]])
 
         for i, Ri in enumerate(R):
@@ -196,7 +158,7 @@ class BackendModuleTests(unittest.TestCase):
                 self.assertAlmostEqual(Ri(wlj), Rval[i, j], places=5)
 
         # check if equal operator is working
-        self.assertEqual(ot.RefractionIndex("SF10"), ot.RefractionIndex("SF10"))
+        self.assertEqual(ot.preset_n_SF10, ot.preset_n_SF10)
         self.assertEqual(R[1], R[1])
         self.assertEqual(ot.RefractionIndex("Function", func=func), ot.RefractionIndex("Function", func=func))
 

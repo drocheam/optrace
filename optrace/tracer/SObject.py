@@ -28,18 +28,21 @@ Properties with FrontSurface + BackSurface:
 from optrace.tracer.Surface import *  # for the SObject surface
 
 from typing import Callable  # for function type hints
-import copy  # for copy.deepcopy
 import numpy as np
+from optrace.tracer.BaseClass import *
 
 
-class SObject:
+class SObject(BaseClass):
+
+    abbr = "SO"
 
     def __init__(self, 
                  FrontSurface:  Surface, 
                  pos:           (list | np.ndarray),
-                 BackSurface:   Surface=None,
-                 d1:            float=None,
-                 d2:            float=None)\
+                 BackSurface:   Surface = None,
+                 d1:            float = None,
+                 d2:            float = None,
+                 desc:          str = None)\
             -> None:
         """
         Create a SObject object..
@@ -52,6 +55,7 @@ class SObject:
         # use a Surface copy, since we change its position in 3D space
         self.FrontSurface = FrontSurface.copy()
         self.BackSurface = BackSurface.copy() if BackSurface is not None else None
+        self.desc = desc
 
         self.d1 = d1
         self.d2 = d2
@@ -114,14 +118,6 @@ class SObject:
             self.FrontSurface.moveTo(pos - [0, 0, self.d1])
             self.BackSurface.moveTo(pos + [0, 0, self.d2])
     
-    def copy(self) -> 'SObject':
-        """
-        Return a fully independent copy of the SObject.
-
-        :return: copy
-        """
-        return copy.deepcopy(self)
-
     @property
     def Surface(self):
         """alias for :obj:`SObject.FrontSurface` for a SObject without BackSurface"""
@@ -151,6 +147,18 @@ class SObject:
                    self.FrontSurface.minz,\
                    self.BackSurface.maxz
 
+    def getDesc(self) -> str:
+        """"""
+        if self.desc is not None:
+            return self.desc
+        else:
+            if self.hasBackSurface():
+                return f"{self.FrontSurface.surface_type} + {self.BackSurface.surface_type} "\
+                       f"at [{self.pos[2]:.04g}, {self.pos[1]:.04g}, {self.pos[2]:.04g}]"
+            else:
+                return f"{self.Surface.surface_type} at [{self.pos[2]:.04g}, "\
+                       f"{self.pos[1]:.04g}, {self.pos[2]:.04g}]"
+
     def getCylinderSurface(self, nc: int = 100, d: float = 0.1) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -176,11 +184,6 @@ class SObject:
 
     def __setattr__(self, key, val):
 
-        # lock assignment of new properties
-        if "_new_lock" in self.__dict__ and self._new_lock:
-            if key not in self.__dict__:
-                raise AttributeError(f"Invalid property '{key}'")
-
         # lock changing of geometry directly
         if "_geometry_lock" in self.__dict__ and self._geometry_lock:
             if key in ["d1", "d2", "FrontSurface", "Surface", "BackSurface"]:
@@ -188,25 +191,22 @@ class SObject:
             if key == "pos":
                 raise RuntimeError("Use moveTo(pos) to move the Object")
 
-        if key in ["name", "short_name"] and not isinstance(val, str):
-            raise TypeError(f"{key} needs to be of type str.")
+        match key:
+            case ("name" | "short_name") if not isinstance(val, str):
+                raise TypeError(f"{key} needs to be of type str.")
 
-        if key in ["FrontSurface", "BackSurface"] and not isinstance(val, Surface | None):
-            raise TypeError(f"{key} needs to be of type Surface.")
+            case ("FrontSurface" | "BackSurface") if not isinstance(val, Surface | None):
+                raise TypeError(f"{key} needs to be of type Surface.")
 
-        if key in ["d1", "d2"]:
-            if not isinstance(val, int | float | None):
-                raise TypeError(f"{key} needs to be a number.")
+            case ("d1" | "d2"):
+                if not isinstance(val, int | float | None):
+                    raise TypeError(f"{key} needs to be a number.")
 
-            if val is not None:
-                val = float(val)
+                if val is not None:
+                    val = float(val)
 
-        self.__dict__[key] = val
+            case "desc" if not isinstance(val, str | None):
+                raise TypeError("desc needs to be of type str.")
+        
+        super().__setattr__(key, val)
     
-    def crepr(self):
-        """ Compact state representation using only lists and immutable types """
-        return [self.FrontSurface.crepr(), (self.BackSurface.crepr() if self.BackSurface is not None else None), self.d1, self.d2]
-
-    def __str__(self):
-        return f"\t{self.__class__} at {hex(id(self))} with {self.__dict__}"
-

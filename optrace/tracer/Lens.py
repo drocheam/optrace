@@ -18,6 +18,8 @@ from optrace.tracer.SObject import *
 
 class Lens(SObject):
 
+    abbr = "L"
+
     def __init__(self, 
                  front: Surface, 
                  back:  Surface,
@@ -26,7 +28,8 @@ class Lens(SObject):
                  de:    float = 0,
                  d1:    float = None,
                  d2:    float = None,
-                 n2:    RefractionIndex = None)\
+                 n2:    RefractionIndex = None,
+                 **kwargs)\
             -> None:
         """
         Creates a lens object using 2 surfaces and additional properties.
@@ -54,10 +57,7 @@ class Lens(SObject):
         elif d1 is None or d2 is None:
             raise ValueError("Both thicknesses d1, d2 need to be specified")
 
-        self.name = "Lens"
-        self.short_name = "L"
-        
-        super().__init__(front, pos, back, d1, d2)
+        super().__init__(front, pos, back, d1, d2, **kwargs)
 
         self._new_lock = True
 
@@ -70,21 +70,17 @@ class Lens(SObject):
         :param n0: ambient refraction index
         :return: focal length
         """
-        match self.FrontSurface.surface_type:
-            case ("Sphere" | "Asphere"):
-                R1 = 1/self.FrontSurface.rho
-            case "Circle":
-                R1 = np.inf
-            case _:
+
+        def getR(Surf):
+            if Surf.surface_type in ["Sphere", "Asphere"]:
+                return 1/Surf.rho
+            elif Surf.isPlanar():
+                return np.inf
+            else:
                 raise RuntimeError("Calculation only possible with surface_type 'Circle', 'Sphere' or 'Asphere'.")
 
-        match self.BackSurface.surface_type:
-            case ("Sphere" | "Asphere"):
-                R2 = 1/self.BackSurface.rho
-            case "Circle":
-                R2 = np.inf
-            case _:
-                raise RuntimeError("Calculation only possible with surface_type 'Circle', 'Sphere' or 'Asphere'.")
+        R1 = getR(self.FrontSurface)
+        R2 = getR(self.BackSurface)
 
         n = self.n(wl)
         n0_ = n0(wl)
@@ -94,10 +90,4 @@ class Lens(SObject):
         D = (n-n0_)/n0_ * (1/R1 - 1/R2 + (n - n0_) * d /(n*R1*R2))
 
         return 1 / D    
-
-
-    def crepr(self):
-        """ Compact state representation using only lists and immutable types """
-        return [self.FrontSurface.crepr(), self.BackSurface.crepr(), self.d1, self.d2,\
-                self.n.crepr(), (self.n2.crepr() if self.n2 is not None else None)]
 
