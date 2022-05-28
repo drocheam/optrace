@@ -6,19 +6,16 @@ A refractive index is specified for the material and one for the area behind the
 """
 
 import numpy as np
-import copy
 
 from optrace.tracer.RefractionIndex import *
 from optrace.tracer.Surface import *
 from optrace.tracer.SObject import *
 
-# TODO error message when surface is point or line
-
-# TODO setattr handling
 
 class Lens(SObject):
 
     abbr = "L"
+    _allow_non_2D = False  # don't allow points or lines as surfaces
 
     def __init__(self, 
                  front: Surface, 
@@ -90,4 +87,14 @@ class Lens(SObject):
         D = (n-n0_)/n0_ * (1/R1 - 1/R2 + (n - n0_) * d /(n*R1*R2))
 
         return 1 / D    
+
+    def __setattr__(self, key, val):
+
+        if key == "n2":
+            self._checkType(key, val, RefractionIndex | None)
+
+        if key == "n":
+            self._checkType(key, val, RefractionIndex)
+
+        super().__setattr__(key, val)
 

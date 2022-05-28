@@ -7,6 +7,7 @@ sys.path.append('./')
 import numpy as np
 import optrace as ot
 from optrace.gui import GUI as TraceGUI
+from optrace.plots import SpectrumPlot
 
 # make Raytracer
 RT = ot.Raytracer(outline=[-4, 5, -3, 5, -1, 27.5])

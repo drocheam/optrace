@@ -13,7 +13,7 @@ class RayStorage(BaseClass):
 
     N_list = np.array([], dtype=int)
     B_list = np.array([], dtype=int)
-    
+  
     def init(self, RaySourceList, N, nt, no_pol=False):
         """
         """
@@ -34,7 +34,7 @@ class RayStorage(BaseClass):
         index_add = np.random.choice(self.N_list.shape[0], size=dN, p=P_list/P_all)
         np.add.at(self.N_list, index_add, np.ones(index_add.shape))
 
-        if np.any(np.array(self.N_list) == 0):
+        if np.any(np.array(self.N_list) == 0) and not self.silent:
             warnings.warn("There are RaySources that have no rays assigned. "\
                     "Change the power ratio or raise the overall ray number", RuntimeWarning)
         
@@ -114,7 +114,6 @@ class RayStorage(BaseClass):
     def getRaysByMask(self,
                       ch:           np.ndarray,
                       ch2:          np.ndarray = None,
-                      snum:         int = None,
                       ret:          list[bool | int] = [1, 1, 1, 1, 1, 1]) \
             -> tuple[(np.ndarray | None), (np.ndarray | None), (np.ndarray | None),
                      (np.ndarray | None), (np.ndarray | None), (np.ndarray | None)]:

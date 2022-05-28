@@ -12,6 +12,7 @@ from functools import wraps
 import time
 import sys
 
+from PIL import Image as PILImage
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function
@@ -36,25 +37,8 @@ def timer(func: Callable) -> Any:
     return _time_it
 
 
-def interp1d(x: np.ndarray, y: np.ndarray, xs: np.ndarray) -> np.ndarray:
-    """
-    fast alternative to :obj:`scipy.interpolate.interp1d` with equally spaced x-values
-
-    >>> interp1d(np.array([1, 2, 3, 4]), np.array([5, 6, 5, 4]), np.array([1, 1.5, 3.5, 2.5]))
-    array([5. , 5.5, 4.5, 5.5])
-    """
-    x0, x1 = x[0], x[1]
-    ind0 = ne.evaluate("(1-1e-13)/(x1-x0)*(xs-x0)")
-    ind1 = ind0.astype(int)
-
-    # multiplication with (1-1e-13) to avoid case xs = x[-1],
-    # which would lead to y[ind1 + 1] being an access violation
-    # we could circumvent this using comparisons, masks or cases, but this would decreas performance
-
-    ya = y[ind1]
-    yb = y[ind1+1]
-
-    return ne.evaluate("(1-ind0+ind1)*ya + (ind0-ind1)*yb")
+def loadImage(path):
+    return np.asarray(PILImage.open(path).convert("RGB"), dtype=np.float64) / 2**8
 
 
 def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
@@ -96,18 +80,13 @@ def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarr
     """
     # unnormalized cdf
     cdf = np.cumsum(pdf)
-    cdf /= cdf[-1]
 
-    # normalize cdf and append 0 at the beginning
-    xc = np.concatenate(([x[0]], x))
-    cdf = np.concatenate(([0], cdf))
-
-    X = np.random.sample(N)
+    X = np.random.uniform(cdf[0], cdf[-1], N)
 
     # unfortunately we can't use np.interp1d, since cdf is not equally spaced
-    icdf = scipy.interpolate.interp1d(cdf, xc, assume_sorted=True, kind='linear')
-    return icdf(X)
+    icdf = scipy.interpolate.interp1d(cdf, x, assume_sorted=True, kind='linear')
 
+    return icdf(X)
 
 def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """ 
@@ -120,10 +99,7 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     x, y, z    = a[:, 0], a[:, 1], a[:, 2]
     x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
     
-    if a.shape[0] < 1000:
-        return x*x2 + y*y2 + z*z2
-    else: 
-        return ne.evaluate("x*x2 + y*y2 + z*z2")
+    return ne.evaluate("x*x2 + y*y2 + z*z2")
 
 
 def partMask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
@@ -138,6 +114,16 @@ def partMask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     return wc
 
 
+def uniform(x, y, N):
+
+    if x is None or y is None:
+        return x, y
+
+    xs = np.linspace(x[0], x[-1], N)
+    interp = scipy.interpolate.interp1d(x, y)
+    return xs, interp(xs)
+
+
 def normalize(a: np.ndarray) -> None:
     """ 
     faster vector normalization for vectors in axis=1.
@@ -149,16 +135,11 @@ def normalize(a: np.ndarray) -> None:
     array([[0.26726124, 0.53452248, 0.80178373],
            [0.45584231, 0.56980288, 0.68376346]])
     """
-    if a.shape[0] < 1000:
-        norms = np.linalg.norm(a, axis=1)
-        a /= np.where(norms != 0, norms, np.full_like(norms, np.nan))[:, np.newaxis]
-    
-    else:
-        x, y, z = a[:, 0, np.newaxis], a[:, 1, np.newaxis], a[:, 2, np.newaxis]
-        valid = ~((x == 0) & (y == 0) & (z == 0))
+    x, y, z = a[:, 0, np.newaxis], a[:, 1, np.newaxis], a[:, 2, np.newaxis]
+    valid = ~((x == 0) & (y == 0) & (z == 0))
 
-        nan = np.nan
-        a[:] = ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
+    nan = np.nan
+    a[:] = ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
 
 
 def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -169,21 +150,17 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     array([[-12.,   0.,   4.],
            [ -3.,   6.,  -3.]])
     """
-    if a.shape[0] < 1000:
-        return np.cross(a, b, axis=1)
-    
-    else:
-        x, y, z    = a[:, 0], a[:, 1], a[:, 2]
-        x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
+    x, y, z    = a[:, 0], a[:, 1], a[:, 2]
+    x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
 
-        n = np.zeros_like(a, dtype=np.float64, order='F')
+    n = np.zeros_like(a, dtype=np.float64, order='F')
 
-        # using ne is ~2x faster than np.cross
-        ne.evaluate("y*z2 - z*y2", out=n[:, 0])
-        ne.evaluate("z*x2 - x*z2", out=n[:, 1])
-        ne.evaluate("x*y2 - y*x2", out=n[:, 2])
+    # using ne is ~2x faster than np.cross
+    ne.evaluate("y*z2 - z*y2", out=n[:, 0])
+    ne.evaluate("z*x2 - x*z2", out=n[:, 1])
+    ne.evaluate("x*y2 - y*x2", out=n[:, 2])
 
-        return n
+    return n
 
 
 def ValueAt(x:  np.ndarray,
@@ -306,28 +283,23 @@ def interp2d(x:         np.ndarray,
              y:         np.ndarray,
              z:         np.ndarray,
              xp:        np.ndarray,
-             yp:        np.ndarray,
-             method:    str = 'linear')\
+             yp:        np.ndarray)\
         -> np.ndarray:
     """
     Faster alternative for :obj:`scipy.interpolate.interp2d` for gridded and equally spaced 2D data
-    linear or nearest neighbor interpolation
+    and kind="linear"
 
     :param x: x coordinate vector (numpy 1D array)
     :param y: y coordinate vector (numpy 1D array)
     :param z: z values (numpy 2D array)
     :param xp: numpy 1D arrays holding the interpolation points x coordinates
     :param yp: numpy 1D arrays holding the interpolation points y coordinates
-    :param method: "linear" or "nearest" (string)
     :return: interpolated values as 1D array
     
-    >>> interp2d(np.array([2, 3]), np.array([1, 2]), np.array([[0, 1], [2, 3]]), np.array([2.25, 2.75]), np.array([1, 1.5]), method="linear")
+    >>> interp2d(np.array([2, 3]), np.array([1, 2]), np.array([[0, 1], [2, 3]]), np.array([2.25, 2.75]), np.array([1, 1.5]))
     array([0.25, 1.75])
 
-    >>> interp2d(np.array([2, 3]), np.array([1, 2]), np.array([[0, 1], [2, 3]]), np.array([2.25, 2.75]), np.array([1, 1.5]), method="nearest")
-    array([0, 3])
     """
-
     # check input shapes
     if x.ndim != 1 or y.ndim != 1:
         raise TypeError("x and y need to be vectors")
@@ -351,31 +323,22 @@ def interp2d(x:         np.ndarray,
     # xc, yc: integer part of xt, yt coordinates (x1, y1 in Wikipedia)
     # xr, yr: float part of xt, yt coordinates ((x-x1)/(x2-x1), (y-y1)/(y2-y1) in Wikipedia)
 
-    xs, xe, ys, ye = x[0], x[1], y[0], y[1]
-    xt =  ne.evaluate("1 / (xe - xs) * (xp - xs)")
-    yt =  ne.evaluate("1 / (ye - ys) * (yp - ys)")
+    x0, x1, y0, y1 = x[0], x[1], y[0], y[1]
+    xt =  ne.evaluate("1 / (x1 - x0) * (xp - x0)")
+    yt =  ne.evaluate("1 / (y1 - y0) * (yp - y0)")
 
-    if method == 'linear':
-        # this part is faster than using np.divmod
-        xc = xt.astype(int)
-        yc = yt.astype(int)
-        xr = xt - xc
-        yr = yt - yc
+    # this part is faster than using np.divmod
+    xc = xt.astype(int)
+    yc = yt.astype(int)
+    xr = xt - xc
+    yr = yt - yc
 
-        a = z[yc, xc]
-        b = z[yc+1, xc]
-        c = z[yc, xc+1]
-        d = z[yc+1, xc+1]
+    # handle case where we are exactly add the edge of the data, the index is
+    xcp = np.where(xc < x.shape[0], xc+1, xc)
+    ycp = np.where(yc < y.shape[0], yc+1, yc)
 
-        # rearranged form with only 4 multiplications for speedup
-        return ne.evaluate("(1 - yr) * (xr * (c - a) + a) + yr * (xr * (d - b) + b)")
+    a, b, c, d = z[yc, xc], z[ycp, xc], z[yc, xcp], z[ycp, xcp]
 
-    elif method == 'nearest':
-        # fast rounding for positive numbers
-        xc = (xt + 0.5).astype(int)
-        yc = (yt + 0.5).astype(int)
-
-        return z[yc, xc]
-    else:
-        raise ValueError("Invalid method")
+    # rearranged form with only 4 multiplications for speedup
+    return ne.evaluate("(1 - yr) * (xr * (c - a) + a) + yr * (xr * (d - b) + b)")
 

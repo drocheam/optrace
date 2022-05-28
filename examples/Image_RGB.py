@@ -7,7 +7,7 @@ sys.path.append('./')
 import optrace as ot
 from optrace.gui import GUI as TraceGUI
 
-Image = './examples/tv-test-pattern.png'
+Image = ot.preset_image_test_screen
 
 # make Raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])

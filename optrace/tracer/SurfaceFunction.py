@@ -14,7 +14,8 @@ class SurfaceFunction(BaseClass):
                  derivative:    Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] = None,
                  hits:          Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
                  minz:          float = None,
-                 maxz:          float = None)\
+                 maxz:          float = None,
+                 **kwargs)\
             -> None:
         """
 
@@ -32,17 +33,20 @@ class SurfaceFunction(BaseClass):
         self.derivative = derivative
         self.hits = hits
 
+        super().__init__(**kwargs)
+        
         # get offset at (0, 0), gets removed later
         self.off = func(np.array([0.]), np.array([0.]))[0]
 
         if maxz is None or minz is None:
-            warnings.warn("WARNING: minz or maxz missing, the values will be determined automatically."
-                  "This is however less accurate than specifying them.")
+            if not self.silent:
+                warnings.warn("WARNING: minz or maxz missing, the values will be determined automatically."
+                              "This is however less accurate than specifying them.")
             self.minz, self.maxz = self.__findBounds()
             self.minz, self.maxz = self.minz - self.off, self.maxz - self.off
         else:
             self.minz, self.maxz = minz - self.off, maxz - self.off
-
+        
         self._lock = True
 
     def hasDerivative(self) -> bool:
@@ -152,12 +156,11 @@ class SurfaceFunction(BaseClass):
 
         match key:
             case ("r" | "off" | "maxz" | "minz"):
-                if not isinstance(val, float | int):
-                    raise TypeError(f"{key} needs to be of type float or int.")
+                self._checkType(key, val, float | int)
                 val = float(val)
 
-            case ("derivative" | "func" | "hits" | "mask") if val is not None and not callable(val):
-                raise TypeError(f"{key} needs to be callable.")
+            case ("derivative" | "func" | "hits" | "mask"):
+                self._checkNoneOrCallable(key, val)
 
         super().__setattr__(key, val)
 

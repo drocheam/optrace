@@ -8,9 +8,7 @@ import optrace as ot
 from optrace.plots import *
 import numpy as np
 
-
-# Open the image form working directory
-Image_path = './examples/tv-test-pattern.png'
+Image_path = ot.preset_image_test_screen
 
 # make Raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
@@ -34,11 +32,10 @@ RT.add(Det)
 
 # render and show detector image
 pos = [27., 30., 33., 36.]
-Ims = RT.iterativeDetectorImage(N_rays=15e6, N_px=300, pos=pos)
+_, Ims = RT.iterativeRender(N_rays=10e6, N_px_D=100, pos=pos)
 
-
+# show rendered images
 for i in np.arange(len(Ims)-1):
-    DetectorPlot(Ims[i], block=False, mode="sRGB (Absolute RI)")
-# DetectorPlot(ot.Image.load("./saveTest.npz"), block=False, mode="sRGB")
-DetectorPlot(Ims[-1], block=True, mode="sRGB (Absolute RI)")
+    ImagePlot(Ims[i], block=False, mode="sRGB (Absolute RI)")
+ImagePlot(Ims[-1], block=True, mode="sRGB (Absolute RI)")
 

@@ -5,8 +5,6 @@ Provides the functionality for the creation of numerical or analytical surfaces.
 The class contains methods for interpolation, surface masking and normal calculation
 """
 
-
-import copy
 import numpy as np
 import optrace.tracer.Misc as misc
 from optrace.tracer.SurfaceFunction import *
@@ -25,7 +23,8 @@ class Surface(BaseClass):
                  dim:           (list | np.ndarray) = [6, 6],
                  ang:           float = 0,
                  Data:          np.ndarray = None,
-                 func:          SurfaceFunction = None)\
+                 func:          SurfaceFunction = None,
+                 **kwargs)\
             -> None:
         """
         Create a surface object.
@@ -48,9 +47,7 @@ class Surface(BaseClass):
         self.pos = np.array([0., 0., 0.], dtype=np.float64)
         
         self.dim = np.array(dim, dtype=np.float64)
-
         self.Mask = np.array([], dtype=np.float64)
-
         self.Z = np.array([], dtype=np.float64)
 
         self.r, self.ri = r, ri
@@ -73,12 +70,11 @@ class Surface(BaseClass):
                 if (self.k + 1)*(self.rho*self.r)**2 >= 1:
                     raise ValueError("Surface radius r larger than radius of conic section.")
 
-                self.maxz = None
-
-                self.minz = self.pos[2] if self.rho > 0 \
-                                        else self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
-                self.maxz = self.pos[2] if self.rho < 0 \
-                                        else self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
+                # depending on the sign of rho maxz or minz can be on the edge or center
+                z0 = self.pos[2]
+                self.maxz = None # set to some value so getValues() can be called
+                z1 = self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
+                self.minz, self.maxz = min(z0, z1), max(z0, z1)
 
             case "Data":
    
@@ -128,6 +124,7 @@ class Surface(BaseClass):
             case _:
                 raise ValueError("Invalid surface_type")
 
+        super().__init__(**kwargs)
         self.lock()
 
     def hasHitFinding(self) -> bool:
@@ -140,7 +137,11 @@ class Surface(BaseClass):
         """return if the surface has no extent in z-direction"""
 
         return self.surface_type in ["Circle", "Ring", "Rectangle", "Point", "Line"]
-    
+   
+    def is2D(self) -> bool:
+        """"""
+        return self.surface_type not in ["Point", "Line"]
+
     def moveTo(self, pos: (list | np.ndarray)) -> None:
         """
         Moves the surface in 3D space.
@@ -234,6 +235,10 @@ class Surface(BaseClass):
         :param N: number of grid values in each dimension (int)
         :return: X, Y, Z coordinate array (all numpy 2D array)
         """
+        
+        if self.surface_type in ["Point", "Line"]:
+            raise RuntimeError(f"Can't plot a non 2D surface_type '{self.surface_type}'")
+        
         if self.surface_type == "Rectangle":
             xs, xe, ys, ye, _, _ = self.getExtent()
 
@@ -245,9 +250,6 @@ class Surface(BaseClass):
             
             return X, Y, Z
     
-        if self.surface_type in ["Point", "Line"]:
-            raise RuntimeError("PlottingMesh not defined for types 'Point' and 'Line'")
-
         x = self.pos[0] + np.linspace(-self.r, self.r, N)
         y = self.pos[1] + np.linspace(-self.r, self.r, N)
 
@@ -435,7 +437,7 @@ class Surface(BaseClass):
                 return x, y, np.full_like(y, self.pos[2])
 
             case ("Line" | "Point"):
-                raise RuntimeError("Edge not defined for surface_types 'Point' and 'Line'")
+                raise RuntimeError(f"Edge not defined for non 2D surface_type '{self.surface_type}'")
 
             case _:
                 r = self.r - self.eps
@@ -580,31 +582,24 @@ class Surface(BaseClass):
         match key:
 
             case "surface_type":
-                if not isinstance(val, str):
-                    raise TypeError(f"{key} needs to be of type str.")
-                if val not in self.surface_types:
-                    raise ValueError("Invalid surface_type.")
+                self._checkType(key, val, str)
+                self._checkIfIn(key, val, self.surface_types)
 
             case ("r" | "rho" | "k" | "ri" | "ang"):
-                if not isinstance(val, float | int):
-                    raise TypeError(f"{key} needs to be of type int or float.")
+                self._checkType(key, val, float | int)
                 val = float(val)
 
-                if key == "r" and val < 0:
-                    raise ValueError("Surface radius r needs to be positive.")
+                if key in ["r", "ri"]:
+                    self._checkNotBelow(key, val, 0)
 
-                if key == "ri" and val < 0:
-                    raise ValueError("Inner Surface radius ri needs to be non-negative.")
-        
                 if key == "rho" and val == 0:
                     raise ValueError("rho needs to be non-zero. For a plane use surface_type=\"Circle\".")
 
-            case "func" if not isinstance(val, SurfaceFunction | None):
-                raise TypeError("func needs to be a SurfaceFunction object.")
+            case "func":
+                self._checkType(key, val, SurfaceFunction | None)
 
             case "dim":
-                if not isinstance(val, np.ndarray):
-                    raise TypeError("dim needs to be of type np.ndarray")
+                self._checkType(key, val, np.ndarray)
 
                 if val[0] <= 0 or val[1] <= 0:
                     raise ValueError("Dimensions dim need to be positive.")

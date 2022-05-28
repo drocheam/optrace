@@ -1,4 +1,7 @@
 
+# spectral lines
+#######################################################################################################################
+
 # lines from https://en.wikipedia.org/wiki/Abbe_number
 preset_line_i  = 365.01 	# Hg 	UV-A
 preset_line_h  = 404.66 	# h 	Hg 	violet
@@ -15,16 +18,24 @@ preset_line_A_ = 768.2 	    # A' 	K 	IR-A
 preset_line_s  = 852.11 	# s 	Cs 	IR-A
 preset_line_t  = 1013.98    # t 	Hg 	IR-A 
 
-# line combinations
+# line combinations, used for the calculation of Abbe numbers
+#######################################################################################################################
+
 preset_lines_FDC   = [preset_line_F,  preset_line_D, preset_line_C]
 preset_lines_FdC   = [preset_line_F,  preset_line_d, preset_line_C]
 preset_lines_FeC   = [preset_line_F,  preset_line_e, preset_line_C]
 preset_lines_F_eC_ = [preset_line_F_, preset_line_e, preset_line_C_]
 
 
+# List of presets for Lines
+#######################################################################################################################
+
 presets_line = [preset_line_i, preset_line_h, preset_line_g, preset_line_F_, preset_line_F, preset_line_e,
                 preset_line_d, preset_line_D, preset_line_C, preset_line_C_,preset_line_r, preset_line_A_, 
                 preset_line_s, preset_line_t]
+
+# list of presets for line combinations
+#######################################################################################################################
 
 presets_lines = [preset_lines_FDC, preset_lines_FdC, preset_lines_FeC, preset_lines_F_eC_]
 

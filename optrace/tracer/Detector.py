@@ -14,6 +14,7 @@ import optrace.tracer.Misc as misc
 class Detector(SObject):
 
     abbr = "DET"
+    _allow_non_2D = False  # don't allow points or lines as surfaces
 
     def __init__(self,
                  Surface:   Surface,

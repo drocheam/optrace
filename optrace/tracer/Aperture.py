@@ -4,7 +4,6 @@ Aperture class:
 """
 
 import numpy as np
-from typing import Callable  # for function type hints
 
 from optrace.tracer.SObject import *
 from optrace.tracer.Surface import *  # for the Aperture surface
@@ -13,6 +12,7 @@ from optrace.tracer.Surface import *  # for the Aperture surface
 class Aperture(SObject):
 
     abbr = "AP"
+    _allow_non_2D = False  # don't allow points or lines as surfaces
 
     def __init__(self, 
                  Surface:       Surface, 
@@ -27,6 +27,6 @@ class Aperture(SObject):
         """
 
         super().__init__(Surface, pos, **kwargs)
-      
+     
         self._new_lock = True
 

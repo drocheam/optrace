@@ -10,7 +10,6 @@ The RaySource object also holds all rays and ray sections generated in raytracin
 
 import numpy as np
 from typing import Callable
-from PIL import Image as PILImage
 
 from optrace.tracer.Surface import * 
 from optrace.tracer.SObject import *
@@ -28,6 +27,7 @@ class RaySource(SObject):
     polarization_types = ["Angle", "Random", "x", "y", "xy"]
 
     abbr = "RS"
+    _allow_non_2D = True  # allow points or lines as surfaces
 
     def __init__(self,
 
@@ -51,7 +51,7 @@ class RaySource(SObject):
                 
                  # Polarization Parameters
                  polarization_type: str = "Random",
-                 pol_ang:           float = 0,
+                 pol_ang:           float = 0.,
 
                  **kwargs)\
             -> None:
@@ -74,6 +74,8 @@ class RaySource(SObject):
         """
         self._new_lock = False
 
+        self.pIf = None
+        
         super().__init__(Surface, pos, **kwargs)
 
         self.direction_type = direction_type
@@ -84,9 +86,9 @@ class RaySource(SObject):
         self.pol_ang = pol_ang
         self.power = power
         self.spectrum = spectrum
-        self.s = s
         self.Image = Image
         self.or_func = or_func
+        self.s = s
 
         # lock assignment of new properties. New properties throw an error.
         self._new_lock = True
@@ -101,7 +103,7 @@ class RaySource(SObject):
                    np.mean(self.Image[:, :, 2]), 1.0
         else:
             return self.spectrum.getColor()
-                
+    
     def createRays(self, N: int, no_pol: bool = False, power: float=None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -137,17 +139,14 @@ class RaySource(SObject):
             if self.Image is None:
                 raise RuntimeError("Image parameter missing")
 
-            RGB = Color.sRGB_to_sRGBLinear(self.Image)  # physical brightness is proportional to RGBLinear signal
-            If = np.sum(RGB, axis=2).flatten()  # brightness is sum of RGBLinear components
-
             # get random pixel number, the pixel brightness is the probability
-            P = np.random.choice(If.shape[0], N, p=If/np.sum(If))
-            PY, PX = np.divmod(P, RGB.shape[1])  # pixel x, y position from pixel number
+            P = np.random.choice(self.pIf.shape[0], N, p=self.pIf)
+            PY, PX = np.divmod(P, self.Image.shape[1])  # pixel x, y position from pixel number
 
             # add random position inside pixel and calculate positions in 3D space
             rx, ry = np.random.sample(N), np.random.sample(N)
             xs, xe, ys, ye = self.Surface.getExtent()[:4]
-            Iy, Ix = RGB.shape[:2]
+            Iy, Ix = self.Image.shape[:2]
 
             p = np.zeros((N, 3), dtype=np.float64, order='F')
             misc.calc("(xe-xs)/Ix * (PX + rx) + xs", out=p[:, 0])
@@ -269,49 +268,53 @@ class RaySource(SObject):
 
         match key:
 
-            case "direction_type" if not isinstance(val, str) or val not in self.direction_types:
-                raise ValueError(f"Invalid direction_type '{val}'.")
+            case "direction_type":
+                self._checkType(key, val, str)
+                self._checkIfIn(key, val, self.direction_types)
 
-            case "orientation_type" if not isinstance(val, str) or val not in self.orientation_types:
-                raise ValueError(f"Invalid orientation_type '{val}'.")
+            case "orientation_type":
+                self._checkType(key, val, str)
+                self._checkIfIn(key, val, self.orientation_types)
 
-            case "polarization_type" if not isinstance(val, str) or val not in self.polarization_types:
-                raise ValueError(f"Invalid polarization_type '{val}'.")
+            case "polarization_type":
+                self._checkType(key, val, str)
+                self._checkIfIn(key, val, self.polarization_types)
 
             case ("power" | "sr_angle" | "pol_ang"):
-
-                if not isinstance(val, int | float):
-                    raise TypeError(f"{key} needs to be of type int or float.")
-
+                self._checkType(key, val, int | float)
+                self._checkNotBelow(key, val, 0)
                 val = float(val)
 
-                if key in ["power", "sr_angle"] and val <= 0:
-                    raise ValueError(f"{key} needs to be positive, but is {val}.")
-
             case "s":
-                if not isinstance(val, list | np.ndarray):
-                    raise TypeError("s needs to be of type list or numpy.ndarray")
+                self._checkType(key, val, list | np.ndarray)
                 val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
 
-            case "spectrum" if not isinstance(val, Spectrum | None):
-                raise TypeError("spectrum needs to be of type Spectrum.")
+            case "spectrum":
+                self._checkType(key, val, Spectrum | None)
 
-            case "or_func" if val is not None and not callable(val):
-                raise TypeError(f"{key} needs to be callable.")
+            case "or_func":
+                self._checkNoneOrCallable(key, val)
 
             case "Image" if val is not None:
-                match val:
-                    case str():
-                        val = np.asarray(PILImage.open(val).convert("RGB"), dtype=np.float64) / 2**8
-                    case np.ndarray():
-                        val = np.array(val, dtype=np.float64)
-                    case _:
-                        raise TypeError("Invalid image format")
+
+                self._checkType(key, val, str | np.ndarray)
+
+                val = misc.loadImage(val) if isinstance(val, str) else np.array(val, dtype=np.float64)
+
+                if val.shape[0]*val.shape[1] > 2e6:
+                    raise RuntimeError("For performance reasons only images with less than 2 megapixels are allowed.")
 
                 val = np.flipud(val)
 
-            case "FrontSurface" if isinstance(val, Surface) and not val.isPlanar():
-                raise ValueError("Currently only planar surfaces are supported for RaySources.")
+                # calculate pixel probability from relative power for each pixel
+                If = Color._PowerFromSRGB(val).flatten()
+                self.pIf = 1/np.sum(If)*If
+
+            case "FrontSurface":
+                self._checkType(key, val, Surface)
+
+                if not val.isPlanar():
+                    raise ValueError("Currently only planar surfaces are supported for RaySources.")
 
         super().__setattr__(key, val)
 

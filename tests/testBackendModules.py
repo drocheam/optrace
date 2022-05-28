@@ -138,6 +138,7 @@ class BackendModuleTests(unittest.TestCase):
         # check presets
         for material in ot.presets_n:
             material(550)
+            # print(material.desc, material.getAbbeNumber())
 
         # check exceptions
         self.assertRaises(ValueError, ot.RefractionIndex, "ABC")  # invalid type

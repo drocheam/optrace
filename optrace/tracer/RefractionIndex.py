@@ -19,14 +19,16 @@ class RefractionIndex(BaseClass):
     # Refraction Index Models:
     # see https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
 
-    n_types = ["Constant", "Cauchy", "Conrady", "Sellmeier", "Function"]
+    n_types = ["Constant", "Cauchy", "Conrady", "Data", "Sellmeier", "Function"]
 
     def __init__(self,
                  n_type:    str = "Constant",
                  n:         float = 1.0,
                  func:      Callable[[np.ndarray], np.ndarray] = None,
                  coeff:     list = [0, 0, 0, 0, 0, 0, 0, 0],
-                 desc:      str = None)\
+                 wls:       list | np.ndarray = None,
+                 ns:        list | np.ndarray = None,
+                 **kwargs)\
             -> None:
         """
         Create a RefractionIndex object of type "n_type".
@@ -46,9 +48,10 @@ class RefractionIndex(BaseClass):
         self.n_type = n_type
         self.n = n
         self.func = func
-        self.desc = desc
         self.coeff = coeff
 
+        self._wls, self._ns = misc.uniform(wls, ns, 5000)
+        super().__init__(**kwargs)
         self._new_lock = True
 
     def __call__(self, wl: np.ndarray | list | float) -> np.ndarray:
@@ -65,12 +68,12 @@ class RefractionIndex(BaseClass):
 
             case "Cauchy":
                 # parameters are specified in 1/µm^n, so convert nm wavelengths to µm with factor 1e-3
-                A, B, C, D, _, _, _, _ = tuple(self.coeff)
+                A, B, C, D, = tuple(self.coeff)[:4]
                 return misc.calc("A + B/l**2 + C/l**4 + D/l**6", l=wl_*1e-3)
         
             case "Conrady":
-                A, B, C, _, _, _, _, _ = tuple(self.coeff)
-                return misc.calc("A + B/l + C/l**3.5", l=wl*1e-3)
+                A, B, C = tuple(self.coeff)[:3]
+                return misc.calc("A + B/l + C/l**3.5", l=wl_*1e-3)
 
             case "Constant":
                 return np.full_like(wl_, self.n, dtype=np.float32)
@@ -79,6 +82,9 @@ class RefractionIndex(BaseClass):
                 if self.func is None:
                     raise RuntimeError("n_type='Function', but func not specified.")
                 return self.func(wl_)
+
+            case "Data":
+                return np.interp(wl, self._wls, self._ns)
 
             case _:  # Sellmeier
                 wl2 = misc.calc("(wl_*1e-3)**2") # since Cs are specified in µm, not in nm
@@ -92,34 +98,33 @@ class RefractionIndex(BaseClass):
 
         match key:
         
-            case "n_type" if not isinstance(val, str) or val not in self.n_types:
-                raise ValueError(f"n_type needs to be one of {self.n_types}")
+            case "n_type":
+                self._checkType(key, val, str)
+                self._checkIfIn(key, val, self.n_types)
                 
             case "n":
-                if not isinstance(val, int | float):
-                    raise TypeError(f"Parameter {key} needs to be of type int or float")
-
+                self._checkType(key, val, float | int)
+                self._checkNotBelow(key, val, 1)
                 val = float(val)
-
-                if val < 1:
-                    raise ValueError(f"Parameter {key} needs to be >= 1.0, but is {val}.")
 
             case "coeff":
 
+                self._checkType(key, val, list)
+                
                 match self.n_type:
                     case "Cauchy":      cnt = 4
                     case "Conrady":     cnt = 3
                     case "Sellmeier":   cnt = 8
                     case _:             cnt = 8
 
-                if not isinstance(val, list) or len(val) > cnt:
+                if len(val) > cnt:
                     raise ValueError(f"{key} needs to be a list with maximum {cnt} numeric coefficients")
 
                 # pad to 8 coeffs
                 val += [0] * (8 - len(val))
 
-            case "func" if val is not None and not callable(val):
-                raise TypeError(f"func needs to be callable.")
+            case "func":
+                self._checkNoneOrCallable(key, val)
 
         super().__setattr__(key, val)
 
@@ -133,12 +138,8 @@ class RefractionIndex(BaseClass):
 
     def getDesc(self):
         """"""
-        if self.desc is not None:
-            return self.desc
-        elif self.n_type == "Constant":
-            return str(self.n)
-        else:
-            return self.n_type
+        fallback = str(self.n) if self.n_type == "Constant" else self.n_type
+        return super().getDesc(fallback=fallback)
 
     def getAbbeNumber(self, lines=Lines.preset_lines_FDC) -> float:
         """

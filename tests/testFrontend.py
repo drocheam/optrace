@@ -26,7 +26,7 @@ class FrontendTests(unittest.TestCase):
     
     def test_GUI_inits(self) -> None:
 
-        Image = './examples/tv-test-pattern.png'
+        Image = ot.preset_image_test_screen
 
         # make Raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], silent=True)
@@ -284,6 +284,7 @@ class FrontendTests(unittest.TestCase):
                 sim.PlottingType = "Points"
                 sim.waitForIdle()
                 sim.close()
+                time.sleep(2)
             sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
 
         RT = self.RT_Example()

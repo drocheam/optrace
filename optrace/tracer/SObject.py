@@ -34,7 +34,9 @@ from optrace.tracer.BaseClass import *
 
 class SObject(BaseClass):
 
-    abbr = "SO"
+    abbr = "SO" # abbreviation for objects of this class
+    _allow_non_2D = True # allow points or lines as surfaces
+
 
     def __init__(self, 
                  FrontSurface:  Surface, 
@@ -42,7 +44,7 @@ class SObject(BaseClass):
                  BackSurface:   Surface = None,
                  d1:            float = None,
                  d2:            float = None,
-                 desc:          str = None)\
+                 **kwargs)\
             -> None:
         """
         Create a SObject object..
@@ -55,7 +57,6 @@ class SObject(BaseClass):
         # use a Surface copy, since we change its position in 3D space
         self.FrontSurface = FrontSurface.copy()
         self.BackSurface = BackSurface.copy() if BackSurface is not None else None
-        self.desc = desc
 
         self.d1 = d1
         self.d2 = d2
@@ -69,6 +70,9 @@ class SObject(BaseClass):
                 raise ValueError("Thicknesses de, d1, d2 need to be non-negative.")
         
         self.moveTo(pos)
+
+        super().__init__(**kwargs)
+        
         self._geometry_lock = True
 
     def hasBackSurface(self) -> bool:
@@ -109,7 +113,7 @@ class SObject(BaseClass):
 
         :param pos: new 3D position of SObject center (list or numpy array)
         """
-
+        self._checkType("pos", pos, list | np.ndarray)
         pos = np.array(pos, dtype=np.float64)
 
         if not self.hasBackSurface():
@@ -126,10 +130,7 @@ class SObject(BaseClass):
     @property
     def pos(self) -> np.ndarray:
         """ position of the SObject center """
-        if not self.hasBackSurface():
-            return self.FrontSurface.pos
-        else:
-            return self.FrontSurface.pos + [0, 0, self.d1]
+        return self.FrontSurface.pos + [0, 0, 0 if not self.hasBackSurface() else self.d1]
 
     @property
     def extent(self) -> tuple[float, float, float, float, float, float]:
@@ -149,15 +150,14 @@ class SObject(BaseClass):
 
     def getDesc(self) -> str:
         """"""
-        if self.desc is not None:
-            return self.desc
-        else:
-            if self.hasBackSurface():
-                return f"{self.FrontSurface.surface_type} + {self.BackSurface.surface_type} "\
+        if self.hasBackSurface():
+            fallback = f"{self.FrontSurface.surface_type} + {self.BackSurface.surface_type} "\
                        f"at [{self.pos[2]:.04g}, {self.pos[1]:.04g}, {self.pos[2]:.04g}]"
-            else:
-                return f"{self.Surface.surface_type} at [{self.pos[2]:.04g}, "\
-                       f"{self.pos[1]:.04g}, {self.pos[2]:.04g}]"
+        else:
+            fallback =  f"{self.Surface.surface_type} at [{self.pos[2]:.04g}, "\
+                        f"{self.pos[1]:.04g}, {self.pos[2]:.04g}]"
+
+        return super().getDesc(fallback)
 
     def getCylinderSurface(self, nc: int = 100, d: float = 0.1) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -170,17 +170,11 @@ class SObject(BaseClass):
         """
 
         X1, Y1, Z1 = self.FrontSurface.getEdge(nc)
+        X2, Y2, Z2 = self.BackSurface.getEdge(nc) if self.hasBackSurface() else (X1, Y1, Z1+d)
 
-        if not self.hasBackSurface():
-            X2, Y2, Z2 = X1, Y1, Z1 + d
-        else:
-            X2, Y2, Z2 = self.BackSurface.getEdge(nc)
-
-        X = np.column_stack((X1, X2))
-        Y = np.column_stack((Y1, Y2))
-        Z = np.column_stack((Z1, Z2))
-
-        return X, Y, Z
+        return np.column_stack((X1, X2)),\
+               np.column_stack((Y1, Y2)),\
+               np.column_stack((Z1, Z2))
 
     def __setattr__(self, key, val):
 
@@ -192,21 +186,20 @@ class SObject(BaseClass):
                 raise RuntimeError("Use moveTo(pos) to move the Object")
 
         match key:
-            case ("name" | "short_name") if not isinstance(val, str):
-                raise TypeError(f"{key} needs to be of type str.")
 
-            case ("FrontSurface" | "BackSurface") if not isinstance(val, Surface | None):
-                raise TypeError(f"{key} needs to be of type Surface.")
+            case "FrontSurface":
+                self._checkType(key, val, Surface)
+                if val is not None and not self._allow_non_2D and not val.is2D():
+                    raise RuntimeError(f"FrontSurface of a {self.__class__.__name__} object needs to be 2 dimensional.")
 
+            case "BackSurface":
+                self._checkType(key, val, Surface | None)
+                if val is not None and not self._allow_non_2D and not val.is2D():
+                    raise RuntimeError(f"BackSurface of a {self.__class__.__name__} object needs to be 2 dimensional.")
+            
             case ("d1" | "d2"):
-                if not isinstance(val, int | float | None):
-                    raise TypeError(f"{key} needs to be a number.")
+                self._checkType(key, val, int | float | None)
+                val = float(val) if val is not None else val
 
-                if val is not None:
-                    val = float(val)
-
-            case "desc" if not isinstance(val, str | None):
-                raise TypeError("desc needs to be of type str.")
-        
         super().__setattr__(key, val)
     

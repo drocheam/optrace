@@ -739,13 +739,12 @@ class Raytracer:
         is_hit = surface.getMask(p_hit[:, 0], p_hit[:, 1])
         return p_hit, is_hit
 
-    def DetectorImage(self,
-                      N:        int,
+    def _hitDetector(self,
+                     info:      str,
                       ind:      int = 0,
                       snum:     int = None,
-                      extent:   (list | np.ndarray | str) = "auto",
-                      **kwargs) \
-            -> Image:
+                      extent:   (list | np.ndarray | str) = "auto") \
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, str, ProgressBar]:
         """
         Rendered Detector Image. Rays are already traced.
 
@@ -755,17 +754,13 @@ class Raytracer:
         :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
         """
 
-        N = int(N)
-        if N <= 0:
-            raise ValueError(f"Pixel number N needs to be a positive int, but is {N}")
-
         if not self.DetectorList:
             raise RuntimeError("Detector Missing")
 
         if not self.RaySourceList:
             raise RuntimeError("Raysource Missing")
 
-        bar = ProgressBar(prefix="Detector Image: ", max_value=4).start() if not self.silent else None
+        bar = ProgressBar(prefix=f"{info}: ", max_value=4).start() if not self.silent else None
 
         # range for selected Rays in RayStorage
         Ns, Ne = self.Rays.B_list[snum:snum+2] if snum is not None else (0, self.Rays.N)
@@ -864,24 +859,56 @@ class Raytracer:
         else:
             raise ValueError(f"Invalid extent '{extent}'.")
 
-        # init image and extent, these are the default values when no rays hit the detector
         Detector_ = self.DetectorList[ind]
-        pname = f": {Detector_.desc}" if Detector_.desc is not None else ""
+        pname = f": {Detector_.desc}" if Detector_.desc != "" else ""
         desc = f"{Detector.abbr}{ind}{pname} at z = {Detector_.pos[2]:.5g} mm"
-        Im = Image(desc=desc, extent=extent_out, coordinate_type=coordinate_type)
-        Im.makeImage(N, ph, w, wl, threading=self.multithreading, **kwargs)
+        
+        return ph, w, wl, extent_out, desc, coordinate_type, bar
+
+    def DetectorImage(self,
+                      N:        int,
+                      ind:      int = 0,
+                      snum:     int = None,
+                      extent:   (list | np.ndarray | str) = "auto",
+                      **kwargs) -> Image:
+        
+        N = int(N)
+        if N <= 0:
+            raise ValueError(f"Pixel number N needs to be a positive int, but is {N}")
+        
+        p, w, wl, extent_out, desc, coordinate_type, bar = self._hitDetector("Detector Image", ind, snum, extent)
+
+        # init image and extent, these are the default values when no rays hit the detector
+        Im = Image(desc=desc, extent=extent_out, coordinate_type=coordinate_type, 
+                   threading=self.multithreading, silent=self.silent)
+        Im.makeImage(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
 
         return Im
 
-    def iterativeDetectorImage(self,
+    def DetectorSpectrum(self,
+                         ind:      int = 0,
+                         snum:     int = None,
+                         extent:   (list | np.ndarray | str) = "auto",
+                         **kwargs) -> Spectrum:
+        
+        p, w, wl, extent, desc, coordinate_type, bar = self._hitDetector("Detector Spectrum", ind, snum)
+
+        spec = Spectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        if bar is not None:
+            bar.finish()
+
+        return spec
+
+    def iterativeRender(self,
                             N_rays:     int,
-                            N_px:       int,
-                            ind:        int = 0,
+                            N_px_D:     int | list = 400,
+                            N_px_S:     int | list = 400,
+                            ind:        int | list = 0,
                             pos:        list = [],
                             silent:     bool = False,
-                            extent:     (str | list | np.ndarray) = "whole")\
+                            extent:     (str | list | np.ndarray) = "auto")\
             -> list[Image]:
         """
         Raytrace with N_rays and render Detector Image.
@@ -893,14 +920,15 @@ class Raytracer:
         :param extent: image extent, either "whole" or 4 element numpy 1D array or list
         :return: list of XYZIL Images (each numpy 3D array of XYZ channels + Irradiance + Illuminance)
         """
-        if not isinstance(extent, list) and not isinstance(extent, np.ndarray) and extent == "auto":
-            raise ValueError("Image extent can't be 'auto' for multiple image render.")
 
         if (N_rays := int(N_rays)) <= 0:
             raise ValueError(f"Ray number N_rays needs to be a positive int, but is {N_rays}.")
 
-        if (N_px := int(N_px)) <= 0:
-            raise ValueError(f"Pixel number N_px needs to be a positive int, but is {N_px}.")
+        if (N_px_S := int(N_px_S)) <= 0:
+            raise ValueError(f"Pixel number N_px_S needs to be a positive int, but is {N_px_S}.")
+        
+        if (N_px_D := int(N_px_D)) <= 0:
+            raise ValueError(f"Pixel number N_px_D needs to be a positive int, but is {N_px_D}.")
 
         if not self.DetectorList:
             raise RuntimeError("Detector missing.")
@@ -908,6 +936,19 @@ class Raytracer:
         # use current detector position if pos is empty
         if not len(pos):
             pos = [self.DetectorList[ind].pos[2]]
+
+        if not isinstance(N_px_D, list):
+            N_px_D = [N_px_D] * len(pos)
+        
+        if not isinstance(N_px_S, list):
+            N_px_S = [N_px_S] * len(self.RaySourceList)
+        
+        if not isinstance(ind, list):
+            ind = [ind] * len(pos)
+        
+        if not isinstance(extent, list) or isinstance(extent[0], int | float):
+            extent = [extent] * len(pos)
+        extentc = extent.copy()
 
         rays_step = self.ITER_RAYS_STEP
         iterations = int(N_rays / rays_step)
@@ -919,7 +960,8 @@ class Raytracer:
         self.silent = True
 
         # image list
-        Im_res = []
+        DIm_res = []
+        SIm_res = []
 
         iter_ = range(iterations+extra)
         iterator = progressbar(iter_, prefix="Rendering: ") if not silent else iter_
@@ -935,27 +977,39 @@ class Raytracer:
 
             # for all detector positions
             for j in np.arange(len(pos)):
-                pos_new = np.concatenate((self.DetectorList[ind].pos[:2], [pos[j]]))
-                self.DetectorList[ind].moveTo(pos_new)
-                Imi = self.DetectorImage(N=N_px, ind=ind, extent=extent)
+                pos_new = np.concatenate((self.DetectorList[ind[j]].pos[:2], [pos[j]]))
+                self.DetectorList[ind[j]].moveTo(pos_new)
+                Imi = self.DetectorImage(N=N_px_D[j], ind=ind[j], extent=extentc[j])
                 Imi._Im *= rays_step/N_rays
                 
                 # append image to list in first iteration, after that just add image content
                 if i == 0:
-                    Im_res.append(Imi)
+                    DIm_res.append(Imi)
+                    extentc[j] = Imi.extent
                 else:
-                    Im_res[j]._Im += Imi._Im
+                    DIm_res[j]._Im += Imi._Im
+
+            for j, _ in enumerate(self.RaySourceList):
+                Imi = self.SourceImage(N=N_px_S[j], sindex=j)
+                Imi._Im *= rays_step/N_rays
+                
+                # append image to list in first iteration, after that just add image content
+                if i == 0:
+                    SIm_res.append(Imi)
+                else:
+                    SIm_res[j]._Im += Imi._Im
 
         # rescale images to update Im.Im, we only added Im._Im each
-        for Im in Im_res:
-            Im.rescale(N_px)
+        [SIm.rescale(N_px_S[i]) for i, SIm in enumerate(SIm_res)]
+        [DIm.rescale(N_px_D[i]) for i, DIm in enumerate(DIm_res)]
 
         # revert silent to its state
         self.silent = silent_old
 
-        return Im_res
+        return SIm_res, DIm_res
 
-    def SourceImage(self, N: int, sindex: int = 0, **kwargs) -> Image:
+    def _hitSource(self, info: str, sindex: int = 0)\
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
         """
         Rendered Image of RaySource. Rays were already traced.
 
@@ -967,20 +1021,44 @@ class Raytracer:
         if not self.RaySourceList:
             raise RuntimeError("RaySource Missing")
 
-        if (N := int(N)) <= 0:
-            raise ValueError(f"Pixel number N needs to be a positive int, but is {N}.")
-
-        RS = self.RaySourceList[sindex]
-        bar = ProgressBar(prefix="Source Image: ", max_value=2).start() if not self.silent else None
-        extent = RS.extent[:4]
-        p, _, _, w, wavelengths = self.Rays.getSourceSections(sindex)
+        bar = ProgressBar(prefix=f"{info}: ", max_value=2).start() if not self.silent else None
+        extent = self.RaySourceList[sindex].extent[:4]
+        p, _, _, w, wl = self.Rays.getSourceSections(sindex)
         if bar is not None:
             bar.update(1)
 
-        pname = f": {RS.desc}" if RS.desc is not None else ""
+        RS = self.RaySourceList[sindex]
+        pname = f": {RS.desc}" if RS.desc != "" else ""
         desc = f"{RaySource.abbr}{sindex}{pname} at z = {RS.pos[2]:.5g} mm"
-        Im = Image(desc=desc, extent=extent, coordinate_type="Cartesian")
-        Im.makeImage(N, p, w, wavelengths, **kwargs)
+
+        return p, w, wl, extent, desc, bar
+
+    def SourceSpectrum(self, sindex: int = 0, **kwargs) -> Spectrum:
+        p, w, wl, extent, desc, bar = self._hitSource("Source Spectrum", sindex)
+
+        spec = Spectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        if bar is not None:
+            bar.finish()
+
+        return spec
+
+    def SourceImage(self, N: int, sindex: int = 0, **kwargs) -> Image:
+        """
+        Rendered Image of RaySource. Rays were already traced.
+
+        :param N: number of image pixels in each dimension (int)
+        :param sindex:
+        :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
+        """
+        
+        if (N := int(N)) <= 0:
+            raise ValueError(f"Pixel number N needs to be a positive int, but is {N}.")
+        
+        p, w, wl, extent, desc, bar = self._hitSource("Source Image", sindex)
+
+        Im = Image(desc=desc, extent=extent, coordinate_type="Cartesian",
+                   threading=self.multithreading, silent=self.silent)
+        Im.makeImage(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1033,8 +1111,8 @@ class Raytracer:
             extent = np.min(x), np.max(x), np.min(y), np.max(y)
 
             # get hit pixel coordinate, subtract 1e-12 from N so all values are 0 <= xcor < N
-            xcor = (N_px - 1e-12) / (extent[1] - extent[0]) * (x - extent[0]) 
-            ycor = (N_px - 1e-12) / (extent[3] - extent[2]) * (y - extent[2])  
+            xcor = N_px*(1 - 1e-12) / (extent[1] - extent[0]) * (x - extent[0]) 
+            ycor = N_px*(1 - 1e-12) / (extent[3] - extent[2]) * (y - extent[2])  
 
             # image can be 1D for standard deviation, speed things up a little bit
             ind = N_px*ycor.astype(int) + xcor.astype(int)

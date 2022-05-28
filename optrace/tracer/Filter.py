@@ -14,11 +14,12 @@ from optrace.tracer.Surface import *  # for the Filter surface
 class Filter(SObject):
 
     abbr = "F"
+    _allow_non_2D = False  # don't allow points or lines as surfaces
 
     def __init__(self, 
                  Surface:       Surface, 
                  pos:           (list | np.ndarray),
-                 spectrum:      Spectrum = None,
+                 spectrum:      Spectrum,
                  **kwargs)\
             -> None:
         """
@@ -55,8 +56,8 @@ class Filter(SObject):
 
     def __setattr__(self, key, val):
       
-        if key == "spectrum" and not isinstance(val, Spectrum):
-            raise TypeError("spectrum needs to be of type Spectrum.")
+        if key == "spectrum":
+            self._checkType(key, val, Spectrum)
 
         super().__setattr__(key, val)
 

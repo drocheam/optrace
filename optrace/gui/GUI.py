@@ -32,7 +32,7 @@ from mayavi.sources.parametric_surface import ParametricSurface
 
 from optrace.tracer import *
 from optrace.tracer.Misc import timer as timer
-from optrace.plots.ImagePlots import DetectorPlot, SourcePlot
+from optrace.plots.ImagePlots import ImagePlot
 from optrace.plots.DebugPlots import AutoFocusDebugPlot
 
 import optrace.gui.TCPServer as TCPServer
@@ -187,8 +187,10 @@ class GUI(HasTraits):
     App = wx.App(False)
 
     # size of the mlab scene
-    SceneSize = [1150, 850] # with the window bar this should still fit on a 900p screen
-
+    SceneSize0 = [1150, 850] # default size
+    # with the window bar this should still fit on a 900p screen
+    SceneSize = SceneSize0.copy() # will hold current size
+    
     ####################################################################################################################
     # UI view creation
 
@@ -399,6 +401,7 @@ class GUI(HasTraits):
         self.OrientationAxes.text_property.trait_set(**self.TEXT_STYLE)
         self.OrientationAxes.marker.interactive = 0  # make orientation axes non-interactive
         self.OrientationAxes.visible = not bool(self.CleanerView)
+        self.OrientationAxes.widgets[0].viewport = [0, 0, 0.1, 0.15]
 
         # turn of text scaling of oaxes
         self.OrientationAxes.widgets[0].orientation_marker.x_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
@@ -514,16 +517,6 @@ class GUI(HasTraits):
             text.actor.text_scale_mode = 'none'
             text.property.trait_set(**self.TEXT_STYLE, justification="center", frame=True, frame_color=self.SUBTLE_INFO_STYLE["color"])
 
-            # if len(BoundList) > 2 and nList[i] != RefractionIndex("Constant", n=1):
-                # opacity = (nList[i](550) - 0.8) / 5
-                # points = self.Scene.mlab.points3d(0, 0, 0, name=f"Refraction Index Box {i}", mode='cube', scale_factor=1, opacity=opacity)
-                # ou=self.Raytracer.outline
-                # points.trait_set(name="Box")
-                # points.actor.actor.trait_set(position=((ou[1]+ou[0])/2,  (ou[3]+ou[2])/2, (BoundList[i+1]+BoundList[i])/2))
-                # points.actor.actor.trait_set(scale=((ou[1]-ou[0]),  (ou[3]-ou[2]), (BoundList[i+1]-BoundList[i])))
-            # else:
-                # points = None
-
             points = None
 
             self.RefractionIndexPlotObjects.append((outline, text, points))
@@ -561,7 +554,7 @@ class GUI(HasTraits):
         # object label
         label = f"{obj.abbr}{num}"
         # add desciption if any exists. But only if we are not in "CleanerView" displaying mode
-        label = label if obj.desc is None or bool(self.CleanerView) else label + ": " + obj.desc
+        label = label if obj.desc == "" or bool(self.CleanerView) else label + ": " + obj.desc
         text = self.Scene.mlab.text(x=obj.extent[1], y=obj.pos[1], z=zl, text=label, name=f"Label")
         text.property.trait_set(**self.LABEL_STYLE, justification="center")
         text.actor.text_scale_mode = 'none'
@@ -672,9 +665,10 @@ class GUI(HasTraits):
         lutm.title_text_property.trait_set(**self.INFO_STYLE)
 
         # lut position and size
-        # TODO make so that scalar bar has the same size regardless of scene dimensions (self.SceneSize)
-        lutm.scalar_bar_representation.position         = np.array([0.92, 0.2])
-        lutm.scalar_bar_representation.position2        = np.array([0.06, 0.6])
+        hr = self.SceneSize0[0]/self.SceneSize[0] # horizontal ratio 
+        vr = self.SceneSize0[1]/self.SceneSize[1] # vertical ratio
+        lutm.scalar_bar_representation.position         = np.array([0.92, (1-0.6*vr)/2])
+        lutm.scalar_bar_representation.position2        = np.array([0.06*hr, 0.6*vr])
         lutm.scalar_bar_widget.process_events           = False  # make non-interactive
         lutm.scalar_bar_representation.border_thickness = 0  # no ugly borders 
 
@@ -1292,7 +1286,7 @@ class GUI(HasTraits):
                 Imc = self.lastDetImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:
-                    DetectorPlot(self.lastDetImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
+                    ImagePlot(self.lastDetImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
                     self.Status["DetectorImage"] = False
                 
                 pyfaceGUI.invoke_later(on_finish)
@@ -1326,7 +1320,7 @@ class GUI(HasTraits):
                 Imc = self.lastSourceImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:
-                    SourcePlot(self.lastSourceImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
+                    ImagePlot(self.lastSourceImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
                     self.Status["SourceImage"] = False
                 
                 pyfaceGUI.invoke_later(on_finish)
@@ -1414,7 +1408,7 @@ class GUI(HasTraits):
                             self.FilterPlotObjects, self.AperturePlotObjects, self.DetectorPlotObjects]:
                 for num, obj in enumerate(Objects):
                     label = f"{obj[4].abbr}{num}"
-                    label = label if obj[4].desc is None or not show else label + ": " + obj[4].desc
+                    label = label if obj[4].desc == "" or not show else label + ": " + obj[4].desc
                     obj[3].text = label
 
             # replot Ray Pick Text, opacity of default text gets set
@@ -1466,6 +1460,12 @@ class GUI(HasTraits):
 
             # rescale orientation axes
             self.OrientationAxes.widgets[0].zoom = self.OrientationAxes.widgets[0].zoom * ch1/ch2
+  
+            if self.RaysPlot is not None:
+                bar = self.RaysPlot.parent.scalar_lut_manager.scalar_bar_representation
+                bar.position2 = np.array([bar.position2[0]*self.SceneSize[0]/SceneSize[0], 
+                                          bar.position2[1]*self.SceneSize[1]/SceneSize[1]])
+                bar.position = np.array([bar.position[0], (1-bar.position2[1])/2])
 
             # set current window size
             self.SceneSize = SceneSize

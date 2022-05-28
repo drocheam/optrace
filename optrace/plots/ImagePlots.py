@@ -12,67 +12,9 @@ import numpy as np
 import copy
 
 from optrace.tracer.Image import *
-from optrace.tracer.Detector import *
-from optrace.tracer.RaySource import *
-
-def DetectorPlot(Im: Image, mode: str = Image.display_modes[0], **kwargs) -> None:
-    """
-    Plot an Detector Image in Irradiance, Illuminance or RGB Mode.
-    Also displays image position and flux on detector.
-
-    :param Im: Image object
-    :param mode: mode from Image.modes (string)
-    """
-    # index = f"{Im.index}" if Im.index is not None else ""
-    # text = f"{Detector.abbr}{index} at z = {Im.z:.5g} mm"
-   
-    text = Im.desc
-
-    match mode:
-        case "Irradiance":      
-            clabel = "Irradiance in W/mm²"
-            text += f"\n Total Radiant Flux at Detector: {Im.getPower():.5g} W"
-
-        case "Illuminance":    
-            clabel = "Illuminance in lm/mm²"
-            text += f"\n Total Luminous Flux at Detector: {Im.getLuminousPower():.5g} lm"
-
-        case _:                 
-            clabel = mode
-            text += f"\nMode: {mode}"
-
-    showImage(Im, clabel=clabel, text=text, mode=mode, **kwargs)
 
 
-def SourcePlot(Im: Image, mode: str = Image.display_modes[0], **kwargs) -> None:
-    """
-    Plot an Source Image in Irradiance, Illuminance or RGB Mode.
-    Also displays image position and flux on detector.
-
-    :param Im: Image object
-    :param mode: mode from Image.modes (string)
-    """
-    # index = f"{Im.index}" if Im.index is not None else ""
-    # text = f"{RaySource.abbr}{index} at z = {Im.z:.5g} mm"
-    text = Im.desc
-    
-    match mode:
-        case "Irradiance":      
-            clabel = "Radiant Emittance in W/mm²"
-            text += f"\n Total Radiant Flux from Source: {Im.getPower():.5g} W"
-
-        case "Illuminance":    
-            clabel = "Luminous Emittance in lm/mm²"
-            text += f"\n Total Luminous Flux from Source: {Im.getLuminousPower():.5g} lm"
-
-        case _:                 
-            clabel = mode
-            text += f"\nMode: {mode}"
-
-    showImage(Im, clabel=clabel, text=text, mode=mode, **kwargs)
-
-
-def showImage(Im_in:    Image,
+def ImagePlot(Im:    Image,
               Imc:      np.ndarray=None,
               block:    bool = False,
               log:      bool = False,
@@ -82,7 +24,6 @@ def showImage(Im_in:    Image,
               mode:     str = "sRGB")\
         -> None:
     """
-    Shared plotting function for DetectorImage() and SourceImage(), call these functions for plotting instead.
 
     :param Im_in: Image from Raytracer SourceImage/DetectorImage function, numpy 3D array shape (N, N, 5)
     :param Imc: precalculated Image (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
@@ -93,18 +34,33 @@ def showImage(Im_in:    Image,
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
 
-    Im = Imc.copy() if Imc is not None else Im_in.getByDisplayMode(mode, log=log)
+    text = Im.getLongDesc(fallback="")
+
+    match mode:
+        case "Irradiance":      
+            clabel = "Irradiance in W/mm²"
+            text += f"\n Total Radiant Flux: {Im.getPower():.5g} W"
+
+        case "Illuminance":    
+            clabel = "Illuminance in lm/mm²"
+            text += f"\n Total Luminous Flux: {Im.getLuminousPower():.5g} lm"
+
+        case _:                 
+            clabel = mode
+            text += f"\nMode: {mode}"
+
+    Imd = Imc.copy() if Imc is not None else Im.getByDisplayMode(mode, log=log)
 
     # fall back to linear values when all pixels have the same value
-    if log and (np.max(Im) == np.min(Im) or mode == "Outside sRGB Gamut"):
+    if log and (np.max(Imd) == np.min(Imd) or mode == "Outside sRGB Gamut"):
         log = False
 
     # rotate 180 deg
     if flip:
-        Im = np.fliplr(np.flipud(Im))
-        extent = Im_in.extent[[1, 0, 3, 2]]
+        Imd = np.fliplr(np.flipud(Imd))
+        extent = Im.extent[[1, 0, 3, 2]]
     else:
-        extent = Im_in.extent
+        extent = Im.extent
 
     # better fonts to make everything look more professional
     matplotlib.rcParams['mathtext.fontset'] = 'stix'
@@ -117,17 +73,17 @@ def showImage(Im_in:    Image,
 
     # make image black if all content is zero
     vmin, vmax = None, None
-    if np.max(Im) == np.min(Im) == 0:
+    if np.max(Imd) == np.min(Imd) == 0:
         vmin, vmax = 0, 1e-16
     elif not log and not mode.startswith("sRGB"):
         vmin = 0
 
     # plot image
     plt.figure()
-    plt.imshow(Im, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, vmin=vmin, vmax=vmax)
+    plt.imshow(Imd, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, vmin=vmin, vmax=vmax)
 
     # plot labels
-    if Im_in.coordinate_type == "Polar":
+    if Im.coordinate_type == "Polar":
         plt.xlabel(r"$\theta_x$ / °")
         plt.ylabel(r"$\theta_y$ / °")
     else:
@@ -141,8 +97,68 @@ def showImage(Im_in:    Image,
 
     # show image
     plt.show(block=block)
+    plt.pause(0.1)
 
-    # wait a little to render the plot
-    if not block:
-        plt.pause(0.05)
+# TODO test
+def ImageCutPlot(Im:    Image,
+              block:    bool = False,
+              log:      bool = False,
+              flip:     bool = False,
+              text:     str = "",
+              clabel:   str = "",
+              mode:     str = "sRGB",
+              **kwargs)\
+        -> None:
+    """
+
+    :param Im_in: Image from Raytracer SourceImage/DetectorImage function, numpy 3D array shape (N, N, 5)
+    :param block: if plot is blocking (bool)
+    :param log: if logarithmic values are shown (bool)
+    :param text: Title text to display (string)
+    :param clabel: label for colorbar (string)
+    :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
+    """
+
+    text = Im.getLongDesc(fallback="")
+
+    match mode:
+        case "Irradiance":      clabel = "Irradiance in W/mm²"
+        case "Illuminance":     clabel = "Illuminance in lm/mm²"
+        case _:                 clabel = mode
+
+    s, Imd = Im.cut(mode, log=log, **(kwargs))
+
+    # better fonts to make everything look more professional
+    matplotlib.rcParams['mathtext.fontset'] = 'stix'
+    matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
+    yim = "x" in kwargs
+    
+    # plot image
+    plt.figure()
+
+    colors = ["r", "g", "b"] if mode.startswith("sRGB") else [None, None, None]
+    [plt.plot(s, Imd[i], color=colors[i]) for i, _ in enumerate(Imd)]
+
+    # plot labels
+    if Im.coordinate_type == "Polar":
+        plt.xlabel(r"$\theta_x$ / °") if yim else plt.ylabel(r"$\theta_y$ / °")
+    else:
+        plt.xlabel("x / mm") if yim else plt.ylabel("y / mm")
+
+    if log:
+        plt.yscale('log')
+
+    if mode.startswith("sRGB"):
+        plt.legend(["R", "G", "B"])
+
+    plt.grid(visible=True, which='major')
+    plt.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
+    plt.minorticks_on()
+    plt.ylabel(clabel)
+    plt.title(text)
+
+    # show image
+    plt.show(block=block)
+    plt.pause(0.1)
 
