@@ -88,6 +88,7 @@ def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarr
 
     return icdf(X)
 
+
 def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """ 
     row wise scalar product. 
@@ -115,9 +116,6 @@ def partMask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
 
 
 def uniform(x, y, N):
-
-    if x is None or y is None:
-        return x, y
 
     xs = np.linspace(x[0], x[-1], N)
     interp = scipy.interpolate.interp1d(x, y)
@@ -279,11 +277,7 @@ def interpolateNan(h_data: np.ndarray) -> np.ndarray:
     return h_data_ix
 
 
-def interp2d(x:         np.ndarray,
-             y:         np.ndarray,
-             z:         np.ndarray,
-             xp:        np.ndarray,
-             yp:        np.ndarray)\
+def interp2d(x: np.ndarray, y: np.ndarray, z: np.ndarray, xp: np.ndarray, yp: np.ndarray)\
         -> np.ndarray:
     """
     Faster alternative for :obj:`scipy.interpolate.interp2d` for gridded and equally spaced 2D data
@@ -324,8 +318,8 @@ def interp2d(x:         np.ndarray,
     # xr, yr: float part of xt, yt coordinates ((x-x1)/(x2-x1), (y-y1)/(y2-y1) in Wikipedia)
 
     x0, x1, y0, y1 = x[0], x[1], y[0], y[1]
-    xt =  ne.evaluate("1 / (x1 - x0) * (xp - x0)")
-    yt =  ne.evaluate("1 / (y1 - y0) * (yp - y0)")
+    xt = ne.evaluate("1 / (x1 - x0) * (xp - x0)")
+    yt = ne.evaluate("1 / (y1 - y0) * (yp - y0)")
 
     # this part is faster than using np.divmod
     xc = xt.astype(int)

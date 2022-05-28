@@ -7,7 +7,7 @@ The class contains methods for interpolation, surface masking and normal calcula
 
 import numpy as np
 import optrace.tracer.Misc as misc
-from optrace.tracer.SurfaceFunction import *
+from optrace.tracer.geometry.SurfaceFunction import *
 from optrace.tracer.BaseClass import *
 
 class Surface(BaseClass):

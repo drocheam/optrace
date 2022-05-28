@@ -7,9 +7,9 @@ Useful for color filters or apertures.
 
 import numpy as np
 
-from optrace.tracer.SObject import *
-from optrace.tracer.Spectrum import *
-from optrace.tracer.Surface import *  # for the Filter surface
+from optrace.tracer.geometry.SObject import *
+from optrace.tracer.spectrum.TransmissionSpectrum import *
+from optrace.tracer.geometry.Surface import *  # for the Filter surface
 
 class Filter(SObject):
 
@@ -19,7 +19,7 @@ class Filter(SObject):
     def __init__(self, 
                  Surface:       Surface, 
                  pos:           (list | np.ndarray),
-                 spectrum:      Spectrum,
+                 spectrum:      TransmissionSpectrum,
                  **kwargs)\
             -> None:
         """
@@ -52,12 +52,12 @@ class Filter(SObject):
 
         :return: sRGB color tuple, with each channel in range [0, 1]
         """
-        return self.spectrum.getColor(illu="D65")
+        return self.spectrum.getColor()
 
     def __setattr__(self, key, val):
       
         if key == "spectrum":
-            self._checkType(key, val, Spectrum)
+            self._checkType(key, val, TransmissionSpectrum)
 
         super().__setattr__(key, val)
 

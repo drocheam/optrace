@@ -7,8 +7,8 @@ import numpy as np
 import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
 from optrace.tracer.Image import Image as Image
-from optrace.tracer.Spectrum import Spectrum as Spectrum
-from optrace.tracer.Surface import Surface as Surface
+from optrace.tracer.spectrum.LightSpectrum import *
+from optrace.tracer.geometry.Surface import *
 
 
 def AutoFocusDebugPlot(r, vals, rf, ff, title="Focus Finding", block=False):
@@ -42,7 +42,7 @@ def AutoFocusDebugPlot(r, vals, rf, ff, title="Focus Finding", block=False):
 def RefractionIndexPlot(RI, title="Refraction Index", **kwargs):
     """
     """
-    _SpectrumPlot(RI, r"$\lambda$ in nm", "n", title=title, **kwargs)
+    SpectrumPlot(RI, title=title, **kwargs)
 
 def SpectrumPlot(Spec, title="Spectrum", **kwargs):
     """
@@ -80,7 +80,7 @@ def ChromacitiesCIE1931(Im: Image | Spectrum | list[Spectrum], RI="Ignore", **kw
     _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, "CIE 1931 Chromaticity Diagram", "x", "y", **kwargs)
 
 
-def ChromacitiesCIE1976(Im: Image | Spectrum | list[Spectrum], RI="Ignore", **kwargs):
+def ChromacitiesCIE1976(Im: Image | LightSpectrum | list[LightSpectrum], RI="Ignore", **kwargs):
 
     r, g, b, w = Color._sRGB_r_uv, Color._sRGB_g_uv, Color._sRGB_b_uv, Color._sRGB_w_uv
 
@@ -140,18 +140,19 @@ def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, bloc
         labels = []
         legend3 = "Image Colors"
 
-    elif isinstance(Im, Spectrum):
-        XYZ = Im.getXYZ()[0]
+    elif isinstance(Im, LightSpectrum):
+        XYZ = Im.getXYZ()
         labels = [Im.getDesc()]
         legend3 = "Spectrum Colors"
-    
+   
+    # TODO only allow list of LightSpectrum
     elif isinstance(Im, list):
         labels = []
         XYZ = np.zeros((0, 1, 3), dtype=np.float64)
 
         for i, Imi in enumerate(Im):
             labels.append(Imi.getDesc())
-            XYZ = np.vstack((XYZ, Imi.getXYZ()[0]))
+            XYZ = np.vstack((XYZ, Imi.getXYZ()))
 
         legend3 = "Spectrum Colors"
 

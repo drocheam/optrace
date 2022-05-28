@@ -6,8 +6,8 @@ rectangular plane perpendicular to optical axis for creation of Detector Images
 
 import numpy as np
 
-from optrace.tracer.Surface import *  # for the Detector surface
-from optrace.tracer.SObject import *
+from optrace.tracer.geometry.Surface import *  # for the Detector surface
+from optrace.tracer.geometry.SObject import *
 import optrace.tracer.Misc as misc
 
 

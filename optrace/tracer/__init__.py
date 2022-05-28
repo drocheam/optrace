@@ -3,18 +3,21 @@ Backend module
 """
 
 # load modules
-from optrace.tracer.SurfaceFunction import SurfaceFunction
-from optrace.tracer.Surface import Surface 
-from optrace.tracer.Lens import Lens
+from optrace.tracer.geometry.SurfaceFunction import SurfaceFunction
+from optrace.tracer.geometry.Surface import Surface 
+from optrace.tracer.geometry.Lens import Lens
+from optrace.tracer.geometry.Aperture import Aperture
+from optrace.tracer.geometry.Filter import Filter
+from optrace.tracer.geometry.Detector import Detector
+
 from optrace.tracer.RayStorage import RaySource
 from optrace.tracer.Image import Image
 from optrace.tracer.Raytracer import Raytracer
-from optrace.tracer.Detector import Detector
-from optrace.tracer.RefractionIndex import RefractionIndex
-from optrace.tracer.Filter import Filter
-from optrace.tracer.Spectrum import Spectrum
-from optrace.tracer.Aperture import Aperture
 
+from optrace.tracer.spectrum.RefractionIndex import RefractionIndex
+from optrace.tracer.spectrum.Spectrum import Spectrum
+from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
+from optrace.tracer.spectrum.TransmissionSpectrum import TransmissionSpectrum
 
 from optrace.tracer.presets.Lines import *
 from optrace.tracer.presets.Spectrum import *

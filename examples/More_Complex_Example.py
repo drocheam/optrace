@@ -57,7 +57,7 @@ ap = ot.Surface("Circle", r=1, ri=0.005)
 def func(l):
     return np.exp(-0.5*(l-460)**2/20**2)
 
-fspec = ot.Spectrum("Function", func=func)
+fspec = ot.TransmissionSpectrum("Function", func=func)
 RT.add(ot.Filter(ap, pos=[0, 0, 45.2], spectrum=fspec))
 
 

@@ -14,17 +14,17 @@ from threading import Thread
 from typing import Callable
 from progressbar import progressbar, ProgressBar
 
-from optrace.tracer.Filter import * 
-from optrace.tracer.Aperture import * 
-from optrace.tracer.Detector import * 
-from optrace.tracer.Lens import * 
-from optrace.tracer.RaySource import * 
-from optrace.tracer.Surface import * 
-from optrace.tracer.RefractionIndex import * 
+from optrace.tracer.geometry.Filter import * 
+from optrace.tracer.geometry.Aperture import * 
+from optrace.tracer.geometry.Detector import * 
+from optrace.tracer.geometry.Lens import * 
+from optrace.tracer.geometry.RaySource import * 
+from optrace.tracer.geometry.Surface import * 
+
+from optrace.tracer.spectrum.RefractionIndex import * 
 from optrace.tracer.RayStorage import * 
 from optrace.tracer.Image import *
 
-from optrace.tracer.Misc import timer as timer
 import optrace.tracer.Misc as misc
 
 from enum import IntEnum

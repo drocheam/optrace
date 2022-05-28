@@ -714,7 +714,7 @@ class GUI(HasTraits):
                         case _:  # no single axis -> show white
                             col = (255, 255, 255)
 
-                    RSColor.append(np.array(col[:3])/255.)
+                    RSColor.append(np.array(col[:3])/255)
 
             case 'Source':
                 lutm.number_of_labels = len(self.Raytracer.RaySourceList)

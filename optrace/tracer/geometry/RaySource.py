@@ -11,9 +11,10 @@ The RaySource object also holds all rays and ray sections generated in raytracin
 import numpy as np
 from typing import Callable
 
-from optrace.tracer.Surface import * 
-from optrace.tracer.SObject import *
-from optrace.tracer.Spectrum import *
+from optrace.tracer.geometry.Surface import * 
+from optrace.tracer.geometry.SObject import *
+from optrace.tracer.spectrum.LightSpectrum import *
+
 from optrace.tracer.Misc import timer as timer
 import optrace.tracer.Misc as misc
 import optrace.tracer.Color as Color
@@ -41,7 +42,7 @@ class RaySource(SObject):
                  sr_angle:          float = 20.,
 
                  # Light Parameters
-                 spectrum:          Spectrum = None,
+                 spectrum:          LightSpectrum = None,
                  power:             float = 1.,
                  Image:             (str | np.ndarray) = None,
                  
@@ -290,7 +291,7 @@ class RaySource(SObject):
                 val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
 
             case "spectrum":
-                self._checkType(key, val, Spectrum | None)
+                self._checkType(key, val, LightSpectrum | None)
 
             case "or_func":
                 self._checkNoneOrCallable(key, val)

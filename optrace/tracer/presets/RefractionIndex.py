@@ -1,4 +1,4 @@
-from optrace.tracer.RefractionIndex import *
+from optrace.tracer.spectrum.RefractionIndex import *
 
 
 # Glasses
@@ -89,11 +89,11 @@ preset_n_PS = RefractionIndex("Sellmeier", coeff=[1.4435, 0.020216], desc="PS", 
 # https://refractiveindex.info/?shelf=organic&book=polyethylene_terephthalate&page=Zhang
 # linearly extrapolated from 400nm to 380nm
 preset_n_PET = RefractionIndex("Data", wls=np.concatenate(([380], 400+10*np.arange(39))),
-                               ns=[1.61891, 1.61027, 1.60595, 1.60212, 1.59847, 1.59528, 1.59247, 1.58988, 1.58716,
-                                   1.58496, 1.58304, 1.58111, 1.57927, 1.57769, 1.57630, 1.57470, 1.57333, 1.57194,
-                                   1.57086, 1.56993, 1.56904, 1.56811, 1.56696, 1.56627, 1.56527, 1.56478, 1.56368, 
-                                   1.56317, 1.56225, 1.56199, 1.56131, 1.56052, 1.56013, 1.55933, 1.55868, 1.55854,
-                                   1.55817, 1.55795, 1.55723, 1.55583], 
+                               vals=[1.61891, 1.61027, 1.60595, 1.60212, 1.59847, 1.59528, 1.59247, 1.58988, 1.58716,
+                                     1.58496, 1.58304, 1.58111, 1.57927, 1.57769, 1.57630, 1.57470, 1.57333, 1.57194,
+                                     1.57086, 1.56993, 1.56904, 1.56811, 1.56696, 1.56627, 1.56527, 1.56478, 1.56368, 
+                                     1.56317, 1.56225, 1.56199, 1.56131, 1.56052, 1.56013, 1.55933, 1.55868, 1.55854,
+                                     1.55817, 1.55795, 1.55723, 1.55583], 
                                desc="PET", long_desc="Polyethylene terephthalate")
 
 presets_n_plastic = [preset_n_CR39, preset_n_PC, preset_n_PDSM, preset_n_PET, preset_n_PMMA, preset_n_PS]
@@ -118,11 +118,11 @@ preset_n_Diamond = RefractionIndex("Sellmeier", coeff=[0.3306, 0.1750**2, 4.3356
 # https://refractiveindex.info/?shelf=3d&book=crystals&page=ice
 # (from table in full database record)
 preset_n_Ice = RefractionIndex("Data", wls=np.concatenate(([350], 390+10*np.arange(40))),
-                               ns=[1.3249, 1.3203, 1.3194, 1.3185, 1.3177, 1.3170, 1.3163, 1.3157, 1.3151, 1.3145,
-                                   1.3140, 1.3135, 1.3130, 1.3126, 1.3121, 1.3117, 1.3114, 1.3110, 1.3106, 1.3103, 
-                                   1.3100, 1.3097, 1.3094, 1.3091, 1.3088, 1.3085, 1.3083, 1.3080, 1.3078, 1.3076, 
-                                   1.3073, 1.3071, 1.3069, 1.3067, 1.3065, 1.3062, 1.3060, 1.3059, 1.3057, 1.3055, 
-                                   1.3053], desc="Ice", long_desc="Water Ice at -7°C")
+                               vals=[1.3249, 1.3203, 1.3194, 1.3185, 1.3177, 1.3170, 1.3163, 1.3157, 1.3151, 1.3145,
+                                     1.3140, 1.3135, 1.3130, 1.3126, 1.3121, 1.3117, 1.3114, 1.3110, 1.3106, 1.3103, 
+                                     1.3100, 1.3097, 1.3094, 1.3091, 1.3088, 1.3085, 1.3083, 1.3080, 1.3078, 1.3076, 
+                                     1.3073, 1.3071, 1.3069, 1.3067, 1.3065, 1.3062, 1.3060, 1.3059, 1.3057, 1.3055, 
+                                     1.3053], desc="Ice", long_desc="Water Ice at -7°C")
 
 # https://refractiveindex.info/?shelf=main&book=MgF2&page=Dodge-o
 preset_n_MgF2 = RefractionIndex("Sellmeier", coeff=[0.48755108, 0.04338408**2, 0.39875031, 0.09461442**2, 
