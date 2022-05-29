@@ -15,7 +15,7 @@ def func2(N2):
 
     # add Raysource
     RSS = Surface("Circle", r=1)
-    RS = RaySource(RSS, direction_type="Parallel", spectrum=Spectrum("Blackbody", T=5500),
+    RS = RaySource(RSS, direction_type="Parallel", spectrum=LightSpectrum("Blackbody", T=5500),
                    pos=[0, 0, 0], s=[0, 0, 1], polarization_type='y')
     RT.add(RS)
 
@@ -64,7 +64,7 @@ def func2(N2):
         w[l <= 500] = 1
         return w
 
-    fspec = Spectrum("Function", func=func)
+    fspec = TransmissionSpectrum("Function", func=func)
     RT.add(Filter(ap, pos=[0, 0, 45.2], spectrum=fspec))
 
     # add Detector
@@ -73,7 +73,7 @@ def func2(N2):
 
     start = time.time()    
     RT.trace(N=N2)
-    Im = RT.DetectorImage(500, extent="auto")
+    # Im = RT.DetectorImage(500, extent="auto")
     print(time.time()-start)
 
 

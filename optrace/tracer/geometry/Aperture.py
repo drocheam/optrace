@@ -6,12 +6,12 @@ Aperture class:
 import numpy as np
 
 from optrace.tracer.geometry.SObject import *
-from optrace.tracer.geometry.Surface import *  # for the Aperture surface
+from optrace.tracer.geometry.Surface import *
 
 
 class Aperture(SObject):
 
-    abbr = "AP"
+    abbr = "AP"  # object abbreviation 
     _allow_non_2D = False  # don't allow points or lines as surfaces
 
     def __init__(self, 
@@ -28,5 +28,5 @@ class Aperture(SObject):
 
         super().__init__(Surface, pos, **kwargs)
      
-        self._new_lock = True
+        self._new_lock = True  # no new properties after this
 

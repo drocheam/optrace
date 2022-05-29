@@ -32,7 +32,7 @@ from mayavi.sources.parametric_surface import ParametricSurface
 
 from optrace.tracer import *
 from optrace.tracer.Misc import timer as timer
-from optrace.plots.ImagePlots import ImagePlot
+from optrace.plots.RImagePlots import RImagePlot
 from optrace.plots.DebugPlots import AutoFocusDebugPlot
 
 import optrace.gui.TCPServer as TCPServer
@@ -40,7 +40,7 @@ from twisted.internet import reactor
 from twisted.python import log, util
 
 
-class GUI(HasTraits):
+class TraceGUI(HasTraits):
 
     ####################################################################################################################
     # UI objects
@@ -151,7 +151,7 @@ class GUI(HasTraits):
     ColoringType: Enum = Enum(*ColoringTypes, desc="Ray Property to Color the Rays With")
     """Ray Coloring Mode"""
 
-    ImageType: Enum = Enum(*Image.display_modes, desc="Image Type Presented")
+    ImageType: Enum = Enum(*RImage.display_modes, desc="Image Type Presented")
     """Image Type"""
 
     FocusType: Enum = Enum(*Raytracer.AutofocusModes, desc="Method for Autofocus")
@@ -1286,7 +1286,7 @@ class GUI(HasTraits):
                 Imc = self.lastDetImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:
-                    ImagePlot(self.lastDetImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
+                    RImagePlot(self.lastDetImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
                     self.Status["DetectorImage"] = False
                 
                 pyfaceGUI.invoke_later(on_finish)
@@ -1320,7 +1320,7 @@ class GUI(HasTraits):
                 Imc = self.lastSourceImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:
-                    ImagePlot(self.lastSourceImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
+                    RImagePlot(self.lastSourceImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
                     self.Status["SourceImage"] = False
                 
                 pyfaceGUI.invoke_later(on_finish)

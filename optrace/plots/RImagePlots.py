@@ -11,17 +11,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import copy
 
-from optrace.tracer.Image import *
+from optrace.tracer.RImage import *
 
 
-def ImagePlot(Im:    Image,
-              Imc:      np.ndarray=None,
-              block:    bool = False,
-              log:      bool = False,
-              flip:     bool = False,
-              text:     str = "",
-              clabel:   str = "",
-              mode:     str = "sRGB")\
+def RImagePlot(Im:       RImage,
+               Imc:      np.ndarray=None,
+               block:    bool = False,
+               log:      bool = False,
+               flip:     bool = False,
+               text:     str = "",
+               clabel:   str = "",
+               mode:     str = "sRGB")\
         -> None:
     """
 
@@ -100,14 +100,14 @@ def ImagePlot(Im:    Image,
     plt.pause(0.1)
 
 # TODO test
-def ImageCutPlot(Im:    Image,
-              block:    bool = False,
-              log:      bool = False,
-              flip:     bool = False,
-              text:     str = "",
-              clabel:   str = "",
-              mode:     str = "sRGB",
-              **kwargs)\
+def RImageCutPlot(Im:       RImage,
+                  block:    bool = False,
+                  log:      bool = False,
+                  flip:     bool = False,
+                  text:     str = "",
+                  clabel:   str = "",
+                  mode:     str = "sRGB",
+                  **kwargs)\
         -> None:
     """
 

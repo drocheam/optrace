@@ -16,7 +16,7 @@ RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 # add Raysource
 RSS = ot.Surface("Rectangle", dim=[4, 4])
 RS = ot.RaySource(RSS, direction_type="Diverging", sr_angle=8,
-               Image=Image_path, s=[0, 0, 1], pos=[0, 0, 0])
+                  Image=Image_path, s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 
 # add Lens 1
@@ -36,6 +36,6 @@ _, Ims = RT.iterativeRender(N_rays=10e6, N_px_D=100, pos=pos)
 
 # show rendered images
 for i in np.arange(len(Ims)-1):
-    ImagePlot(Ims[i], block=False, mode="sRGB (Absolute RI)")
-ImagePlot(Ims[-1], block=True, mode="sRGB (Absolute RI)")
+    RImagePlot(Ims[i], block=False, mode="sRGB (Absolute RI)")
+RImagePlot(Ims[-1], block=True, mode="sRGB (Absolute RI)")
 

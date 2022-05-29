@@ -10,7 +10,7 @@ import time
 import numpy as np
 
 import optrace as ot
-import optrace.gui.GUI as TraceGUI
+from optrace.gui import TraceGUI
 
 from threading import Thread
 
@@ -172,7 +172,7 @@ class FrontendTests(unittest.TestCase):
             sim.waitForIdle()
 
             # Image Type Tests standard
-            for mode in ot.Image.display_modes:
+            for mode in ot.RImage.display_modes:
                 sim.ImageType = mode
                 sim.showDetectorImage()
                 sim.waitForIdle()
@@ -241,7 +241,7 @@ class FrontendTests(unittest.TestCase):
             sim.LogImage = ['Logarithmic Scaling']
 
             # display all image modes with log
-            for mode in ot.Image.display_modes:
+            for mode in ot.RImage.display_modes:
                 sim.ImageType = mode
                 sim.showDetectorImage()
                 sim.waitForIdle()

@@ -23,7 +23,7 @@ from optrace.tracer.geometry.Surface import *
 
 from optrace.tracer.spectrum.RefractionIndex import * 
 from optrace.tracer.RayStorage import * 
-from optrace.tracer.Image import *
+from optrace.tracer.RImage import *
 
 import optrace.tracer.Misc as misc
 
@@ -870,7 +870,7 @@ class Raytracer:
                       ind:      int = 0,
                       snum:     int = None,
                       extent:   (list | np.ndarray | str) = "auto",
-                      **kwargs) -> Image:
+                      **kwargs) -> RImage:
         
         N = int(N)
         if N <= 0:
@@ -879,9 +879,9 @@ class Raytracer:
         p, w, wl, extent_out, desc, coordinate_type, bar = self._hitDetector("Detector Image", ind, snum, extent)
 
         # init image and extent, these are the default values when no rays hit the detector
-        Im = Image(desc=desc, extent=extent_out, coordinate_type=coordinate_type, 
+        Im = RImage(desc=desc, extent=extent_out, coordinate_type=coordinate_type, 
                    threading=self.multithreading, silent=self.silent)
-        Im.makeImage(N, p, w, wl, **kwargs)
+        Im.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -909,7 +909,7 @@ class Raytracer:
                             pos:        list = [],
                             silent:     bool = False,
                             extent:     (str | list | np.ndarray) = "auto")\
-            -> list[Image]:
+            -> tuple[list[RImage], list[RImage]]:
         """
         Raytrace with N_rays and render Detector Image.
 
@@ -1042,7 +1042,7 @@ class Raytracer:
 
         return spec
 
-    def SourceImage(self, N: int, sindex: int = 0, **kwargs) -> Image:
+    def SourceImage(self, N: int, sindex: int = 0, **kwargs) -> RImage:
         """
         Rendered Image of RaySource. Rays were already traced.
 
@@ -1056,9 +1056,9 @@ class Raytracer:
         
         p, w, wl, extent, desc, bar = self._hitSource("Source Image", sindex)
 
-        Im = Image(desc=desc, extent=extent, coordinate_type="Cartesian",
+        Im = RImage(desc=desc, extent=extent, coordinate_type="Cartesian",
                    threading=self.multithreading, silent=self.silent)
-        Im.makeImage(N, p, w, wl, **kwargs)
+        Im.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
 

@@ -21,11 +21,14 @@ class ExampleTests(unittest.TestCase):
     def test_0Complex(self):
         self.execute(["python", "./examples/More_Complex_Example.py"])
 
-    def test_4RGBRender(self):
+    def test_5RGBRender(self):
         self.execute(["python", "./examples/Image_RGB_Render.py"], 90)
 
-    def test_3Presets(self):
-        self.execute(["python", "./examples/Plot_Presets.py"])
+    def test_4PresetsRefractionIndex(self):
+        self.execute(["python", "./examples/RefractionIndex_Presets.py"])
+    
+    def test_3PresetsSpectrum(self):
+        self.execute(["python", "./examples/Spectrum_Presets.py"])
     
     def test_2RGB(self):
         self.execute(["python", "./examples/Image_RGB.py"])

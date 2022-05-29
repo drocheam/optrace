@@ -6,10 +6,11 @@ import numpy as np
 
 import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
-from optrace.tracer.Image import Image as Image
+from optrace.tracer.RImage import *
 from optrace.tracer.spectrum.LightSpectrum import *
+from optrace.tracer.spectrum.RefractionIndex import *
 from optrace.tracer.geometry.Surface import *
-
+import optrace.tracer.presets.Lines as Lines
 
 def AutoFocusDebugPlot(r, vals, rf, ff, title="Focus Finding", block=False):
     """
@@ -54,7 +55,39 @@ def SpectrumPlot(Spec, title="Spectrum", **kwargs):
     _SpectrumPlot(Spec, r"$\lambda$ in nm", ylabel, title=title, **kwargs)
 
 
-def ChromacitiesCIE1931(Im: Image | Spectrum | list[Spectrum], RI="Ignore", **kwargs):
+def AbbePlot(RI:    list[RefractionIndex], 
+             title: str = "Abbe Diagram", 
+             lines: list = Lines.preset_lines_FdC,
+             block: bool = False):
+    """
+    """
+
+    _set_font()
+    plt.figure()
+
+    for i, RIi in enumerate(RI):
+
+        nd = RIi(lines[1])
+        Vd = RIi.getAbbeNumber(lines)
+
+        if not np.isfinite(Vd):
+            print(f"Ignoring non dispersive material '{RIi.getDesc()}'")
+            continue
+
+        sc = plt.scatter(Vd, nd, marker="x")
+        col = sc.get_facecolors()[0].tolist()
+        plt.text(Vd, nd, RIi.getDesc(), color=col)
+    
+    plt.xlim([plt.xlim()[1], plt.xlim()[0]])
+    _show_grid()
+    plt.xlabel("Abbe Number V")
+    plt.ylabel(f"Refraction Index n ($\lambda$ = {lines[1]}nm)")
+    plt.title(title)
+    plt.show(block=block)
+    plt.pause(0.1)
+    
+
+def ChromacitiesCIE1931(Im: RImage | Spectrum | list[Spectrum], RI="Ignore", **kwargs):
 
     r, g, b, w = Color._sRGB_r_xy, Color._sRGB_g_xy, Color._sRGB_b_xy, Color._sRGB_w_xy
 
@@ -80,7 +113,7 @@ def ChromacitiesCIE1931(Im: Image | Spectrum | list[Spectrum], RI="Ignore", **kw
     _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, "CIE 1931 Chromaticity Diagram", "x", "y", **kwargs)
 
 
-def ChromacitiesCIE1976(Im: Image | LightSpectrum | list[LightSpectrum], RI="Ignore", **kwargs):
+def ChromacitiesCIE1976(Im: RImage | LightSpectrum | list[LightSpectrum], RI="Ignore", **kwargs):
 
     r, g, b, w = Color._sRGB_r_uv, Color._sRGB_g_uv, Color._sRGB_b_uv, Color._sRGB_w_uv
 
@@ -135,7 +168,7 @@ def ChromacitiesCIE1976(Im: Image | LightSpectrum | list[LightSpectrum], RI="Ign
 def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, block=False, norm="Sum"):
     """"""
 
-    if isinstance(Im, Image):
+    if isinstance(Im, RImage):
         XYZ = Im.getXYZ() if RI == "Ignore" else Color.sRGB_to_XYZ(Im.getRGB(RI=RI))
         labels = []
         legend3 = "Image Colors"

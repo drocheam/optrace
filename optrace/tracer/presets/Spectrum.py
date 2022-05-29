@@ -2,6 +2,7 @@ from optrace.tracer.spectrum.LightSpectrum import *
 from optrace.tracer.presets.Lines import *
 import optrace.tracer.Color as Color
 
+
 # Standard Illuminants
 #######################################################################################################################
 
@@ -41,6 +42,7 @@ presets_spec_standard = [preset_spec_A, preset_spec_C, preset_spec_D50, preset_s
                          preset_spec_D65, preset_spec_D75, preset_spec_E,  preset_spec_F2,  
                          preset_spec_F7, preset_spec_F11]
 
+
 # Tristimulus Curves
 #######################################################################################################################
 
@@ -76,6 +78,7 @@ preset_spec_sRGB_w = LightSpectrum("Function", func=lambda wl: Color._sRGB_r_pri
 
 presets_spec_sRGB = [preset_spec_sRGB_r, preset_spec_sRGB_g, preset_spec_sRGB_b, preset_spec_sRGB_w]
 
+
 # spectra for line combinations
 #######################################################################################################################
 
@@ -91,8 +94,7 @@ preset_spec_FeC = LightSpectrum("Lines", lines=preset_lines_FeC, line_vals=[1, 1
 preset_spec_F_eC_ = LightSpectrum("Lines", lines=preset_lines_F_eC_, line_vals=[1, 1, 1],
                                   desc="Lines F'eC'", long_desc="Spectral Lines F', e, C'")
 
-presets_spec_lines = [preset_spec_FDC, preset_spec_FdC,  
-                      preset_spec_FeC, preset_spec_F_eC_]
+presets_spec_lines = [preset_spec_FDC, preset_spec_FdC, preset_spec_FeC, preset_spec_F_eC_]
 
 
 # List of all spec presets

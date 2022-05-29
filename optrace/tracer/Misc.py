@@ -5,15 +5,16 @@ helper
 import scipy.interpolate
 import numpy as np
 import numexpr as ne
-import scipy.special
 
-from typing import Callable, Any, Dict
+from typing import Callable, Any
 from functools import wraps
 import time
 import sys
 
 from PIL import Image as PILImage
 
+
+# TODO docstring
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function
 def timer(func: Callable) -> Any:
@@ -29,21 +30,36 @@ def timer(func: Callable) -> Any:
             return func(*args, **kwargs)
         finally:
             diff = time.time() - start
-            if diff < 0.1:
-                print(f"Timing: {1000*diff:.3f} ms for {func}")
-            else:
-                print(f"Timing: {diff:.3f} s for {func}")
+
+            unit = "ms" if diff < 0.1 else "s"
+            time_ = 1000*diff if diff < 0.1 else diff
+
+            print(f"Timing: {time_:.3f} {unit} for {func}")
 
     return _time_it
 
 
-def loadImage(path):
+def loadImage(path: str) -> np.ndarray:
+    """
+    Load an image file and convert it to a numpy array.
+
+    :param path: path to image
+    :return: sRGB image as 3D np.ndarray. Float values in range [0, 1]
+    """
     return np.asarray(PILImage.open(path).convert("RGB"), dtype=np.float64) / 2**8
 
 
 def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
-    """"""
+    """
+    wrapper for numexpr.evaluate with predefined mathematical constants 
+    and possiblity to add keyword arguments for evaluation using kwargs.
 
+    :param expr: expression to evaluate
+    :param out: optional output variable to save to
+    :param kwargs: keyword args to add to evaluation dictionary
+    :return: result of evaluation
+    """
+    # add mathematical constants
     base = dict(pi=np.pi, nan=np.nan, inf=np.inf, ninf=np.NINF, euler_gamma=np.euler_gamma, euler=np.e)
 
     # get variables from local frame of caller
@@ -53,7 +69,7 @@ def calc(expr: str, out: np.ndarray=None, **kwargs) -> np.ndarray:
     # dictonary from additional keyword arguments
     kw = dict(**kwargs) if kwargs is not None else dict()
 
-    # join local dict and keyword dict
+    # join base dict, local dict and keyword dict
     dict_ = base | loc | kw
 
     return ne.evaluate(expr, local_dict=dict_, out=out)
@@ -72,7 +88,7 @@ def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarr
     :param x: pdf x values
     :param pdf: pdf y values
     :param N: number of random values
-    :return: N randomly distributed values
+    :return: N randomly distributed values according to pdf
 
     >>> ch = random_from_distribution(np.array([0., 1.]), np.array([0., 1.]), 10000)
     >>> (0.49 < np.mean(ch) < 0.51) and (np.max(ch) > 0.99) and (np.min(ch) < 0.01)
@@ -81,11 +97,12 @@ def random_from_distribution(x: np.ndarray, pdf: np.ndarray, N: int) -> np.ndarr
     # unnormalized cdf
     cdf = np.cumsum(pdf)
 
-    X = np.random.uniform(cdf[0], cdf[-1], N)
-
     # unfortunately we can't use np.interp1d, since cdf is not equally spaced
     icdf = scipy.interpolate.interp1d(cdf, x, assume_sorted=True, kind='linear')
 
+    # random variable
+    X = np.random.uniform(cdf[0], cdf[-1], N)
+    
     return icdf(X)
 
 
@@ -115,13 +132,23 @@ def partMask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     return wc
 
 
-def uniform(x, y, N):
+# TODO doctest
+def uniform(x: np.ndarray, y: np.ndarray, N: int) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Resample irregular 1D function data to regular data with N values.
+    This is done using linear interpolation.
 
+    :param x: x values (1D numpy vector)
+    :param y: y values (1D numpy vector)
+    :param N: number of points
+    :return: resampled x vector, resampled y vector
+    """
     xs = np.linspace(x[0], x[-1], N)
     interp = scipy.interpolate.interp1d(x, y)
     return xs, interp(xs)
 
 
+# TODO why work on the object itself?
 def normalize(a: np.ndarray) -> None:
     """ 
     faster vector normalization for vectors in axis=1.
@@ -161,12 +188,7 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     return n
 
 
-def ValueAt(x:  np.ndarray,
-            y:  np.ndarray,
-            Z:  np.ndarray,
-            x0: float,
-            y0: float) \
-        -> float:
+def ValueAt(x: np.ndarray, y: np.ndarray, Z: np.ndarray, x0: float, y0: float) -> float:
     """
     Interpolate value at given coordinate.
     Use :obj:`Backend.Misc.interp2f` for list of coordinates.

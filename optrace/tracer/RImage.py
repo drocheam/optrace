@@ -10,11 +10,9 @@ from threading import Thread  # for multithreading
 
 from optrace.tracer.BaseClass import *
 
-# TODO
-# Image.at() function, makes x or y cuts
-# quantile clip parameter
+# Rendered Image class
 
-class Image(BaseClass):
+class RImage(BaseClass):
 
     EPS: float = 1e-9
     """ Used for minimal extent """
@@ -287,13 +285,13 @@ class Image(BaseClass):
             np.savez_compressed(path, **sdict)
 
     @staticmethod
-    def load(path: str) -> "Image":
+    def load(path: str) -> 'RImage':
         """load a saved image object numpy archive to a image object"""
 
         # load npz archive
         Io = np.load(path)
 
-        Im = Image(Io["extent"], long_desc=Io["long_desc"], desc=Io["desc"][()], coordinate_type=Io["type_"][()])
+        Im = RImage(Io["extent"], long_desc=Io["long_desc"], desc=Io["desc"][()], coordinate_type=Io["type_"][()])
 
         Im._Im = np.array(Io["Im"], dtype=np.float64)
         Im.rescale(Io["N"]) # also creates Im from _Im
@@ -316,13 +314,13 @@ class Image(BaseClass):
         
         super().__setattr__(key, val)
     
-    def makeImage(self, 
-                  N:            int, 
-                  p:            np.ndarray = None,
-                  w:            np.ndarray = None,
-                  wl:           np.array = None,
-                  keep_extent:  bool = False,
-                  max_res:      bool = False)\
+    def render(self, 
+               N:            int, 
+               p:            np.ndarray = None,
+               w:            np.ndarray = None,
+               wl:           np.array = None,
+               keep_extent:  bool = False,
+               max_res:      bool = False)\
             -> None:
         """
         Creates an pixel image from ray positions on the detector.

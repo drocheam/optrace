@@ -5,7 +5,7 @@ import sys
 sys.path.append('./')
 
 import optrace as ot
-from optrace.gui import GUI as TraceGUI
+from optrace.gui import TraceGUI
 
 Image = ot.preset_image_test_screen
 

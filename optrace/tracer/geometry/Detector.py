@@ -13,7 +13,7 @@ import optrace.tracer.Misc as misc
 
 class Detector(SObject):
 
-    abbr = "DET"
+    abbr = "DET"  # object abbreviation
     _allow_non_2D = False  # don't allow points or lines as surfaces
 
     def __init__(self,
@@ -27,7 +27,7 @@ class Detector(SObject):
 
         :param Surface: the Detector surface
         :param pos: position in 3D space
-        :param ar: rho factor for AngleCoordinate Transformation
+        :param ar: rho factor for getAngleCoordinate() transformation
         """
         super().__init__(Surface, pos, **kwargs)
 
@@ -36,7 +36,7 @@ class Detector(SObject):
         if not self.Surface.hasHitFinding:
             raise RuntimeError(f"surface_type '{Surface.surface_type}' has no hit finding functionality.")
 
-        self._new_lock = True
+        self._new_lock = True  # no new properties after this
 
     def getAngleExtent(self) -> np.ndarray:
         """

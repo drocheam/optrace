@@ -14,18 +14,18 @@ from optrace.tracer.geometry.SObject import *
 
 class Lens(SObject):
 
-    abbr = "L"
+    abbr = "L"  # object abbreviation
     _allow_non_2D = False  # don't allow points or lines as surfaces
 
     def __init__(self, 
-                 front: Surface, 
-                 back:  Surface,
-                 n:     RefractionIndex,
-                 pos:   (list | np.ndarray), 
-                 de:    float = 0,
-                 d1:    float = None,
-                 d2:    float = None,
-                 n2:    RefractionIndex = None,
+                 front:   Surface, 
+                 back:    Surface,
+                 n:       RefractionIndex,
+                 pos:     (list | np.ndarray), 
+                 de:      float = 0,
+                 d1:      float = None,
+                 d2:      float = None,
+                 n2:      RefractionIndex = None,
                  **kwargs)\
             -> None:
         """
@@ -61,10 +61,10 @@ class Lens(SObject):
     def estimateFocalLength(self, wl: float=555., n0: RefractionIndex=RefractionIndex("Constant", n=1.)) -> float:
         """
         Estimate the lens focal length using the lensmaker equation.
-        Only works if both surfaces are of type "Sphere", "Asphere", or "Circle".
+        Only works if both surfaces are of type "Sphere", "Asphere" or planar.
 
         :param wl: wavelength
-        :param n0: ambient refraction index
+        :param n0: ambient refraction index, defaults to vacuum
         :return: focal length
         """
 

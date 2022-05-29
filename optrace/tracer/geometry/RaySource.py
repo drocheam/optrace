@@ -27,7 +27,7 @@ class RaySource(SObject):
     orientation_types = ["Constant", "Function"]
     polarization_types = ["Angle", "Random", "x", "y", "xy"]
 
-    abbr = "RS"
+    abbr = "RS"  # object abbreviation
     _allow_non_2D = True  # allow points or lines as surfaces
 
     def __init__(self,

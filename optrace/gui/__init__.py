@@ -2,4 +2,4 @@
 Frontend module
 """
 
-from optrace.gui.GUI import GUI
+from optrace.gui.TraceGUI import TraceGUI

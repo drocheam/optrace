@@ -6,7 +6,7 @@ sys.path.append('./')
 
 import numpy as np
 import optrace as ot
-from optrace.gui import GUI as TraceGUI
+from optrace.gui import TraceGUI
 from optrace.plots import SpectrumPlot
 
 # make Raytracer
@@ -25,7 +25,7 @@ P2 = ot.SurfaceFunction(r=3, func=lambda x, y: -0.5*x, derivative=lambda x, y: (
 # Prism 1
 front = ot.Surface("Function", func=P1)
 back = ot.Surface("Function", func=P2)
-nL1 = ot.preset_n_SF10
+nL1 = ot.preset_n_SF10  # glass with small abbe number => much dispersion
 L1 = ot.Lens(front, back, de=0.5, pos=[0, 0, 10], n=nL1)
 RT.add(L1)
 

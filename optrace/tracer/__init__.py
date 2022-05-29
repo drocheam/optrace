@@ -11,7 +11,7 @@ from optrace.tracer.geometry.Filter import Filter
 from optrace.tracer.geometry.Detector import Detector
 
 from optrace.tracer.RayStorage import RaySource
-from optrace.tracer.Image import Image
+from optrace.tracer.RImage import RImage
 from optrace.tracer.Raytracer import Raytracer
 
 from optrace.tracer.spectrum.RefractionIndex import RefractionIndex

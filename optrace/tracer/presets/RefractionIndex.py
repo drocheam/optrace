@@ -37,9 +37,29 @@ preset_n_Fused_Silica = RefractionIndex("Sellmeier", coeff=[0.6961663, 0.0684043
 preset_n_K5 = RefractionIndex("Sellmeier", coeff=[1.08511833, 0.00661099503, 0.199562005, 
                               0.024110866, 0.930511663, 111.982777], desc="K5", long_desc="N-K5 (SCHOTT)") 
 
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-LaF&page=N-LAF2
+preset_n_LAF2 = RefractionIndex("Sellmeier", coeff=[1.80984227, 0.0101711622, 0.15729555, 0.0442431765, 
+                                1.0930037, 100.687748], desc="LAF2", long_desc="N-LAF2 (SCHOTT)")
+
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-LaK&page=N-LAK8
+preset_n_LAK8 = RefractionIndex("Sellmeier", coeff=[1.33183167, 0.00620023871, 0.546623206, 0.0216465439, 
+                                1.19084015, 82.5827736], desc="LAK8", long_desc="N-LAK8 (SCHOTT)")
+
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-LaK&page=N-LAK22
+preset_n_LAK22 = RefractionIndex("Sellmeier", coeff=[1.14229781, 0.00585778594, 0.535138441, 0.0198546147, 
+                                 1.04088385, 100.834017], desc="LAK22", long_desc="N-LAK22 (SCHOTT)")
+
 # https://refractiveindex.info/?shelf=glass&book=LASF9&page=SCHOTT
 preset_n_LASF9 = RefractionIndex("Sellmeier", coeff=[2.00029547, 0.0121426017, 0.298926886, 
                                  0.0538736236, 1.80691843, 156.530829], desc="LASF9", long_desc="N-LASF9 (SCHOTT)")
+
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-LaSF&page=N-LASF44
+preset_n_LASF44 = RefractionIndex("Sellmeier", coeff=[1.78897105, 0.00872506277, 0.38675867, 0.0308085023,
+                                  1.30506243, 92.7743824], desc="LASF44", long_desc="N-LASF44 (SCHOTT)")
+
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-LF&page=LF5
+preset_n_LF5 = RefractionIndex("Sellmeier", coeff=[1.28035628, 0.00929854416, 0.163505973, 0.0449135769, 
+                               0.893930112, 110.493685], desc="LF5", long_desc="N-LF5 (SCHOTT)")
 
 # https://refractiveindex.info/?shelf=glass&book=SF5&page=SCHOTT
 preset_n_SF5 = RefractionIndex("Sellmeier", coeff=[1.52481889, 0.011254756, 0.187085527, 
@@ -57,13 +77,27 @@ preset_n_SF10 = RefractionIndex("Sellmeier", coeff=[1.62153902, 0.0122241457, 0.
 preset_n_SF11 = RefractionIndex("Sellmeier", coeff=[1.73759695, 0.013188707, 0.313747346, 
                                 0.0623068142, 1.89878101, 155.23629], desc="SF11", long_desc="N-SF11 (SCHOTT)") 
 
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-SF&page=N-SF66
+preset_n_SF66 = RefractionIndex("Sellmeier", coeff=[2.0245976, 0.0147053225, 0.470187196, 0.0692998276, 
+                                2.59970433, 161.817601], desc="SF66", long_desc="N-SF66 (SCHOTT)") 
+
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-SK&page=N-SK14
+preset_n_SK14 = RefractionIndex("Sellmeier", coeff=[0.936155374, 0.00461716525, 0.594052018, 0.016885927, 
+                                1.04374583, 103.736265], desc="SK14", long_desc="N-SK14 (SCHOTT)") 
+
 # https://refractiveindex.info/?shelf=3d&book=glass&page=soda-lime-clear
 preset_n_Soda_Lime = RefractionIndex("Function", func=lambda x: 1.5130-0.003169*(x*1e-3)**2+0.003962*(x*1e-3)**-2,
                                      desc="Soda Lime", long_desc="Clear soda lime silica window glass")
 
+# https://refractiveindex.info/?shelf=glass&book=SCHOTT-SSK&page=N-SSK8
+preset_n_SSK8 = RefractionIndex("Sellmeier", coeff=[1.44857867, 0.00869310149, 0.117965926, 0.0421566593, 
+                                1.06937528, 111.300666], desc="SSK8", long_desc="N-SSK8 (SCHOTT)") 
+
 presets_n_glass = [preset_n_BK7, preset_n_BAF10, preset_n_BAK1, preset_n_BASF64, preset_n_F2, preset_n_FK51A,
-                   preset_n_Fused_Silica, preset_n_K5, preset_n_LASF9, preset_n_SF5, preset_n_SF6, 
-                   preset_n_SF10, preset_n_SF11, preset_n_Soda_Lime]
+                   preset_n_Fused_Silica, preset_n_K5, preset_n_LAF2, preset_n_LAK8, preset_n_LAK22, preset_n_LASF9, 
+                   preset_n_LASF44, preset_n_LF5, preset_n_SF5, preset_n_SF6, preset_n_SF10, preset_n_SF11, 
+                   preset_n_SF66, preset_n_SK14, preset_n_Soda_Lime, preset_n_SSK8]
+
 # Plastics
 #######################################################################################################################
 
@@ -142,5 +176,4 @@ presets_n_misc = [preset_n_Air, preset_n_CaF2, preset_n_Diamond, preset_n_Ice, p
 #######################################################################################################################
 
 presets_n = [*presets_n_glass, *presets_n_plastic, *presets_n_misc]
-
 
