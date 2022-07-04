@@ -1,4 +1,4 @@
-from optrace.tracer.spectrum.RefractionIndex import *
+from optrace.tracer.RefractionIndex import *
 
 
 # Glasses
@@ -107,6 +107,10 @@ presets_n_glass = [preset_n_BK7, preset_n_BAF10, preset_n_BAK1, preset_n_BASF64,
 preset_n_CR39 = RefractionIndex("Conrady", coeff=[1.471862713E+000, 1.520790642E-002, 3.555509148E-005], 
                                 desc="CR39", long_desc="CR-39, PADC, Poly(allyl diglycol carbonate)")
 
+# G. Khanarian, Hoechst Celanese - "Optical properties of cyclic olefin copolymers", Table 1
+preset_n_COC = RefractionIndex("Sellmeier", coeff=[2.045-1., 0, 0.266, 0.206**2], desc="COC",
+                               long_desc="Topas COC 5013 at 25°C")
+
 # https://refractiveindex.info/?shelf=organic&book=polycarbonate&page=Sultanova
 preset_n_PC = RefractionIndex("Sellmeier", coeff=[1.4182, 0.021304], desc="PC", long_desc="Polycarbonate") 
 
@@ -130,7 +134,8 @@ preset_n_PET = RefractionIndex("Data", wls=np.concatenate(([380], 400+10*np.aran
                                      1.55817, 1.55795, 1.55723, 1.55583], 
                                desc="PET", long_desc="Polyethylene terephthalate")
 
-presets_n_plastic = [preset_n_CR39, preset_n_PC, preset_n_PDSM, preset_n_PET, preset_n_PMMA, preset_n_PS]
+presets_n_plastic = [preset_n_CR39, preset_n_COC, preset_n_PC, preset_n_PDSM, preset_n_PET, 
+                     preset_n_PMMA, preset_n_PS]
 
 # Misc
 #######################################################################################################################
@@ -141,6 +146,10 @@ presets_n_plastic = [preset_n_CR39, preset_n_PC, preset_n_PDSM, preset_n_PET, pr
 # see https://refractiveindex.info/?shelf=other&book=air&page=Ciddor
 preset_n_Air = RefractionIndex("Constant", n=1.00027784, desc="Air", long_desc="Air at 550nm, 15°C, 1013.25hPa")
 
+# https://refractiveindex.info/?shelf=main&book=BaF2&page=Malitson
+preset_n_BaF2 = RefractionIndex("Sellmeier", coeff=[0.643356, 0.057789**2, 0.506762, 0.10968**2, 3.8261, 46.3864**2], 
+                                desc="BaF2", long_desc="BaF2 (Barium fluoride)")
+
 # https://refractiveindex.info/?shelf=main&book=CaF2&page=Malitson
 preset_n_CaF2 = RefractionIndex("Sellmeier", coeff=[0.5675888, 0.050263605**2, 0.4710914, 0.1003909**2, 
                                 3.8484723, 34.649040**2], desc="CaF2", long_desc="CaF2 (Calcium fluoride)")
@@ -148,6 +157,10 @@ preset_n_CaF2 = RefractionIndex("Sellmeier", coeff=[0.5675888, 0.050263605**2, 0
 # https://refractiveindex.info/?shelf=main&book=C&page=Peter
 preset_n_Diamond = RefractionIndex("Sellmeier", coeff=[0.3306, 0.1750**2, 4.3356, 0.1060**2], 
                                    desc="Diamond", long_desc="Diamond")
+
+# https://refractiveindex.info/?shelf=organic&book=ethanol&page=Sani-formula
+preset_n_Ethanol = RefractionIndex("Sellmeier", coeff=[0.0165, 9.08, 0.8268, 0.01039], 
+                                   desc="Ethanol", long_desc="C2H5OH (Ethanol)")
 
 # https://refractiveindex.info/?shelf=3d&book=crystals&page=ice
 # (from table in full database record)
@@ -169,8 +182,8 @@ preset_n_Water = RefractionIndex("Sellmeier", coeff=[5.684027565E-1, 5.101829712
                                  1.726177391E-1, 1.821153936E-2, 2.086189578E-2, 2.620722293E-2, 
                                  1.130748688E-1, 1.069792721E1], desc="Water", long_desc="Water at 20.0°C")
 
-presets_n_misc = [preset_n_Air, preset_n_CaF2, preset_n_Diamond, preset_n_Ice, preset_n_MgF2, 
-                  preset_n_Vacuum, preset_n_Water]
+presets_n_misc = [preset_n_Air, preset_n_BaF2, preset_n_CaF2, preset_n_Ethanol, preset_n_Diamond, preset_n_Ice, 
+                  preset_n_MgF2, preset_n_Vacuum, preset_n_Water]
 
 # list of all n presets
 #######################################################################################################################

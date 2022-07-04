@@ -21,6 +21,7 @@ import optrace.tracer.Color as Color
 
 # TODO remove BW_Image, ersetzen durch emittance_type = "Constant", "Image"
 # TODO Check: check image dimensions
+# TODO pol_ang and sr_angle - make names more consistent. Rename sr_angle to div_ang?
 class RaySource(SObject):
 
     direction_types = ["Diverging", "Parallel"]
@@ -29,6 +30,7 @@ class RaySource(SObject):
 
     abbr = "RS"  # object abbreviation
     _allow_non_2D = True  # allow points or lines as surfaces
+    _max_image_px = 2e6
 
     def __init__(self,
 
@@ -39,7 +41,7 @@ class RaySource(SObject):
                  # Direction Parameters
                  direction_type:    str = "Parallel",
                  s:                 (list | np.ndarray) = [0., 0., 1.],
-                 sr_angle:          float = 20.,
+                 sr_angle:          float = 0.5,
 
                  # Light Parameters
                  spectrum:          LightSpectrum = None,
@@ -102,6 +104,8 @@ class RaySource(SObject):
         if self.Image is not None:
             return np.mean(self.Image[:, :, 0]), np.mean(self.Image[:, :, 1]),\
                    np.mean(self.Image[:, :, 2]), 1.0
+        elif self.spectrum is None:
+            raise RuntimeError("spectrum not specified.")
         else:
             return self.spectrum.getColor()
     
@@ -125,6 +129,8 @@ class RaySource(SObject):
         ################################################################################################################
 
         if self.Image is None:
+            if self.spectrum is None:
+                raise RuntimeError("spectrum not specified.")
             wavelengths = self.spectrum.randomWavelengths(N)
 
         ## Generate ray starting points
@@ -280,15 +286,23 @@ class RaySource(SObject):
             case "polarization_type":
                 self._checkType(key, val, str)
                 self._checkIfIn(key, val, self.polarization_types)
-
-            case ("power" | "sr_angle" | "pol_ang"):
+            
+            case ("pol_ang"):
                 self._checkType(key, val, int | float)
-                self._checkNotBelow(key, val, 0)
+                val = float(val)
+
+            case ("power" | "sr_angle"):
+                self._checkType(key, val, int | float)
+                self._checkAbove(key, val, 0)
                 val = float(val)
 
             case "s":
                 self._checkType(key, val, list | np.ndarray)
                 val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
+                if val.shape[0] != 3:
+                    raise TypeError("s needs to have 3 dimensions")
+
+                self._checkAbove("s[2]", val[2], 0)
 
             case "spectrum":
                 self._checkType(key, val, LightSpectrum | None)
@@ -302,14 +316,26 @@ class RaySource(SObject):
 
                 val = misc.loadImage(val) if isinstance(val, str) else np.array(val, dtype=np.float64)
 
-                if val.shape[0]*val.shape[1] > 2e6:
+                if val.shape[0]*val.shape[1] > self._max_image_px:
                     raise RuntimeError("For performance reasons only images with less than 2 megapixels are allowed.")
+                
+                if val.ndim != 3:
+                    raise TypeError("Image array needs to have 3 dimensions")
+                if val.shape[2] != 3:
+                    raise TypeError("Image array needs to have 3 elements in the 3 dimension")
+                if np.min(val) < 0 or np.max(val) > 1:
+                    raise ValueError("Image values need to be inside range [0, 1]")
 
                 val = np.flipud(val)
 
                 # calculate pixel probability from relative power for each pixel
                 If = Color._PowerFromSRGB(val).flatten()
-                self.pIf = 1/np.sum(If)*If
+                Ifs = np.sum(If)
+                
+                if Ifs == 0:
+                    raise ValueError("Image can not be completely black")
+
+                self.pIf = 1/Ifs*If
 
             case "FrontSurface":
                 self._checkType(key, val, Surface)

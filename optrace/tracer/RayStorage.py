@@ -78,7 +78,7 @@ class RayStorage(BaseClass):
         Ns = Nt*Np
         Ne = Ns + Np if Nt != N_threads-1 else self.N  # last threads also gets remainder
 
-        i = np.argmax(np.array(self.B_list) >= Ns) - 1
+        i = np.argmax(self.B_list > Ns) - 1
         i = max(i, 0)  # enforce i >= 0
 
         while self.B_list[i] < Ne:

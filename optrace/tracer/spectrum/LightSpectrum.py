@@ -1,6 +1,6 @@
 
 
-from optrace.tracer.spectrum.Spectrum import Spectrum as Spectrum
+from optrace.tracer.spectrum.Spectrum import *
 import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
 
@@ -12,6 +12,7 @@ class LightSpectrum(Spectrum):
     quantity = "Spectral Power Density"
     unit = "W/nm"
 
+    # TODO rename to render?
     @staticmethod
     def makeSpectrum(wl:        np.ndarray,
                      w:         np.ndarray, 
@@ -49,10 +50,18 @@ class LightSpectrum(Spectrum):
                 wl = np.random.uniform(wl0, wl1, N)
 
             case "Lines":
+                if self.lines is None:
+                    raise RuntimeError("Spectrum lines not defined.")
+                if self.line_vals is None:
+                    raise RuntimeError("Spectrum line_vals not defined.")
+
                 wl = np.random.choice(self.lines, N, p=self.line_vals/np.sum(self.line_vals))
 
             case "Data":
-                wl = misc.random_from_distribution(self._wls, self._vals, N)
+                if self._wls is None or self._vals is None:
+                    raise RuntimeError("spectrum_type='Data' but wls or vals not specified")
+
+                wl = misc.random_from_distribution(self._wls, self._vals, N) 
 
             case "Gaussian":
                 # don't use the whole [0, 1] range for our random variable, 
@@ -90,8 +99,12 @@ class LightSpectrum(Spectrum):
                 spec = np.array([1.])
 
             case "Lines":
-                wl = np.array(self.lines)
-                spec = np.ones_like(wl)
+                if self.lines is None:
+                    raise RuntimeError("Spectrum lines not defined.")
+                if self.line_vals is None:
+                    raise RuntimeError("Spectrum line_vals not defined.")
+                wl = self.lines
+                spec = self.line_vals
 
             case _:
                 cnt = 10000 if self.spectrum_type in ["Function", "Data"] else 4000
@@ -101,6 +114,7 @@ class LightSpectrum(Spectrum):
         XYZ = np.array([[[np.sum(spec * Color.Tristimulus(wl, "X")),\
                           np.sum(spec * Color.Tristimulus(wl, "Y")),\
                           np.sum(spec * Color.Tristimulus(wl, "Z"))]]])
+
         return XYZ
 
     def getColor(self) -> tuple[float, float, float]:
@@ -111,4 +125,13 @@ class LightSpectrum(Spectrum):
         RGB = Color.XYZ_to_sRGB(XYZ)[0, 0]
 
         return RGB[0], RGB[1], RGB[2]
+
+    def __setattr__(self, key, val) -> None:
+        """"""
+
+        # "Constant" with val == 0 not allowed for light spectrum
+        if key == "val" and isinstance(val, int | float):
+            self._checkAbove(key, val, 0)
+
+        super().__setattr__(key, val)
 

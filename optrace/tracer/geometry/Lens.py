@@ -7,7 +7,7 @@ A refractive index is specified for the material and one for the area behind the
 
 import numpy as np
 
-from optrace.tracer.spectrum.RefractionIndex import *
+from optrace.tracer.RefractionIndex import *
 from optrace.tracer.geometry.Surface import *
 from optrace.tracer.geometry.SObject import *
 
@@ -23,6 +23,7 @@ class Lens(SObject):
                  n:       RefractionIndex,
                  pos:     (list | np.ndarray), 
                  de:      float = 0,
+                 d:       float = None,
                  d1:      float = None,
                  d2:      float = None,
                  n2:      RefractionIndex = None,
@@ -34,9 +35,10 @@ class Lens(SObject):
 
         :param front: front surface (smaller z-position) (Surface object)
         :param back: back surface (higher z-position) (Surface object)
-        :param de: edge thickness (distance between highest point of front and smallest point of back surface), (float)
-        :param d1: thickness of front surface, relative to position (float)
-        :param d2: thickness of back surface, relative to position (float)
+        :param de: thickness extension. additional thickness between maximum height of front and minimal height of back, (float)
+        :param d: thickness at the optical axis / lens center
+        :param d1: thickness of front surface relative to surface center position (float)
+        :param d2: thickness of back surface relative to surface center position (float)
         :param n: material refraction index (RefractionIndex object)
         :param n2: refraction index behind lens (positive z direction) (RefractionIndex object)
         :param pos: 3D position of lens center (list or numpy array)
@@ -47,9 +49,15 @@ class Lens(SObject):
         d1 = float(d1) if d1 is not None else d1
         d2 = float(d2) if d2 is not None else d2
 
-        if de is not None and d1 is None and d2 is None:
+        # TODO check if surface height not too large
+
+        if de is not None and d1 is None and d2 is None and d is None:
             d1 = de / 2. + front.maxz - front.pos[2]
             d2 = de / 2. + back.pos[2] - back.minz
+
+        elif d is not None:
+            d1 = d / 2.
+            d2 = d / 2.
 
         elif d1 is None or d2 is None:
             raise ValueError("Both thicknesses d1, d2 need to be specified")
@@ -81,13 +89,21 @@ class Lens(SObject):
 
         n = self.n(wl)
         n0_ = n0(wl)
-        d = self.BackSurface.pos[2] - self.FrontSurface.pos[2]  # thickness along the optical axis
+        d = self.d # thickness along the optical axis
 
         # lensmaker equation
         D = (n-n0_)/n0_ * (1/R1 - 1/R2 + (n - n0_) * d /(n*R1*R2))
 
         return 1 / D    
 
+    # @property
+    # def da(self) -> float:
+        # return back.minz - front.maxz
+
+    @property
+    def d(self) -> float:
+        return self.d1 + self.d2
+    
     def __setattr__(self, key, val):
 
         if key == "n2":

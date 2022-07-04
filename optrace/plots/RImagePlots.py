@@ -21,7 +21,7 @@ def RImagePlot(Im:       RImage,
                flip:     bool = False,
                text:     str = "",
                clabel:   str = "",
-               mode:     str = "sRGB")\
+               mode:     str = RImage.display_modes[0])\
         -> None:
     """
 
@@ -106,7 +106,7 @@ def RImageCutPlot(Im:       RImage,
                   flip:     bool = False,
                   text:     str = "",
                   clabel:   str = "",
-                  mode:     str = "sRGB",
+                  mode:     str = RImage.display_modes[0],
                   **kwargs)\
         -> None:
     """

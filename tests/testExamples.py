@@ -22,7 +22,7 @@ class ExampleTests(unittest.TestCase):
         self.execute(["python", "./examples/More_Complex_Example.py"])
 
     def test_5RGBRender(self):
-        self.execute(["python", "./examples/Image_RGB_Render.py"], 90)
+        self.execute(["python", "./examples/Image_RGB_Render.py"], 120)
 
     def test_4PresetsRefractionIndex(self):
         self.execute(["python", "./examples/RefractionIndex_Presets.py"])
@@ -36,6 +36,6 @@ class ExampleTests(unittest.TestCase):
     def test_1Prism(self):
         self.execute(["python", "./examples/Double_Prism.py"])
 
-
 if __name__ == '__main__':
     unittest.main()
+

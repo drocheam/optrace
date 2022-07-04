@@ -100,5 +100,5 @@ presets_spec_lines = [preset_spec_FDC, preset_spec_FdC, preset_spec_FeC, preset_
 # List of all spec presets
 #######################################################################################################################
 
-presets_spec = [*presets_spec_standard, *presets_spec_lines, *presets_spec_tristimulus, *presets_spec_sRGB]
+presets_light = [*presets_spec_standard, *presets_spec_lines, *presets_spec_sRGB]
 

@@ -133,7 +133,7 @@ def partMask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
 
 
 # TODO doctest
-def uniform(x: np.ndarray, y: np.ndarray, N: int) -> tuple[np.ndarray, np.ndarray]:
+def uniform_resample(x: list | np.ndarray, y: list | np.ndarray, N: int) -> tuple[np.ndarray, np.ndarray]:
     """
     Resample irregular 1D function data to regular data with N values.
     This is done using linear interpolation.
@@ -142,9 +142,12 @@ def uniform(x: np.ndarray, y: np.ndarray, N: int) -> tuple[np.ndarray, np.ndarra
     :param y: y values (1D numpy vector)
     :param N: number of points
     :return: resampled x vector, resampled y vector
+
+    >>> uniform_resample([0, 1, 2.5, 4, 6], [1, 2, 5, 5, 1], 7)
+    (array([0., 1., 2., 3., 4., 5., 6.]), array([1., 2., 4., 5., 5., 3., 1.]))
     """
     xs = np.linspace(x[0], x[-1], N)
-    interp = scipy.interpolate.interp1d(x, y)
+    interp = scipy.interpolate.interp1d(np.array(x, dtype=np.float64), np.array(y, dtype=np.float64))
     return xs, interp(xs)
 
 

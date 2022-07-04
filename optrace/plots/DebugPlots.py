@@ -8,7 +8,7 @@ import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
 from optrace.tracer.RImage import *
 from optrace.tracer.spectrum.LightSpectrum import *
-from optrace.tracer.spectrum.RefractionIndex import *
+from optrace.tracer.RefractionIndex import *
 from optrace.tracer.geometry.Surface import *
 import optrace.tracer.presets.Lines as Lines
 

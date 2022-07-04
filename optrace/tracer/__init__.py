@@ -14,7 +14,7 @@ from optrace.tracer.RayStorage import RaySource
 from optrace.tracer.RImage import RImage
 from optrace.tracer.Raytracer import Raytracer
 
-from optrace.tracer.spectrum.RefractionIndex import RefractionIndex
+from optrace.tracer.RefractionIndex import RefractionIndex
 from optrace.tracer.spectrum.Spectrum import Spectrum
 from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
 from optrace.tracer.spectrum.TransmissionSpectrum import TransmissionSpectrum

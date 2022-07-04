@@ -15,6 +15,8 @@ from optrace.tracer.BaseClass import *
 class Spectrum(BaseClass):
 
     spectrum_types = ["Monochromatic", "Blackbody", "Constant", "Data", "Lines", "Rectangle", "Gaussian", "Function"]
+    unit = ""
+    quantity = ""
 
     def __init__(self, 
                  spectrum_type:     str, 
@@ -44,7 +46,12 @@ class Spectrum(BaseClass):
         self.wl, self.wl0, self.wl1 = wl, wl0, wl1
         self.val, self.fact, self.mu, self.sig, self.T = val, fact, mu, sig, T
 
-        self._wls, self._vals = misc.uniform(wls, vals, 5000) if wls is not None and vals is not None else (wls, vals)
+        if wls is not None:
+            self._checkType("wls", wls, list | np.ndarray)
+        if vals is not None:
+            self._checkType("vals", vals, list | np.ndarray)
+
+        self._wls, self._vals = misc.uniform_resample(wls, vals, 5000) if wls is not None and vals is not None else (wls, vals)
        
         # hold infos for plotting etc. Defined in each subclass.
         self.unit = unit if unit is not None else self.unit
@@ -70,11 +77,13 @@ class Spectrum(BaseClass):
                 res = np.full_like(wl, self.val, dtype=np.float64)
        
             case "Data":
-                res = np.interp(wl, self._wls, self._vals)
+                if self._wls is None or self._vals is None:
+                    raise RuntimeError("spectrum_type='Data' but wls or vals not specified")
+                res = np.interp(wl, self._wls, self._vals, left=0, right=0)
 
             case "Rectangle":
                 res = np.zeros(wl.shape, dtype=np.float64)
-                res[(self.wl0 < wl) & (wl < self.wl1)] = self.val
+                res[(self.wl0 <= wl) & (wl <= self.wl1)] = self.val
 
             case "Gaussian":
                 fact, mu, sig = self.fact, self.mu, self.sig
@@ -146,8 +155,17 @@ class Spectrum(BaseClass):
 
             case "func":
                 self._checkNoneOrCallable(key, val)
+                if val is not None:
+                    wls = Color.wavelengths(1000)
+                    T = val(wls)
+                    if np.min(T) < 0 or np.max(T) <= 0:
+                        raise RuntimeError("Function func needs to return positive values over the visible range.")
 
-            case ("wl", "wl0", "wl", "T", "mu", "sig", "val", "fact"):
+            case "_vals" if val is not None:
+                if (lmin := np.min(val))  < 0:
+                    raise ValueError(f"vals must be all positive, but one value is {lmin}")
+
+            case ("wl" | "wl0" | "wl1" | "T" | "mu" | "sig" | "val" | "fact"):
                 self._checkType(key, val, int | float)
                 val = float(val)
 
@@ -155,8 +173,11 @@ class Spectrum(BaseClass):
                     self._checkNotBelow(key, val, Color.WL_MIN)
                     self._checkNotAbove(key, val, Color.WL_MAX)
 
-                if key in ["val", "fact", "sig"]:
+                if key in ["val"]:
                     self._checkNotBelow(key, val, 0)
+                
+                if key in ["fact", "sig", "T"]:
+                    self._checkAbove(key, val, 0)
 
         super().__setattr__(key, val)
 

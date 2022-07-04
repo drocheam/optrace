@@ -109,7 +109,7 @@ class TraceGUI(HasTraits):
                       auto_set=True, label="Width")
     """Width of rays shown."""
 
-    ImagePixels: Range = Range(1, 1000, 100, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
+    ImagePixels: Range = Range(1, 1000, 200, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
                         auto_set=True, label="Pixels_xy", mode='text')
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
@@ -126,8 +126,8 @@ class TraceGUI(HasTraits):
                     desc="if Logarithmic Values are Plotted")
     """Boolean value for a logarithmic image visualization. Packed as Checkbox into a :obj:`List`"""
 
-    FlipImage: List = List(editor=CheckListEditor(values=['Flip Image'], format_func=lambda x: x),
-                    desc="if imaged should be rotated by 180 degrees")
+    FlipDetImage: List = List(editor=CheckListEditor(values=['Flip Detector Image'], format_func=lambda x: x),
+                    desc="if detector image should be rotated by 180 degrees")
     """Boolean value for flipping the image (rotating it by 180°). Packed as Checkbox into a :obj:`List`"""
 
     FocusDebugPlot = List(editor=CheckListEditor(values=['Show Cost Function'], format_func=lambda x: x),
@@ -226,7 +226,7 @@ class TraceGUI(HasTraits):
                         Item('ImageType', label='Image'),
                         Item('ImagePixels'),
                         Item('LogImage', style="custom", show_label=False),
-                        Item('FlipImage', style="custom", show_label=False),
+                        Item('FlipDetImage', style="custom", show_label=False),
                         Item('DetImageOneSource', style="custom", show_label=False),
                         Item('SourceImageButton', show_label=False),
                         Item('DetectorImageButton', show_label=False),
@@ -245,7 +245,7 @@ class TraceGUI(HasTraits):
     # Class constructor
 
     def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, CleanerView: bool=False, LogImage: bool=False,
-                 FlipImage: bool=False, FocusDebugPlot: bool=False, AFOneSource: bool=False,
+                 FlipDetImage: bool=False, FocusDebugPlot: bool=False, AFOneSource: bool=False,
                  DetImageOneSource: bool=False, **kwargs) -> None:
         """
         The extra bool parameters are needed to assign the List-Checklisteditor to bool values in the GUI.__init__. 
@@ -293,7 +293,7 @@ class TraceGUI(HasTraits):
         self.AbsorbMissing     = self.__CheckValFromBool(self.AbsorbMissing,     AbsorbMissing)
         self.CleanerView       = self.__CheckValFromBool(self.CleanerView,       CleanerView)
         self.LogImage          = self.__CheckValFromBool(self.LogImage,          LogImage)
-        self.FlipImage         = self.__CheckValFromBool(self.FlipImage,         FlipImage)
+        self.FlipDetImage         = self.__CheckValFromBool(self.FlipDetImage,         FlipDetImage)
         self.FocusDebugPlot    = self.__CheckValFromBool(self.FocusDebugPlot,    FocusDebugPlot)
         self.AFOneSource       = self.__CheckValFromBool(self.AFOneSource,       AFOneSource)
         self.DetImageOneSource = self.__CheckValFromBool(self.DetImageOneSource, DetImageOneSource)
@@ -322,7 +322,7 @@ class TraceGUI(HasTraits):
 
     def __removeObjects(self, objs):
         for obj in objs:
-            for obji in obj:
+            for obji in obj[:4]:
                 if obji is not None:
                     if obji.parent.parent.parent in self.Scene.mayavi_scene.children:
                         obji.parent.parent.parent.remove()
@@ -1286,7 +1286,7 @@ class TraceGUI(HasTraits):
                 Imc = self.lastDetImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:
-                    RImagePlot(self.lastDetImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
+                    RImagePlot(self.lastDetImage, log=self.LogImage, flip=self.FlipDetImage, mode=self.ImageType, Imc=Imc)
                     self.Status["DetectorImage"] = False
                 
                 pyfaceGUI.invoke_later(on_finish)
@@ -1320,7 +1320,7 @@ class TraceGUI(HasTraits):
                 Imc = self.lastSourceImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:
-                    RImagePlot(self.lastSourceImage, log=self.LogImage, flip=self.FlipImage, mode=self.ImageType, Imc=Imc)
+                    RImagePlot(self.lastSourceImage, log=self.LogImage, mode=self.ImageType, Imc=Imc)
                     self.Status["SourceImage"] = False
                 
                 pyfaceGUI.invoke_later(on_finish)

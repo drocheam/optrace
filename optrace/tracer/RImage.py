@@ -291,7 +291,7 @@ class RImage(BaseClass):
         # load npz archive
         Io = np.load(path)
 
-        Im = RImage(Io["extent"], long_desc=Io["long_desc"], desc=Io["desc"][()], coordinate_type=Io["type_"][()])
+        Im = RImage(Io["extent"], long_desc=Io["long_desc"][()], desc=Io["desc"][()], coordinate_type=Io["type_"][()])
 
         Im._Im = np.array(Io["Im"], dtype=np.float64)
         Im.rescale(Io["N"]) # also creates Im from _Im

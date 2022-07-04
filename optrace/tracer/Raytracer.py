@@ -21,7 +21,7 @@ from optrace.tracer.geometry.Lens import *
 from optrace.tracer.geometry.RaySource import * 
 from optrace.tracer.geometry.Surface import * 
 
-from optrace.tracer.spectrum.RefractionIndex import * 
+from optrace.tracer.RefractionIndex import * 
 from optrace.tracer.RayStorage import * 
 from optrace.tracer.RImage import *
 
@@ -204,8 +204,8 @@ class Raytracer:
         if not self.RaySourceList:
             raise RuntimeError("RaySource Missing")
 
-        if (N := int(N)) <= 0:
-            raise ValueError(f"Ray number N needs to be a positive int, but is {N}.")
+        if (N := int(N)) < 1000:
+            raise ValueError(f"Ray number N needs to be at least 1000, but is {N}.")
 
         if N > self.MAX_RAYS:
             raise ValueError(f"Ray number exceeds maximum of {self.MAX_RAYS}")
@@ -741,9 +741,9 @@ class Raytracer:
 
     def _hitDetector(self,
                      info:      str,
-                      ind:      int = 0,
-                      snum:     int = None,
-                      extent:   (list | np.ndarray | str) = "auto") \
+                     ind:      int = 0,
+                     snum:     int = None,
+                     extent:   (list | np.ndarray | str) = "auto") \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, str, ProgressBar]:
         """
         Rendered Detector Image. Rays are already traced.
@@ -753,6 +753,8 @@ class Raytracer:
         :param extent:
         :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
         """
+        
+        # TODO check if snum and ind are correct
 
         if not self.DetectorList:
             raise RuntimeError("Detector Missing")
@@ -895,7 +897,7 @@ class Raytracer:
         
         p, w, wl, extent, desc, coordinate_type, bar = self._hitDetector("Detector Spectrum", ind, snum)
 
-        spec = Spectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        spec = LightSpectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1018,6 +1020,8 @@ class Raytracer:
         :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
         """
 
+        # TODO check if sindex is correct
+        
         if not self.RaySourceList:
             raise RuntimeError("RaySource Missing")
 
@@ -1036,7 +1040,7 @@ class Raytracer:
     def SourceSpectrum(self, sindex: int = 0, **kwargs) -> Spectrum:
         p, w, wl, extent, desc, bar = self._hitSource("Source Spectrum", sindex)
 
-        spec = Spectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        spec = LightSpectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1131,7 +1135,7 @@ class Raytracer:
                   snum:         int = None,
                   N:            int = 75000,
                   ret_cost:     bool = True)\
-            -> tuple[float, np.ndarray, np.ndarray]:
+            -> tuple[float, float, np.ndarray | None, np.ndarray | None]:
         """
         Find the focal point using different methods. z_start defines the starting point, 
         the search range is the region between lenses or the outline.
@@ -1145,11 +1149,21 @@ class Raytracer:
         :return: position of focus (float)
         """
 
-        if not self.RaySourceList:
-            raise RuntimeError("RaySource Missing.")
-
         if not (self.outline[4] <= z_start <= self.outline[5]):
             raise ValueError("Starting position z_start outside outline.")
+
+        if method not in self.AutofocusModes:
+            raise ValueError(f"Invalid method '{method}', should be one of {self.AutofocusModes}.")
+
+        if N < 1000:
+            raise ValueError("N should be at least 1000.")
+
+        if snum is not None and snum < 0:
+            raise ValueError("snum needs to be >= 0.")
+
+        if (snum is not None and snum > len(self.Rays.N_list)) or len(self.Rays.N_list) == 0:
+            raise ValueError("snum larger than number of simulated sources. "
+                             "Either the source was not added or the geometry was not traced.")
 
         # get search bounds
         ########################################################################################################
@@ -1198,9 +1212,6 @@ class Raytracer:
         # get rays and properties
         ########################################################################################################
         
-        if snum is not None and snum >= len(self.RaySourceList):
-            raise RuntimeError("Invalid RaySource Index.")
-
         Ns, Ne = self.Rays.B_list[snum:snum+2] if snum is not None else (0, self.Rays.N)
 
         rays_pos = np.zeros(self.Rays.N, dtype=bool)
@@ -1215,8 +1226,8 @@ class Raytracer:
         rays_pos[pos==-1] = False
         
         N_is = min(N, np.count_nonzero(rays_pos))
-        if N_is == 0:  # throw error when no rays are present
-            raise RuntimeError("No rays found for autofocus")
+        if N_is < 1000:  # throw error when no rays are present
+            raise RuntimeError("Less than 1000 rays for autofocus.")
 
         # select random rays from all valid
         rp = np.where(rays_pos)[0]

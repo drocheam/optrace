@@ -29,6 +29,7 @@ class BaseClass:
 
             if isinstance(val, list):                               el = tuple(val)
             elif issubclass(type(val), BaseClass):                  el = val.crepr()
+            elif isinstance(val, np.ndarray) and val.size < 20:     el = tuple(val)
             elif isinstance(val, np.ndarray) or callable(val):      el = id(val)
             else:                                                   el = val
 
@@ -37,8 +38,8 @@ class BaseClass:
         return cl
 
     def getLongDesc(self, fallback: str=""):
-        """"""
-        return self.long_desc if self.long_desc != "" else self.getDesc(fallback)
+        
+        return self.long_desc if self.long_desc != "" else BaseClass.getDesc(self, fallback)
 
     def getDesc(self, fallback: str=""):
         """"""
@@ -68,7 +69,7 @@ class BaseClass:
         val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
         
         if self._new_lock and key not in self.__dict__:
-            raise ValueError(f"Invalid property {key}.")
+            raise AttributeError(f"Invalid property {key}.")
         
         if self._lock and key != "_lock":
             raise RuntimeError("Object is currently read-only. Create a new object with new properties "
@@ -86,11 +87,11 @@ class BaseClass:
     def _checkType(key, val, type_):
         if not isinstance(val, type_):
             types = str(type_).replace("|", "or")
-            raise TypeError(f"Property '{key}' needs to be of type(s) {types}.")
+            raise TypeError(f"Property '{key}' needs to be of type(s) {types}, but is {type(val)}.")
 
     @staticmethod
     def _checkNotAbove(key, val, cmp):
-        if val <= cmp:
+        if val > cmp:
             raise ValueError(f"Property '{key}' needs to be below or equal to {cmp}, but is {val}.")
 
     @staticmethod
@@ -102,6 +103,11 @@ class BaseClass:
     def _checkAbove(key, val, cmp):
         if val <= cmp:
             raise ValueError(f"Property '{key}' needs to be above {cmp}, but is {val}.")
+    
+    @staticmethod
+    def _checkBelow(key, val, cmp):
+        if val >= cmp:
+            raise ValueError(f"Property '{key}' needs to be below {cmp}, but is {val}.")
     
     @staticmethod
     def _checkNoneOrCallable(key, val):

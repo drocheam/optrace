@@ -87,6 +87,8 @@ class BackendModuleTests(unittest.TestCase):
                 if Si.isPlanar():
                     Si.getRandomPositions(N=1000)
 
+        # TODO check lock
+
     def test_SurfaceFunction(self):
 
         # turn off warnings temporarily, since not specifying maxz, minz in __init__ leads to one
@@ -109,16 +111,174 @@ class BackendModuleTests(unittest.TestCase):
         warnings.simplefilter("default")
 
     def test_Filter(self):
-        pass
+
+        self.assertRaises(TypeError, ot.Filter, ot.Surface("Circle"), spectrum=ot.preset_spec_X, pos=[0, 0, 0]) # invalid TransmissionSpectrun
+        self.assertRaises(RuntimeError, ot.Filter, ot.Surface("Point"), spectrum=ot.preset_spec_D65, pos=[0, 0, 0]) # non 2D surface
+        self.assertRaises(RuntimeError, ot.Filter, ot.Surface("Line"), spectrum=ot.preset_spec_D65, pos=[0, 0, 0]) # non 2D surface
+
+        # if getColor and calling implemented
+        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=0.5), pos=[0, 0, 0])
+        F.getColor()
+        F(np.array([400, 500]))
+
+        def invalid_set():
+            F.aaa = 1
+        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
 
     def test_Detector(self):
+
+        self.assertRaises(RuntimeError, ot.Detector, ot.Surface("Point"), pos=[0, 0, 0]) # non 2D surface
+        self.assertRaises(RuntimeError, ot.Detector, ot.Surface("Line"), pos=[0, 0, 0]) # non 2D surface
+
+        Det = ot.Detector(ot.Surface("Sphere"), pos=[0, 0, 0])
+        Det.getAngleExtent() # TODO check actual values
+
+        # TODO check Det.toAngleCoordinates()
+
+        def invalid_set():
+            Det.aaa = 1
+        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+
+    def test_SObject(self):
+        pass
+
+    def test_BaseClass(self):
         pass
 
     def test_Lens(self):
-        pass
+        # TODO check estimateFocalLength()
+
+        front = ot.Surface("Sphere", r=3, rho=1/10)  # height 10 - sqrt(91)
+        back = ot.Surface("Asphere", r=2, k=-5, rho=-1/20) # height sqrt(26) - 5
+        n = ot.preset_n_SF10
+        n2 = ot.RefractionIndex("Constant", n=1.05)
+        
+        L = [ot.Lens(front, back, n, pos=[0, 0, 0], de=0.),
+             ot.Lens(front, back, n, pos=[0, 0, 0], de=0.1),
+             ot.Lens(front, back, n, pos=[0, 0, 0], d=0.8),
+             ot.Lens(back, front, n, pos=[0, 0, 0], de=0.1),
+             ot.Lens(back, front, n, pos=[0, 0, 0], d=0.1),
+             ot.Lens(front, back, n, pos=[0, 0, 0], d1=0.5, d2=0.3, n2=n2),
+             ot.Lens(front, front, n, pos=[0, 0, 0], d=0.1),
+             ot.Lens(front, front, n, pos=[0, 0, 0], de=0.1),
+             ot.Lens(front, front, n, pos=[0, 0, 0], d1=0.1, d2=0.1),
+             ot.Lens(back, back, n, pos=[0, 0, 0], d=0.1),
+             ot.Lens(back, back, n, pos=[0, 0, 0], d1=0.1, d2=0.1)]
+
+        d = [10-np.sqrt(91) + np.sqrt(26)-5, 10-np.sqrt(91) + np.sqrt(26)-5 + 0.1,
+             0.8, 0.1, 0.1, 0.8, 0.1, 10-np.sqrt(91) + 0.1, 0.2, 0.1, 0.2]
+
+        for di, Li in zip(d, L):
+            self.assertAlmostEqual(di, Li.d1+Li.d2, 8)
+
+        self.assertRaises(TypeError, ot.Lens, front, back, None, pos=[0, 0 ,0])
+        self.assertRaises(TypeError, ot.Lens, front, back, n, n2=front, pos=[0, 0, 0])
+        self.assertRaises(RuntimeError, ot.Lens, front, ot.Surface("Point"), n, pos=[0, 0, 0]) # non 2D surface
+        self.assertRaises(RuntimeError, ot.Lens, front, ot.Surface("Line"), n, pos=[0, 0, 0]) # non 2D surface
+
+        def invalid_set():
+            L[0].aaa = 1
+        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
 
     def test_RaySource(self):
-        pass
+
+        def or_func(x, y):
+            s = np.column_stack((-x, -y, np.ones_like(x)*5))
+            ab = (s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2) ** 0.5
+            s /= ab[:, np.newaxis]
+            return s
+
+        # use power other than default of 1
+        # use position other than default of [0, 0, 0]
+        # use s other than [0, 0, 1]
+        rargs = dict(spectrum=ot.preset_spec_D50, or_func=or_func, pos=[0.5, -2, 3], power=2.5, s=[0, 0.5, 1], pol_ang=0.5)
+       
+        # possible surface types
+        Surfaces = [ot.Surface("Point"), ot.Surface("Line"), ot.Surface("Circle"), 
+                    ot.Surface("Rectangle"), ot.Surface("Ring")]
+
+        # check most RaySource combinations
+        # also checks validity of createRays()
+        # the loop also has the nice side effect of checking of all image presets
+
+        for Surf in Surfaces:
+            for dir_type in ot.RaySource.direction_types:
+                for or_type in ot.RaySource.orientation_types:
+                    for pol_type in ot.RaySource.polarization_types:
+                        for Im in [None, *ot.presets_image]:
+
+                            # only check RectangleSurface with Image being active/set
+                            if Im is not None and Surf.surface_type != "Rectangle":
+                                continue
+
+                            RS = ot.RaySource(Surf, direction_type=dir_type, orientation_type=or_type, 
+                                              polarization_type=pol_type, Image=Im, **rargs)
+                            RS.getColor()
+                            p, s, pols, weights, wavelengths = RS.createRays(10000)
+
+                            self.assertGreater(np.min(s[:, 2]), 0) # ray direction in positive direction
+                            self.assertGreater(np.min(weights), 0) # no zero weight rays
+                            self.assertEqual(np.sum(weights), rargs["power"]) # rays amount to power
+                            self.assertGreaterEqual(np.min(wavelengths), ot.Color.WL_MIN) # inside visible range
+                            self.assertLessEqual(np.max(wavelengths), ot.Color.WL_MAX) # inside visible range
+
+                            # check positions
+                            self.assertTrue(np.all(p[:, 2] == rargs["pos"][2])) # rays start at correct z-position
+                            self.assertGreaterEqual(np.min(p[:, 0]), RS.Surface.getExtent()[0])
+                            self.assertLessEqual(np.max(p[:, 0]), RS.Surface.getExtent()[1])
+                            self.assertGreaterEqual(np.min(p[:, 1]), RS.Surface.getExtent()[2])
+                            self.assertLessEqual(np.max(p[:, 1]),  RS.Surface.getExtent()[3])
+
+                            # s needs to be a unity vector
+                            ss = s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2
+                            self.assertAlmostEqual(np.max(ss), 1, 6)
+                            self.assertAlmostEqual(np.min(ss), 1, 6)
+
+                            # pol needs to be a unity vector
+                            polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
+                            self.assertAlmostEqual(np.max(polss), 1, 6)
+                            self.assertAlmostEqual(np.min(polss), 1, 6)
+
+        rsargs=[ot.Surface("Rectangle"), [0, 0, 0]]
+     
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, spectrum=1) # invalid spectrum_type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, or_func=1) # invalid or_func
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, power=0) # power needs to be above 0
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, power=None) # invalid power type
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, sr_angle=0) # psr_angle needs to be above 0
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, sr_angle=None) # invalid sr_angle type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_ang=None) # invalid pol_ang type
+        
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, orientation_type=1) # invalid orientation_type type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, direction_type=1) # invalid direction_type type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, polarization_type=1) # invalid polarization_type type
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, orientation_type="A") # invalid orientation_type
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, direction_type="A") # invalid direction_type
+        self.assertRaises(ValueError, ot.RaySource,*rsargs,  polarization_type="A") # invalid polarization_type
+
+        # image error handling
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, Image=1) # invalid image type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, Image=[1, 2]) # invalid image type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, Image=[[1, 2], [3, 4]]) # invalid image type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, Image=np.ones((2, 2, 3, 2))) # invalid image type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, Image=np.ones((2, 2, 2))) # invalid image type
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, Image=np.zeros((2, 2, 3))) # image completely black
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, Image=-np.ones((2, 2, 3))) # invalid image values
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, Image=2*np.ones((2, 2, 3))) # invalid image values
+        self.assertRaises(RuntimeError, ot.RaySource, *rsargs, Image=np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3))) # image too large
+
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, s=1) # invalid s type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, s=[1, 3]) # invalid s type
+        
+        self.assertRaises(ValueError, ot.RaySource, ot.Surface("Sphere"), pos=[0, 0, 0], s=[1, 3]) # currently only planar surfaces are supported
+
+        RS = ot.RaySource(*rsargs)
+        def invalid_set():
+            RS.aaa = 1
+        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+
+        self.assertRaises(RuntimeError, RS.createRays, 1000) # spectrum missing
+        self.assertRaises(RuntimeError, RS.getColor) # spectrum missing
 
     def test_Image(self):
         pass
@@ -130,25 +290,43 @@ class BackendModuleTests(unittest.TestCase):
 
         func = lambda wl: 2.0 - wl/500/5 
 
-        # check __init__
+        rargs = dict(V=50, coeff=[1.2, 1e-8], func=func, wls=[380, 780], vals=[1.5, 1.])
+
+        for type_ in ot.RefractionIndex.n_types:
+            n = ot.RefractionIndex(type_, **rargs)
+            n(550)
+            n.getAbbeNumber()
+            n.isDispersive()
+
+        # combinations to check for correct values
         R = [ot.RefractionIndex("Constant", n=1.2),
              ot.RefractionIndex("Cauchy", coeff=[1.2, 0.004]),
              ot.RefractionIndex("Function", func=func)]
 
         # check presets
         for material in ot.presets_n:
-            material(550)
-            # print(material.desc, material.getAbbeNumber())
+            n0 = material(550)
+            A0 = material.getAbbeNumber()
 
+            self.assertTrue(n0 >= 1 and n0 <= 2.5) # sane refraction index
+            self.assertTrue(A0 == np.inf or A0 < 150) # sane Abbe Number
+                
         # check exceptions
         self.assertRaises(ValueError, ot.RefractionIndex, "ABC")  # invalid type
         n2 = ot.RefractionIndex("Function")
         self.assertRaises(RuntimeError, n2, 550)  # func missing
         self.assertRaises(ValueError, ot.RefractionIndex, "Constant", n=0.99)  # n < 1
-        # self.assertRaises(ValueError, ot.RefractionIndex, "Cauchy", Cauchy=[0.99])  # A < 1
+        self.assertRaises(TypeError, ot.RefractionIndex, "Abbe", V=[1]) # invalid V type
+        self.assertRaises(ValueError, ot.RefractionIndex, "Abbe", V=0) # invalid V
+        self.assertRaises(ValueError, ot.RefractionIndex, "Abbe", V=50, lines=[380, 480]) # lines need to have 3 elements
+        self.assertRaises(ValueError, ot.RefractionIndex, "Abbe", V=50, lines=[380, 780, 480]) # lines need to be ascending
+        self.assertRaises(ValueError, ot.RefractionIndex, "Function", func=lambda wl: 1.5 - wl/550) # func < 1
+        self.assertRaises(ValueError, ot.RefractionIndex, "Data", wls=[380, 780], vals=[1.5, 0.9]) # vals < 1
+        self.assertRaises(TypeError, ot.RefractionIndex, "Cauchy", coeff=1) # invalid coeff type
+        self.assertRaises(ValueError, ot.RefractionIndex, "Cauchy", coeff=[1, 0, 0, 0, 0]) # too many coeff
+        self.assertRaises(RuntimeError, ot.RefractionIndex("Cauchy", coeff=[2, -1]), np.array([380., 780.])) # n < 1 on runtime
 
         # check values
-
         wl = np.array([450., 580.])
         Rval = np.array([[1.2, 1.2],
                          [1.219753086, 1.211890606],
@@ -163,13 +341,211 @@ class BackendModuleTests(unittest.TestCase):
         self.assertEqual(R[1], R[1])
         self.assertEqual(ot.RefractionIndex("Function", func=func), ot.RefractionIndex("Function", func=func))
 
-        
+        def invalid_set():
+            R[0].aaa = 1
+        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+
     def test_Color(self):
+        
         doctest.testmod(ot.tracer.Color)
 
+        # raytracer geometry of only a Source
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
+        RSS = ot.Surface("Rectangle", dim=[6, 6])
+        RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.preset_spec_D65)
+        RT.add(RS)
+
+        # check white color of spectrum in sRGB
+        for RSci, WPi in zip(RS.getColor(), np.array([1, 1, 1])):
+            self.assertAlmostEqual(RSci, WPi, delta=0.001)
+
+        # check white color of spectrum in XYZ
+        spec_XYZ = RS.spectrum.getXYZ()[0, 0]
+        for RSci, WPi in zip(spec_XYZ/spec_XYZ[1], ot.Color._WP_D65_XYZ):
+            self.assertAlmostEqual(RSci, WPi, delta=0.001) 
+
+        # check color of all rendered rays on RaySource in sRGB
+        RT.trace(N=500000)
+        spec_RS = RT.SourceSpectrum(N=2000)
+        for RSci, WPi in zip(spec_RS.getColor(), np.array([1, 1, 1])):
+            self.assertAlmostEqual(RSci, WPi, delta=0.015)
+
+        # check color of all rendered rays on RaySource in XYZ
+        RS_XYZ = spec_RS.getXYZ()[0, 0]
+        for RSci, WPi in zip(RS_XYZ/RS_XYZ[1], ot.Color._WP_D65_XYZ):
+            self.assertAlmostEqual(RSci, WPi, delta=0.015) 
+
+        # assign colored image to RaySource
+        RS.Image = Image = np.array([[[0, 1, 0], [1, 1, 1]],[[0.2, 0.5, 0.1], [0, 0.8, 1.0]]], dtype=np.float32)
+        RT.trace(N=5000000)
+
+        # get Source Image
+        RS_RGB = RT.SourceImage(N=2).getRGB()
+        Im_px = Image.reshape((4, 3))
+        RS_px = RS_RGB.reshape((4, 3))
+
+        # check if is near original image. 
+        # Unfortunately many rays are needed for the color to be near
+        for i in range(4):
+            for RSp, Cp in zip(RS_px[i], Im_px[i]):
+                self.assertAlmostEqual(RSp, Cp, delta=0.04)
+
+    def test_Spectrum(self):
+
+        wl = ot.Color.wavelengths(100)
+        sargs = dict(func=lambda x: x**2, lines=ot.preset_lines_FDC, line_vals=[0.5, 1., 5], 
+                     wls=np.array([380, 400, 780]), vals=np.array([1, 0.5, 0]))
+
+        for type_ in ot.Spectrum.spectrum_types:
+            spec = ot.Spectrum(type_, **sargs) # init
+            if spec.isContinuous():
+                spec(wl) # call
+
+        # check presets
+        for spec in ot.presets_spec_tristimulus:
+            if spec.isContinuous():
+                spec(wl) # call
+
+        spec  = ot.Spectrum("Function")
+        self.assertRaises(RuntimeError, spec, np.array([380., 780.])) # no function
+        spec  = ot.Spectrum("Data")
+        self.assertRaises(RuntimeError, spec, np.array([380., 780.])) # wls or vals not specified
+        
+        self.assertRaises(ValueError, ot.Spectrum, "Monochromatic", wl=100) # wavelength outside visible range
+        self.assertRaises(ValueError, ot.Spectrum, "Rectangle", wl0=100, wl1=500) # wavelength outside visible range
+        self.assertRaises(ValueError, ot.Spectrum, "Rectangle", wl0=400, wl1=900) # wavelength outside visible range
+        self.assertRaises(ValueError, ot.Spectrum, "Blackbody", T=0) # temperature <= 0
+        self.assertRaises(ValueError, ot.Spectrum, "Gaussian", mu=100) # wavelength outside visible range
+        self.assertRaises(ValueError, ot.Spectrum, "Gaussian", sig=0) # sigma <= 0
+        self.assertRaises(ValueError, ot.Spectrum, "Gaussian", fact=0) # fact <= 0
+        self.assertRaises(ValueError, ot.Spectrum, "Constant", val=-1) # val < 0
+        self.assertRaises(ValueError, ot.Spectrum, "Lines", lines=[400, 500], line_vals=[1, -1]) # line weights below zero
+        self.assertRaises(ValueError, ot.Spectrum, "Lines", lines=[100, 500], line_vals=[1, 2]) # wavelength outside visible range
+        self.assertRaises(ValueError, ot.Spectrum, "AAAA") # invalid type
+        self.assertRaises(ValueError, ot.Spectrum, "Data", wls=[400, 500], vals=[5, -1]) # vals below 0
+
+        self.assertRaises(TypeError, ot.Spectrum, "Function", func=1) # invalid function type
+        self.assertRaises(TypeError, ot.Spectrum, "Lines", lines=5, line_vals=[1, 2]) # invalid lines type
+        self.assertRaises(TypeError, ot.Spectrum, "Lines", lines=[400, 500], line_vals=5) # invalid line_vals type
+        self.assertRaises(TypeError, ot.Spectrum, 5) # invalid type type
+        self.assertRaises(TypeError, ot.Spectrum, "Constant", quantity=1) # quantity not str
+        self.assertRaises(TypeError, ot.Spectrum, "Constant", unit=1) # unit not str
+        self.assertRaises(TypeError, ot.Spectrum, "Data", wls=1, vals=[1, 2]) # wls not array-like
+        self.assertRaises(TypeError, ot.Spectrum, "Data", wls=[400, 500], vals=3) # vals not array-like
+
+        self.assertRaises(RuntimeError, ot.Spectrum, "Function", func= lambda wl: 1-wl/550) # func below 0 
+
+        def invalid_set():
+            spec.aaa = 1
+        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+
+    def test_TransmissionSpectrum(self):
+
+        wl = ot.Color.wavelengths(100)
+        sargs = dict(func=lambda x: 0.5, wls=np.array([380, 400, 780]), vals=np.array([1, 0.5, 0]))
+
+        for type_ in ot.TransmissionSpectrum.spectrum_types:
+            spec = ot.TransmissionSpectrum(type_, **sargs) # init
+            spec(wl)
+            spec.getXYZ()
+            spec.getColor()
+           
+        self.assertRaises(ValueError, ot.TransmissionSpectrum, "Lines") # invalid discrete type
+        self.assertRaises(ValueError, ot.TransmissionSpectrum, "Monochromatic") # invalid discrete type
+        self.assertRaises(ValueError, ot.TransmissionSpectrum, "Gaussian", fact=2) # fact above 1 
+        self.assertRaises(ValueError, ot.TransmissionSpectrum, "Constant", val=2) # val above 1 
+        self.assertRaises(ValueError, ot.TransmissionSpectrum, "Data", wls=[380, 500], vals=[0, 2]) # vals above 1
+        self.assertRaises(RuntimeError, ot.TransmissionSpectrum, "Function", func= lambda wl: wl/550) # func above 1 
+
+    def test_LightSpectrum(self):
+
+        wl = ot.Color.wavelengths(100)
+        sargs = dict(func=lambda x: x**2, lines=ot.preset_lines_FDC, line_vals=[0.5, 1., 5], 
+                     wls=np.array([380, 400, 780]), vals=np.array([1, 0.5, 0]))
+
+        for type_ in ot.LightSpectrum.spectrum_types:
+            spec = ot.LightSpectrum(type_, **sargs) # init
+            if spec.isContinuous():
+                spec(wl)
+            spec.getXYZ()
+            spec.getColor()
+            spec.randomWavelengths(1000)
+
+        # check presets
+        for spec in ot.presets_light:
+            if spec.isContinuous():
+                spec(wl)
+            spec.getXYZ()
+            spec.getColor()
+            spec.randomWavelengths(1000)
+
+        # LightSpectrum.makeSpectrum() is tested in test_Color()
+
+        self.assertRaises(ValueError, ot.LightSpectrum, "Constant", val=0) # val <= 0
+
+        # LightSpectrum has specialized functions compared to Spectrum, check if they handle missing properties correctly
+        self.assertRaises(RuntimeError, ot.LightSpectrum("Data").getXYZ) # wls or vals not specified
+        self.assertRaises(RuntimeError, ot.LightSpectrum("Data").randomWavelengths, 100) # wls or vals not specified
+        self.assertRaises(RuntimeError, ot.LightSpectrum("Lines").getXYZ) # lines or line_vals not specified
+        self.assertRaises(RuntimeError, ot.LightSpectrum("Lines").randomWavelengths, 100) # lines or line_vals not specified
+        
     def test_Misc(self):
         doctest.testmod(ot.tracer.Misc)
+        # additional tests not required here, since this functions are not exposed to the user
 
+
+    def test_Focus(self):
+        
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -60, 80], silent=True, n0=ot.RefractionIndex("Constant", n=1.1))
+        RSS = ot.Surface("Circle", r=0.5)
+        RS = ot.RaySource(RSS, pos=[0, 0, -3], spectrum=ot.preset_spec_D65)
+        RT.add(RS)
+
+        front = ot.Surface("Sphere", r=3, rho=1/30)
+        back = ot.Surface("Asphere", r=3, rho=-1/20, k=1)
+        n = ot.RefractionIndex("Constant", n=1.5)
+        L = ot.Lens(front, back, n, de=0.1, pos=[0, 0, 0])
+        RT.add(L)
+
+        f = L.estimateFocalLength(n0=RT.n0)
+        fs = 33.08433714
+        self.assertAlmostEqual(f, fs, 6)
+
+        self.assertRaises(ValueError, RT.autofocus, RT.AutofocusModes[0], z_start=5) # no simulated rays
+        
+        RT.trace(200000)
+
+        for method in RT.AutofocusModes: # all methods
+            for N in [50000, 200000, 500000]: # N cases: less rays, all rays, more rays than simulated
+                z, _, _, _ = RT.autofocus(method, z_start=5.0, N=N, ret_cost=False)
+                self.assertAlmostEqual(z, fs, delta=0.15)
+
+        # snum=0 with only one source leads to the same result
+        z, _, _, _ = RT.autofocus(RT.AutofocusModes[0], z_start=5.0, snum=0, N=N, ret_cost=False)
+        self.assertAlmostEqual(z, fs, delta=0.15)
+
+        RS2 = ot.RaySource(ot.Surface("Point"), spectrum=ot.preset_spec_D65, direction_type="Diverging", 
+                           sr_angle=0.5, pos=[0, 0, -60])
+        RT.add(RS2)
+        
+        RT.trace(200000)
+
+        # snum=0 with two raysources should lead to the same result as if the second RS was missing
+        z, _, _, _ = RT.autofocus(RT.AutofocusModes[0], z_start=5.0, snum=0, N=N, ret_cost=False)
+        self.assertAlmostEqual(z, fs, delta=0.15)
+
+        # 1/f = 1/b + 1/g with f=33.08, g=60 should lead to b=73.73
+        z, _, _, _ = RT.autofocus(RT.AutofocusModes[0], z_start=5.0, snum=1, N=N, ret_cost=False)
+        self.assertAlmostEqual(z, 73.73, delta=0.1)
+
+        self.assertRaises(ValueError, RT.autofocus, RT.AutofocusModes[0], z_start=-100) # z_start outside outline
+        self.assertRaises(ValueError, RT.autofocus, "AA", z_start=-100) # invalid mode
+        self.assertRaises(ValueError, RT.autofocus, RT.AutofocusModes[0], z_start=-100, snum=-1) # snum negative
+        self.assertRaises(ValueError, RT.autofocus, RT.AutofocusModes[0], z_start=-100, snum=10) # snum too large
+
+        self.assertRaises(ValueError, RT.autofocus, RT.AutofocusModes[0], z_start=10, N=10) # N too low
+
+        # TODO test r- and vals-returns of autofocus()
 
 if __name__ == '__main__':
     unittest.main()
