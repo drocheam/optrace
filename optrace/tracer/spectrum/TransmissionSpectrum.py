@@ -1,9 +1,11 @@
 
-from optrace.tracer.spectrum.Spectrum import *
-from optrace.tracer.spectrum.LightSpectrum import *
+from optrace.tracer.spectrum.Spectrum import Spectrum
+from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
 
 import optrace.tracer.Color as Color
 import optrace.tracer.presets.Spectrum as presets_spectrum
+
+import numpy as np
 
 
 class TransmissionSpectrum(Spectrum):

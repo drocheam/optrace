@@ -9,7 +9,7 @@ import scipy.special
 
 import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
-from optrace.tracer.BaseClass import *
+from optrace.tracer.BaseClass import BaseClass
 
 # TODO multiple gaussians? Specify mu, sig, val as list
 class Spectrum(BaseClass):

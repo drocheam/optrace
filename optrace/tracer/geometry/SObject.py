@@ -25,11 +25,11 @@ Properties with FrontSurface + BackSurface:
 """
 
 
-from optrace.tracer.geometry.Surface import *  # for the SObject surface
+from optrace.tracer.geometry.Surface import Surface  # for the SObject surface
 
 from typing import Callable  # for function type hints
 import numpy as np
-from optrace.tracer.BaseClass import *
+from optrace.tracer.BaseClass import BaseClass
 
 
 class SObject(BaseClass):

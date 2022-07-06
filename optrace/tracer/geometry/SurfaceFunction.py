@@ -3,7 +3,7 @@ import numpy as np
 from typing import Callable
 import warnings
 
-from optrace.tracer.BaseClass import *
+from optrace.tracer.BaseClass import BaseClass
 
 class SurfaceFunction(BaseClass):
 

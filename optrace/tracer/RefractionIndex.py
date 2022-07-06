@@ -9,7 +9,7 @@ import numpy as np
 import optrace.tracer.Misc as misc
 import optrace.tracer.presets.Lines as Lines
 from optrace.tracer.spectrum.Spectrum import Spectrum as Spectrum
-from optrace.tracer.BaseClass import *
+from optrace.tracer.BaseClass import BaseClass
 import optrace.tracer.Color as Color
 
 

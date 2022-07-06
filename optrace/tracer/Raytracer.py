@@ -14,17 +14,20 @@ from threading import Thread
 from typing import Callable
 from progressbar import progressbar, ProgressBar
 
-from optrace.tracer.geometry.Filter import * 
-from optrace.tracer.geometry.Aperture import * 
-from optrace.tracer.geometry.Detector import * 
-from optrace.tracer.geometry.Lens import * 
-from optrace.tracer.geometry.RaySource import * 
-from optrace.tracer.geometry.Surface import * 
+from optrace.tracer.geometry.Filter import Filter
+from optrace.tracer.geometry.Aperture import Aperture
+from optrace.tracer.geometry.Detector import Detector 
+from optrace.tracer.geometry.Lens import Lens 
+from optrace.tracer.geometry.RaySource import RaySource
+from optrace.tracer.geometry.Surface import Surface 
+from optrace.tracer.geometry.SObject import SObject 
 
-from optrace.tracer.RefractionIndex import * 
-from optrace.tracer.RayStorage import * 
-from optrace.tracer.RImage import *
-from optrace.tracer.BaseClass import *
+from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
+
+from optrace.tracer.RefractionIndex import RefractionIndex
+from optrace.tracer.RayStorage import RayStorage
+from optrace.tracer.RImage import RImage
+from optrace.tracer.BaseClass import BaseClass
 
 import optrace.tracer.Misc as misc
 
@@ -91,17 +94,14 @@ class Raytracer(BaseClass):
 
         super().__init__(**kwargs)
 
-    def __setattr__(self, key, val0):
-
-        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
+    def __setattr__(self, key, val):
 
         match key:
 
             case "outline":
                 self._checkType(key, val, list | np.ndarray)
-                val = np.array(val, dtype=np.float64)
 
-                o = val
+                o = np.array(val, dtype=np.float64)
                 if o.shape[0] != 6 or o[0] >= o[1] or o[2] >= o[3] or o[4] >= o[5]:
                     raise ValueError("Outline needs to be specified as [x1, x2, y1, y2, z1, z2] "
                                      "with x2 > x1, y2 > y1, z2 > z1.")
@@ -904,7 +904,7 @@ class Raytracer(BaseClass):
                          ind:      int = 0,
                          snum:     int = None,
                          extent:   (list | np.ndarray | str) = "auto",
-                         **kwargs) -> Spectrum:
+                         **kwargs) -> LightSpectrum:
         
         p, w, wl, extent, desc, coordinate_type, bar = self._hitDetector("Detector Spectrum", ind, snum)
 
@@ -1049,7 +1049,7 @@ class Raytracer(BaseClass):
 
         return p, w, wl, extent, desc, bar
 
-    def SourceSpectrum(self, sindex: int = 0, **kwargs) -> Spectrum:
+    def SourceSpectrum(self, sindex: int = 0, **kwargs) -> LightSpectrum:
         p, w, wl, extent, desc, bar = self._hitSource("Source Spectrum", sindex)
 
         spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)

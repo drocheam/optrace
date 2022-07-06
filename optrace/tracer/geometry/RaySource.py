@@ -11,9 +11,9 @@ The RaySource object also holds all rays and ray sections generated in raytracin
 import numpy as np
 from typing import Callable
 
-from optrace.tracer.geometry.Surface import * 
-from optrace.tracer.geometry.SObject import *
-from optrace.tracer.spectrum.LightSpectrum import *
+from optrace.tracer.geometry.Surface import Surface 
+from optrace.tracer.geometry.SObject import SObject
+from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
 
 from optrace.tracer.Misc import timer as timer
 import optrace.tracer.Misc as misc

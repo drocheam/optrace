@@ -8,7 +8,7 @@ from optrace.tracer.Misc import timer as timer  # for benchmarking
 import optrace.tracer.Misc as misc
 from threading import Thread  # for multithreading
 
-from optrace.tracer.BaseClass import *
+from optrace.tracer.BaseClass import BaseClass
 
 # Rendered Image class
 

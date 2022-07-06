@@ -2,7 +2,9 @@
 import wx
 import numpy as np
 
-from optrace.tracer import *
+
+from optrace.tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage,\
+                           Surface, SurfaceFunction, Spectrum, TransmissionSpectrum, LightSpectrum, RefractionIndex
 
 from twisted.internet import wxreactor
 wxreactor.install()

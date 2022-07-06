@@ -5,8 +5,8 @@ Aperture class:
 
 import numpy as np
 
-from optrace.tracer.geometry.SObject import *
-from optrace.tracer.geometry.Surface import *
+from optrace.tracer.geometry.SObject import SObject
+from optrace.tracer.geometry.Surface import Surface
 
 
 class Aperture(SObject):

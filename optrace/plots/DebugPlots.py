@@ -6,10 +6,10 @@ import numpy as np
 
 import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
-from optrace.tracer.RImage import *
-from optrace.tracer.spectrum.LightSpectrum import *
-from optrace.tracer.RefractionIndex import *
-from optrace.tracer.geometry.Surface import *
+from optrace.tracer.RImage import RImage
+from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
+from optrace.tracer.RefractionIndex import RefractionIndex
+from optrace.tracer.geometry.Surface import Surface
 import optrace.tracer.presets.Lines as Lines
 
 def AutoFocusDebugPlot(r, vals, rf, ff, title="Focus Finding", block=False):

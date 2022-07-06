@@ -1,10 +1,11 @@
 
 
-from optrace.tracer.spectrum.Spectrum import *
+from optrace.tracer.spectrum.Spectrum import Spectrum
 import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
 
 import numpy as np
+import scipy.special
 
 
 class LightSpectrum(Spectrum):

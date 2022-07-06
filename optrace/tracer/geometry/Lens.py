@@ -7,9 +7,9 @@ A refractive index is specified for the material and one for the area behind the
 
 import numpy as np
 
-from optrace.tracer.RefractionIndex import *
-from optrace.tracer.geometry.Surface import *
-from optrace.tracer.geometry.SObject import *
+from optrace.tracer.RefractionIndex import RefractionIndex
+from optrace.tracer.geometry.Surface import Surface
+from optrace.tracer.geometry.SObject import SObject
 
 
 class Lens(SObject):

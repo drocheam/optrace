@@ -30,10 +30,11 @@ from mayavi.sources.builtin_surface import BuiltinSurface
 from mayavi.modules.surface import Surface as mayaviSurface
 from mayavi.sources.parametric_surface import ParametricSurface
 
-from optrace.tracer import *
+from optrace.tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex
 from optrace.tracer.Misc import timer as timer
 from optrace.plots.RImagePlots import RImagePlot
 from optrace.plots.DebugPlots import AutoFocusDebugPlot
+import optrace.tracer.Color as Color
 
 import optrace.gui.TCPServer as TCPServer
 from twisted.internet import reactor

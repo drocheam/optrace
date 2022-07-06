@@ -7,9 +7,9 @@ Useful for color filters or apertures.
 
 import numpy as np
 
-from optrace.tracer.geometry.SObject import *
-from optrace.tracer.spectrum.TransmissionSpectrum import *
-from optrace.tracer.geometry.Surface import *
+from optrace.tracer.geometry.SObject import SObject
+from optrace.tracer.spectrum.TransmissionSpectrum import TransmissionSpectrum
+from optrace.tracer.geometry.Surface import Surface
 
 
 class Filter(SObject):

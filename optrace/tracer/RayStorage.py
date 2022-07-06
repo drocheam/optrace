@@ -3,9 +3,9 @@ from threading import Thread
 
 import warnings
 import numpy as np
-from optrace.tracer.geometry.RaySource import *
+from optrace.tracer.geometry.RaySource import RaySource
 import optrace.tracer.Misc as misc
-from optrace.tracer.BaseClass import *
+from optrace.tracer.BaseClass import BaseClass
 from optrace.tracer.Misc import timer as timer
 
 

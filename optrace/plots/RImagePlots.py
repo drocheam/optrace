@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import copy
 
-from optrace.tracer.RImage import *
+from optrace.tracer.RImage import RImage
 
 
 def RImagePlot(Im:       RImage,
