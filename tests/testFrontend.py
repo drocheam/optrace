@@ -33,7 +33,7 @@ class FrontendTests(unittest.TestCase):
 
         # add Raysource
         RSS = ot.Surface("Rectangle", dim=[4, 4])
-        RS = ot.RaySource(RSS, direction_type="Diverging", sr_angle=8,
+        RS = ot.RaySource(RSS, direction="Diverging", div_angle=8,
                        Image=Image, s=[0, 0, 1], pos=[0, 0, 0])
         RT.add(RS)
 
@@ -83,13 +83,13 @@ class FrontendTests(unittest.TestCase):
 
         # add Raysource
         RSS = ot.Surface("Circle", r=1)
-        RS = ot.RaySource(RSS, direction_type="Parallel", spectrum=ot.preset_spec_FDC,
-                       pos=[0, 0, 0], s=[0, 0, 1], polarization_type="y")
+        RS = ot.RaySource(RSS, direction="Parallel", spectrum=ot.preset_spec_FDC,
+                       pos=[0, 0, 0], s=[0, 0, 1], polarization="y")
         RT.add(RS)
 
         RSS2 = ot.Surface("Circle", r=1)
-        RS2 = ot.RaySource(RSS2, direction_type="Parallel", s=[0, 0, 1], spectrum=ot.preset_spec_D65,
-                        pos=[0, 1, -3], polarization_type="Angle", pol_ang=25, power=2)
+        RS2 = ot.RaySource(RSS2, direction="Parallel", s=[0, 0, 1], spectrum=ot.preset_spec_D65,
+                        pos=[0, 1, -3], polarization="Angle", pol_angle=25, power=2)
         RT.add(RS2)
 
         front = ot.Surface("Circle", r=3, rho=1/10, k=-0.444)
@@ -200,6 +200,13 @@ class FrontendTests(unittest.TestCase):
             sim.moveToFocus()
             sim.waitForIdle()
 
+            # Focus Test 5, one source only
+            sim.FocusDebugPlot = []
+            sim.PosDet = pos0[2]
+            sim.AFOneSource = ['Rays From Selected Source Only']
+            sim.moveToFocus()
+            sim.waitForIdle()
+            
             # Ray Coloring Tests
             for type_ in sim.ColoringTypes:
                 sim.ColoringType = type_
@@ -251,6 +258,12 @@ class FrontendTests(unittest.TestCase):
             sim.FlipImage = ['Flip Image']
             sim.showDetectorImage()
             sim.waitForIdle()
+
+            # one source only
+            sim.DetImageOneSource = ['Rays From Selected Source Only']
+            sim.showDetectorImage()
+            sim.waitForIdle()
+            
             sim.close()
 
         sim = TraceGUI(RT)

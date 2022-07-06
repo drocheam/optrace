@@ -12,12 +12,11 @@ class LightSpectrum(Spectrum):
     quantity = "Spectral Power Density"
     unit = "W/nm"
 
-    # TODO rename to render?
     @staticmethod
-    def makeSpectrum(wl:        np.ndarray,
-                     w:         np.ndarray, 
-                     N:         int = 2000, 
-                     **kwargs)\
+    def render(wl:        np.ndarray,
+               w:         np.ndarray, 
+               N:         int = 2000, 
+               **kwargs)\
             -> 'LightSpectrum':
         """"""
         spec = LightSpectrum("Data", **kwargs)

@@ -125,11 +125,8 @@ class Spectrum(BaseClass):
         fallback = str(self.val) if self.spectrum_type == "Constant" else self.spectrum_type
         return super().getDesc(fallback=fallback)
     
-    def __setattr__(self, key, val0):
+    def __setattr__(self, key, val):
       
-        # work on copies of ndarray and list
-        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
-        
         match key:
            
             case "spectrum_type":
@@ -138,17 +135,20 @@ class Spectrum(BaseClass):
 
             case ("lines" | "line_vals") if val is not None:
                 self._checkType(key, val, list | np.ndarray)
-                val = np.array(val, dtype=np.float32)
+                val2 = np.array(val, dtype=np.float32)
 
-                if val.shape[0] == 0:
+                if val2.shape[0] == 0:
                     raise ValueError(f"'{key}' can't be empty.")
 
-                if key == "lines" and ((wlo := np.min(val)) < Color.WL_MIN or (wlo := np.max(val)) > Color.WL_MAX):
+                if key == "lines" and ((wlo := np.min(val2)) < Color.WL_MIN or (wlo := np.max(val2)) > Color.WL_MAX):
                     raise ValueError(f"'lines' need to be inside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]"\
                                      f", but got a value of {wlo}nm.")
 
-                if key == "line_vals" and (lmin := np.min(val))  < 0:
+                if key == "line_vals" and (lmin := np.min(val2))  < 0:
                     raise ValueError(f"line_vals must be all positive, but one value is {lmin}")
+
+                super().__setattr__(key, val2)
+                return
 
             case ("quantity" | "unit"):
                 self._checkType(key, val, str)

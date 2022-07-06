@@ -14,14 +14,15 @@ import sys
 from PIL import Image as PILImage
 
 
-# TODO docstring
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function
 def timer(func: Callable) -> Any:
     """
+    timing wrapper for function timings
+    write a @timer decorator around a function to time it
 
-    :param func:
-    :return:
+    :param func: function to wrap
+    :return: function return value
     """
     @wraps(func)
     def _time_it(*args, **kwargs) -> Any:
@@ -132,7 +133,6 @@ def partMask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     return wc
 
 
-# TODO doctest
 def uniform_resample(x: list | np.ndarray, y: list | np.ndarray, N: int) -> tuple[np.ndarray, np.ndarray]:
     """
     Resample irregular 1D function data to regular data with N values.
@@ -151,7 +151,6 @@ def uniform_resample(x: list | np.ndarray, y: list | np.ndarray, N: int) -> tupl
     return xs, interp(xs)
 
 
-# TODO why work on the object itself?
 def normalize(a: np.ndarray) -> None:
     """ 
     faster vector normalization for vectors in axis=1.
@@ -159,7 +158,6 @@ def normalize(a: np.ndarray) -> None:
     
     >>> a = np.array([[1., 2., 3.], [4., 5., 6.]])
     >>> normalize(a)
-    >>> a
     array([[0.26726124, 0.53452248, 0.80178373],
            [0.45584231, 0.56980288, 0.68376346]])
     """
@@ -167,7 +165,7 @@ def normalize(a: np.ndarray) -> None:
     valid = ~((x == 0) & (y == 0) & (z == 0))
 
     nan = np.nan
-    a[:] = ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
+    return ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
 
 
 def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -223,8 +221,6 @@ def ValueAt(x: np.ndarray, y: np.ndarray, Z: np.ndarray, x0: float, y0: float) -
     return val
 
 
-# TODO improve speed
-# TODO use np.interp
 # TODO Bug: Remaining "nan islands". Example: h_data with isnan = [[0, 1, 1, 1], [0, 0, 1, 0], [0, 0, 1, 1], [0, 0, 0, 0]]
 #  creates remaining nan at isnan[3,3]. Execute function multiple times to solve this issue?
 def interpolateNan(h_data: np.ndarray) -> np.ndarray:
@@ -241,48 +237,44 @@ def interpolateNan(h_data: np.ndarray) -> np.ndarray:
            [4., 5., 6.],
            [7., 8., 9.]])
     """
-    
-    # copy initial data
-    h_data_ix = h_data.copy()
-    h_data_iy = h_data.copy()
 
     x = np.arange(h_data.shape[1])
     y = np.arange(h_data.shape[0])
 
     bad_mask = ~np.isfinite(h_data)
+    h_data_ix = h_data.copy()
 
     # in x direction
     for n in y:
-        bad_mask_n = bad_mask[n, :]
+        mask1 = bad_mask[n, :]
+        mask2 = ~mask1
 
         # only interpolate if more than 10 valid data points and there is missing data to interpolate
-        if np.any(bad_mask_n) and np.count_nonzero(~bad_mask_n) > 1:
-
-            # interpolation
-            f = scipy.interpolate.interp1d(x[~bad_mask_n], h_data_ix[n, ~bad_mask_n])
-
+        if np.any(mask1):
             # exclude outlying invalid data points, so no extrapolation takes place
-            finite = (~bad_mask_n).nonzero()[0]
-            bad_mask_n[:finite.min()] = False
-            bad_mask_n[finite.max():] = False
+            finite = mask2.nonzero()[0]
+            mask1[:finite.min()] = False
+            mask1[finite.max():] = False
 
-            # fill interpolated data
-            h_data_ix[n, bad_mask_n] = f(x[bad_mask_n])
+            # interpolate 
+            h_data_ix[n, mask1] = np.interp(x[mask1], x[mask2], h_data_ix[n, mask2])
 
     bad_mask = ~np.isfinite(h_data)
+    h_data_iy = h_data.copy()
 
     # do the same in y direction
     for n in x:
-        bad_mask_n = bad_mask[:, n]
+        mask1 = bad_mask[:, n]
+        mask2 = ~mask1
 
-        if np.any(bad_mask_n) and np.count_nonzero(~bad_mask_n) > 1:
-            f = scipy.interpolate.interp1d(y[~bad_mask_n], h_data_iy[~bad_mask_n, n])
-
-            finite = (~bad_mask_n).nonzero()[0]
-            bad_mask_n[:finite.min()] = False
-            bad_mask_n[finite.max():] = False
-
-            h_data_iy[bad_mask_n, n] = f(y[bad_mask_n])
+        if np.any(mask1):
+            # exclude outlying invalid data points, so no extrapolation takes place
+            finite = mask2.nonzero()[0]
+            mask1[:finite.min()] = False
+            mask1[finite.max():] = False
+            
+            # interpolate
+            h_data_iy[mask1, n] = np.interp(y[mask1], y[mask2], h_data_iy[mask2, n])
 
     # initial bad data
     bad_mask = ~np.isfinite(h_data)

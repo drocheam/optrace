@@ -63,11 +63,8 @@ class BaseClass:
         d = {x: val for x, val in self.__dict__.items() if not x.startswith("_")}
         return f"{self.__class__.__name__} at {hex(id(self))} with {d}"
 
-    def __setattr__(self, key, val0):
+    def __setattr__(self, key, val):
       
-        # work on copies of ndarray and list
-        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
-        
         if self._new_lock and key not in self.__dict__:
             raise AttributeError(f"Invalid property {key}.")
         
@@ -112,10 +109,10 @@ class BaseClass:
     @staticmethod
     def _checkNoneOrCallable(key, val):
         if val is not None and not callable(val):
-             raise TypeError(f"{key} needs to be callable or None.")
+             raise TypeError(f"{key} needs to be callable or None, but is {type(val)}.")
     
     @staticmethod
     def _checkIfIn(key, val, list_):
         if val not in list_:
-            raise ValueError(f"Invalid value '{val}' for property '{key}', needs to be one of {list_}.")
+            raise ValueError(f"Invalid value '{val}' for property '{key}'. Needs to be one of {list_}, but is {val}.")
 

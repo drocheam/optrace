@@ -75,10 +75,10 @@ class BackendModuleTests(unittest.TestCase):
                         self.assertAlmostEqual(z[0], 10.94461486)
                         self.assertAlmostEqual(z[500], 10.0000009)
                     elif Si is S[4]: # Asphere
-                        self.assertAlmostEqual(z[0], 10.)  # == maxz since it's outside
+                        self.assertAlmostEqual(z[0], 10.)  # == zmax since it's outside
                         self.assertAlmostEqual(z[300], 9.78499742)
                     elif Si is S[6]:                    
-                        self.assertAlmostEqual(z[0], 15.)  # == maxz since it's outside
+                        self.assertAlmostEqual(z[0], 15.)  # == zmax since it's outside
                         self.assertAlmostEqual(z[200], 10.8993994)
 
                 if Si.hasHitFinding():
@@ -91,7 +91,7 @@ class BackendModuleTests(unittest.TestCase):
 
     def test_SurfaceFunction(self):
 
-        # turn off warnings temporarily, since not specifying maxz, minz in __init__ leads to one
+        # turn off warnings temporarily, since not specifying zmax, zmin in __init__ leads to one
         warnings.simplefilter("ignore")
 
         func = lambda x, y: 1 + x - y
@@ -104,8 +104,8 @@ class BackendModuleTests(unittest.TestCase):
         self.assertTrue(S0.hasDerivative())
 
         # max and min values are +-5*sqrt(2), since the offset of 1 is removed internally
-        self.assertAlmostEqual(S0.maxz, 5*np.sqrt(2), delta=1e-6)
-        self.assertAlmostEqual(S0.minz, -5*np.sqrt(2), delta=1e-6)
+        self.assertAlmostEqual(S0.zmax, 5*np.sqrt(2), delta=1e-6)
+        self.assertAlmostEqual(S0.zmin, -5*np.sqrt(2), delta=1e-6)
 
         # restore warnings
         warnings.simplefilter("default")
@@ -191,7 +191,7 @@ class BackendModuleTests(unittest.TestCase):
         # use power other than default of 1
         # use position other than default of [0, 0, 0]
         # use s other than [0, 0, 1]
-        rargs = dict(spectrum=ot.preset_spec_D50, or_func=or_func, pos=[0.5, -2, 3], power=2.5, s=[0, 0.5, 1], pol_ang=0.5)
+        rargs = dict(spectrum=ot.preset_spec_D50, or_func=or_func, pos=[0.5, -2, 3], power=2.5, s=[0, 0.5, 1], pol_angle=0.5)
        
         # possible surface types
         Surfaces = [ot.Surface("Point"), ot.Surface("Line"), ot.Surface("Circle"), 
@@ -202,17 +202,17 @@ class BackendModuleTests(unittest.TestCase):
         # the loop also has the nice side effect of checking of all image presets
 
         for Surf in Surfaces:
-            for dir_type in ot.RaySource.direction_types:
-                for or_type in ot.RaySource.orientation_types:
-                    for pol_type in ot.RaySource.polarization_types:
+            for dir_type in ot.RaySource.directions:
+                for or_type in ot.RaySource.orientations:
+                    for pol_type in ot.RaySource.polarizations:
                         for Im in [None, *ot.presets_image]:
 
                             # only check RectangleSurface with Image being active/set
                             if Im is not None and Surf.surface_type != "Rectangle":
                                 continue
 
-                            RS = ot.RaySource(Surf, direction_type=dir_type, orientation_type=or_type, 
-                                              polarization_type=pol_type, Image=Im, **rargs)
+                            RS = ot.RaySource(Surf, direction=dir_type, orientation=or_type, 
+                                              polarization=pol_type, Image=Im, **rargs)
                             RS.getColor()
                             p, s, pols, weights, wavelengths = RS.createRays(10000)
 
@@ -245,16 +245,16 @@ class BackendModuleTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.RaySource, *rsargs, or_func=1) # invalid or_func
         self.assertRaises(ValueError, ot.RaySource, *rsargs, power=0) # power needs to be above 0
         self.assertRaises(TypeError, ot.RaySource, *rsargs, power=None) # invalid power type
-        self.assertRaises(ValueError, ot.RaySource, *rsargs, sr_angle=0) # psr_angle needs to be above 0
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, sr_angle=None) # invalid sr_angle type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_ang=None) # invalid pol_ang type
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, div_angle=0) # pdiv_angle needs to be above 0
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, div_angle=None) # invalid div_angle type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_angle=None) # invalid pol_angle type
         
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, orientation_type=1) # invalid orientation_type type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, direction_type=1) # invalid direction_type type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, polarization_type=1) # invalid polarization_type type
-        self.assertRaises(ValueError, ot.RaySource, *rsargs, orientation_type="A") # invalid orientation_type
-        self.assertRaises(ValueError, ot.RaySource, *rsargs, direction_type="A") # invalid direction_type
-        self.assertRaises(ValueError, ot.RaySource,*rsargs,  polarization_type="A") # invalid polarization_type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, orientation=1) # invalid orientationtype
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, direction=1) # invalid directiontype
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, polarization=1) # invalid polarizationtype
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, orientation="A") # invalid orientation
+        self.assertRaises(ValueError, ot.RaySource, *rsargs, direction="A") # invalid direction
+        self.assertRaises(ValueError, ot.RaySource,*rsargs,  polarization="A") # invalid polarization
 
         # image error handling
         self.assertRaises(TypeError, ot.RaySource, *rsargs, Image=1) # invalid image type
@@ -283,6 +283,19 @@ class BackendModuleTests(unittest.TestCase):
     def test_Image(self):
         pass
 
+    def test_Raytracer_Init(self):
+        o0 = [-5, 5, -5, 5, 0, 10]
+
+        self.assertRaises(TypeError, ot.Raytracer, outline=5) # incorrect outline
+        self.assertRaises(ValueError, ot.Raytracer, outline=[5]) # incorrect outline
+        self.assertRaises(ValueError, ot.Raytracer, outline=[5, 6, 7, 8, 9]) # incorrect outline
+        self.assertRaises(ValueError, ot.Raytracer, outline=[-5, -10, -5, 5, 0, 10]) # incorrect outline
+        self.assertRaises(TypeError, ot.Raytracer, outline=o0, AbsorbMissing=1) # incorrect bool parameter
+        self.assertRaises(TypeError, ot.Raytracer, outline=o0, no_pol=1) # incorrect bool parameter
+        self.assertRaises(TypeError, ot.Raytracer, outline=o0, threading=1) # incorrect bool parameter
+        self.assertRaises(TypeError, ot.Raytracer, outline=o0, silent=1) # incorrect bool parameter
+        self.assertRaises(TypeError, ot.Raytracer, outline=o0, n0=1) # incorrect Refractionindex
+        
     def test_Raytracer(self):
         pass
 
@@ -524,8 +537,8 @@ class BackendModuleTests(unittest.TestCase):
         z, _, _, _ = RT.autofocus(RT.AutofocusModes[0], z_start=5.0, snum=0, N=N, ret_cost=False)
         self.assertAlmostEqual(z, fs, delta=0.15)
 
-        RS2 = ot.RaySource(ot.Surface("Point"), spectrum=ot.preset_spec_D65, direction_type="Diverging", 
-                           sr_angle=0.5, pos=[0, 0, -60])
+        RS2 = ot.RaySource(ot.Surface("Point"), spectrum=ot.preset_spec_D65, direction="Diverging", 
+                           div_angle=0.5, pos=[0, 0, -60])
         RT.add(RS2)
         
         RT.trace(200000)

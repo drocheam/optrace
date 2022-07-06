@@ -49,18 +49,40 @@ class Lens(SObject):
         d1 = float(d1) if d1 is not None else d1
         d2 = float(d2) if d2 is not None else d2
 
-        # TODO check if surface height not too large
+        # initial d1 and d2
+        d10 = front.zmax - front.pos[2]
+        d20 = back.pos[2] - back.zmin
 
-        if de is not None and d1 is None and d2 is None and d is None:
-            d1 = de / 2. + front.maxz - front.pos[2]
-            d2 = de / 2. + back.pos[2] - back.minz
+        # calculate de from d and use de mode from now on
+        if d is not None:
+            de = d - d10 - d20
+            
+            # de negative: z-extents of lens surfaces overlap,
+            # possible in lenses with same curvature sign on both sides
+            # (concave-convex or convex-concave)
+            if de < 0:
+                # using the initial d10, d20 makes no sense here,
+                # just distribute d equally
+                d1 = d/2
+                d2 = d/2
 
-        elif d is not None:
-            d1 = d / 2.
-            d2 = d / 2.
+        if de is not None and d1 is None and d2 is None:
+            # de negative: z-extents of surfaces overlap,
+            # possible in lenses with same curvature sign on both sides
+            # (concave-convex or convex-concave)
+            if de < 0:
+                # distribute de equally without taking d10, d20 into account
+                d1 = -de/2
+                d2 = -de/2
+            else:
+                # distribute de equally
+                d1 = de / 2. + d10
+                d2 = de / 2. + d20
 
         elif d1 is None or d2 is None:
             raise ValueError("Both thicknesses d1, d2 need to be specified")
+
+        # it's hard to check surface collisions here, so we outsource it to the raytracing process
 
         super().__init__(front, pos, back, d1, d2, **kwargs)
 
@@ -98,7 +120,7 @@ class Lens(SObject):
 
     # @property
     # def da(self) -> float:
-        # return back.minz - front.maxz
+        # return back.zmin - front.zmax
 
     @property
     def d(self) -> float:

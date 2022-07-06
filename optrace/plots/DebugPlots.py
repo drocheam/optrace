@@ -87,7 +87,7 @@ def AbbePlot(RI:    list[RefractionIndex],
     plt.pause(0.1)
     
 
-def ChromacitiesCIE1931(Im: RImage | Spectrum | list[Spectrum], RI="Ignore", **kwargs):
+def ChromacitiesCIE1931(Im: RImage | LightSpectrum | list[LightSpectrum], RI="Ignore", **kwargs):
 
     r, g, b, w = Color._sRGB_r_xy, Color._sRGB_g_xy, Color._sRGB_b_xy, Color._sRGB_w_xy
 
@@ -178,8 +178,12 @@ def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, bloc
         labels = [Im.getDesc()]
         legend3 = "Spectrum Colors"
    
-    # TODO only allow list of LightSpectrum
     elif isinstance(Im, list):
+
+        for Imi in Im:
+            if not isinstance(Imi, LightSpectrum):
+                raise RuntimeError(f"Expected list of LightSpectrum, got one element of {type(Imi)}.")
+
         labels = []
         XYZ = np.zeros((0, 1, 3), dtype=np.float64)
 
@@ -188,6 +192,8 @@ def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, bloc
             XYZ = np.vstack((XYZ, Imi.getXYZ()))
 
         legend3 = "Spectrum Colors"
+    else:
+        raise RuntimeError(f"Invalid parameter of type {type(Im)}.")
 
     def wl_to_xy(wl):
         XYZ = np.column_stack((Color.Tristimulus(wl, "X"),\

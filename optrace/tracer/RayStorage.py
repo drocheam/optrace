@@ -145,10 +145,10 @@ class RayStorage(BaseClass):
 
             if not isinstance(ch2, slice):
                 s = s[np.ones(s.shape[0], dtype=bool), ch2]
-                misc.normalize(s)
+                s = misc.normalize(s)
             else:
                 s_ = s.reshape((s.shape[0]*s.shape[1], 3))
-                misc.normalize(s_)
+                s_ = misc.normalize(s_)
                 s = s_.reshape(s.shape)
 
         p     = self.p_list[ch, ch2]    if ret[0] else None

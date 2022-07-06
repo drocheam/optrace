@@ -15,13 +15,13 @@ RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
 # add Raysource
 RSS = ot.Surface("Circle", r=1)
-RS = ot.RaySource(RSS, direction_type="Parallel", spectrum=ot.preset_spec_FDC,
-               pos=[0, 0, 0], s=[0, 0, 1], polarization_type="y", desc="Centered Circle")
+RS = ot.RaySource(RSS, direction="Parallel", spectrum=ot.preset_spec_FDC,
+               pos=[0, 0, 0], s=[0, 0, 1], polarization="y", desc="Centered Circle")
 RT.add(RS)
 
 RSS2 = ot.Surface("Circle", r=1)
-RS2 = ot.RaySource(RSS2, direction_type="Parallel", s=[0, 0, 1], spectrum=ot.preset_spec_D65,
-                pos=[0, 1, -3], polarization_type="Angle", pol_ang=25, power=2, desc="Decentered Circle")
+RS2 = ot.RaySource(RSS2, direction="Parallel", s=[0, 0, 1], spectrum=ot.preset_spec_D65,
+                pos=[0, 1, -3], polarization="Angle", pol_angle=25, power=2, desc="Decentered Circle")
 ident = RT.add(RS2)
 
 

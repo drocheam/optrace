@@ -116,7 +116,7 @@ class TraceGUI(HasTraits):
     # Checklists (with capitalization workaround from https://stackoverflow.com/a/23783351)
     # this should basically be bool values, but because we want to have checkboxes with text right of them
     # we need to embed a CheckListEditor in a List. 
-    # To assign bool values we need the workaround function self.__CheckValFromBool
+    # To assign bool values we need the workaround function self._CheckValFromBool
 
     AbsorbMissing: List = List(editor=CheckListEditor(values=["Absorb Rays Missing Lens"], format_func=lambda x: x),
                          desc="if Rays are Absorbed when not Hitting a Lens")
@@ -244,9 +244,7 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Class constructor
 
-    def __init__(self, RT: Raytracer, AbsorbMissing: bool=True, CleanerView: bool=False, LogImage: bool=False,
-                 FlipDetImage: bool=False, FocusDebugPlot: bool=False, AFOneSource: bool=False,
-                 DetImageOneSource: bool=False, **kwargs) -> None:
+    def __init__(self, RT: Raytracer, **kwargs) -> None:
         """
         The extra bool parameters are needed to assign the List-Checklisteditor to bool values in the GUI.__init__. 
         Otherwise the user would assign bool values to a string list.
@@ -288,17 +286,19 @@ class TraceGUI(HasTraits):
         self._exit          = False
         self._set_only      = False
 
-        # convert bool parameters to values of ChecklistEditor
+        # set the properties after this without leading to a redraw
         self._set_only = True
-        self.AbsorbMissing     = self.__CheckValFromBool(self.AbsorbMissing,     AbsorbMissing)
-        self.CleanerView       = self.__CheckValFromBool(self.CleanerView,       CleanerView)
-        self.LogImage          = self.__CheckValFromBool(self.LogImage,          LogImage)
-        self.FlipDetImage         = self.__CheckValFromBool(self.FlipDetImage,         FlipDetImage)
-        self.FocusDebugPlot    = self.__CheckValFromBool(self.FocusDebugPlot,    FocusDebugPlot)
-        self.AFOneSource       = self.__CheckValFromBool(self.AFOneSource,       AFOneSource)
-        self.DetImageOneSource = self.__CheckValFromBool(self.DetImageOneSource, DetImageOneSource)
-        self._set_only = False
+        
+        # add true default parameter
+        if "AbsorbMissing" not in kwargs:
+            kwargs["AbsorbMissing"] = True
 
+        # convert bool values to list entries for List()
+        for key, val in kwargs.items():  
+            if key in ["AbsorbMissing", "CleanerView", "LogImage", "FlipDetImage", 
+                       "FocusDebugPlot", "AFOneSource", "DetImageOneSource"] and isinstance(val, bool):
+                kwargs[key] = eval(f"self._CheckValFromBool(self.{key}, {val})")
+       
         self.lastDetSnap = None
         self.lastDetImage = None
         self.lastSourceSnap = None
@@ -311,15 +311,20 @@ class TraceGUI(HasTraits):
 
         super().__init__(**kwargs)
 
+        # reset the no-redraw flag
+        self._set_only = False
+        
         # wx Frame, see https://docs.enthought.com/mayavi/mayavi/auto/example_wx_mayavi_embed_in_notebook.html#example-wx-mayavi-embed-in-notebook
         self.wxF = wx.Frame(None, wx.ID_ANY, 'Mayavi with Wx')
 
     ####################################################################################################################
     # Helpers
 
-    def __CheckValFromBool(self, obj, bool_): 
+    # convert bool value to list entry for Checkbox Lists
+    def _CheckValFromBool(self, obj, bool_): 
         return [obj.trait._metadata["editor"].values[0]] if bool_ else []
 
+    # remove visual objects from raytracer geometry
     def __removeObjects(self, objs):
         for obj in objs:
             for obji in obj[:4]:
@@ -331,6 +336,15 @@ class TraceGUI(HasTraits):
 
         objs[:] = [] 
 
+    # workaround so we can set bool values to some settings
+    def __setattr__(self, key, val):
+        
+        if key in ["AbsorbMissing", "CleanerView", "LogImage", "FlipDetImage", "FocusDebugPlot", "AFOneSource", "DetImageOneSource"]:
+            if isinstance(val, bool):
+                val = eval(f"self._CheckValFromBool(self.{key}, {val})")
+
+        super().__setattr__(key, val)
+    
     ####################################################################################################################
     # Plotting functions
 
@@ -564,6 +578,7 @@ class TraceGUI(HasTraits):
 
         return a, b, c, text, obj
 
+    # independent function for RaySource Coloring?
     def plotRays(self) -> None:
         """Ray/Point Plotting with a specified scalar coloring"""
         p_, _, pol_, w_, wl_, snum_ =\
@@ -703,13 +718,13 @@ class TraceGUI(HasTraits):
                 # Color from polarization projection on yz-plane
                 RSColor = []
                 for RS in self.Raytracer.RaySourceList:
-                    match RS.polarization_type:
+                    match RS.polarization:
                         case "x":
                             col = lutm.lut.table[0]
                         case "y":
                             col = lutm.lut.table[-1]
                         case "Angle":
-                            yzpr = (np.sin(np.deg2rad(RS.pol_ang)) - lutm.data_range[0]) / lrange
+                            yzpr = (np.sin(np.deg2rad(RS.pol_angle)) - lutm.data_range[0]) / lrange
                             col = lutm.lut.table[int(yzpr*255)]
                         case _:  # no single axis -> show white
                             col = (255, 255, 255)
@@ -957,18 +972,18 @@ class TraceGUI(HasTraits):
 
     def serve(self):
 
-        sdict = dict(mlab = self.Scene.mlab,
+        sdict = dict(mlab   = self.Scene.mlab,
                      engine = self.Scene.engine,
-                     scene = self.Scene.scene,
+                     scene  = self.Scene.scene,
                      camera = self.Scene.scene.camera,
-                     close = self.close,
-                     GUI = self,
-                     RT = self.Raytracer,
-                     LL = self.Raytracer.LensList,
-                     FL = self.Raytracer.FilterList,
-                     AL = self.Raytracer.ApertureList,
-                     RSL = self.Raytracer.RaySourceList,
-                     DL = self.Raytracer.DetectorList)
+                     close  = self.close,
+                     GUI    = self,
+                     RT     = self.Raytracer,
+                     LL     = self.Raytracer.LensList,
+                     FL     = self.Raytracer.FilterList,
+                     AL     = self.Raytracer.ApertureList,
+                     RSL    = self.Raytracer.RaySourceList,
+                     DL     = self.Raytracer.DetectorList)
 
         TCPServer.serve_tcp(self, dict_=sdict)
 
@@ -1039,7 +1054,7 @@ class TraceGUI(HasTraits):
             # reassign AbsorbMissing if it has changed
             if self.Raytracer.AbsorbMissing != bool(self.AbsorbMissing):
                 self._set_only = True
-                self.AbsorbMissing = self.__CheckValFromBool(self.AbsorbMissing, self.Raytracer.AbsorbMissing)
+                self.AbsorbMissing = self._CheckValFromBool(self.AbsorbMissing, self.Raytracer.AbsorbMissing)
                 self._set_only = False
 
         rdh = False  # if Drawing Status should be reset in this function
@@ -1166,7 +1181,7 @@ class TraceGUI(HasTraits):
 
             # set parameters to current value, since they could be changed by the user while tracing
             self._set_only = True
-            self.AbsorbMissing = self.__CheckValFromBool(self.AbsorbMissing, self.Raytracer.AbsorbMissing)
+            self.AbsorbMissing = self._CheckValFromBool(self.AbsorbMissing, self.Raytracer.AbsorbMissing)
             self.RayCount = self.Raytracer.Rays.N
             self._set_only = False
 

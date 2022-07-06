@@ -13,8 +13,8 @@ class SurfaceFunction(BaseClass):
                  mask:          Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
                  derivative:    Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] = None,
                  hits:          Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
-                 minz:          float = None,
-                 maxz:          float = None,
+                 zmin:          float = None,
+                 zmax:          float = None,
                  **kwargs)\
             -> None:
         """
@@ -24,8 +24,8 @@ class SurfaceFunction(BaseClass):
         :param mask:
         :param derivative:
         :param hits:
-        :param minz:
-        :param maxz:
+        :param zmin:
+        :param zmax:
         """
         self.func = func
         self.r = r
@@ -38,14 +38,14 @@ class SurfaceFunction(BaseClass):
         # get offset at (0, 0), gets removed later
         self.off = func(np.array([0.]), np.array([0.]))[0]
 
-        if maxz is None or minz is None:
+        if zmax is None or zmin is None:
             if not self.silent:
-                warnings.warn("WARNING: minz or maxz missing, the values will be determined automatically."
+                warnings.warn("WARNING: zmin or zmax missing, the values will be determined automatically."
                               "This is however less accurate than specifying them.")
-            self.minz, self.maxz = self.__findBounds()
-            self.minz, self.maxz = self.minz - self.off, self.maxz - self.off
+            self.zmin, self.zmax = self.__findBounds()
+            self.zmin, self.zmax = self.zmin - self.off, self.zmax - self.off
         else:
-            self.minz, self.maxz = minz - self.off, maxz - self.off
+            self.zmin, self.zmax = zmin - self.off, zmax - self.off
         
         self._lock = True
 
@@ -100,7 +100,7 @@ class SurfaceFunction(BaseClass):
         """
         inside = x**2 + y**2 <= self.r**2
 
-        z = np.full_like(x, self.maxz, dtype=np.float64)
+        z = np.full_like(x, self.zmax, dtype=np.float64)
         z[inside] = self.func(x[inside], y[inside]) - self.off
     
         return z
@@ -147,15 +147,15 @@ class SurfaceFunction(BaseClass):
         vals = np.concatenate((vals, vals2, vals3))
 
         # find minimum and maximum value
-        minz = np.nanmin(vals)
-        maxz = np.nanmax(vals)
+        zmin = np.nanmin(vals)
+        zmax = np.nanmax(vals)
 
-        return minz, maxz
+        return zmin, zmax
 
     def __setattr__(self, key, val):
 
         match key:
-            case ("r" | "off" | "maxz" | "minz"):
+            case ("r" | "off" | "zmax" | "zmin"):
                 self._checkType(key, val, float | int)
                 val = float(val)
 

@@ -112,11 +112,8 @@ class RefractionIndex(Spectrum):
 
         return ns
 
-    def __setattr__(self, key, val0):
+    def __setattr__(self, key, val):
       
-        # work on copies of ndarray and list
-        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
-
         match key:
         
             case "val" if isinstance(val, int | float):
@@ -125,7 +122,7 @@ class RefractionIndex(Spectrum):
             case "coeff":
 
                 self._checkType(key, val, list)
-                
+
                 match self.spectrum_type:
                     case "Cauchy":      cnt = 4
                     case "Conrady":     cnt = 3
@@ -136,7 +133,11 @@ class RefractionIndex(Spectrum):
                     raise ValueError(f"{key} needs to be a list with maximum {cnt} numeric coefficients")
 
                 # pad to 8 coeffs
-                val += [0] * (8 - len(val))
+                val2 = val.copy()
+                val2 += [0] * (8 - len(val))
+
+                super().__setattr__(key, val2)
+                return
 
                 # validity of coeffs is checked in __call__
                 # otherwise it would be possible that the coeffs seem invalid,
@@ -147,12 +148,11 @@ class RefractionIndex(Spectrum):
                     raise ValueError("all vals values needs to be at least 1.")
 
             case "lines" if isinstance(val, list | np.ndarray):
-                val2 = np.array(val)
 
-                if val2.shape[0] != 3:
+                if len(val) != 3:
                     raise ValueError("Property 'lines' for n_type='Abbe' needs to have exactly 3 elements")
 
-                if not (val2[0] < val2[1] and val2[1] < val2[2]):
+                if not (val[0] < val[1] and val[1] < val[2]):
                     raise ValueError("The values of property 'lines' need to be ascending.")
 
             case "func" if callable(val):

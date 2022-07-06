@@ -14,7 +14,7 @@ RT = ot.Raytracer(outline=[-4, 5, -3, 5, -1, 27.5])
 
 # add Raysource
 RSS = ot.Surface("Circle", r=0.05)
-RS = ot.RaySource(RSS, direction_type="Parallel", spectrum=ot.preset_spec_D65,
+RS = ot.RaySource(RSS, direction="Parallel", spectrum=ot.preset_spec_D65,
                pos=[-2.5, 0, 0], s=[0.3, 0, 0.7])
 RT.add(RS)
 

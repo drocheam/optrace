@@ -67,7 +67,7 @@ class SObject(BaseClass):
                 raise ValueError("d1 and d2 need to be specfied for a SObject with BackSurface")
 
             if d1 < 0 or d2 < 0:
-                raise ValueError("Thicknesses de, d1, d2 need to be non-negative.")
+                raise ValueError("Thicknesses d1, d2 need to be non-negative.")
         
         self.moveTo(pos)
 
@@ -145,8 +145,8 @@ class SObject(BaseClass):
                    max(front_ext[1], back_ext[1]),\
                    min(front_ext[2], back_ext[2]),\
                    max(front_ext[3], back_ext[3]),\
-                   self.FrontSurface.minz,\
-                   self.BackSurface.maxz
+                   self.FrontSurface.zmin,\
+                   self.BackSurface.zmax
 
     def getDesc(self) -> str:
         """"""

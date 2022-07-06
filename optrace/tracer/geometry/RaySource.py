@@ -20,13 +20,11 @@ import optrace.tracer.Misc as misc
 import optrace.tracer.Color as Color
 
 # TODO remove BW_Image, ersetzen durch emittance_type = "Constant", "Image"
-# TODO Check: check image dimensions
-# TODO pol_ang and sr_angle - make names more consistent. Rename sr_angle to div_ang?
 class RaySource(SObject):
 
-    direction_types = ["Diverging", "Parallel"]
-    orientation_types = ["Constant", "Function"]
-    polarization_types = ["Angle", "Random", "x", "y", "xy"]
+    directions = ["Diverging", "Parallel"]
+    orientations = ["Constant", "Function"]
+    polarizations = ["Angle", "Random", "x", "y", "xy"]
 
     abbr = "RS"  # object abbreviation
     _allow_non_2D = True  # allow points or lines as surfaces
@@ -39,9 +37,9 @@ class RaySource(SObject):
                  pos:               (list | np.ndarray) = [0., 0., 0.],
                 
                  # Direction Parameters
-                 direction_type:    str = "Parallel",
+                 direction:         str = "Parallel",
                  s:                 (list | np.ndarray) = [0., 0., 1.],
-                 sr_angle:          float = 0.5,
+                 div_angle:         float = 0.5,
 
                  # Light Parameters
                  spectrum:          LightSpectrum = None,
@@ -49,12 +47,12 @@ class RaySource(SObject):
                  Image:             (str | np.ndarray) = None,
                  
                  # Ray Orientation Parameters
-                 orientation_type:  str = "Constant",
+                 orientation:       str = "Constant",
                  or_func:           Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
                 
                  # Polarization Parameters
-                 polarization_type: str = "Random",
-                 pol_ang:           float = 0.,
+                 polarization:      str = "Random",
+                 pol_angle:         float = 0.,
 
                  **kwargs)\
             -> None:
@@ -62,10 +60,10 @@ class RaySource(SObject):
         Create a RaySource with a specific source_type, direction_type and light_type.
 
         :param Surface:
-        :param direction_type: "Diverging" or "Parallel"
-        :param orientation_type: "Constant" or "Function"
+        :param direction: "Diverging" or "Parallel"
+        :param orientation: "Constant" or "Function"
         :param s: 3D direction vector
-        :param sr_angle: cone opening angle in degree in mode direction_type="Diverging"
+        :param div_angle: cone opening angle in degree in mode direction_type="Diverging"
         :param pos: 3D position of RaySource center
         :param power: total power of RaySource in W
         :param pol: polarisation angle as float. Specify 'x' or 'y' for x- or y-polarisation, 'xy' for both
@@ -81,12 +79,12 @@ class RaySource(SObject):
         
         super().__init__(Surface, pos, **kwargs)
 
-        self.direction_type = direction_type
-        self.orientation_type = orientation_type
-        self.polarization_type = polarization_type
+        self.direction = direction
+        self.orientation = orientation
+        self.polarization = polarization
         
-        self.sr_angle = sr_angle
-        self.pol_ang = pol_ang
+        self.div_angle = div_angle
+        self.pol_angle = pol_angle
         self.power = power
         self.spectrum = spectrum
         self.Image = Image
@@ -165,7 +163,7 @@ class RaySource(SObject):
         ## Generate orientations
         ################################################################################################################
 
-        match self.orientation_type:
+        match self.orientation:
 
             case "Constant":
                 s_or = np.tile(self.s, (N, 1))
@@ -182,7 +180,7 @@ class RaySource(SObject):
         ## Generate ray directions relative to orientation
         ################################################################################################################
 
-        match self.direction_type:
+        match self.direction:
 
             case "Parallel":
                 s = s_or  # all rays have the same direction
@@ -190,7 +188,7 @@ class RaySource(SObject):
             # TODO sind die Strahlen gleichmäßig diverging?
             case "Diverging":
                 # random direction inside cone, described with two angles
-                alpha = np.radians(self.sr_angle) * np.sqrt(np.random.sample(N))
+                alpha = np.radians(self.div_angle) * np.sqrt(np.random.sample(N))
                 theta = np.random.uniform(0, 2*np.pi, N)
 
                 # vector perpendicular to s, created using  sy = [1, 0, 0] x s_or
@@ -219,11 +217,11 @@ class RaySource(SObject):
             pols = np.full(p.shape, np.nan, np.float64, order='F')
 
         else:
-            match self.polarization_type:
+            match self.polarization:
                 case "x":       ang = 0.
                 case "y":       ang = np.pi/2
                 case "xy":      ang = np.random.choice([0, np.pi/2], N)
-                case "Angle":   ang = np.radians(self.pol_ang)
+                case "Angle":   ang = np.radians(self.pol_angle)
                 case "Random":  ang = np.random.uniform(0, 2*np.pi, N)
                 case _:         raise RuntimeError(f"polarization_type '{self.polarization_type}' not handled.")
 
@@ -268,41 +266,44 @@ class RaySource(SObject):
 
         return p, s, pols, weights, wavelengths
 
-    def __setattr__(self, key, val0):
+    def __setattr__(self, key, val):
 
         # work on copies of ndarray and list, so initial objects are not overwritten
-        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
+        # val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
 
         match key:
 
-            case "direction_type":
+            case "direction":
                 self._checkType(key, val, str)
-                self._checkIfIn(key, val, self.direction_types)
+                self._checkIfIn(key, val, self.directions)
 
-            case "orientation_type":
+            case "orientation":
                 self._checkType(key, val, str)
-                self._checkIfIn(key, val, self.orientation_types)
+                self._checkIfIn(key, val, self.orientations)
 
-            case "polarization_type":
+            case "polarization":
                 self._checkType(key, val, str)
-                self._checkIfIn(key, val, self.polarization_types)
+                self._checkIfIn(key, val, self.polarizations)
             
-            case ("pol_ang"):
+            case ("pol_angle"):
                 self._checkType(key, val, int | float)
                 val = float(val)
 
-            case ("power" | "sr_angle"):
+            case ("power" | "div_angle"):
                 self._checkType(key, val, int | float)
                 self._checkAbove(key, val, 0)
                 val = float(val)
 
             case "s":
                 self._checkType(key, val, list | np.ndarray)
-                val = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
-                if val.shape[0] != 3:
+                val2 = np.array(val, dtype=np.float64) / np.linalg.norm(val)  # normalize
+                if val2.shape[0] != 3:
                     raise TypeError("s needs to have 3 dimensions")
 
-                self._checkAbove("s[2]", val[2], 0)
+                self._checkAbove("s[2]", val2[2], 0)
+
+                super().__setattr__(key, val2)
+                return
 
             case "spectrum":
                 self._checkType(key, val, LightSpectrum | None)
@@ -314,28 +315,31 @@ class RaySource(SObject):
 
                 self._checkType(key, val, str | np.ndarray)
 
-                val = misc.loadImage(val) if isinstance(val, str) else np.array(val, dtype=np.float64)
+                img = misc.loadImage(val) if isinstance(val, str) else np.array(val, dtype=np.float64)
 
-                if val.shape[0]*val.shape[1] > self._max_image_px:
+                if img.shape[0]*img.shape[1] > self._max_image_px:
                     raise RuntimeError("For performance reasons only images with less than 2 megapixels are allowed.")
                 
-                if val.ndim != 3:
+                if img.ndim != 3:
                     raise TypeError("Image array needs to have 3 dimensions")
-                if val.shape[2] != 3:
+                if img.shape[2] != 3:
                     raise TypeError("Image array needs to have 3 elements in the 3 dimension")
-                if np.min(val) < 0 or np.max(val) > 1:
+                if np.min(img) < 0 or np.max(img) > 1:
                     raise ValueError("Image values need to be inside range [0, 1]")
 
-                val = np.flipud(val)
+                img = np.flipud(img)
 
                 # calculate pixel probability from relative power for each pixel
-                If = Color._PowerFromSRGB(val).flatten()
+                If = Color._PowerFromSRGB(img).flatten()
                 Ifs = np.sum(If)
                 
                 if Ifs == 0:
                     raise ValueError("Image can not be completely black")
 
                 self.pIf = 1/Ifs*If
+
+                super().__setattr__(key, img)
+                return
 
             case "FrontSurface":
                 self._checkType(key, val, Surface)

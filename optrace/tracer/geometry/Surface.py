@@ -70,11 +70,11 @@ class Surface(BaseClass):
                 if (self.k + 1)*(self.rho*self.r)**2 >= 1:
                     raise ValueError("Surface radius r larger than radius of conic section.")
 
-                # depending on the sign of rho maxz or minz can be on the edge or center
+                # depending on the sign of rho zmax or zmin can be on the edge or center
                 z0 = self.pos[2]
-                self.maxz = None # set to some value so getValues() can be called
+                self.zmax = None # set to some value so getValues() can be called
                 z1 = self.getValues(np.array([r+self.pos[0]]), np.array([self.pos[1]]))[0]
-                self.minz, self.maxz = min(z0, z1), max(z0, z1)
+                self.zmin, self.zmax = min(z0, z1), max(z0, z1)
 
             case "Data":
    
@@ -90,34 +90,34 @@ class Surface(BaseClass):
                 self.xy = np.linspace(-self.r, self.r, nx)
                 self.eps = (self.xy[1] - self.xy[0]) / 1e3
 
-                self.minz, self.maxz = np.nanmin(self.Z), np.nanmax(self.Z)
+                self.zmin, self.zmax = np.nanmin(self.Z), np.nanmax(self.Z)
 
                 Mask2 = np.isfinite(self.Z)
-                self.Z[~Mask2] = self.maxz
+                self.Z[~Mask2] = self.zmax
 
                 # remove offset at center
                 self.Z -= misc.ValueAt(self.xy, self.xy, self.Z, 0, 0)
 
             case "Function":
-                self.minz = self.pos[2] + self.func.minz
-                self.maxz = self.pos[2] + self.func.maxz
+                self.zmin = self.pos[2] + self.func.zmin
+                self.zmax = self.pos[2] + self.func.zmax
                 self.r = self.func.r
                 self.eps = max(self.r / 1e6, 1e-12)
 
             case "Rectangle":
-                self.minz = self.maxz = self.pos[2]
+                self.zmin = self.zmax = self.pos[2]
                 self.eps = max(self.dim[0] / 1e6, 1e-12)
 
             case ("Circle" | "Line"):
-                self.minz = self.maxz = self.pos[2]
+                self.zmin = self.zmax = self.pos[2]
            
             case "Ring":
-                self.minz = self.maxz = self.pos[2]
+                self.zmin = self.zmax = self.pos[2]
                 if ri >= r:
                     raise ValueError("ri needs to be smaller than r.")
 
             case "Point":
-                self.minz = self.maxz = self.pos[2]
+                self.zmin = self.zmax = self.pos[2]
                 self.r = 0
                 self.eps = 0
 
@@ -150,8 +150,8 @@ class Surface(BaseClass):
         """
 
         self._lock = False
-        self.minz += pos[2] - self.pos[2]
-        self.maxz += pos[2] - self.pos[2]
+        self.zmin += pos[2] - self.pos[2]
+        self.zmax += pos[2] - self.pos[2]
 
         # update position
         self.pos = np.array(pos, dtype=np.float64)
@@ -167,19 +167,19 @@ class Surface(BaseClass):
 
             case ("Circle" | "Ring" | "Sphere" | "Asphere" | "Function" | "Data" | "Point"):
                 return *(self.r*np.array([-1, 1, -1, 1]) + self.pos[:2].repeat(2)), \
-                       self.minz, self.maxz
+                       self.zmin, self.zmax
 
             case "Rectangle":
                 return *(self.pos[:2].repeat(2) + self.dim.repeat(2)/2 * np.array([-1, 1, -1, 1])), \
-                        self.minz, self.maxz
+                        self.zmin, self.zmax
                 
             case "Line":
                 return self.pos[0] - self.r * np.cos(self.ang),\
                        self.pos[0] + self.r * np.cos(self.ang),\
                        self.pos[1] - self.r * np.sin(self.ang),\
                        self.pos[1] + self.r * np.sin(self.ang),\
-                       self.minz,\
-                       self.maxz
+                       self.zmin,\
+                       self.zmax
             case _:
                 raise RuntimeError(f"No extent defined for surface_type {self.surface_type}.")
     
@@ -198,7 +198,7 @@ class Surface(BaseClass):
 
                 inside = r2 <= self.r**2
 
-                z = np.full_like(r2, self.maxz, dtype=np.float64)
+                z = np.full_like(r2, self.zmax, dtype=np.float64)
 
                 z[inside] = misc.calc("z0 + rho*r2i/(1 + sqrt(1 - (k+1)* rho**2 *r2i))",\
                                       r2i=r2[inside], k=self.k, rho=self.rho, z0=self.pos[2])
@@ -209,7 +209,7 @@ class Surface(BaseClass):
                 xs, xe, ys, ye, _, _ = self.getExtent()
                 inside = (xs < x) & (x < xe) & (ys < y) & (y < ye)
 
-                z = np.full(x.shape, self.maxz, dtype=np.float64)
+                z = np.full(x.shape, self.zmax, dtype=np.float64)
 
                 if np.count_nonzero(inside):
                     z[inside] = self.pos[2] + misc.interp2d(self.xy, self.xy, self.Z,\
@@ -226,7 +226,7 @@ class Surface(BaseClass):
             case _:
                 raise RuntimeError(f"Surface value function not defined for surface_type {self.surface_type}")
 
-    # TODO Kommentare
+
     def getPlottingMesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
@@ -235,10 +235,11 @@ class Surface(BaseClass):
         :param N: number of grid values in each dimension (int)
         :return: X, Y, Z coordinate array (all numpy 2D array)
         """
-        
+        # skip non-plottable objects 
         if self.surface_type in ["Point", "Line"]:
             raise RuntimeError(f"Can't plot a non 2D surface_type '{self.surface_type}'")
         
+        # return rectangle for rectangle type
         if self.surface_type == "Rectangle":
             xs, xe, ys, ye, _, _ = self.getExtent()
 
@@ -250,15 +251,19 @@ class Surface(BaseClass):
             
             return X, Y, Z
     
+        # x and y axis of rectangular grid
         x = self.pos[0] + np.linspace(-self.r, self.r, N)
         y = self.pos[1] + np.linspace(-self.r, self.r, N)
 
+        # get z-values on rectangular grid
         X, Y = np.meshgrid(x, y)
         z = self.getValues(X.ravel(), Y.ravel())
 
+        # convert to polar coordinates
         R = np.sqrt((X-self.pos[0])**2 + (Y-self.pos[1])**2)
         Phi = np.arctan2(Y-self.pos[1], X-self.pos[0])
 
+        # masks for values outside of circular area
         r = self.r - self.eps
         mask = R.ravel() >= r
         mask2 = R >= r
@@ -297,6 +302,7 @@ class Surface(BaseClass):
         mask3 = self.getMask(X.ravel(), Y.ravel())
         z[~mask & ~mask3] = np.nan
 
+        # make 2D
         Z = z.reshape((y.shape[0], x.shape[0]))
 
         return X, Y, Z
@@ -544,8 +550,8 @@ class Surface(BaseClass):
 
                 # choose t that leads to z-position inside z-range of surface
                 z1 = p[:, 2] + sz*t1
-                minz, maxz = self.minz, self.maxz
-                t = misc.calc("where((minz <= z1) & (z1 <= maxz), t1, t2)")
+                zmin, zmax = self.zmin, self.zmax
+                t = misc.calc("where((zmin <= z1) & (z1 <= zmax), t1, t2)")
 
                 # calculate hit points and hit mask
                 p_hit = p + s*t[:, np.newaxis]
@@ -560,17 +566,19 @@ class Surface(BaseClass):
 
                 # cases with no hit:
                 # D imaginary, means no hit with whole surface function
-                # (p_hit[:, 2] < minz) | (p_hit[:, 2] > maxz): Hit with surface function, 
+                # (p_hit[:, 2] < zmin) | (p_hit[:, 2] > zmax): Hit with surface function, 
                 #               but for the wrong side or outside our surfaces definition region
                 # (A == 0) | (B == 0) : Surface is a Line => not hit (technically infinite hits for C == 0, but we'll ignore this) 
                 #   simplest case: ray shooting straight at center of a parabola with 1/rho = 0, which is so steep, it's a line
                 # the ray follows the parabola line exactly => infinite solutions
                 #   s = (0, 0, 1), o = (0, 0, oz), k = -1, 1/rho = inf  => A = 0, B = 0, C = 0 => infinite solutions
-                nh = ~is_hit | ~np.isfinite(D) | ((A == 0) & (B == 0)) | (p_hit[:, 2] < minz) | (p_hit[:, 2] > maxz)
-                # set intersection to plane z = maxz
-                tnh = (self.maxz - p[nh, 2])/s[nh, 2]
-                p_hit[nh] = p[nh] + s[nh]*tnh[:, np.newaxis]
-                is_hit[nh] = False
+                nh = ~is_hit | ~np.isfinite(D) | ((A == 0) & (B == 0)) | (p_hit[:, 2] < zmin) | (p_hit[:, 2] > zmax)
+
+                if np.any(nh):
+                    # set intersection to plane z = zmax
+                    tnh = (self.zmax - p[nh, 2])/s[nh, 2]
+                    p_hit[nh] = p[nh] + s[nh]*tnh[:, np.newaxis]
+                    is_hit[nh] = False
 
                 return p_hit, is_hit
 

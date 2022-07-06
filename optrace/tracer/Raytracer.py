@@ -1,5 +1,5 @@
 
-# flag for toggling multithreading:
+# flag for toggling threading:
 # useful, when the process should be kept in one thread (e.g. for debugging)
 # or raytracer itself is run in multiple threads
 
@@ -24,6 +24,7 @@ from optrace.tracer.geometry.Surface import *
 from optrace.tracer.RefractionIndex import * 
 from optrace.tracer.RayStorage import * 
 from optrace.tracer.RImage import *
+from optrace.tracer.BaseClass import *
 
 import optrace.tracer.Misc as misc
 
@@ -31,7 +32,7 @@ from enum import IntEnum
 import warnings
 
 
-class Raytracer:
+class Raytracer(BaseClass):
 
     EPS: float = 1e-12
     """ raytracer epsilon, used as precision in some places """
@@ -63,8 +64,7 @@ class Raytracer:
                  n0:             RefractionIndex = None,
                  AbsorbMissing:  bool = True,
                  no_pol:         bool = False,
-                 silent:         bool = False,
-                 multithreading: bool = True)\
+                 **kwargs)\
             -> None:
         """
         Initialize the Raytracer
@@ -74,28 +74,47 @@ class Raytracer:
         :param AbsorbMissing: if rays missing a lens are absorbed at the lens (bool)
         :param no_pol:
         :param silent:
-        :param multithreading:
+        :param threading:
         """
 
-        self.outline         = np.array(outline, dtype=np.float64)
+        self.outline         = outline
         self.AbsorbMissing   = AbsorbMissing
         self.no_pol          = no_pol
-        self.silent          = silent
-        self.multithreading  = multithreading
-        self.n0              = n0 if n0 is not None else RefractionIndex() # defaults to Air
+        self.n0              = n0 # defaults to Air
 
         self.LensList        = []
         self.ApertureList    = []
         self.FilterList      = []
         self.DetectorList    = []
         self.RaySourceList   = []
-        self.Rays            = RayStorage() 
+        self.Rays            = RayStorage()
 
-        # check outline
-        o = self.outline
-        if o.shape[0] != 6 or o[0] >= o[1] or o[2] >= o[3] or o[4] >= o[5]:
-            raise ValueError("Outline needs to be specified as [x1, x2, y1, y2, z1, z2] "
-                             "with x2 > x1, y2 > y1, z2 > z1.")
+        super().__init__(**kwargs)
+
+    def __setattr__(self, key, val0):
+
+        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
+
+        match key:
+
+            case "outline":
+                self._checkType(key, val, list | np.ndarray)
+                val = np.array(val, dtype=np.float64)
+
+                o = val
+                if o.shape[0] != 6 or o[0] >= o[1] or o[2] >= o[3] or o[4] >= o[5]:
+                    raise ValueError("Outline needs to be specified as [x1, x2, y1, y2, z1, z2] "
+                                     "with x2 > x1, y2 > y1, z2 > z1.")
+
+            case ("no_pol" | "AbsorbMissing"):
+                self._checkType(key, val, bool)
+            
+            case "n0":
+                self._checkType(key, val, RefractionIndex | None)
+                if val is None:
+                    val = RefractionIndex("Constant", 1)
+
+        super().__setattr__(key, val)
 
     def add(self, el: Lens | Aperture | Filter | RaySource | Detector) -> None:
         """
@@ -227,7 +246,7 @@ class Raytracer:
         nt = 2*len(self.LensList) + len(self.FilterList) + len(self.ApertureList) + 1 + 1
   
         cores = misc.getCoreCount()
-        N_threads = cores if N/cores >= 10000 and self.multithreading else 1
+        N_threads = cores if N/cores >= 10000 and self.threading else 1
 
         # will hold info messages from each thread
         msgs = [np.zeros((len(self.__infos), nt), dtype=int) for i in range(N_threads)]
@@ -372,26 +391,8 @@ class Raytracer:
             o = self.outline
             return o[0] <= e[0] and e[1] <= o[1] and o[2] <= e[2] and e[3] <= o[3] and o[4] <= e[4] and e[5] <= o[5]
 
-        enum = 1
-        z_max_old = self.outline[4]
-
         if not self.RaySourceList:
-            raise RuntimeError("RaySource Missing")
-
-        # check if objects collide in z-direction and if all objects are inside outline
-        for Element in Elements:
-
-            z_min, z_max = Element.extent[4:]
-
-            if not isinside(Element.extent):
-                raise RuntimeError(f"Object {enum} (numbering in z-order) of type {Element} outside outline")
-
-            if z_max_old > z_min:
-                warnings.warn(f"Possible collision between objects {enum-1} and {enum} (numbering in z-order). "
-                              f"However, only the maximum and minimum z-positions of the surfaces were compared.")
-
-            z_max_old = z_max
-            enum += 1
+            raise RuntimeError("RaySource Missing.")
 
         for RS in self.RaySourceList:
 
@@ -407,6 +408,9 @@ class Raytracer:
 
             if not isinside([Dx1, Dx2, Dy1, Dy2, Dz, Dz]):
                 raise RuntimeError(f"Detector {Det} outside outline")
+
+        # it's hard to check for surface collisions, for this we would need to find intersections of surfaces
+        # instead we output a runtime error if the ray hits the surfaces at the wrong order while raytracing
 
     def __absorbCylinderRays(self,
                              p:           np.ndarray,
@@ -573,7 +577,7 @@ class Raytracer:
 
             # s polarization vector
             ps = misc.cross(s_m, n[mask])
-            misc.normalize(ps)
+            ps = misc.normalize(ps)
             pp = misc.cross(ps, s_m)
 
             # init arrays
@@ -592,14 +596,10 @@ class Raytracer:
         else:
             A_ts, A_tp = 1/np.sqrt(2), 1/np.sqrt(2)
 
-        # using this formulas:
-        # ts = 2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)
-        # tp = 2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)
-        # T = n2_h*cos_beta / (n1_h*cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)
-        # we get this monster formula:
         cos_alpha, cos_beta = ns, W
-        T = misc.calc("4*n2_h*cos_beta*n1_h*cos_alpha * ( ( A_ts / (n1_h*cos_alpha + n2_h*cos_beta))**2"\
-                      "+ (A_tp /(n2_h*cos_alpha + n1_h*cos_beta))**2)")
+        ts = misc.calc("2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)")
+        tp = misc.calc("2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)")
+        T = misc.calc("n2_h*cos_beta / (n1_h*cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)")
         
         # handle rays with total internal reflection
         TIR = ~np.isfinite(W)
@@ -640,9 +640,10 @@ class Raytracer:
         # set transmittivity below a threshold to zero
         # useful when filter function is e.g. a gauss function
         # needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power
-        mask = (0 < T) & (T < self.T_TH)
-
-        if np.any(mask):
+        mask = (0 < T) & (T < self.T_TH) 
+                
+        # only do absorbing due to T_TH if spectrum is not constant or rectangular
+        if np.any(mask) and filter_.spectrum.spectrum_type not in ["Constant", "Rectangle"]:
             T[mask] = 0
             m_count = np.count_nonzero(mask)
             msg[self.__infos.TBelowTTH, i] += m_count
@@ -662,85 +663,91 @@ class Raytracer:
 
         # use surface's own hit finding for analytical surfaces
         if surface.hasHitFinding():
-            return surface.findHit(p, s)
+            p_hit, is_hit = surface.findHit(p, s)
 
-        # contraction factor (m = 0.5 : Illinois Algorithm)
-        m = 0.5
+        else:
+            # contraction factor (m = 0.5 : Illinois Algorithm)
+            m = 0.5
 
-        # ray parameters for just above and below the surface
-        t1 = (surface.minz - surface.eps/10 - p[:, 2])/s[:, 2]
-        t2 = (surface.maxz + surface.eps/10 - p[:, 2])/s[:, 2]
+            # ray parameters for just above and below the surface
+            t1 = (surface.zmin - surface.eps/10 - p[:, 2])/s[:, 2]
+            t2 = (surface.zmax + surface.eps/10 - p[:, 2])/s[:, 2]
 
-        # ray coordinates at t1, t2
-        p1 = p + s*t1[:, np.newaxis]
-        p2 = p + s*t2[:, np.newaxis]
+            # ray coordinates at t1, t2
+            p1 = p + s*t1[:, np.newaxis]
+            p2 = p + s*t2[:, np.newaxis]
 
-        # starting values for minimization function
-        f1 = p1[:, 2] - surface.getValues(p1[:, 0], p1[:, 1])
-        f2 = p2[:, 2] - surface.getValues(p2[:, 0], p2[:, 1])
+            # starting values for minimization function
+            f1 = p1[:, 2] - surface.getValues(p1[:, 0], p1[:, 1])
+            f2 = p2[:, 2] - surface.getValues(p2[:, 0], p2[:, 1])
 
-        # assign non-finite and rays converged in first iteration
-        w = np.ones(t1.shape, dtype=bool)  # bool array for hit search
-        w[~np.isfinite(t1) | ~np.isfinite(t2)] = False  # exclude non-finite t1, t2
-        w[(t2 - t1) < surface.eps] = False  # exclude rays that already converged
-        c = ~w  # bool array for which ray has converged
+            # assign non-finite and rays converged in first iteration
+            w = np.ones(t1.shape, dtype=bool)  # bool array for hit search
+            w[~np.isfinite(t1) | ~np.isfinite(t2)] = False  # exclude non-finite t1, t2
+            w[(t2 - t1) < surface.eps] = False  # exclude rays that already converged
+            c = ~w  # bool array for which ray has converged
 
-        # arrays for estimated hit points
-        p_hit = np.zeros_like(s, dtype=np.float64, order='F')
-        p_hit[c] = p1[c]  # assign already converged rays
+            # arrays for estimated hit points
+            p_hit = np.zeros_like(s, dtype=np.float64, order='F')
+            p_hit[c] = p1[c]  # assign already converged rays
 
-        it = 1  # number of iteration
-        # do until all rays have converged
-        while np.any(w):
+            it = 1  # number of iteration
+            # do until all rays have converged
+            while np.any(w):
 
-            # secant root
-            t1w, t2w, f1w, f2w = t1[w], t2[w], f1[w], f2[w]
-            ts = misc.calc("t1w - f1w/(f2w-f1w)*(t2w-t1w)")
+                # secant root
+                t1w, t2w, f1w, f2w = t1[w], t2[w], f1[w], f2[w]
+                ts = misc.calc("t1w - f1w/(f2w-f1w)*(t2w-t1w)")
 
-            # position of root on rays
-            pl = p[w] + s[w]*ts[:, np.newaxis]
+                # position of root on rays
+                pl = p[w] + s[w]*ts[:, np.newaxis]
 
-            # difference between ray and surface at root
-            fts = pl[:, 2] - surface.getValues(pl[:, 0], pl[:, 1])
+                # difference between ray and surface at root
+                fts = pl[:, 2] - surface.getValues(pl[:, 0], pl[:, 1])
 
-            # sign of fts*f2 decides which case is handled for each ray
-            prod = fts*f2[w]
+                # sign of fts*f2 decides which case is handled for each ray
+                prod = fts*f2[w]
 
-            # case 1: fts, f2 different sign => change [t1, t2] interval to [t2, ts]
-            mask = prod < 0
-            wm = misc.partMask(w, mask)
-            t1[wm], t2[wm], f1[wm], f2[wm] = t2[wm], ts[mask], f2[wm], fts[mask]
+                # case 1: fts, f2 different sign => change [t1, t2] interval to [t2, ts]
+                mask = prod < 0
+                wm = misc.partMask(w, mask)
+                t1[wm], t2[wm], f1[wm], f2[wm] = t2[wm], ts[mask], f2[wm], fts[mask]
 
-            # case 2: fts, f2 same sign => change [t1, t2] interval to [t1, ts]
-            mask = prod > 0
-            wm = misc.partMask(w, mask)
-            t2[wm], f1[wm], f2[wm] = ts[mask], m*f1[wm], fts[mask]
+                # case 2: fts, f2 same sign => change [t1, t2] interval to [t1, ts]
+                mask = prod > 0
+                wm = misc.partMask(w, mask)
+                t2[wm], f1[wm], f2[wm] = ts[mask], m*f1[wm], fts[mask]
 
-            # case 3: fts or f2 is zero => ts and fts are the found solution
-            mask = prod == 0
-            wm = misc.partMask(w, mask)
-            t1[wm], t2[wm], f1[wm], f2[wm] = ts[mask], ts[mask], fts[mask], fts[mask]
+                # case 3: fts or f2 is zero => ts and fts are the found solution
+                mask = prod == 0
+                wm = misc.partMask(w, mask)
+                t1[wm], t2[wm], f1[wm], f2[wm] = ts[mask], ts[mask], fts[mask], fts[mask]
 
-            # masks for rays converged in this iteration
-            cn = t2[w]-t1[w] < surface.eps
-            wcn = misc.partMask(w, cn)
+                # masks for rays converged in this iteration
+                cn = t2[w]-t1[w] < surface.eps
+                wcn = misc.partMask(w, cn)
 
-            # assign found hits and update bool arrays
-            p_hit[wcn] = pl[cn]
-            c[wcn] = True
-            w[wcn] = False
+                # assign found hits and update bool arrays
+                p_hit[wcn] = pl[cn]
+                c[wcn] = True
+                w[wcn] = False
 
-            # timeout
-            if it == 40:
-                raise RuntimeError(f"Non-convergence for {f1[w].shape[0]} rays in "\
-                                   f"surface hit finding after {it} iterations.")
-            it += 1
+                # timeout
+                if it == 40:
+                    raise RuntimeError(f"Non-convergence for {f1[w].shape[0]} rays in "\
+                                       f"surface hit finding after {it} iterations.")
+                it += 1
 
-        is_hit = surface.getMask(p_hit[:, 0], p_hit[:, 1])
+            is_hit = surface.getMask(p_hit[:, 0], p_hit[:, 1])
+
+        if np.any(p_hit[:, 2] < p[:, 2]):
+            raise RuntimeError("Hit point behind last starting point. This can be a result "
+                               "of surface collisions or incorrect sequentiality.")
+
         return p_hit, is_hit
 
     def _hitDetector(self,
-                     info:      str,
+                     info:     str,
                      ind:      int = 0,
                      snum:     int = None,
                      extent:   (list | np.ndarray | str) = "auto") \
@@ -749,18 +756,22 @@ class Raytracer:
         Rendered Detector Image. Rays are already traced.
 
         :param N: number of image pixels in each dimension (int)
-        :param ind: index of detector
+        :param ind: index of Detector
         :param extent:
         :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
         """
         
-        # TODO check if snum and ind are correct
-
         if not self.DetectorList:
             raise RuntimeError("Detector Missing")
 
         if not self.RaySourceList:
             raise RuntimeError("Raysource Missing")
+
+        if snum is not None and (snum > len(self.RaySourceList) - 1 or snum < 0):
+            raise RuntimeError("Invalid RaySource index.")
+
+        if ind > len(self.DetectorList) - 1 or ind < 0:
+            raise RuntimeError("Invalid Detector index.")
 
         bar = ProgressBar(prefix=f"{info}: ", max_value=4).start() if not self.silent else None
 
@@ -775,7 +786,7 @@ class Raytracer:
         rs[Ns:Ne] = True # use rays of selected source
 
         # section index rs for each ray for section before z
-        # rs2 == -1 can mean mask is true everywhere (ray starts after surface.minz) or false everywhere (rays don't reach surface),
+        # rs2 == -1 can mean mask is true everywhere (ray starts after surface.zmin) or false everywhere (rays don't reach surface),
         # so we need to check which case we're in. In the later case we don't need to calculate ray hits.
         mask = z <= self.Rays.p_list[Ns:Ne, :, 2]
         rs2 = np.argmax(mask, axis=1) - 1
@@ -882,7 +893,7 @@ class Raytracer:
 
         # init image and extent, these are the default values when no rays hit the detector
         Im = RImage(desc=desc, extent=extent_out, coordinate_type=coordinate_type, 
-                   threading=self.multithreading, silent=self.silent)
+                   threading=self.threading, silent=self.silent)
         Im.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
@@ -897,7 +908,7 @@ class Raytracer:
         
         p, w, wl, extent, desc, coordinate_type, bar = self._hitDetector("Detector Spectrum", ind, snum)
 
-        spec = LightSpectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1019,11 +1030,12 @@ class Raytracer:
         :param sindex:
         :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
         """
-
-        # TODO check if sindex is correct
         
         if not self.RaySourceList:
             raise RuntimeError("RaySource Missing")
+        
+        if sindex > len(self.RaySourceList) - 1 or sindex < 0:
+            raise RuntimeError("Invalid RaySource index.")
 
         bar = ProgressBar(prefix=f"{info}: ", max_value=2).start() if not self.silent else None
         extent = self.RaySourceList[sindex].extent[:4]
@@ -1040,7 +1052,7 @@ class Raytracer:
     def SourceSpectrum(self, sindex: int = 0, **kwargs) -> Spectrum:
         p, w, wl, extent, desc, bar = self._hitSource("Source Spectrum", sindex)
 
-        spec = LightSpectrum.makeSpectrum(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1061,7 +1073,7 @@ class Raytracer:
         p, w, wl, extent, desc, bar = self._hitSource("Source Image", sindex)
 
         Im = RImage(desc=desc, extent=extent, coordinate_type="Cartesian",
-                   threading=self.multithreading, silent=self.silent)
+                   threading=self.threading, silent=self.silent)
         Im.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
@@ -1205,7 +1217,7 @@ class Raytracer:
 
         Nt = 1000
         N_th = misc.getCoreCount()
-        steps = np.ceil(Nt/N_th/10).astype(int) if self.multithreading else np.ceil(Nt/10).astype(int)
+        steps = np.ceil(Nt/N_th/10).astype(int) if self.threading else np.ceil(Nt/10).astype(int)
         steps += 2
         bar = ProgressBar(prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start() if not self.silent else None
 
@@ -1277,7 +1289,7 @@ class Raytracer:
                         bar.update(2+int(i/10+1))
                     vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
 
-            if self.multithreading:   
+            if self.threading:   
                 threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, p, s, weights, r0)) for N_is in range(N_th)]
                 [th.start() for th in threads]
                 [th.join() for th in threads]

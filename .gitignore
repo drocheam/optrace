@@ -14,5 +14,9 @@ src/old
 # personal notes
 notes
 
+# vim session file
+Session.vim
+
 # cache not needed
 *__pycache__
+
