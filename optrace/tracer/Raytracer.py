@@ -7,13 +7,16 @@
 Raytracer class:
 Provides the functionality for raytracing, autofocussing and rendering of source and detector images.
 """
-import numpy as np
-import scipy.optimize
 
-from threading import Thread
-from typing import Callable
-from progressbar import progressbar, ProgressBar
+import numpy as np  # calculations
+import scipy.optimize  # numerical optimization methods
 
+from threading import Thread  # threading
+from typing import Callable  # Callable type
+from progressbar import progressbar, ProgressBar  # fancy progressbars
+import sys  # redirect progressbar to stdout
+
+# needed for raytracing geometry and functionality
 from optrace.tracer.geometry.Filter import Filter
 from optrace.tracer.geometry.Aperture import Aperture
 from optrace.tracer.geometry.Detector import Detector 
@@ -21,18 +24,16 @@ from optrace.tracer.geometry.Lens import Lens
 from optrace.tracer.geometry.RaySource import RaySource
 from optrace.tracer.geometry.Surface import Surface 
 from optrace.tracer.geometry.SObject import SObject 
-
 from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
-
 from optrace.tracer.RefractionIndex import RefractionIndex
 from optrace.tracer.RayStorage import RayStorage
 from optrace.tracer.RImage import RImage
 from optrace.tracer.BaseClass import BaseClass
 
-import optrace.tracer.Misc as misc
+import optrace.tracer.Misc as misc # calculations
 
-from enum import IntEnum
-import warnings
+from enum import IntEnum  # integer enum
+import warnings  # print warnings
 
 
 class Raytracer(BaseClass):
@@ -93,6 +94,7 @@ class Raytracer(BaseClass):
         self.Rays            = RayStorage()
 
         super().__init__(**kwargs)
+        self._new_lock = True
 
     def __setattr__(self, key, val):
 
@@ -252,7 +254,8 @@ class Raytracer(BaseClass):
         msgs = [np.zeros((len(self.__infos), nt), dtype=int) for i in range(N_threads)]
 
         # start a progressbar
-        bar = ProgressBar(prefix="Raytracing: ", max_value=nt, redirect_stdout=True).start() if not self.silent else None
+        bar = ProgressBar(fd=sys.stdout, prefix="Raytracing: ", max_value=nt, redirect_stderr=True).start()\
+              if not self.silent else None
 
         # create Rays from RaySources
         self.Rays.init(self.RaySourceList, N, nt, no_pol=self.no_pol)
@@ -393,6 +396,10 @@ class Raytracer(BaseClass):
 
         if not self.RaySourceList:
             raise RuntimeError("RaySource Missing.")
+
+        for El in Elements:
+            if not isinside(El.extent):
+                raise RuntimeError(f"Element {El} of outside outline")
 
         for RS in self.RaySourceList:
 
@@ -773,7 +780,7 @@ class Raytracer(BaseClass):
         if ind > len(self.DetectorList) - 1 or ind < 0:
             raise RuntimeError("Invalid Detector index.")
 
-        bar = ProgressBar(prefix=f"{info}: ", max_value=4).start() if not self.silent else None
+        bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=4).start() if not self.silent else None
 
         # range for selected Rays in RayStorage
         Ns, Ne = self.Rays.B_list[snum:snum+2] if snum is not None else (0, self.Rays.N)
@@ -977,7 +984,7 @@ class Raytracer(BaseClass):
         SIm_res = []
 
         iter_ = range(iterations+extra)
-        iterator = progressbar(iter_, prefix="Rendering: ") if not silent else iter_
+        iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if not silent else iter_
 
         # for all render iterations
         for i in iterator:
@@ -1037,7 +1044,7 @@ class Raytracer(BaseClass):
         if sindex > len(self.RaySourceList) - 1 or sindex < 0:
             raise RuntimeError("Invalid RaySource index.")
 
-        bar = ProgressBar(prefix=f"{info}: ", max_value=2).start() if not self.silent else None
+        bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=2).start() if not self.silent else None
         extent = self.RaySourceList[sindex].extent[:4]
         p, _, _, w, wl = self.Rays.getSourceSections(sindex)
         if bar is not None:
@@ -1219,7 +1226,8 @@ class Raytracer(BaseClass):
         N_th = misc.getCoreCount()
         steps = np.ceil(Nt/N_th/10).astype(int) if self.threading else np.ceil(Nt/10).astype(int)
         steps += 2
-        bar = ProgressBar(prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start() if not self.silent else None
+        bar = ProgressBar(fd=sys.stdout, prefix="Finding Focus: ", max_value=steps, redirect_stdout=True).start()\
+              if not self.silent else None
 
         # get rays and properties
         ########################################################################################################

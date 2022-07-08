@@ -5,11 +5,11 @@ A lens is an geometrical object with two refractive surfaces.
 A refractive index is specified for the material and one for the area behind the lens (optional)
 """
 
-import numpy as np
+import numpy as np  # calculations and ndarray type
 
-from optrace.tracer.RefractionIndex import RefractionIndex
-from optrace.tracer.geometry.Surface import Surface
-from optrace.tracer.geometry.SObject import SObject
+from optrace.tracer.RefractionIndex import RefractionIndex  # material refraction index
+from optrace.tracer.geometry.Surface import Surface  # Surface type
+from optrace.tracer.geometry.SObject import SObject  # parent class
 
 
 class Lens(SObject):

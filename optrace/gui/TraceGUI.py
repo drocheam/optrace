@@ -10,35 +10,35 @@ Autofocus functionality with different modes.
 
 """
 
-import wx
+import wx  # provides the creation of a wx app
 
-import sys
-import time
-import numpy as np
-from threading import Thread
-from typing import Callable
+import sys  # logging to sys.stdout
+import time  # provides sleeping
+import numpy as np  # calculations
+from threading import Thread  # threading
+from typing import Callable  # callable typing hints
 
-from pynput.keyboard import Key, Listener
+from pynput.keyboard import Key, Listener  # detects key presses for events
 
-from pyface.qt import QtCore, QtGui
-from pyface.api import GUI as pyfaceGUI
+from pyface.qt import QtGui  # closing UI elements
+from pyface.api import GUI as pyfaceGUI  # invoke_later() method
+
+# traits types and UI elements
 from traitsui.api import View, Item, HSplit, Group, CheckListEditor
-from traits.api import HasTraits, Range, Instance, on_trait_change, Str, Button, Enum, List, Dict
-
+from traits.api import HasTraits, Range, Instance, on_trait_change, Str, Button, Enum, List, Dict  
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
-from mayavi.sources.builtin_surface import BuiltinSurface
-from mayavi.modules.surface import Surface as mayaviSurface
-from mayavi.sources.parametric_surface import ParametricSurface
+from mayavi.sources.parametric_surface import ParametricSurface  # provides outline and axes
 
+# provides types and plotting functionality
 from optrace.tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex
-from optrace.tracer.Misc import timer as timer
-from optrace.plots.RImagePlots import RImagePlot
-from optrace.plots.DebugPlots import AutoFocusDebugPlot
-import optrace.tracer.Color as Color
+from optrace.plots.RImagePlots import RImagePlot  # plot RImages
+from optrace.plots.DebugPlots import AutoFocusDebugPlot  # debugging of autofocus functionality
 
-import optrace.gui.TCPServer as TCPServer
-from twisted.internet import reactor
-from twisted.python import log, util
+import optrace.tracer.Color as Color  # for visible wavelength range
+import optrace.gui.TCPServer as TCPServer  # TraceGUI TCP server
+
+from twisted.internet import reactor  # networking functionality for tcp protocol
+from twisted.python import log  # logging
 
 
 class TraceGUI(HasTraits):
@@ -110,7 +110,7 @@ class TraceGUI(HasTraits):
                       auto_set=True, label="Width")
     """Width of rays shown."""
 
-    ImagePixels: Range = Range(1, 1000, 200, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
+    ImagePixels: Range = Range(1, 1024, 200, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
                         auto_set=True, label="Pixels_xy", mode='text')
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
@@ -1291,14 +1291,15 @@ class TraceGUI(HasTraits):
             snum = None if not self.DetImageOneSource else self.SourceInd
 
             def background() -> None:
-                # only calculate DetectorImage if Raytracer Snapshot, selected Detector or ImagePixels changed
+                # only calculate DetectorImage if Raytracer Snapshot, selected Detector or rendered source changed
                 # otherwise we can replot the old Image with the new visual settings
-                snap = str(self.Raytracer.PropertySnapshot()) + self.DetectorSelection + str(self.ImagePixels) + str(snum)
+                snap = str(self.Raytracer.PropertySnapshot()) + self.DetectorSelection + str(snum)
                 if snap != self.lastDetSnap or self.lastDetImage is None:
                     self.lastDetImage = self.Raytracer.DetectorImage(N=self.ImagePixels, ind=self.DetInd,
-                                                                     snum=snum, max_res=True)
+                                                                     snum=snum, max_res=False)
                     self.lastDetSnap = snap
-
+                
+                self.lastDetImage.rescale(self.ImagePixels)
                 Imc = self.lastDetImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:
@@ -1326,13 +1327,14 @@ class TraceGUI(HasTraits):
             def background() -> None:
                 # only calculate SourceImage if Raytracer Snapshot, selected Source or ImagePixels changed
                 # otherwise we can replot the old Image with the new visual settings
-                snap = str(self.Raytracer.PropertySnapshot()) + self.SourceSelection + str(self.ImagePixels)
+                snap = str(self.Raytracer.PropertySnapshot()) + self.SourceSelection
 
                 if snap != self.lastSourceSnap or self.lastSourceImage is None:
                     self.lastSourceImage = self.Raytracer.SourceImage(N=self.ImagePixels,\
                                                                       sindex=self.SourceInd, max_res=True)
                     self.lastSourceSnap = snap
                 
+                self.lastSourceImage.rescale(self.ImagePixels)
                 Imc = self.lastSourceImage.getByDisplayMode(self.ImageType, log=self.LogImage)
 
                 def on_finish() -> None:

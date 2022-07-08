@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import sys
-sys.path.append('./')
+sys.path.append('.')
 
 import optrace as ot
 from optrace.plots import *
@@ -32,7 +32,7 @@ RT.add(Det)
 
 # render and show detector image
 pos = [27., 30., 33., 36.]
-_, Ims = RT.iterativeRender(N_rays=10e6, N_px_D=100, pos=pos)
+_, Ims = RT.iterativeRender(N_rays=10e6, N_px_D=200, pos=pos)
 
 # show rendered images
 for i in np.arange(len(Ims)-1):

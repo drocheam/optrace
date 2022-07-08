@@ -4,11 +4,11 @@ Detector class:
 rectangular plane perpendicular to optical axis for creation of Detector Images
 """
 
-import numpy as np
+import numpy as np  # for ndarray type
 
 from optrace.tracer.geometry.Surface import Surface  # for the Detector surface
-from optrace.tracer.geometry.SObject import SObject
-import optrace.tracer.Misc as misc
+from optrace.tracer.geometry.SObject import SObject  # parent class
+import optrace.tracer.Misc as misc  # calculations
 
 
 class Detector(SObject):

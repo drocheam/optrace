@@ -1,6 +1,9 @@
-from optrace.tracer.spectrum.LightSpectrum import *
-from optrace.tracer.presets.Lines import *
-import optrace.tracer.Color as Color
+
+import optrace.tracer.presets.Lines as Lines  # spectral lines
+import optrace.tracer.Color as Color  # tristimulus curves
+
+from optrace.tracer.spectrum.LightSpectrum import LightSpectrum  # light spectrum class
+from optrace.tracer.spectrum.Spectrum import Spectrum  # Spectrum base class used for tristimulus curves
 
 
 # Standard Illuminants
@@ -82,16 +85,16 @@ presets_spec_sRGB = [preset_spec_sRGB_r, preset_spec_sRGB_g, preset_spec_sRGB_b,
 # spectra for line combinations
 #######################################################################################################################
 
-preset_spec_FDC = LightSpectrum("Lines", lines=preset_lines_FDC, line_vals=[1, 1, 1],
+preset_spec_FDC = LightSpectrum("Lines", lines=Lines.preset_lines_FDC, line_vals=[1, 1, 1],
                                 desc="Lines FDC", long_desc="Spectral Lines F, D, C") 
 
-preset_spec_FdC = LightSpectrum("Lines", lines=preset_lines_FdC, line_vals=[1, 1, 1],
+preset_spec_FdC = LightSpectrum("Lines", lines=Lines.preset_lines_FdC, line_vals=[1, 1, 1],
                                 desc="Lines FdC", long_desc="Spectral Lines F, d, C") 
 
-preset_spec_FeC = LightSpectrum("Lines", lines=preset_lines_FeC, line_vals=[1, 1, 1], 
+preset_spec_FeC = LightSpectrum("Lines", lines=Lines.preset_lines_FeC, line_vals=[1, 1, 1], 
                                 desc="Lines Fec", long_desc="Spectral Lines F, e, C") 
 
-preset_spec_F_eC_ = LightSpectrum("Lines", lines=preset_lines_F_eC_, line_vals=[1, 1, 1],
+preset_spec_F_eC_ = LightSpectrum("Lines", lines=Lines.preset_lines_F_eC_, line_vals=[1, 1, 1],
                                   desc="Lines F'eC'", long_desc="Spectral Lines F', e, C'")
 
 presets_spec_lines = [preset_spec_FDC, preset_spec_FdC, preset_spec_FeC, preset_spec_F_eC_]
@@ -100,5 +103,5 @@ presets_spec_lines = [preset_spec_FDC, preset_spec_FdC, preset_spec_FeC, preset_
 # List of all spec presets
 #######################################################################################################################
 
-presets_light = [*presets_spec_standard, *presets_spec_lines, *presets_spec_sRGB]
+presets_spec_light = [*presets_spec_standard, *presets_spec_lines, *presets_spec_sRGB]
 

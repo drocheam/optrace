@@ -1,12 +1,9 @@
 
-import copy
-import numpy as np
+import copy  # deepcopy
+import numpy as np  # calculations
 
 
 class BaseClass:
-
-    _new_lock = False
-    _lock = False
 
     def __init__(self, 
                  desc:      str = "", 
@@ -18,7 +15,7 @@ class BaseClass:
         self.long_desc   = long_desc
         self.silent      = silent
         self.threading   = threading
-        
+
     def crepr(self):
         """ Compact state representation using only lists and immutable types """
 
@@ -65,12 +62,13 @@ class BaseClass:
 
     def __setattr__(self, key, val):
       
-        if self._new_lock and key not in self.__dict__:
-            raise AttributeError(f"Invalid property {key}.")
-        
-        if self._lock and key != "_lock":
-            raise RuntimeError("Object is currently read-only. Create a new object with new properties "
-                               "or use class methods to change its properties.")
+        if key not in ["_lock", "_new_lock"]:
+            if "_new_lock" in self.__dict__ and self._new_lock and key not in self.__dict__:
+                raise AttributeError(f"Invalid property {key}.")
+            
+            if "_lock" in self.__dict__ and self._lock:
+                raise RuntimeError("Object is currently read-only. Create a new object with new properties "
+                                   "or use class methods to change its properties.")
        
         if key in ["desc", "long_desc"]:
             self._checkType(key, val, str)

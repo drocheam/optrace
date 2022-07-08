@@ -5,14 +5,17 @@ Provides the functionality for the creation of numerical or analytical surfaces.
 The class contains methods for interpolation, surface masking and normal calculation
 """
 
-import numpy as np
-import optrace.tracer.Misc as misc
-from optrace.tracer.geometry.SurfaceFunction import SurfaceFunction
-from optrace.tracer.BaseClass import BaseClass
+import numpy as np  # calculations
+
+import optrace.tracer.Misc as misc  # calculations
+from optrace.tracer.geometry.SurfaceFunction import SurfaceFunction  # user surface functions
+from optrace.tracer.BaseClass import BaseClass  # parent class
+
 
 class Surface(BaseClass):
 
     surface_types = ["Asphere", "Sphere", "Circle", "Rectangle", "Point", "Line", "Function", "Data", "Ring"]
+    """possible surface types"""
 
     def __init__(self,
                  surface_type:  str,

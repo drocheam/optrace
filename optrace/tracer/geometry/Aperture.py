@@ -3,10 +3,10 @@
 Aperture class:
 """
 
-import numpy as np
+import numpy as np  # for ndarray type
 
-from optrace.tracer.geometry.SObject import SObject
-from optrace.tracer.geometry.Surface import Surface
+from optrace.tracer.geometry.SObject import SObject  # parent class
+from optrace.tracer.geometry.Surface import Surface  # for Surface type
 
 
 class Aperture(SObject):

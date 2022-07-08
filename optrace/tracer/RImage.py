@@ -1,14 +1,13 @@
 
-import numpy as np
-from datetime import datetime
-import os
+import numpy as np  # calculations
+import os  # saving and loading files 
+from datetime import datetime  # date for fallback file naming
 
-import optrace.tracer.Color as Color  # for Tristimulus curves and sRGB conversions
-from optrace.tracer.Misc import timer as timer  # for benchmarking
-import optrace.tracer.Misc as misc
-from threading import Thread  # for multithreading
+import optrace.tracer.Color as Color   # Tristimulus curves and sRGB conversions
+import optrace.tracer.Misc as misc  # interpolation and calculation methods
+from threading import Thread  # multithreading
 
-from optrace.tracer.BaseClass import BaseClass
+from optrace.tracer.BaseClass import BaseClass # parent class
 
 # Rendered Image class
 
@@ -20,12 +19,23 @@ class RImage(BaseClass):
     MAX_IMAGE_RATIO: float = 5.
     """ maximum ratio of image side lengths. Images with ratios beyond will be corrected """
 
+    MAX_IMAGE_SIDE: int = 1024
+    """ maximum size of smaller image side in pixels. Needs to be a power of 2 """
+    
     display_modes = ["sRGB (Absolute RI)", "sRGB (Perceptual RI)", "Outside sRGB Gamut", "Irradiance", "Illuminance",\
                      "Lightness (CIELUV)", "Hue (CIELUV)", "Chroma (CIELUV)", "Saturation (CIELUV)"]
+    """possible display modes for the RImage"""
 
     coordinate_types = ["Cartesian", "Polar"]
+    """possible coordinate types for the RImage"""
+
     
-    def __init__(self, extent: (list | np.ndarray), coordinate_type: str = "Cartesian", **kwargs) -> None:
+    def __init__(self, 
+                 extent:            (list | np.ndarray), 
+                 coordinate_type:   str = "Cartesian", 
+                 offset:            float = 0.,
+                 **kwargs)\
+            -> None:
         """
         Init an Image object.
         This class is used to calculate and hold an Image consisting of the channels X, Y, Z, Illuminance and Irradiance.
@@ -37,6 +47,12 @@ class RImage(BaseClass):
         self._new_lock = False
         self.extent = extent
         self.coordinate_type = coordinate_type
+
+        self.offset = offset
+        """additional subjective ambient white for the rendered image.
+        0 equals no additional white, 1 equals only additional white.
+        An offset can increase visibility of dark tones. See RImage class for more details"""
+
         self.Im = None
         self._Im = None
 
@@ -47,7 +63,7 @@ class RImage(BaseClass):
         """Check Image objects contains an calculated image."""
         return self.Im is not None
 
-    def __checkForImage(self):
+    def __checkForImage(self) -> None:
         """throw exception when image is missing"""
         if not self.hasImage():
             raise RuntimeError("Image was not calculated.")
@@ -78,11 +94,23 @@ class RImage(BaseClass):
     def Apx(self) -> float:
         """ area per pixel """
         self.__checkForImage()
-        # pixel are from pixel number and image extent
         return self.sx * self.sy / (self.Nx * self.Ny)
 
-    def cut(self, mode, x=None, y=None, log=False):
+    def cut(self, 
+            mode:   str, 
+            x:      float = None,
+            y:      float = None, 
+            log:    bool = False)\
+            \
+            -> tuple[np.ndarray, list[np.ndarray]]:
+        """
 
+        :param mode:
+        :param x:
+        :param y:
+        :param log:
+        :return:
+        """
         xp = np.linspace(self.extent[0], self.extent[1], self.Nx)
         yp = np.linspace(self.extent[2], self.extent[3], self.Ny)
         Im = self.getByDisplayMode(mode, log)
@@ -101,12 +129,13 @@ class RImage(BaseClass):
 
         return sp, Ims
 
-    def getByDisplayMode(self, mode, log=False) -> np.ndarray:
+    def getByDisplayMode(self, mode: str, log: bool=False) -> np.ndarray:
         """Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ"""
 
         self.__checkForImage()
 
         match mode:
+
             case "Irradiance":             
                 return 1 / self.Apx * self.Im[:, :, 3]
 
@@ -121,7 +150,8 @@ class RImage(BaseClass):
                 return self.getRGB(log=log, RI="Perceptual")
 
             case "Outside sRGB Gamut":
-                return Color.outside_sRGB(self.getXYZ())
+                # force conversion from bool to int so further algorithms work correctly
+                return np.array(Color.outside_sRGB(self.getXYZ()), dtype=int)
 
             case "Lightness (CIELUV)":      
                 return self.getLuv()[:, :, 0]
@@ -139,7 +169,7 @@ class RImage(BaseClass):
                 return Color.getLuvSaturation(Luv)
 
             case _:                         
-                raise ValueError("Invalid display_mode.")
+                raise ValueError(f"Invalid display_mode {mode}, should be one of {self.display_modes}.")
 
     def getPower(self) -> float:
         """Calculate total image power"""
@@ -154,14 +184,21 @@ class RImage(BaseClass):
     def getXYZ(self) -> np.ndarray:
         """Get XYZ image (np.ndarray with shape (Ny, Nx, 3))"""
         self.__checkForImage()
-        return self.Im[:, :, :3]
+
+        if self.offset == 0: 
+            return self.Im[:, :, :3]
+        else:
+            wp = np.array(Color._WP_D65_XYZ)
+            loffset = ((100*self.offset+16)/116)**3 # relative Y to L (from Luv) conversion, see Color.XYZ_to_Luv
+            Ymax = np.max(self.Im[:, :, 1])
+            return wp*loffset*Ymax + (1-loffset) * self.Im[:, :, :3]
 
     def getLuv(self) -> np.ndarray:
         """CIELAB image"""
         XYZ = self.getXYZ()
         return Color.XYZ_to_Luv(XYZ)
 
-    def getRGB(self, log: bool = False, RI: str="Absolute") -> np.ndarray:
+    def getRGB(self, log: bool = False, RI: str = "Absolute") -> np.ndarray:
         """
         Get sRGB image
 
@@ -212,10 +249,18 @@ class RImage(BaseClass):
             self.extent[2] = ym - sx/MR/2
             self.extent[3] = ym + sx/MR/2
 
-    def rescale(self, N, threading: bool=True):
+    def rescale(self, N: int, threading: bool = True) -> None:
+       
+        if not isinstance(N, int) or N < 1:
+            raise ValueError("N needs to be an integer >= 1.")
 
         Ny, Nx, Nz = self._Im.shape
-        fact = min(Nx, Ny) // N
+
+        # get downscaling factor
+        Nm = min(Nx, Ny)
+        fact = Nm // 2**round(np.log2(N))
+
+        # the image gets only rescaled to nearest 2**x resolution
 
         # for each of the XYZW channels:
         def threaded(ind, in_, out):
@@ -246,7 +291,11 @@ class RImage(BaseClass):
             # out = [[A0+A1+A2+A3, B0+B1+B2+B3], [C0+C1+C2+C3, D0+D1+D2+D3]]
             out[:, :, ind] = B5.reshape((Ny//fact, Nx//fact), order='F')
 
-        if fact != 1:
+        if fact <= 1:
+            self.Im = self._Im
+
+        # only rescale if target image size is different from current Image
+        elif self.Im is None or min(*self.Im.shape[:2]) != Nm:
             self.Im = np.zeros((Ny//fact, Nx//fact, Nz))
 
             if self.threading:
@@ -256,33 +305,56 @@ class RImage(BaseClass):
             else:
                 for i in range(Nz):
                     threaded(i, self._Im, self.Im)
-        else:
-            self.Im = self._Im
 
-    def save(self, path, save32bit=True):
-        """save the image object in a numpy archive"""
+    def save(self, 
+             path:       str, 
+             save32bit:  bool = True, 
+             overwrite:  bool = False)\
+            -> str:
+        """
 
+        :param path: path to save to
+        :param save32bit: save image data in 32bit instead 64bit. Looses information in some darker regions of the image
+        :param overwrite: if file can be overwritten. If no, it is saved in a fallback path
+        :return: path of saved file
+        """
         # save in float32 to save some space
         Im = np.array(self._Im, dtype=np.float32) if save32bit else self._Im
 
         sdict = dict(Im=Im, extent=self.extent, N=min(self.Im.shape[0], self.Im.shape[1]), 
                      desc=self.desc, long_desc=self.long_desc, type_=self.coordinate_type)
 
-        try:
-            np.savez_compressed(path, **sdict)
-            if not self.silent:
-                print(f"Saved Image as \"{path}.npz\"")
-
-        except:
+        # called when invalid path or file exists but overwrite=False
+        def fallback():
             # create a valid path and filename
             wd = os.getcwd()
-            filename = "Image_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z')
+            filename = "Image_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z') + ".npz"
             path = os.path.join(wd, filename)
 
             # resave
             if not self.silent:
-                print(f"Failed saving Image, resaving as \"{path}.npz\"")
+                print(f"Failed saving Image, resaving as \"{path}\"")
             np.savez_compressed(path, **sdict)
+
+            return path
+       
+        # append file ending if the path provided has none
+        if path[-4:] != ".npz":
+            path += ".npz"
+
+        # check if file already exists
+        exists = os.path.exists(path)
+
+        if overwrite or not exists:
+            try:
+                np.savez_compressed(path, **sdict)
+                if not self.silent:
+                    print(f"Saved Image as \"{path}.npz\"")
+                return path
+            except:
+                return fallback()
+        else:
+            return fallback()
 
     @staticmethod
     def load(path: str) -> 'RImage':
@@ -292,25 +364,39 @@ class RImage(BaseClass):
         Io = np.load(path)
 
         Im = RImage(Io["extent"], long_desc=Io["long_desc"][()], desc=Io["desc"][()], coordinate_type=Io["type_"][()])
-
         Im._Im = np.array(Io["Im"], dtype=np.float64)
-        Im.rescale(Io["N"]) # also creates Im from _Im
+
+        # create Im from _Im
+        N = int(Io["N"][()])
+        Im.rescale(N)
 
         return Im
 
-    def __setattr__(self, key, val0):
+    def __setattr__(self, key, val):
        
-        # work on copies of ndarray and list
-        val = val0.copy() if isinstance(val0, list | np.ndarray) else val0
-
         match key:
           
             case "extent":
                 self._checkType(key, val, list | tuple | np.ndarray)
-                val = np.array(val, dtype=np.float64)
+                val2 = np.array(val, dtype=np.float64)
+
+                if val2.shape[0] != 4:
+                    raise ValueError("Extent needs to have 4 elements.")
+
+                if val2[0] >= val[1] or val2[2] >= val2[3]:
+                    raise ValueError("Extent needs to be an array with [x0, x1, y0, y1] with x0 < x1 and y0 < y1.")
+
+                super().__setattr__(key, val2)
+                return
 
             case "coordinate_type":
+                self._checkType(key, val, str)
                 self._checkIfIn(key, val, self.coordinate_types)
+
+            case "offset":
+                self._checkType(key, val, int | float)
+                self._checkNotBelow(key, val, 0)
+                self._checkNotAbove(key, val, 1)
         
         super().__setattr__(key, val)
     
@@ -321,6 +407,7 @@ class RImage(BaseClass):
                wl:           np.array = None,
                keep_extent:  bool = False,
                max_res:      bool = False)\
+            \
             -> None:
         """
         Creates an pixel image from ray positions on the detector.
@@ -339,15 +426,15 @@ class RImage(BaseClass):
         
         sx, sy = self.sx, self.sy
        
-        if N > 1000:
-            raise ValueError("N needs to below 1000")
+        if N > self.MAX_IMAGE_SIDE:
+            raise ValueError("N needs to be equal or below 1024")
 
-        # int factor that upscales N such that it is at least 1000
-        # N is provided for smaller side of image, get the other one by scaling
-        # note that the resulting pixel size is not square, since we are limited to int values
-        Nrs = int(N*np.ceil(1000/N)) if not max_res else N
-        Nx = Nrs if sx <= sy else Nrs*int(sx / sy)
-        Ny = Nrs if sx > sy  else Nrs*int(sy / sx)
+        # set smaller side to 1024 pixels, other one can be 1024* 2^x with x integer
+        # upper bound is the side ratio MAX_IMAGE_RATIO
+        # the resulting pixel size is not square. And the user doesn't exactly get his desired resolution
+        Nrs = self.MAX_IMAGE_SIDE
+        Nx = Nrs if sx <= sy else Nrs * 2**int(np.log2(sx / sy))
+        Ny = Nrs if sx > sy  else Nrs * 2**int(np.log2(sy / sx))
 
         # init image
         self._Im = np.zeros((Ny, Nx, 4), dtype=np.float64)
@@ -372,6 +459,6 @@ class RImage(BaseClass):
             # render image fro positions and XYZW array
             np.add.at(self._Im, (ycor.astype(int), xcor.astype(int)), XYZW)
 
-        self._Im = np.flipud(self._Im)
-        self.rescale(N)
+        self._Im = np.flipud(self._Im) # flip so [0, 0] is in the lower left
+        self.rescale(N) # create rescaled Image Im
 

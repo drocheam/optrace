@@ -27,9 +27,9 @@ Properties with FrontSurface + BackSurface:
 
 from optrace.tracer.geometry.Surface import Surface  # for the SObject surface
 
-from typing import Callable  # for function type hints
-import numpy as np
-from optrace.tracer.BaseClass import BaseClass
+from typing import Callable  # Callable type hints
+import numpy as np  # calculations
+from optrace.tracer.BaseClass import BaseClass  # parent class
 
 
 class SObject(BaseClass):
@@ -54,10 +54,8 @@ class SObject(BaseClass):
         """
         self._geometry_lock = False
 
-        # use a Surface copy, since we change its position in 3D space
-        self.FrontSurface = FrontSurface.copy()
-        self.BackSurface = BackSurface.copy() if BackSurface is not None else None
-
+        self.FrontSurface = FrontSurface
+        self.BackSurface = BackSurface
         self.d1 = d1
         self.d2 = d2
 
@@ -80,31 +78,18 @@ class SObject(BaseClass):
         return self.BackSurface is not None
 
     def setSurface(self, surf: Surface) -> None:
-        """alias for :obj:`SObject.setFrontSurface` for a SObject with no BackSurface"""
-        self.setFrontSurface(surf)
-
-    def setFrontSurface(self, surf: Surface) -> None:
         """
         Assign a new Surface to the SObject.
 
         :param surf: Surface to assign
         """
+        if self.hasBackSurface():
+            raise RuntimeError("Replacing of Surfaces only supported for objects with one surface")
+
         self._geometry_lock = False
         pos = self.FrontSurface.pos
         self.FrontSurface = surf.copy()
         self.FrontSurface.moveTo(pos)
-        self._geometry_lock = True
-
-    def setBackSurface(self, surf: Surface) -> None:
-        """
-        Assign a new Surface to the SObject.
-
-        :param surf: Surface to assign
-        """
-        self._geometry_lock = False
-        pos = self.BackSurface.pos
-        self.BackSurface = surf.copy()
-        self.BackSurface.moveTo(pos)
         self._geometry_lock = True
 
     def moveTo(self, pos: (list | np.ndarray)) -> None:
@@ -115,6 +100,9 @@ class SObject(BaseClass):
         """
         self._checkType("pos", pos, list | np.ndarray)
         pos = np.array(pos, dtype=np.float64)
+
+        if pos.shape[0] != 3:
+            raise ValueError("pos needs to have 3 elements.")
 
         if not self.hasBackSurface():
             self.FrontSurface.moveTo(pos)
@@ -181,7 +169,7 @@ class SObject(BaseClass):
         # lock changing of geometry directly
         if "_geometry_lock" in self.__dict__ and self._geometry_lock:
             if key in ["d1", "d2", "FrontSurface", "Surface", "BackSurface"]:
-                raise RuntimeError("Use Functions setFrontSurface and setBackSurface to reassign a new Surface or its thickness.")
+                raise RuntimeError("Use Functions setSurface to reassign a new Surface or its thickness.")
             if key == "pos":
                 raise RuntimeError("Use moveTo(pos) to move the Object")
 
@@ -192,10 +180,16 @@ class SObject(BaseClass):
                 if val is not None and not self._allow_non_2D and not val.is2D():
                     raise RuntimeError(f"FrontSurface of a {self.__class__.__name__} object needs to be 2 dimensional.")
 
+                super().__setattr__(key, val.copy()) # save internal copy
+                return
+
             case "BackSurface":
                 self._checkType(key, val, Surface | None)
                 if val is not None and not self._allow_non_2D and not val.is2D():
                     raise RuntimeError(f"BackSurface of a {self.__class__.__name__} object needs to be 2 dimensional.")
+
+                super().__setattr__(key, val.copy() if val is not None else None) # save internal copy
+                return
             
             case ("d1" | "d2"):
                 self._checkType(key, val, int | float | None)

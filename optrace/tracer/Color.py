@@ -3,11 +3,10 @@ Color conversion and processing functions
 
 """
 
-import numpy as np
-import colorio
-import optrace.tracer.Misc as misc
-from typing import Callable
-from optrace.tracer.Misc import timer as timer
+import numpy as np  # calculations
+import colorio  # standard illuminants and tristimulus curves
+import optrace.tracer.Misc as misc  # calculations
+from typing import Callable  # Callable type
 
 # DO NOT CHANGE THIS WAVELENGTH RANGE IF YOU WANT COLORS TO WORK CORRECTLY
 
@@ -22,6 +21,9 @@ ILLUMINANTS = ["A", "C", "D50", "D55", "D65", "D75", "E", "F2", "F7", "F11"]
 
 TRISTIMULI = ["X", "Y", "Z"]
 """List of possible values for Color.Tristimulus"""
+
+sRGB_RI = ["Ignore", "Absolute", "Perceptual"]
+"""Rendering intents for XYZ to sRGB conversion"""
 
 # Whitepoints in XYZ and Luv
 _WP_D65_XYZ = [0.950489, 1.00000, 1.08840]

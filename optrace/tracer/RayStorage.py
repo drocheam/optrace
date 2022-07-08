@@ -1,12 +1,11 @@
 
-from threading import Thread
+from threading import Thread  # threading
+import warnings  # print warnings
+import numpy as np  # calculations
 
-import warnings
-import numpy as np
-from optrace.tracer.geometry.RaySource import RaySource
-import optrace.tracer.Misc as misc
-from optrace.tracer.BaseClass import BaseClass
-from optrace.tracer.Misc import timer as timer
+from optrace.tracer.geometry.RaySource import RaySource  # create Rays
+import optrace.tracer.Misc as misc # calculations
+from optrace.tracer.BaseClass import BaseClass  # parent class
 
 
 class RayStorage(BaseClass):

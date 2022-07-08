@@ -1,17 +1,18 @@
 
-import wx
-import numpy as np
+import wx  # protocol is run in wx app
 
-
+# following includes only so that they can be used via the tcp protocol
+import numpy as np  
 from optrace.tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage,\
                            Surface, SurfaceFunction, Spectrum, TransmissionSpectrum, LightSpectrum, RefractionIndex
 
+# configures the twisted mainloop to be run inside the wxPython mainloop. 
 from twisted.internet import wxreactor
 wxreactor.install()
 
-from twisted.internet.protocol import Protocol, DatagramProtocol, Factory
-from twisted.internet import reactor
-from twisted.python import log
+from twisted.internet import reactor # provides networking
+from twisted.internet.protocol import Protocol, DatagramProtocol, Factory # needed for tcp protocol
+from twisted.python import log  # logging
 
 
 class OTTCP(Protocol):

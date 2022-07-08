@@ -1,9 +1,10 @@
 
-import numpy as np
-from typing import Callable
-import warnings
+import numpy as np   # calculations
+from typing import Callable  # Callable typing hint
+import warnings  # print warnings
 
-from optrace.tracer.BaseClass import BaseClass
+from optrace.tracer.BaseClass import BaseClass  # parent class
+
 
 class SurfaceFunction(BaseClass):
 
@@ -48,6 +49,7 @@ class SurfaceFunction(BaseClass):
             self.zmin, self.zmax = zmin - self.off, zmax - self.off
         
         self._lock = True
+        self._new_lock = True
 
     def hasDerivative(self) -> bool:
         """returns if a derivative function is implemented"""

@@ -2,16 +2,16 @@
 helper
 """
 
-import scipy.interpolate
-import numpy as np
-import numexpr as ne
+import scipy.interpolate  # linear interpolation
+import numpy as np  # calculations
+import numexpr as ne  # faster calculations
 
-from typing import Callable, Any
-from functools import wraps
-import time
-import sys
+from typing import Callable, Any  # Callable and Any types
+from functools import wraps  # wrapping of functions
+import time  # timing
+import sys  # get frame/scope
 
-from PIL import Image as PILImage
+from PIL import Image as PILImage  # image loading
 
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
@@ -345,8 +345,8 @@ def interp2d(x: np.ndarray, y: np.ndarray, z: np.ndarray, xp: np.ndarray, yp: np
     yr = yt - yc
 
     # handle case where we are exactly add the edge of the data, the index is
-    xcp = np.where(xc < x.shape[0], xc+1, xc)
-    ycp = np.where(yc < y.shape[0], yc+1, yc)
+    xcp = np.where(xc < x.shape[0]-1, xc+1, xc)
+    ycp = np.where(yc < y.shape[0]-1, yc+1, yc)
 
     a, b, c, d = z[yc, xc], z[ycp, xc], z[yc, xcp], z[ycp, xcp]
 

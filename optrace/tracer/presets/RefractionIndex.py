@@ -1,5 +1,6 @@
-from optrace.tracer.RefractionIndex import *
 
+from optrace.tracer.RefractionIndex import RefractionIndex  # RefractionIndex class
+import numpy as np  # ndarray creation
 
 # Glasses
 #######################################################################################################################

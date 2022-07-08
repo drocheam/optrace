@@ -1,18 +1,35 @@
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patheffects as path_effects
-import numpy as np
+# plotting library
+import matplotlib  # plotting library
+import matplotlib.pyplot as plt  # actual plotting
+import matplotlib.patheffects as path_effects  # path effects for plot lines
 
-import optrace.tracer.Color as Color
-import optrace.tracer.Misc as misc
+import numpy as np  # calculations
+from typing import Callable  # Callable typing hints
+
+import optrace.tracer.Color as Color  # color conversions for chromacity plots
+
+# only needed for typing and plotting
 from optrace.tracer.RImage import RImage
 from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
+from optrace.tracer.spectrum.Spectrum import Spectrum
 from optrace.tracer.RefractionIndex import RefractionIndex
 from optrace.tracer.geometry.Surface import Surface
-import optrace.tracer.presets.Lines as Lines
 
-def AutoFocusDebugPlot(r, vals, rf, ff, title="Focus Finding", block=False):
+import optrace.tracer.presets.Lines as Lines  # spectral lines for AbbePlot
+
+
+chromacity_norms = ["Ignore", "Largest", "Sum"]
+"""possible norms for chromacity diagrams"""
+
+
+def AutoFocusDebugPlot(r:       np.ndarray, 
+                       vals:    np.ndarray, 
+                       rf:      float, 
+                       ff:      float, 
+                       title:   str = "Focus Finding", 
+                       block:   bool = False)\
+        -> None:
     """
 
     :param r:
@@ -40,12 +57,18 @@ def AutoFocusDebugPlot(r, vals, rf, ff, title="Focus Finding", block=False):
     plt.pause(0.1)
 
 
-def RefractionIndexPlot(RI, title="Refraction Index", **kwargs):
+def RefractionIndexPlot(RI:         RefractionIndex | list[RefractionIndex], 
+                        title:      str = "Refraction Index", 
+                        **kwargs)\
+        -> None:
     """
     """
     SpectrumPlot(RI, title=title, **kwargs)
 
-def SpectrumPlot(Spec, title="Spectrum", **kwargs):
+def SpectrumPlot(Spec:      Spectrum | list[Spectrum], 
+                 title:     str = "Spectrum", 
+                 **kwargs)\
+        -> None:
     """
     """
     Spec0 = Spec[0] if isinstance(Spec, list) else Spec
@@ -55,10 +78,12 @@ def SpectrumPlot(Spec, title="Spectrum", **kwargs):
     _SpectrumPlot(Spec, r"$\lambda$ in nm", ylabel, title=title, **kwargs)
 
 
-def AbbePlot(RI:    list[RefractionIndex], 
-             title: str = "Abbe Diagram", 
-             lines: list = Lines.preset_lines_FdC,
-             block: bool = False):
+def AbbePlot(RI:     list[RefractionIndex], 
+             title:  str = "Abbe Diagram", 
+             lines:  list = Lines.preset_lines_FdC,
+             block:  bool = False,
+             silent: bool = False)\
+        -> None:
     """
     """
 
@@ -71,7 +96,8 @@ def AbbePlot(RI:    list[RefractionIndex],
         Vd = RIi.getAbbeNumber(lines)
 
         if not np.isfinite(Vd):
-            print(f"Ignoring non dispersive material '{RIi.getDesc()}'")
+            if not silent:
+                print(f"Ignoring non dispersive material '{RIi.getDesc()}'")
             continue
 
         sc = plt.scatter(Vd, nd, marker="x")
@@ -87,7 +113,12 @@ def AbbePlot(RI:    list[RefractionIndex],
     plt.pause(0.1)
     
 
-def ChromacitiesCIE1931(Im: RImage | LightSpectrum | list[LightSpectrum], RI="Ignore", **kwargs):
+def ChromacitiesCIE1931(Im:     RImage | LightSpectrum | list[LightSpectrum], 
+                        RI:     str = "Ignore", 
+                        **kwargs)\
+        -> None:
+    """
+    """
 
     r, g, b, w = Color._sRGB_r_xy, Color._sRGB_g_xy, Color._sRGB_b_xy, Color._sRGB_w_xy
 
@@ -113,7 +144,12 @@ def ChromacitiesCIE1931(Im: RImage | LightSpectrum | list[LightSpectrum], RI="Ig
     _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, "CIE 1931 Chromaticity Diagram", "x", "y", **kwargs)
 
 
-def ChromacitiesCIE1976(Im: RImage | LightSpectrum | list[LightSpectrum], RI="Ignore", **kwargs):
+def ChromacitiesCIE1976(Im:     RImage | LightSpectrum | list[LightSpectrum],
+                        RI:     str = "Ignore", 
+                        **kwargs)\
+        -> None:
+    """
+    """
 
     r, g, b, w = Color._sRGB_r_uv, Color._sRGB_g_uv, Color._sRGB_b_uv, Color._sRGB_w_uv
 
@@ -137,6 +173,7 @@ def ChromacitiesCIE1976(Im: RImage | LightSpectrum | list[LightSpectrum], RI="Ig
 
     ext = [0, 0.7, 0, 0.7]
     _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, "CIE 1976 UCS Diagram", "u'", "v'", **kwargs)
+
 
 # TODO improve. Multiple Surfaces?
 # How to handle r and re?
@@ -165,19 +202,35 @@ def ChromacitiesCIE1976(Im: RImage | LightSpectrum | list[LightSpectrum], RI="Ig
 
     
 # TODO list of Images. Enables RI for Images
-def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, block=False, norm="Sum"):
-    """"""
+def _ChromaticityPlot(Im:       RImage | LightSpectrum | list[LightSpectrum], 
+                      conv:     Callable, 
+                      i_conv:   Callable, 
+                      RI:       str, 
+                      r:        list, 
+                      g:        list, 
+                      b:        list, 
+                      w:        list, 
+                      ext:      list, 
+                      title:    str, 
+                      xl:       str, 
+                      yl:       str, 
+                      block:    bool = False, 
+                      norm:     str = "Sum")\
+        -> None:
+    """Lower level plotting function. Don't use directly"""
 
     if isinstance(Im, RImage):
         XYZ = Im.getXYZ() if RI == "Ignore" else Color.sRGB_to_XYZ(Im.getRGB(RI=RI))
         labels = []
         legend3 = "Image Colors"
+        point_alpha = 0.1
 
     elif isinstance(Im, LightSpectrum):
         XYZ = Im.getXYZ()
         labels = [Im.getDesc()]
         legend3 = "Spectrum Colors"
-   
+        point_alpha = 1
+
     elif isinstance(Im, list):
 
         for Imi in Im:
@@ -192,6 +245,8 @@ def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, bloc
             XYZ = np.vstack((XYZ, Imi.getXYZ()))
 
         legend3 = "Spectrum Colors"
+        point_alpha = 1
+
     else:
         raise RuntimeError(f"Invalid parameter of type {type(Im)}.")
 
@@ -220,9 +275,11 @@ def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, bloc
 
     XYZ_shoe = i_conv(x, y)
     RGB = Color.XYZ_to_sRGBLinear(XYZ_shoe, RI="Absolute", normalize=False)
+
     if norm == "Largest":
         mask = ~np.all(RGB == 0, axis=2)
         RGB[mask] /= np.max(RGB[mask], axis=1)[:, np.newaxis] # normalize brightness
+
     elif norm == "Sum":
         mask = ~np.all(RGB == 0, axis=2)
         RGB[mask] /= np.sum(RGB[mask], axis=1)[:, np.newaxis] # normalize brightness
@@ -274,7 +331,7 @@ def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, bloc
 
     # plot image/spectrum points and labels
     xi, yi = conv(XYZ)
-    plt.scatter(xi, yi, color="k", marker="x", s=10)
+    plt.scatter(xi, yi, color="k", marker="x", s=10, alpha=point_alpha)
     for i, l in enumerate(labels):
         text = plt.text(xi[i], yi[i], l, fontsize=9, color="k")
 
@@ -285,9 +342,21 @@ def _ChromaticityPlot(Im, conv, i_conv, RI, r, g, b, w, ext, title, xl, yl, bloc
     plt.show(block=block)
     plt.pause(0.1)
 
+
 # TODO make Lines and Monochromatic plottable        
-def _SpectrumPlot(obj, xlabel, ylabel, title, wl0=Color.WL_MIN, wl1=Color.WL_MAX, steps=5000, 
-                  legend_off=False, labels_off=False, colors=None, block=False):
+def _SpectrumPlot(obj:          Spectrum | list[Spectrum], 
+                  xlabel:       str, 
+                  ylabel:       str, 
+                  title:        str, 
+                  wl0:          float = Color.WL_MIN, 
+                  wl1:          float = Color.WL_MAX, 
+                  steps:        int = 5000, 
+                  legend_off:   bool = False, 
+                  labels_off:   bool = False, 
+                  colors:       str | list[str] = None, 
+                  block:        bool = False)\
+        -> None:
+    """Lower level plotting function. Don't use directly"""
 
     # TODO isContinuous not needed after this?
     # if not obj.isContinuous():
@@ -336,13 +405,15 @@ def _SpectrumPlot(obj, xlabel, ylabel, title, wl0=Color.WL_MIN, wl1=Color.WL_MAX
     plt.pause(0.1)
 
 
-def _show_grid(what=plt):
+def _show_grid(what=plt) -> None:
+    """active major and minor grid lines, while minor are dashed and less visible"""
     what.grid(visible=True, which='major')
     what.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
     what.minorticks_on()
 
 
-def _set_font():
+def _set_font() -> None:
+    """set the font to something professionally looking (similar to Times New Roman)"""
     matplotlib.rcParams['mathtext.fontset'] = 'stix'
     matplotlib.rcParams['font.family'] = 'STIXGeneral'
 

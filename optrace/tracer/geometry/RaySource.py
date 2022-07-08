@@ -8,16 +8,16 @@ The RaySource object also holds all rays and ray sections generated in raytracin
 
 # Why random sampling? Sampling the source, "sampling" the lens areas or aperture by the rays can lead to Nyquist Theorem violation. Also, this ensures that when you run it repeatedly, you get a different version of the image, and not the same one. E.g. with image compositions by several raytraces.
 
-import numpy as np
-from typing import Callable
+import numpy as np  # ndarray type and calculations
+from typing import Callable  # Callable type
 
-from optrace.tracer.geometry.Surface import Surface 
-from optrace.tracer.geometry.SObject import SObject
-from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
+from optrace.tracer.geometry.Surface import Surface  # Surface type and methods 
+from optrace.tracer.geometry.SObject import SObject  # parent class
+from optrace.tracer.spectrum.LightSpectrum import LightSpectrum  # spectrum of source
 
-from optrace.tracer.Misc import timer as timer
-import optrace.tracer.Misc as misc
-import optrace.tracer.Color as Color
+import optrace.tracer.Misc as misc  # calculations
+import optrace.tracer.Color as Color  # for randomWavelenghtsFromSRGB() and PowerFromSRGB() 
+
 
 # TODO remove BW_Image, ersetzen durch emittance_type = "Constant", "Image"
 class RaySource(SObject):

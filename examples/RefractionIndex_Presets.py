@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import sys
-sys.path.append('./')
+sys.path.append('.')
 
 import optrace as ot
 import optrace.plots

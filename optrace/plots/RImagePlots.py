@@ -6,12 +6,15 @@ All Modes can be shown in linear or logarithmic scaling
 
 """
 
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-import copy
+# plotting library
+import matplotlib  # plotting library
+import matplotlib.pyplot as plt  # actual plotting
 
-from optrace.tracer.RImage import RImage
+import numpy as np  # calculations
+import copy  # copying for classes without copy function
+
+from optrace.tracer.RImage import RImage  # RImage type and RImage displaying
+from optrace.tracer.BaseClass import BaseClass  # type checking 
 
 
 def RImagePlot(Im:       RImage,
@@ -19,8 +22,6 @@ def RImagePlot(Im:       RImage,
                block:    bool = False,
                log:      bool = False,
                flip:     bool = False,
-               text:     str = "",
-               clabel:   str = "",
                mode:     str = RImage.display_modes[0])\
         -> None:
     """
@@ -33,6 +34,8 @@ def RImagePlot(Im:       RImage,
     :param clabel: label for colorbar (string)
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
+    BaseClass._checkType("Im", Im, RImage)
+    BaseClass._checkIfIn("mode", mode, RImage.display_modes)
 
     text = Im.getLongDesc(fallback="")
 
@@ -99,7 +102,7 @@ def RImagePlot(Im:       RImage,
     plt.show(block=block)
     plt.pause(0.1)
 
-# TODO test
+
 def RImageCutPlot(Im:       RImage,
                   block:    bool = False,
                   log:      bool = False,
@@ -118,8 +121,16 @@ def RImageCutPlot(Im:       RImage,
     :param clabel: label for colorbar (string)
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
+    BaseClass._checkType("Im", Im, RImage)
+    BaseClass._checkIfIn("mode", mode, RImage.display_modes)
 
+    if "x" not in kwargs and "y" not in kwargs:
+        raise RuntimeError("Provide an x or y parameter to the RImageCutPlot function.")
+
+    yim = "x" in kwargs
+   
     text = Im.getLongDesc(fallback="")
+    text += "\nCut at " + (f'x = {kwargs["x"]:.5g}' if yim else f'y = {kwargs["y"]:.5g}') + " mm"
 
     match mode:
         case "Irradiance":      clabel = "Irradiance in W/mm²"
@@ -132,8 +143,6 @@ def RImageCutPlot(Im:       RImage,
     matplotlib.rcParams['mathtext.fontset'] = 'stix'
     matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
-    yim = "x" in kwargs
-    
     # plot image
     plt.figure()
 
@@ -142,9 +151,9 @@ def RImageCutPlot(Im:       RImage,
 
     # plot labels
     if Im.coordinate_type == "Polar":
-        plt.xlabel(r"$\theta_x$ / °") if yim else plt.ylabel(r"$\theta_y$ / °")
+        plt.xlabel(r"$\theta_y$ / °") if yim else plt.xlabel(r"$\theta_x$ / °")
     else:
-        plt.xlabel("x / mm") if yim else plt.ylabel("y / mm")
+        plt.xlabel("y / mm") if yim else plt.xlabel("x / mm")
 
     if log:
         plt.yscale('log')

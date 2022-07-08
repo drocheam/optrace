@@ -20,12 +20,12 @@ class Spectrum(BaseClass):
 
     def __init__(self, 
                  spectrum_type:     str, 
+                 val:               float = 1.,
                  lines:             list[float] | np.ndarray = None,
                  line_vals:         list[float] | np.ndarray = None,
                  wl:                float = 550.,
                  wl0:               float = 400.,
                  wl1:               float = 600.,
-                 val:               float = 1.,
                  wls:               np.ndarray = None,
                  vals:              np.ndarray = None,
                  func:              Callable[[np.ndarray], np.ndarray] = None,

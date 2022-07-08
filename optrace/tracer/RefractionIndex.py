@@ -4,13 +4,12 @@ RefractionIndex class:
 Provides the creation and computation of constant or wavelength depended refraction indices
 """
 
-import copy
-import numpy as np
-import optrace.tracer.Misc as misc
-import optrace.tracer.presets.Lines as Lines
-from optrace.tracer.spectrum.Spectrum import Spectrum as Spectrum
-from optrace.tracer.BaseClass import BaseClass
-import optrace.tracer.Color as Color
+import numpy as np  # calculations
+
+import optrace.tracer.Misc as misc  # calculations
+import optrace.tracer.presets.Lines as Lines  # spectral lines for Abbe number
+from optrace.tracer.spectrum.Spectrum import Spectrum as Spectrum  # parent class 
+import optrace.tracer.Color as Color  # for visible wavelength range
 
 
 class RefractionIndex(Spectrum):

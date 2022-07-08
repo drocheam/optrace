@@ -5,11 +5,11 @@ A filter is a surface with wavelength dependent or constant transmittance.
 Useful for color filters or apertures.
 """
 
-import numpy as np
+import numpy as np  # ndarray type
 
-from optrace.tracer.geometry.SObject import SObject
-from optrace.tracer.spectrum.TransmissionSpectrum import TransmissionSpectrum
-from optrace.tracer.geometry.Surface import Surface
+from optrace.tracer.geometry.SObject import SObject  # parent class
+from optrace.tracer.spectrum.TransmissionSpectrum import TransmissionSpectrum  # for transmission
+from optrace.tracer.geometry.Surface import Surface  # Surface type
 
 
 class Filter(SObject):

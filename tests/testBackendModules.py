@@ -1,14 +1,19 @@
 #!/bin/env python3
 
 import sys
-sys.path.append('./')
+sys.path.append('.')
 
+import os
 import doctest
 import unittest
 import numpy as np
 import warnings
 
+from pathlib import Path
+
 import optrace as ot
+from optrace.tracer.geometry.SObject import SObject as SObject
+from optrace.tracer.BaseClass import BaseClass as BaseClass
 
 
 class BackendModuleTests(unittest.TestCase):
@@ -89,6 +94,7 @@ class BackendModuleTests(unittest.TestCase):
 
         # TODO check lock
 
+
     def test_SurfaceFunction(self):
 
         # turn off warnings temporarily, since not specifying zmax, zmin in __init__ leads to one
@@ -135,15 +141,80 @@ class BackendModuleTests(unittest.TestCase):
 
         # TODO check Det.toAngleCoordinates()
 
-        def invalid_set():
-            Det.aaa = 1
-        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+        self.assertRaises(AttributeError, Det.__setattr__, "aaa", 1)  # _new_lock active
 
     def test_SObject(self):
-        pass
+
+        front = ot.Surface("Sphere")
+        back = ot.Surface("Circle")
+        pos = [0, -1, 5]
+
+        self.assertRaises(ValueError, SObject, front, pos, back) # no d1, d2
+        self.assertRaises(TypeError, SObject, front, pos, back, d1=[], d2=2) # invalid d1 type
+        self.assertRaises(TypeError, SObject, front, pos, back, d2=[], d1=1) # invalid d2 type
+        self.assertRaises(ValueError, SObject, front, pos, back, d1=1) # d2 missing
+        self.assertRaises(ValueError, SObject, front, pos, back, d2=1) # d1 missing
+        self.assertRaises(ValueError, SObject, front, pos, back, d1=-1, d2=1) # d1 negative
+        self.assertRaises(TypeError, SObject, front, pos, 5, 1, 1) # invalid BackSurface type
+        self.assertRaises(TypeError, SObject, 5, pos, back, 1, 1) # invalid FrontSurface type
+        self.assertRaises(TypeError, SObject, front, 5, back, 1, 1) # invalid pos type
+        self.assertRaises(ValueError, SObject, front, [5, 5], back, 1, 1) # wrong pos shape
+
+        L = ot.Lens(ot.Surface("Circle"), ot.Surface("Sphere"), n=ot.RefractionIndex("Constant", n=1.1), pos=[0, -1, 5], d=2)
+
+        self.assertTrue(L.hasBackSurface())
+        self.assertTrue(np.all(L.pos == np.array([0, -1, 5])))
+
+        self.assertRaises(RuntimeError, L.__setattr__, "Surface", ot.Surface("Circle")) # surface needs to be set in a different way
+        self.assertRaises(RuntimeError, L.__setattr__, "pos", [0, 1, 0]) # pos needs to be set in a different way
+
+        L.moveTo([5, 6, 8])
+        self.assertTrue(np.all(L.pos == np.array([5, 6, 8])))
+
+        self.assertRaises(RuntimeError, L.setSurface, ot.Surface("Circle")) # only SObjects with one surface can be set
+
+        AP = ot.Aperture(ot.Surface("Ring"), pos=[0, 1, 2])
+        AP.setSurface(ot.Surface("Asphere"))
+        self.assertEqual(AP.Surface.surface_type, "Asphere")
 
     def test_BaseClass(self):
-        pass
+
+        self.assertRaises(TypeError, BaseClass, desc=1) # desc not a string 
+        self.assertRaises(TypeError, BaseClass, long_desc=1) # long_desc not a string 
+        self.assertRaises(TypeError, BaseClass, threading=1) # threading not bool
+        self.assertRaises(TypeError, BaseClass, silent=1) # silent not bool
+    
+        BC = BaseClass(desc="a")
+        BC.crepr()
+        BC.copy()
+        str(BC)
+
+        BC._new_lock = True
+        BC.lock()
+
+        self.assertRaises(RuntimeError, BC.__setattr__, "desc", "") # object locked
+        self.assertRaises(AttributeError, BC.__setattr__, "dc", "") # invalid property
+
+        # check desc handling
+        self.assertEqual(BC.getLongDesc(), BC.desc)
+        self.assertEqual(BC.getDesc(), BC.desc)
+        BC = BaseClass()
+        self.assertEqual(BC.getLongDesc(fallback="abc"), "abc")
+
+        self.assertRaises(TypeError, BaseClass._checkType, "", 5, bool) # 5 not bool
+        BaseClass._checkType("", 5, int) # 5 not bool
+        BaseClass._checkNoneOrCallable("", None) # valid
+        BaseClass._checkNoneOrCallable("", lambda x: x) # valid
+
+        def test():
+            return 1
+        BaseClass._checkNoneOrCallable("", test) # valid
+        
+        self.assertRaises(ValueError, BaseClass._checkBelow, "", 5, 4) # 5 > 4
+        self.assertRaises(ValueError, BaseClass._checkNotAbove, "", 5, 4) # 5 > 4
+        self.assertRaises(ValueError, BaseClass._checkNotBelow, "", 4, 5) # 5 > 4
+        self.assertRaises(ValueError, BaseClass._checkAbove, "", 4, 5) # 4 < 5
+        self.assertRaises(ValueError, BaseClass._checkIfIn, "", "test", ["test1", "test2"]) # not an element of
 
     def test_Lens(self):
         # TODO check estimateFocalLength()
@@ -175,10 +246,7 @@ class BackendModuleTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.Lens, front, back, n, n2=front, pos=[0, 0, 0])
         self.assertRaises(RuntimeError, ot.Lens, front, ot.Surface("Point"), n, pos=[0, 0, 0]) # non 2D surface
         self.assertRaises(RuntimeError, ot.Lens, front, ot.Surface("Line"), n, pos=[0, 0, 0]) # non 2D surface
-
-        def invalid_set():
-            L[0].aaa = 1
-        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+        self.assertRaises(AttributeError, L[0].__setattr__, "aaa", 2)  # _new_lock active
 
     def test_RaySource(self):
 
@@ -273,15 +341,84 @@ class BackendModuleTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.RaySource, ot.Surface("Sphere"), pos=[0, 0, 0], s=[1, 3]) # currently only planar surfaces are supported
 
         RS = ot.RaySource(*rsargs)
-        def invalid_set():
-            RS.aaa = 1
-        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
-
+        self.assertRaises(AttributeError, RS.__setattr__, "aaa", 2)  # _new_lock active
         self.assertRaises(RuntimeError, RS.createRays, 1000) # spectrum missing
         self.assertRaises(RuntimeError, RS.getColor) # spectrum missing
 
-    def test_Image(self):
-        pass
+    def test_RImage(self):
+
+        self.assertRaises(TypeError, ot.RImage, 5) # invalid extent
+        self.assertRaises(ValueError, ot.RImage, [5, 6, 8]) # invalid extent
+        self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 7]) # invalid extent
+        self.assertRaises(TypeError, ot.RImage, [5, 6, 8, 9], 5) # invalid coordinate type
+        self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 9], "hjkhjk") # invalid coordinate type
+        self.assertRaises(TypeError, ot.RImage, [5, 6, 8, 9], offset=None) # invalid offset type
+        self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 9], offset=1.2) # invalid offset value
+        self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 9], offset=-0.1) # invalid offset value
+
+        img = ot.RImage([-1, 1, -2, 2], silent=True)
+        self.assertFalse(img.hasImage())
+        
+        N = 4
+        p = np.array([[-1, -2],[-1, 2],[1, -2],[1, 2]])
+        w = np.array([1, 1, 2, 2])
+        wl = np.array([480, 550, 670, 750])
+        img.render(N, p, w, wl)
+
+        img.Nx
+        img.Ny
+        img.sx
+        img.sy
+        img.Apx
+        img.getPower()
+        img.getLuminousPower()
+        img.getXYZ()
+        img.getRGB()
+        img.getLuv()
+        self.assertTrue(img.hasImage())
+
+        for dm in ot.RImage.display_modes:
+            img.getByDisplayMode(dm)
+
+        self.assertRaises(ValueError, img.getByDisplayMode, "hjkhjkhjk") # invalid mode
+
+        self.assertEqual(img.getPower(), np.sum(w))
+
+        # check rescaling
+        img.rescale(250) # valid value
+        img.rescale(ot.RImage.MAX_IMAGE_SIDE) # maximum value
+        img.rescale(131) # a prime number
+        img.rescale(1) # smallest possible number
+        img.rescale(ot.RImage.MAX_IMAGE_SIDE * 10) # too large number
+        self.assertRaises(ValueError, img.rescale, 0.5) # N < 1
+        self.assertRaises(ValueError, img.rescale, -1) # N negative
+
+        # saving and loading for valid path
+        path = "test_img.npz"
+        img.save(path)
+        img = ot.RImage.load(path)
+        img.silent = True
+
+        # saving and loading for valid path, overwrite file
+        path0 = img.save(path, overwrite=True)
+        img = ot.RImage.load(path0)
+        img.silent = True
+        self.assertEqual(path, path0)
+        
+        # saving and loading for valid path, don't overwrite file
+        path1 = img.save(path, overwrite=False)
+        img = ot.RImage.load(path1)
+        img.silent = True
+        self.assertNotEqual(path, path1)
+        
+        # saving and loading for invalid path
+        path2 = img.save(str(Path("hjkhjkljk") / "test_img.npz"))
+        img = ot.RImage.load(path2)
+
+        # delete files
+        os.remove(path0)
+        os.remove(path1)
+        os.remove(path2)
 
     def test_Raytracer_Init(self):
         o0 = [-5, 5, -5, 5, 0, 10]
@@ -295,7 +432,81 @@ class BackendModuleTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, threading=1) # incorrect bool parameter
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, silent=1) # incorrect bool parameter
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, n0=1) # incorrect Refractionindex
+    
+    def test_Raytracer_Geometry(self):
+
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 30])
+
+        RT.add(ot.RaySource(ot.Surface("Point"), pos=[0, 0, 0]))
+        self.assertEqual(len(RT.RaySourceList), 1)
+        RT.add(ot.RaySource(ot.Surface("Point"), pos=[0, 0, 0]))
+        self.assertEqual(len(RT.RaySourceList), 2)
+        RT.remove(RT.RaySourceList[1])
+        self.assertEqual(len(RT.RaySourceList), 1)
+
+        RT.add(ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5]))
+        self.assertEqual(len(RT.FilterList), 1)
+        RT.remove(RT.FilterList[0])
+        self.assertEqual(len(RT.FilterList), 0)
+
+        RT.add(ot.Detector(ot.Surface("Circle"), pos=[0, 0, 10]))
+        self.assertEqual(len(RT.DetectorList), 1)
+        RT.remove(RT.DetectorList[0])
+        self.assertEqual(len(RT.DetectorList), 0)
+
+        RT.add(ot.Aperture(ot.Surface("Ring"), pos=[0, 0, 10]))
+        self.assertEqual(len(RT.ApertureList), 1)
+        RT.remove(RT.ApertureList[0])
+        self.assertEqual(len(RT.ApertureList), 0)
+
+        RT.add(ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"), n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10]))
+        self.assertEqual(len(RT.LensList), 1)
+        RT.remove(RT.LensList[0])
+        self.assertEqual(len(RT.LensList), 0)
+
+        RT.add(ot.Detector(ot.Surface("Circle"), pos=[0, 10, 10]))
+        self.assertRaises(RuntimeError, RT.trace, 1000) # Detector outside outline
+        RT.remove(RT.DetectorList[-1])
+
+        RT.add(ot.Aperture(ot.Surface("Ring"), pos=[0, -6, 10]))
+        self.assertRaises(RuntimeError, RT.trace, 1000) # Aperture outside outline
+        RT.remove(RT.ApertureList[-1])
+
+        RT.remove(RT.RaySourceList[0])
+        self.assertRaises(RuntimeError, RT.trace, 1000) # RaySource Missing
+        RT.add(ot.RaySource(ot.Surface("Point"), pos=[0, 0, 0]))
         
+        RT.add(ot.Aperture(ot.Surface("Ring"), pos=[0, 0, -5]))
+        self.assertRaises(RuntimeError, RT.trace, 1000) # Element behind RaySources
+
+        def countTrue(dict_):
+            i = 0
+            for key, val in dict_.items():
+                if val:
+                    i += 1
+            return i
+        
+        # check snapshotting
+        snap = RT.PropertySnapshot()
+        RT.add(ot.Aperture(ot.Surface("Ring"), pos=[0, 0, 15]))
+        snap2 = RT.PropertySnapshot()
+        self.assertNotEqual(snap, snap2)
+
+        # check snapshots comparison 1
+        cmp = RT.comparePropertySnapshot(snap, snap2)
+        self.assertTrue(cmp["Any"])
+        self.assertTrue(cmp["Apertures"])
+        self.assertEqual(countTrue(cmp), 2)
+
+        # check snapshots comparison 2
+        RT.add(ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"), n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10]))
+        snap3 = RT.PropertySnapshot()
+        cmp = RT.comparePropertySnapshot(snap2, snap3)
+        self.assertTrue(cmp["Any"])
+        self.assertTrue(cmp["Lenses"])
+        self.assertTrue(cmp["Ambient"])
+        self.assertEqual(countTrue(cmp), 3)
+
     def test_Raytracer(self):
         pass
 
@@ -354,9 +565,7 @@ class BackendModuleTests(unittest.TestCase):
         self.assertEqual(R[1], R[1])
         self.assertEqual(ot.RefractionIndex("Function", func=func), ot.RefractionIndex("Function", func=func))
 
-        def invalid_set():
-            R[0].aaa = 1
-        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+        self.assertRaises(AttributeError, R[0].__setattr__, "aaa", 1)  # _new_lock active
 
     def test_Color(self):
         
@@ -398,10 +607,10 @@ class BackendModuleTests(unittest.TestCase):
         RS_px = RS_RGB.reshape((4, 3))
 
         # check if is near original image. 
-        # Unfortunately many rays are needed for the color to be near
+        # Unfortunately many rays are needed for the color to be near the actual value
         for i in range(4):
             for RSp, Cp in zip(RS_px[i], Im_px[i]):
-                self.assertAlmostEqual(RSp, Cp, delta=0.04)
+                self.assertAlmostEqual(RSp, Cp, delta=0.06)
 
     def test_Spectrum(self):
 
@@ -448,9 +657,7 @@ class BackendModuleTests(unittest.TestCase):
 
         self.assertRaises(RuntimeError, ot.Spectrum, "Function", func= lambda wl: 1-wl/550) # func below 0 
 
-        def invalid_set():
-            spec.aaa = 1
-        self.assertRaises(AttributeError, invalid_set)  # _new_lock active
+        self.assertRaises(AttributeError, spec.__setattr__, "aaa", 1)  # _new_lock active
 
     def test_TransmissionSpectrum(self):
 
@@ -485,7 +692,7 @@ class BackendModuleTests(unittest.TestCase):
             spec.randomWavelengths(1000)
 
         # check presets
-        for spec in ot.presets_light:
+        for spec in ot.presets_spec_light:
             if spec.isContinuous():
                 spec(wl)
             spec.getXYZ()
@@ -505,7 +712,6 @@ class BackendModuleTests(unittest.TestCase):
     def test_Misc(self):
         doctest.testmod(ot.tracer.Misc)
         # additional tests not required here, since this functions are not exposed to the user
-
 
     def test_Focus(self):
         
