@@ -11,10 +11,9 @@ import optrace.tracer.Color as Color  # color conversions for chromacity plots
 
 # only needed for typing and plotting
 from optrace.tracer.RImage import RImage
-from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
-from optrace.tracer.spectrum.Spectrum import Spectrum
+from optrace.tracer.spectrum import Spectrum, LightSpectrum
 from optrace.tracer.RefractionIndex import RefractionIndex
-from optrace.tracer.geometry.Surface import Surface
+from optrace.tracer.geometry import Surface
 
 import optrace.tracer.presets.Lines as Lines  # spectral lines for AbbePlot
 

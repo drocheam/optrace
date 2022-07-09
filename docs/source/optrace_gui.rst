@@ -10,4 +10,4 @@ __________________________
 
 gui.GUI
 __________________________
-.. automodule:: optrace.gui.GUI
+.. automodule:: optrace.gui.TraceGUI

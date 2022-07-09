@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 
 import sys
 sys.path.append('.')
@@ -7,7 +6,6 @@ sys.path.append('.')
 import numpy as np
 import optrace as ot
 from optrace.gui import TraceGUI
-from optrace.plots import SpectrumPlot
 
 # make Raytracer
 RT = ot.Raytracer(outline=[-4, 5, -3, 5, -1, 27.5])

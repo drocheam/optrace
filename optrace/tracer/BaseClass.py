@@ -16,7 +16,7 @@ class BaseClass:
         self.silent      = silent
         self.threading   = threading
 
-    def crepr(self):
+    def crepr(self) -> list:
         """ Compact state representation using only lists and immutable types """
 
         d = {x: val for x, val in self.__dict__.items() if not x.startswith("_")}
@@ -34,19 +34,19 @@ class BaseClass:
 
         return cl
 
-    def getLongDesc(self, fallback: str=""):
+    def getLongDesc(self, fallback: str="") -> str:
         
         return self.long_desc if self.long_desc != "" else BaseClass.getDesc(self, fallback)
 
-    def getDesc(self, fallback: str=""):
+    def getDesc(self, fallback: str="") -> str:
         """"""
         return self.desc if self.desc != "" else fallback
     
-    def copy(self):
+    def copy(self) -> 'BaseClass':
         """Return a fully independent copy"""
         return copy.deepcopy(self)
     
-    def lock(self):
+    def lock(self) -> None:
         """make storage read only"""
 
         for key, val in self.__dict__.items():
@@ -55,12 +55,12 @@ class BaseClass:
 
         self._lock = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         """gets called when print(obj) or repr(obj) gets called"""
         d = {x: val for x, val in self.__dict__.items() if not x.startswith("_")}
         return f"{self.__class__.__name__} at {hex(id(self))} with {d}"
 
-    def __setattr__(self, key, val):
+    def __setattr__(self, key, val) -> None:
       
         if key not in ["_lock", "_new_lock"]:
             if "_new_lock" in self.__dict__ and self._new_lock and key not in self.__dict__:
@@ -79,38 +79,38 @@ class BaseClass:
         self.__dict__[key] = val
 
     @staticmethod
-    def _checkType(key, val, type_):
+    def _checkType(key, val, type_) -> None:
         if not isinstance(val, type_):
             types = str(type_).replace("|", "or")
             raise TypeError(f"Property '{key}' needs to be of type(s) {types}, but is {type(val)}.")
 
     @staticmethod
-    def _checkNotAbove(key, val, cmp):
+    def _checkNotAbove(key, val, cmp) -> None:
         if val > cmp:
             raise ValueError(f"Property '{key}' needs to be below or equal to {cmp}, but is {val}.")
 
     @staticmethod
-    def _checkNotBelow(key, val, cmp):
+    def _checkNotBelow(key, val, cmp) -> None:
         if val < cmp:
             raise ValueError(f"Property '{key}' needs to be above or equal to {cmp}, but is {val}.")
 
     @staticmethod
-    def _checkAbove(key, val, cmp):
+    def _checkAbove(key, val, cmp) -> None:
         if val <= cmp:
             raise ValueError(f"Property '{key}' needs to be above {cmp}, but is {val}.")
     
     @staticmethod
-    def _checkBelow(key, val, cmp):
+    def _checkBelow(key, val, cmp) -> None:
         if val >= cmp:
             raise ValueError(f"Property '{key}' needs to be below {cmp}, but is {val}.")
     
     @staticmethod
-    def _checkNoneOrCallable(key, val):
+    def _checkNoneOrCallable(key, val) -> None:
         if val is not None and not callable(val):
              raise TypeError(f"{key} needs to be callable or None, but is {type(val)}.")
     
     @staticmethod
-    def _checkIfIn(key, val, list_):
+    def _checkIfIn(key, val, list_) -> None:
         if val not in list_:
             raise ValueError(f"Invalid value '{val}' for property '{key}'. Needs to be one of {list_}, but is {val}.")
 

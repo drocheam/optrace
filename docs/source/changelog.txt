@@ -1,5 +1,13 @@
-Current Version: 0.8.7 
+Current Version: 0.9.5 
 
+0.9.5           Improved RImage saving. Added optional RImage offset. More plot and backend tests.
+0.9.4           Project restructuring. New RefractionIndex Presets. New AbbePlot.
+0.9.3           Project restructuring
+0.9.2           New RefractionIndex presets. Functions for plotting RefractionIndex, Spectrum and chromaticity diagrams. Functions for creating spectra at Detector and RaySource. Plots for Image cuts. iterativeDetectorImage is now iterativeRender, also renders RaySource Images.
+0.9.1           Spectrum class for Filter and RaySource. Common BaseClass for almost all optrace.tracer classes. Spectral line presets. Two new RefractionIndex Formulas and mutiple new presets. DetectorImage now possible for selected source only.
+0.9.0           Image now can be saved and loaded. Holds higher resolution version internally, that can be rescaled to. New sRGB Rendering Intents. New Image modes (Outside Gamut, Lightness, Hue, Chroma, Saturation). RaySource for autofocus can be selected.
+0.8.9           Information messages are now displayed combined from all tracing threads. RaySource rays are now created in threads.
+0.8.8           Project restructuring 2.
 0.8.7           Backend now has a progress bar for operations.
 0.8.6           Project restructuring.
 0.8.5           New 'Cleaner View'-option in GUI. Simpler and more cleaned up GUI code. Minor bug fixes.

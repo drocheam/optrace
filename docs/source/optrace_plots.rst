@@ -3,9 +3,9 @@ plots Submodule
 
 .. automodule:: optrace.plots
 
-plots.ImagePlots
+plots.RImagePlots
 __________________________
-.. automodule:: optrace.plots.ImagePlots
+.. automodule:: optrace.plots.RImagePlots
 
 plots.DebuggingPlots
 __________________________

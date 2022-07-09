@@ -57,9 +57,9 @@ bibtex_bibfiles = ['bib.bib']
 # a list of builtin themes.
 #
 # needs sphinx-rtd-theme installed
-html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_rtd_theme'
 # html_theme = 'sphinx_pdj_theme'
-# html_theme = 'classic'
+html_theme = 'classic'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -71,11 +71,11 @@ def setup(app):
 
 html_theme_options = {
     # "rightsidebar": "false",
-    # "relbarbgcolor": "GoldenRod",
-    # "footerbgcolor": "GoldenRod",
-    # "sidebarbgcolor": "black",
+    "relbarbgcolor": "GoldenRod",
+    "footerbgcolor": "GoldenRod",
+    "sidebarbgcolor": "black",
     "stickysidebar": True,
-    "body_max_width" : 1200
+    "body_max_width" : 1080
 }
 
 
@@ -92,7 +92,7 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
 autodoc_default_options = {
 	'members': True,
     'undoc-members': True,
-    'special-members' : '__call__, __eq__, __ne__, __setattr__',
+    'special-members' : '__call__, __eq__, __ne__',
     'exclude-members': '__weakref__'
 }
 

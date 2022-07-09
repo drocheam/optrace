@@ -3,7 +3,7 @@ from threading import Thread  # threading
 import warnings  # print warnings
 import numpy as np  # calculations
 
-from optrace.tracer.geometry.RaySource import RaySource  # create Rays
+from optrace.tracer.geometry import RaySource  # create Rays
 import optrace.tracer.Misc as misc # calculations
 from optrace.tracer.BaseClass import BaseClass  # parent class
 

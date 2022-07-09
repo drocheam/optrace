@@ -106,7 +106,10 @@ class Spectrum(BaseClass):
     def __eq__(self, other: 'Spectrum') -> bool:
         """Equal operator. Compares self to 'other'."""
 
-        if self is other or self.crepr() == other.crepr():
+        if type(self) is not type(other):
+            return False
+
+        elif self is other or self.crepr() == other.crepr():
             return True
 
         elif self.spectrum_type == "Data" and other.spectrum_type == "Data":

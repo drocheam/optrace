@@ -8,7 +8,7 @@ import numpy as np  # calculations
 
 import optrace.tracer.Misc as misc  # calculations
 import optrace.tracer.presets.Lines as Lines  # spectral lines for Abbe number
-from optrace.tracer.spectrum.Spectrum import Spectrum as Spectrum  # parent class 
+from optrace.tracer.spectrum import Spectrum  # parent class 
 import optrace.tracer.Color as Color  # for visible wavelength range
 
 

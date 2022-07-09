@@ -17,14 +17,10 @@ from progressbar import progressbar, ProgressBar  # fancy progressbars
 import sys  # redirect progressbar to stdout
 
 # needed for raytracing geometry and functionality
-from optrace.tracer.geometry.Filter import Filter
-from optrace.tracer.geometry.Aperture import Aperture
-from optrace.tracer.geometry.Detector import Detector 
-from optrace.tracer.geometry.Lens import Lens 
-from optrace.tracer.geometry.RaySource import RaySource
-from optrace.tracer.geometry.Surface import Surface 
+from optrace.tracer.geometry import Filter, Aperture, Detector, Lens, RaySource, Surface
 from optrace.tracer.geometry.SObject import SObject 
-from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
+
+from optrace.tracer.spectrum import LightSpectrum
 from optrace.tracer.RefractionIndex import RefractionIndex
 from optrace.tracer.RayStorage import RayStorage
 from optrace.tracer.RImage import RImage
