@@ -18,8 +18,7 @@ from optrace.tracer.BaseClass import BaseClass as BaseClass
 
 class BackendModuleTests(unittest.TestCase):
 
-
-    # Szrface Function missing
+    # TODO Surface Function missing
     # TODO checks Masks and PlottingMeshes
     def test_Surface(self):
 
@@ -92,8 +91,17 @@ class BackendModuleTests(unittest.TestCase):
                 if Si.isPlanar():
                     Si.getRandomPositions(N=1000)
 
-        # TODO check lock
+        # test object lock
+        self.assertRaises(AttributeError, S[0].__setattr__, "r46546", 4)  # _new_lock active
+        self.assertRaises(RuntimeError, S[0].__setattr__, "r", 4)  # object locked
+        self.assertRaises(RuntimeError, S[0].__setattr__, "dim", np.array([4, 5]))  # object locked
 
+        # test array lock
+        assert(S[6].surface_type == "Data")  # check if type is actually Data, needed for further tests
+        self.assertRaises(RuntimeError, S[6].__setattr__, "Z", np.array([4, 5]))  # object locked (S[6] is of type "Data"
+        def setArrayElement():
+            S[6].Z[0, 0] = 1.
+        self.assertRaises(ValueError, setArrayElement)  # array elements read-only
 
     def test_SurfaceFunction(self):
 

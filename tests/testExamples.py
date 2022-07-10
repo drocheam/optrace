@@ -17,7 +17,7 @@ class ExampleTests(unittest.TestCase):
     
     # execute, but kill after timeout, since everything should be automated
     # higher timeout for a human viewer to see if everythings working
-    def execute(self, str_, timeout=20):
+    def execute(self, str_, timeout=10):
 
         # start process. ignore warnings and redirect stdout to null
         process = subprocess.Popen(["python", "-W", "ignore", str_], stdout=subprocess.DEVNULL)
@@ -30,7 +30,7 @@ class ExampleTests(unittest.TestCase):
         self.execute("./examples/More_Complex_Example.py")
 
     def test_5RGBRender(self):
-        self.execute("./examples/Image_RGB_Render.py", 120)
+        self.execute("./examples/Image_RGB_Render.py", 90)
 
     def test_4PresetsRefractionIndex(self):
         self.execute("./examples/RefractionIndex_Presets.py")

@@ -33,6 +33,7 @@ RT.add(Det)
 pos = [27., 30., 33., 36.]
 _, Ims = RT.iterativeRender(N_rays=10e6, N_px_D=200, pos=pos)
 
+
 # show rendered images
 for i in np.arange(len(Ims)-1):
     RImagePlot(Ims[i], block=False, mode="sRGB (Absolute RI)")

@@ -15,6 +15,10 @@ from twisted.internet.protocol import Protocol, DatagramProtocol, Factory # need
 from twisted.python import log  # logging
 
 
+TCP_port = 8007
+"""port for the TCP server"""
+
+
 class OTTCP(Protocol):
 
     def __init__(self):
@@ -63,8 +67,14 @@ class OTTCP(Protocol):
                 else:
                     log.msg("Currently busy, not starting a new action.")
 
+            # compact error message. command is already printed in the try-block
+            except SyntaxError:
+                log.err('Syntax error in command')
+
+            # only exit connection
             except SystemExit:
-                exit()
+                self.transport.loseConnection()
+                self.factory.numConnect -= 1
 
             except Exception:
                 log.err()
@@ -72,7 +82,7 @@ class OTTCP(Protocol):
             log.msg('Received empty command')
 
 
-def serve_tcp(GUI, port=8007, max_connect=1, dict_=dict()):
+def serve_tcp(GUI, port=TCP_port, max_connect=1, dict_=dict()):
 
     # Setup the factory with the right attributes.
     factory = Factory()

@@ -1016,8 +1016,9 @@ class Raytracer(BaseClass):
                     SIm_res[j]._Im += Imi._Im
 
         # rescale images to update Im.Im, we only added Im._Im each
-        [SIm.rescale(N_px_S[i]) for i, SIm in enumerate(SIm_res)]
-        [DIm.rescale(N_px_D[i]) for i, DIm in enumerate(DIm_res)]
+        # force rescaling even if Im has the same size as _Im, since only _Im holds the sum image of all iterations
+        [SIm.rescale(N_px_S[i], _force=True) for i, SIm in enumerate(SIm_res)]
+        [DIm.rescale(N_px_D[i], _force=True) for i, DIm in enumerate(DIm_res)]
 
         # revert silent to its state
         self.silent = silent_old

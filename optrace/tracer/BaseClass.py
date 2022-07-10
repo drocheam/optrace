@@ -17,7 +17,14 @@ class BaseClass:
         self.threading   = threading
 
     def crepr(self) -> list:
-        """ Compact state representation using only lists and immutable types """
+        """ 
+        Compact state representation using only lists and immutable types.
+        Used to compare states of BaseClass objects.
+        np.ndarray is only compared for a size < 20, so either ignore these changes or make the arrays read only.
+        """
+        # The alternative approach would be to detect changes on the object and set a flag or save a timestamp,
+        # unfortunately it would be hard to not only detect changes on the object itself, but as well on all its members,
+        # which can also be classes or types such as list or np.ndarray
 
         d = {x: val for x, val in self.__dict__.items() if not x.startswith("_")}
         cl = []
@@ -47,13 +54,14 @@ class BaseClass:
         return copy.deepcopy(self)
     
     def lock(self) -> None:
-        """make storage read only"""
+        """make storage and object read only"""
 
         for key, val in self.__dict__.items():
             if isinstance(val, np.ndarray):
                 val.flags.writeable = False
 
         self._lock = True
+        self._new_lock = True
 
     def __str__(self) -> str:
         """gets called when print(obj) or repr(obj) gets called"""

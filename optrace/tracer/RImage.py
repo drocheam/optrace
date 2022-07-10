@@ -252,7 +252,7 @@ class RImage(BaseClass):
             self.extent[2] = ym - sx/MR/2
             self.extent[3] = ym + sx/MR/2
 
-    def rescale(self, N: int, threading: bool = True) -> None:
+    def rescale(self, N: int, threading: bool = True, _force=False) -> None:
        
         if not isinstance(N, int) or N < 1:
             raise ValueError("N needs to be an integer >= 1.")
@@ -297,8 +297,8 @@ class RImage(BaseClass):
         if fact <= 1:
             self.Im = self._Im
 
-        # only rescale if target image size is different from current Image
-        elif self.Im is None or min(*self.Im.shape[:2]) != Nm//fact:
+        # only rescale if target image size is different from current Image (but not if force is active)
+        elif self.Im is None or _force or min(*self.Im.shape[:2]) != Nm//fact:
             self.Im = np.zeros((Ny//fact, Nx//fact, Nz))
 
             if self.threading:
@@ -447,12 +447,11 @@ class RImage(BaseClass):
         super().__setattr__(key, val)
     
     def render(self, 
-               N:            int, 
+               N:            int = MAX_IMAGE_SIDE, 
                p:            np.ndarray = None,
                w:            np.ndarray = None,
                wl:           np.array = None,
-               keep_extent:  bool = False,
-               max_res:      bool = False)\
+               keep_extent:  bool = False)\
             \
             -> None:
         """

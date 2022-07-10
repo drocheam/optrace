@@ -36,6 +36,7 @@ from optrace.plots.DebugPlots import AutoFocusDebugPlot  # debugging of autofocu
 
 import optrace.tracer.Color as Color  # for visible wavelength range
 import optrace.gui.TCPServer as TCPServer  # TraceGUI TCP server
+import optrace.tracer.Misc as Misc  # for partMask function
 
 from twisted.internet import reactor  # networking functionality for tcp protocol
 from twisted.python import log  # logging
@@ -763,7 +764,7 @@ class TraceGUI(HasTraits):
 
     def initRayInfoText(self) -> None:
         """init detection of ray point clicks and the info display"""
-        self.Scene.mlab.gcf().on_mouse_pick(self.onRayPick, button='Left')
+        self._RayPicker = self.Scene.mlab.gcf().on_mouse_pick(self.onRayPick, button='Left')
 
         # add ray info text
         self.RayTextParent = self.Scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.Scene)
@@ -771,7 +772,7 @@ class TraceGUI(HasTraits):
 
     def initStatusText(self) -> None:
         """init GUI status text display"""
-        self.Scene.mlab.gcf().on_mouse_pick(self.onSpacePick, button='Right')
+        self._SpacePicker = self.Scene.mlab.gcf().on_mouse_pick(self.onSpacePick, button='Right')
         
         # add status text
         self.StatusTextParent = self.Scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.Scene)
@@ -956,7 +957,9 @@ class TraceGUI(HasTraits):
         """sets GUILoaded Status. Exits GUI if self.exit set."""
 
         self.Status["DisplayingGUI"] = False
-       
+      
+        # .pick(0, 0)
+
         if self._exit:
             self.close()
 
@@ -1296,8 +1299,7 @@ class TraceGUI(HasTraits):
                 # otherwise we can replot the old Image with the new visual settings
                 snap = str(self.Raytracer.PropertySnapshot()) + self.DetectorSelection + str(snum)
                 if snap != self.lastDetSnap or self.lastDetImage is None:
-                    self.lastDetImage = self.Raytracer.DetectorImage(N=self.ImagePixels, ind=self.DetInd,
-                                                                     snum=snum, max_res=False)
+                    self.lastDetImage = self.Raytracer.DetectorImage(N=self.ImagePixels, ind=self.DetInd, snum=snum)
                     self.lastDetSnap = snap
                 
                 self.lastDetImage.rescale(self.ImagePixels)
@@ -1331,8 +1333,7 @@ class TraceGUI(HasTraits):
                 snap = str(self.Raytracer.PropertySnapshot()) + self.SourceSelection
 
                 if snap != self.lastSourceSnap or self.lastSourceImage is None:
-                    self.lastSourceImage = self.Raytracer.SourceImage(N=self.ImagePixels,\
-                                                                      sindex=self.SourceInd, max_res=True)
+                    self.lastSourceImage = self.Raytracer.SourceImage(N=self.ImagePixels, sindex=self.SourceInd)
                     self.lastSourceSnap = snap
                 
                 self.lastSourceImage.rescale(self.ImagePixels)
