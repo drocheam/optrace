@@ -9,6 +9,9 @@ from threading import Thread  # multithreading
 
 from optrace.tracer.BaseClass import BaseClass # parent class
 
+from PIL import Image  # saving as png
+from typing import Callable  # Callable type
+
 # Rendered Image class
 
 class RImage(BaseClass):
@@ -295,7 +298,7 @@ class RImage(BaseClass):
             self.Im = self._Im
 
         # only rescale if target image size is different from current Image
-        elif self.Im is None or min(*self.Im.shape[:2]) != Nm:
+        elif self.Im is None or min(*self.Im.shape[:2]) != Nm//fact:
             self.Im = np.zeros((Ny//fact, Nx//fact, Nz))
 
             if self.threading:
@@ -312,6 +315,7 @@ class RImage(BaseClass):
              overwrite:  bool = False)\
             -> str:
         """
+        Save the RImage as .npz archive.
 
         :param path: path to save to
         :param save32bit: save image data in 32bit instead 64bit. Looses information in some darker regions of the image
@@ -319,37 +323,79 @@ class RImage(BaseClass):
         :return: path of saved file
         """
         # save in float32 to save some space
-        Im = np.array(self._Im, dtype=np.float32) if save32bit else self._Im
+        _Im = np.array(self._Im, dtype=np.float32) if save32bit else self._Im
 
-        sdict = dict(Im=Im, extent=self.extent, N=min(self.Im.shape[0], self.Im.shape[1]), 
+        sdict = dict(_Im=_Im, extent=self.extent, N=min(*self.Im.shape[:2]), 
                      desc=self.desc, long_desc=self.long_desc, type_=self.coordinate_type)
+       
+        def sfunc(path: str):
+            np.savez_compressed(path, **sdict)
 
+        return self.__saveWithFallback(path, sfunc, "RImage", ".npz", overwrite)
+
+    def exportPNG(self, 
+                  path:         str, 
+                  mode:         str, 
+                  log:          bool = False, 
+                  flip:         bool = False, 
+                  overwrite:    bool = False)\
+            -> str:
+        """
+        Export the RImage in a given display mode as png.
+
+        :param path: path to save to
+        :param mode: display mode for getByDisplayMode()
+        :param log: logarithmic image (bool)
+        :param flip: rotate image by 180 degrees
+        :param overwrite file if it exists, otherwise saved in a fallback path
+        :return: path of saved file
+        """
+        im = self.getByDisplayMode(mode, log)
+        if flip:
+            im = np.fliplr(np.flipud(Imd))
+
+        imp = Image.fromarray((im/np.max(im)*255).astype(np.uint8))
+
+        def sfunc(path: str):
+            imp.save(path)
+
+        return self.__saveWithFallback(path, sfunc, "Image", ".png", overwrite)
+
+    def __saveWithFallback(self, 
+                           path:        str, 
+                           sfunc:       Callable, 
+                           fname:       str, 
+                           ending:      str, 
+                           overwrite:   bool=False)\
+            -> str:
+        """saving with fallback path if the file exists and overwrite=False"""
+        
         # called when invalid path or file exists but overwrite=False
         def fallback():
             # create a valid path and filename
             wd = os.getcwd()
-            filename = "Image_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z') + ".npz"
+            filename = f"{fname}_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z') + ending
             path = os.path.join(wd, filename)
 
             # resave
             if not self.silent:
-                print(f"Failed saving Image, resaving as \"{path}\"")
-            np.savez_compressed(path, **sdict)
+                print(f"Failed saving {fname}, resaving as \"{path}\"")
+            sfunc(path)
 
             return path
        
         # append file ending if the path provided has none
-        if path[-4:] != ".npz":
-            path += ".npz"
+        if path[-len(ending):] != ending:
+            path += ending
 
         # check if file already exists
         exists = os.path.exists(path)
 
         if overwrite or not exists:
             try:
-                np.savez_compressed(path, **sdict)
+                sfunc(path)
                 if not self.silent:
-                    print(f"Saved Image as \"{path}.npz\"")
+                    print(f"Saved {fname} as \"{path}\"")
                 return path
             except:
                 return fallback()
@@ -364,7 +410,7 @@ class RImage(BaseClass):
         Io = np.load(path)
 
         Im = RImage(Io["extent"], long_desc=Io["long_desc"][()], desc=Io["desc"][()], coordinate_type=Io["type_"][()])
-        Im._Im = np.array(Io["Im"], dtype=np.float64)
+        Im._Im = np.array(Io["_Im"], dtype=np.float64)
 
         # create Im from _Im
         N = int(Io["N"][()])

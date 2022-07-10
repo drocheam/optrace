@@ -185,7 +185,6 @@ class RaySource(SObject):
             case "Parallel":
                 s = s_or  # all rays have the same direction
 
-            # TODO sind die Strahlen gleichmäßig diverging?
             case "Diverging":
                 # random direction inside cone, described with two angles
                 alpha = np.radians(self.div_angle) * np.sqrt(np.random.sample(N))

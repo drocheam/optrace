@@ -319,6 +319,41 @@ class FrontendTests(unittest.TestCase):
         self.assertTrue(not RT.RaySourceList)
         testFeatures(RT)
 
+    def test_non2D(self):
+
+        # initially there were problems with non-plotable "surfaces" like Line and Point
+        # check if initial plotting, replotting and trying to color the parent sources (CorloringType=...)
+        # works correctly
+
+        # make Raytracer
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60], silent=True)
+
+        # add Raysource
+        RSS = ot.Surface("Point")
+        RS = ot.RaySource(RSS, direction="Diverging", spectrum=ot.preset_spec_D65,
+                          pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
+        RT.add(RS)
+        
+        # add Raysource2
+        RSS = ot.Surface("Line")
+        RS2 = ot.RaySource(RSS, direction="Parallel", spectrum=ot.preset_spec_D65,
+                          pos=[0, 0, 0], s=[0, 0, 1])
+        RT.add(RS2)
+
+        sim = TraceGUI(RT, ColoringType="Wavelength")
+
+        def interact(sim):
+            sim.waitForIdle()
+            sim.ColoringType = "Wavelength"
+            sim.waitForIdle()
+            sim.PlottingType = "Points"
+            sim.waitForIdle()
+            sim.replot()
+            sim.waitForIdle()
+            sim.close()
+            time.sleep(2)
+        sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
+
 if __name__ == '__main__':
     unittest.main()
 

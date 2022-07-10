@@ -554,7 +554,7 @@ class TraceGUI(HasTraits):
 
         # decide what to plot
         plotFront = obj.FrontSurface.surface_type not in ["Point", "Line"]
-        plotCyl = obj.hasBackSurface() or obj.Surface.isPlanar()
+        plotCyl = (obj.hasBackSurface() or obj.Surface.isPlanar()) and plotFront
         plotBack  = obj.BackSurface is not None and obj.BackSurface.surface_type not in ["Point", "Line"]
 
         a = plot(obj.FrontSurface.getPlottingMesh(N=self.SURFACE_RES), "front") if plotFront else None
@@ -750,7 +750,8 @@ class TraceGUI(HasTraits):
 
         # set RaySource Colors
         for i, RSp in enumerate(self.RaySourcePlotObjects):
-            RSp[0].actor.actor.property.trait_set(color=tuple(RSColor[i]))
+            if RSp[0] is not None:
+                RSp[0].actor.actor.property.trait_set(color=tuple(RSColor[i]))
             if RSp[1] is not None:
                 RSp[1].actor.actor.property.trait_set(color=tuple(RSColor[i]))
 

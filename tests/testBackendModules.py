@@ -420,6 +420,15 @@ class BackendModuleTests(unittest.TestCase):
         os.remove(path1)
         os.remove(path2)
 
+        # png saving
+        img.rescale(4)
+        img.silent = True
+        for imm in ot.RImage.display_modes:
+            path3 = img.exportPNG(path, imm, log=True, overwrite=True)
+            path3 = img.exportPNG(path, imm, log=False, overwrite=True)
+        os.remove(path3)
+
+
     def test_Raytracer_Init(self):
         o0 = [-5, 5, -5, 5, 0, 10]
 
