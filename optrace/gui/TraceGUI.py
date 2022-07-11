@@ -42,6 +42,7 @@ from twisted.internet import reactor  # networking functionality for tcp protoco
 from twisted.python import log  # logging
 
 
+
 class TraceGUI(HasTraits):
 
     ####################################################################################################################
@@ -53,7 +54,7 @@ class TraceGUI(HasTraits):
     LENS_COLOR: tuple[float, float, float] = (0.63, 0.79, 1.00, 0.30)
     """RGB + Alpha Tuple for the Lens surface visualization"""
 
-    BACKGROUND_COLOR: tuple[float, float, float] = (0.32, 0.30, 0.30)
+    BACKGROUND_COLOR: tuple[float, float, float] = (0.26, 0.24, 0.23)
     """RGB Color for the Scene background"""
     
     RAYSOURCE_ALPHA: float = 0.5
@@ -80,7 +81,7 @@ class TraceGUI(HasTraits):
     INFO_STYLE: dict = dict(font_size=13, bold=True, color=(1, 1, 1), font_family="courier", shadow=True, italic=False)
     """Info Text Style. Used for status messages and interaction overlay"""
 
-    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.501, 0.501, 0.501), font_family="courier", shadow=True)
+    SUBTLE_INFO_STYLE: dict = dict(font_size=13, bold=False, color=(0.42, 0.42, 0.42), font_family="courier", shadow=False)
     """Style for hidden info text. The color is used for the refraction index boxes frame"""
     
     AXIS_STYLE: dict = dict(font_size=11, bold=False, italic=False, color=(1, 1, 1), font_family="courier", shadow=True)
@@ -111,7 +112,7 @@ class TraceGUI(HasTraits):
                       auto_set=True, label="Width")
     """Width of rays shown."""
 
-    ImagePixels: Range = Range(1, 1024, 200, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
+    ImagePixels: Range = Range(1, 1024, 256, desc='Detector Image Pixels in Smaller of x or y Dimension', enter_set=True,
                         auto_set=True, label="Pixels_xy", mode='text')
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
@@ -264,6 +265,7 @@ class TraceGUI(HasTraits):
         self.RaysPlotScatter = None  # plot for scalar ray values
         self.RaysPlot = None  # plot for visualization of rays/points
         self.RayText = None  # textbox for ray information
+        self.Crosshair = None  # Crosshair used for picking visualization
 
         self.LensPlotObjects = []
         self.AxisPlotObjects = []
@@ -341,7 +343,8 @@ class TraceGUI(HasTraits):
     # workaround so we can set bool values to some settings
     def __setattr__(self, key, val):
         
-        if key in ["AbsorbMissing", "CleanerView", "LogImage", "FlipDetImage", "FocusDebugPlot", "AFOneSource", "DetImageOneSource"]:
+        if key in ["AbsorbMissing", "CleanerView", "LogImage", "FlipDetImage", "FocusDebugPlot",\
+                   "AFOneSource", "DetImageOneSource"]:
             if isinstance(val, bool):
                 val = eval(f"self._CheckValFromBool(self.{key}, {val})")
 
@@ -794,8 +797,29 @@ class TraceGUI(HasTraits):
         # don't append and delete directly on elements of self.DetectorNames, 
         # because issues with trait updates with type "List"
 
+    def initCrosshair(self) -> None:
+        """init a crosshair for the picker"""
+        self.Crosshair = self.Scene.mlab.points3d([0.], [0.], [0.], mode="axes", color=(1, 0, 0))
+        self.Crosshair.parent.parent.name = "Crosshair"
+        self.Crosshair.actor.actor.property.trait_set(lighting=False)
+        self.Crosshair.actor.actor.pickable = False
+        self.Crosshair.glyph.glyph.scale_factor = 1.5
+        self.CrosshairVisibility(False)
+
+    def moveCrosshair(self, pos: list[float]) -> None:
+        """move the crosshair for the picker"""
+        if self.Crosshair is not None:
+            x_cor, y_cor, z_cor = [pos[0]], [pos[1]], [pos[2]]
+            self.Crosshair.mlab_source.trait_set(x=x_cor, y=y_cor, z=z_cor)
+
+    def CrosshairVisibility(self, visible: bool, global_override: bool=None) -> None:
+        """change crosshair visibility"""
+        if self.Crosshair is not None:
+            self.Crosshair.visible = global_override if global_override is not None else visible
+
     def defaultCameraView(self) -> None:
-        """set scene camera view. This should be called after the objects are added, otherwise the clipping range is incorrect"""
+        """set scene camera view. This should be called after the objects are added,
+           otherwise the clipping range is incorrect"""
         self.Scene.scene.parallel_projection = True
         self.Scene.scene._def_pos = 1  # for some reason it is set to None
         self.Scene.y_plus_view()
@@ -810,6 +834,7 @@ class TraceGUI(HasTraits):
         pos = picker_obj.pick_position
 
         if self.ShiftPressed:
+            self.CrosshairVisibility(False)
             if self.hasDetector():
                 # set outside position to inside of outline
                 pos_z = max(self.PosDetMin, pos[2])
@@ -823,6 +848,8 @@ class TraceGUI(HasTraits):
         else:
             self.RayText.text = f"Pick Position: ({pos[0]:>9.6g}, {pos[1]:>9.6g}, {pos[2]:>9.6g})"
             self.RayText.property.trait_set(**self.INFO_STYLE, background_opacity=0.2, opacity=1)
+            self.moveCrosshair(pos)
+            self.CrosshairVisibility(True)
 
     def onRayPick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker'=None) -> None:
         """
@@ -845,7 +872,7 @@ class TraceGUI(HasTraits):
 
             # get ray number and ray section
             if self.PlottingType == "Rays" and self.ColoringType != "White":
-                # in some cases we changed the number of points per ray using the workaround in self.plotRays()
+                # in some cases we changed the number of points per eay using the workaround in self.plotRays()
                 n_, n2_ = np.divmod(b, (a-1)*2)
                 if n2_ > 0:
                     n2_ = 1 + (n2_-1)//2
@@ -928,20 +955,29 @@ class TraceGUI(HasTraits):
 
             self.RayText.text = text
             self.RayText.property.trait_set(**self.INFO_STYLE, background_opacity=0.2, opacity=1)
+            self.moveCrosshair(p)
+            self.CrosshairVisibility(True)
         else:
             self.RayText.text = "Left Click on a Ray-Surface Intersection to Show Ray Properties.\n" + \
                                 "Right Click Anywhere to Show 3D Position.\n" + \
                                 "Shift + Right Click to Move the Detector to this z-Position"
             self.RayText.property.trait_set(**self.SUBTLE_INFO_STYLE, background_opacity=0, opacity=0 if bool(self.CleanerView) else 1)
+            self.CrosshairVisibility(False)
 
         # text settings
         self.RayText.property.trait_set(vertical_justification="top")
         self.RayText.actor.text_scale_mode = 'none'
 
-    def initShiftPressDetector(self) -> None:
+    # TODO documentation
+    def initKeyboardShortcuts(self) -> None:
         """Init shift key press detection"""
+
         self.ShiftPressed = False
 
+        # check if focus is in scene. otherwise we react on key presses from different windows or dialogs
+        def windowActive() -> bool:
+            return self.Scene.scene_editor._content.hasFocus()
+        
         def on_press(key):
             if key == Key.shift:
                 self.ShiftPressed = True
@@ -949,6 +985,28 @@ class TraceGUI(HasTraits):
         def on_release(key):
             if key == Key.shift:
                 self.ShiftPressed = False
+
+            elif hasattr(key, 'char') and windowActive():
+                if key.char == "y":
+                    self.defaultCameraView()
+
+                elif key.char == "c":
+                    self.CleanerView = not bool(self.CleanerView)
+
+                elif key.char == "r":
+                    self.Scene.scene.disable_render = True
+                    ptypes = self.PlottingTypes
+                    # cycle plotting types
+                    self.PlottingType = ptypes[(ptypes.index(self.PlottingType)+1) % len(ptypes)]
+                    self.Scene.scene.disable_render = False
+
+                elif key.char == "d":
+                    self.showDetectorImage()
+
+                elif key.char == "n":
+                    self.Scene.scene.disable_render = True
+                    self.chooseRays()
+                    self.Scene.scene.disable_render = False
 
         listener = Listener(on_press=on_press, on_release=on_release)
         listener.start()
@@ -958,16 +1016,13 @@ class TraceGUI(HasTraits):
 
         self.Status["DisplayingGUI"] = False
       
-        # .pick(0, 0)
-
         if self._exit:
             self.close()
 
     def close(self):
 
         def widgetClose():
-            app = QtGui.QApplication.instance()
-            for widget in app.topLevelWidgets():
+            for widget in QtGui.QApplication.topLevelWidgets():
                 widget.close()
             time.sleep(0.2)
 
@@ -1385,11 +1440,12 @@ class TraceGUI(HasTraits):
         """Initialize the GUI. Inits a variety of things."""
         self.initRayInfoText()
         self.initStatusText()
-        self.initShiftPressDetector()
+        self.initCrosshair()
+        self.initKeyboardShortcuts()
         self.plotOrientationAxes()
         
         self.Scene.background = self.BACKGROUND_COLOR
-        
+
         self.replot()
 
         self.defaultCameraView()  # this need to be called after replot, which defines the visual scope

@@ -16,6 +16,12 @@ from threading import Thread
 
 import matplotlib.pyplot as plt
 
+# TODO check if scene resizing works
+# TODO check if race conditions avoided while raytracing
+# TODO check if replot() deletes old objects
+# TODO check if change and removal of sources and detectors is handled correctly by the UI
+
+
 def RT_Example() -> ot.Raytracer:
 
     # make Raytracer

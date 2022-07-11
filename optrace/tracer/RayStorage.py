@@ -139,16 +139,15 @@ class RayStorage(BaseClass):
 
         # calculate s
         if ret[1]:
-            s = self.p_list[ch, 1:] - self.p_list[ch, :-1]
-            s = np.hstack((s, s[:, np.newaxis, -1]))
-
             if not isinstance(ch2, slice):
-                s = s[np.ones(s.shape[0], dtype=bool), ch2]
+                ch21 = np.where(ch2 < self.nt-1, ch2 + 1, ch2)
+                s = self.p_list[ch, ch21] - self.p_list[ch, ch2]
                 s = misc.normalize(s)
             else:
+                s = self.p_list[ch, 1:] - self.p_list[ch, :-1]
+                s = np.hstack((s, s[:, np.newaxis, -1]))
                 s_ = s.reshape((s.shape[0]*s.shape[1], 3))
-                s_ = misc.normalize(s_)
-                s = s_.reshape(s.shape)
+                s = misc.normalize(s_).reshape(s.shape)
 
         p     = self.p_list[ch, ch2]    if ret[0] else None
         s     = s                       if ret[1] else None
