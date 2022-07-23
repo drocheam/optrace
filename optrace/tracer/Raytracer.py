@@ -80,7 +80,7 @@ class Raytracer(BaseClass):
         self.outline         = outline
         self.AbsorbMissing   = AbsorbMissing
         self.no_pol          = no_pol
-        self.n0              = n0 # defaults to Air
+        self.n0              = n0  # defaults to Air
 
         self.LensList        = []
         self.ApertureList    = []
@@ -103,6 +103,9 @@ class Raytracer(BaseClass):
                 if o.shape[0] != 6 or o[0] >= o[1] or o[2] >= o[3] or o[4] >= o[5]:
                     raise ValueError("Outline needs to be specified as [x1, x2, y1, y2, z1, z2] "
                                      "with x2 > x1, y2 > y1, z2 > z1.")
+                
+                super().__setattr__(key, o)
+                return 
 
             case ("no_pol" | "AbsorbMissing"):
                 self._checkType(key, val, bool)
@@ -110,16 +113,15 @@ class Raytracer(BaseClass):
             case "n0":
                 self._checkType(key, val, RefractionIndex | None)
                 if val is None:
-                    val = RefractionIndex("Constant", 1)
+                    val = RefractionIndex("Constant", n=1.)
 
         super().__setattr__(key, val)
 
-    def add(self, el: Lens | Aperture | Filter | RaySource | Detector) -> None:
+    def add(self, el: Lens | Aperture | Filter | RaySource | Detector | list) -> None:
         """
-        Add an element to the Raytracer geometry.
+        Add an element or a list of elements to the Raytracer geometry.
 
         :param el: Element to add to Raytracer 
-        :return: identifier of object
         """
         match el:
             case Lens():        self.LensList.append(el)
@@ -127,7 +129,12 @@ class Raytracer(BaseClass):
             case Filter():      self.FilterList.append(el)
             case RaySource():   self.RaySourceList.append(el)
             case Detector():    self.DetectorList.append(el)
-            case _:             raise TypeError("Invalid element type.")
+
+            case list():
+                for eli in el:
+                    self.add(eli)
+            case _:             
+                raise TypeError("Invalid element type.")
 
     def remove(self, ident: int | SObject) -> bool:
         """
@@ -135,6 +142,7 @@ class Raytracer(BaseClass):
         Returns True if element(s) have been found and removes, False otherwise.
 
         :param ident: identifier of element from :obj:`Raytracer.add` or from :obj:`id`
+        :return: if the element was found and removed
         """
 
         success = False
@@ -187,28 +195,28 @@ class Raytracer(BaseClass):
                 if count := msga[type_, surf]:
                     match type_:
                         case self.__infos.TIR:
-                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                   f"with total inner reflection at surface {surf}, treating as absorbed.")
 
                         case self.__infos.AbsorbMissing:
-                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                   f"missing surface {surf}, set to absorbed because of parameter AbsorbMissing=True.")
 
                         case self.__infos.OutlineIntersection:
-                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                   f"hitting outline, set to absorbed.")
 
                         case self.__infos.TBelowTTH:
-                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
-                                  f"with transmittivity at filter surface {surf} below threshold of "\
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                  f"with transmittivity at filter surface {surf} below threshold of "
                                   f"{self.T_TH*100:.3g}%, setting to absorbed.")
 
                         case self.__infos.OnlyHitFront:
-                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                   f"hitting lens front but missing back, setting to absorbed.")
 
                         case self.__infos.OnlyHitBack:
-                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "\
+                            print(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                   f"missing lens front but hitting back, setting to absorbed.")
 
     def trace(self, N: int) -> None:
@@ -231,7 +239,7 @@ class Raytracer(BaseClass):
         if not self.AbsorbMissing:
             for Lens_ in self.LensList:
                 if Lens_.n2 is not None and self.n0 != Lens_.n2:
-                    warnings.warn("Outside refraction index defined for at least one lens, setting AbsorbMissing"\
+                    warnings.warn("Outside refraction index defined for at least one lens, setting AbsorbMissing"
                                   " simulation parameter to True", RuntimeWarning)
                     self.AbsorbMissing = True
                     break
@@ -386,7 +394,7 @@ class Raytracer(BaseClass):
         :param Elements: element list from __makeElementList()
         """
 
-        def isinside(e: list | np.ndarray) -> bool:
+        def isinside(e: tuple | list) -> bool:
             o = self.outline
             return o[0] <= e[0] and e[1] <= o[1] and o[2] <= e[2] and e[3] <= o[3] and o[4] <= e[4] and e[5] <= o[5]
 
@@ -530,7 +538,7 @@ class Raytracer(BaseClass):
                      msg:          np.ndarray)\
             -> None:
         """
-        Calculate directions and weights after refraction. Rays with total inner r\eflection are treated as absorbed.
+        Calculate directions and weights after refraction. Rays with total inner reflection are treated as absorbed.
         The weights are calculated using the Fresnel formulas, assuming 50% p and s polarized light.
 
         :param surface: Surface object
@@ -594,7 +602,8 @@ class Raytracer(BaseClass):
 
             # new polarization vector after refraction
             pp_ = misc.cross(ps, s_m)  # ps and s_m are unity vectors and perpendicular, so we need no normalization
-            pols[mask2, i+1] = misc.calc("ps*A_tsm + pp_*A_tpm", A_tsm=A_ts[mask, np.newaxis], A_tpm=A_tp[mask, np.newaxis])
+            pols[mask2, i+1] = misc.calc("ps*A_tsm + pp_*A_tpm", A_tsm=A_ts[mask, np.newaxis],
+                                         A_tpm=A_tp[mask, np.newaxis])
 
         else:
             A_ts, A_tp = 1/np.sqrt(2), 1/np.sqrt(2)
@@ -789,7 +798,8 @@ class Raytracer(BaseClass):
         rs[Ns:Ne] = True # use rays of selected source
 
         # section index rs for each ray for section before z
-        # rs2 == -1 can mean mask is true everywhere (ray starts after surface.zmin) or false everywhere (rays don't reach surface),
+        # rs2 == -1 can mean mask is true everywhere (ray starts after surface.zmin)
+        # or false everywhere (rays don't reach surface),
         # so we need to check which case we're in. In the later case we don't need to calculate ray hits.
         mask = z <= self.Rays.p_list[Ns:Ne, :, 2]
         rs2 = np.argmax(mask, axis=1) - 1
@@ -887,7 +897,15 @@ class Raytracer(BaseClass):
                       snum:     int = None,
                       extent:   (list | np.ndarray | str) = "auto",
                       **kwargs) -> RImage:
-        
+        """
+
+        :param N:
+        :param ind:
+        :param snum:
+        :param extent:
+        :param kwargs:
+        :return:
+        """
         N = int(N)
         if N <= 0:
             raise ValueError(f"Pixel number N needs to be a positive int, but is {N}")
@@ -896,7 +914,7 @@ class Raytracer(BaseClass):
 
         # init image and extent, these are the default values when no rays hit the detector
         Im = RImage(desc=desc, extent=extent_out, coordinate_type=coordinate_type, 
-                   threading=self.threading, silent=self.silent)
+                    threading=self.threading, silent=self.silent)
         Im.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
@@ -908,7 +926,14 @@ class Raytracer(BaseClass):
                          snum:     int = None,
                          extent:   (list | np.ndarray | str) = "auto",
                          **kwargs) -> LightSpectrum:
-        
+        """
+
+        :param ind:
+        :param snum:
+        :param extent:
+        :param kwargs:
+        :return:
+        """
         p, w, wl, extent, desc, coordinate_type, bar = self._hitDetector("Detector Spectrum", ind, snum)
 
         spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)
@@ -927,16 +952,16 @@ class Raytracer(BaseClass):
                             extent:     (str | list | np.ndarray) = "auto")\
             -> tuple[list[RImage], list[RImage]]:
         """
-        Raytrace with N_rays and render Detector Image.
 
-        :param N_rays: number of rays (int)
-        :param N_px: number of image pixels in each dimension (int)
+        :param N_rays:
+        :param N_px_D:
+        :param N_px_S:
         :param ind:
-        :param pos: list of z coordinates to render the Detector Images, current position is used if the list is empty
-        :param extent: image extent, either "whole" or 4 element numpy 1D array or list
-        :return: list of XYZIL Images (each numpy 3D array of XYZ channels + Irradiance + Illuminance)
+        :param pos:
+        :param silent:
+        :param extent:
+        :return:
         """
-
         if (N_rays := int(N_rays)) <= 0:
             raise ValueError(f"Ray number N_rays needs to be a positive int, but is {N_rays}.")
 
@@ -1054,6 +1079,12 @@ class Raytracer(BaseClass):
         return p, w, wl, extent, desc, bar
 
     def SourceSpectrum(self, sindex: int = 0, **kwargs) -> LightSpectrum:
+        """
+
+        :param sindex:
+        :param kwargs:
+        :return:
+        """
         p, w, wl, extent, desc, bar = self._hitSource("Source Spectrum", sindex)
 
         spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)
@@ -1157,6 +1188,7 @@ class Raytracer(BaseClass):
         the search range is the region between lenses or the outline.
         The influence of filters is neglected.
 
+        :param snum:
         :param z_start: starting position z (float)
         :param N: maximum number of rays to evaluate (int)
         :param method:
@@ -1214,7 +1246,7 @@ class Raytracer(BaseClass):
         # show filter warning
         for F in (self.FilterList + self.ApertureList):
             if bounds[0] <= F.pos[2] <= bounds[1]:
-                warnings.warn("WARNING: The influence of the filters/apertures in the autofocus range will be ignored. ")
+                warnings.warn("WARNING: The influence of the filters/apertures in the autofocus range will be ignored.")
 
         # start progress bar
         ########################################################################################################
@@ -1240,7 +1272,7 @@ class Raytracer(BaseClass):
         if not self.silent:
             bar.update(1)
 
-        rays_pos[pos==-1] = False
+        rays_pos[pos == -1] = False
         
         N_is = min(N, np.count_nonzero(rays_pos))
         if N_is < 1000:  # throw error when no rays are present
@@ -1295,7 +1327,8 @@ class Raytracer(BaseClass):
                     vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
 
             if self.threading:   
-                threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, p, s, weights, r0)) for N_is in range(N_th)]
+                threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, p, s, weights, r0))
+                           for N_is in range(N_th)]
                 [th.start() for th in threads]
                 [th.join() for th in threads]
             else:

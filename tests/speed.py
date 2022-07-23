@@ -11,7 +11,8 @@ import time
 
 def func2(N2):
     # make Raytracer
-    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60],  AbsorbMissing=True, silent=True, no_pol=False, threading=True)
+    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60],  AbsorbMissing=True,
+                   silent=True, no_pol=False, threading=True)
 
     # add Raysource
     RSS = Surface("Circle", r=1)
@@ -19,7 +20,7 @@ def func2(N2):
                    pos=[0, 0, 0], s=[0, 0, 1], polarization='y')
     RT.add(RS)
 
-    RS2 = RaySource(RSS, direction="Parallel", spectrum=preset_spec_D65,
+    RS2 = RaySource(RSS, direction="Parallel", spectrum=presets.LightSpectrum.D65,
                    pos=[0, 1, 0], s=[0, 0, 1], polarization='x', power=2)
     RT.add(RS2)
 

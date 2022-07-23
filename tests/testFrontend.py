@@ -16,10 +16,15 @@ from threading import Thread
 
 import matplotlib.pyplot as plt
 
-# TODO check if scene resizing works
-# TODO check if race conditions avoided while raytracing
+from pynput.keyboard import Controller, Key
+from pyface.qt import QtGui  # closing UI elements
+
 # TODO check if replot() deletes old objects
 # TODO check if change and removal of sources and detectors is handled correctly by the UI
+
+
+# the twisted reactor is not restartable
+# that's why we we only run it in once (and not in this file)
 
 
 def RT_Example() -> ot.Raytracer:
@@ -29,12 +34,12 @@ def RT_Example() -> ot.Raytracer:
 
     # add Raysource
     RSS = ot.Surface("Circle", r=1)
-    RS = ot.RaySource(RSS, direction="Parallel", spectrum=ot.preset_spec_FDC,
+    RS = ot.RaySource(RSS, direction="Parallel", spectrum=ot.presets.LightSpectrum.FDC,
                    pos=[0, 0, 0], s=[0, 0, 1], polarization="y")
     RT.add(RS)
 
     RSS2 = ot.Surface("Circle", r=1)
-    RS2 = ot.RaySource(RSS2, direction="Parallel", s=[0, 0, 1], spectrum=ot.preset_spec_D65,
+    RS2 = ot.RaySource(RSS2, direction="Parallel", s=[0, 0, 1], spectrum=ot.presets.LightSpectrum.D65,
                     pos=[0, 1, -3], polarization="Angle", pol_angle=25, power=2)
     RT.add(RS2)
 
@@ -99,7 +104,7 @@ class FrontendTests(unittest.TestCase):
     
     def test_GUI_inits(self) -> None:
 
-        Image = ot.preset_image_test_screen
+        Image = ot.presets.Image.test_screen
 
         # make Raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], silent=True)
@@ -127,7 +132,7 @@ class FrontendTests(unittest.TestCase):
             TraceGUI_Run.i += 1
             with self.subTest(i=TraceGUI_Run.i, args=kwargs):
                 sim = TraceGUI(RT, **kwargs)
-                sim.run(_exit=True, no_server=True, silent=True)
+                sim.debug(_exit=True, no_server=True, silent=True)
         TraceGUI_Run.i = 0
 
         TraceGUI_Run()  # default init
@@ -152,128 +157,141 @@ class FrontendTests(unittest.TestCase):
 
         def interact(sim):
 
-            sim.waitForIdle()
+            sim._waitForIdle()
 
             # check if Detector is moving
-            sim.PosDet = 5.3
-            sim.waitForIdle()
+            sim._setInMain("PosDet", 5.3)
+            sim._waitForIdle()
             self.assertEqual(sim.PosDet, RT.DetectorList[0].pos[2])
         
             # Source Image Tests
-            sim.showSourceImage()
-            sim.waitForIdle()
-            sim.SourceSelection = sim.SourceNames[1]
-            sim.waitForIdle()
-            sim.showSourceImage()
-            sim.waitForIdle()
+            sim._doInMain(sim.showSourceImage)
+            sim._waitForIdle()
+            sim._setInMain("SourceSelection", sim.SourceNames[1])
+            sim._waitForIdle()
+            sim._doInMain(sim.showSourceImage)
+            sim._waitForIdle()
             
             # Detector Image Tests
-            sim.showDetectorImage()
-            sim.waitForIdle()
-            sim.DetectorSelection = sim.DetectorNames[1]
-            sim.waitForIdle()
-            self.assertTrue(sim.DetInd == 1)
+            sim._doInMain(sim.showDetectorImage)
+            sim._waitForIdle()
+            sim._setInMain("DetectorSelection", sim.DetectorNames[1])
+            sim._waitForIdle()
+            self.assertTrue(sim._DetInd == 1)
             self.assertTrue(sim.PosDet == sim.Raytracer.DetectorList[1].pos[2])
-            sim.showDetectorImage()
-            sim.waitForIdle()
+            sim._doInMain(sim.showDetectorImage)
+            sim._waitForIdle()
 
             # Image Type Tests standard
             for mode in ot.RImage.display_modes:
-                sim.ImageType = mode
-                sim.showDetectorImage()
-                sim.waitForIdle()
+                sim._setInMain("ImageType", mode)
+                sim._waitForIdle()
+                sim._doInMain(sim.showDetectorImage)
+                sim._waitForIdle()
 
             # Image Tests Higher Res
-            sim.ImagePixels = 300
-            sim.showDetectorImage()
-            sim.waitForIdle()
+            sim._setInMain("ImagePixels", 300)
+            sim._waitForIdle()
+            sim._doInMain(sim.showDetectorImage)
+            sim._waitForIdle()
 
             # Image Test Source, but actually we should test all parameter combinations,
-            sim.showSourceImage()
+            sim._doInMain(sim.showSourceImage)
+            sim._waitForIdle()
 
             # Focus Tests
             pos0 = sim.Raytracer.DetectorList[1].pos
-            sim.DetectorSelection = sim.DetectorNames[1]
+            sim._setInMain("DetectorSelection", sim.DetectorNames[1])
+            sim._waitForIdle()
 
             for mode in ot.Raytracer.AutofocusModes:
-                sim.FocusType = mode
-                sim.moveToFocus()
-                sim.waitForIdle()
-                sim.PosDet = pos0[2]
+                sim._setInMain("FocusType", mode)
+                sim._waitForIdle()
+                sim._doInMain(sim.moveToFocus)
+                sim._waitForIdle()
+                sim._setInMain("PosDet", pos0[2])
+                sim._waitForIdle()
 
             # Focus Test 4, show Debug Plot
-            sim.FocusDebugPlot = True
-            sim.moveToFocus()
-            sim.waitForIdle()
+            sim._setInMain("FocusDebugPlot", True)
+            sim._waitForIdle()
+            sim._doInMain(sim.moveToFocus)
+            sim._waitForIdle()
 
             # Focus Test 5, one source only
-            sim.FocusDebugPlot = False
-            sim.PosDet = pos0[2]
-            sim.AFOneSource = True
-            sim.moveToFocus()
-            sim.waitForIdle()
+            sim._setInMain("FocusDebugPlot", False)
+            sim._waitForIdle()
+            sim._setInMain("PosDet", pos0[2])
+            sim._waitForIdle()
+            sim._setInMain("AFOneSource", True)
+            sim._doInMain(sim.moveToFocus)
+            sim._waitForIdle()
             
             # Ray Coloring Tests
             for type_ in sim.ColoringTypes:
-                sim.ColoringType = type_
-                sim.waitForIdle()
+                sim._setInMain("ColoringType", type_)
+                sim._waitForIdle()
 
             # PlottingType Tests
             for type_ in sim.PlottingTypes:
-                sim.PlottingType = type_
-                sim.waitForIdle()
+                sim._setInMain("PlottingType", type_)
+                sim._waitForIdle()
           
             # AbsorbMissing test
-            sim.AbsorbMissing = False
-            sim.waitForIdle()
+            sim._setInMain("AbsorbMissing", False)
+            sim._waitForIdle()
 
             # retrace Tests
-            sim.RayCount = 100000
-            sim.waitForIdle()
+            sim._setInMain("RayCount", 100000)
+            sim._waitForIdle()
             
-            sim.RaysAmountShown = -2.5
-            sim.waitForIdle()
+            sim._setInMain("RaysAmountShown", -2.5)
+            sim._waitForIdle()
 
-            sim.RaysAmountShown = -2.
-            sim.waitForIdle()
+            sim._setInMain("RaysAmountShown", -2.)
+            sim._waitForIdle()
 
-            sim.close()
+            sim._doInMain(sim.close)
 
         RT = RT_Example()
         
         sim = TraceGUI(RT)
-        sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
+        sim.debug(_func=interact, no_server=True, silent=True, _args=(sim,))
         plt.close('all')
 
 
         def interact2(sim):
             
-            sim.waitForIdle()
+            sim._waitForIdle()
 
             # Image Type Tests log scaling
-            sim.LogImage = True
+            sim._setInMain("LogImage", True)
 
             # display all image modes with log
             for mode in ot.RImage.display_modes:
-                sim.ImageType = mode
-                sim.showDetectorImage()
-                sim.waitForIdle()
+                sim._setInMain("ImageType", mode)
+                sim._waitForIdle()
+                sim._doInMain(sim.showDetectorImage)
+                sim._waitForIdle()
 
             # Image Tests Flip
-            sim.LogImage = False
-            sim.FlipImage = True
-            sim.showDetectorImage()
-            sim.waitForIdle()
+            sim._setInMain("LogImage", False)
+            sim._waitForIdle()
+            sim._setInMain("FlipImage", True)
+            sim._waitForIdle()
+            sim._doInMain(sim.showDetectorImage)
+            sim._waitForIdle()
 
             # one source only
-            sim.DetImageOneSource = True
-            sim.showDetectorImage()
-            sim.waitForIdle()
+            sim._setInMain("DetImageOneSource", True)
+            sim._waitForIdle()
+            sim._doInMain(sim.showDetectorImage)
+            sim._waitForIdle()
             
-            sim.close()
+            sim._doInMain(sim.close)
 
         sim = TraceGUI(RT)
-        sim.run(_func=interact2, no_server=True, silent=True, _args=(sim,))
+        sim.debug(_func=interact2, no_server=True, silent=True, _args=(sim,))
         plt.close('all')
 
 
@@ -283,31 +301,31 @@ class FrontendTests(unittest.TestCase):
         def testFeatures(RT):
             sim = TraceGUI(RT)
             def interact(sim):
-                sim.waitForIdle()
-                sim.showDetectorImage()
-                sim.waitForIdle()
-                sim.moveToFocus()
-                sim.waitForIdle()
-                sim.PosDet = 10.
-                sim.waitForIdle()
-                sim.showSourceImage()
-                sim.waitForIdle()
-                sim.RayCount = 100000
-                sim.waitForIdle()
-                sim.AbsorbMissing = False
-                sim.waitForIdle()
-                sim.RaysAmountShown = -3.
-                sim.waitForIdle()
-                sim.CleanerView = True
-                sim.waitForIdle()
-                sim.ColoringType = "Power"
-                sim.waitForIdle()
-                sim.PlottingType = "Points"
-                sim.waitForIdle()
-                sim.close()
-                time.sleep(1)
+                sim._waitForIdle()
+                sim._doInMain(sim.showDetectorImage)
+                sim._waitForIdle()
+                sim._doInMain(sim.moveToFocus)
+                sim._waitForIdle()
+                sim._setInMain("PosDet", 10.)
+                sim._waitForIdle()
+                sim._doInMain(sim.showSourceImage)
+                sim._waitForIdle()
+                sim._setInMain("RayCount", 100000)
+                sim._waitForIdle()
+                sim._setInMain("AbsorbMissing", False)
+                sim._waitForIdle()
+                sim._setInMain("RaysAmountShown", -3.)
+                sim._waitForIdle()
+                sim._setInMain("CleanerView", True)
+                sim._waitForIdle()
+                sim._setInMain("ColoringType", "Power")
+                sim._waitForIdle()
+                sim._setInMain("PlottingType", "Points")
+                sim._waitForIdle()
+                sim._doInMain(sim.close)
 
-            sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
+            sim.debug(_func=interact, no_server=True, silent=True, _args=(sim,))
+            time.sleep(1)
 
         RT = RT_Example()
 
@@ -328,6 +346,179 @@ class FrontendTests(unittest.TestCase):
         self.assertTrue(not RT.RaySourceList)
         testFeatures(RT)
 
+    def test_ActionSpam(self):
+
+        RT = RT_Example()
+        sim = TraceGUI(RT)
+
+        def interact(sim):
+
+            sim._waitForIdle()
+
+            N0 = sim.RayCount
+            sim.RayCount = int(N0*1.3)
+            sim.showDetectorImage()
+            sim.showSourceImage()
+            sim.moveToFocus()
+
+            time.sleep(0.01)
+            sim.RayCount = int(N0/1.3)
+            sim.PosDet = (RT.outline[5] - RT.outline[4])/2
+            sim.moveToFocus()
+            sim.DetectorSelection = sim.DetectorNames[1]
+            sim.showDetectorImage()
+            sim.replotRays()
+            sim.showSourceImage()
+
+            time.sleep(0.1)
+            sim.replotRays()
+            sim.PosDet = (RT.outline[5] - RT.outline[4])/2
+            sim.showSourceImage()
+            sim.moveToFocus()
+            sim.RayCount = int(N0*1.6)
+            sim.showDetectorImage()
+            sim.DetectorSelection = sim.DetectorNames[1]
+
+            sim.RayCount = 1000000
+            sim.replotRays()
+            sim.DetectorSelection = sim.DetectorNames[1]
+            sim.moveToFocus()
+            
+            sim._waitForIdle()
+
+            self.assertEqual(sim.RayCount, 1000000)
+            self.assertEqual(sim.Raytracer.Rays.N, 1000000)
+            sim.close()
+
+        sim.debug(_func=interact, no_server=True, silent=True, _args=(sim,))
+
+    def test_KeyPresses(self):
+
+        RT = RT_Example()
+        sim = TraceGUI(RT)
+
+        keyboard = Controller()
+
+        def sendKey(sim, key):
+            sim._doInMain(sim.Scene.scene_editor._content.setFocus)
+            keyboard.press(key)
+            keyboard.release(key)
+
+
+        def interact(sim):
+
+            sim._waitForIdle()
+
+            # check CleanerView shortcut
+            self.assertTrue(len(sim.CleanerView) == 0)
+            sendKey(sim, "c")
+            sim._waitForIdle()
+            self.assertTrue(len(sim.CleanerView) != 0)
+            
+            # check Ray-Point toggle shortcut
+            self.assertTrue(sim.PlottingType == "Rays")
+            sendKey(sim, "r")
+            sim._waitForIdle()
+            self.assertTrue(sim.PlottingType == "Points")
+            
+            # y plus view
+            # TODO how to check this?
+            sendKey(sim, "y")
+            sim._waitForIdle()
+
+            # replot rays
+            # TODO how to check this, if rays are chosen random and can therefore stay the same?
+            sendKey(sim, "n")
+            sim._waitForIdle()
+          
+            # detect shift key
+            self.assertFalse(sim._ShiftPressed)
+            keyboard.press(Key.shift)
+            self.assertTrue(sim._ShiftPressed)
+            keyboard.release(Key.shift)
+            self.assertFalse(sim._ShiftPressed)
+
+            # do this one last, since it raises another window
+            # and I don't know how to focus the scene after this
+            # check DetectorImage shortcut
+            self.assertTrue(sim.lastDetImage is None)
+            sendKey(sim, "d")
+            sim._waitForIdle()
+            self.assertTrue(sim.lastDetImage is not None)
+            
+            sim._waitForIdle()
+            sim._doInMain(sim.close)
+
+        sim.debug(_func=interact, no_server=True, silent=True, _args=(sim,))
+    
+
+    def test_Resize(self):
+        
+        # this test checks if
+        # * some UI properties get resized correctly
+        # * no exceptions while doing so
+        # * resizing to initial state resizes everything back to normal
+
+        RT = RT_Example()
+        sim = TraceGUI(RT)
+
+        def interact(sim):
+            sim._waitForIdle()
+
+            sim._setInMain("ColoringType", "Power") # shows a side bar, that also needs to be rescaled
+            sim._waitForIdle()
+
+            SceneSize0 = sim._SceneSize
+            Window = sim.Scene.scene_editor._content.window()
+
+            # properties before resizing
+            ff = sim._AxisPlotObjects[0][0].axes.font_factor
+            zoom = sim._OrientationAxes.widgets[0].zoom
+            pos2 = sim._RaysPlot.parent.scalar_lut_manager.scalar_bar_representation.position2
+
+            qsize = Window.size()
+            ss0 = np.array([qsize.width(), qsize.height()])
+            ss1 = ss0 * 1.3
+            ss2 = ss1 / 1.2
+
+            # enlarge
+            sim._doInMain(Window.resize, *ss1.astype(int))
+            time.sleep(0.5)  # how to check how much time it takes?
+
+            # check if scale properties changed
+            self.assertNotAlmostEqual(sim._SceneSize[0], SceneSize0[0])  # scene size variable changed
+            self.assertNotAlmostEqual(sim._SceneSize[1], SceneSize0[1])  # scene size variable changed
+            self.assertNotAlmostEqual(ff, sim._AxisPlotObjects[0][0].axes.font_factor) 
+            self.assertNotAlmostEqual(zoom, sim._OrientationAxes.widgets[0].zoom) 
+            self.assertNotAlmostEqual(pos2[0], sim._RaysPlot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
+            self.assertNotAlmostEqual(pos2[1], sim._RaysPlot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+
+            sim._doInMain(Window.resize, *ss2.astype(int))
+            time.sleep(0.5)
+            sim._doInMain(Window.showFullScreen)
+            time.sleep(0.5)
+            sim._doInMain(Window.showMaximized)
+            time.sleep(0.5)
+            sim._doInMain(Window.showMinimized)
+            time.sleep(0.5)
+            sim._doInMain(Window.showNormal)
+            time.sleep(0.5)
+            sim._doInMain(Window.resize, *ss0.astype(int))
+            time.sleep(0.5)
+           
+            # check if scale properties are back at their default state
+            self.assertAlmostEqual(sim._SceneSize[0], SceneSize0[0]) 
+            self.assertAlmostEqual(sim._SceneSize[1], SceneSize0[1]) 
+            self.assertAlmostEqual(ff, sim._AxisPlotObjects[0][0].axes.font_factor) 
+            self.assertAlmostEqual(zoom, sim._OrientationAxes.widgets[0].zoom) 
+            self.assertAlmostEqual(pos2[0], sim._RaysPlot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
+            self.assertAlmostEqual(pos2[1], sim._RaysPlot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+
+            sim._waitForIdle()
+            sim._doInMain(sim.close)
+
+        sim.debug(_func=interact, no_server=True, silent=True, _args=(sim,))
+        
     def test_non2D(self):
 
         # initially there were problems with non-plotable "surfaces" like Line and Point
@@ -339,29 +530,29 @@ class FrontendTests(unittest.TestCase):
 
         # add Raysource
         RSS = ot.Surface("Point")
-        RS = ot.RaySource(RSS, direction="Diverging", spectrum=ot.preset_spec_D65,
+        RS = ot.RaySource(RSS, direction="Diverging", spectrum=ot.presets.LightSpectrum.D65,
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RT.add(RS)
         
         # add Raysource2
         RSS = ot.Surface("Line")
-        RS2 = ot.RaySource(RSS, direction="Parallel", spectrum=ot.preset_spec_D65,
+        RS2 = ot.RaySource(RSS, direction="Parallel", spectrum=ot.presets.LightSpectrum.D65,
                           pos=[0, 0, 0], s=[0, 0, 1])
         RT.add(RS2)
 
         sim = TraceGUI(RT, ColoringType="Wavelength")
 
         def interact(sim):
-            sim.waitForIdle()
-            sim.ColoringType = "Wavelength"
-            sim.waitForIdle()
-            sim.PlottingType = "Points"
-            sim.waitForIdle()
-            sim.replot()
-            sim.waitForIdle()
-            sim.close()
+            sim._waitForIdle()
+            sim._setInMain("ColoringType", "Wavelength")
+            sim._waitForIdle()
+            sim._setInMain("PlottingType", "Points")
+            sim._waitForIdle()
+            sim._doInMain(sim.replot)
+            sim._waitForIdle()
+            sim._doInMain(sim.close)
 
-        sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
+        sim.debug(_func=interact, no_server=True, silent=True, _args=(sim,))
 
     def test_Picker(self):
        
@@ -374,75 +565,75 @@ class FrontendTests(unittest.TestCase):
         
         def interact(sim):
             
-            sim.waitForIdle()
+            sim._waitForIdle()
 
             # change to z+ view, so there are are rays at the middle of the scene
-            sim.Scene.z_plus_view()
-            sim.waitForIdle()
+            sim._doInMain(sim.Scene.z_plus_view)
+            sim._waitForIdle()
        
-            default_text = sim.RayText.text  # save default text for comparison
+            default_text = sim._RayText.text  # save default text for comparison
 
             # ray picked -> show default infos
-            sim._RayPicker.pick(sim.SceneSize[0]/2, sim.SceneSize[1]/2, 0, sim.Scene.renderer)
-            sim.waitForIdle()
+            sim._doInMain(sim._RayPicker.pick, sim._SceneSize[0]/2, sim._SceneSize[1]/2, 0, sim.Scene.renderer)
+            sim._waitForIdle()
             time.sleep(0.2) # delay so a human user can check the text
-            text1 = sim.RayText.text
+            text1 = sim._RayText.text
             self.assertNotEqual(text1, default_text)  # shows a ray info text
             
             # ray picked -> show verbose info
-            sim.ShiftPressed = True
-            sim._RayPicker.pick(sim.SceneSize[0]/2, sim.SceneSize[1]/2, 0, sim.Scene.renderer)
-            sim.waitForIdle()
+            sim._ShiftPressed = True
+            sim._doInMain(sim._RayPicker.pick, sim._SceneSize[0]/2, sim._SceneSize[1]/2, 0, sim.Scene.renderer)
+            sim._waitForIdle()
             time.sleep(0.2)
-            text2 = sim.RayText.text
+            text2 = sim._RayText.text
             self.assertNotEqual(text2, default_text)  # no default text
             self.assertNotEqual(text1, text2)  # not the old text
             
             # no ray picked -> default text
-            sim._RayPicker.pick(0, 0, 0, sim.Scene.renderer)
-            sim.waitForIdle()
+            sim._doInMain(sim._RayPicker.pick, 0, 0, 0, sim.Scene.renderer)
+            sim._waitForIdle()
             time.sleep(0.2)
-            text2 = sim.RayText.text
+            text2 = sim._RayText.text
             self.assertEqual(text2, default_text)  # shows default text
           
             # we have an extra picker sim._SpacePicker for right clicking in the scene,
             # but I don't know how to make the Picker.pick() function pick with a right click
             # so currently we overide the RayPicker with the onSpacePick method
-            sim._RayPicker = sim.Scene.mlab.gcf().on_mouse_pick(sim.onSpacePick, button='Left')
-
+            # TODO this should be done in main thread
+            sim._RayPicker = sim.Scene.mlab.gcf().on_mouse_pick(sim._onSpacePick, button='Left')
             # space picked -> show coordinates
-            sim.ShiftPressed = False
-            sim._RayPicker.pick(sim.SceneSize[0]/3, sim.SceneSize[1]/3, 0, sim.Scene.renderer)
-            sim.waitForIdle()
+            sim._ShiftPressed = False
+            sim._doInMain(sim._RayPicker.pick, sim._SceneSize[0]/3, sim._SceneSize[1]/3, 0, sim.Scene.renderer)
+            sim._waitForIdle()
             time.sleep(0.2)
-            text3 = sim.RayText.text
+            text3 = sim._RayText.text
             self.assertNotEqual(text3, default_text)  # not the default text
             self.assertNotEqual(text3, text2)  # not the old text
             
             # valid space picked with shift -> move detector
-            sim.ShiftPressed = True
+            sim._ShiftPressed = True
             old_pos = RT.DetectorList[0].pos
-            sim._RayPicker.pick(sim.SceneSize[0]/3, sim.SceneSize[1]/3, 0, sim.Scene.renderer)
-            sim.waitForIdle()
+            sim._doInMain(sim._RayPicker.pick, sim._SceneSize[0]/3, sim._SceneSize[1]/3, 0, sim.Scene.renderer)
+            sim._waitForIdle()
             time.sleep(0.2)
-            text4 = sim.RayText.text
+            text4 = sim._RayText.text
             self.assertEqual(text4, default_text)  # not the default text
             self.assertNotEqual(RT.DetectorList[0].pos[2], old_pos[2])
             
             # space outside outline picked with shift -> move detector
-            sim.Scene.y_plus_view()  # position 0, 0 in the window is outside the RT outline
+            sim._doInMain(sim.Scene.y_plus_view)
             old_pos = RT.DetectorList[0].pos
-            sim._RayPicker.pick(0, 0, 0, sim.Scene.renderer)
-            sim.waitForIdle()
+            sim._doInMain(sim._RayPicker.pick, 0, 0, 0, sim.Scene.renderer)
+            sim._waitForIdle()
             time.sleep(0.2)
-            text4 = sim.RayText.text
+            text4 = sim._RayText.text
             self.assertEqual(text4, default_text)  # not the default text
             self.assertEqual(RT.DetectorList[0].pos[2], RT.outline[4])  # detector moved to the outline beginning
             
-            sim.close()
+            sim._doInMain(sim.close)
 
         sim = TraceGUI(RT)
-        sim.run(_func=interact, no_server=True, silent=True, _args=(sim,))
+        sim.debug(_func=interact, no_server=True, silent=True, _args=(sim,))
 
 if __name__ == '__main__':
     unittest.main()

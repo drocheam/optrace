@@ -7,7 +7,7 @@ import optrace as ot
 from optrace.plots import *
 import numpy as np
 
-Image_path = ot.preset_image_test_screen
+Image_path = ot.presets.Image.test_screen
 
 # make Raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])

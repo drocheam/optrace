@@ -19,7 +19,7 @@ class PlotTests(unittest.TestCase):
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
         RSS = ot.Surface("Rectangle", dim=[6, 6])
-        RS = ot.RaySource(RSS, pos=[0, 0, 0], Image=ot.preset_image_color_checker)
+        RS = ot.RaySource(RSS, pos=[0, 0, 0], Image=ot.presets.Image.color_checker)
         RT.add(RS)
 
         RT.trace(200000)
@@ -57,31 +57,31 @@ class PlotTests(unittest.TestCase):
     def test_DebugPlots(self) -> None:
 
         # RefractionIndexPlots
-        otp.RefractionIndexPlot(ot.presets_n_misc)
-        otp.RefractionIndexPlot(ot.preset_n_SF10)
+        otp.RefractionIndexPlot(ot.presets.RefractionIndex.misc)
+        otp.RefractionIndexPlot(ot.presets.RefractionIndex.SF10)
         
         # Abbe Plot
-        otp.AbbePlot(ot.presets_n_glass, silent=True)
+        otp.AbbePlot(ot.presets.RefractionIndex.glasses, silent=True)
 
         # SpectrumPlot
-        otp.SpectrumPlot(ot.preset_spec_D50)
-        otp.SpectrumPlot(ot.presets_spec_standard)
+        otp.SpectrumPlot(ot.presets.LightSpectrum.D50)
+        otp.SpectrumPlot(ot.presets.LightSpectrum.standard)
 
         plt.close('all')
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
         RSS = ot.Surface("Rectangle", dim=[6, 6])
-        RS = ot.RaySource(RSS, pos=[0, 0, 0], Image=ot.preset_image_color_checker)
+        RS = ot.RaySource(RSS, pos=[0, 0, 0], Image=ot.presets.Image.color_checker)
         RT.add(RS)
         RT.trace(200000)
         img = RT.SourceImage(200)
         
         # ChromacityPlots
         for normi in otp.chromacity_norms: 
-            otp.ChromacitiesCIE1931(ot.preset_spec_D65, norm=normi)
-            otp.ChromacitiesCIE1931(ot.presets_spec_standard, norm=normi)
-            otp.ChromacitiesCIE1976(ot.preset_spec_D65, norm=normi)
-            otp.ChromacitiesCIE1976(ot.presets_spec_standard, norm=normi)
+            otp.ChromacitiesCIE1931(ot.presets.LightSpectrum.D65, norm=normi)
+            otp.ChromacitiesCIE1931(ot.presets.LightSpectrum.standard, norm=normi)
+            otp.ChromacitiesCIE1976(ot.presets.LightSpectrum.D65, norm=normi)
+            otp.ChromacitiesCIE1976(ot.presets.LightSpectrum.standard, norm=normi)
             
             for RIi in Color.sRGB_RI:
                 otp.ChromacitiesCIE1931(img, norm=normi, RI=RIi)
@@ -93,7 +93,7 @@ class PlotTests(unittest.TestCase):
 
     def test_Image_Presets(self) -> None:
 
-        for imgi in ot.presets_image:
+        for imgi in ot.presets.Image.all_presets:
             RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
             RSS = ot.Surface("Rectangle", dim=[6, 6])
             RS = ot.RaySource(RSS, pos=[0, 0, 0], Image=imgi)

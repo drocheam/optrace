@@ -23,29 +23,26 @@ class BaseClass:
         np.ndarray is only compared for a size < 20, so either ignore these changes or make the arrays read only.
         """
         # The alternative approach would be to detect changes on the object and set a flag or save a timestamp,
-        # unfortunately it would be hard to not only detect changes on the object itself, but as well on all its members,
-        # which can also be classes or types such as list or np.ndarray
+        # unfortunately it would be hard to not only detect changes on the object itself,
+        # but as well on all its members, which can also be classes or types such as list or np.ndarray
 
-        d = {x: val for x, val in self.__dict__.items() if not x.startswith("_")}
         cl = []
-
-        for key, val in d.items():
-
-            if isinstance(val, list):                               el = tuple(val)
-            elif issubclass(type(val), BaseClass):                  el = val.crepr()
-            elif isinstance(val, np.ndarray) and val.size < 20:     el = tuple(val)
-            elif isinstance(val, np.ndarray) or callable(val):      el = id(val)
-            else:                                                   el = val
-
-            cl.append(el)
+        
+        for key, val in self.__dict__.items():
+            if key[0] != "_" and key not in ["silent", "threading"]:
+                if isinstance(val, list):                   cl.append(tuple(val))
+                elif issubclass(type(val), BaseClass):      cl.append(val.crepr())
+                elif isinstance(val, np.ndarray):           cl.append(tuple(val) if val.size < 20 else id(val))
+                elif callable(val):                         cl.append(id(val))
+                else:                                       cl.append(val)
 
         return cl
 
-    def getLongDesc(self, fallback: str="") -> str:
+    def getLongDesc(self, fallback: str = "") -> str:
         
         return self.long_desc if self.long_desc != "" else BaseClass.getDesc(self, fallback)
 
-    def getDesc(self, fallback: str="") -> str:
+    def getDesc(self, fallback: str = "") -> str:
         """"""
         return self.desc if self.desc != "" else fallback
     

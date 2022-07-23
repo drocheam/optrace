@@ -3,7 +3,7 @@ from optrace.tracer.spectrum.Spectrum import Spectrum
 from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
 
 import optrace.tracer.Color as Color
-import optrace.tracer.presets.Spectrum as presets_spectrum
+import optrace.tracer.presets.LightSpectrum as presets_spectrum
 
 import numpy as np
 
@@ -27,9 +27,9 @@ class TransmissionSpectrum(Spectrum):
     def getColor(self):
 
         XYZ = self.getXYZ()
-        Y0 = presets_spectrum.preset_spec_D65.getXYZ()[0, 0, 1]
+        Y0 = presets_spectrum.D65.getXYZ()[0, 0, 1]
 
-        # 1 - Yc/Y0 is the ratio of visble ambient light coming through the filter
+        # 1 - Yc/Y0 is the ratio of visible ambient light coming through the filter
         # gamma correct for non-linear human vision
         alpha = (1 - XYZ[0, 0, 1]/Y0) ** (1/2.2)
         XYZ /= Y0

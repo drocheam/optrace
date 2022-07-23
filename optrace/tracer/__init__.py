@@ -1,8 +1,4 @@
-"""
-Backend module
-"""
 
-# load modules
 from optrace.tracer.geometry.SurfaceFunction import SurfaceFunction
 from optrace.tracer.geometry.Surface import Surface 
 from optrace.tracer.geometry.Lens import Lens
@@ -19,9 +15,6 @@ from optrace.tracer.spectrum.Spectrum import Spectrum
 from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
 from optrace.tracer.spectrum.TransmissionSpectrum import TransmissionSpectrum
 
-from optrace.tracer.presets.Lines import *
-from optrace.tracer.presets.Spectrum import *
-from optrace.tracer.presets.RefractionIndex import *
-from optrace.tracer.presets.Image import *
+import optrace.tracer.presets as presets
 
 

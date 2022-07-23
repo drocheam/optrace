@@ -7,12 +7,12 @@ import optrace as ot
 import optrace.plots
 
 
-ot.plots.SpectrumPlot(ot.presets_spec_standard, labels_off=True)
-ot.plots.ChromacitiesCIE1976(ot.presets_spec_standard)
+ot.plots.SpectrumPlot(ot.presets.LightSpectrum.standard, labels_off=True)
+ot.plots.ChromacitiesCIE1976(ot.presets.LightSpectrum.standard)
 
-ot.plots.SpectrumPlot(ot.presets_spec_sRGB, colors=["r", "g", "b", "k"], labels_off=True)
-ot.plots.ChromacitiesCIE1976(ot.presets_spec_sRGB)
+ot.plots.SpectrumPlot(ot.presets.LightSpectrum.sRGB, colors=["r", "g", "b", "k"], labels_off=True)
+ot.plots.ChromacitiesCIE1976(ot.presets.LightSpectrum.sRGB)
 
-ot.plots.SpectrumPlot(ot.presets_spec_tristimulus, block=True, colors=["r", "g", "b"], 
+ot.plots.SpectrumPlot(ot.presets.Spectrum.tristimulus, block=True, colors=["r", "g", "b"], 
                       title="Tristimuli", labels_off=True)
 

@@ -11,6 +11,7 @@ import optrace.tracer.Color as Color
 import optrace.tracer.Misc as misc
 from optrace.tracer.BaseClass import BaseClass
 
+
 # TODO multiple gaussians? Specify mu, sig, val as list
 class Spectrum(BaseClass):
 
@@ -35,13 +36,15 @@ class Spectrum(BaseClass):
                  T:                 float = 6504.,
                  unit:              str = None,
                  quantity:          str = None,
+                 fargs:             tuple = None,
                  **kwargs):
         """"""
     
         self.spectrum_type = spectrum_type
         self.lines = lines
         self.line_vals = line_vals
-        self.func = func
+        self.fargs = fargs if fargs is not None else tuple()
+        self.func = func  # make sure this comes after fargs, so func is called correctly
 
         self.wl, self.wl0, self.wl1 = wl, wl0, wl1
         self.val, self.fact, self.mu, self.sig, self.T = val, fact, mu, sig, T
@@ -51,7 +54,8 @@ class Spectrum(BaseClass):
         if vals is not None:
             self._checkType("vals", vals, list | np.ndarray)
 
-        self._wls, self._vals = misc.uniform_resample(wls, vals, 5000) if wls is not None and vals is not None else (wls, vals)
+        self._wls, self._vals = misc.uniform_resample(wls, vals, 5000) if wls is not None and vals is not None \
+                                else (wls, vals)
        
         # hold infos for plotting etc. Defined in each subclass.
         self.unit = unit if unit is not None else self.unit
@@ -92,7 +96,7 @@ class Spectrum(BaseClass):
             case "Function":
                 if self.func is None:
                     raise RuntimeError("spectrum_type='Function' but parameter func not specified")
-                res = self.func(wl)
+                res = self.func(wl, *self.fargs)
 
             case _:
                 raise RuntimeError(f"spectrum_type '{self.spectrum_type}' not handled.")
@@ -144,7 +148,7 @@ class Spectrum(BaseClass):
                     raise ValueError(f"'{key}' can't be empty.")
 
                 if key == "lines" and ((wlo := np.min(val2)) < Color.WL_MIN or (wlo := np.max(val2)) > Color.WL_MAX):
-                    raise ValueError(f"'lines' need to be inside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]"\
+                    raise ValueError(f"'lines' need to be inside visible range [{Color.WL_MIN}nm, {Color.WL_MAX}nm]"
                                      f", but got a value of {wlo}nm.")
 
                 if key == "line_vals" and (lmin := np.min(val2))  < 0:
@@ -160,7 +164,7 @@ class Spectrum(BaseClass):
                 self._checkNoneOrCallable(key, val)
                 if val is not None:
                     wls = Color.wavelengths(1000)
-                    T = val(wls)
+                    T = val(wls, *self.fargs)
                     if np.min(T) < 0 or np.max(T) <= 0:
                         raise RuntimeError("Function func needs to return positive values over the visible range.")
 

@@ -140,9 +140,9 @@ class SObject(BaseClass):
         """"""
         if self.hasBackSurface():
             fallback = f"{self.FrontSurface.surface_type} + {self.BackSurface.surface_type} "\
-                       f"at [{self.pos[2]:.04g}, {self.pos[1]:.04g}, {self.pos[2]:.04g}]"
+                       f"at [{self.pos[0]:.04g}, {self.pos[1]:.04g}, {self.pos[2]:.04g}]"
         else:
-            fallback =  f"{self.Surface.surface_type} at [{self.pos[2]:.04g}, "\
+            fallback =  f"{self.Surface.surface_type} at [{self.pos[0]:.04g}, "\
                         f"{self.pos[1]:.04g}, {self.pos[2]:.04g}]"
 
         return super().getDesc(fallback)
@@ -180,7 +180,7 @@ class SObject(BaseClass):
                 if val is not None and not self._allow_non_2D and not val.is2D():
                     raise RuntimeError(f"FrontSurface of a {self.__class__.__name__} object needs to be 2 dimensional.")
 
-                super().__setattr__(key, val.copy()) # save internal copy
+                super().__setattr__(key, val.copy())  # save internal copy
                 return
 
             case "BackSurface":

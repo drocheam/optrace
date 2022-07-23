@@ -126,9 +126,9 @@ class BackendModuleTests(unittest.TestCase):
 
     def test_Filter(self):
 
-        self.assertRaises(TypeError, ot.Filter, ot.Surface("Circle"), spectrum=ot.preset_spec_X, pos=[0, 0, 0]) # invalid TransmissionSpectrun
-        self.assertRaises(RuntimeError, ot.Filter, ot.Surface("Point"), spectrum=ot.preset_spec_D65, pos=[0, 0, 0]) # non 2D surface
-        self.assertRaises(RuntimeError, ot.Filter, ot.Surface("Line"), spectrum=ot.preset_spec_D65, pos=[0, 0, 0]) # non 2D surface
+        self.assertRaises(TypeError, ot.Filter, ot.Surface("Circle"), spectrum=ot.presets.Spectrum.X, pos=[0, 0, 0]) # invalid TransmissionSpectrun
+        self.assertRaises(RuntimeError, ot.Filter, ot.Surface("Point"), spectrum=ot.presets.LightSpectrum.D65, pos=[0, 0, 0]) # non 2D surface
+        self.assertRaises(RuntimeError, ot.Filter, ot.Surface("Line"), spectrum=ot.presets.LightSpectrum.D65, pos=[0, 0, 0]) # non 2D surface
 
         # if getColor and calling implemented
         F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=0.5), pos=[0, 0, 0])
@@ -229,7 +229,7 @@ class BackendModuleTests(unittest.TestCase):
 
         front = ot.Surface("Sphere", r=3, rho=1/10)  # height 10 - sqrt(91)
         back = ot.Surface("Asphere", r=2, k=-5, rho=-1/20) # height sqrt(26) - 5
-        n = ot.preset_n_SF10
+        n = ot.presets.RefractionIndex.SF10
         n2 = ot.RefractionIndex("Constant", n=1.05)
         
         L = [ot.Lens(front, back, n, pos=[0, 0, 0], de=0.),
@@ -267,7 +267,7 @@ class BackendModuleTests(unittest.TestCase):
         # use power other than default of 1
         # use position other than default of [0, 0, 0]
         # use s other than [0, 0, 1]
-        rargs = dict(spectrum=ot.preset_spec_D50, or_func=or_func, pos=[0.5, -2, 3], power=2.5, s=[0, 0.5, 1], pol_angle=0.5)
+        rargs = dict(spectrum=ot.presets.LightSpectrum.D50, or_func=or_func, pos=[0.5, -2, 3], power=2.5, s=[0, 0.5, 1], pol_angle=0.5)
        
         # possible surface types
         Surfaces = [ot.Surface("Point"), ot.Surface("Line"), ot.Surface("Circle"), 
@@ -281,7 +281,7 @@ class BackendModuleTests(unittest.TestCase):
             for dir_type in ot.RaySource.directions:
                 for or_type in ot.RaySource.orientations:
                     for pol_type in ot.RaySource.polarizations:
-                        for Im in [None, *ot.presets_image]:
+                        for Im in [None, *ot.presets.Image.all_presets]:
 
                             # only check RectangleSurface with Image being active/set
                             if Im is not None and Surf.surface_type != "Rectangle":
@@ -545,7 +545,7 @@ class BackendModuleTests(unittest.TestCase):
              ot.RefractionIndex("Function", func=func)]
 
         # check presets
-        for material in ot.presets_n:
+        for material in ot.presets.RefractionIndex.all_presets:
             n0 = material(550)
             A0 = material.getAbbeNumber()
 
@@ -578,7 +578,7 @@ class BackendModuleTests(unittest.TestCase):
                 self.assertAlmostEqual(Ri(wlj), Rval[i, j], places=5)
 
         # check if equal operator is working
-        self.assertEqual(ot.preset_n_SF10, ot.preset_n_SF10)
+        self.assertEqual(ot.presets.RefractionIndex.SF10, ot.presets.RefractionIndex.SF10)
         self.assertEqual(R[1], R[1])
         self.assertEqual(ot.RefractionIndex("Function", func=func), ot.RefractionIndex("Function", func=func))
 
@@ -591,7 +591,7 @@ class BackendModuleTests(unittest.TestCase):
         # raytracer geometry of only a Source
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
         RSS = ot.Surface("Rectangle", dim=[6, 6])
-        RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.preset_spec_D65)
+        RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.presets.LightSpectrum.D65)
         RT.add(RS)
 
         # check white color of spectrum in sRGB
@@ -632,7 +632,7 @@ class BackendModuleTests(unittest.TestCase):
     def test_Spectrum(self):
 
         wl = ot.Color.wavelengths(100)
-        sargs = dict(func=lambda x: x**2, lines=ot.preset_lines_FDC, line_vals=[0.5, 1., 5], 
+        sargs = dict(func=lambda x: x**2, lines=ot.presets.Lines.FDC, line_vals=[0.5, 1., 5], 
                      wls=np.array([380, 400, 780]), vals=np.array([1, 0.5, 0]))
 
         for type_ in ot.Spectrum.spectrum_types:
@@ -641,7 +641,7 @@ class BackendModuleTests(unittest.TestCase):
                 spec(wl) # call
 
         # check presets
-        for spec in ot.presets_spec_tristimulus:
+        for spec in ot.presets.Spectrum.tristimulus:
             if spec.isContinuous():
                 spec(wl) # call
 
@@ -697,7 +697,7 @@ class BackendModuleTests(unittest.TestCase):
     def test_LightSpectrum(self):
 
         wl = ot.Color.wavelengths(100)
-        sargs = dict(func=lambda x: x**2, lines=ot.preset_lines_FDC, line_vals=[0.5, 1., 5], 
+        sargs = dict(func=lambda x: x**2, lines=ot.presets.Lines.FDC, line_vals=[0.5, 1., 5], 
                      wls=np.array([380, 400, 780]), vals=np.array([1, 0.5, 0]))
 
         for type_ in ot.LightSpectrum.spectrum_types:
@@ -709,7 +709,7 @@ class BackendModuleTests(unittest.TestCase):
             spec.randomWavelengths(1000)
 
         # check presets
-        for spec in ot.presets_spec_light:
+        for spec in ot.presets.LightSpectrum.all_presets:
             if spec.isContinuous():
                 spec(wl)
             spec.getXYZ()
@@ -730,11 +730,25 @@ class BackendModuleTests(unittest.TestCase):
         doctest.testmod(ot.tracer.Misc)
         # additional tests not required here, since this functions are not exposed to the user
 
+    def test_Geometries(self):
+
+        # test example geometries from presets
+        for geom_func in ot.presets.Geometry.geometries:
+            RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 80], silent=True)
+            RSS = ot.Surface("Circle", r=0.5)
+            RS = ot.RaySource(RSS, pos=[0, 0, -3], spectrum=ot.presets.LightSpectrum.D65)
+            RT.add(RS)
+
+            geom = geom_func()
+            RT.add(geom)
+
+            RT.trace(100000)
+
     def test_Focus(self):
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -60, 80], silent=True, n0=ot.RefractionIndex("Constant", n=1.1))
         RSS = ot.Surface("Circle", r=0.5)
-        RS = ot.RaySource(RSS, pos=[0, 0, -3], spectrum=ot.preset_spec_D65)
+        RS = ot.RaySource(RSS, pos=[0, 0, -3], spectrum=ot.presets.LightSpectrum.D65)
         RT.add(RS)
 
         front = ot.Surface("Sphere", r=3, rho=1/30)
@@ -760,7 +774,7 @@ class BackendModuleTests(unittest.TestCase):
         z, _, _, _ = RT.autofocus(RT.AutofocusModes[0], z_start=5.0, snum=0, N=N, ret_cost=False)
         self.assertAlmostEqual(z, fs, delta=0.15)
 
-        RS2 = ot.RaySource(ot.Surface("Point"), spectrum=ot.preset_spec_D65, direction="Diverging", 
+        RS2 = ot.RaySource(ot.Surface("Point"), spectrum=ot.presets.LightSpectrum.D65, direction="Diverging", 
                            div_angle=0.5, pos=[0, 0, -60])
         RT.add(RS2)
         

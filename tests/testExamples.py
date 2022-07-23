@@ -26,23 +26,30 @@ class ExampleTests(unittest.TestCase):
         except subprocess.TimeoutExpired:
             process.kill()
 
-    def test_0Complex(self):
-        self.execute("./examples/More_Complex_Example.py")
-
-    def test_5RGBRender(self):
+    # zzzz so it gets tested at the end
+    def test_zzzz_RGBRender(self):
         self.execute("./examples/Image_RGB_Render.py", 90)
 
-    def test_4PresetsRefractionIndex(self):
+    def test_Complex(self):
+        self.execute("./examples/More_Complex_Example.py")
+    
+    def test_PresetsRefractionIndex(self):
         self.execute("./examples/RefractionIndex_Presets.py")
     
-    def test_3PresetsSpectrum(self):
+    def test_PresetsSpectrum(self):
         self.execute("./examples/Spectrum_Presets.py")
     
-    def test_2RGB(self):
+    def test_RGB(self):
         self.execute("./examples/Image_RGB.py")
 
-    def test_1Prism(self):
+    def test_Prism(self):
         self.execute("./examples/Double_Prism.py")
+
+    def test_EyeModel(self):
+        self.execute("./examples/Arizona_Eye_Model.py")
+    
+    def test_EyeModelImaging(self):
+        self.execute("./examples/Arizona_Eye_Model_Imaging.py")
 
 if __name__ == '__main__':
     # deactivate warnings temporarily

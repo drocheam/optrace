@@ -151,7 +151,7 @@ def uniform_resample(x: list | np.ndarray, y: list | np.ndarray, N: int) -> tupl
     return xs, interp(xs)
 
 
-def normalize(a: np.ndarray) -> None:
+def normalize(a: np.ndarray) -> np.ndarray:
     """ 
     faster vector normalization for vectors in axis=1.
     Zero length vectors can normalized to np.nan.
@@ -176,7 +176,7 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     array([[-12.,   0.,   4.],
            [ -3.,   6.,  -3.]])
     """
-    x, y, z    = a[:, 0], a[:, 1], a[:, 2]
+    x, y, z = a[:, 0], a[:, 1], a[:, 2]
     x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
 
     n = np.zeros_like(a, dtype=np.float64, order='F')
@@ -325,7 +325,7 @@ def interp2d(x: np.ndarray, y: np.ndarray, z: np.ndarray, xp: np.ndarray, yp: np
     if np.min(yp) < y[0] or np.max(yp) > y[-1]:
         raise ValueError("yp value outside data range")
 
-    # bilinear interpolation: https://en.wikipedia.org/wiki/Bilinear_interpolation
+    # bi-linear interpolation: https://en.wikipedia.org/wiki/Bilinear_interpolation
     # rewrite the equation to:
     # zi = (1 - yr)*(xr*z[yc, xc+1] + z[yc, xc]*(1-xr)) + yr*(xr*z[yc+1, xc+1]+ z[yc+1, xc]*(1-xr))
     #

@@ -26,8 +26,8 @@ class RefractionIndex(Spectrum):
     def __init__(self,
                  n_type:    str = "Constant",
                  n:         float = 1.0,
-                 coeff:     list = [0, 0, 0, 0, 0, 0, 0, 0],
-                 lines:     list = Lines.preset_lines_FDC,
+                 coeff:     list = None,
+                 lines:     list = None,
                  V:         float = None,
                  **kwargs)\
             -> None:
@@ -51,11 +51,12 @@ class RefractionIndex(Spectrum):
         :param lines: spectral lines to use for n_type="Abbe", 
                       list of 3 wavelengths [short wavelength, center wavelength, long wavelength]
         """
-        # self._new_lock = False
-        self.spectrum_type = n_type # needs to be here so coeff gets set correctly
+        self.spectrum_type = n_type  # needs to be first so coeff gets set correctly
         self.coeff = coeff
         self.V = V
         
+        lines = lines if lines is not None else Lines.FDC
+
         super().__init__(n_type, val=n, lines=lines, **kwargs)
 
         self._new_lock = True
@@ -69,6 +70,9 @@ class RefractionIndex(Spectrum):
         :return: array of refraction indices
         """
         wl_ = wl if isinstance(wl, np.ndarray) else np.array(wl, dtype=np.float32)
+
+        if self.spectrum_type in ["Cauchy", "Conrady", "Sellmeier"] and self.coeff is None:
+            raise RuntimeError("coefficients coeff not defined.")
 
         match self.spectrum_type:
 
@@ -118,7 +122,7 @@ class RefractionIndex(Spectrum):
             case "val" if isinstance(val, int | float):
                 self._checkNotBelow(key, val, 1)
 
-            case "coeff":
+            case "coeff" if val is not None:
 
                 self._checkType(key, val, list)
 
@@ -156,7 +160,7 @@ class RefractionIndex(Spectrum):
 
             case "func" if callable(val):
                 wls = Color.wavelengths(1000)
-                n = val(wls)
+                n = val(wls, *self.fargs)
                 if np.min(n) < 1:
                     raise ValueError("Function func needs to output values >= 1 over the whole visible range.")
 
@@ -166,7 +170,7 @@ class RefractionIndex(Spectrum):
 
         super().__setattr__(key, val)
 
-    def getAbbeNumber(self, lines=Lines.preset_lines_FDC) -> float:
+    def getAbbeNumber(self, lines=Lines.FDC) -> float:
         """
         Calculates the Abbe Number.
 

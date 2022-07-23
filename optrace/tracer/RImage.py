@@ -1,9 +1,9 @@
 
 import numpy as np  # calculations
-import os  # saving and loading files 
 from datetime import datetime  # date for fallback file naming
+from pathlib import Path  # path handling for image saving
 
-import optrace.tracer.Color as Color   # Tristimulus curves and sRGB conversions
+import optrace.tracer.Color as Color  # Tristimulus curves and sRGB conversions
 import optrace.tracer.Misc as misc  # interpolation and calculation methods
 from threading import Thread  # multithreading
 
@@ -12,8 +12,8 @@ from optrace.tracer.BaseClass import BaseClass # parent class
 from PIL import Image  # saving as png
 from typing import Callable  # Callable type
 
-# Rendered Image class
 
+# Rendered Image class
 class RImage(BaseClass):
 
     EPS: float = 1e-9
@@ -42,7 +42,8 @@ class RImage(BaseClass):
         """
         Init an Image object.
         This class is used to calculate and hold an Image consisting of the channels X, Y, Z, Illuminance and Irradiance.
-        The class also includes information like extent, z-position of image, an image plotting type and an index for tagging.
+        The class also includes information like extent, z-position of image,
+        an image plotting type and an index for tagging.
 
         :param extent: image extent in the form [xs, xe, ys, ye]
         :param coordinate_type: "Cartesian" or "Polar"
@@ -366,16 +367,16 @@ class RImage(BaseClass):
                            sfunc:       Callable, 
                            fname:       str, 
                            ending:      str, 
-                           overwrite:   bool=False)\
+                           overwrite:   bool = False)\
             -> str:
         """saving with fallback path if the file exists and overwrite=False"""
         
         # called when invalid path or file exists but overwrite=False
         def fallback():
             # create a valid path and filename
-            wd = os.getcwd()
+            wd = Path.cwd()
             filename = f"{fname}_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z') + ending
-            path = os.path.join(wd, filename)
+            path = str(wd / filename)
 
             # resave
             if not self.silent:
@@ -389,7 +390,7 @@ class RImage(BaseClass):
             path += ending
 
         # check if file already exists
-        exists = os.path.exists(path)
+        exists = Path(path).exists()
 
         if overwrite or not exists:
             try:
@@ -501,7 +502,7 @@ class RImage(BaseClass):
             XYZW[:, 2] = Color.Tristimulus(wl, "Z")
             XYZW *= w[:, np.newaxis]
 
-            # render image fro positions and XYZW array
+            # render image for positions and XYZW array
             np.add.at(self._Im, (ycor.astype(int), xcor.astype(int)), XYZW)
 
         self._Im = np.flipud(self._Im) # flip so [0, 0] is in the lower left

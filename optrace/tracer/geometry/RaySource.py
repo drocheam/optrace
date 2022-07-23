@@ -34,11 +34,11 @@ class RaySource(SObject):
 
                  # Surface Parameters
                  Surface:           Surface,
-                 pos:               (list | np.ndarray) = [0., 0., 0.],
+                 pos:               (list | np.ndarray) = None,
                 
                  # Direction Parameters
                  direction:         str = "Parallel",
-                 s:                 (list | np.ndarray) = [0., 0., 1.],
+                 s:                 (list | np.ndarray) = None,
                  div_angle:         float = 0.5,
 
                  # Light Parameters
@@ -76,7 +76,12 @@ class RaySource(SObject):
         self._new_lock = False
 
         self.pIf = None
-        
+      
+        # assign default list parameters
+        # since we want to avoid mutable default parameters
+        pos = [0, 0, 0] if pos is None else pos
+        s = [0, 0, 1] if s is None else s
+
         super().__init__(Surface, pos, **kwargs)
 
         self.direction = direction
@@ -100,8 +105,13 @@ class RaySource(SObject):
         :return:
         """
         if self.Image is not None:
-            return np.mean(self.Image[:, :, 0]), np.mean(self.Image[:, :, 1]),\
-                   np.mean(self.Image[:, :, 2]), 1.0
+            # mean color needs to calculated in a linear colorspace, hence sRGBLinear
+            sRGBL = Color.sRGB_to_sRGBLinear(self.Image)
+            sRGBL_mean = np.mean(sRGBL, axis=(0, 1))
+            sRGB_mean = Color.sRGBLinear_to_sRGB(np.array([[[*sRGBL_mean]]]))
+
+            return *sRGB_mean[0, 0], 1.0
+
         elif self.spectrum is None:
             raise RuntimeError("spectrum not specified.")
         else:
@@ -175,7 +185,7 @@ class RaySource(SObject):
                 s_or = self.or_func(p[:, 0], p[:, 1])
 
             case _:
-                raise RuntimeError(f"orientation_type '{self.orientation_type}' not handled.")
+                raise RuntimeError(f"orientation_type '{self.orientation}' not handled.")
 
         ## Generate ray directions relative to orientation
         ################################################################################################################
@@ -204,7 +214,7 @@ class RaySource(SObject):
                 s = misc.calc("cos(alpha_)*s_or + sin(alpha_)*(cos(theta_)*sx + sin(theta_)*sy)")
 
             case _:
-                raise RuntimeError(f"direction_type '{self.direction_type}' not handled.")
+                raise RuntimeError(f"direction_type '{self.direction}' not handled.")
 
         if np.any(s[:, 2] <= 0):
             raise RuntimeError("All ray directions s need to be in positive z-direction")
@@ -222,7 +232,7 @@ class RaySource(SObject):
                 case "xy":      ang = np.random.choice([0, np.pi/2], N)
                 case "Angle":   ang = np.radians(self.pol_angle)
                 case "Random":  ang = np.random.uniform(0, 2*np.pi, N)
-                case _:         raise RuntimeError(f"polarization_type '{self.polarization_type}' not handled.")
+                case _:         raise RuntimeError(f"polarization_type '{self.polarization}' not handled.")
 
             # pol is rotated by an axis perpendicular to the plane of base direction s = [0, 0, 1] and the current direction s_
             # let's call this axis ps. The resulting polarization pol_ is perpendicular to s_ and has the same component at ps

@@ -64,6 +64,7 @@ def RefractionIndexPlot(RI:         RefractionIndex | list[RefractionIndex],
     """
     SpectrumPlot(RI, title=title, **kwargs)
 
+
 def SpectrumPlot(Spec:      Spectrum | list[Spectrum], 
                  title:     str = "Spectrum", 
                  **kwargs)\
@@ -79,7 +80,7 @@ def SpectrumPlot(Spec:      Spectrum | list[Spectrum],
 
 def AbbePlot(RI:     list[RefractionIndex], 
              title:  str = "Abbe Diagram", 
-             lines:  list = Lines.preset_lines_FdC,
+             lines:  list = Lines.FdC,
              block:  bool = False,
              silent: bool = False)\
         -> None:
@@ -110,7 +111,7 @@ def AbbePlot(RI:     list[RefractionIndex],
     plt.title(title)
     plt.show(block=block)
     plt.pause(0.1)
-    
+
 
 def ChromacitiesCIE1931(Im:     RImage | LightSpectrum | list[LightSpectrum], 
                         RI:     str = "Ignore", 
@@ -250,8 +251,8 @@ def _ChromaticityPlot(Im:       RImage | LightSpectrum | list[LightSpectrum],
         raise RuntimeError(f"Invalid parameter of type {type(Im)}.")
 
     def wl_to_xy(wl):
-        XYZ = np.column_stack((Color.Tristimulus(wl, "X"),\
-                               Color.Tristimulus(wl, "Y"),\
+        XYZ = np.column_stack((Color.Tristimulus(wl, "X"),
+                               Color.Tristimulus(wl, "Y"),
                                Color.Tristimulus(wl, "Z")))
 
         XYZ = np.array([XYZ])
@@ -393,7 +394,7 @@ def _SpectrumPlot(obj:          Spectrum | list[Spectrum],
 
     colors = np.array([Color.spectralCM(wl0=plt.xlim()[0], wl1=plt.xlim()[1], N=1000)[:, :3]])/255
 
-    #enforce image extent of 1:10 for every wavelength range
+    # enforce image extent of 1:10 for every wavelength range
     ax2.imshow(colors, extent=[*plt.xlim(), 0.1*plt.xlim()[0], 0.1*plt.xlim()[1]], aspect="auto")
 
     ax1.set(ylabel=ylabel)

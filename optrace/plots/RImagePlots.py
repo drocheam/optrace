@@ -1,4 +1,3 @@
-
 """
 Functions for plotting of Source/Detector Images.
 Plotting Modes include Irradiance, Illuminance and RGB.
@@ -14,11 +13,11 @@ import numpy as np  # calculations
 import copy  # copying for classes without copy function
 
 from optrace.tracer.RImage import RImage  # RImage type and RImage displaying
-from optrace.tracer.BaseClass import BaseClass  # type checking 
+from optrace.tracer.BaseClass import BaseClass  # type checking
 
 
 def RImagePlot(Im:       RImage,
-               Imc:      np.ndarray=None,
+               Imc:      np.ndarray = None,
                block:    bool = False,
                log:      bool = False,
                flip:     bool = False,
@@ -26,12 +25,11 @@ def RImagePlot(Im:       RImage,
         -> None:
     """
 
-    :param Im_in: Image from Raytracer SourceImage/DetectorImage function, numpy 3D array shape (N, N, 5)
+    :param Im:
+    :param flip:
     :param Imc: precalculated Image (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
     :param block: if plot is blocking (bool)
     :param log: if logarithmic values are shown (bool)
-    :param text: Title text to display (string)
-    :param clabel: label for colorbar (string)
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
     BaseClass._checkType("Im", Im, RImage)
@@ -40,15 +38,15 @@ def RImagePlot(Im:       RImage,
     text = Im.getLongDesc(fallback="")
 
     match mode:
-        case "Irradiance":      
+        case "Irradiance":
             clabel = "Irradiance in W/mm²"
             text += f"\n Total Radiant Flux: {Im.getPower():.5g} W"
 
-        case "Illuminance":    
+        case "Illuminance":
             clabel = "Illuminance in lm/mm²"
             text += f"\n Total Luminous Flux: {Im.getLuminousPower():.5g} lm"
 
-        case _:                 
+        case _:
             clabel = mode
             text += f"\nMode: {mode}"
 
@@ -107,18 +105,15 @@ def RImageCutPlot(Im:       RImage,
                   block:    bool = False,
                   log:      bool = False,
                   flip:     bool = False,
-                  text:     str = "",
-                  clabel:   str = "",
                   mode:     str = RImage.display_modes[0],
                   **kwargs)\
         -> None:
     """
 
-    :param Im_in: Image from Raytracer SourceImage/DetectorImage function, numpy 3D array shape (N, N, 5)
+    :param Im:
+    :param kwargs:
     :param block: if plot is blocking (bool)
     :param log: if logarithmic values are shown (bool)
-    :param text: Title text to display (string)
-    :param clabel: label for colorbar (string)
     :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
     """
     BaseClass._checkType("Im", Im, RImage)
@@ -128,7 +123,7 @@ def RImageCutPlot(Im:       RImage,
         raise RuntimeError("Provide an x or y parameter to the RImageCutPlot function.")
 
     yim = "x" in kwargs
-   
+
     text = Im.getLongDesc(fallback="")
     text += "\nCut at " + (f'x = {kwargs["x"]:.5g}' if yim else f'y = {kwargs["y"]:.5g}') + " mm"
 
@@ -167,7 +162,9 @@ def RImageCutPlot(Im:       RImage,
     plt.ylabel(clabel)
     plt.title(text)
 
+    if flip:
+        plt.gca().invert_xaxis()
+
     # show image
     plt.show(block=block)
     plt.pause(0.1)
-

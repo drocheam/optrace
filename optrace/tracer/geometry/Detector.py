@@ -19,7 +19,7 @@ class Detector(SObject):
     def __init__(self,
                  Surface:   Surface,
                  pos:       (list | np.ndarray),
-                 ar:        float=2.,
+                 ar:        float = 2.,
                  **kwargs)\
             -> None:
         """
@@ -49,7 +49,7 @@ class Detector(SObject):
 
         Surf = self.Surface
         zm = Surf.pos[2] + self.ar/Surf.rho
-        ze = Surf.getEdge(nc=1)[2][0] # TODO what if no rotational symmetry?
+        ze = Surf.getEdge(nc=1)[2][0]  # TODO what if no rotational symmetry?
 
         theta = np.arctan(Surf.r/np.abs(ze-zm))*180/np.pi
         return np.array([-theta, theta, -theta, theta])

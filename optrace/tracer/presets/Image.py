@@ -1,34 +1,37 @@
-
 import pathlib  # loading files in relative path
 
-# directory of this source file
-this_dir = pathlib.Path(__file__).resolve().parent
+# path of the image library folder
+image_dir = pathlib.Path(__file__).resolve().parent / "images"
 
 
-# https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg
-# Permission: Public Domain
-preset_image_color_checker: str = str(this_dir / "images" / "ColorChecker.jpg")
-"""Color checker chart"""
-
-# https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg
-# Permission: Public Domain
-preset_image_test_screen: str = str(this_dir / "images" / "TestScreen_square.png")
-"""TV test screen"""
-
-# https://commons.wikimedia.org/wiki/File:EIA_Resolution_Chart_1956.svg
-# Permission: Public Domain
-preset_image_resolution_chart: str = str(this_dir / "images" / "EIA_Resolution_Chart_1956.png")
-"""EIA 1956 resolution chart"""
-
-# https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg
-# Permission: Public Domain
-preset_image_ETDRS_chart: str = str(this_dir / "images" / "ETDRS_Chart.png")
-"""ETDRS Chart standard"""
-preset_image_ETDRS_chart_inverted: str = str(this_dir / "images" / "ETDRS_Chart_inverted.png")
-"""ETDRS Chart inverted"""
+color_checker: str = str(image_dir / "ColorChecker.jpg")
+"""Color checker chart
+Public domain image from 
+https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg """
 
 
-presets_image: list = [preset_image_color_checker, preset_image_test_screen, preset_image_resolution_chart,
-                       preset_image_ETDRS_chart, preset_image_ETDRS_chart_inverted]
+ETDRS_chart: str = str(image_dir / "ETDRS_Chart.png")
+"""ETDRS Chart standard
+Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
+
+
+ETDRS_chart_inverted: str = str(image_dir / "ETDRS_Chart_inverted.png")
+"""ETDRS Chart inverted
+edited version of Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
+
+
+resolution_chart: str = str(image_dir / "EIA_Resolution_Chart_1956.png")
+"""EIA 1956 resolution chart
+Public Domain image from https://commons.wikimedia.org/wiki/File:EIA_Resolution_Chart_1956.svg """
+
+
+test_screen: str = str(image_dir / "TestScreen_square.png")
+"""TV test screen
+Public Domain Image from  https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg """
+
+
+
+all_presets: list = [color_checker, ETDRS_chart, ETDRS_chart_inverted,
+                     resolution_chart, test_screen]
 """list with all Image presets"""
 

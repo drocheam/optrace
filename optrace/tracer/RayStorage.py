@@ -4,15 +4,16 @@ import warnings  # print warnings
 import numpy as np  # calculations
 
 from optrace.tracer.geometry import RaySource  # create Rays
-import optrace.tracer.Misc as misc # calculations
+import optrace.tracer.Misc as misc  # calculations
 from optrace.tracer.BaseClass import BaseClass  # parent class
 
 
 class RayStorage(BaseClass):
 
-    N_list = np.array([], dtype=int)
-    B_list = np.array([], dtype=int)
-  
+    def __init__(self):
+        self.N_list = np.array([], dtype=int)
+        self.B_list = np.array([], dtype=int)
+
     def init(self, RaySourceList, N, nt, no_pol=False):
         """
         """
@@ -34,8 +35,8 @@ class RayStorage(BaseClass):
         np.add.at(self.N_list, index_add, np.ones(index_add.shape))
 
         if np.any(np.array(self.N_list) == 0) and not self.silent:
-            warnings.warn("There are RaySources that have no rays assigned. "\
-                    "Change the power ratio or raise the overall ray number", RuntimeWarning)
+            warnings.warn("There are RaySources that have no rays assigned. "
+                          "Change the power ratio or raise the overall ray number", RuntimeWarning)
         
         self.B_list = np.concatenate(([0], np.cumsum(self.N_list))).astype(int)
         self.RaySourceList = RaySourceList
@@ -113,7 +114,8 @@ class RayStorage(BaseClass):
     def getRaysByMask(self,
                       ch:           np.ndarray,
                       ch2:          np.ndarray = None,
-                      ret:          list[bool | int] = [1, 1, 1, 1, 1, 1]) \
+                      ret:          list[bool | int] = None,
+                      normalize:    bool = True) \
             -> tuple[(np.ndarray | None), (np.ndarray | None), (np.ndarray | None),
                      (np.ndarray | None), (np.ndarray | None), (np.ndarray | None)]:
         """
@@ -123,6 +125,8 @@ class RayStorage(BaseClass):
         :param ret:
         :return:
         """
+        # assign default parameter for ret
+        ret = [1, 1, 1, 1, 1, 1] if ret is None else ret
 
         if not self.N:
             raise RuntimeError("RaySourceList has no rays stored.")
@@ -142,12 +146,14 @@ class RayStorage(BaseClass):
             if not isinstance(ch2, slice):
                 ch21 = np.where(ch2 < self.nt-1, ch2 + 1, ch2)
                 s = self.p_list[ch, ch21] - self.p_list[ch, ch2]
-                s = misc.normalize(s)
+                if normalize:
+                    s = misc.normalize(s)
             else:
                 s = self.p_list[ch, 1:] - self.p_list[ch, :-1]
-                s = np.hstack((s, s[:, np.newaxis, -1]))
-                s_ = s.reshape((s.shape[0]*s.shape[1], 3))
-                s = misc.normalize(s_).reshape(s.shape)
+                s = np.hstack((s, np.zeros((s.shape[0], 1, 3))))
+                if normalize:
+                    s_ = s.reshape((s.shape[0]*s.shape[1], 3))
+                    s = misc.normalize(s_).reshape(s.shape)
 
         p     = self.p_list[ch, ch2]    if ret[0] else None
         s     = s                       if ret[1] else None

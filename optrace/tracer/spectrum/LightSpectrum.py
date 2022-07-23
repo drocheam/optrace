@@ -111,8 +111,8 @@ class LightSpectrum(Spectrum):
                 wl = Color.wavelengths(cnt)
                 spec = self(wl)
 
-        XYZ = np.array([[[np.sum(spec * Color.Tristimulus(wl, "X")),\
-                          np.sum(spec * Color.Tristimulus(wl, "Y")),\
+        XYZ = np.array([[[np.sum(spec * Color.Tristimulus(wl, "X")),
+                          np.sum(spec * Color.Tristimulus(wl, "Y")),
                           np.sum(spec * Color.Tristimulus(wl, "Z"))]]])
 
         return XYZ

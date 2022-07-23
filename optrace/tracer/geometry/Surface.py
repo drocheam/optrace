@@ -23,7 +23,7 @@ class Surface(BaseClass):
                  rho:           float = 1/10,
                  k:             float = -0.444,
                  ri:            float = 0.1,
-                 dim:           (list | np.ndarray) = [6, 6],
+                 dim:           (list | np.ndarray) = None,
                  ang:           float = 0,
                  Data:          np.ndarray = None,
                  func:          SurfaceFunction = None,
@@ -49,7 +49,9 @@ class Surface(BaseClass):
 
         self.pos = np.array([0., 0., 0.], dtype=np.float64)
         
+        dim = dim if dim is not None else [6, 6]
         self.dim = np.array(dim, dtype=np.float64)
+        
         self.Mask = np.array([], dtype=np.float64)
         self.Z = np.array([], dtype=np.float64)
 
@@ -203,7 +205,7 @@ class Surface(BaseClass):
 
                 z = np.full_like(r2, self.zmax, dtype=np.float64)
 
-                z[inside] = misc.calc("z0 + rho*r2i/(1 + sqrt(1 - (k+1)* rho**2 *r2i))",\
+                z[inside] = misc.calc("z0 + rho*r2i/(1 + sqrt(1 - (k+1)* rho**2 *r2i))",
                                       r2i=r2[inside], k=self.k, rho=self.rho, z0=self.pos[2])
 
                 return z
@@ -215,7 +217,7 @@ class Surface(BaseClass):
                 z = np.full(x.shape, self.zmax, dtype=np.float64)
 
                 if np.count_nonzero(inside):
-                    z[inside] = self.pos[2] + misc.interp2d(self.xy, self.xy, self.Z,\
+                    z[inside] = self.pos[2] + misc.interp2d(self.xy, self.xy, self.Z,
                                                             x[inside] - self.pos[0], y[inside] - self.pos[1])
 
                 return z
@@ -228,7 +230,6 @@ class Surface(BaseClass):
 
             case _:
                 raise RuntimeError(f"Surface value function not defined for surface_type {self.surface_type}")
-
 
     def getPlottingMesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -272,7 +273,7 @@ class Surface(BaseClass):
         mask2 = R >= r
 
         # move values outside surface to surface edge
-        # this defines the edge with more points, making it more circular instead of steplike
+        # this defines the edge with more points, making it more circular instead of step-like
         z[mask] = self.getValues(self.pos[0] + r*np.cos(Phi.ravel()[mask]), self.pos[1] + r*np.sin(Phi.ravel()[mask]))
         X[mask2] = self.pos[0] + r*np.cos(Phi[mask2])
         Y[mask2] = self.pos[1] + r*np.sin(Phi[mask2])
@@ -503,7 +504,6 @@ class Surface(BaseClass):
                 raise RuntimeError(f"surface_type '{self.surface_type}' not handled.")
 
         return p
-        
 
     # TODO does this work for non-hitting rays?
     # TODO check with  k = -1 and sz = 1

@@ -88,7 +88,10 @@ class Lens(SObject):
 
         self._new_lock = True
 
-    def estimateFocalLength(self, wl: float=555., n0: RefractionIndex=RefractionIndex("Constant", n=1.)) -> float:
+    def estimateFocalLength(self,
+                            wl: float = 555.,
+                            n0: RefractionIndex = None) \
+            -> float:
         """
         Estimate the lens focal length using the lensmaker equation.
         Only works if both surfaces are of type "Sphere", "Asphere" or planar.
@@ -105,6 +108,9 @@ class Lens(SObject):
                 return np.inf
             else:
                 raise RuntimeError("Calculation only possible with surface_type 'Circle', 'Sphere' or 'Asphere'.")
+
+        # default refraction index
+        n0 = n0 if n0 is not None else RefractionIndex("Constant", n=1.)
 
         R1 = getR(self.FrontSurface)
         R2 = getR(self.BackSurface)

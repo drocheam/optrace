@@ -72,7 +72,7 @@ def Blackbody(wl: np.ndarray, T: float = 6504.) -> np.ndarray:
 
     # blackbody equation
     # https://en.wikipedia.org/wiki/Planck%27s_law
-    return 2 * h * c ** 2 / wlm** 5 / (np.exp(h * c / (wlm * k_B * T)) - 1)
+    return 2 * h * c ** 2 / wlm**5 / (np.exp(h * c / (wlm * k_B * T)) - 1)
 
 
 def Gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
@@ -130,7 +130,7 @@ def Illuminant(wl: np.ndarray, name: str) -> np.ndarray:
     if name not in ILLUMINANTS:
         raise ValueError(f"Invalid Illuminant Type, must be one of {ILLUMINANTS}.")
 
-    illu = eval(f"colorio.illuminants.{name.lower()}()")
+    illu = colorio.illuminants.__dict__[name.lower()]()
     return np.interp(wl, illu.lmbda_nm, illu.data)     
 
 
@@ -209,7 +209,8 @@ def XYZ_to_xyY(XYZ: np.ndarray) -> np.ndarray:
 
     return xyY
 
-def XYZ_to_sRGBLinear(XYZ_in: np.ndarray, normalize: bool = True, RI: str="Absolute") -> np.ndarray:
+
+def XYZ_to_sRGBLinear(XYZ_in: np.ndarray, normalize: bool = True, RI: str = "Absolute") -> np.ndarray:
     """
     Conversion XYZ to linear RGB values.
 
@@ -218,7 +219,7 @@ def XYZ_to_sRGBLinear(XYZ_in: np.ndarray, normalize: bool = True, RI: str="Absol
     :return: linear RGB image (numpy 3D array)
     """
 
-    def _to_sRGB(XYZ):
+    def _to_sRGB(XYZ: np.ndarray) -> np.ndarray:
 
         # it makes no difference if we normalize before or after the matrix multiplication
         # since X, Y and Z gets scaled by the same value and matrix multiplication is a linear operation
@@ -271,7 +272,8 @@ def XYZ_to_sRGBLinear(XYZ_in: np.ndarray, normalize: bool = True, RI: str="Absol
 
         # whitepoint line: line going from (x, y) to whitepoint
 
-        # in the following cases no division by zero can occur, since the whitepoint line and the triangle sides are never parallel
+        # in the following cases no division by zero can occur,
+        # since the whitepoint line and the triangle sides are never parallel
         # (which would for example mean abr = awbr), or if they are, they do so in another intersection case 
         # (e.g. the whitepoint line being parallel to the br side occurs only for is_gr)
 
@@ -365,8 +367,8 @@ def sRGBLinear_to_sRGB(RGBL: np.ndarray, clip: bool = True) -> np.ndarray:
     """
     Conversion linear RGB to sRGB. sRGBLinear values need to be inside [0, 1]
 
+    :param clip:
     :param RGBL: linear RGB values (numpy 1D, 2D or 3D array)
-    :param normalize: if RGB values are normalized before conversion (bool)
     :return: sRGB image (same shape as input)
     """
     # return RGBL 
@@ -387,7 +389,7 @@ def sRGBLinear_to_sRGB(RGBL: np.ndarray, clip: bool = True) -> np.ndarray:
     return RGB
 
 
-def XYZ_to_sRGB(XYZ: np.ndarray, normalize: bool = True, RI: str="Absolute") -> np.ndarray:
+def XYZ_to_sRGB(XYZ: np.ndarray, normalize: bool = True, RI: str = "Absolute") -> np.ndarray:
     """
     Conversion XYZ to sRGB
 
@@ -402,7 +404,10 @@ def XYZ_to_sRGB(XYZ: np.ndarray, normalize: bool = True, RI: str="Absolute") -> 
 
 
 def XYZ_to_Luv(XYZ: np.ndarray) -> np.ndarray:
-    """"""
+    """
+    :param XYZ:
+    :return:
+    """
 
     # all XYZ values need to be below that of D65 reference white,
     # we therefore need to normalize
@@ -432,7 +437,7 @@ def XYZ_to_Luv(XYZ: np.ndarray) -> np.ndarray:
 
     mask2 = t > e  # t > e for L > 0
     mask3 = misc.partMask(mask, mask2)  # Y > 0 and t > e
-    mask4 = misc.partMask(mask, ~mask2) # Y > 0 and t <= e
+    mask4 = misc.partMask(mask, ~mask2)  # Y > 0 and t <= e
 
     Luv[mask3, 0] = misc.calc("116*tm**(1/3) - 16", tm=t[mask2])
     Luv[mask4, 0] = k * t[~mask2]
@@ -449,7 +454,10 @@ def XYZ_to_Luv(XYZ: np.ndarray) -> np.ndarray:
 
 
 def Luv_to_XYZ(Luv: np.ndarray) -> np.ndarray:
-    """"""
+    """
+    :param Luv:
+    :return:
+    """
 
     # calculations are a rewritten from of
     # http://www.brucelindbloom.com/Eqn_Luv_to_XYZ.html
@@ -482,7 +490,10 @@ def Luv_to_XYZ(Luv: np.ndarray) -> np.ndarray:
 
 
 def Luv_to_u_v_L(Luv: np.ndarray) -> np.ndarray:
-    """"""
+    """
+    :param Luv:
+    :return:
+    """
     _, un, vn = _WP_D65_LUV
     
     mi = Luv[:, :, 0] > 0
@@ -545,6 +556,7 @@ def getLuvHue(Luv: np.ndarray) -> np.ndarray:
 # the formulas and coefficients were determined using optimization algorithms
 ########################################################################################################################
 
+
 def _sRGB_r_primary(wl: np.ndarray) -> np.ndarray:
     """
     Possible sRGB r primary curve.
@@ -555,6 +567,7 @@ def _sRGB_r_primary(wl: np.ndarray) -> np.ndarray:
     r =  75.59166249 * rs * (Gauss(wl, 639.899361, 30.1649583) + 0.0479726849 * Gauss(wl, 418.343791, 76.0664758))
     return r
 
+
 def _sRGB_g_primary(wl: np.ndarray) -> np.ndarray:
     """
     Possible sRGB g primary curve.
@@ -564,6 +577,7 @@ def _sRGB_g_primary(wl: np.ndarray) -> np.ndarray:
     gs = 1
     g = 83.49992300 * gs * Gauss(wl, 539.131090, 33.3116497)
     return g
+
 
 def _sRGB_b_primary(wl: np.ndarray) -> np.ndarray:
     """
@@ -584,6 +598,7 @@ _sRGB_g_primary_power_factor = 1.0
 _sRGB_b_primary_power_factor = 0.77836381
 
 ########################################################################################################################
+
 
 def randomWavelengthFromRGB(RGB: np.ndarray) -> np.ndarray:
     """
@@ -622,6 +637,7 @@ def randomWavelengthFromRGB(RGB: np.ndarray) -> np.ndarray:
 
     return wl_out
 
+
 def _PowerFromSRGB(sRGB: np.ndarray) -> np.ndarray:
     """relative power for each pixel"""
     RGB = sRGB_to_sRGBLinear(sRGB)  # physical brightness is proportional to RGBLinear signal
@@ -631,10 +647,18 @@ def _PowerFromSRGB(sRGB: np.ndarray) -> np.ndarray:
 
 ########################################################################################################################
 
-def spectralCM(N: int, wl0: float = WL_MIN, wl1: float = WL_MAX, RI: str="Absolute") -> np.ndarray:
+
+def spectralCM(N: int,
+               wl0: float = WL_MIN,
+               wl1: float = WL_MAX,
+               RI: str = "Absolute") \
+        -> np.ndarray:
     """
     Get a spectral colormap with N steps
 
+    :param wl0:
+    :param wl1:
+    :param RI:
     :param N: number of steps (int)
     :return: sRGBA array (numpy 2D array, shape (N, 4))
     """
@@ -650,7 +674,7 @@ def spectralCM(N: int, wl0: float = WL_MIN, wl1: float = WL_MAX, RI: str="Absolu
     RGB /= np.max(RGB, axis=1)[:, np.newaxis] # normalize brightness
 
     # some smoothed rectangle function for brightness fall-off for low and large wavelengths
-    # this is for visualization only, theres is no physical or perceptual truth behind this
+    # this is for visualization only, there is no physical or perceptual truth behind this
     RGB *= (0.05+0.95/4*(1-np.tanh((wl-650)/50))*(1+np.tanh((wl-450)/30)))[:, np.newaxis]
 
     # convert to sRGB

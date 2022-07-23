@@ -7,11 +7,11 @@ import optrace as ot
 import optrace.plots
 
 
-ot.plots.RefractionIndexPlot(ot.presets_n_glass, legend_off=True, title="Glass Presets")
-ot.plots.RefractionIndexPlot(ot.presets_n_plastic, legend_off=True, title="Plastic Presets")
-ot.plots.RefractionIndexPlot(ot.presets_n_misc, legend_off=True, block=False, title="Miscellaneous Presets")
+ot.plots.RefractionIndexPlot(ot.presets.RefractionIndex.glasses, legend_off=True, title="Glass Presets")
+ot.plots.RefractionIndexPlot(ot.presets.RefractionIndex.plastics, legend_off=True, title="Plastic Presets")
+ot.plots.RefractionIndexPlot(ot.presets.RefractionIndex.misc, legend_off=True, block=False, title="Miscellaneous Presets")
 
-ot.plots.AbbePlot(ot.presets_n_glass, title="Abbe Diagram for Glasses")
-ot.plots.AbbePlot(ot.presets_n_plastic, title="Abbe Diagram for Plastics")
-ot.plots.AbbePlot(ot.presets_n_misc, title="Abbe Diagram for Miscellaneous Materials", block=True)
+ot.plots.AbbePlot(ot.presets.RefractionIndex.glasses, title="Abbe Diagram for Glasses")
+ot.plots.AbbePlot(ot.presets.RefractionIndex.plastics, title="Abbe Diagram for Plastics")
+ot.plots.AbbePlot(ot.presets.RefractionIndex.misc, title="Abbe Diagram for Miscellaneous Materials", block=True)
 
