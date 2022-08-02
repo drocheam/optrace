@@ -1,4 +1,8 @@
 
+# dist files
+dist
+build
+
 # where does this folder even come from
 .idea
 
@@ -8,8 +12,19 @@ docs/build
 # backups don't need to be included
 bak
 
-# source backups
-src/old
+# testing and CI
+.hypothesis
+.coverage
+.tox
+.pytest_cache
+htmlcov
+eggs/
+.eggs/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # personal notes
 notes

@@ -1,5 +1,5 @@
 
-from optrace.tracer.spectrum.Spectrum import Spectrum
-from optrace.tracer.spectrum.LightSpectrum import LightSpectrum
-from optrace.tracer.spectrum.TransmissionSpectrum import TransmissionSpectrum
+from optrace.tracer.spectrum.spectrum import Spectrum
+from optrace.tracer.spectrum.light_spectrum import LightSpectrum
+from optrace.tracer.spectrum.transmission_spectrum import TransmissionSpectrum
 

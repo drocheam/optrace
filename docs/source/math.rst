@@ -72,11 +72,11 @@ Source: :cite:`FresnelWiki`
 
 .. math::
    t_{\mathrm{s}}=\frac{2\, n_{1} \cos \varepsilon}{n_{1} \cos \varepsilon+n_{2} \cos \varepsilon'}
-   :label: ts
+   :label: ts_coeff
 
 .. math::
    t_{\mathrm{p}}=\frac{2\, n_{1} \cos \varepsilon}{n_{2} \cos \varepsilon+n_{1} \cos \varepsilon'}
-   :label: tp
+   :label: tp_coeff
 
 .. math::
    T=\frac{n_{2} \cos \varepsilon'}{n_{1} \cos \varepsilon}t^{2}
@@ -86,7 +86,7 @@ with
 
 .. math::
    t^2 = \left(t_\text{p}^2 + t_\text{s}^2\right)/\,2
-   :label: t
+   :label: t_coeff
 
 Hit Detection
 ______________________________________
@@ -119,6 +119,7 @@ Intersection Ray with Asphere
    \text{Ray support vector:}~~~~   p &= (p_x, p_y, p_z)\\
    \text{Ray direction vector:}~~~~ s &= (s_x, s_y, s_z)\\
    \text{Center of surface:}~~~~    q &= (x_0, y_0, z_0)
+    :label: IntersectionAsphere0
 
 .. math::
    p_z + s_z t = z_0 + \frac{\rho r^2}{1 + \sqrt{1-(k+1)\rho^2 r^2}}
@@ -418,6 +419,7 @@ Curves with same color stimulus as primaries
                 & + 0.0665761658 \cdot S(\lambda, 552.077348, 150.000000)\Big]\\
     g_0(\lambda) =&~  83.4999030 \cdot  S(\lambda, 539.131090, 33.3116417)\\
     b_0(\lambda) =&~ 118.345477  \cdot  S(\lambda, 415.035902, 47.2130145)\\
+   :label: r0g0b0_curves
 
 .. _rgb_curve1:
 .. figure:: images/rgb_curves1.svg
@@ -430,6 +432,7 @@ Rescale for same Y stimulus as primaries
     r(\lambda) =&~ 1.24573718 \cdot r_0(\lambda)\\
     g(\lambda) =&~ 1.00000000 \cdot g_0(\lambda)\\
     b(\lambda) =&~ 1.12354883 \cdot b_0(\lambda)\\
+    :label: rgb_curves
 
 .. _rgb_curve2:
 .. figure:: images/rgb_curves2.svg
@@ -443,6 +446,7 @@ Rescaling factors:
     r_\text{P} = 1.38950586\\
     g_\text{P} = 1.00000000\\
     b_\text{P} = 1.22823756\\
+   :label: r_g_b_factors
 
 Bibliography
 ______________________________________

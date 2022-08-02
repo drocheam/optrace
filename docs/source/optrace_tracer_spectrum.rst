@@ -4,15 +4,15 @@ tracer.spectrum Submodule
 .. automodule:: optrace.tracer.spectrum
 
 
-tracer.spectrum.LightSpectrum
+tracer.spectrum.light_spectrum
 _________________________________________
-.. automodule:: optrace.tracer.spectrum.LightSpectrum
+.. automodule:: optrace.tracer.spectrum.light_spectrum
 
-tracer.spectrum.Spectrum
+tracer.spectrum.spectrum
 _________________________________
-.. automodule:: optrace.tracer.spectrum.Spectrum
+.. automodule:: optrace.tracer.spectrum.spectrum
 
-tracer.spectrum.TransmissionSpectrum
+tracer.spectrum.transmission_spectrum
 _________________________________________
-.. automodule:: optrace.tracer.spectrum.TransmissionSpectrum
+.. automodule:: optrace.tracer.spectrum.transmission_spectrum
 

@@ -1,17 +1,15 @@
 #!/bin/env python3
 
+import time
 import sys
 sys.path.append('./')
 
 from optrace import *
 
-import copy
-import time
-
 
 def func2(N2):
     # make Raytracer
-    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60],  AbsorbMissing=True,
+    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60], absorb_missing=True,
                    silent=True, no_pol=False, threading=True)
 
     # add Raysource
@@ -20,8 +18,8 @@ def func2(N2):
                    pos=[0, 0, 0], s=[0, 0, 1], polarization='y')
     RT.add(RS)
 
-    RS2 = RaySource(RSS, direction="Parallel", spectrum=presets.LightSpectrum.D65,
-                   pos=[0, 1, 0], s=[0, 0, 1], polarization='x', power=2)
+    RS2 = RaySource(RSS, direction="Parallel", spectrum=presets.light_spectrum.D65,
+                    pos=[0, 1, 0], s=[0, 0, 1], polarization='x', power=2)
     RT.add(RS2)
 
     front = Surface("Circle", r=3, rho=1/10, k=-0.444)
@@ -80,4 +78,3 @@ def func2(N2):
 
 N = 1000000
 func2(N)
-

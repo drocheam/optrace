@@ -18,9 +18,8 @@ Additional External Libraries Frontend
 
 * `matplotlib <https://matplotlib.org/stable/users/index>`_
 * `mayavi <https://docs.enthought.com/mayavi/mayavi/>`_
-* `pynput <https://pypi.org/project/pynput/>`_
 * `PyQt5 <https://pypi.org/project/PyQt5/>`_
-* `traisui <https://docs.enthought.com/traitsui/>`_
-* `Twisted <https://pypi.org/project/Twisted/>`_
-* `wxPyhon <https://pypi.org/project/wxPython/>`_
+* `traitsui <https://docs.enthought.com/traitsui/>`_
+* traits
+* pyface
 

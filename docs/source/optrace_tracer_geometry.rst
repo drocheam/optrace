@@ -4,35 +4,35 @@ tracer.geometry Submodule
 .. automodule:: optrace.tracer.geometry
 
 
-tracer.geometry.Aperture
+tracer.geometry.aperture
 _________________________________
-.. automodule:: optrace.tracer.geometry.Aperture
+.. automodule:: optrace.tracer.geometry.aperture
 
-tracer.geometry.Detector
+tracer.geometry.detector
 _________________________________
-.. automodule:: optrace.tracer.geometry.Detector
+.. automodule:: optrace.tracer.geometry.detector
 
-tracer.geometry.Filter
+tracer.geometry.filter
 _________________________________
-.. automodule:: optrace.tracer.geometry.Filter
+.. automodule:: optrace.tracer.geometry.filter
 
-tracer.geometry.Lens
+tracer.geometry.lens
 _________________________________
-.. automodule:: optrace.tracer.geometry.Lens
+.. automodule:: optrace.tracer.geometry.lens
 
-tracer.geometry.RaySource
+tracer.geometry.ray_source
 _________________________________
-.. automodule:: optrace.tracer.geometry.RaySource
+.. automodule:: optrace.tracer.geometry.ray_source
 
-tracer.geometry.SObject
+tracer.geometry.s_object
 _________________________________
-.. automodule:: optrace.tracer.geometry.SObject
+.. automodule:: optrace.tracer.geometry.s_object
 
-tracer.geometry.Surface
+tracer.geometry.surface
 _________________________________
-.. automodule:: optrace.tracer.geometry.Surface
+.. automodule:: optrace.tracer.geometry.surface
 
-tracer.geometry.SurfaceFunction
+tracer.geometry.surface_function
 _________________________________
-.. automodule:: optrace.tracer.geometry.SurfaceFunction
+.. automodule:: optrace.tracer.geometry.surface_function
 

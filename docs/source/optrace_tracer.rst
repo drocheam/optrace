@@ -3,31 +3,31 @@ tracer Submodule
 
 .. automodule:: optrace.tracer
 
-tracer.Colors
+tracer.color
 _________________________________
-.. automodule:: optrace.tracer.Color
+.. automodule:: optrace.tracer.color
 
-tracer.BaseClass
+tracer.base_class
 _________________________________
-.. automodule:: optrace.tracer.BaseClass
+.. automodule:: optrace.tracer.base_class
 
-tracer.Misc
+tracer.misc
 _________________________________
-.. automodule:: optrace.tracer.Misc
+.. automodule:: optrace.tracer.misc
 
-tracer.RayStorage
+tracer.ray_storage
 _________________________________
-.. automodule:: optrace.tracer.RayStorage
+.. automodule:: optrace.tracer.ray_storage
 
-tracer.RImage
+tracer.r_image
 _________________________________
-.. automodule:: optrace.tracer.RImage
+.. automodule:: optrace.tracer.r_image
 
-tracer.Raytracer
+tracer.raytracer
 _________________________________
-.. automodule:: optrace.tracer.Raytracer
+.. automodule:: optrace.tracer.raytracer
 
-tracer.RefractionIndex
+tracer.refraction_index
 _________________________________
-.. automodule:: optrace.tracer.RefractionIndex
+.. automodule:: optrace.tracer.refraction_index
 

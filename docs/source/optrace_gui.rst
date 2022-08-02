@@ -3,11 +3,11 @@ gui Submodule
 
 .. automodule:: optrace.gui
 
-gui.TCPServer
+gui.propertyy_browser
 __________________________
-.. automodule:: optrace.gui.TCPServer
+.. automodule:: optrace.gui.property_browser
 
 
-gui.GUI
+gui.trace_gui
 __________________________
-.. automodule:: optrace.gui.TraceGUI
+.. automodule:: optrace.gui.trace_gui

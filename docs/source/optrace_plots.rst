@@ -3,11 +3,11 @@ plots Submodule
 
 .. automodule:: optrace.plots
 
-plots.RImagePlots
+plots.r_image_plots
 __________________________
-.. automodule:: optrace.plots.RImagePlots
+.. automodule:: optrace.plots.r_image_plots
 
-plots.DebuggingPlots
+plots.debug_plots
 __________________________
-.. automodule:: optrace.plots.DebugPlots
+.. automodule:: optrace.plots.debug_plots
 
