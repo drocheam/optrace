@@ -1091,8 +1091,8 @@ class TraceGUI(HasTraits):
         for num, mark in enumerate(self.raytracer.marker_list):
             m = self.scene.mlab.points3d(*mark.pos, mode="axes", color=self.MARKER_COLOR)
             m.parent.parent.name = f"Marker {num}"
-            m.actor.actor.property.trait_set(lighting=False)
-            m.actor.actor.pickable = False
+            m.actor.actor.property.trait_set(lighting=False, line_width=5)
+            m.actor.actor.trait_set(pickable=False, force_translucent=True)
             radius  = 0.2 * mark.marker_factor
             m.glyph.glyph.scale_factor = radius
         

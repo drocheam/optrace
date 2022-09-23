@@ -93,7 +93,6 @@ RT.add(ot.Marker("F_obj", [0, 0, tma_obj.focal_point[1]]))
 RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_point[0]]))
 RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_point[1]]))
 
-print(RT.tma().matrix_at(RS.pos[2], RT.tma().focal_point[1]))
 # start GUI.
 sim = TraceGUI(RT, minimalistic_view=True, dark_mode=False, ray_count=2000000)
 sim.run()
