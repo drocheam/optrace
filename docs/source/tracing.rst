@@ -1,0 +1,151 @@
+
+*********************************
+Tracing
+*********************************
+
+Sampling
+====================
+
+Density
+----------------
+
+**Relevancy Sampling**
+
+.. figure:: images/Random_Sampling_Comparison.svg
+   :width: 600
+   :align: center
+
+   Sampling Comparison
+
+**Inverse Transform Sampling**
+
+To calculate a random variable :math:`\mathcal{T}` with probability distribution function :math:`\text{pdf}(x)` from a uniform random variable :math:`\mathcal{U}_{[0,~1]}` we make use of the inverse transform sampling theorem.
+
+.. math::
+   \mathcal{T}_{[0,~1]} = \text{cdf}^{-1}(\mathcal{U}_{[0,~1]})
+
+Where :math:`\text{cdf}^{-1}(x)` is the inverse function of the cumulative distribution function :math:`\text{cdf}(x) = \int_{-\infty}^{x} \text{pdf}(\chi) ~\text{d}\chi`.
+
+This can be generalized for an interval :math:`[a,~b]` of an arbitrary function :math:`f(x)` with :math:`F(x) = \int_{-\infty}^{x} f(\chi)~\text{d}\chi` with :math:`F(x)` needing to be injective.
+
+.. math::
+   \mathcal{T}_{[a,~b]} = \text{F}^{-1}(\mathcal{U}_{[\text{F}(a),~\text{F}(b)]})
+
+.. A change of interval :math:`\mathcal{U}_{[0,~1]} \to \mathcal{U}_{[\text{F}(a),~\text{F}(b)]}` leads to :math:`\mathcal{T}_{[0,~1]} \to \mathcal{T}_{[a,~b]}`.
+
+.. The overall probability :math:`P = \int_{-\infty}^{+\infty} \text{f}(\chi) ~\text{d}\chi` does not need to be :math:`1` like for a :math:`\text{pdf}`, since it can be shown that a normalization :math:`\text{pdf}(x) = f(x)/k` is linear in :math:`\text{cdf}` and also :math:`\text{cdf}^{-1}`, leading to :math:`\mathcal{T}  \to \mathcal{T}/k`, which can be ommitted if :math:`\mathcal{T}` is desired.
+
+Regarding the injectivity condition, this can be simply ensured by :math:`f(x) > 0 ~\forall ~ x \in [a,~b]`.
+
+Direction
+---------------
+
+Spectrum
+----------------
+
+Polarization
+-------------------
+
+Power
+----------------------
+
+
+Tracing Process
+========================
+
+Refraction
+====================
+
+.. figure:: images/Vektorielle_Brechung2-fs8.png
+   :width: 200
+   :align: center
+.. figure:: images/Vektorielle_Brechung-fs8.png
+   :width: 300
+   :align: center
+
+   Images and Equation: :cite:`OptikHaferkorn`
+
+.. math::
+   s^{\prime}=\frac{n_1}{n_2} s-n\left\{\frac{n_1}{n_2}(n s)-\sqrt{1-\left(\frac{n_1}{n_2}\right)^{2}\left[1-(n s)^{2}\right]}\right\}
+   :label: refraction
+
+Polarization
+====================
+
+Transmission
+====================
+
+Source: :cite:`FresnelWiki`
+
+.. math::
+   t_{\mathrm{s}}=\frac{2\, n_{1} \cos \varepsilon}{n_{1} \cos \varepsilon+n_{2} \cos \varepsilon'}
+   :label: ts_coeff
+
+.. math::
+   t_{\mathrm{p}}=\frac{2\, n_{1} \cos \varepsilon}{n_{2} \cos \varepsilon+n_{1} \cos \varepsilon'}
+   :label: tp_coeff
+
+.. math::
+   T=\frac{n_{2} \cos \varepsilon'}{n_{1} \cos \varepsilon} \left( (A_\text{ts} t_\text{s})^2  + (A_\text{tp} t_\text{p})^2 \right)
+   :label: T
+
+
+For light hitting the surface perpendicular this yields an expression independent of the polarization:
+
+.. math::
+   T_{\varepsilon=0} = \frac{4 n_1 n_2 }{(n_1 + n_2)^2}
+
+Filtering
+==================
+
+Geometry Checks
+==========================
+
+Outline Intersection
+========================
+
+Abnormal Lens Rays
+==========================
+
+Hit Finding
+=============================
+
+For inbuilt analytical types the hit finding is described in {}.
+
+Bound Calculation
+-----------------------
+
+Intersections
+--------------------
+
+.. math::
+   \text{Ray support vector:}~~~~   \vec{p_0} &= (p_x, p_y, p_z)\\
+   \text{Ray direction vector:}~~~~ \vec{s} &= (s_x, s_y, s_z)\\
+   \text{Point on Ray:}~~~~ \vec{p_t} &= (x_t, y_t, z_t)\\
+
+Ray line equation depending on ray parameter :math:`t`:
+
+.. math::
+   \vec{p_t}(t)=\vec{p}_{0}+t \cdot \vec{s}
+   :label: pt
+
+Cost function :math:`G` with surface function :math:`f`:
+
+.. math::
+   G(t)=z_{t}-f\left(x_{t}, y_{t}\right)
+   :label: G
+
+.. figure:: images/Illinois.png
+   :width: 500
+   :align: center
+
+   Comparison of the standard Regula-Falsi-algorithm (left) and the Illinois-algorithm :cite:`DiscontinuitiesSlides`.
+
+
+Detector Intersection
+=========================
+
+
+Image Rendering
+====================
+

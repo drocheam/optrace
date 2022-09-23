@@ -2,66 +2,39 @@
 
 import optrace as ot
 from optrace.gui import TraceGUI
-
-# Arizona Eye Model from
-# Schwiegerling J. Field Guide to Visual and Ophthalmic Optics. SPIE Publications: 2004.
+import numpy as np
 
 # options:
-P = 5.7 # pupil diameter
-A = 0  # adaption in dpt
+g = 0.6e3  # object distance
+G_alpha = 4  # angle of object in view
+P = 4  # pupil diameter
 dispersion = True  # turns on chromatic dispersion
 
-# the eye model geometry, excluding the raysource, can also be loaded using simply
-# geom = ot.presets.Geometry.ArizonaEye(P=P, A=A, dispersion=dispersion)
-# RT.add(geom)
-# for the sake of a learning expericence it is
+# resulting properties
+A = 1/g*1000  # adaption in dpt for given g
+G = g*np.tan(G_alpha/180*np.pi) # half object size
+OL = max(G, 8)  # half of x, y, outline size
+sr_angle = np.arctan(1.25*P/2/g)/np.pi*180  # ray divergence needed for diffuse light
 
-# create Raytracer
-RT = ot.Raytracer(outline=[-6, 6, -6, 6, -10, 28], absorb_missing=True, no_pol=False)
+# image vector pointing at the center of the cornea
+def F(x, y):
+    s = np.column_stack((-x, -y, np.ones_like(x)*g))
+    ab = (s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2) ** 0.5
+    return s / ab[:, np.newaxis]
+
+# create raytracer
+RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], absorb_missing=True, no_pol=False)
 
 # add RaySource
-RSS = ot.Surface("Circle", r=3)
-RS = ot.RaySource(RSS, direction="Parallel", spectrum=ot.presets.light_spectrum.D65, pos=[0, 0, -10])
+RSS = ot.Surface("Rectangle", dim=[2*G, 2*G])
+RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=sr_angle, image=ot.presets.image.ETDRS_chart_inverted, 
+               pos=[0, 0, -g], orientation="Function", or_func=F, desc="USAF Chart")
 RT.add(RS)
 
-# add refraction indices depending on dispersive behaviour
-if dispersion:
-    n_Cornea = ot.RefractionIndex("Abbe", n=1.377, V=57.1, desc="n_Cornea")
-    n_Aqueous = ot.RefractionIndex("Abbe", n=1.337, V=61.3, desc="n_Aqueous")
-    n_Lens = ot.RefractionIndex("Abbe", n=1.42+0.00256*A-0.00022*A**2, V=51.9, desc="n_Lens")
-    n_Vitreous = ot.RefractionIndex("Abbe", n=1.336, V=61.1, desc="n_Vitreous")
-else:
-    n_Cornea = ot.RefractionIndex("Constant", n=1.377, desc="n_Cornea")
-    n_Aqueous = ot.RefractionIndex("Constant", n=1.337, desc="n_Aqueous")
-    n_Lens = ot.RefractionIndex("Constant", n=1.42+0.00256*A-0.00022*A**2, desc="n_Lens")
-    n_Vitreous = ot.RefractionIndex("Constant", n=1.336, desc="n_Vitreous")
-
-d_Aq = 2.97-0.04*A  # thickness Aqueous
-d_Lens = 3.767+0.04*A  # thickness lens
-
-# add Cornea
-front = ot.Surface("Asphere", r=5.25, rho=1/7.8, k=-0.25)
-back = ot.Surface("Asphere", r=5.25, rho=1/6.5, k=-0.25)
-L0 = ot.Lens(front, back, d1=0.25, d2=0.30, pos=[0, 0, 0.25], n=n_Cornea, n2=n_Aqueous, desc="Cornea")
-RT.add(L0)
-
-# add Pupil
-ap = ot.Surface("Ring", r=5.25, ri=P/2)
-AP = ot.Aperture(ap, pos=[0, 0, 3.3], desc="Pupil")
-RT.add(AP)
-
-# add Lens
-front = ot.Surface("Asphere", r=5.25, rho=1/(12-0.4*A), k=-7.518749+1.285720*A)
-back = ot.Surface("Asphere", r=5.25, rho=1/(-5.224557+0.2*A), k=-1.353971-0.431762*A)
-L1 = ot.Lens(front, back, d1=d_Lens/3, d2=d_Lens*2/3, pos=[0, 0, d_Aq+0.55+d_Lens/3], 
-             n=n_Lens, n2=n_Vitreous, desc="Lens")
-RT.add(L1)
-
-# add Detector
-DetS = ot.Surface("Sphere", r=6, rho=-1/13.4)
-Det = ot.Detector(DetS, pos=[0, 0, 24], desc="Retina")
-RT.add(Det)
+# load Arizona Eye model
+geom = ot.presets.geometry.arizona_eye(adaptation=A, pupil=P)
+RT.add(geom)
 
 # Instantiate the class and configure its traits.
-TG = TraceGUI(RT, LogImage=True, FlipDetImage=True, ImageType="Irradiance")
+TG = TraceGUI(RT, ray_count=1000000, flip_det_image=True, ray_alpha=-2.25)
 TG.run()

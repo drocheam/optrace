@@ -24,9 +24,9 @@ tracer.geometry.ray_source
 _________________________________
 .. automodule:: optrace.tracer.geometry.ray_source
 
-tracer.geometry.s_object
+tracer.geometry.element
 _________________________________
-.. automodule:: optrace.tracer.geometry.s_object
+.. automodule:: optrace.tracer.geometry.element
 
 tracer.geometry.surface
 _________________________________

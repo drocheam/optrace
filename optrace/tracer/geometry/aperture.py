@@ -4,14 +4,14 @@ Aperture class:
 
 import numpy as np  # for ndarray type
 
-from optrace.tracer.geometry.s_object import SObject  # parent class
-from optrace.tracer.geometry.surface import Surface  # for Surface type
+from .element import Element  # parent class
+from .surface import Surface  # for Surface type
 
 
-class Aperture(SObject):
+class Aperture(Element):
 
-    abbr = "AP"  # object abbreviation
-    _allow_non_2D = False  # don't allow points or lines as surfaces
+    abbr: str = "AP"  #: object abbreviation
+    _allow_non_2D: bool = False  # don't allow points or lines as surfaces
 
     def __init__(self,
                  surface:       Surface,
@@ -25,7 +25,5 @@ class Aperture(SObject):
         :param pos: 3D position of Aperture center (numpy array or list)
         :param kwargs:
         """
-
         super().__init__(surface, pos, **kwargs)
-
         self._new_lock = True  # no new properties after this

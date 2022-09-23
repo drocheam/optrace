@@ -7,7 +7,15 @@ plots.r_image_plots
 __________________________
 .. automodule:: optrace.plots.r_image_plots
 
-plots.debug_plots
+plots.spectrum_plots
 __________________________
-.. automodule:: optrace.plots.debug_plots
+.. automodule:: optrace.plots.spectrum_plots
+
+plots.chromacity_plots
+__________________________
+.. automodule:: optrace.plots.chromacity_plots
+
+plots.misc_plots
+__________________________
+.. automodule:: optrace.plots.misc_plots
 

@@ -3,14 +3,15 @@
 RefractionIndex class:
 Provides the creation and computation of constant or wavelength depended refraction indices
 """
+from typing import Any  # Any type
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
-import optrace.tracer.presets.spectral_lines as Lines  # spectral lines for Abbe number
-from optrace.tracer.spectrum import Spectrum  # parent class 
-import optrace.tracer.color as Color  # for visible wavelength range
-from optrace.tracer.misc import PropertyChecker as pc  # check types and values
+from .presets import spectral_lines as Lines  # spectral lines for Abbe number
+from .spectrum import Spectrum  # parent class
+from . import color  # for visible wavelength range
+from .misc import PropertyChecker as pc  # check types and values
 
 
 class RefractionIndex(Spectrum):
@@ -18,17 +19,17 @@ class RefractionIndex(Spectrum):
     # Refraction Index Models:
     # see https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
 
-    n_types = ["Abbe", "Cauchy", "Conrady", "Sellmeier", "Constant", "Data", "Function"]
-    spectrum_types = n_types  # alias
-   
-    quantity = "Refraction Index n"
-    unit = ""
+    n_types: list[str] = ["Abbe", "Cauchy", "Conrady", "Sellmeier", "Constant", "Data", "Function"]
+    spectrum_types: list[str] = n_types  # alias
+
+    quantity: str = "Refraction Index n"
+    unit: str = ""
 
     def __init__(self,
                  n_type:    str = "Constant",
                  n:         float = 1.0,
                  coeff:     list = None,
-                 lines:     list = None,
+                 lines:     np.ndarray | list = None,
                  V:         float = None,
                  **kwargs)\
             -> None:
@@ -49,20 +50,20 @@ class RefractionIndex(Spectrum):
         :param n: refraction index for ntype="Constant" (float)
         :param func: function for n_type="Function", input needs to be in nm
         :param V: Abbe number for n_type="Abbe"
-        :param lines: spectral lines to use for n_type="Abbe", 
+        :param lines: spectral lines to use for n_type="Abbe",
                       list of 3 wavelengths [short wavelength, center wavelength, long wavelength]
         """
         self.spectrum_type = n_type  # needs to be first so coeff gets set correctly
         self.coeff = coeff
         self.V = V
-        
+
         lines = lines if lines is not None else Lines.FDC
 
         super().__init__(n_type, val=n, lines=lines, **kwargs)
 
         self._new_lock = True
 
-    def __call__(self, wl: np.ndarray | list | float) -> np.ndarray:
+    def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
         """
         Returns the refractive index at specified wavelengths.
         Call on obj using obj(wavelengths).
@@ -70,7 +71,7 @@ class RefractionIndex(Spectrum):
         :param wl: wavelengths in nm (numpy 1D array)
         :return: array of refraction indices
         """
-        wl_ = wl if isinstance(wl, np.ndarray) else np.array(wl, dtype=np.float32)
+        wl_ = np.asarray_chkfinite(wl, dtype=np.float32)
 
         if self.spectrum_type in ["Cauchy", "Conrady", "Sellmeier"] and self.coeff is None:
             raise RuntimeError("coefficients coeff not defined.")
@@ -82,7 +83,7 @@ class RefractionIndex(Spectrum):
                 l = wl_*1e-3
                 A, B, C, D, = tuple(self.coeff)[:4]
                 ns = ne.evaluate("A + B/l**2 + C/l**4 + D/l**6")
-            
+
             case "Abbe":
                 # estimate a refractive index curve from abbe number
                 # note: many different curves can have the same number, these is just an estimation for a possible one
@@ -90,7 +91,7 @@ class RefractionIndex(Spectrum):
                 # use wl in um
                 l = 1e-3*np.array(self.lines)
                 nc = self.val
-                
+
                 # compromise between Cauchy (d=0) and Hetzberger (d=0.028)
                 d = 0.014
 
@@ -118,16 +119,20 @@ class RefractionIndex(Spectrum):
 
         return ns
 
-    def __setattr__(self, key, val):
-      
+    def __setattr__(self, key: str, val: Any) -> None:
+        """
+        assigns the value of an attribute
+        :param key: attribute name
+        :param val: value to assign
+        """
         match key:
-        
+
             case "val" if isinstance(val, int | float):
-                pc.checkNotBelow(key, val, 1)
+                pc.check_not_below(key, val, 1)
 
             case "coeff" if val is not None:
 
-                pc.checkType(key, val, list)
+                pc.check_type(key, val, list)
 
                 match self.spectrum_type:
                     case "Cauchy":      cnt = 4
@@ -158,18 +163,18 @@ class RefractionIndex(Spectrum):
                 if len(val) != 3:
                     raise ValueError("Property 'lines' for n_type='Abbe' needs to have exactly 3 elements")
 
-                if not (val[0] < val[1] < val[2]):
+                if not val[0] < val[1] < val[2]:
                     raise ValueError("The values of property 'lines' need to be ascending.")
 
             case "func" if callable(val):
-                wls = Color.wavelengths(1000)
+                wls = color.wavelengths(1000)
                 n = val(wls, **self.func_args)
                 if np.min(n) < 1:
                     raise ValueError("Function func needs to output values >= 1 over the whole visible range.")
 
             case "V" if val is not None:
-                pc.checkType(key, val, float | int)
-                pc.checkAbove(key, val, 0)
+                pc.check_type(key, val, float | int)
+                pc.check_above(key, val, 0)
 
         super().__setattr__(key, val)
 
@@ -185,5 +190,5 @@ class RefractionIndex(Spectrum):
         return (nc - 1) / (ns - nl) if ns != nl else np.inf
 
     def is_dispersive(self) -> bool:
-        """Checks if dispersive using the Abbe Number"""
+        """:return: if the refractive index is dispersive using the Abbe Number"""
         return self.get_abbe_number() != np.inf

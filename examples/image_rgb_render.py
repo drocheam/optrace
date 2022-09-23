@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 
+import numpy as np
 import optrace as ot
 from optrace.plots import *
-import numpy as np
 
-Image_path = ot.presets.Image.test_screen
+Image_path = ot.presets.image.test_screen
 
-# make Raytracer
+# make raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
 # add Raysource
 RSS = ot.Surface("Rectangle", dim=[4, 4])
-RS = ot.RaySource(RSS, direction="Diverging", div_angle=8,
+RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8,
                   image=Image_path, s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 
 # add Lens 1
-front = ot.Surface("Sphere", r=3, rho=1/8)
-back = ot.Surface("Sphere", r=3, rho=-1/8)
+front = ot.Surface("Sphere", r=3, R=8)
+back = ot.Surface("Sphere", r=3, R=-8)
 nL1 = ot.RefractionIndex("Constant", n=1.5)
 L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
 RT.add(L1)
@@ -28,7 +28,7 @@ RT.add(Det)
 
 # render and show detector image
 pos = [27., 30., 33., 36.]
-_, Ims = RT.iterative_render(N_rays=10e6, N_px_D=200, pos=pos)
+_, Ims = RT.iterative_render(N_rays=15e6, N_px_D=200, pos=pos, no_sources=True)
 
 # show rendered images
 for i in np.arange(len(Ims)-1):

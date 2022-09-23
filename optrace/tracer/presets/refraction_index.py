@@ -1,5 +1,5 @@
-from optrace.tracer.refraction_index import RefractionIndex  # RefractionIndex class
 import numpy as np  # ndarray creation
+from ..refraction_index import RefractionIndex  # RefractionIndex class
 
 
 # Glasses
@@ -42,7 +42,7 @@ FK51A: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.971247817, 0.0047
 """N-FK51A (SCHOTT), see https://refractiveindex.info/?shelf=glass&book=FK51A&page=SCHOTT"""
 
 
-Fused_Silica: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.6961663, 0.0684043**2, 0.4079426,
+fused_silica: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.6961663, 0.0684043**2, 0.4079426,
                                                                     0.1162414**2, 0.8974794, 9.896161**2],
                                                 desc="Fused_Silica", long_desc="Fused silica (fused quartz)")
 """Fused silica (fused quartz), see https://refractiveindex.info/?shelf=glass&book=fused_silica&page=Malitson"""
@@ -127,7 +127,7 @@ SK14: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.936155374, 0.00461
 
 
 # https://refractiveindex.info/?shelf=3d&book=glass&page=soda-lime-clear
-Soda_Lime: RefractionIndex = RefractionIndex("Function",
+soda_lime: RefractionIndex = RefractionIndex("Function",
                                              func=lambda x: 1.5130-0.003169 *
                                              (x*1e-3)**2+0.003962*(x*1e-3)**-2,
                                              desc="Soda Lime",
@@ -141,8 +141,8 @@ SSK8: RefractionIndex = RefractionIndex("Sellmeier", coeff=[1.44857867, 0.008693
 """N-SSK8 (SCHOTT), see https://refractiveindex.info/?shelf=glass&book=SCHOTT-SSK&page=N-SSK8"""
 
 
-glasses: list = [BAF10, BAK1, BASF64, BK7, F2, FK51A, Fused_Silica, K5, LAF2, LAK8, LAK22,
-                 LASF9, LASF44, LF5, SF5, SF6, SF10, SF11, SF66, SK14, Soda_Lime, SSK8]
+glasses: list = [BAF10, BAK1, BASF64, BK7, F2, FK51A, fused_silica, K5, LAF2, LAK8, LAK22,
+                 LASF9, LASF44, LF5, SF5, SF6, SF10, SF11, SF66, SK14, soda_lime, SSK8]
 """glass refraction index presets"""
 
 
@@ -151,34 +151,31 @@ glasses: list = [BAF10, BAK1, BASF64, BK7, F2, FK51A, Fused_Silica, K5, LAF2, LA
 
 CR39: RefractionIndex = RefractionIndex("Conrady", coeff=[1.471862713E+000, 1.520790642E-002, 3.555509148E-005],
                                         desc="CR39", long_desc="CR-39, PADC, Poly(allyl diglycol carbonate)")
-"""CR-39, PADC, Poly(allyl diglycol carbonate), see Conrady equation coefficients from ZEMAX model for CR39, 
+"""CR-39, PADC, Poly(allyl diglycol carbonate), see Conrady equation coefficients from ZEMAX model for CR39,
 thread https://community.zemax.com/got-a-question-7/cr-39-eyeglass-lenses-677
 attached file ophthalmic.zip, line 50 in ophthalmic.agf"""
 
 
 COC: RefractionIndex = RefractionIndex("Sellmeier", coeff=[2.045-1., 0, 0.266, 0.206**2], desc="COC",
                                        long_desc="Topas COC 5013 at 25°C")
-"""Topas COC 5013 at 25°C, 
+"""Topas COC 5013 at 25°C,
 see G. Khanarian, Hoechst Celanese - "Optical properties of cyclic olefin copolymers", Table 1"""
 
 
 Finalite: RefractionIndex = RefractionIndex("Abbe", n=1.600, V=42, desc="Finalite", long_desc="Sola Finalite")
 """
-Sola Finalite,
-from https://eyewiki.aao.org/Lens_Material_Properties
+Sola Finalite from https://eyewiki.aao.org/Lens_Material_Properties
 """
 
 
 MR7: RefractionIndex = RefractionIndex("Abbe", n=1.660, V=32, desc="MR-7", long_desc="MR-7")
 """
-MR-7,
-from https://eyewiki.aao.org/Lens_Material_Properties
+MR-7 from https://eyewiki.aao.org/Lens_Material_Properties
 """
 
 Ormex: RefractionIndex = RefractionIndex("Abbe", n=1.558, V=32, desc="Ormex", long_desc="Essilor Ormex")
 """
-Essilor Ormex,
-from https://eyewiki.aao.org/Lens_Material_Properties
+Essilor Ormex from https://eyewiki.aao.org/Lens_Material_Properties
 """
 
 
@@ -189,7 +186,7 @@ PC: RefractionIndex = RefractionIndex(
 
 PDSM: RefractionIndex = RefractionIndex("Sellmeier", coeff=[1.0057, 0.013217], desc="PDSM",
                                         long_desc="Polydimethylsiloxane")
-"""Polydimethylsiloxane, 
+"""Polydimethylsiloxane,
 see https://refractiveindex.info/?shelf=organic&book=polydimethylsiloxane&page=Schneider-RTV615"""
 
 
@@ -200,7 +197,7 @@ PET: RefractionIndex = RefractionIndex("Data", wls=np.concatenate(([380], 400+10
                                              1.56527, 1.56478, 1.56368, 1.56317, 1.56225, 1.56199, 1.56131, 1.56052,
                                              1.56013, 1.55933, 1.55868, 1.55854, 1.55817, 1.55795, 1.55723, 1.55583],
                                        desc="PET", long_desc="Polyethylene terephthalate")
-"""Polyethylene terephthalate, 
+"""Polyethylene terephthalate,
 see https://refractiveindex.info/?shelf=organic&book=polyethylene_terephthalate&page=Zhang
 linearly extrapolated from 400nm to 380nm"""
 
@@ -208,7 +205,7 @@ linearly extrapolated from 400nm to 380nm"""
 PMMA: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.99654, 0.00787, 0.18964, 0.02191,
                                                             0.00411, 3.85727],
                                         desc="PMMA", long_desc="Poly(methyl methacrylate)")
-"""Poly(methyl methacrylate), 
+"""Poly(methyl methacrylate),
 see https://refractiveindex.info/?shelf=organic&book=poly%28methyl_methacrylate%29&page=Szczurowski"""
 
 
@@ -219,20 +216,19 @@ PS: RefractionIndex = RefractionIndex("Sellmeier", coeff=[1.4435, 0.020216],
 
 Spectralite: RefractionIndex = RefractionIndex("Abbe", n=1.537, V=47, desc="Spectralite", long_desc="Sola Spectralite")
 """
-Sola Spectralite,
-from https://eyewiki.aao.org/Lens_Material_Properties
+Sola Spectralite from https://eyewiki.aao.org/Lens_Material_Properties
 """
 
 
-plastics: list = [CR39, COC, Finalite, MR7, Ormex, PC, PDSM, PET, PMMA, PS, Spectralite]
+plastics: list = [COC, CR39, Finalite, MR7, Ormex, PC, PDSM, PET, PMMA, PS, Spectralite]
 """plastics refraction index presets"""
 
 
 # Misc
 #######################################################################################################################
 
-Air: RefractionIndex = RefractionIndex("Constant", n=1.00027784, desc="Air", long_desc="Air at 550nm, 15°C, 1013.25hPa")
-"""Air at 550nm, 15°C, 1013.25hPa, neglecting dispersion, 
+air: RefractionIndex = RefractionIndex("Constant", n=1.00027784, desc="Air", long_desc="Air at 550nm, 15°C, 1013.25hPa")
+"""Air at 550nm, 15°C, 1013.25hPa, neglecting dispersion,
 see https://refractiveindex.info/?shelf=other&book=air&page=Ciddor"""
 
 
@@ -248,26 +244,26 @@ CaF2: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.5675888, 0.0502636
 """CaF2 (Calcium fluoride), see https://refractiveindex.info/?shelf=main&book=CaF2&page=Malitson"""
 
 
-Diamond: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.3306, 0.1750**2, 4.3356, 0.1060**2],
+diamond: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.3306, 0.1750**2, 4.3356, 0.1060**2],
                                            desc="Diamond", long_desc="Diamond")
 """Diamond, see https://refractiveindex.info/?shelf=main&book=C&page=Peter"""
 
 
-Ethanol: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.0165, 9.08, 0.8268, 0.01039],
+ethanol: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.0165, 9.08, 0.8268, 0.01039],
                                            desc="Ethanol", long_desc="C2H5OH (Ethanol)")
 """C2H5OH (Ethanol), see https://refractiveindex.info/?shelf=organic&book=ethanol&page=Sani-formula"""
 
 
-Ice: RefractionIndex = RefractionIndex("Data", wls=380+10*np.arange(41),
+ice: RefractionIndex = RefractionIndex("Data", wls=380+10*np.arange(41),
                                        vals=[1.32145, 1.3203, 1.3194, 1.3185, 1.3177, 1.3170, 1.3163, 1.3157,
                                              1.3151, 1.3145, 1.3140, 1.3135, 1.3130, 1.3126, 1.3121, 1.3117,
                                              1.3114, 1.3110, 1.3106, 1.3103, 1.3100, 1.3097, 1.3094, 1.3091,
                                              1.3088, 1.3085, 1.3083, 1.3080, 1.3078, 1.3076, 1.3073, 1.3071,
                                              1.3069, 1.3067, 1.3065, 1.3062, 1.3060, 1.3059, 1.3057, 1.3055,
                                              1.3053], desc="Ice", long_desc="Water Ice at -7°C")
-"""Water Ice at -7°C, 
+"""Water Ice at -7°C,
 see https://refractiveindex.info/?shelf=3d&book=crystals&page=ice (from table in full database record)
-interpolated so it starts at 380nm
+but interpolated so it starts at 380nm
 """
 
 
@@ -277,24 +273,23 @@ MgF2: RefractionIndex = RefractionIndex("Sellmeier", coeff=[0.48755108, 0.043384
 """MgF2 (Magnesium fluoride), see https://refractiveindex.info/?shelf=main&book=MgF2&page=Dodge-o"""
 
 
-Vacuum: RefractionIndex = RefractionIndex(
-    "Constant", n=1.0, desc="Vacuum", long_desc="Vacuum")
+vacuum: RefractionIndex = RefractionIndex("Constant", n=1.0, desc="Vacuum", long_desc="Vacuum")
 """Vacuum"""
 
 
-Water: RefractionIndex = RefractionIndex("Sellmeier", coeff=[5.684027565E-1, 5.101829712E-3, 1.726177391E-1,
+water: RefractionIndex = RefractionIndex("Sellmeier", coeff=[5.684027565E-1, 5.101829712E-3, 1.726177391E-1,
                                                              1.821153936E-2, 2.086189578E-2, 2.620722293E-2,
                                                              1.130748688E-1, 1.069792721E1],
                                          desc="Water", long_desc="Water at 20.0°C")
 """Water at 20.0°C, see https://refractiveindex.info/?shelf=main&book=H2O&page=Daimon-20.0C """
 
 
-misc: list = [Air, BaF2, CaF2, Diamond, Ethanol, Ice, MgF2, Vacuum, Water]
+misc: list = [air, BaF2, CaF2, diamond, ethanol, ice, MgF2, vacuum, water]
 """misc refraction index presets"""
 
 
 # list of all n presets
-#######################################################################################################################
+########################################################################################################################
 
 all_presets: list = [*glasses, *plastics, *misc]
 """all refraction index presets in one list"""

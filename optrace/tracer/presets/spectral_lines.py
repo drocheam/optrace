@@ -19,8 +19,8 @@ A_:  float = 768.2 	    #: A' 	K 	IR-A
 # t: float  = 1013.98   #: t 	Hg 	IR-A  # can't simulate this one
 
 
-all_lines: list = [h, g, F_, F, e, d, D, C, C_, r, A_]
-"""all line presets in one list"""
+all_lines: list = [h, g, F_, F, e, d, D, C_, C, r, A_]
+"""all line presets in one list. Order by value."""
 
 
 # line combinations, used for the calculation of Abbe numbers
@@ -31,6 +31,12 @@ FdC:   list = [F,  d, C]   #: FdC line combination
 FeC:   list = [F,  e, C]   #: FeC line combination
 F_eC_: list = [F_, e, C_]  #: F'eC' line combination
 
-all_line_combinations: list = [FDC, FdC, FeC, F_eC_]
-"""all line combination presets in one list"""
+# With the help of
+# http://www.brucelindbloom.com/index.html?ColorCalcHelp.html
+# and some finetuning
+rgb:   list =  [464.3118, 549.1321, 611.2826]
+"""dominant wavelengths of sRGB primaries,
+ with order b, g, r. With image render mode 'Absolute' we get the primaries."""
 
+all_line_combinations: list = [FDC, FdC, FeC, F_eC_, rgb]
+"""all line combination presets in one list"""

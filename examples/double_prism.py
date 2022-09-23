@@ -4,37 +4,46 @@ import numpy as np
 import optrace as ot
 from optrace.gui import TraceGUI
 
-# make Raytracer
+# Further Assignments:
+# 1. replace the ray source spectrum below with led_b3, F_eC_ and others from ot.presets 
+#    and compare the detector image as well as the detector spectrum using the "Imaging" tab in the GUI
+# 2. replace the glass refractive index below by different presets (BASF64, LAK8, ...)
+#    and compare the abbe number as well as the effect on the dispersion
+# 3. check the documentation for the difference between image modes "sRGB (Absolute RI)" and "sRGB (Perceptual RI)"
+#    and compare the image modes by rendering both images
+
+RS_spectrum = ot.presets.light_spectrum.d65
+n = ot.presets.refraction_index.SF10
+
+# print the abbe number
+print(f"Abbe Number: {n.get_abbe_number():.4g}")
+
+
+# make raytracer
 RT = ot.Raytracer(outline=[-4, 5, -3, 5, -1, 27.5])
 
 # add Raysource
 RSS = ot.Surface("Circle", r=0.05)
-RS = ot.RaySource(RSS, direction="Parallel", spectrum=ot.presets.light_spectrum.D65,
+RS = ot.RaySource(RSS, divergence="None", spectrum=RS_spectrum,
                   pos=[-2.5, 0, 0], s=[0.3, 0, 0.7])
 RT.add(RS)
 
-# prism surface
-P1 = ot.SurfaceFunction(r=3, func=lambda x, y: 0.5*x, deriv_func=lambda x, y: (np.full_like(x, 0.5), 0*y))
-P2 = ot.SurfaceFunction(r=3, func=lambda x, y: -0.5*x, deriv_func=lambda x, y: (np.full_like(x, -0.5), 0*y))
-
 # Prism 1
-front = ot.Surface("Function", func=P1)
-back = ot.Surface("Function", func=P2)
-nL1 = ot.presets.RefractionIndex.SF10  # glass with small Abbe number => much dispersion
-L1 = ot.Lens(front, back, de=0.5, pos=[0, 0, 10], n=nL1)
+# the surfaces are tilted circles specified by a normal vector
+front = ot.Surface("Circle", r=3, normal=[-0.45, 0, np.sqrt(1-0.45**2)])
+back = ot.Surface("Circle", r=3, normal=[0.45, 0, np.sqrt(1-0.45**2)])
+L1 = ot.Lens(front, back, de=0.5, pos=[0, 0, 10], n=n)
 RT.add(L1)
 
-print("Abbe Number: ", nL1.get_abbe_number())
-
 # Prism 2
-# back and front of Prism 1 are switched,
-L2 = ot.Lens(back, front, de=0.5, pos=[0, 0, 16.5], n=nL1)
+# back and front of Prism 1 are swapped,
+L2 = ot.Lens(back, front, de=0.5, pos=[0, 0, 16.5], n=n)
 RT.add(L2)
 
 # add Detector
 Det = ot.Detector(ot.Surface("Rectangle", dim=[5, 5]), pos=[0, 0, 23.])
 RT.add(Det)
 
-# Instantiate the class and configure its traits.
-sim = TraceGUI(RT, ColoringType="Wavelength")
+# run the simulator
+sim = TraceGUI(RT, coloring_type="Wavelength")
 sim.run()

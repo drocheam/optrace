@@ -1,3 +1,2 @@
 
-from optrace.tracer import *
-
+from .tracer import *

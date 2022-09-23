@@ -12,10 +12,8 @@
 #
 import os
 import sys
-# sys.path.append(['../../optrace', '../../'
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../..'))
-
 
 
 # -- Project information -----------------------------------------------------
@@ -25,8 +23,7 @@ copyright = '2022, Damian Mendroch'
 author = 'Damian Mendroch'
 
 # The full version, including alpha/beta/rc tags
-release = '0.7.2'
-
+release = '0.9.8'
 
 # -- General configuration ---------------------------------------------------
 
@@ -78,7 +75,6 @@ html_theme_options = {
     "body_max_width" : 1080
 }
 
-
 numfig = True
 math_numfig = True
 
@@ -87,7 +83,6 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
                        'matplotlib': ('http://matplotlib.org/stable', None)}
-
 
 autodoc_default_options = {
 	'members': True,

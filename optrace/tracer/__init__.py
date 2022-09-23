@@ -1,20 +1,23 @@
 
-from optrace.tracer.geometry.surface_function import SurfaceFunction
-from optrace.tracer.geometry.surface import Surface
-from optrace.tracer.geometry.lens import Lens
-from optrace.tracer.geometry.aperture import Aperture
-from optrace.tracer.geometry.filter import Filter
-from optrace.tracer.geometry.detector import Detector
+from .geometry.surface_function import SurfaceFunction
+from .geometry.surface import Surface
+from .geometry.point import Point
+from .geometry.line import Line
 
-from optrace.tracer.ray_storage import RaySource
-from optrace.tracer.r_image import RImage
-from optrace.tracer.raytracer import Raytracer
+from .geometry.lens import Lens
+from .geometry.aperture import Aperture
+from .geometry.filter import Filter
+from .geometry.detector import Detector
+from .geometry.marker import Marker
 
-from optrace.tracer.refraction_index import RefractionIndex
-from optrace.tracer.spectrum.spectrum import Spectrum
-from optrace.tracer.spectrum.light_spectrum import LightSpectrum
-from optrace.tracer.spectrum.transmission_spectrum import TransmissionSpectrum
+from .ray_storage import RaySource
+from .r_image import RImage
+from .raytracer import Raytracer
+from .transfer_matrix_analysis import TMA
 
-import optrace.tracer.presets as presets
+from .refraction_index import RefractionIndex
+from .spectrum.spectrum import Spectrum
+from .spectrum.light_spectrum import LightSpectrum
+from .spectrum.transmission_spectrum import TransmissionSpectrum
 
-
+from . import presets

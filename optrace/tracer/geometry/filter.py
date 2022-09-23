@@ -6,20 +6,21 @@ Useful for color filters or apertures.
 """
 
 import numpy as np  # ndarray type
+from typing import Any  # Any type
 
-from optrace.tracer.geometry.s_object import SObject  # parent class
-from optrace.tracer.spectrum.transmission_spectrum import TransmissionSpectrum  # for transmission
-from optrace.tracer.geometry.surface import Surface  # Surface type
-from optrace.tracer.misc import PropertyChecker as pc  # check types and values
+from .element import Element  # parent class
+from .surface import Surface  # Surface type
+from ..spectrum.transmission_spectrum import TransmissionSpectrum  # for transmission
+from ..misc import PropertyChecker as pc  # check types and values
 
 
-class Filter(SObject):
+class Filter(Element):
 
-    abbr = "F"  # object abbreviation
-    _allow_non_2D = False  # don't allow points or lines as surfaces
+    abbr: str = "F"  #: object abbreviation
+    _allow_non_2D: bool = False  # don't allow points or lines as surfaces
 
-    def __init__(self, 
-                 surface:       Surface, 
+    def __init__(self,
+                 surface:       Surface,
                  pos:           (list | np.ndarray),
                  spectrum:      TransmissionSpectrum,
                  **kwargs)\
@@ -36,7 +37,7 @@ class Filter(SObject):
         self.spectrum = spectrum
         self._new_lock = True  # new properties can't be assigned after this
 
-    def __call__(self, wl: np.ndarray) -> np.ndarray:        
+    def __call__(self, wl: np.ndarray) -> np.ndarray:
         """
         Return filter transmittance for specified wavelengths.
 
@@ -53,9 +54,13 @@ class Filter(SObject):
         """
         return self.spectrum.get_color()
 
-    def __setattr__(self, key: str, val) -> None:
-      
+    def __setattr__(self, key: str, val: Any) -> None:
+        """
+        assigns the value of an attribute
+        :param key: attribute name
+        :param val: value to assign
+        """
         if key == "spectrum":
-            pc.checkType(key, val, TransmissionSpectrum)
+            pc.check_type(key, val, TransmissionSpectrum)
 
         super().__setattr__(key, val)

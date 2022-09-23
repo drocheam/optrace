@@ -1,3 +1,2 @@
 
-from optrace.gui.trace_gui import TraceGUI
-
+from .trace_gui import TraceGUI

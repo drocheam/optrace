@@ -1,0 +1,246 @@
+
+from typing import Callable  # Callable typing hints
+
+import numpy as np  # calculations
+import matplotlib.pyplot as plt  # actual plotting
+import matplotlib.patheffects as path_effects  # path effects for plot lines
+
+from ..tracer.r_image import RImage
+from ..tracer.spectrum import LightSpectrum
+from ..tracer import color  # color conversions for chromacity plots
+from ..plots.misc_plots import _set_font
+
+
+chromacity_norms: list[str, str, str] = ["Ignore", "Largest", "Sum"]
+"""possible norms for the chromacity diagrams"""
+
+
+def chromacities_cie_1931(img:                  RImage | LightSpectrum | list[LightSpectrum],
+                          rendering_intent:     str = "Ignore",
+                          title:                str = "CIE 1931 Chromaticity Diagram",
+                          **kwargs)\
+        -> None:
+    """
+
+    :param img:
+    :param rendering_intent:
+    :param title:
+    :param kwargs:
+    """
+
+    # coordinates of whitepoint and sRGB primaries in Chromacity diagramm coordinates (xy)
+    r, g, b, w = color.SRGB_R_XY, color.SRGB_G_XY, color.SRGB_B_XY, color.SRGB_W_XY
+
+    # when looking at the XYZ to sRGB Matrix, the r channel has by far the highest coefficients
+    # therefore the red region leads to the highest brightness clipping
+    # normalizing to the redmost point, the primary, saves all values inside the gamut from brightness clipping
+    # coefficients are from Color.XYZ_to_sRGBLinear()
+    # we do this since we can't normalize on the highest value in the chromacity image,
+    # since the brightest values come from impossible colors (colors outside human vision) clipped towards the gamut
+    norm = 3.2404542*r[0] - 1.5371385*r[1] - 0.4985314*(1 - r[0] - r[1])
+
+    # XYZ to Chromacity Diagram coordinates (xy in this case)
+    def conv(XYZ):
+        xyY = color.xyz_to_xyY(XYZ)
+        return xyY[:, :, 0].flatten(), xyY[:, :, 1].flatten()
+
+    # inverse operation of conv
+    def i_conv(x, y):
+        xg, yg = np.meshgrid(x, y)
+        zg = 1 - xg - yg
+        return 1/norm*np.dstack((xg, yg, zg))
+
+    ext = [0, 0.8, 0, 0.9]  # extent of diagram
+    _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
+                       title, "x", "y", **kwargs)
+
+
+def chromacities_cie_1976(img:                  RImage | LightSpectrum | list[LightSpectrum],
+                          rendering_intent:     str = "Ignore",
+                          title:                str = "CIE 1976 UCS Diagram",
+                          **kwargs)\
+        -> None:
+    """
+
+    :param img:
+    :param rendering_intent:
+    :param title:
+    :param kwargs:
+    """
+
+    # coordinates of whitepoint and sRGB primaries in chromacity diagram coordinates (u'v')
+    r, g, b, w = color.SRGB_R_UV, color.SRGB_G_UV, color.SRGB_B_UV, color.SRGB_W_UV
+
+    # see notes in ChromacitiesCIE1931()
+    r_xy = color.SRGB_R_XY
+    norm = 3.2404542*r_xy[0] - 1.5371385*r_xy[1] - 0.4985314*(1 - r_xy[0] - r_xy[1])
+
+    # XYZ to Chromacity Diagram coordinates (u'v' in this case)
+    def conv(XYZ):
+        Luv = color.xyz_to_luv(XYZ)
+        u_v_L = color.luv_to_u_v_l(Luv)
+        return u_v_L[:, :, 0].flatten(), u_v_L[:, :, 1].flatten()
+
+    # inverse operation of conv
+    def i_conv(u_, v_):
+        u_g, v_g = np.meshgrid(u_, v_)
+        xg = 9*u_g / (6*u_g - 16*v_g + 12)
+        yg = 4*v_g / (6*u_g - 16*v_g + 12)
+        zg = 1 - xg - yg
+
+        return 1/norm * np.dstack((xg, yg, zg))
+
+    ext = [0, 0.7, 0, 0.7]  # extent of diagram
+    _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
+                       title, "u'", "v'", **kwargs)
+
+
+def _chromaticity_plot(img:                     RImage | LightSpectrum | list[LightSpectrum],
+                       conv:                    Callable,
+                       i_conv:                  Callable,
+                       rendering_intent:        str,
+                       r:                       list,
+                       g:                       list,
+                       b:                       list,
+                       w:                       list,
+                       ext:                     list,
+                       title:                   str,
+                       xl:                      str,
+                       yl:                      str,
+                       block:                   bool = False,
+                       norm:                    str = "Sum")\
+        -> None:
+    """Lower level plotting function. Don't use directly"""
+
+    # RImage -> plot Pixel colors (RI != "Ignore" means sRGB conversion with said rendering intent)
+    if isinstance(img, RImage):
+        XYZ = img.get_xyz() if rendering_intent == "Ignore" \
+            else color.srgb_to_xyz(img.get_rgb(rendering_intent=rendering_intent))
+        labels = []  # no labels, otherwise many labels would cover the whole diagram
+        legend3 = "Image Colors"
+        point_alpha = 0.1  # low alpha since we have a lot of pixels
+
+    # LightSpectrum -> single point in diagram
+    elif isinstance(img, LightSpectrum):
+        XYZ = img.get_xyz()
+        labels = [img.get_desc()]
+        legend3 = "Spectrum Colors"
+        point_alpha = 1
+
+    # list of LightSpectrum -> multiple points in diagram
+    elif isinstance(img, list):
+
+        # make sure they are of LightSpectrum type
+        for Imi in img:
+            if not isinstance(Imi, LightSpectrum):
+                raise TypeError(f"Expected list of LightSpectrum, got one element of {type(Imi)}.")
+
+        labels = []
+        XYZ = np.zeros((0, 1, 3), dtype=np.float64)  # will hold XYZ coordinates of spectra
+
+        # fill legend and color array
+        for i, Imi in enumerate(img):
+            labels.append(Imi.get_desc())
+            XYZ = np.vstack((XYZ, Imi.get_xyz()))
+
+        legend3 = "Spectrum Colors"
+        point_alpha = 1
+
+    else:
+        raise TypeError(f"Invalid parameter of type {type(img)}.")
+
+    # convert wavelength to coordinates in diagram
+    def wl_to_xy(wl):
+        XYZ = np.column_stack((color.x_tristimulus(wl),
+                               color.y_tristimulus(wl),
+                               color.z_tristimulus(wl)))
+
+        XYZ = np.array([XYZ])
+        return conv(XYZ)
+
+    # spectral curve
+    wl = np.linspace(380, 780, 1001)
+    xs, ys = wl_to_xy(wl)
+
+    # points for scatters (image pixel colors or spectrum positions)
+    wls = np.linspace(380, 780, 41)
+    xss, yss = wl_to_xy(wls)
+
+    # coordinates for some spectral curve labels
+    wls2 = np.array([380, 470, 480, 490, 500, 510, 520, 540,  560, 580, 600, 620, 780], dtype=np.float64)
+    xss2, yss2 = wl_to_xy(wls2)
+
+    # calculate chromacity shoe area
+    x = np.linspace(ext[0], ext[1], 100)
+    y = np.linspace(ext[2], ext[3], 100)
+    XYZ_shoe = i_conv(x, y)
+    RGB = color.xyz_to_srgb_linear(XYZ_shoe, rendering_intent="Absolute", normalize=False)
+
+    # "bright" chromacity diagram -> normalize such that one of the sRGB coordinates is 1
+    if norm == "Largest":
+        mask = ~np.all(RGB == 0, axis=2)
+        RGB[mask] /= np.max(RGB[mask], axis=1)[:, np.newaxis]  # normalize brightness
+
+    # "smooth gradient" chromacity diagram -> normalize colors such that R + G + B = 1
+    elif norm == "Sum":
+        mask = ~np.all(RGB == 0, axis=2)
+        RGB[mask] /= np.sum(RGB[mask], axis=1)[:, np.newaxis]  # normalize brightness
+
+    # convert to sRGB and flip such that element [0, 0] is in the lower left of the diagram
+    sRGB = color.srgb_linear_to_srgb(RGB)
+    sRGB = np.flipud(sRGB)
+
+    _set_font()
+    plt.figure()
+    plt.minorticks_on()
+
+    # plot colored area, this also includes colors outside the gamut
+    plt.imshow(sRGB, extent=[x[0], x[-1], y[0], y[-1]], interpolation="bilinear", label='_nolegend_')
+
+    # we want to fill the regions outside the gamut black
+    # the edge can be divided into a lower and upper part
+    # both go from the leftmost point xsm to the rightmost x[-1]
+    # position and wavelength of leftmost point in gamut
+    xsm = np.argmin(xs)
+    wlleft, ylleft = wl[xsm], ys[xsm]
+
+    # fill upper edge part of gamut
+    xf1 = np.concatenate(([x[0]],   xs[wl >= wlleft], [x[-1]]))
+    yf1 = np.concatenate(([ylleft], ys[wl >= wlleft], [ys[-1]]))
+    plt.fill_between(xf1, yf1, np.ones_like(xf1)*y[-1], color="0.2", label='_nolegend_')  # fill region outside gamut
+
+    # fill lower edge part of gamut
+    xf2 = np.concatenate(([x[0]],   np.flip(xs[wl <= wlleft]), [xs[-1]], [x[-1]]))
+    yf2 = np.concatenate(([ylleft], np.flip(ys[wl <= wlleft]), [ys[-1]], [ys[-1]]))
+    plt.fill_between(xf2, yf2, np.ones_like(xf2)*y[0], color="0.2", label='_nolegend_')
+
+    # plot gamut edge line
+    plt.plot(xs, ys, color="k", zorder=4, linewidth=1, label='_nolegend_')
+    plt.plot([xs[0], xs[-1]], [ys[0], ys[-1]], color="k", linewidth=1, zorder=4, label='_nolegend_')
+
+    # add spectral wavelength labels and markers
+    plt.scatter(xss, yss, marker="+", color="0.7", linewidth=1, s=15, zorder=5, label='_nolegend_')
+    for i, wli in enumerate(wls2.tolist()):
+        text = plt.text(xss2[i], yss2[i], str(int(wli)), fontsize=9, color="w", zorder=10, label='_nolegend_')
+        text.set_path_effects([path_effects.Stroke(linewidth=1, foreground='black'), path_effects.Normal()])
+
+    # draw sRGB gamut and whitepoint
+    # effect = [path_effects.Stroke(linewidth=2, foreground='w'), path_effects.Normal()]
+    plt.plot([r[0], g[0], b[0], r[0]], [r[1], g[1], b[1], r[1]], "k-.", linewidth=1)
+    plt.scatter(w[0], w[1], color="w", marker="o", s=20, edgecolor="k")
+
+    # plot image/spectrum points and labels
+    xi, yi = conv(XYZ)
+    plt.scatter(xi, yi, color="k", marker="x", s=10, alpha=point_alpha)
+    for i, l in enumerate(labels):
+        text = plt.text(xi[i], yi[i], l, fontsize=9, color="k")
+
+    plt.minorticks_on()
+    # labels and legends
+    plt.xlabel(xl)
+    plt.ylabel(yl)
+    plt.title(title)
+    plt.legend(["sRGB Gamut", "Whitepoint D65", legend3])
+    plt.show(block=block)
+    plt.pause(0.1)
+

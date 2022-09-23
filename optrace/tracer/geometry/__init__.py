@@ -1,8 +1,12 @@
 
-from optrace.tracer.geometry.surface import Surface
-from optrace.tracer.geometry.filter import Filter
-from optrace.tracer.geometry.aperture import Aperture
-from optrace.tracer.geometry.detector import Detector
-from optrace.tracer.geometry.lens import Lens
-from optrace.tracer.geometry.ray_source import RaySource
+from .surface import Surface
+from .line import Line
+from .point import Point
+
+from .filter import Filter
+from .aperture import Aperture
+from .detector import Detector
+from .lens import Lens
+from .marker import Marker
+from .ray_source import RaySource
 

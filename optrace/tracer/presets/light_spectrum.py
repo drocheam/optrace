@@ -1,55 +1,82 @@
-import optrace.tracer.presets.spectral_lines as Lines  # spectral lines
-# light spectrum and spectrum class
-from optrace.tracer.spectrum import LightSpectrum
-import optrace.tracer.color as Color
+from . import spectral_lines as Lines  # spectral lines
+from ..spectrum import LightSpectrum
+from .. import color
 
 # Standard Illuminants
 #######################################################################################################################
 
 _quan_unit = dict(quantity="Relative Radiant Power", unit="")
 
-A: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "A"),
-                                 desc="A", long_desc="Standard Illuminant A", **_quan_unit)
+a: LightSpectrum = LightSpectrum("Function", func=color.a_illuminant,
+                                 desc="A", long_desc="Illuminant A", **_quan_unit)
 """Standard Illuminant A"""
 
-C: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "C"),
-                                 desc="C", long_desc="Standard Illuminant C", **_quan_unit)
+c: LightSpectrum = LightSpectrum("Function", func=color.c_illuminant,
+                                 desc="C", long_desc="Illuminant C", **_quan_unit)
 """Standard Illuminant C"""
 
-D50: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "D50"),
-                                   desc="D50", long_desc="Standard Illuminant D50", **_quan_unit)
+d50: LightSpectrum = LightSpectrum("Function", func=color.d50_illuminant,
+                                   desc="D50", long_desc="Illuminant D50", **_quan_unit)
 """Standard Illuminant D50"""
 
-D55: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "D55"),
-                                   desc="D55", long_desc="Standard Illuminant D55", **_quan_unit)
+d55: LightSpectrum = LightSpectrum("Function", func=color.d55_illuminant,
+                                   desc="D55", long_desc="Illuminant D55", **_quan_unit)
 """Standard Illuminant D55"""
 
-D65: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "D65"),
-                                   desc="D65", long_desc="Standard Illuminant D65", **_quan_unit)
+d65: LightSpectrum = LightSpectrum("Function", func=color.d65_illuminant,
+                                   desc="D65", long_desc="Illuminant D65", **_quan_unit)
 """Standard Illuminant D65"""
 
-D75: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "D75"),
-                                   desc="D75", long_desc="Standard Illuminant D75", **_quan_unit)
+d75: LightSpectrum = LightSpectrum("Function", func=color.d75_illuminant,
+                                   desc="D75", long_desc="Illuminant D75", **_quan_unit)
 """Standard Illuminant D75"""
 
-E: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "E"),
-                                 desc="E", long_desc="Standard Illuminant E", **_quan_unit)
+e: LightSpectrum = LightSpectrum("Function", func=color.e_illuminant,
+                                  desc="E", long_desc="Illuminant E", **_quan_unit)
 """Standard Illuminant E"""
 
-F2: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "F2"),
-                                  desc="F2", long_desc="Standard Illuminant F2", **_quan_unit)
-"""Standard Illuminant F2"""
+fl2: LightSpectrum = LightSpectrum("Function", func=color.fl2_illuminant,
+                                   desc="FL2", long_desc="Illuminant FL2", **_quan_unit)
+"""Standard Illuminant FL2"""
 
-F7: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "F7"),
-                                  desc="F7", long_desc="Standard Illuminant F7", **_quan_unit)
-"""Standard Illuminant F7"""
+fl7: LightSpectrum = LightSpectrum("Function", func=color.fl7_illuminant,
+                                   desc="FL7", long_desc="Illuminant FL7", **_quan_unit)
+"""Standard Illuminant FL7"""
 
-F11: LightSpectrum = LightSpectrum("Function", func=lambda x: Color.illuminant(x, "F11"),
-                                   desc="F11", long_desc="Standard Illuminant F11", **_quan_unit)
-"""Standard Illuminant F11"""
+fl11: LightSpectrum = LightSpectrum("Function", func=color.fl11_illuminant,
+                                    desc="FL11", long_desc="Illuminant FL11", **_quan_unit)
+"""Standard Illuminant FL11"""
 
+led_b1: LightSpectrum = LightSpectrum("Function", func=color.led_b1_illuminant,
+                                      desc="LED-B1", long_desc="Illuminant LED-B1", **_quan_unit)
+"""Standard Illuminant LED-B1"""
 
-standard: list = [A, C, D50, D55, D65, D75, E, F2, F7, F11]
+led_b2: LightSpectrum = LightSpectrum("Function", func=color.led_b2_illuminant,
+                                      desc="LED-B2", long_desc="Illuminant LED-B2", **_quan_unit)
+"""Standard Illuminant LED-B2"""
+
+led_b3: LightSpectrum = LightSpectrum("Function", func=color.led_b3_illuminant,
+                                      desc="LED-B3", long_desc="Illuminant LED-B3", **_quan_unit)
+"""Standard Illuminant LED-B3"""
+
+led_b4: LightSpectrum = LightSpectrum("Function", func=color.led_b4_illuminant,
+                                      desc="LED-B4", long_desc="Illuminant LED-B4", **_quan_unit)
+"""Standard Illuminant LED-B4"""
+
+led_b5: LightSpectrum = LightSpectrum("Function", func=color.led_b5_illuminant,
+                                      desc="LED-B5", long_desc="Illuminant LED-B5", **_quan_unit)
+"""Standard Illuminant LED-B5"""
+
+standard_natural: list = [a, c, d50, d55, d65, d75, e]
+"""natural standard illuminants. Includes illuminant A and E as well as daylight illuminants"""
+
+standard_fl: list = [fl2, fl7, fl11]
+"""standard illuminants for fluorescent lamp light"""
+
+standard_led: list = [led_b1, led_b2, led_b3, led_b4, led_b5]
+"""standard illuminants for LED light"""
+
+standard: list = [*standard_natural, *standard_fl, *standard_led]
 """standard illuminant presets in one list"""
 
 
@@ -58,25 +85,25 @@ standard: list = [A, C, D50, D55, D65, D75, E, F2, F7, F11]
 
 _quan_unit = dict(quantity="Relative Spectral Density", unit="")
 
-sRGB_r: LightSpectrum = LightSpectrum("Function", func=Color.sRGB_r_primary,
-                                      desc="R", long_desc="Possible sRGB R Primary", **_quan_unit)
+srgb_r: LightSpectrum = LightSpectrum("Function", func=color.srgb_r_primary,
+                                      desc="R", long_desc="sRGB R Primary", **_quan_unit)
 """Possible sRGB R Primary"""
 
-sRGB_g: LightSpectrum = LightSpectrum("Function", func=Color.sRGB_g_primary,
-                                      desc="G", long_desc="Possible sRGB G Primary", **_quan_unit)
+srgb_g: LightSpectrum = LightSpectrum("Function", func=color.srgb_g_primary,
+                                      desc="G", long_desc="sRGB G Primary", **_quan_unit)
 """Possible sRGB G Primary"""
 
-sRGB_b: LightSpectrum = LightSpectrum("Function", func=Color.sRGB_b_primary,
-                                      desc="B", long_desc="Possible sRGB B Primary", **_quan_unit)
+srgb_b: LightSpectrum = LightSpectrum("Function", func=color.srgb_b_primary,
+                                      desc="B", long_desc="sRGB B Primary", **_quan_unit)
 """Possible sRGB B Primary"""
 
-sRGB_w: LightSpectrum = LightSpectrum("Function", func=lambda wl: Color.sRGB_r_primary(wl) +
-                                                                  Color.sRGB_g_primary(wl) + Color.sRGB_b_primary(wl),
-                                      desc="W", long_desc="Possible sRGB White Spectrum", **_quan_unit)
+srgb_w: LightSpectrum = LightSpectrum("Function", func=lambda wl: color.srgb_r_primary(wl) +
+                                                                  color.srgb_g_primary(wl) + color.srgb_b_primary(wl),
+                                      desc="W", long_desc="sRGB White Spectrum", **_quan_unit)
 """Possible sRGB White Spectrum"""
 
 
-sRGB: list = [sRGB_r, sRGB_g, sRGB_b, sRGB_w]
+srgb: list = [srgb_r, srgb_g, srgb_b, srgb_w]
 """sRGB channel and white presets in one list"""
 
 
@@ -99,13 +126,16 @@ F_eC_: LightSpectrum = LightSpectrum("Lines", lines=Lines.F_eC_, line_vals=[1, 1
                                      desc="Lines F'eC'", long_desc="Spectral Lines F', e, C'")
 """Spectral Lines F', e, C'"""
 
+rgb_lines: LightSpectrum = LightSpectrum("Lines", lines=Lines.rgb, line_vals=[0.5745000, 0.5985758, 0.3895581],
+                                         desc="RGB Lines'", long_desc="Spectral Lines 450, 550, 650nm")
+"""Spectral Lines 450, 550, 650nm with a power ratio producing neutral D65 white"""
 
-lines: list = [FDC, FdC, FeC, F_eC_]
+lines: list = [FDC, FdC, FeC, F_eC_, rgb_lines]
 """all lines spectrum presets in one list"""
 
 
 # List of all spec presets
 #######################################################################################################################
 
-all_presets: list = [*standard, *lines, *sRGB]
+all_presets: list = [*standard, *lines, *srgb]
 """all light spectrum presets in one list"""

@@ -1,24 +1,24 @@
-import optrace.tracer.color as Color  # tristimulus curves
-from optrace.tracer.spectrum import Spectrum  # spectrum class
+from .. import color  # tristimulus curves
+from ..spectrum import Spectrum  # spectrum class
 
 
 # Tristimulus Curves
 #######################################################################################################################
 
-X: Spectrum = Spectrum("Function", func=lambda x: Color.tristimulus(x, "X"),
-                       desc="X", long_desc="Tristimulus X Curve", quantity="Relative Response", unit="")
-"""tristimulus X curve"""
+x: Spectrum = Spectrum("Function", func=color.x_tristimulus,
+                       desc="x", long_desc="Tristimulus x Curve", quantity="Relative Response", unit="")
+"""tristimulus x curve"""
 
-Y: Spectrum = Spectrum("Function", func=lambda x: Color.tristimulus(x, "Y"),
-                       desc="Y", long_desc="Tristimulus Y Curve", quantity="Relative Response", unit="")
-"""tristimulus Y curve"""
+y: Spectrum = Spectrum("Function", func=color.y_tristimulus,
+                       desc="y", long_desc="Tristimulus y Curve", quantity="Relative Response", unit="")
+"""tristimulus y curve"""
 
-Z: Spectrum = Spectrum("Function", func=lambda x: Color.tristimulus(x, "Z"),
-                       desc="Z", long_desc="Tristimulus Z Curve", quantity="Relative Response", unit="")
-"""tristimulus Z curve"""
+z: Spectrum = Spectrum("Function", func=color.z_tristimulus,
+                       desc="z", long_desc="Tristimulus z Curve", quantity="Relative Response", unit="")
+"""tristimulus z curve"""
 
 
-tristimulus: list = [X, Y, Z]
+tristimulus: list = [x, y, z]
 """tristimulus curve spectrum presets in one list"""
 
 

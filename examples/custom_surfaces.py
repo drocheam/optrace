@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+
+import numpy as np
+import optrace as ot
+from optrace.gui import TraceGUI
+
+# init raytracer
+RT = ot.Raytracer(outline=[-7, 7, -7, 7, 0, 40])
+
+# add Raysource
+RSS = ot.Surface("Circle", r=2)
+RS = ot.RaySource(RSS, divergence="Isotropic", div_angle=8, s=[0, 0, 1], pos=[0, 0, 0], 
+                  spectrum=ot.presets.light_spectrum.led_b2)
+RT.add(RS)
+
+# custom surface with SurfaceFunction
+surf_func = ot.SurfaceFunction(func=lambda x, y: ((x**2 + y**2)**2 - (x**2 + y**2)*20)/100)
+back = ot.Surface("Function", func=surf_func, r=3)
+front = ot.Surface("Sphere", r=3, R=8)
+nL1 = ot.RefractionIndex("Constant", n=1.5)
+L1 = ot.Lens(front, back, de=0, pos=[0, 0, 12], n=nL1)
+RT.add(L1)
+
+# filter with custom spectrum and mask
+mask = lambda x, y: ~((x < 0) & (x**2 + y**2 < 2))
+surf_func2 = ot.SurfaceFunction(func=lambda x, y: np.zeros_like(x), mask_func=mask)
+def filter_func(wl):
+    T = np.full_like(wl, 0.2)
+    T[(wl < 450) | (wl > 630)] = 1
+    return T
+f_surf = ot.Surface("Function", func=surf_func2, r=3)
+t_spec = ot.TransmissionSpectrum("Function", func=filter_func)
+F = ot.Filter(f_surf, pos=[0, 0, 18], spectrum=t_spec)
+RT.add(F)
+
+# custom surface with surface_type="Data"
+r = 2.5
+X, Y = np.mgrid[-r:r:100j, -r:r:100j]
+m = X > 0
+Z = np.zeros_like(X)
+Z[m] = -(X[m]**2 + Y[m]**2)/40
+Z[~m] = -(X[~m]**2 + Y[~m]**2)/40 - X[~m]**2/20
+front = ot.Surface("Sphere", r=r, R=-20)
+front = ot.Surface("Data", r=r, data=-Z)
+back = ot.Surface("Data", r=r, data=Z)
+nL2 = ot.RefractionIndex("Constant", n=1.6)
+L2 = ot.Lens(front, back, de=0, pos=[0, 0, 21], n=nL2)
+RT.add(L2)
+
+
+func3 = lambda x, y: np.abs(x)/3
+surf_func3 = ot.SurfaceFunction(func=func3)
+front = ot.Surface("Function", func=surf_func3, r=5, z_min=0, z_max=5/3)
+back = ot.Surface("Circle", r=5)
+L3 = ot.Lens(front, back, n=nL1, pos=[1, 0, 29])
+RT.add(L3)
+
+# add Detector
+DetS = ot.Surface("Rectangle", dim=[14, 14])
+Det = ot.Detector(DetS, pos=[0, 0, 36])
+RT.add(Det)
+
+# Instantiate the class and configure its traits.
+sim = TraceGUI(RT, ray_alpha=-1.5)
+sim.run()

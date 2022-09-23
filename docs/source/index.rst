@@ -14,6 +14,7 @@ Optrace Documentation
    overview
    installation
    usage
+   math
    API
    Development
 
