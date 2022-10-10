@@ -66,7 +66,7 @@ class ExampleTests(unittest.TestCase):
     
     @pytest.mark.slow
     def test_quickstart(self):
-        self.execute("quickstart.py")
+        self.execute("spherical_aberration.py")
     
     @pytest.mark.slow
     def test_achromat(self):

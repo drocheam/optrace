@@ -1,5 +1,17 @@
-Dependency Graph
+Library Structure
 ----------------------------
+
+**Folder Structure**
+
+.. highlight:: none
+
+.. include:: bib_structure.txt
+   :literal:
+
+.. highlight:: default
+
+
+**Dependency Tree**
 
 .. _pydeps: https://github.com/thebjorn/pydeps
 

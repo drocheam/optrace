@@ -13,6 +13,7 @@ from optrace.tracer import misc
 from test_gui import rt_example
 
 
+
 class TracerTests(unittest.TestCase):
 
     def test_raytracer_init(self):
@@ -32,7 +33,10 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.Raytracer, outline=[-5, -10, -5, 5, 0, 10])  # incorrect outline
         self.assertRaises(ValueError, ot.Raytracer, outline=[0, 1, 0, 1, 0, np.inf])  # non finite outline
 
-    def test_raytracer_geometry_adding_removal_snapshot(self):
+        # coverage: init with refraction index
+        ot.Raytracer(outline=[-1, 1, -1, 1, -1, 1], n0=ot.RefractionIndex("Constant", n=1.2))
+
+    def test_raytracer_snapshot(self):
         """
         checks add, remove, property_snapshot, compare_property_snapshot, has() and clear()
         """
@@ -49,26 +53,11 @@ class TracerTests(unittest.TestCase):
 
         # test actions for different element types
         for el, list_, ckey in zip([RS, L, AP, DET, F, M], 
-                [RT.ray_source_list, RT.lens_list, RT.aperture_list, RT.detector_list, RT.filter_list, RT.marker_list], 
+                [RT.ray_sources, RT.lenses, RT.apertures, RT.detectors, RT.filters, RT.markers],
                 ["RaySources", "Lenses", "Apertures", "Detectors", "Filters", "Markers"]):
         
-            el2 = el.copy()
-
-            # adding works
             RT.add(el)
-            self.assertEqual(len(list_), 1)
-            RT.add(el2)
-            self.assertEqual(len(list_), 2)
-
-            # removal works
-            succ = RT.remove(el2)
-            self.assertTrue(succ)
-            self.assertEqual(len(list_), 1)
-            self.assertTrue(list_[0] is el)
-            
-            # remnoving it a second time fails
-            succ = RT.remove(el2)
-            self.assertFalse(succ)
+            el2 = el.copy()
             
             # check if ckey in compare dictionary is set
             snap = RT.property_snapshot()
@@ -79,31 +68,6 @@ class TracerTests(unittest.TestCase):
             self.assertTrue(cmp[ckey])
             if ckey == "Lenses":
                 self.assertTrue(cmp["Ambient"])
-
-            # adding the same element a second time does not work
-            assert len(list_) == 2
-            RT.add(el2)
-            self.assertEqual(len(list_), 2)
-            RT.remove(el2)
-            
-            # has() works
-            self.assertTrue(RT.has(el))
-            self.assertFalse(RT.has(el2))
-            
-            # clear actually clears
-            RT.add(el2)
-            RT.clear()
-            self.assertEqual(len(list_), 0)
-
-            # adding as list
-            RT.add([el, el2])
-            self.assertEqual(len(list_), 2)
-            self.assertTrue(list_[0] is el)
-            self.assertTrue(list_[1] is el2)
-            
-            # removing as list
-            RT.remove([el, el2])
-            self.assertEqual(len(list_), 0)
 
         # test Rays change detection
         snap = RT.property_snapshot()
@@ -136,20 +100,29 @@ class TracerTests(unittest.TestCase):
             cmp = RT.compare_property_snapshot(snap, snap2)
             self.assertTrue(cmp["Any"])
             self.assertTrue(cmp["TraceSettings"])
-     
-        # removal of whole RT list, make sure remove makes a copy of a given list
-        # otherwise RT.filter_list would change for each deleted element and therefore also the list iterator,
-        # leading to not all elements being actually deleted
-        assert len(RT.filter_list) == 0
-        for i in np.arange(5):
-            RT.add(ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5]))
-        RT.remove(RT.filter_list)
-        self.assertFalse(len(RT.filter_list))
+    
+    def test_raytracer_misc(self):
+        """checks tma, clear, extent and pos"""
 
-        # check type checking for adding
-        self.assertRaises(TypeError, RT.add, ot.Point())  # Surface is a invalid element type
+        RT = rt_example()
 
-    def test_0geometry_checks(self):
+        # check outline and pos
+        self.assertTrue(np.allclose(RT.extent - RT.outline, 0))  # extent is outline
+        posrt = [(RT.outline[0] + RT.outline[1])/2, (RT.outline[2] + RT.outline[3])/2, RT.outline[4]]
+        self.assertTrue(np.allclose(np.array(RT.pos) - posrt, 0))  # position is position of first xy plane
+
+        # check if tma works correctly
+        abcd0 = RT.tma(489).abcd
+        abcd1 = ot.Group(RT.lenses).tma(489, n0=RT.n0).abcd
+        self.assertTrue(np.allclose(abcd0 - abcd1, 0))
+
+        # clear also deletes rays
+        RT.trace(10000)
+        self.assertTrue(RT.rays.N > 0)
+        RT.clear()
+        self.assertFalse(RT.rays.N > 0)
+
+    def test_geometry_checks(self):
         """test geometry checks before tracing"""
         
         RS = ot.RaySource(ot.Surface("Circle"), pos=[0, 0, 20], spectrum=ot.presets.light_spectrum.led_b1)
@@ -175,48 +148,59 @@ class TracerTests(unittest.TestCase):
                                 [0, 0, RT.outline[4]-1],
                                 [0, 0, RT.outline[5]+1]]:  # check different positions outside outline
                         el.move_to(pos)
-                        self.assertRaises(RuntimeError, RT.trace, 10000)  # element outside outline
+                        RT.trace(10000) 
+                        self.assertTrue(RT.geometry_error)  # element outside outline
+                        RT.geometry_error = False
 
                 elif el is not RS:  # case i=1: element in front of source
-                    self.assertRaises(RuntimeError, RT.trace, 10000)  # for i == 1 correct order is broken
+                    RT.trace(10000) 
+                    self.assertTrue(RT.geometry_error)  # for i == 1 correct order is broken
+                    RT.geometry_error = False
 
                 RT.remove(el)
 
             RT.add(RS)  # add second source that lies behind element, lead to sequentiality errors
 
         RT.remove([RS, RS0])
-        self.assertRaises(RuntimeError, RT.trace, 10000)  # RaySource Missing
+        RT.trace(10000) 
+        self.assertTrue(RT.geometry_error)  # RaySource Missing
+        RT.geometry_error = False
         
         RT.add(ot.RaySource(ot.Point(), pos=[0, 0, 0]))
-        self.assertRaises(ValueError, RT.trace, 10)  # too few rays
+        self.assertRaises(ValueError, RT.trace, 0)  # too few rays
         self.assertRaises(ValueError, RT.trace, 1e10)  # too many rays
 
 
         # additional ray source geometry checks
 
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 30], silent=True)
-        RS = ot.RaySource(ot.Point(), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
+        RS = ot.RaySource(ot.Point(), pos=[0, 0, -10])
         RT.add(RS)
 
         RT.add(ot.Lens(ot.Surface("Sphere", r=3, R=-3.2), ot.Surface("Circle"), n=ot.presets.refraction_index.SF10, pos=[0, 0, 0], d=0.2))
 
         RT.trace(10000)  # works
+        self.assertFalse(RT.geometry_error)
     
         RS.move_to([0, 0, -0.5])
         RT.trace(10000)  # should also work, lens encompasses source, but correct order and not collision
+        self.assertFalse(RT.geometry_error)
 
         RS.move_to([0, 0, 0])
-        self.assertRaises(RuntimeError, RT.trace, 10000)  # source inside lens
+        RT.trace(1000)  # source inside lens
+        self.assertTrue(RT.geometry_error)
         
+        RT.geometry_error = False
         RS.move_to([0, 0, 10])
-        self.assertRaises(RuntimeError, RT.trace, 10000)  # source behind lens
+        RT.trace(1000)  # source behind lens
+        self.assertTrue(RT.geometry_error)
 
     @pytest.mark.slow
     def test_focus(self):
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 40], silent=True, n0=ot.RefractionIndex("Constant", n=1.1))
         RSS = ot.Surface("Circle", r=0.5)
-        RS = ot.RaySource(RSS, pos=[0, 0, -3], spectrum=ot.presets.light_spectrum.d65)
+        RS = ot.RaySource(RSS, pos=[0, 0, -3])
         RT.add(RS)
 
         front = ot.Surface("Sphere", r=3, R=30)
@@ -231,19 +215,23 @@ class TracerTests(unittest.TestCase):
 
         self.assertRaises(RuntimeError, RT.autofocus, RT.autofocus_methods[0], z_start=5)  # no simulated rays
         
-        RT.trace(200000)
+        RT.trace(20000)
 
         for method in RT.autofocus_methods:  # all methods
-            for N in [50000, 200000, 500000]:  # N cases: less rays, all rays, more rays than simulated
-                res, _ = RT.autofocus(method, z_start=5.0, N=N, return_cost=False)
-                self.assertAlmostEqual(res.x, fs, delta=0.15)
+            for N in [5000, 20000, 50000]:  # N cases: less rays, all rays, more rays than simulated
+                for N_th in [1, 2, 3, 4, 8, 16]:  # different thread counts
+                    RT._force_threads = N_th
+                    res, _ = RT.autofocus(method, z_start=5.0, N=N, return_cost=False)
+                    self.assertAlmostEqual(res.x, fs, delta=0.15)
+
+        # reset thread count overwrite
+        RT._force_threads = None
 
         # source_index=0 with only one source leads to the same result
         res, _, = RT.autofocus(RT.autofocus_methods[0], z_start=5.0, source_index=0, N=N, return_cost=False)
         self.assertAlmostEqual(res.x, fs, delta=0.15)
 
-        RS2 = ot.RaySource(ot.Point(), spectrum=ot.presets.light_spectrum.d65, divergence="Isotropic",
-                           div_angle=0.5, pos=[0, 0, -60])
+        RS2 = ot.RaySource(ot.Point(), divergence="Isotropic", div_angle=0.5, pos=[0, 0, -60])
         RT.add(RS2)
        
         # enlargen outline so imaging works
@@ -259,6 +247,7 @@ class TracerTests(unittest.TestCase):
         res, _ = RT.autofocus(RT.autofocus_methods[0], z_start=5.0, source_index=1, N=N, return_cost=False)
         self.assertAlmostEqual(res.x, 73.73, delta=0.1)
 
+        self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=0, N=0)  # N too small
         self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=-100)  # z_start outside outline
         self.assertRaises(ValueError, RT.autofocus, "AA", z_start=10)  # invalid mode
         self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=10, source_index=-1)
@@ -266,21 +255,13 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=10, source_index=10)
         # index too large
 
-        self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=10, N=10)  # N too low
-
-        # add a light source with only a small power
-        RS2.power = 0.001
-        RT.trace(200000)
-        self.assertRaises(RuntimeError, RT.autofocus, RT.autofocus_methods[0], z_start=10, source_index=1)
-        # actual ray number after selection too low (since this source has only few rays)
-
         # coverage tests
 
         RT.autofocus(RT.autofocus_methods[0], z_start=RT.outline[4]) # before all lenses, source_index=None
         RT.autofocus(RT.autofocus_methods[0], z_start=RT.outline[4], source_index=0) # before all lenses, source_index
         RT.autofocus(RT.autofocus_methods[0], z_start=RT.outline[5])  # behind all lenses
-        RT.autofocus(RT.autofocus_methods[0], z_start=RT.lens_list[0].extent[5] + 0.01)  # between lenses
-        RT.autofocus(RT.autofocus_methods[0], z_start=RT.lens_list[-1].extent[4] - 0.01)  # between lenses with n_ambient
+        RT.autofocus(RT.autofocus_methods[0], z_start=RT.lenses[0].extent[5] + 0.01)  # between lenses
+        RT.autofocus(RT.autofocus_methods[0], z_start=RT.lenses[-1].extent[4] - 0.01)  # between lenses with n_ambient
         RT.autofocus("Irradiance Variance", z_start=RT.outline[5])  
         # leads to a warning, that minimum may not be found
         
@@ -299,10 +280,11 @@ class TracerTests(unittest.TestCase):
         * rays starting after the detector
         * rays ending before the detector
         * rays starting inside of detector extent
+        for different number of threads
         """
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -100, 100], silent=True)
-        RS = ot.RaySource(ot.Surface("Circle", r=0.5), pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65, divergence="None")
+        RS = ot.RaySource(ot.Surface("Circle", r=0.5), pos=[0, 0, 0], divergence="None")
         RT.add(RS)
 
         aps = ot.Surface("Ring", r=2, ri=1)
@@ -321,13 +303,15 @@ class TracerTests(unittest.TestCase):
 
         for z in [RT.outline[4], RS.pos[2]+1, ap.pos[2]-1, ap.pos[2]+1, RS.pos[2]+1+det.surface.R, RT.outline[5]-RT.N_EPS, RT.outline[5] + 1]:
             det.move_to([0, 0, z])
-            img = RT.detector_image(16, projection_method="Equidistant")
-            
-            if RT.outline[5] > z > RS.surface.pos[2]:
-                self.assertAlmostEqual(img.get_power(), RS.power)  # correctly lit
-                self.assertTrue(np.allclose(img.extent-ext, 0, atol=1e-2))  # extent correct
-            else:
-                self.assertAlmostEqual(img.get_power(), 0)
+            for N_th in [1, 2, 3, 4, 8, 16]:
+                RT._force_threads = N_th
+                img = RT.detector_image(16, projection_method="Equidistant")
+                
+                if RT.outline[5] > z > RS.surface.pos[2]:
+                    self.assertAlmostEqual(img.get_power(), RS.power)  # correctly lit
+                    self.assertTrue(np.allclose(img.extent-ext, 0, atol=1e-2, rtol=0))  # extent correct
+                else:
+                    self.assertAlmostEqual(img.get_power(), 0)
 
     @pytest.mark.slow
     def test_uniform_emittance(self):
@@ -344,7 +328,7 @@ class TracerTests(unittest.TestCase):
                     ot.Surface("Ring", ri=1.5, r=2),
                     ot.Surface("Ring", ri=0.25, r=2)]:
 
-            RS = ot.RaySource(surf, pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65)
+            RS = ot.RaySource(surf, pos=[0, 0, 0])
             RT.add(RS)
             RT.trace(200000)
 
@@ -384,7 +368,7 @@ class TracerTests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True)
 
         RSS0 = ot.Surface("Rectangle", dim=[0.02, 0.02])
-        RS0 = ot.RaySource(RSS0, divergence="Isotropic", spectrum=ot.presets.light_spectrum.d65, div_2d=True,
+        RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=True,
                 pos=[0, 0, 0], s=[0, 0, 1], div_angle=82)
         RT.add(RS0)
             
@@ -396,7 +380,7 @@ class TracerTests(unittest.TestCase):
         # Parallel Illumination 2D
         RS0.divergence = "None"
         RT.trace(2000000)
-        img = RT.detector_image(64)
+        img = RT.detector_image(63)
         x, y = img.cut(y=0, mode="Irradiance")
         y = y[0]
         self.assertTrue(np.std(y/np.max(y)) < 0.025)
@@ -404,16 +388,18 @@ class TracerTests(unittest.TestCase):
         # Equal divergence in 2D, leads to 1/cos(e)**2 on detector
         RS0.divergence = "Isotropic"
         RT.trace(2000000)
-        img = RT.detector_image(64)
+        img = RT.detector_image(63)
         x, y = img.cut(y=0, mode="Irradiance")
+        x = x[:-1] + (x[1] - x[0])/2  # bin edge to bin center position
         y = y[0]/np.cos(np.arctan(x/10))**2
         self.assertTrue(np.std(y/np.max(y)) < 0.05)
 
         # Equal divergence in 2D, leads to 1/cos(e)**3 on detector
         RS0.divergence = "Lambertian"
         RT.trace(2000000)
-        img = RT.detector_image(64)
+        img = RT.detector_image(63)
         x, y = img.cut(y=0, mode="Irradiance")
+        x = x[:-1] + (x[1] - x[0])/2  # bin edge to bin center position
         y = y[0]/np.cos(np.arctan(x/10))**3
         self.assertTrue(np.std(y/np.max(y)) < 0.05)
 
@@ -421,7 +407,7 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1/np.cos(e)**2
         RT.trace(2000000)
-        img = RT.detector_image(64)
+        img = RT.detector_image(63)
         x, y = img.cut(y=0, mode="Irradiance")
         y = y[0]
         self.assertTrue(np.std(y/np.max(y)) < 0.025)
@@ -430,8 +416,9 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1+np.sqrt(e)
         RT.trace(2000000)
-        img = RT.detector_image(64)
+        img = RT.detector_image(63)
         x, y = img.cut(y=0, mode="Irradiance")
+        x = x[:-1] + (x[1] - x[0])/2  # bin edge to bin center position
         y = y[0]/( 1 + np.sqrt(np.arctan(np.abs(x)/10)))/np.cos(np.arctan(x/10))**2
         self.assertTrue(np.std(y/np.max(y)) < 0.025)
 
@@ -441,27 +428,27 @@ class TracerTests(unittest.TestCase):
         # Parallel Illumination 3D
         RS0.divergence = "None"
         RT.trace(2000000)
-        img = RT.detector_image(64)
+        img = RT.detector_image(63)
         img = img.get_by_display_mode("Irradiance")
         self.assertTrue(np.std(img/np.max(img)) < 0.025)
 
         # Equal divergence in 3D, leads to 1/cos(e)**3 on detector
         RS0.divergence = "Isotropic"
         RT.trace(2000000)
-        img0 = RT.detector_image(64)
+        img0 = RT.detector_image(63)
         img = img0.get_by_display_mode("Irradiance")
         x0, x1, y0, y1 = img0.extent
-        X, Y = np.mgrid[x0:x1:64j, y0:y1:64j]
+        X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**3
         self.assertTrue(np.std(Z/np.max(Z)) < 0.05)
 
         # Lambertian divergence in 3D, leads to 1/cos(e)**4 on detector
         RS0.divergence = "Lambertian"
         RT.trace(2000000)
-        img0 = RT.detector_image(64)
+        img0 = RT.detector_image(63)
         img = img0.get_by_display_mode("Irradiance")
         x0, x1, y0, y1 = img0.extent
-        X, Y = np.mgrid[x0:x1:64j, y0:y1:64j]
+        X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**4
         self.assertTrue(np.std(Z/np.max(Z)) < 0.075)
 
@@ -469,7 +456,7 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1/np.cos(e)**3
         RT.trace(2000000)
-        img0 = RT.detector_image(64)
+        img0 = RT.detector_image(63)
         Z = img0.get_by_display_mode("Irradiance")
         self.assertTrue(np.std(Z/np.max(Z)) < 0.075)
 
@@ -477,10 +464,10 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1+np.sqrt(e)
         RT.trace(2000000)
-        img0 = RT.detector_image(64)
+        img0 = RT.detector_image(63)
         img = img0.get_by_display_mode("Irradiance")
         x0, x1, y0, y1 = img0.extent
-        X, Y = np.mgrid[x0:x1:64j, y0:y1:64j]
+        X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
         r = np.sqrt(X**2 + Y**2)
         Z = img / ( 1 + np.sqrt(np.arctan(r/10)))/np.cos(np.arctan(r/10))**3
         self.assertTrue(np.std(Z/np.max(Z)) < 0.05)
@@ -502,14 +489,14 @@ class TracerTests(unittest.TestCase):
         
         # add point source with isotropic light
         RSS0 = ot.Point()
-        RS0 = ot.RaySource(RSS0, divergence="Isotropic", spectrum=ot.presets.light_spectrum.d65, div_2d=False,
+        RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=False,
                 pos=[0, 0, 0], s=[0, 0, 1], div_angle=89)
         RT.add(RS0)
         RT.trace(2000000)
-        img0 = RT.detector_image(64, projection_method="Equal-Area")
+        img0 = RT.detector_image(63, projection_method="Equal-Area")
         Z = img0.get_by_display_mode("Irradiance")
         # mask out area outside disc, leave 3 pixels margin
-        X, Y = np.mgrid[-32:32:64j, -32:32:64j]
+        X, Y = np.mgrid[-32:32:63j, -32:32:63j]
         mask = np.sqrt(X**2 + Y**2) < 29
         Z = Z[mask]
         self.assertTrue(np.std(Z/np.max(Z)) < 0.015)  # constant irradiance (neglecting noise) as it should be
@@ -521,7 +508,7 @@ class TracerTests(unittest.TestCase):
         # add point sources with parallel rays
         for theta in [-89.99, -60, -30, 0.001, 30, 60, 89.99]:  # slightly decentered central value so we only hit one pixel
             theta_r = np.radians(theta)
-            RS0 = ot.RaySource(RSS0, divergence="None", spectrum=ot.presets.light_spectrum.d65, div_2d=False,
+            RS0 = ot.RaySource(RSS0, divergence="None", div_2d=False,
                     pos=[0, 0, 0], s=[np.sin(theta_r), 0, np.cos(theta_r)])
             RT.add(RS0)
 
@@ -538,7 +525,7 @@ class TracerTests(unittest.TestCase):
             self.assertAlmostEqual(zpi, 0, delta=1/fact*1.1)  # radial positions equally spaced
 
         # remove all sources
-        for rs in RT.ray_source_list.copy():
+        for rs in RT.ray_sources.copy():
             RT.remove(rs)
 
         # Stereographic projection: small circles on surface keep relative their shape, therefore also their side lengths
@@ -553,7 +540,7 @@ class TracerTests(unittest.TestCase):
                 sx = np.sin(phi)*np.sin(tr)
                 sy = np.cos(phi)*np.sin(tr)
                 sz = np.cos(tr)
-                RS0 = ot.RaySource(RSS0, divergence="Isotropic", spectrum=ot.presets.light_spectrum.d65, div_2d=False,
+                RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=False,
                         pos=[0, 0, 0], s=[sx, sy, sz], div_angle=2)
                 RT.add(RS0)
 
@@ -572,66 +559,173 @@ class TracerTests(unittest.TestCase):
     def test_ray_storage(self):
         
         RT = rt_example()
-
+        RT.add(ot.RaySource(ot.Point(), spectrum=ot.presets.light_spectrum.d55, pos=[0, 0, 0]))
+        
         # we want the ray sources to be two and have different power
-        assert len(RT.ray_source_list) == 2
-
-        # TODO check only one source and check three sources
-
-        powers = [(1, 1), (2, 1), (0.3456465, 4.57687168)]
+        assert len(RT.ray_sources) == 3
+        
+        RS0, RS1, RS2 = tuple(RT.ray_sources)
+        powers = [(1, 1, 1), (2, 1, 1), (0.3456465, 4.57687168, np.pi/2)] 
         Ns = [100000, 52657, 30000, 30001]
 
-        for powersi in powers:
-            for N in Ns:
+        # test tracing for different number of rays, sources and different power ratios and threads
+        for i in np.arange(2):  # different number of sources (1 source gets removed after each iteration)
+            for powersi in powers:  # different power ratios
+                for N in Ns:  # different rays numbers
+                    for N_th in [1, 2, 3, 4, 8]:  # different number of threads
 
-                P1, P2 = powersi
+                        RS0.power, RS1.power, RS2.power = powersi
 
-                RT.ray_source_list[0].power = P1
-                RT.ray_source_list[1].power = P2
+                        RT._force_threads = N_th
+                        RT.trace(N)
 
-                # check if tracing leads to the correct amount of rays
-                RT.trace(N)
-                self.assertEqual(N, RT.rays.N)  # correct number of rays
-                self.assertAlmostEqual(P1+P2, np.sum(RT.rays.w_list[:, 0]), delta=10/N)  # approx. correct power
+                        # check number of rays
+                        self.assertEqual(N, RT.rays.N)
 
-                # returns all source sections
-                tup = RT.rays.get_source_sections()
-                self.assertEqual(tup[0].shape[0], N)
-                
-                # returns only sections of first source
-                tup = RT.rays.get_source_sections(0)
-                self.assertEqual(tup[0].shape[0], RT.rays.n_list[0])  # correct number
-                self.assertAlmostEqual(RT.rays.n_list[0]/RT.rays.N, P1/(P1+P2), delta=10/N)  # approx. correct power
+                        # check power
+                        P_s = np.sum([RS.power for RS in RT.ray_sources])
+                        self.assertAlmostEqual(P_s, np.sum(RT.rays.w_list[:, 0]), delta=10/N)
 
-                # returns only sections of second source
-                tup = RT.rays.get_source_sections(1)
-                self.assertEqual(tup[0].shape[0], RT.rays.n_list[1])  # correct number
-                self.assertAlmostEqual(RT.rays.n_list[1]/RT.rays.N, P2/(P1+P2), delta=10/N)  # approx. correct power
+                        # check power and number for each source
+                        for Ni, RSi in enumerate(RT.ray_sources):
+                            tup = RT.rays.source_sections(Ni)
+                            self.assertEqual(tup[0].shape[0], RT.rays.n_list[Ni])
+                            self.assertAlmostEqual(RT.rays.n_list[Ni]/RT.rays.N, RSi.power/P_s, delta=10/N)
 
-        # check get_rays_by_mask
+                        # check source section call for all rays, call for each source has been tested above
+                        tup = RT.rays.source_sections()
+                        self.assertEqual(tup[0].shape[0], N)
 
-        ch = np.random.randint(0, 2, size=N).astype(bool)
-        N2 = np.count_nonzero(ch)
-        ch2 = np.random.randint(0, RT.rays.nt, size=N2)
+                        # check rays_by_mask without parameters
+                        tp1 = RT.rays.rays_by_mask()
+                        tp2 = RT.rays.rays_by_mask(np.ones(N, dtype=bool))
+                        for t1, t2 in zip(tp1, tp2):
+                            np.testing.assert_array_equal(t1, t2)
 
-        ch2l = [None, ch2]
-        retl = [None, [1, 0, 1, 1, 1, 1], [1, 1, 1, 1, 1, 0]]
-        norml = [False, True]
+                        # check rays_by_mask
+                        ch = np.random.randint(0, 2, size=N).astype(bool)
+                        N2 = np.count_nonzero(ch)
+                        ch2 = np.random.randint(0, RT.rays.Nt, size=N2)
+                        for ch2li in [None, ch2]:
+                            for retli in [None, [1, 0, 1, 1, 1, 1], [1, 1, 1, 1, 1, 0]]:
+                                for normli in [False, True]:
+                                    tup = RT.rays.rays_by_mask(ch, ch2li, retli, normli)
+                                    self.assertEqual(tup[3].shape[0], N2)  # correct shape 1
+                                    self.assertEqual(tup[3].ndim, (1 if ch2li is not None else 2))  # correct shape 1
+                                    self.assertTrue(retli is None or retli[1] or tup[1] is None)  # property omitted for ret[1] = 0
+                                    self.assertTrue(retli is None or retli[5] or tup[5] is None)  # property omitted for ret[5] = 0
+                                    # check if s is normalized
+                                    if normli and (retli is None or retli[1]):
+                                        # mask out values that have zero vectors (due to absorption)
+                                        mask = np.all(np.isfinite(tup[1]), axis=2 if ch2li is None else 1)
+                                        self.assertTrue(np.allclose(tup[1][mask, 0]**2 + tup[1][mask, 1]**2\
+                                                                    + tup[1][mask, 2]**2, 1, rtol=0, atol=1e-4))
 
-        for ch2li in ch2l:
-            for retli in retl:
-                for normli in norml:
-                    tup = RT.rays.get_rays_by_mask(ch, ch2li, retli, normli)
-                    self.assertEqual(tup[3].shape[0], N2)  # correct shape 1
-                    self.assertEqual(tup[3].ndim, (1 if ch2li is not None else 2))  # correct shape 1
-                    self.assertTrue(retli is None or retli[1] or tup[1] is None)  # property omitted for ret[1] = 0
-                    self.assertTrue(retli is None or retli[5] or tup[5] is None)  # property omitted for ret[5] = 0
+            RT.remove(RT.ray_sources[-1])
 
+        # ray_lengths is tested in tracing tests
+
+    def test_rt_media_surfaces(self):
+        """test if media and surface list is generated correctly"""
+
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -20, 80])
+
+        geom = ot.presets.geometry.arizona_eye()
+        geome = geom.elements
+
+        # two lenses, correct order
+        RT.clear()
+        RT.add([geome[0], geome[2]])
+        media = RT.media
+        surf = RT.surfaces
+        media2 = [RT.n0, geome[0].n, geome[0].n2, geome[2].n, geome[2].n2]
+        surf2 = [geome[0].front, geome[0].back, geome[2].front, geome[2].back]
+        self.assertEqual(media, media2)
+        self.assertEqual(surf, surf2)
+        
+        # two lenses wrong order
+        RT.clear()
+        RT.add([geome[2], geome[0]])
+        media = RT.media
+        surf = RT.surfaces
+        media2 = [RT.n0, geome[0].n, geome[0].n2, geome[2].n, geome[2].n2]
+        surf2 = [geome[0].front, geome[0].back, geome[2].front, geome[2].back]
+        self.assertEqual(media, media2)
+        self.assertEqual(surf, surf2)
+        
+        # two lenses and aperture
+        RT.clear()
+        RT.add([geome[2], geome[0], geome[1]])
+        media = RT.media
+        surf = RT.surfaces
+        media2 = [RT.n0, geome[0].n, geome[0].n2, geome[0].n2, geome[2].n, geome[2].n2]
+        surf2 = [geome[0].front, geome[0].back, geome[1].front, geome[2].front, geome[2].back]
+        self.assertEqual(media, media2)
+        self.assertEqual(surf, surf2)
+
+        # two lenses, aperture and filter
+        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, -1])
+        RT.add(F)
+        media = RT.media
+        surf = RT.surfaces
+        media2 = [RT.n0, RT.n0, geome[0].n, geome[0].n2, geome[0].n2, geome[2].n, geome[2].n2]
+        surf2 = [F.front, geome[0].front, geome[0].back, geome[1].front, geome[2].front, geome[2].back]
+        self.assertEqual(media, media2)
+        self.assertEqual(surf, surf2)
+
+    def test_optical_lengths_ray_lengths(self):
+       
+        # optical setup of a source, a lens, filter and aperture
+        # all rays have direction strictly parallel to z-axis
+        # all surfaces have no extent in z-direction
+
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -2, 10])
+
+        RS = ot.RaySource(ot.Point(), pos=[0, 0, 0])
+        RT.add(RS)
+
+        n = ot.presets.refraction_index.SF10
+        L = ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"), n=n, pos=[0, 0, 1], d1=0, d2=1.2)
+        RT.add(L)
+        
+        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
+        RT.add(F)
+        
+        AP = ot.Aperture(ot.Surface("Circle"), pos=[0, 0, 9])
+        RT.add(AP)
+
+        RT.trace(1000)
+
+        # optical path lengths
+        olengths = RT.rays.optical_lengths()
+        olengths2 = olengths.copy()
+        olengths2[:, 0] = 1
+        olengths2[:, 1] = n(RT.rays.wl_list)*1.2
+        olengths2[:, 2] = 2.8
+        olengths2[:, 3] = 4
+        self.assertTrue(np.allclose(olengths - olengths2, 0, atol=1e-9, rtol=0))
+        
+        # ray lengths
+        lengths = RT.rays.ray_lengths()
+        lengths2 = lengths.copy()
+        lengths2[:, 0] = 1
+        lengths2[:, 1] = 1.2
+        lengths2[:, 2] = 2.8
+        lengths2[:, 3] = 4
+        self.assertTrue(np.allclose(lengths - lengths2, 0, atol=1e-9, rtol=0))
+
+        # check checking of absorb_missing parameter
+        RT.absorb_missing = False
+        RT.trace(1000)
+        self.assertRaises(RuntimeError, RT.rays.optical_lengths)  # absorb_missing not True
+        
+    def test_ray_storage_misc(self):
         # coverage tests
 
         # warns that there are sources without rays
-        RT.ray_source_list[0].power = 0.000001
-        RT.ray_source_list[1].power = 1
+        RT = rt_example()
+        RT.ray_sources[0].power = 0.000001
+        RT.ray_sources[1].power = 1
         RT.trace(10000)
 
     @pytest.mark.slow
@@ -722,11 +816,11 @@ class TracerTests(unittest.TestCase):
                 im = im2.copy()
             # run > 1: compare values
             if im is not None:
-                self.assertTrue(np.allclose(im.extent-im2.extent+pos0[:2].repeat(2), 0, atol=0.001))
+                self.assertTrue(np.allclose(im.extent-im2.extent+pos0[:2].repeat(2), 0, atol=0.001, rtol=0))
                 self.assertAlmostEqual(im.extent[1]-im.extent[0], im2.extent[1]-im2.extent[0], delta=0.001)
                 self.assertAlmostEqual(im.extent[3]-im.extent[2], im2.extent[3]-im2.extent[2], delta=0.001)
                 self.assertAlmostEqual(im.get_power(), im2.get_power(), places=4)
-                self.assertTrue(np.allclose(abcd-abcd2, 0, atol=0.0001))
+                self.assertTrue(np.allclose(abcd-abcd2, 0, atol=0.0001, rtol=0))
 
     def test_numeric_tracing(self):
         """checks RT.find_hit for a numeric surface and Surface of type "Data" """
@@ -864,7 +958,7 @@ class TracerTests(unittest.TestCase):
         RT.trace(N)
         self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_BACK, 2] / N, places=3)
 
-        RT.lens_list[0] = ot.Lens(surf1, surf2, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        RT.lenses[0] = ot.Lens(surf1, surf2, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
         RT.trace(N)
         self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_FRONT, 1] / N, places=3)
        
@@ -969,31 +1063,31 @@ class TracerTests(unittest.TestCase):
 
         # add Raysource
         RSS = ot.Point()
-        RS = ot.RaySource(RSS, divergence="Isotropic", spectrum=ot.presets.light_spectrum.d65,
+        RS = ot.RaySource(RSS, divergence="Isotropic",
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RT.add(RS)
         
         geom = ot.presets.geometry.arizona_eye()
-        geom[2].move_to([0, 0, 0.15])
+        geom.elements[2].move_to([0, 0, 0.15])
         RT.add(geom)
 
-        self.assertRaises(RuntimeError, RT.trace, 10000)  # object collision
+        RT.trace(1000)
+        self.assertTrue(RT.geometry_error)  # object collision
         self.assertEqual(RT.rays.N, 0)  # not traced
 
     def test_seq_violation(self):
 
         # make raytracer
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60], silent=True)
-        RT._no_geometry_checks = True  # deactivate checks so we can enforce a seq violation
+        RT._ignore_geometry_error = True  # deactivate checks so we can enforce a seq violation
 
         # add Raysource
         RSS = ot.Point()
-        RS = ot.RaySource(RSS, divergence="Isotropic", spectrum=ot.presets.light_spectrum.d65,
-                          pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
+        RS = ot.RaySource(RSS, divergence="Isotropic", pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RT.add(RS)
         
         geom = ot.presets.geometry.arizona_eye()
-        geom[1].move_to([0, 0, 0.01])
+        geom.elements[1].move_to([0, 0, 0.01])
         RT.add(geom)
 
         RT.trace(10000)
@@ -1004,7 +1098,7 @@ class TracerTests(unittest.TestCase):
         RT = rt_example()
 
         # blocking aperture
-        RT.aperture_list[0] = ot.Aperture(ot.Surface("Circle", r=5), pos=RT.aperture_list[0].pos)
+        RT.apertures[0] = ot.Aperture(ot.Surface("Circle", r=5), pos=RT.apertures[0].pos)
 
         # see if it is handled
         RT.trace(10000)
@@ -1042,10 +1136,10 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(ValueError, RT.detector_spectrum, extent="abc")  # invalid extent
         self.assertRaises(ValueError, RT.detector_spectrum, extent=[1, 2, 1, np.inf])  # invalid extent
 
-        RT.detector_list = []
+        RT.detectors = []
         self.assertRaises(RuntimeError, RT.detector_image, 200)  # no detectors
         self.assertRaises(RuntimeError, RT.detector_spectrum)  # no detectors
-        RT.ray_source_list = []
+        RT.ray_sources = []
         self.assertRaises(RuntimeError, RT.source_image, 200)  # no sources
         self.assertRaises(RuntimeError, RT.source_spectrum)  # no sources
 
@@ -1054,14 +1148,14 @@ class TracerTests(unittest.TestCase):
         RT = rt_example()
 
         # testing only makes sense with multiple sources and detectors
-        assert len(RT.ray_source_list) > 1
-        assert len(RT.detector_list) > 1
+        assert len(RT.ray_sources) > 1
+        assert len(RT.detectors) > 1
         
         N_rays = int(RT.ITER_RAYS_STEP/10)
         
         # default call
         sim, dim = RT.iterative_render(N_rays, silent=True)
-        self.assertEqual(len(sim), len(RT.ray_source_list))
+        self.assertEqual(len(sim), len(RT.ray_sources))
         self.assertEqual(len(dim), 1)
         
         # default call with no sources
@@ -1072,7 +1166,7 @@ class TracerTests(unittest.TestCase):
         sim, dim = RT.iterative_render(N_rays, pos=13.3, silent=True)
         
         # call with explicit extent = [...]
-        ext2 = [0, *RT.detector_list[0].extent[1:4]]
+        ext2 = [0, *RT.detectors[0].extent[1:4]]
         sim, dim = RT.iterative_render(N_rays, extent=ext2, silent=True)
         self.assertTrue(np.all(dim[0].extent == ext2))
         
@@ -1085,6 +1179,10 @@ class TracerTests(unittest.TestCase):
         # call with explicit source pixel number
         sim, dim = RT.iterative_render(N_rays, N_px_S=400, silent=True)
         
+        # call with explicit projection_method
+        sim, dim = RT.iterative_render(N_rays, N_px_S=400, silent=True, detector_index=1, 
+                                       projection_method="Stereographic")
+        
         # call with multiple positions
         sim, dim = RT.iterative_render(N_rays, pos=[0, 5], silent=True)
         self.assertEqual(len(dim), 2)
@@ -1093,13 +1191,19 @@ class TracerTests(unittest.TestCase):
         sim, dim = RT.iterative_render(N_rays, pos=[0, 5], 
                                        detector_index=[0, 1], silent=True)
         self.assertEqual(len(dim), 2)
-        self.assertNotEqual(dim[0].coordinate_type, dim[1].coordinate_type) 
+        self.assertNotEqual(dim[0].projection, dim[1].projection) 
         # the detectors have different coordinate types
 
         # call with multiple positions and detector pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[0, 5], 
                                        N_px_D=[5, 500], silent=True)
         self.assertNotEqual(dim[0].Nx, dim[1].Nx) 
+        
+        # call with multiple positions and projection_methods
+        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[0, 5], 
+                                       N_px_D=500, silent=True, detector_index=1,
+                                       projection_method=["Equidistant", "Equal-Area"])
+        self.assertNotEqual(dim[0].projection, dim[1].projection) 
         
         # call with multiple source pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4),
@@ -1120,8 +1224,10 @@ class TracerTests(unittest.TestCase):
         
         self.assertRaises(ValueError, RT.iterative_render, 10000, N_px_D=[2, 500])  # len(N_px_D) != len(pos)
         self.assertRaises(ValueError, RT.iterative_render, 10000, N_px_S=[2, 500, 600])  
-        # len(N_px_S) != len(RT.ray_source_list)
+        # len(N_px_S) != len(RT.ray_sources)
         self.assertRaises(ValueError, RT.iterative_render, 10000, extent=[None, None])  # len(extent) != len(pos)
+        self.assertRaises(ValueError, RT.iterative_render, 10000, projection_method=["Equidistant", "Equal-Area"])
+        # ^--  len(projection_method) != len(pos)
         self.assertRaises(ValueError, RT.iterative_render, 10000, detector_index=[0, 1])  
         # len(detector_index) != len(pos)
         self.assertRaises(ValueError, RT.iterative_render, 10000, detector_index=[0, 1], pos=[0])  
@@ -1136,12 +1242,12 @@ class TracerTests(unittest.TestCase):
         sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*3+100, silent=True)
         
         # render without detectors
-        RT.detector_list = []
+        RT.detectors = []
         sim, dim = RT.iterative_render(N_rays, silent=True)
 
         self.assertRaises(RuntimeError, RT.iterative_render, 10000, pos=0)  # no detectors to move
 
-        RT.ray_source_list = []
+        RT.ray_sources = []
         self.assertRaises(RuntimeError, RT.iterative_render, 10000)  # no ray_sources
 
     def test_tilted_plane_different_surface_types(self):
@@ -1189,9 +1295,9 @@ class TracerTests(unittest.TestCase):
             RT.remove(L)
 
             # check if all rays are straight and get parallel shifted
-            p, s, _, _, _, _ = RT.rays.get_rays_by_mask(np.ones(RT.rays.N, dtype=bool), ret=[1, 1, 0, 0, 0, 0])
+            p, s, _, _, _, _ = RT.rays.rays_by_mask(np.ones(RT.rays.N, dtype=bool), ret=[1, 1, 0, 0, 0, 0])
             self.assertAlmostEqual(np.mean(s[:, -2, 2]), 1)  # still straight
-            self.assertTrue(np.allclose(p[:, -2, 0] - p[:, -3, 0], -0.0531867, atol=0.00001))  # parallel shift
+            self.assertTrue(np.allclose(p[:, -2, 0] - p[:, -3, 0], -0.0531867, atol=0.00001, rtol=0))  # parallel shift
 
     @pytest.mark.slow
     def test_non_sequental_surface_extent(self):
@@ -1204,7 +1310,7 @@ class TracerTests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-15, 15, -15, 15, -20, 50], silent=True)
 
         RSS = ot.Surface("Circle", r=4)
-        RS = ot.RaySource(RSS, spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -20])
+        RS = ot.RaySource(RSS, pos=[0, 0, -20])
         RT.add(RS)
 
         # )) - lens, second surface embracing first
@@ -1233,7 +1339,7 @@ class TracerTests(unittest.TestCase):
 
         # )), but this time hitting space between surfaces
         RT.remove(RS)
-        RS = ot.RaySource(ot.Surface("Ring", r=7, ri=6), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -20])
+        RS = ot.RaySource(ot.Surface("Ring", r=7, ri=6), pos=[0, 0, -20])
         RT.add(RS)
         RT.trace(N)
         self.assertTrue(np.all(RT.rays.w_list[:, -2] == 0))
@@ -1285,7 +1391,7 @@ class TracerTests(unittest.TestCase):
             Ns, Ne = RT.rays.b_list[index:index + 2]
             mask[Ns:Ne] = True
 
-            p, s, pol, w, wl, _ = RT.rays.get_rays_by_mask(mask, slice(None))
+            p, s, pol, w, wl, _ = RT.rays.rays_by_mask(mask, slice(None))
             return s, pol, w
 
         sx, polx, wx = get_s_w_pol_source(0)
@@ -1296,15 +1402,15 @@ class TracerTests(unittest.TestCase):
         # values for n=1.55, n0=1
         # see https://de.wikipedia.org/wiki/Brewster-Winkel
         w0 = wn[0, 0]
-        self.assertTrue(np.allclose(wx[:, 1]/w0, 0.8301, atol=0.001))
-        self.assertTrue(np.allclose(wy[:, 1]/w0, 1.0000, atol=0.001))
+        self.assertTrue(np.allclose(wx[:, 1]/w0, 0.8301, atol=0.001, rtol=0))
+        self.assertTrue(np.allclose(wy[:, 1]/w0, 1.0000, atol=0.001, rtol=0))
         self.assertAlmostEqual(np.mean(wn[:, 1])/w0, 0.915, delta=0.001)
 
         # check pol projection values
-        self.assertTrue(np.allclose(polx[:, 0, 1]**2 + polx[:, 0, 2]**2, 0, atol=0.00001))
-        self.assertTrue(np.allclose(polx[:, 1, 1]**2 + polx[:, 1, 2]**2, 0, atol=0.00001))
-        self.assertTrue(np.allclose(poly[:, 0, 1]**2 + poly[:, 0, 2]**2, 1, atol=0.00001))
-        self.assertTrue(np.allclose(poly[:, 1, 1]**2 + poly[:, 1, 2]**2, 1, atol=0.00001))
+        self.assertTrue(np.allclose(polx[:, 0, 1]**2 + polx[:, 0, 2]**2, 0, atol=0.00001, rtol=0))
+        self.assertTrue(np.allclose(polx[:, 1, 1]**2 + polx[:, 1, 2]**2, 0, atol=0.00001, rtol=0))
+        self.assertTrue(np.allclose(poly[:, 0, 1]**2 + poly[:, 0, 2]**2, 1, atol=0.00001, rtol=0))
+        self.assertTrue(np.allclose(poly[:, 1, 1]**2 + poly[:, 1, 2]**2, 1, atol=0.00001, rtol=0))
 
         mean_yz_proj = lambda pol: np.mean(np.sqrt(pol[:, 1]**2 + pol[:, 2]**2)) 
         self.assertAlmostEqual(mean_yz_proj(poln[:, 0]), 2/np.pi, delta=0.005)
@@ -1314,13 +1420,49 @@ class TracerTests(unittest.TestCase):
                             [sx[:, 0], sx[:, 1], sy[:, 0], sy[:, 1], sn[:, 0], sn[:, 1]]):
             # pols stays unity vector
             polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
-            self.assertTrue(np.allclose(polss, 1, atol=0.0001))
+            self.assertTrue(np.allclose(polss, 1, atol=0.0001, rtol=0))
 
             # pol and s are always perpendicular
             cross = misc.cross(pols, ss)
             crosss = cross[:, 0]**2 + cross[:, 1]**2 + cross[:, 2]**2
-            self.assertTrue(np.allclose(crosss, 1, atol=0.0001))
+            self.assertTrue(np.allclose(crosss, 1, atol=0.0001, rtol=0))
 
+    def test_few_rays_action(self):
+        """test how the raytracer handles few or no rays"""
 
+        RT = rt_example()
+        AP = RT.apertures[0]
+
+        # remove apertures and filter so no rays are filtered
+        for el in [*RT.apertures, *RT.filters]:
+            RT.remove(el)
+
+        for i in range(2):  # without and with rays filtered
+            for N in [950, 50, 3, 1]:  # ray numbers
+
+                RT.trace(N)
+
+                # test renders
+                RT.source_image(289)
+                RT.detector_image(289)
+                RT.source_spectrum()
+                RT.detector_spectrum()
+                RT.iterative_render(N)
+
+                # test autofocus
+                for fm in RT.autofocus_methods:
+                    RT.autofocus(fm, z_start=30)
+
+                # ray storage
+                RT.rays.source_sections()
+                RT.rays.source_sections(0)
+                RT.rays.source_sections(1)
+                RT.rays.rays_by_mask(np.full_like(RT.rays.wl_list, 0, dtype=bool))
+                RT.rays.rays_by_mask(np.full_like(RT.rays.wl_list, 1, dtype=bool))
+
+            # add aperture and move it so that no rays reach detector or autofocus region
+            RT.add(AP)
+            RT.apertures[0].move_to(AP.pos + [0.2, 0.2, 0])
+        
 if __name__ == '__main__':
     unittest.main()

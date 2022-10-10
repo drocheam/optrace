@@ -17,33 +17,33 @@ from .misc import PropertyChecker as pc  # type checking
 # transfer matrix analysis class
 class TMA(BaseClass):
 
-    def __init__(self, 
-                 lens_list:  list[RefractionIndex], 
-                 wl:        float = 555., 
+    def __init__(self,
+                 lenses:  list[RefractionIndex],
+                 wl:        float = 555.,
                  n0:        RefractionIndex = None,
                  **kwargs)\
             -> None:
         """
         
-        :param lens_list:
+        :param lenses:
         :param wl:
         :param n0:
         :param kwargs:
         """
         # type checks
-        pc.check_type("lens_list", lens_list, list)
+        pc.check_type("lenses", lenses, list)
         pc.check_type("wl", wl, float | int)
-        pc.check_not_below("wl", wl, color.WL_MIN)
-        pc.check_not_above("wl", wl, color.WL_MAX)
+        pc.check_not_below("wl", wl, color.WL_BOUNDS[0])
+        pc.check_not_above("wl", wl, color.WL_BOUNDS[1])
         pc.check_type("n0", n0, RefractionIndex | None)
 
-        if not len(lens_list):
-            raise ValueError("Empty lens_list.")
+        if not len(lenses):
+            raise ValueError("Empty lenses.")
 
-        self.lens_list = sorted(lens_list, key=lambda el: el.front.pos[2])
+        self.lenses = sorted(lenses, key=lambda el: el.front.pos[2])
         self.wl = wl
         self.n1 = n0(self.wl) if n0 is not None else 1.0
-        self.n2 = self.lens_list[-1].n2(self.wl) if self.lens_list[-1].n2 is not None else self.n1
+        self.n2 = self.lenses[-1].n2(self.wl) if self.lenses[-1].n2 is not None else self.n1
 
         self._gen_abcd()
         self._gen_properties()
@@ -59,7 +59,7 @@ class TMA(BaseClass):
 
         :return:
         """
-        L = self.lens_list
+        L = self.lenses
         mat = np.eye(2)
 
         for i in np.arange(len(L)-1, -1, -1):
@@ -99,11 +99,8 @@ class TMA(BaseClass):
 
             self._abcd = mat
 
-    def _gen_properties(self)\
-            -> tuple[list, list, list, list, float, float]:
+    def _gen_properties(self):
         """
-
-        :return:
         """
         # cardinal points from ABCD matrix:
         # https://www.montana.edu/ddickensheets/documents/abcdCardinal%202.pdf
@@ -111,7 +108,7 @@ class TMA(BaseClass):
         # https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/
 
         n1_, n2_ = self.n1, self.n2
-        _1, _2 = self._vertices = self.lens_list[0].front.pos[2], self.lens_list[-1].back.pos[2]
+        _1, _2 = self._vertices = self.lenses[0].front.pos[2], self.lenses[-1].back.pos[2]
 
         A, B, C, D = tuple(self._abcd.ravel())
 
@@ -228,7 +225,7 @@ class TMA(BaseClass):
         else:
             b = -A/C if C else np.nan
 
-        return b + self.lens_list[-1].back.pos[2]
+        return b + self.lenses[-1].back.pos[2]
 
     def object_position(self, z_b) -> float:
         """
@@ -255,7 +252,7 @@ class TMA(BaseClass):
         else:
             g = -D/C if C else np.nan
 
-        return self.lens_list[0].front.pos[2] - g
+        return self.lenses[0].front.pos[2] - g
 
     def matrix_at(self, z_g: float, z_b: float) -> np.ndarray:
         """
@@ -266,20 +263,20 @@ class TMA(BaseClass):
         :return:
         """
         d_b_matrix = np.array([[1, z_b - self.vertex_point[1]], [0, 1]])  # matrix for distance to first lens
-        d_g_matrix = np.array([[1, self.vertex_point[0] - z_g], [0, 1]])  # matrix for distance ffrom last lens
+        d_g_matrix = np.array([[1, self.vertex_point[0] - z_g], [0, 1]])  # matrix for distance from last lens
         mat = d_b_matrix @ self._abcd @ d_g_matrix
 
         return mat
 
-    def trace(self, in_: list[float, float] | np.ndarray):
+    def trace(self, pos: list[float, float] | np.ndarray):
         """
         Paraxial tracing. Calculates r and theta values.
 
-        :param in_: either two element list or array with [r, theta] 
-                or two dimensional array with r and theta in columns
-        :return: resulting r and theta in same shape as in_
+        :param pos: either two element list or array with [r, theta] 
+                or two-dimensional array with r and theta in columns
+        :return: resulting r and theta in same shape as pos
         """
-        in_arr = np.array(in_, dtype=float)
+        in_arr = np.array(pos, dtype=float)
 
         if in_arr.ndim == 1:
             return self._abcd @ in_arr

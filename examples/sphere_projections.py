@@ -33,6 +33,6 @@ DET = ot.Detector(DETS, pos=[0, 0, R])
 RT.add(DET)
 
 # run the simulator
-sim = TraceGUI(RT, ray_alpha=-0.4, image_type="Irradiance")
+sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance")
 sim.run()
 

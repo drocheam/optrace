@@ -11,6 +11,7 @@ from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 
 
+
 class Spectrum(BaseClass):
 
     spectrum_types: list[str] = ["Monochromatic", "Constant", "Data", "Lines",
@@ -36,7 +37,6 @@ class Spectrum(BaseClass):
                  func:              Callable[[np.ndarray], np.ndarray] = None,
                  mu:                float = 550.,
                  sig:               float = 50.,
-                 fact:              float = 1.,
                  unit:              str = None,
                  quantity:          str = None,
                  func_args:         dict = None,
@@ -55,7 +55,6 @@ class Spectrum(BaseClass):
         :param func:
         :param mu:
         :param sig:
-        :param fact:
         :param unit:
         :param quantity:
         :param func_args:
@@ -69,15 +68,8 @@ class Spectrum(BaseClass):
         self.func = func  # make sure this comes after func_args, so func is called correctly
 
         self.wl, self.wl0, self.wl1 = wl, wl0, wl1
-        self.val, self.fact, self.mu, self.sig = val, fact, mu, sig
-
-        if wls is not None:
-            pc.check_type("wls", wls, list | np.ndarray)
-        if vals is not None:
-            pc.check_type("vals", vals, list | np.ndarray)
-
-        self._wls, self._vals = misc.uniform_resample(wls, vals, 5000) if wls is not None and vals is not None \
-            else (wls, vals)
+        self.val, self.mu, self.sig = val, mu, sig
+        self._wls, self._vals = wls, vals
 
         # hold infos for plotting etc. Defined in each subclass.
         self.unit = unit if unit is not None else self.unit
@@ -97,7 +89,7 @@ class Spectrum(BaseClass):
         if not self.is_continuous():
             raise RuntimeError(f"Can't call discontinuous spectrum_type '{self.spectrum_type}'")
 
-        wl_ = np.asarray_chkfinite(wl, dtype=np.float32)
+        wl_ = np.asarray_chkfinite(wl, dtype=np.float64)
 
         match self.spectrum_type:
 
@@ -105,8 +97,8 @@ class Spectrum(BaseClass):
                 res = np.full_like(wl_, self.val, dtype=np.float64)
 
             case "Data":
-                if self._wls is None or self._vals is None:
-                    raise RuntimeError("spectrum_type='Data' but wls or vals not specified")
+                pc.check_type("Spectrum.wls", self._wls, np.ndarray | list)
+                pc.check_type("Spectrum.vals", self._vals, np.ndarray | list)
                 res = np.interp(wl_, self._wls, self._vals, left=0, right=0)
 
             case "Rectangle":
@@ -114,12 +106,11 @@ class Spectrum(BaseClass):
                 res[(self.wl0 <= wl_) & (wl_ <= self.wl1)] = self.val
 
             case "Gaussian":
-                fact, mu, sig = self.fact, self.mu, self.sig
-                res = ne.evaluate("fact*exp(-(wl-mu)**2/(2*sig**2))")
+                val, mu, sig = self.val, self.mu, self.sig
+                res = ne.evaluate("val*exp(-(wl-mu)**2/(2*sig**2))")
 
             case "Function":  # pragma: no branch
-                if self.func is None:
-                    raise RuntimeError("spectrum_type='Function' but parameter func not specified")
+                pc.check_callable("Spectrum.func", self.func)
                 res = self.func(wl_, **self.func_args)
 
         return res
@@ -127,33 +118,6 @@ class Spectrum(BaseClass):
     def is_continuous(self) -> bool:
         """:return: if the spectrum is continuous, thus not discrete"""
         return self.spectrum_type not in ["Lines", "Monochromatic"]
-
-    def __eq__(self, other: 'Spectrum') -> bool:
-        """
-        Equal operator. Compares self to 'other'.
-        :param other:
-        :return:
-        """
-
-        if type(self) is not type(other):
-            return False
-
-        elif self is other or (self.spectrum_type != "Data" and self.crepr() == other.crepr()):
-            return True
-
-        elif self.spectrum_type == "Data" and other.spectrum_type == "Data":
-            if np.all(self._wls == other._wls) and np.all(self._vals == other._vals)\
-               and self.quantity == other.quantity and self.unit == other.unit:
-                return True
-
-        return False
-
-    def __ne__(self, other: 'Spectrum') -> bool:
-        """Not equal operator. Compares self to 'other'.
-        :param other:
-        :return:
-        """
-        return not self.__eq__(other)
 
     def get_desc(self, fallback: str = None) -> str:
         """
@@ -183,12 +147,12 @@ class Spectrum(BaseClass):
                 if val2.shape[0] == 0:
                     raise ValueError(f"'{key}' can't be empty.")
 
-                if key == "lines" and ((wlo := np.min(val2)) < color.WL_MIN or (wlo := np.max(val2)) > color.WL_MAX):
-                    raise ValueError(f"'lines' need to be inside visible range [{color.WL_MIN}nm, {color.WL_MAX}nm]"
+                if key == "lines" and ((wlo := np.min(val2)) < color.WL_BOUNDS[0] or (wlo := np.max(val2)) > color.WL_BOUNDS[1]):
+                    raise ValueError(f"'lines' need to be inside visible range [{color.WL_BOUNDS[0]}nm, {color.WL_BOUNDS[1]}nm]"
                                      f", but got a value of {wlo}nm.")
 
                 if key == "line_vals" and (lmin := np.min(val2)) < 0:
-                    raise ValueError(f"line_vals must be all positive, but one value is {lmin}")
+                    raise ValueError(f"line_vals must be all positive, but one value is {lmin}.")
 
                 super().__setattr__(key, val2)
                 return
@@ -209,22 +173,36 @@ class Spectrum(BaseClass):
                     if np.min(T) < 0 or np.max(T) <= 0:
                         raise RuntimeError("Function func needs to return positive values over the visible range.")
 
-            case "_vals" if val is not None:
-                if (lmin := np.min(val)) < 0:
-                    raise ValueError(f"vals must be all positive, but one value is {lmin}")
+            case ("_wls" | "_vals") if val is not None:
+                
+                pc.check_type(key, val, list | np.ndarray)
+                val2 = np.asarray_chkfinite(val, dtype=np.float64)
 
-            case ("wl" | "wl0" | "wl1" | "mu" | "sig" | "val" | "fact"):
+                if key == "_wls":
+                    pc.check_not_below("wls[0]", val[0], color.WL_BOUNDS[0])
+                    pc.check_not_above("wls[-1]", val[-1], color.WL_BOUNDS[1])
+
+                    if np.std(np.diff(val2)) > 1e-4 or np.any(np.diff(val2) <= 0) or (val[1]-val[0] < 1e-6):
+                        raise ValueError("wls needs to be monotonically increasing with the same step size.")
+                else: 
+                    if (lmin := np.min(val2)) < 0:
+                        raise ValueError(f"vals must be all positive, but one value is {lmin}")
+
+                super().__setattr__(key, val2)
+                return
+
+            case ("wl" | "wl0" | "wl1" | "mu" | "sig" | "val"):
                 pc.check_type(key, val, int | float)
                 val = float(val)
 
                 if key in ["wl", "wl0", "wl1", "mu"]:
-                    pc.check_not_below(key, val, color.WL_MIN)
-                    pc.check_not_above(key, val, color.WL_MAX)
+                    pc.check_not_below(key, val, color.WL_BOUNDS[0])
+                    pc.check_not_above(key, val, color.WL_BOUNDS[1])
 
                 if key in ["val"]:
-                    pc.check_not_below(key, val, 0)
+                    pc.check_above(key, val, 0)
 
-                if key in ["fact", "sig"]:
+                if key in ["sig"]:
                     pc.check_above(key, val, 0)
 
         super().__setattr__(key, val)

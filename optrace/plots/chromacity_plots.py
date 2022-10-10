@@ -15,6 +15,16 @@ chromacity_norms: list[str, str, str] = ["Ignore", "Largest", "Sum"]
 """possible norms for the chromacity diagrams"""
 
 
+# when looking at the XYZ to sRGB Matrix, the r channel has by far the highest coefficients
+# therefore the red region leads to the highest brightness clipping
+# normalizing to the redmost point, the primary, saves all values inside the gamut from brightness clipping
+# coefficients are from Color.XYZ_to_sRGBLinear()
+# we do this since we can't normalize on the highest value in the chromacity image,
+# since the brightest values come from impossible colors (colors outside human vision) clipped towards the gamut
+_red_xyz = np.array([[[*color.SRGB_R_XY, 1 - color.SRGB_R_XY[0] - color.SRGB_R_XY[1]]]])  # red in xyz chromacities
+_CONV_XYZ_NORM = color.xyz_to_srgb_linear(_red_xyz, normalize=False)[0, 0, 0]  # srgb linear red channel for the red primary
+
+
 def chromacities_cie_1931(img:                  RImage | LightSpectrum | list[LightSpectrum],
                           rendering_intent:     str = "Ignore",
                           title:                str = "CIE 1931 Chromaticity Diagram",
@@ -29,26 +39,18 @@ def chromacities_cie_1931(img:                  RImage | LightSpectrum | list[Li
     """
 
     # coordinates of whitepoint and sRGB primaries in Chromacity diagramm coordinates (xy)
-    r, g, b, w = color.SRGB_R_XY, color.SRGB_G_XY, color.SRGB_B_XY, color.SRGB_W_XY
-
-    # when looking at the XYZ to sRGB Matrix, the r channel has by far the highest coefficients
-    # therefore the red region leads to the highest brightness clipping
-    # normalizing to the redmost point, the primary, saves all values inside the gamut from brightness clipping
-    # coefficients are from Color.XYZ_to_sRGBLinear()
-    # we do this since we can't normalize on the highest value in the chromacity image,
-    # since the brightest values come from impossible colors (colors outside human vision) clipped towards the gamut
-    norm = 3.2404542*r[0] - 1.5371385*r[1] - 0.4985314*(1 - r[0] - r[1])
+    r, g, b, w = color.SRGB_R_XY, color.SRGB_G_XY, color.SRGB_B_XY, color.WP_D65_XY
 
     # XYZ to Chromacity Diagram coordinates (xy in this case)
-    def conv(XYZ):
+    def conv(XYZ: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         xyY = color.xyz_to_xyY(XYZ)
         return xyY[:, :, 0].flatten(), xyY[:, :, 1].flatten()
 
     # inverse operation of conv
-    def i_conv(x, y):
+    def i_conv(x: np.ndarray, y: np.ndarray) -> np.ndarray:
         xg, yg = np.meshgrid(x, y)
-        zg = 1 - xg - yg
-        return 1/norm*np.dstack((xg, yg, zg))
+        xyY = np.dstack((xg, yg, yg))
+        return 1/_CONV_XYZ_NORM * color.xyY_to_xyz(xyY)
 
     ext = [0, 0.8, 0, 0.9]  # extent of diagram
     _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
@@ -69,11 +71,7 @@ def chromacities_cie_1976(img:                  RImage | LightSpectrum | list[Li
     """
 
     # coordinates of whitepoint and sRGB primaries in chromacity diagram coordinates (u'v')
-    r, g, b, w = color.SRGB_R_UV, color.SRGB_G_UV, color.SRGB_B_UV, color.SRGB_W_UV
-
-    # see notes in ChromacitiesCIE1931()
-    r_xy = color.SRGB_R_XY
-    norm = 3.2404542*r_xy[0] - 1.5371385*r_xy[1] - 0.4985314*(1 - r_xy[0] - r_xy[1])
+    r, g, b, w = color.SRGB_R_UV, color.SRGB_G_UV, color.SRGB_B_UV, color.WP_D65_UV
 
     # XYZ to Chromacity Diagram coordinates (u'v' in this case)
     def conv(XYZ):
@@ -84,11 +82,11 @@ def chromacities_cie_1976(img:                  RImage | LightSpectrum | list[Li
     # inverse operation of conv
     def i_conv(u_, v_):
         u_g, v_g = np.meshgrid(u_, v_)
+        # see https://en.wikipedia.org/wiki/CIELUV
         xg = 9*u_g / (6*u_g - 16*v_g + 12)
         yg = 4*v_g / (6*u_g - 16*v_g + 12)
         zg = 1 - xg - yg
-
-        return 1/norm * np.dstack((xg, yg, zg))
+        return 1/_CONV_XYZ_NORM * np.dstack((xg, yg, zg))
 
     ext = [0, 0.7, 0, 0.7]  # extent of diagram
     _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
@@ -122,7 +120,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
 
     # LightSpectrum -> single point in diagram
     elif isinstance(img, LightSpectrum):
-        XYZ = img.get_xyz()
+        XYZ = np.array([[[*img.get_xyz()]]])
         labels = [img.get_desc()]
         legend3 = "Spectrum Colors"
         point_alpha = 1
@@ -141,7 +139,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
         # fill legend and color array
         for i, Imi in enumerate(img):
             labels.append(Imi.get_desc())
-            XYZ = np.vstack((XYZ, Imi.get_xyz()))
+            XYZ = np.vstack((XYZ, np.array([[[*Imi.get_xyz()]]])))
 
         legend3 = "Spectrum Colors"
         point_alpha = 1
@@ -175,6 +173,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     y = np.linspace(ext[2], ext[3], 100)
     XYZ_shoe = i_conv(x, y)
     RGB = color.xyz_to_srgb_linear(XYZ_shoe, rendering_intent="Absolute", normalize=False)
+    RGB = np.clip(RGB, 0, 1)
 
     # "bright" chromacity diagram -> normalize such that one of the sRGB coordinates is 1
     if norm == "Largest":
@@ -236,6 +235,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
         text = plt.text(xi[i], yi[i], l, fontsize=9, color="k")
 
     plt.minorticks_on()
+
     # labels and legends
     plt.xlabel(xl)
     plt.ylabel(yl)

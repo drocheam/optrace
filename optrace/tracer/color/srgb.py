@@ -1,286 +1,27 @@
-"""
-Color conversion and processing functions
 
-"""
+import numexpr as ne
+import numpy as np
 
-import pathlib
+from . import misc
+from . import tools
+from .xyz import xyz_to_xyY, WP_D65_XY
+from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV
+from .observers import x_tristimulus, y_tristimulus, z_tristimulus
 
-import numpy as np  # calculations
-import numexpr as ne  # faster calculations
-import scipy.constants  # for c, h, k_B
-
-from . import misc  # calculations
-
-
-# DO NOT CHANGE THIS WAVELENGTH RANGE IF YOU WANT COLORS TO WORK CORRECTLY
-
-WL_MIN: float = 380.
-"""lower bound of wavelength range in nm."""
-
-WL_MAX: float = 780.
-"""upper bound of wavelength range in nm"""
 
 SRGB_RENDERING_INTENTS: list[str, str, str] = ["Ignore", "Absolute", "Perceptual"]
 """Rendering intents for XYZ to sRGB conversion"""
-
-# Whitepoints in XYZ and Luv
-WP_D65_XYZ: list[float, float, float] = [0.95047, 1.00000, 1.08883]
-"""whitepoint D65 in XYZ, https://en.wikipedia.org/wiki/Illuminant_D65"""
-
-WP_D65_LUV: list[float, float, float] = [100, 0.19783982, 0.4683363]
-"""whitepoint D65 in Lu'v'"""
 
 # whitepoints and primary coordinates in xy
 SRGB_R_XY: list[float, float] = [0.64, 0.33]  #: sRGB red primary in xy coordinates
 SRGB_G_XY: list[float, float] = [0.30, 0.60]  #: sRGB green primary in xy coordinates
 SRGB_B_XY: list[float, float] = [0.15, 0.06]  #: sRGB blue primary in xy coordinates
-SRGB_W_XY: list[float, float] = [0.31271, 0.32902]
-"""whitepoint D65 xy coordinates, https://en.wikipedia.org/wiki/Illuminant_D65"""
-
-# whitepoints and primary coordinates in u'v'
-SRGB_R_UV: list[float, float] = [0.4507042254, 0.5228873239]  #: sRGB red primary in u'v' coordinates
-SRGB_G_UV: list[float, float] = [0.125, 0.5625]  #: sRGB green primary in u'v' coordinates
-SRGB_B_UV: list[float, float] = [0.1754385965, 0.1578947368]  #: sRGB blue primary  in u'v' coordinates
-SRGB_W_UV: list[float, float] = WP_D65_LUV[1:]  #: D65 whitepoint in u'v' coordinates
-
-# load illuminants
-_ill_names = ["wl", "A", "C", "D50", "D55", "D65", "D75", "FL2", "FL7", "FL11",
-              "LED-B1", "LED-B2", "LED-B3", "LED-B4", "LED-B5"]
-_ill_path = pathlib.Path(__file__).resolve().parent.parent / "ressources" / "illuminants.csv"
-_illuminants = np.genfromtxt(_ill_path, skip_header=1, delimiter=",", dtype=np.float64)
-
-# load observers
-_obs_names = ["wl", "x", "y", "z"]
-_obs_path = pathlib.Path(__file__).resolve().parent.parent / "ressources" / "observers.csv"
-_observers = np.genfromtxt(_obs_path, skip_header=1, delimiter=",", dtype=np.float64)
-
-# Sources A, C, E, D50, D55, D65, D75, F2, F7, F11:
-# CIE Colorimetry, 3. Edition, 2004
-
-# Sources tristimulus values:
-# https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer
-
-# Sources LED Series:
-# eigentlich CIE Colorimetry, 4th Edition, 2018, Werte aber von
-# https://github.com/colour-science/colour/blob/develop/colour/colorimetry/datasets/illuminants/sds.py
-
-
-def wavelengths(N: int) -> np.ndarray:
-    """
-    Get wavelength range array with equal spacing and N points.
-
-    :param N: number of values
-    :return: wavelength vector in nm, 1D numpy array
-
-    >>> wavelengths(5)
-    array([380., 480., 580., 680., 780.])
-    """
-    return np.linspace(WL_MIN, WL_MAX, N)
-
-
-def blackbody(wl: np.ndarray, T: float = 6504.) -> np.ndarray:
-    """
-    Get spectral radiance of a planck blackbody curve. Unit is W/(sr m³).
-
-    :param wl: wavelength vector in nm (numpy 1D array)
-    :param T: blackbody temperature in Kelvin (float)
-    :return: blackbody curve values (numpy 1D array)
-
-    >>> blackbody(np.array([380., 500., 600.]), T=5500)
-    array([1.54073437e+13, 2.04744373e+13, 1.98272922e+13])
-    """
-
-    # physical constants
-    c, h, k_B = scipy.constants.c, scipy.constants.h, scipy.constants.k
-
-    # wavelength in meters
-    wlm = 1e-9*wl
-
-    # blackbody equation
-    # https://en.wikipedia.org/wiki/Planck%27s_law
-    return 2 * h * c ** 2 / wlm**5 / (np.exp(h * c / (wlm * k_B * T)) - 1)
-
-
-def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
-    """
-    normalized Gauss Function
-
-    :param x:
-    :param mu:
-    :param sig:
-    :return:
-
-    >>> gauss(np.array([0., 0.5, 1.5]), 0.75, 1)
-    array([0.30113743, 0.38666812, 0.30113743])
-    """
-    return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 * (x - mu) ** 2 / sig ** 2)
-
-
-def x_tristimulus(wl: np.ndarray) -> np.ndarray:
-    """
-    Eye x tristimulus values (CIE 1931 2° Standard Observer)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _observers[:, 0], _observers[:, _obs_names.index("x")], left=0, right=0)
-
-
-def y_tristimulus(wl: np.ndarray) -> np.ndarray:
-    """
-    Eye y tristimulus values (CIE 1931 2° Standard Observer)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _observers[:, 0], _observers[:, _obs_names.index("y")], left=0, right=0)
-
-
-def z_tristimulus(wl: np.ndarray) -> np.ndarray:
-    """
-    Eye z tristimulus values (CIE 1931 2° Standard Observer)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _observers[:, 0], _observers[:, _obs_names.index("z")], left=0, right=0)
-
-
-def a_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    A standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("A")], left=0, right=0)
-
-
-def c_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    C standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("C")], left=0, right=0)
-
-
-def e_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    E standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.full_like(wl, 100.0, dtype=np.float64)
-
-
-def d50_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    D50 standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("D50")], left=0, right=0)
-
-
-def d55_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    D55 standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("D55")], left=0, right=0)
-
-
-def d65_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    D65 standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("D65")], left=0, right=0)
-
-
-def d75_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    D75 standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("D75")], left=0, right=0)
-
-
-def fl2_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    FL2 standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("FL2")], left=0, right=0)
-
-
-def fl7_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    FL7 standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("FL7")], left=0, right=0)
-
-
-def fl11_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    FL11 standard illuminant (CIE Colorimetry, 3. Edition, 2004)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("FL11")], left=0, right=0)
-
-
-def led_b1_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    LED-B1 standard illuminant (CIE Colorimetry, 4th Edition, 2018)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("LED-B1")], left=0, right=0)
-
-
-def led_b2_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    LED-B2 standard illuminant (CIE Colorimetry, 4th Edition, 2018)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("LED-B2")], left=0, right=0)
-
-
-def led_b3_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    LED-B3 standard illuminant (CIE Colorimetry, 4th Edition, 2018)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("LED-B3")], left=0, right=0)
-
-
-def led_b4_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    LED-B4 standard illuminant (CIE Colorimetry, 4th Edition, 2018)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("LED-B4")], left=0, right=0)
-
-
-def led_b5_illuminant(wl: np.ndarray) -> np.ndarray:
-    """
-    LED-B5 standard illuminant (CIE Colorimetry, 4th Edition, 2018)
-    :param wl: wavelength array
-    :return: value array
-    """
-    return np.interp(wl, _illuminants[:, 0], _illuminants[:, _ill_names.index("LED-B5")], left=0, right=0)
 
 
 def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     """
-    Conversion from sRGB to linear RGB values
+    Conversion from sRGB to linear RGB values. srgb values should be inside [0, 1], however this is not checked or enforced.
+    For negative values -a  srgb_to_srgb_linear(-a) is the same as -srgb_to_srgb_linear(a)
 
     :param rgb: RGB values (numpy 1D, 2D or 3D array)
     :return: linear RGB values, array with same shape as input
@@ -291,9 +32,9 @@ def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     # remove gamma correction (sRGB -> RGBLinear)
     # Source: https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
     a = 0.055
-    below = RGB <= 0.04045
+    below = np.abs(RGB) <= 0.04045
     RGB[below] *= 1 / 12.92
-    RGB[~below] = ((RGB[~below] + a) / (1 + a)) ** 2.4
+    RGB[~below] = np.sign(RGB[~below])*((np.abs(RGB[~below]) + a) / (1 + a)) ** 2.4
 
     return RGB
 
@@ -326,8 +67,6 @@ def srgb_to_xyz(rgb: np.ndarray) -> np.ndarray:
     :param rgb: sRGB image (numpy 3D array, RGB channels in third dimension)
     :return: XYZ image (numpy 3D array)
     """
-
-    # sRGB -> XYZ is just sRGB -> RGBLinear -> XYZ
     RGBL = srgb_to_srgb_linear(rgb)
     XYZ = srgb_linear_to_xyz(RGBL)
 
@@ -343,27 +82,10 @@ def outside_srgb_gamut(xyz: np.ndarray) -> np.ndarray:
     return np.any(xyz_to_srgb_linear(xyz, rendering_intent="Ignore") < 0, axis=2)
 
 
-def xyz_to_xyY(xyz: np.ndarray) -> np.ndarray:
-    """
-    Convert XYZ to xyY coordinates
-
-    :param xyz:
-    :return:
-    """
-    s = np.sum(xyz, axis=2)
-    mask = s > 0
-
-    xyY = xyz.copy()
-
-    xyY[mask, :2] /= s[mask, np.newaxis]
-    xyY[~mask, :2] = SRGB_W_XY
-
-    xyY[:, :, 2] = xyz[:, :, 1]
-
-    return xyY
-
-
-def xyz_to_srgb_linear(xyz: np.ndarray, normalize: bool = True, rendering_intent: str = "Absolute") -> np.ndarray:
+def xyz_to_srgb_linear(xyz:                 np.ndarray, 
+                       normalize:           bool = True, 
+                       rendering_intent:    str = "Absolute")\
+        -> np.ndarray:
     """
     Conversion XYZ to linear RGB values.
 
@@ -426,7 +148,7 @@ def xyz_to_srgb_linear(xyz: np.ndarray, normalize: bool = True, rendering_intent
 
         # slope towards whitepoint and between primaries
         aw = ne.evaluate("(wy-y)/(wx-x)")
-        aw[x == wx] = 1e6 # finite slope for x == wx
+        aw[x == wx] = 1e10 # finite slope for x == wx
         abg = (gy-by)/(gx-bx)
         abr = (ry-by)/(rx-bx)
         agr = (ry-gy)/(rx-gx)
@@ -445,7 +167,7 @@ def xyz_to_srgb_linear(xyz: np.ndarray, normalize: bool = True, rendering_intent
         y[is_bg] = ne.evaluate("by + (t - bx)*abg")
 
         # green-red line intersections
-        is_gr = (phi < phig) & (phi > phir)
+        is_gr = (phi <= phig) & (phi > phir)
         xgr, ygr, awgr = x[is_gr], y[is_gr], aw[is_gr]
         x[is_gr] = t = ne.evaluate("(ygr - gy - xgr*awgr + gx*agr) / (agr-awgr)")
         y[is_gr] = ne.evaluate("gy + (t - gx)*agr")
@@ -482,24 +204,25 @@ def xyz_to_srgb_linear(xyz: np.ndarray, normalize: bool = True, rendering_intent
         x, y, Y = xyY[:, :, 0], xyY[:, :, 1], xyY[:, :, 2]
 
         # sRGB primaries and whitepoint D65 coordinates
-        r, g, b, w = SRGB_R_XY, SRGB_G_XY, SRGB_B_XY, SRGB_W_XY
+        r, g, b, w = SRGB_R_XY, SRGB_G_XY, SRGB_B_XY, WP_D65_XY
 
         _triangle_intersect(r, g, b, w, x, y)
 
         # rescale x, y, z so the color has the same Y as original color
-        k = Y/y
+        k = Y/y  # okay since y == 0 is an invalid color outside the visible gamut
         XYZ[inv, 0] = k*x
         XYZ[inv, 2] = ne.evaluate("k*(1-x-y)")
 
     if rendering_intent == "Perceptual":
-        Luv = xyz_to_luv(XYZ)
+        Luv = xyz_to_luv(XYZ, normalize=False)  
+        # ^-- don't normalize, since we transform back and forth and expect the same L
 
         # convert to CIE1976 UCS diagram coordinates
         u_v_L = luv_to_u_v_l(Luv)
         u_, v_ = u_v_L[:, :, 0], u_v_L[:, :, 1]
 
         # sRGB primaries and D65 uv coordinates
-        r, g, b, w = SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, SRGB_W_UV
+        r, g, b, w = SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV
         un, vn = w
 
         # squared saturation
@@ -525,20 +248,16 @@ def xyz_to_srgb_linear(xyz: np.ndarray, normalize: bool = True, rendering_intent
     return RGB
 
 
-def srgb_linear_to_srgb(rgbl: np.ndarray, clip: bool = True) -> np.ndarray:
+def srgb_linear_to_srgb(rgbl: np.ndarray) -> np.ndarray:
     """
-    Conversion linear RGB to sRGB. sRGBLinear values need to be inside [0, 1]
+    Conversion linear RGB to sRGB. Values should be inside range [0, 1], however with clip=False this is not enforced.
+    For negative values srgb(-a) is the same as -srgb(a)
 
-    :param clip:
     :param rgbl: linear RGB values (numpy 1D, 2D or 3D array)
     :return: sRGB image (same shape as input)
     """
     # return RGBL
     RGB = rgbl.copy()
-
-    # clip values
-    if clip:
-        np.clip(RGB, 0, 1, out=RGB)
 
     # gamma correction. RGB -> sRGB
     # Source: https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
@@ -550,171 +269,43 @@ def srgb_linear_to_srgb(rgbl: np.ndarray, clip: bool = True) -> np.ndarray:
     return RGB
 
 
-def xyz_to_srgb(xyz: np.ndarray, normalize: bool = True, rendering_intent: str = "Absolute") -> np.ndarray:
+def xyz_to_srgb(xyz:                np.ndarray,
+                normalize:          bool = True,
+                clip:               bool = True,
+                rendering_intent:   str = "Absolute")\
+        -> np.ndarray:
     """
     Conversion XYZ to sRGB
 
     :param xyz: XYZ image (numpy 3D array, XYZ channels in third dimension)
     :param normalize: if values are normalized before conversion (bool)
     :param rendering_intent:
+    :param clip:
     :return: sRGB image (numpy 3D array)
     """
     # XYZ -> sRGB is just XYZ -> RGBLinear -> sRGB
-    RGBL = xyz_to_srgb_linear(xyz, normalize=True, rendering_intent=rendering_intent)
-    RGB = srgb_linear_to_srgb(RGBL, normalize)
+    RGBL = xyz_to_srgb_linear(xyz, normalize=normalize, rendering_intent=rendering_intent)
+
+    if clip:
+        RGBL = np.clip(RGBL, 0, 1)
+
+    RGB = srgb_linear_to_srgb(RGBL)
     return RGB
 
 
-def xyz_to_luv(xyz: np.ndarray) -> np.ndarray:
+def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     """
+    normalized Gauss Function
 
-    :param xyz:
+    :param x:
+    :param mu:
+    :param sig:
     :return:
+
+    >>> gauss(np.array([0., 0.5, 1.5]), 0.75, 1)
+    array([0.30113743, 0.38666812, 0.30113743])
     """
-
-    # all XYZ values need to be below that of D65 reference white,
-    # we therefore need to normalize
-    Xn, Yn, Zn = WP_D65_XYZ
-    _, un, vn = WP_D65_LUV
-
-    # exclude Y = 0 otherwise divisions by zero occur
-    mask = xyz[:, :, 1] > 0  # Y > 0 for 3D array
-    X, Y, Z = xyz[mask, 0], xyz[mask, 1], xyz[mask, 2]
-
-    if not X.shape[0]:
-        return np.zeros_like(xyz)
-
-    XYZm = np.array([np.nanmax(X), np.nanmax(Y), np.nanmax(Z)])
-    nmax = max(XYZm/WP_D65_XYZ)
-    # we only need to normalize t using nmax (see definition of t below), since u and v consist of XYZ ratios
-
-    # conversion using
-    # http://www.brucelindbloom.com/Eqn_XYZ_to_Luv.html
-    # with the "actual CIE standard" constants
-
-    Luv = np.zeros_like(xyz)
-
-    k = 903.3
-    e = 0.008856
-    t = 1/nmax/Yn * Y
-
-    mask2 = t > e  # t > e for L > 0
-    mask3 = misc.part_mask(mask, mask2)  # Y > 0 and t > e
-    mask4 = misc.part_mask(mask, ~mask2)  # Y > 0 and t <= e
-
-    tm, tn = t[mask2], t[~mask2]
-    Luv[mask3, 0] = ne.evaluate("116*tm**(1/3) - 16")
-    Luv[mask4, 0] = k * tn
-
-    D = ne.evaluate("1/(X + 15*Y + 3*Z)")
-    u = ne.evaluate("4*X*D")
-    v = ne.evaluate("9*Y*D")
-
-    L13 = 13*Luv[mask, 0]
-    Luv[mask, 1] = ne.evaluate("L13*(u-un)")
-    Luv[mask, 2] = ne.evaluate("L13*(v-vn)")
-
-    return Luv
-
-
-def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
-    """
-
-    :param luv:
-    :return:
-    """
-
-    # calculations are a rewritten from of
-    # http://www.brucelindbloom.com/Eqn_Luv_to_XYZ.html
-    # with the "actual CIE standard" constants
-
-    _, un, vn = WP_D65_LUV
-
-    # exclude L == 0, otherwise divisions by zero
-    mask = luv[:, :, 0] > 0
-    L_, u_, v_ = luv[mask, 0], luv[mask, 1], luv[mask, 2]
-
-    XYZ = np.zeros_like(luv)
-
-    k = 903.3
-    e = 0.008856
-    mask2 = L_ > k*e
-    mask3 = misc.part_mask(mask, mask2)
-    mask4 = misc.part_mask(mask, ~mask2)
-
-    Lm, Ln = L_[mask2], L_[~mask2]
-    XYZ[mask3, 1] = ne.evaluate("((Lm+16)/116)**3")
-    XYZ[mask4, 1] = 1/k * Ln
-
-    Y = XYZ[mask, 1]
-    L13 = 13 * luv[mask, 0]
-
-    XYZ[mask, 0] = X = ne.evaluate("9/4*Y * (u_ + L13*un) / (v_ + L13*vn)")
-    XYZ[mask, 2] = ne.evaluate("3*Y * (L13/(v_ + L13*vn) - 5/3) - X/3")
-
-    return XYZ
-
-
-def luv_to_u_v_l(luv: np.ndarray) -> np.ndarray:
-    """
-
-    :param luv:
-    :return:
-    """
-    _, un, vn = WP_D65_LUV
-    mi = luv[:, :, 0] > 0
-
-    u_v_L = np.zeros_like(luv)
-    u_v_L[:, :, 0] = un
-    u_v_L[:, :, 1] = vn
-    u_v_L[:, :, 2] = luv[:, :, 0]
-
-    Lm, um, vm = luv[mi, 0], luv[mi, 1], luv[mi, 2]
-    u_v_L[mi, 0] += ne.evaluate("1/13 * um / Lm")
-    u_v_L[mi, 1] += ne.evaluate("1/13 * vm / Lm")
-
-    return u_v_L
-
-
-def get_luv_saturation(luv: np.ndarray) -> np.ndarray:
-    """
-    Get Chroma from Luv. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Saturation
-
-    :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
-    :return: Saturation Image, np.ndarray with shape (Ny, Nx)
-    """
-    C = get_luv_chroma(luv)
-
-    Sat = np.zeros_like(C)
-    mask = luv[:, :, 0] > 0
-    Sat[mask] = C[mask] / luv[mask, 0]
-
-    return Sat
-
-
-def get_luv_chroma(luv: np.ndarray) -> np.ndarray:
-    """
-    Get Chroma from Luv. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Chroma
-
-    :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
-    :return: Chroma Image, np.ndarray with shape (Ny, Nx)
-    """
-    u, v = luv[:, :, 1], luv[:, :, 2]
-    return ne.evaluate("sqrt(u**2 + v**2)")
-
-
-def get_luv_hue(luv: np.ndarray) -> np.ndarray:
-    """
-    Get Hue from Luv. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Chroma
-
-    :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
-    :return: Hue Image, np.ndarray with shape (Ny, Nx)
-    """
-    pi = np.pi
-    u, v = luv[:, :, 1], luv[:, :, 2]
-    hue = ne.evaluate("arctan2(v, u)/pi*180")
-    hue[hue < 0] += 360
-    return hue
+    return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 * (x - mu) ** 2 / sig ** 2)
 
 
 # spectra that lie at the sRGB primaries position in the xy-CIE Diagram
@@ -783,8 +374,13 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     # For the RGB intensities we convert the gamma corrected sRGB values to RGBLinear
     RGBL = srgb_to_srgb_linear(rgb)
 
+    if tools._WL_MIN0 < tools.WL_BOUNDS[0] or tools._WL_MAX0 > tools.WL_BOUNDS[1]:
+        raise RuntimeError(f"Wavelength range {tools.WL_BOUNDS} does not include range [{tools._WL_MIN0}, {tools._WL_MAX0}] needed for this feature.")
+
+    wl = np.linspace(tools._WL_MIN0, tools._WL_MAX0, 10000)
+
     # wavelengths to work with
-    wl = wavelengths(10000)
+    wl = tools.wavelengths(10000)
 
     # rescale channel values by probability (=spectrum power factor)
     RGBL[:, 0] *= _SRGB_R_PRIMARY_POWER_FACTOR
@@ -825,11 +421,11 @@ def power_from_srgb(rgb: np.ndarray) -> np.ndarray:
 ########################################################################################################################
 
 def spectral_colormap(N:    int,
-                      wl0:  float = WL_MIN,
-                      wl1:  float = WL_MAX) \
+                      wl0:  float = tools.WL_BOUNDS[0],
+                      wl1:  float = tools.WL_BOUNDS[1]) \
         -> np.ndarray:
     """
-    Get a spectral colormap with N steps
+    Get a spectral colormap with N steps in srgb
 
     :param wl0:
     :param wl1:
@@ -861,11 +457,10 @@ def spectral_colormap(N:    int,
    
     # mix those two
     RGB = 0.7*RGBa + 0.3*RGBp
-    # RGB = RGBa
 
     # some smoothed rectangle function for brightness fall-off for low and large wavelengths
     # this is for visualization only, there is no physical or perceptual truth behind this
-    RGB *= (0.05 + 0.95 / 4 * (1 - np.tanh((wl - 650) / 40))*(1 + np.tanh((wl - 440) / 30)))[:, np.newaxis]
+    RGB *= (1 / 4 * (1 - np.tanh((wl - 650) / 40))*(1 + np.tanh((wl - 440) / 30)))[:, np.newaxis]
 
     # convert to sRGB
     RGB = srgb_linear_to_srgb(RGB[:, :3])

@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 class PlotTests(unittest.TestCase):
 
     manual = False
+    # manual = True
 
     def tearDown(self) -> None:
         plt.close('all')
@@ -84,11 +85,13 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.r_image_cut_plot, img, title=2)  # invalid title type
         self.assertRaises(TypeError, otp.r_image_cut_plot, img, log=2)  # invalid log type
         self.assertRaises(TypeError, otp.r_image_cut_plot, img, block=2)  # invalid block type
+        self.assertRaises(TypeError, otp.r_image_cut_plot, img, imc=2)  # invalid imc type
         self.assertRaises(TypeError, otp.r_image_plot, img, mode=2)  # invalid mode type
         self.assertRaises(TypeError, otp.r_image_plot, img, flip=2)  # invalid flip type
         self.assertRaises(TypeError, otp.r_image_plot, img, title=2)  # invalid title type
         self.assertRaises(TypeError, otp.r_image_plot, img, log=2)  # invalid log type
         self.assertRaises(TypeError, otp.r_image_plot, img, block=2)  # invalid block type
+        self.assertRaises(TypeError, otp.r_image_plot, img, imc=2)  # invalid imc type
         self.assertRaises(RuntimeError, otp.r_image_cut_plot, img)  # x and y missing
 
         # check zero image log plot
@@ -108,25 +111,17 @@ class PlotTests(unittest.TestCase):
         img = RT.source_image(200)
         
         # ChromacityPlots
-        for normi in otp.chromacity_norms: 
-            otp.chromacities_cie_1931(ot.presets.light_spectrum.d65, norm=normi, block=self.manual)
-            otp.chromacities_cie_1931(ot.presets.light_spectrum.standard, norm=normi, block=self.manual)
-            otp.chromacities_cie_1976(ot.presets.light_spectrum.d65, norm=normi, block=self.manual)
-            otp.chromacities_cie_1976(ot.presets.light_spectrum.standard, norm=normi, block=self.manual)
-            
-            for RIi in color.SRGB_RENDERING_INTENTS:
-                otp.chromacities_cie_1931(img, norm=normi, rendering_intent=RIi, block=self.manual)
-                otp.chromacities_cie_1976(img, norm=normi, rendering_intent=RIi, block=self.manual)
-        
-            plt.close('all')
-
-        # check if title gets applied
-        otp.chromacities_cie_1931(ot.presets.light_spectrum.d65, norm=normi, block=self.manual, title="Test title")
-        otp.chromacities_cie_1976(ot.presets.light_spectrum.d65, norm=normi, block=self.manual, title="Test title")
-
-        # empty list
-        otp.chromacities_cie_1931([], norm=normi, block=self.manual)
-        otp.chromacities_cie_1976([], norm=normi, block=self.manual)
+        # different paramter combinations
+        for el in [ot.presets.light_spectrum.d65, ot.presets.light_spectrum.standard, img, []]:
+            for cie in [otp.chromacities_cie_1931, otp.chromacities_cie_1976]:
+                for title in [None, "Test title"]:
+                    for normi in otp.chromacity_norms: 
+                        cie(el, norm=normi, block=self.manual)
+                        if isinstance(el, ot.RImage):
+                            for RIi in color.SRGB_RENDERING_INTENTS:
+                                args = dict(title=title) if title is not None else {}
+                                cie(el, norm=normi, rendering_intent=RIi, block=self.manual, **args)
+                    plt.close("all")
 
         # exception tests
         self.assertRaises(TypeError, otp.chromacities_cie_1931, ot.Point())  # invalid type
@@ -135,8 +130,9 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.chromacities_cie_1976, ot.Point())  # invalid type
         self.assertRaises(TypeError, otp.chromacities_cie_1976, [ot.presets.light_spectrum.d65, 
                                                                ot.Point()])  # invalid type in list
-
-    def test_spectrum_plots(self):
+       
+    @pytest.mark.slow
+    def test_0spectrum_plots(self):
 
         self.assertRaises(RuntimeError, otp.spectrum_plot, ot.presets.light_spectrum.FDC)  # discrete type can't be plotted
         self.assertRaises(TypeError, otp.refraction_index_plot, ot.Point())
@@ -150,41 +146,57 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.spectrum_plot, ot.presets.light_spectrum.d65, legend_off=2)
         self.assertRaises(TypeError, otp.spectrum_plot, ot.presets.light_spectrum.d65, labels_off=2)
         self.assertRaises(TypeError, otp.spectrum_plot, ot.presets.light_spectrum.d65, steps=[])
-        self.assertRaises(TypeError, otp.spectrum_plot, ot.presets.light_spectrum.d65, colors=2)
+        self.assertRaises(TypeError, otp.spectrum_plot, ot.presets.light_spectrum.d65, color=2)
    
-        # empty list
-        otp.refraction_index_plot([], block=self.manual)
-        otp.spectrum_plot([], block=self.manual)
-
-        # additional coverage tests
-        otp.refraction_index_plot(ot.presets.refraction_index.misc, legend_off=True, labels_off=False, block=self.manual)
-        otp.refraction_index_plot(ot.presets.refraction_index.misc, legend_off=False, labels_off=True, block=self.manual)
-
         # RefractionIndexPlots
         otp.refraction_index_plot(ot.presets.refraction_index.misc, block=self.manual)
         otp.refraction_index_plot(ot.presets.refraction_index.SF10, block=self.manual, title="Test title")
-        
-        # SpectrumPlot
-        otp.spectrum_plot(ot.presets.light_spectrum.d50, block=self.manual)
-        otp.spectrum_plot(ot.presets.light_spectrum.standard, block=self.manual, title="Test title")
+       
+        # refraction_index_plot and spectrum_plot both call the underlying _spectrum_plot, without doing much else
+        # so it is sufficient to test one of them
+
+        # special case: SpectrumPlot, list of Histogram and normal spectrum
+        N = 200000
+        w = np.ones(N)
+        wl = np.random.uniform(*color.WL_BOUNDS, N)
+        rspec0 = ot.LightSpectrum.render(np.array([]), np.array([]))
+        rspec1 = ot.LightSpectrum.render(wl, w)
+        d65 = ot.presets.light_spectrum.d65
+
+        for list_ in [ot.presets.light_spectrum.standard, d65, [d65], [], rspec0, [rspec0], rspec1,\
+                      [rspec1, d65], [rspec0, rspec1]]:
+            for color_ in [None, "r", ["g", "b"]]:
+                lc = 1 if not isinstance(color_, list) else len(color_)
+                ll = 1 if not isinstance(list_, list) else len(list_)
+                if color_ is None or lc == ll:
+                    for leg in [False, True]:
+                        for lab in [False, True]:
+                            for steps in [500, 5000]:
+                                for title in [None, "abc"]:
+                                    args = dict(labels_off=lab, legend_off=leg, block=self.manual, color=color_)
+                                    args = args if title is None else (args | dict(title=title))
+                                    otp.spectrum_plot(list_, **args)
+
+                            plt.close("all")
 
     def test_autofocus_cost_plot(self):
 
-        # check type checking
-        args = (OptimizeResult, dict())
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], args[1])
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, [], args[1])
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], [])
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], args[1], title=2)
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], args[1], block=2)
+        # type checking
+        args = (OptimizeResult(), dict())
+        self.assertRaises(TypeError, otp.autofocus_cost_plot, [], args[1])  # not a OptimizeResult
+        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], [])  # incorrect afdict type, should be dict 
+        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], args[1], title=2)  # invalid title type
+        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], args[1], block=2)  # invalid block type
 
+        # dummy data
         z = np.linspace(-2.5, 501, 200)
         cost = (z-250)**2 / 250**2
         afdict = dict(z=z, cost=cost)
-
         sci = OptimizeResult()
         sci.x = 250
         sci.fun = 0
+
+        # calls
         otp.autofocus_cost_plot(sci, afdict, block=self.manual)
         otp.autofocus_cost_plot(sci, afdict, title="Test title", block=self.manual)
 
@@ -198,13 +210,15 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.abbe_plot, nl, ri=2)
         self.assertRaises(TypeError, otp.abbe_plot, nl, lines=2)
 
-        # Abbe Plot
-        otp.abbe_plot(ot.presets.refraction_index.misc, silent=True, block=self.manual)  # prints message for non-dispersive materials
-        otp.abbe_plot(ot.presets.refraction_index.misc, silent=False, block=self.manual)  # prints no message for ...
-        otp.abbe_plot(ot.presets.refraction_index.misc, title="Test title", block=self.manual)
-
-        # special case: all elements non-dispersive
-        otp.abbe_plot([ot.presets.refraction_index.air, ot.presets.refraction_index.vacuum], block=self.manual)
+        # test different paramter combinations
+        for ri in [ot.presets.refraction_index.misc, [ot.presets.refraction_index.air,\
+                   ot.presets.refraction_index.vacuum], [ot.presets.refraction_index.SF10], []]:
+            for lines in [None, ot.presets.spectral_lines.rgb]:
+                for title in [None, "Test title"]:
+                    for sil in [False, True]:
+                        args = dict(lines=lines, silent=sil) | (dict(title=title) if title is not None else {})
+                        otp.abbe_plot(ri,  **args, block=self.manual)
+                plt.close("all")
 
     def test_surface_profile_plot(self) -> None:
 
@@ -212,27 +226,15 @@ class PlotTests(unittest.TestCase):
         L = ot.presets.geometry.arizona_eye()[0]
         L.back.desc = "Test Legend"  # so plots shows desc as legend entry for this surface
 
-        for pos in [[0, 0, 0], [1, -1, 5]]:
-            L.move_to(pos)
-
-            SPP(L.front, block=self.manual)
-            SPP([L.front, L.back], block=self.manual)
-            SPP([L.front, L.back], remove_offset=True, block=self.manual)
-            SPP([L.front, L.back], remove_offset=True, xe=1, block=self.manual)
-            SPP([L.front, L.back], remove_offset=True, x0=1, block=self.manual)
-            SPP([L.front, L.back], remove_offset=True, x0=-1, xe=2, block=self.manual)
-            SPP([L.front, L.back], title="Test Title", remove_offset=True, x0=1, xe=2, block=self.manual)
-
-            # special cases
-            SPP([L.front, L.back], remove_offset=True, xe=12, block=self.manual)  # part of the curve outside the surface
-            SPP([L.front, L.back], remove_offset=True, x0=-10, xe=12, block=self.manual)  # some outside the curve
-            SPP([L.front, L.back], remove_offset=True, x0=15, xe=18, block=self.manual, silent=True)  # all outside the curve
-            SPP([L.front, L.back], remove_offset=True, x0=15, xe=18, block=self.manual, silent=False)  # all outside the curve
-          
-            plt.close('all')
-
-        # empty list
-        SPP([], block=self.manual)
+        # check different paramter combinations
+        for sl in [L.front, [L.front, L.back], []]:
+            for pos in [[0, 0, 0], [1, -1, 5]]:
+                L.move_to(pos)
+                for sil in [False, True]:
+                    for ro in [False, True]:
+                        for xb in [[None, None], [None, 1], [1, None], [-1, 2], [1, 2], [None, 12], [-10, 12], [15, 18]]:
+                            SPP(sl, remove_offset=ro, silent=sil, x0=xb[0], xe=xb[1], block=self.manual)
+                        plt.close("all")
 
         # check type checking
         self.assertRaises(TypeError, SPP, L.front, title=2)
@@ -242,6 +244,7 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, SPP, L.front, xe=[])
         self.assertRaises(TypeError, SPP, L.front, silent=2)
         self.assertRaises(TypeError, SPP, 5)
+
 
 if __name__ == '__main__':
     unittest.main()

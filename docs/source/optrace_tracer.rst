@@ -3,9 +3,6 @@ tracer Submodule
 
 .. automodule:: optrace.tracer
 
-tracer.color
-_________________________________
-.. automodule:: optrace.tracer.color
 
 tracer.base_class
 _________________________________
@@ -31,3 +28,6 @@ tracer.refraction_index
 _________________________________
 .. automodule:: optrace.tracer.refraction_index
 
+tracer.transfer_matrix_analysis
+_________________________________
+.. automodule:: optrace.tracer.transfer_matrix_analysis

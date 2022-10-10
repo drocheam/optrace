@@ -103,6 +103,7 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.Marker, "Test", [np.inf, 0, 0])  # inf in pos
         self.assertRaises(TypeError, ot.Marker, "Test", [0, 0, 0], marker_factor="yes")  # invalid factor type
         self.assertRaises(TypeError, ot.Marker, "Test", [0, 0, 0], text_factor="yes")  # invalid factor type
+        self.assertRaises(TypeError, ot.Marker, "Test", [0, 0, 0], label_only="yes")  # invalid label_only type
 
         # check init assignments and extent
         for desc, pos in zip(["a", "", "afhajk"], [[0, 1, 0], [5, 0, 0], [7, 8, 9]]):
@@ -383,7 +384,7 @@ class GeometryTests(unittest.TestCase):
                     for projm in ot.Surface.sphere_projection_methods:
                         pp = surf.sphere_projection(p, projm)
                         self.assertTrue(np.all(np.sign(pp[1:, :2]) == np.sign(p1[1:, :2])))  # correct quadrant
-                        self.assertTrue(np.allclose(pp[0, :2] - p1[0, :2], 0, atol=1e-9))  # projection at center
+                        self.assertTrue(np.allclose(pp[0, :2] - p1[0, :2], 0, atol=1e-9, rtol=0))  # projection at center
 
     def test_surface_zmin_zmax_special_types(self):
 
@@ -555,7 +556,7 @@ class GeometryTests(unittest.TestCase):
                         y = np.zeros_like(x)
                         n_is = surf1.get_normals(x, y)
                         n_should = n_conic(x, y, 1/R, k)
-                        self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-7))
+                        self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-7, rtol=0))
 
                         # type "Data" for different sample sizes
                         for N in [50, 51, 400, 401]:
@@ -567,7 +568,7 @@ class GeometryTests(unittest.TestCase):
                             # data normals are more unprecise, since enough samples are needed to define the shape
                             n_is = surf2.get_normals(x, y)
                             n_should = n_conic(x, y, 1/R, k)
-                            self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-4))
+                            self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-4, rtol=0))
 
     def test_filter(self):
 
@@ -586,7 +587,7 @@ class GeometryTests(unittest.TestCase):
         self.assertEqual(F.get_color(), F.spectrum.get_color())  # filter color is just spectrum color
 
         # test call
-        wl = np.random.uniform(color.WL_MIN, color.WL_MAX, 1000)
+        wl = np.random.uniform(*color.WL_BOUNDS, 1000)
         self.assertTrue(np.all(F(wl) == F.spectrum(wl)))  # call to filter is just call to its spectrum
 
         # _new_lock active after init
@@ -662,28 +663,30 @@ class GeometryTests(unittest.TestCase):
 
         # get geometry
         geom = ot.presets.geometry.arizona_eye()
+        geome = geom.elements
 
         # z overlap but no x-y overlap -> no collision
-        geom[1].move_to(geom[0].front.pos + [0, 20, 0.01])
-        self.assertFalse(Element.check_collision(geom[0].front, geom[1].front)[0])
+        geome[1].move_to(geome[0].front.pos + [0, 20, 0.01])
+        self.assertFalse(Element.check_collision(geome[0].front, geome[1].front)[0])
         
         # no z-overlap -> no collision
-        self.assertFalse(Element.check_collision(geom[0].front, geom[2].front)[0])
+        self.assertFalse(Element.check_collision(geome[0].front, geome[2].front)[0])
         # z-overlap but no collision
-        self.assertFalse(Element.check_collision(geom[0].front, geom[0].back)[0])
+        self.assertFalse(Element.check_collision(geome[0].front, geome[0].back)[0])
         
         # collision
-        geom[1].move_to(geom[0].front.pos + [0, 0, 0.01])  # cornea is now inside empty area of pupil
-        coll, x, y = Element.check_collision(geom[0].front, geom[1].front)
+        geome[1].move_to(geome[0].front.pos + [0, 0, 0.01])  # cornea is now inside empty area of pupil
+        coll, x, y = Element.check_collision(geome[0].front, geome[1].front)
         self.assertTrue(coll)
-        self.assertTrue(np.all(geom[0].front.get_values(x, y) >= geom[1].front.get_values(x, y)))
+        self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[1].front.get_values(x, y)))
 
         # another collision
         geom = ot.presets.geometry.arizona_eye()
-        geom[2].move_to(geom[0].front.pos + [0, 0, 0.2])
-        coll, x, y = Element.check_collision(geom[0].front, geom[2].front)
+        geome = geom.elements
+        geome[2].move_to(geome[0].front.pos + [0, 0, 0.2])
+        coll, x, y = Element.check_collision(geome[0].front, geome[2].front)
         self.assertTrue(coll)
-        self.assertTrue(np.all(geom[0].front.get_values(x, y) >= geom[2].front.get_values(x, y)))
+        self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[2].front.get_values(x, y)))
 
         # collision point - surface
 
@@ -741,6 +744,84 @@ class GeometryTests(unittest.TestCase):
         surf1 = ot.Surface("Sphere", r=3, R=4)
         surf2 = ot.Surface("Circle", r=3)
         self.assertRaises(RuntimeError, Element, surf1, [0, 0, 0], surf2, d1=0.1, d2=0.1)
+
+    def test_group(self):
+        pass
+        # TODO test extent, pos, elements, desc, move_to, tma
+
+    def test_group_geometry_actions(self):
+
+        G = ot.Group()
+
+        RS = ot.RaySource(ot.Point(), pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.led_b1)
+        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
+        DET = ot.Detector(ot.Surface("Circle"), pos=[0, 0, 10])
+        AP = ot.Aperture(ot.Surface("Ring"), pos=[0, 0, 10])
+        M = ot.Marker("Test", pos=[0, 0, 10])
+        L = ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"),
+                       n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10])
+
+        # test actions for different element types
+        for el, list_ in zip([RS, L, AP, DET, F, M], 
+                             [G.ray_sources, G.lenses, G.apertures, G.detectors, G.filters, G.markers]):
+        
+            el2 = el.copy()
+
+            # adding works
+            G.add(el)
+            self.assertEqual(len(list_), 1)
+            G.add(el2)
+            self.assertEqual(len(list_), 2)
+
+            # removal works
+            succ = G.remove(el2)
+            self.assertTrue(succ)
+            self.assertEqual(len(list_), 1)
+            self.assertTrue(list_[0] is el)
+            
+            # removing it a second time fails
+            succ = G.remove(el2)
+            self.assertFalse(succ)
+            
+            # adding the same element a second time does not work
+            G.add(el2)
+            assert len(list_) == 2
+            G.add(el2)
+            self.assertEqual(len(list_), 2)
+            G.remove(el2)
+            
+            # has() works
+            self.assertTrue(G.has(el))
+            self.assertFalse(G.has(el2))
+            
+            # clear actually clears
+            G.add(el2)
+            G.clear()
+            self.assertEqual(len(list_), 0)
+
+            # adding as list
+            G.add([el, el2])
+            self.assertEqual(len(list_), 2)
+            self.assertTrue(list_[0] is el)
+            self.assertTrue(list_[1] is el2)
+            
+            # removing as list
+            G.remove([el, el2])
+            self.assertEqual(len(list_), 0)
+    
+        # TODO test adding of Groups to Group
+
+        # removal of whole G list, make sure remove makes a copy of a given list
+        # otherwise G.filters would change for each deleted element and therefore also the list iterator,
+        # leading to not all elements being actually deleted
+        assert len(G.filters) == 0
+        for i in np.arange(5):
+            G.add(ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5]))
+        G.remove(G.filters)
+        self.assertFalse(len(G.filters))
+
+        # check type checking for adding
+        self.assertRaises(TypeError, G.add, ot.Point())  # Surface is a invalid element type
 
     def test_lens(self):
 
@@ -827,8 +908,8 @@ class GeometryTests(unittest.TestCase):
                             self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
                             self.assertGreater(np.min(weights), 0)  # no zero weight rays
                             self.assertEqual(np.sum(weights), rargs["power"])  # rays amount to power
-                            self.assertGreaterEqual(np.min(wavelengths), color.WL_MIN)  # inside visible range
-                            self.assertLessEqual(np.max(wavelengths), color.WL_MAX)  # inside visible range
+                            self.assertGreaterEqual(np.min(wavelengths), color.WL_BOUNDS[0])  # inside visible range
+                            self.assertLessEqual(np.max(wavelengths), color.WL_BOUNDS[1])  # inside visible range
 
                             # check positions
                             self.assertTrue(np.all(p[:, 2] == rargs["pos"][2]))  # rays start at correct z-position
@@ -839,11 +920,11 @@ class GeometryTests(unittest.TestCase):
 
                             # s needs to be a unity vector
                             ss = s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2
-                            self.assertTrue(np.allclose(ss, 1, atol=0.00001))
+                            self.assertTrue(np.allclose(ss, 1, atol=0.00001, rtol=0))
 
                             # pol needs to be a unity vector
                             polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
-                            self.assertTrue(np.allclose(polss, 1, atol=0.00001))
+                            self.assertTrue(np.allclose(polss, 1, atol=0.00001, rtol=0))
 
         # special image shapes
 
@@ -914,23 +995,19 @@ class GeometryTests(unittest.TestCase):
 
         self.assertRaises(AttributeError, RS.__setattr__, "aaa", 2)  # _new_lock active
 
-        self.assertRaises(RuntimeError, RS.create_rays, 1000)  # spectrum missing
-        self.assertRaises(RuntimeError, RS.get_color)  # spectrum missing
-
-
         # image can only be used with rectangle Surface
         self.assertRaises(RuntimeError, ot.RaySource(ot.Surface("Circle"), pos=[0, 0, 0],
                                                      image=ot.presets.image.ETDRS_chart_inverted).create_rays, 10000)
 
         # no or_func specified
-        self.assertRaises(RuntimeError, ot.RaySource(ot.Surface("Circle"), pos=[0, 0, 0], 
-                                                     spectrum=ot.presets.light_spectrum.d65,
-                                                     orientation="Function").create_rays, 10000)  
+        self.assertRaises(TypeError, ot.RaySource(ot.Surface("Circle"), pos=[0, 0, 0], 
+                                                  spectrum=ot.presets.light_spectrum.d65,
+                                                  orientation="Function").create_rays, 10000)  
         
         # no div_func specified
-        self.assertRaises(RuntimeError, ot.RaySource(ot.Surface("Circle"), pos=[0, 0, 0], 
-                                                     spectrum=ot.presets.light_spectrum.d65,
-                                                     divergence="Function").create_rays, 10000)  
+        self.assertRaises(TypeError, ot.RaySource(ot.Surface("Circle"), pos=[0, 0, 0], 
+                                                  spectrum=ot.presets.light_spectrum.d65,
+                                                  divergence="Function").create_rays, 10000)  
 
         # some rays with negative component in z direction
         self.assertRaises(RuntimeError, ot.RaySource(ot.Surface("Circle"), divergence="Isotropic", pos=[0, 0, 0],

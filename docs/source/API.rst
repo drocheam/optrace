@@ -3,8 +3,9 @@ API
 ###########
 
 .. toctree::
-   dependencies
+   library_structure
    optrace_tracer
+   optrace_tracer_color
    optrace_tracer_geometry
    optrace_tracer_spectrum
    optrace_tracer_presets

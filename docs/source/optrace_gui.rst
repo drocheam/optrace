@@ -3,7 +3,7 @@ gui Submodule
 
 .. automodule:: optrace.gui
 
-gui.propertyy_browser
+gui.property_browser
 __________________________
 .. automodule:: optrace.gui.property_browser
 

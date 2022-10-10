@@ -16,6 +16,10 @@ tracer.geometry.filter
 _________________________________
 .. automodule:: optrace.tracer.geometry.filter
 
+tracer.geometry.group
+_________________________________
+.. automodule:: optrace.tracer.geometry.group
+
 tracer.geometry.lens
 _________________________________
 .. automodule:: optrace.tracer.geometry.lens
@@ -27,6 +31,10 @@ _________________________________
 tracer.geometry.element
 _________________________________
 .. automodule:: optrace.tracer.geometry.element
+
+tracer.geometry.marker
+_________________________________
+.. automodule:: optrace.tracer.geometry.marker
 
 tracer.geometry.surface
 _________________________________

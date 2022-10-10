@@ -46,13 +46,15 @@ class Filter(Element):
         """
         return self.spectrum(wl)
 
-    def get_color(self) -> tuple[float, float, float, float]:
+    def get_color(self, rendering_intent="Absolute", clip=True) -> tuple[float, float, float, float]:
         """
         Get Filter color under daylight (D65).
 
+        :param rendering_intent:
+        :param clip:
         :return: sRGBA color tuple, with each channel in range [0, 1]
         """
-        return self.spectrum.get_color()
+        return self.spectrum.get_color(rendering_intent, clip)
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

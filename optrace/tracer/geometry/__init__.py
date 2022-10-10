@@ -10,3 +10,4 @@ from .lens import Lens
 from .marker import Marker
 from .ray_source import RaySource
 
+from .group import Group

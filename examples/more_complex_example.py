@@ -7,6 +7,9 @@ from optrace.gui import TraceGUI
 # make raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
+# ot.color.tools.WL_BOUNDS[1] = 850
+# globals().update(global ot.color.tools.WL_MAX = 850)
+
 # add Raysource
 RSS = ot.Surface("Circle", r=1)
 RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
@@ -14,7 +17,7 @@ RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC
 RT.add(RS)
 
 RSS2 = ot.Surface("Circle", r=1)
-RS2 = ot.RaySource(RSS2, divergence="None", s=[0, 0, 1], spectrum=ot.presets.light_spectrum.d55,
+RS2 = ot.RaySource(RSS2, divergence="None", s=[0, 0, 1], spectrum=ot.LightSpectrum("Blackbody", T=5000),
                    pos=[0, 1, -3], polarization="Angle", pol_angle=25, power=2, desc="Decentered Circle")
 RT.add(RS2)
 
@@ -61,5 +64,5 @@ Det2 = ot.Detector(ot.Surface("Sphere", R=-1.1, r=1), pos=[0, 0, 40])
 RT.add(Det2)
 
 # Instantiate the GUI and start it.
-sim = TraceGUI(RT, minimalistic_view=True, dark_mode=False)
+sim = TraceGUI(RT, minimalistic_view=True)
 sim.run()

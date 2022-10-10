@@ -35,6 +35,8 @@ from ..tracer import misc  # for partMask function
 
 from .property_browser import PropertyBrowser  # dictionary browser
 
+from ..__metadata__ import __version__
+
 # threading rules:
 # + some ideas from: https://traits-futures.readthedocs.io/en/latest/guide/threading.html
 # * GUI changes only in main thread
@@ -59,7 +61,7 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # UI objects
 
-    DETECTOR_COLOR: tuple[float, float, float] = (0.10, 0.10, 0.10, 0.80)
+    DETECTOR_COLOR: tuple[float, float, float] = (0.10, 0.10, 0.10, 0.90)
     """RGB + Alpha tuple for the Detector visualization"""
 
     LENS_COLOR: tuple[float, float, float] = (0.63, 0.79, 1.00, 0.35)
@@ -71,7 +73,11 @@ class TraceGUI(HasTraits):
     RAYSOURCE_ALPHA: float = 0.55
     """Alpha value for the RaySource visualization"""
 
-    OUTLINE_ALPHA: float = 0.25
+    AXIS_COLOR: tuple[float, float, float] = (0., 0., 0.)
+    
+    AXIS_LABEL_COLOR: tuple[float, float, float] = (0.55, 0.55, 0.55)
+
+    OUTLINE_ALPHA: float = 1
     """ Alpha value for outline visualization """
 
     CROSSHAIR_COLOR: tuple[float, float, float] = (1, 0, 0)
@@ -80,7 +86,7 @@ class TraceGUI(HasTraits):
     MARKER_COLOR: tuple[float, float, float] = (0, 1, 0)
     """color of markers"""
 
-    SUBTLE_COLOR: tuple[float, float, float] = (0.40, 0.40, 0.40)
+    SUBTLE_COLOR: tuple[float, float, float] = (0.30, 0.30, 0.30)
     """color of """
    
     INFO_FRAME_OPACITY = 0.2
@@ -92,13 +98,13 @@ class TraceGUI(HasTraits):
     D_VIS: float = 0.125
     """Visualization thickness for the side view of planar elements"""
 
-    MAX_RAYS_SHOWN: int = 8000
+    MAX_RAYS_SHOWN: int = 10000
     """Maximum of rays shown in visualization"""
 
     LABEL_STYLE: dict = dict(font_size=11, bold=True, font_family="courier", shadow=True)
     """Standard Text Style. Used for object labels, legends and axes"""
 
-    TEXT_STYLE: dict = dict(font_size=11, font_family="courier", shadow=True, italic=False, bold=False)
+    TEXT_STYLE: dict = dict(font_size=11, font_family="courier", italic=False, bold=True)
     """Standard Text Style. Used for object labels, legends and axes"""
 
     INFO_STYLE: dict = dict(font_size=13, bold=True, font_family="courier", shadow=True, italic=False)
@@ -110,21 +116,21 @@ class TraceGUI(HasTraits):
 
     # Ranges
 
-    ray_count: Range = Range(1000, Raytracer.MAX_RAYS, 200000, desc='Number of rays for Simulation', enter_set=True,
-                             auto_set=False, label="N_rays", mode='text')
+    ray_count: Range = Range(1, Raytracer.MAX_RAYS, 200000, desc='Number of rays for Simulation', enter_set=True,
+                             auto_set=False, label="Rays", mode='text')
     """Number of rays for raytracing"""
 
-    ray_amount_shown: Range = Range(-5.0, -1.0, -2.25, desc='Percentage of N Which is Drawn', enter_set=False,
-                                    auto_set=False, label="N_vis (log)", mode='slider')
-    """Number of rays shown in mayavi scenen. log10 value."""
+    ray_amount_shown: Range = Range(1, 10000, 2000, desc='Percentage of N Which is Drawn', enter_set=False,
+                                    auto_set=False, label="Rays Shown", mode='logslider')
+    """Number of rays shown in mayavi scenen"""
 
     det_pos: Range = Range(low='_det_pos_min', high='_det_pos_max', value='_det_pos_max', mode='slider',
                            desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_pos")
     """z-Position of Detector. Lies inside z-range of :obj:`Backend.raytracer.outline`"""
 
-    ray_alpha: Range = Range(-5.0, 0.0, -1.9, desc='Opacity of the rays/Points', enter_set=True,
-                             auto_set=True, label="Alpha (log)", mode='slider')
-    """opacity of shown rays. log10 values"""
+    ray_opacity: Range = Range(1e-5, 1, 0.01, desc='Opacity of the rays/Points', enter_set=True,
+                             auto_set=True, label="Opacity", mode='logslider')
+    """opacity of shown ray"""
 
     ray_width: Range = Range(1.0, 20.0, 1, desc='Ray Linewidth or Point Size', enter_set=True,
                              auto_set=True, label="Width")
@@ -140,7 +146,7 @@ class TraceGUI(HasTraits):
     # To assign bool values we need a workaround in __setattr__
 
     absorb_missing: List = List(editor=CheckListEditor(values=["Absorb Rays Missing Lens"], format_func=lambda x: x),
-                                desc="ifRrays are Absorbed when not Hitting a Lens")
+                                desc="if Rays are Absorbed when not Hitting a Lens")
     """Boolean value for absorbing rays missing Lens. Packed as Checkbox into a :obj:`List`"""
 
     log_image: List = List(editor=CheckListEditor(values=['Logarithmic Scaling'], format_func=lambda x: x),
@@ -230,7 +236,7 @@ class TraceGUI(HasTraits):
     focus_type: Enum = Enum(*Raytracer.autofocus_methods, desc="Method for Autofocus")
     """Focus Finding Mode from raytracer.AutofocusModes"""
 
-    cut_dimension: Enum = Enum(["x dimension", "y dimension"], desc="image cut dimension")
+    cut_dimension: Enum = Enum(["y", "x"], desc="image cut dimension")
     """dimension for image cut"""
 
     source_names: List = List()  #: short names for raytracer ray sources
@@ -241,7 +247,7 @@ class TraceGUI(HasTraits):
     detector_selection: Enum = Enum(values='detector_names', desc="Detector Selection")
     """Detector Selection. Holds the name of one of the Detectors."""
 
-    image_pixels: Enum = Enum([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
+    image_pixels: Enum = Enum(RImage.SIZES,
                                 desc='Detector Image Pixels in Smaller of x or y Dimension',
                                 label="Pixels_xy")
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
@@ -249,46 +255,44 @@ class TraceGUI(HasTraits):
 
     # Buttons
 
-    detector_image_button:      Button = Button(label="Detector Image", desc="Generating a Detector Image")
-    run_button:                 Button = Button(label="Run", desc="runs the specified command")
-    clear_button:               Button = Button(label="Clear", desc="clear command history")
-    property_browser_button:    Button = Button(label="Open Property Browser", desc="property browser is opened")
-    source_spectrum_button:     Button = Button(label="Source Spectrum", desc="sources spectrum is shown")
-    detector_spectrum_button:   Button = Button(label="Detector Spectrum", desc="detector spectrum is shown")
-    source_cut_button:          Button = Button(label="Source Image Cut", desc="source image cut is shown")
-    detector_cut_button:        Button = Button(label="Detector Image Cut", desc="detector image cut is shown")
-    source_image_button:        Button = Button(label="Source Image", desc="Source Image of the Chosen Source")
-    auto_focus_button:          Button = Button(label="Find Focus", desc="Finding the Focus Between the Lenses"
+    _detector_image_button:      Button = Button(label="Detector Image", desc="Generating a Detector Image")
+    _run_button:                 Button = Button(label="Run", desc="runs the specified command")
+    _clear_button:               Button = Button(label="Clear", desc="clear command history")
+    _property_browser_button:    Button = Button(label="Open Property Browser", desc="property browser is opened")
+    _source_spectrum_button:     Button = Button(label="Source Spectrum", desc="sources spectrum is shown")
+    _detector_spectrum_button:   Button = Button(label="Detector Spectrum", desc="detector spectrum is shown")
+    _source_cut_button:          Button = Button(label="Source Image Cut", desc="source image cut is shown")
+    _detector_cut_button:        Button = Button(label="Detector Image Cut", desc="detector image cut is shown")
+    _source_image_button:        Button = Button(label="Source Image", desc="Source Image of the Chosen Source")
+    _auto_focus_button:          Button = Button(label="Find Focus", desc="Finding the Focus Between the Lenses"
                                                                          " around the Detector Position")
 
     # Strings and Labels
 
-    _cmd:                       Str = Str()
-    _autofocus_information:     Str = Str()
-    execute_label:              Str = Str('Command:')
-    history_label:              Str = Str('History:')
-    command_history:            Str = Str('')
-    debug_options_label:        Str = Str('Debugging Options:')
-    debug_command_label:        Str = Str('Command Running Options:')
-    spectrum_label:             Str = Str('Generate Spectrum:')
-    image_label:                Str = Str('Render Image:')
-    geometry_label:             Str = Str('Geometry:')
-    autofocus_label:            Str = Str('Autofocus:')
-    property_label:             Str = Str('Properties:')
-    trace_label:                Str = Str('Trace Settings:')
-    plotting_label:             Str = Str('Ray Plotting Modes:')
-    ray_visual_label:           Str = Str('Ray Visual Settings:')
-    ui_visual_label:            Str = Str('Scene and UI Settings:')
-    autofocus_output_label:     Str = Str('Optimization Output:')
-    whitespace_label:           Str = Str('')
+    _cmd:                        Str = Str()
+    _autofocus_information:      Str = Str()
+    _execute_label:              Str = Str('Command:')
+    _history_label:              Str = Str('History:')
+    _command_history:            Str = Str('')
+    _debug_options_label:        Str = Str('Debugging Options:')
+    _debug_command_label:        Str = Str('Command Running Options:')
+    _spectrum_label:             Str = Str('Generate Spectrum:')
+    _image_label:                Str = Str('Render Image:')
+    _geometry_label:             Str = Str('Geometry:')
+    _autofocus_label:            Str = Str('Autofocus:')
+    _property_label:             Str = Str('Properties:')
+    _trace_label:                Str = Str('Trace Settings:')
+    _plotting_label:             Str = Str('Ray Plotting Modes:')
+    _ray_visual_label:           Str = Str('Ray Visual Settings:')
+    _ui_visual_label:            Str = Str('Scene and UI Settings:')
+    _autofocus_output_label:     Str = Str('Optimization Output:')
+    _whitespace_label:           Str = Str('')
 
-    separator: Item = Item("whitespace_label", style='readonly', show_label=False, width=210)
+    _separator: Item = Item("_whitespace_label", style='readonly', show_label=False, width=210)
 
     _scene_not_maximized: Bool = Bool(True)
 
     _status: Dict = Dict(Str())
-    """
-    """
 
     # size of the mlab scene
     _scene_size0 = [1100, 800]  # default size
@@ -309,112 +313,112 @@ class TraceGUI(HasTraits):
                     ),
                     Group(
                         Group(
-                            separator,
-                            Item("trace_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            Item("_trace_label", style='readonly', show_label=False, emphasized=True),
                             Item('ray_count'),
                             Item('absorb_missing', style="custom", show_label=False),
-                            separator,
-                            separator,
-                            Item("plotting_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            _separator,
+                            Item("_plotting_label", style='readonly', show_label=False, emphasized=True),
                             Item("plotting_type", label='Plotting'),
                             Item("coloring_type", label='Coloring'),
-                            separator,
-                            separator,
-                            Item("ray_visual_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            _separator,
+                            Item("_ray_visual_label", style='readonly', show_label=False, emphasized=True),
                             Item('ray_amount_shown'),
-                            Item('ray_alpha'),
+                            Item('ray_opacity'),
                             Item('ray_width'),
-                            separator,
-                            separator,
-                            Item("ui_visual_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            _separator,
+                            Item("_ui_visual_label", style='readonly', show_label=False, emphasized=True),
                             Item('minimalistic_view', style="custom", show_label=False),
                             Item('maximize_scene', style="custom", show_label=False),
-                            separator,
+                            _separator,
                             label="Main"
                             ),
                         Group(
-                            separator,
-                            Item("geometry_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
                             Item('det_pos', label="Det_z"),
-                            separator,
-                            Item("image_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            Item("_image_label", style='readonly', show_label=False, emphasized=True),
                             Item('image_type', label='Mode'),
                             Item('projection_method', label='Projection', enabled_when="projection_method_enabled"),
                             Item('image_pixels'),
                             Item('log_image', style="custom", show_label=False),
                             Item('flip_det_image', style="custom", show_label=False),
                             Item('det_image_one_source', style="custom", show_label=False),
-                            Item('source_image_button', show_label=False),
-                            Item('detector_image_button', show_label=False),
-                            separator,
-                            Item("cut_dimension", label="Cut dim."),
+                            Item('_source_image_button', show_label=False),
+                            Item('_detector_image_button', show_label=False),
+                            _separator,
+                            Item("cut_dimension", label="Cut at"),
                             Item("cut_value", label="Value"),
-                            Item('source_cut_button', show_label=False),
-                            Item('detector_cut_button', show_label=False),
-                            separator,
-                            Item("spectrum_label", style='readonly', show_label=False, emphasized=True),
-                            Item('source_spectrum_button', show_label=False),
+                            Item('_source_cut_button', show_label=False),
+                            Item('_detector_cut_button', show_label=False),
+                            _separator,
+                            Item("_spectrum_label", style='readonly', show_label=False, emphasized=True),
+                            Item('_source_spectrum_button', show_label=False),
                             Item('det_spectrum_one_source', style="custom", show_label=False),
-                            Item('detector_spectrum_button', show_label=False),
+                            Item('_detector_spectrum_button', show_label=False),
                             label="Imaging",
                             ),
                         Group(
-                            separator,
-                            Item("geometry_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
                             Item('det_pos', label="Det_z"),
-                            separator,
-                            separator,
-                            Item("autofocus_label", style='readonly', show_label=False, emphasized=True),
+                            _separator,
+                            _separator,
+                            Item("_autofocus_label", style='readonly', show_label=False, emphasized=True),
                             Item('focus_type', label='Mode'),
                             Item('af_one_source', style="custom", show_label=False),
                             Item('focus_cost_plot', style="custom", show_label=False),
-                            Item('auto_focus_button', show_label=False),
-                            separator,
-                            Item("autofocus_output_label", style='readonly', show_label=False),
+                            Item('_auto_focus_button', show_label=False),
+                            _separator,
+                            Item("_autofocus_output_label", style='readonly', show_label=False),
                             Item("_autofocus_information", show_label=False, style="custom"),
-                            separator,
+                            _separator,
                             label="Focus",
                             ),
                         Group(
                             Group(
-                                Item("execute_label", style='readonly', show_label=False, emphasized=True),
+                                Item("_execute_label", style='readonly', show_label=False, emphasized=True),
                                 Item('_cmd', editor=CodeEditor(), show_label=False, style="custom"), 
-                                Item("run_button", show_label=False),
+                                Item("_run_button", show_label=False),
                                 style_sheet="*{max-height:200px; max-width:320px}"
                             ),
-                            separator,
+                            _separator,
                             Group(
-                                Item("history_label", style='readonly', show_label=False, emphasized=True),
-                                Item("command_history", editor=CodeEditor(), show_label=False, style="custom"), 
-                                Item("clear_button", show_label=False),
+                                Item("_history_label", style='readonly', show_label=False, emphasized=True),
+                                Item("_command_history", editor=CodeEditor(), show_label=False, style="custom"),
+                                Item("_clear_button", show_label=False),
                                 style_sheet="*{max-width:320px; max-height:500px}"
                             ),
                             label="Run"
                             ),
                         HSplit(  # hsplit with whitespace group so we have a left margin in this tab
-                            Group(Item("whitespace_label", style='readonly', show_label=False, width=50)),
+                            Group(Item("_whitespace_label", style='readonly', show_label=False, width=50)),
                             Group(
-                                separator,
-                                separator,
-                                Item("debug_options_label", style='readonly', show_label=False, emphasized=True),
+                                _separator,
+                                _separator,
+                                Item("_debug_options_label", style='readonly', show_label=False, emphasized=True),
                                 Item('raytracer_single_thread', style="custom", show_label=False),
                                 Item('show_all_warnings', style="custom", show_label=False),
                                 Item('garbage_collector_stats', style="custom", show_label=False),
                                 Item('wireframe_surfaces', style="custom", show_label=False),
-                                separator,
-                                separator,
-                                Item("debug_command_label", style='readonly', show_label=False, emphasized=True),
+                                _separator,
+                                _separator,
+                                Item("_debug_command_label", style='readonly', show_label=False, emphasized=True),
                                 Item('command_dont_replot', style="custom", show_label=False),
                                 Item('command_dont_wait', style="custom", show_label=False),
-                                separator,
-                                separator,
-                                Item("property_label", style='readonly', show_label=False, emphasized=True),
-                                Item('property_browser_button', show_label=False),
-                                separator),
+                                _separator,
+                                _separator,
+                                Item("_property_label", style='readonly', show_label=False, emphasized=True),
+                                Item('_property_browser_button', show_label=False),
+                                _separator),
                             label="Debug",
                             ),
                         layout="tabbed",
@@ -422,7 +426,7 @@ class TraceGUI(HasTraits):
                         ),
                     ),
                 resizable=True,
-                title="Optrace"  # window title
+                title=f"Optrace {__version__}"
                 )
     """the UI view"""
 
@@ -474,8 +478,8 @@ class TraceGUI(HasTraits):
         self._det_pos_max = self.raytracer.outline[5]
 
         self._det_ind = 0
-        if len(self.raytracer.detector_list):
-            self.det_pos = self.raytracer.detector_list[self._det_ind].pos[2]
+        if len(self.raytracer.detectors):
+            self.det_pos = self.raytracer.detectors[self._det_ind].pos[2]
         self._source_ind = 0
 
         self.silent = False
@@ -487,7 +491,7 @@ class TraceGUI(HasTraits):
         self.last_source_image = None
 
         # default value for image_pixels
-        self.image_pixels = 256
+        self.image_pixels = 189
 
         # assign scene background color
         self.scene.background = self.BACKGROUND_COLOR
@@ -627,7 +631,7 @@ class TraceGUI(HasTraits):
         """replot all lenses from raytracer"""
         self.__remove_objects(self._lens_plot_objects)
 
-        for num, L in enumerate(self.raytracer.lens_list):
+        for num, L in enumerate(self.raytracer.lenses):
             t = self._plot_element(L, num, self.LENS_COLOR[:3], self.LENS_COLOR[3])
             self._lens_plot_objects.append(t)
 
@@ -635,7 +639,7 @@ class TraceGUI(HasTraits):
         """replot all apertures from raytracer"""
         self.__remove_objects(self._aperture_plot_objects)
 
-        for num, AP in enumerate(self.raytracer.aperture_list):
+        for num, AP in enumerate(self.raytracer.apertures):
             t = self._plot_element(AP, num, (0, 0, 0), 1)
             self._aperture_plot_objects.append(t)
 
@@ -643,7 +647,7 @@ class TraceGUI(HasTraits):
         """replot all filter from raytracer"""
         self.__remove_objects(self._filter_plot_objects)
 
-        for num, F in enumerate(self.raytracer.filter_list):
+        for num, F in enumerate(self.raytracer.filters):
             fcolor = F.get_color()
             alpha = 0.1 + 0.899*fcolor[3]  # offset in both directions, ensures visibility and see-through
             t = self._plot_element(F, num, fcolor[:3], alpha)
@@ -653,7 +657,7 @@ class TraceGUI(HasTraits):
         """replot all detectors from taytracer"""
         self.__remove_objects(self._detector_plot_objects)
 
-        for num, Det in enumerate(self.raytracer.detector_list):
+        for num, Det in enumerate(self.raytracer.detectors):
             t = self._plot_element(Det, num, self.DETECTOR_COLOR[:3], self.DETECTOR_COLOR[3])
             self._detector_plot_objects.append(t)
 
@@ -661,7 +665,7 @@ class TraceGUI(HasTraits):
         """replot all ray sources from raytracr"""
         self.__remove_objects(self._ray_source_plot_objects)
 
-        for num, RS in enumerate(self.raytracer.ray_source_list):
+        for num, RS in enumerate(self.raytracer.ray_sources):
             t = self._plot_element(RS, num, (1, 1, 1), self.RAYSOURCE_ALPHA, d=-self.D_VIS, spec=False, light=False)
             self._ray_source_plot_objects.append(t)
 
@@ -670,7 +674,7 @@ class TraceGUI(HasTraits):
         self.__remove_objects(self._outline_plot_objects)
 
         self.scene.engine.add_source(ParametricSurface(name="Outline"), self.scene)
-        a = self.scene.mlab.outline(extent=self.raytracer.outline.copy(), opacity=self.OUTLINE_ALPHA)
+        a = self.scene.mlab.outline(extent=self.raytracer.outline.copy(), color=(0, 0, 0))
         a.actor.actor.pickable = False  # only rays should be pickable
 
         self._outline_plot_objects.append((a,))
@@ -723,15 +727,15 @@ class TraceGUI(HasTraits):
             self.scene.engine.add_source(ParametricSurface(name=f"{name}-Axis"), self.scene)
 
             a = self.scene.mlab.axes(extent=ext, nb_labels=lnum, x_axis_visibility=vis_x,
-                                     y_axis_visibility=vis_y, z_axis_visibility=vis_z)
+                                     y_axis_visibility=vis_y, z_axis_visibility=vis_z, color=self.AXIS_COLOR)
 
             label = f"{name} / mm"
             a.axes.trait_set(font_factor=ff_old, fly_mode='none', label_format=lform, x_label=label,
                              y_label=label, z_label=label, layer_number=1)
 
             # a.property.trait_set(display_location='background')
-            a.title_text_property.trait_set(**self.TEXT_STYLE)
-            a.label_text_property.trait_set(**self.TEXT_STYLE)
+            a.title_text_property.trait_set(**self.TEXT_STYLE, color=self.AXIS_LABEL_COLOR)
+            a.label_text_property.trait_set(**self.TEXT_STYLE, color=self.AXIS_LABEL_COLOR)
             a.actors[0].pickable = False
             a.visible = not bool(self.minimalistic_view)
 
@@ -762,11 +766,13 @@ class TraceGUI(HasTraits):
         self.__remove_objects(self._refraction_index_plot_objects)
 
         # sort Element list in z order
-        Lenses = sorted(self.raytracer.lens_list, key=lambda Element: Element.pos[2])
+        Lenses = sorted(self.raytracer.lenses, key=lambda Element: Element.pos[2])
 
         # create n list and z-boundary list
         nList = [self.raytracer.n0] + [Element.n2 for Element in Lenses] + [self.raytracer.n0]
-        BoundList = [self.raytracer.outline[4]] + [np.mean(Element.extent[4:]) for Element in Lenses] + [self.raytracer.outline[5]]
+        BoundList = [self.raytracer.outline[[4, 4]]] +\
+                    [(np.mean(Element.front.extent[4:]), np.mean(Element.back.extent[4:])) for Element in Lenses]\
+                    + [self.raytracer.outline[[5, 5]]]
 
         # replace None values of Lenses n2 with the ambient n0
         nList = [self.raytracer.n0 if ni is None else ni for ni in nList]
@@ -786,17 +792,23 @@ class TraceGUI(HasTraits):
         # plot boxes
         for i in range(len(BoundList)-1):
 
+            # skip plotting if bound difference is small (e.g. for lenses in contact, like achromatic one)
+            bdiff = (BoundList[i+1][0] - BoundList[i][1])
+            if bdiff < 1e-3 or np.abs(bdiff) < 1e-3:
+                continue
+
             # plot outline
             self.scene.engine.add_source(ParametricSurface(name=f"Refraction Index Outline {i}"), self.scene)
-            outline = self.scene.mlab.outline(extent=[*self.raytracer.outline[:4], BoundList[i], BoundList[i + 1]],
-                                              opacity=self.OUTLINE_ALPHA)
+            outline = self.scene.mlab.outline(extent=[*self.raytracer.outline[:4], BoundList[i][1], BoundList[i + 1][0]],
+                                              color=self.AXIS_COLOR)
             outline.outline_mode = 'cornered'
             outline.actor.actor.pickable = False  # only rays should be pickable
+            outline.outline_filter.corner_factor = 0.1
 
             # label position
             x_pos = self.raytracer.outline[0] + (self.raytracer.outline[1] - self.raytracer.outline[0]) * 0.05
             y_pos = np.mean(self.raytracer.outline[2:4])
-            z_pos = np.mean(BoundList[i:i+2])
+            z_pos = np.mean([BoundList[i][1], BoundList[i+1][0]])
 
             # plot label
             label = nList[i].get_desc()
@@ -804,7 +816,8 @@ class TraceGUI(HasTraits):
             text = self.scene.mlab.text(x_pos, y_pos, z=z_pos, text=text_, name="Label")
             text.actor.text_scale_mode = 'none'
             text.property.trait_set(**self.TEXT_STYLE, justification="center", frame=True,
-                                    frame_color=self.SUBTLE_COLOR)
+                                    frame_color=self.SUBTLE_COLOR, color=self.AXIS_LABEL_COLOR)
+            text.property.bold = False
             # append plot objects
             self._refraction_index_plot_objects.append((outline, text, None))
 
@@ -887,13 +900,13 @@ class TraceGUI(HasTraits):
         :return:
         """
 
-        p_, s_, pol_, w_, wl_, snum_ = self.raytracer.rays.get_rays_by_mask(self._ray_selection, normalize=True)
+        p_, s_, pol_, w_, wl_, snum_ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=True)
         self._ray_property_dict.update(p=p_, s=s_, pol=pol_, w=w_, wl=wl_, snum=snum_,
                                        index=np.where(self._ray_selection)[0])
 
         # get flattened list of the coordinates
-        _, s_un, _, _, _, _ = self.raytracer.rays.get_rays_by_mask(self._ray_selection, normalize=False,
-                                                                   ret=[0, 1, 0, 0, 0, 0])
+        _, s_un, _, _, _, _ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=False,
+                                                               ret=[0, 1, 0, 0, 0, 0])
         x, y, z = p_[:, :, 0].ravel(), p_[:, :, 1].ravel(), p_[:, :, 2].ravel()
         u, v, w = s_un[:, :, 0].ravel(), s_un[:, :, 1].ravel(), s_un[:, :, 2].ravel()
         s = np.ones_like(z)
@@ -911,7 +924,7 @@ class TraceGUI(HasTraits):
                                                    scale_mode="vector", scale_factor=1, colormap="Greys", mode="2ddash")
         self._rays_plot.glyph.trait_set(color_mode="color_by_scalar")
         self._rays_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True,
-                                                       opacity=10**self.ray_alpha)
+                                                       opacity=self.ray_opacity)
         self._rays_plot.actor.property.trait_set(line_width=self.ray_width,
                                                  point_size=self.ray_width if self.plotting_type == "Points" else 0.1)
         self._rays_plot.parent.parent.name = "Rays"
@@ -988,14 +1001,14 @@ class TraceGUI(HasTraits):
 
             case 'Wavelength':
                 lutm.lut.table = color.spectral_colormap(255)
-                lutm.data_range = [color.WL_MIN, color.WL_MAX]
+                lutm.data_range = color.WL_BOUNDS 
                 lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-6.0f"
 
             case ('Polarization xz' | "Polarization yz"):
                 lutm.data_range = [0.0, 1.0]
 
             case 'Source':
-                lutm.number_of_labels = len(self.raytracer.ray_source_list)
+                lutm.number_of_labels = len(self.raytracer.ray_sources)
                 lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-6.0f"
                 if lutm.number_of_labels > 1:
                     lutm.lut.table = color.spectral_colormap(lutm.number_of_labels, 440, 620)
@@ -1011,12 +1024,12 @@ class TraceGUI(HasTraits):
                 RSColor = [self.scene.foreground for RSp in self._ray_source_plot_objects]
 
             case 'Wavelength':
-                RSColor = [RS.get_color()[:3] for RS in self.raytracer.ray_source_list]
+                RSColor = [RS.get_color()[:3] for RS in self.raytracer.ray_sources]
 
             case ('Polarization xz' | "Polarization yz"):
                 # color from polarization projection on yz-plane
                 RSColor = []
-                for RS in self.raytracer.ray_source_list:
+                for RS in self.raytracer.ray_sources:
                     
                     if RS.polarization in ["x", "y", "Angle"]:
 
@@ -1041,7 +1054,7 @@ class TraceGUI(HasTraits):
                 # set to maximum ray power, this is the same for all sources
                 RSColor = [np.array(lutm.lut.table[-1][:3]) / 255. for RSp in self._ray_source_plot_objects]
 
-        if len(self.raytracer.ray_source_list) == len(self._ray_source_plot_objects):
+        if len(self.raytracer.ray_sources) == len(self._ray_source_plot_objects):
             for color, RSp in zip(RSColor, self._ray_source_plot_objects):
                 for RSpi in RSp[:2]:
                     if RSpi is not None:
@@ -1073,14 +1086,14 @@ class TraceGUI(HasTraits):
     def _init_source_list(self) -> None:
         """generate a descriptive list of RaySource names"""
         self.source_names = [f"{RaySource.abbr}{num}: {RS.get_desc()}"[:35]
-                             for num, RS in enumerate(self.raytracer.ray_source_list)]
+                             for num, RS in enumerate(self.raytracer.ray_sources)]
         # don't append and delete directly on elements of self.source_names,
         # because issues with trait updates with type List
 
     def _init_detector_list(self) -> None:
         """generate a descriptive list of Detector names"""
         self.detector_names = [f"{Detector.abbr}{num}: {Det.get_desc()}"[:35]
-                               for num, Det in enumerate(self.raytracer.detector_list)]
+                               for num, Det in enumerate(self.raytracer.detectors)]
         # don't append and delete directly on elements of self.detector_names,
         # because issues with trait updates with type "List"
     
@@ -1088,13 +1101,14 @@ class TraceGUI(HasTraits):
         
         self.__remove_objects(self._marker_plot_objects)
 
-        for num, mark in enumerate(self.raytracer.marker_list):
+        for num, mark in enumerate(self.raytracer.markers):
             m = self.scene.mlab.points3d(*mark.pos, mode="axes", color=self.MARKER_COLOR)
             m.parent.parent.name = f"Marker {num}"
             m.actor.actor.property.trait_set(lighting=False, line_width=5)
             m.actor.actor.trait_set(pickable=False, force_translucent=True)
             radius  = 0.2 * mark.marker_factor
             m.glyph.glyph.scale_factor = radius
+            m.visible = not mark.label_only
         
             text = self.scene.mlab.text(x=mark.pos[0]+radius, y=mark.pos[1], z=mark.pos[2], text=mark.desc, name="Label")
             text.property.trait_set(**self.LABEL_STYLE, justification="center")
@@ -1133,7 +1147,7 @@ class TraceGUI(HasTraits):
         if self.scene.interactor.shift_key:
             if self._crosshair is not None:
                 self._crosshair.visible = False
-            if self.raytracer.detector_list:
+            if self.raytracer.detectors:
                 # set outside position to inside of outline
                 pos_z = max(self._det_pos_min, pos[2])
                 pos_z = min(self._det_pos_max, pos_z)
@@ -1174,7 +1188,7 @@ class TraceGUI(HasTraits):
                     print("Can't pick while tracing or drawing.")
                 return
 
-            a = self.raytracer.rays.nt  # number of points per ray plotted
+            a = self.raytracer.rays.Nt  # number of points per ray plotted
             b = picker_obj.point_id  # point id of the ray point
 
             n_, n2_ = np.divmod(b, 2*a)
@@ -1185,8 +1199,7 @@ class TraceGUI(HasTraits):
             pos = np.nonzero(RayMask)[0][0]
 
             # get properties of this ray section
-            p_, s_, pols_, pw_, wv, snum = self.raytracer.rays.get_rays_by_mask(RayMask)
-
+            p_, s_, pols_, pw_, wv, snum = self.raytracer.rays.rays_by_mask(RayMask)
             p_, s_, pols_, pw_, wv, snum = p_[0], s_[0], pols_[0], pw_[0], wv[0], snum[0]  # choose only ray
             p, s, pols, pw = p_[n2_], s_[n2_], pols_[n2_], pw_[n2_]
 
@@ -1203,24 +1216,32 @@ class TraceGUI(HasTraits):
             pols_sph = to_sph_coords(pols)
             pols0_sph = to_sph_coords(pols0) if n2_ else None
 
-            elements = self.raytracer._make_element_list()
-            lastn = self.raytracer.n0
-            nList = [lastn]
-            SList = [self.raytracer.ray_source_list[snum].surface]
+            media = self.raytracer.media
+            n = media[n2_](wv) if n2_ < len(media) else media[0](wv)  # n=n0 outside outline
+            n0 = media[n2_-1](wv) if n2_ else None
 
-            for el in elements:
-                SList.append(el.front)
-                if isinstance(el, Lens):
-                    nList.append(el.n)
-                    lastn = el.n2 if el.n2 is not None else self.raytracer.n0
-                    SList.append(el.back)
-                nList.append(lastn)
+            surfs = self.raytracer.surfaces
 
-            n = nList[n2_](wv)
-            n0 = nList[n2_-1](wv) if n2_ else None
+            # TODO how to test these cases
 
-            normal = SList[n2_].get_normals(np.array([p[0]]), np.array([p[1]]))[0]
-            normal_sph = to_sph_coords(normal)
+            if 0 < n2_ < len(surfs):
+                surf = self.raytracer.surfaces[n2_-1]
+            elif not n2_:
+                surf = self.raytracer.ray_sources[snum].front
+            else:
+                surf = None
+
+            is_surf = isinstance(surf, Surface)
+            if is_surf:
+                normal = surf.get_normals(np.array([p[0]]), np.array([p[1]]))[0]
+                normal_sph = to_sph_coords(normal)
+
+            l = self.raytracer.rays.ray_lengths(RayMask)[0]
+            ol = self.raytracer.rays.optical_lengths(RayMask)[0]
+            l0 = l[n2_ - 1] if n2_ > 0 else None
+            l1 = l[n2_] if n2_ < l.shape[0] else None
+            ol0 = ol[n2_ - 1] if n2_ > 0 else None
+            ol1 = ol[n2_] if n2_ < ol.shape[0] else None
 
             # differentiate between Click and Shift+Click
             if self.scene.interactor.shift_key:
@@ -1241,15 +1262,19 @@ class TraceGUI(HasTraits):
                     f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})" + \
                     f"      ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°, {pols_sph[2]:>10.5f})\n" + \
                     (f"Surface Normal:        ({normal[0]:>10.5f}, {normal[1]:>10.5f}, {normal[2]:>10.5f})"
-                    if pw > 0 else "") + \
+                    if pw > 0  and is_surf else "") + \
                     (f"      ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°, {normal_sph[2]:>10.5f})\n\n"
-                    if pw > 0 else "\n") + \
-                    f"Wavelength:               {wv:>10.2f} nm\n" + \
-                    (f"Refraction Index Before:  {n0:>10.4f}\n" if n2_ else "") + \
-                    f"Refraction Index After:   {n:>10.4f}\n" + \
-                    (f"Ray Power Before:         {pw0*1e6:>10.5g} µW\n" if n2_ else "") + \
-                    f"Ray Power After:          {pw*1e6:>10.5g} µW" + ("\n" if n2_ else "") + \
-                    (f"Power Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "")
+                    if pw > 0 and is_surf else "\n") + \
+                    f"Wavelength:               {wv:>10.2f} nm" + \
+                    (f"\nRefraction Index Before:  {n0:>10.4f}" if n2_ else "") + \
+                    (f"           Distance to Last Intersection:          {l0:>10.5g} mm" if l0 else "") + \
+                    f"\nRefraction Index After:   {n:>10.4f}" + \
+                    (f"           Distance to Next Intersection:          {l1:>10.5g} mm" if l1 else "") + \
+                    (f"\nRay Power Before:         {pw0*1e6:>10.5g} µW" if n2_ else "") + \
+                    (f"        Optical Distance to Last Intersection:  {ol0:>10.5g} mm" if ol0 else "") + \
+                    f"\nRay Power After:          {pw*1e6:>10.5g} µW" + \
+                    (f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm" if ol1 else "") + \
+                    (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "")
             else:
                 text = f"Ray {pos}" +  \
                     f" from Source {snum}" +  \
@@ -1352,9 +1377,9 @@ class TraceGUI(HasTraits):
                 self._init_source_list()
 
                 # restore selected RaySource. If it is missing, default to 0.
-                if self._source_ind >= len(self.raytracer.ray_source_list):
+                if self._source_ind >= len(self.raytracer.ray_sources):
                     self._source_ind = 0
-                if len(self.raytracer.ray_source_list):
+                if len(self.raytracer.ray_sources):
                     self.source_selection = self.source_names[self._source_ind]
 
             if all_ or change["TraceSettings"]:
@@ -1364,7 +1389,7 @@ class TraceGUI(HasTraits):
                         self.absorb_missing = self.raytracer.absorb_missing
 
             rdh = False  # if GUILoaded Status should be reset in this function
-            if self.raytracer.ray_source_list:
+            if self.raytracer.ray_sources:
                 if all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
                         or change["RaySources"] or change["TraceSettings"]:
                     self.retrace()
@@ -1391,10 +1416,10 @@ class TraceGUI(HasTraits):
                 self._init_detector_list()
 
                 # restore selected Detector. If it is missing, default to 0.
-                if self._det_ind >= len(self.raytracer.detector_list):
+                if self._det_ind >= len(self.raytracer.detectors):
                     self._det_ind = 0
 
-                if len(self.raytracer.detector_list):
+                if len(self.raytracer.detectors):
                     self.detector_selection = self.detector_names[self._det_ind]
 
             if all_ or change["Ambient"]:
@@ -1481,7 +1506,7 @@ class TraceGUI(HasTraits):
         """
 
         # don't do while init or tracing, since it will be done afterwards anyway
-        if self.raytracer.ray_source_list and self.raytracer.rays.N and not self._no_trait_action_flag\
+        if self.raytracer.ray_sources and self.raytracer.rays.N and not self._no_trait_action_flag\
              and not self._status["Tracing"]: # don't do while tracing, RayStorage rays are still being generated
 
             self._status["Drawing"] += 1
@@ -1490,7 +1515,7 @@ class TraceGUI(HasTraits):
             def background():
                 with self.__ray_access_lock:
                     N = self.raytracer.rays.N
-                    set_size = int(1 + 10 ** self.ray_amount_shown * N)  # number of shown rays
+                    set_size = min(N, self.ray_amount_shown)
                     source_index = np.random.choice(N, size=set_size, replace=False)  # random choice
 
                     # make bool array with chosen rays set to true
@@ -1517,7 +1542,7 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
     @observe('ray_count, absorb_missing')
@@ -1530,7 +1555,7 @@ class TraceGUI(HasTraits):
         if self._no_trait_action_flag:
             return
 
-        elif self.raytracer.ray_source_list:
+        elif self.raytracer.ray_sources:
 
             self._status["Tracing"] += 1
 
@@ -1542,7 +1567,7 @@ class TraceGUI(HasTraits):
                 with self.__ray_access_lock:
                     with self._try() as error:
                         self.raytracer.trace(N=self.ray_count)
-                    if error:
+                    if error or not self.raytracer.rays.N:  # error or raytracing failed (= no rays)
                         self._status["Tracing"] -= 1
                         # gets unset on first run
                         if self._status["DisplayingGUI"]:
@@ -1552,31 +1577,27 @@ class TraceGUI(HasTraits):
                 # execute this after thread has finished
                 def on_finish() -> None:
                     with self._no_trait_action():
-                        # reset paramter to value of raytracer.absorb_missing, since it can refuse this value
+                        # reset parameter to value of raytracer.absorb_missing, since it can refuse this value
                         self.absorb_missing = self.raytracer.absorb_missing
-
-                        # lower the ratio of rays shown so that the GUI does not become to slow
-                        if self.ray_count * 10**self.ray_amount_shown > self.MAX_RAYS_SHOWN:
-                            self.ray_amount_shown = np.log10(self.MAX_RAYS_SHOWN / self.ray_count)
 
                     self._status["Tracing"] -= 1
                     self.replot_rays()
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
         else:
             pyface_gui.invoke_later(self._set_gui_loaded)
 
-    @observe('ray_alpha')
-    def change_ray_alpha(self, event=None) -> None:
+    @observe('ray_opacity')
+    def change_ray_opacity(self, event=None) -> None:
         """
         change opacity of visible rays.
         :param event: optional event from traits observe decorator
         """
         if self._rays_plot is not None:
-            self._rays_plot.actor.property.trait_set(opacity=10 ** self.ray_alpha)
+            self._rays_plot.actor.property.trait_set(opacity=self.ray_opacity)
 
     @observe("coloring_type")
     def change_ray_colors(self, event=None) -> None:
@@ -1604,7 +1625,7 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
 
-        if not self._no_trait_action_flag and self.raytracer.detector_list and self._detector_plot_objects:
+        if not self._no_trait_action_flag and self.raytracer.detectors and self._detector_plot_objects:
 
             self._status["ChangingDetector"] += 1
 
@@ -1614,17 +1635,17 @@ class TraceGUI(HasTraits):
 
                     self._det_ind = int(self.detector_selection.split(":", 1)[0].split("DET")[1])
                     with self._no_trait_action():
-                        self.det_pos = self.raytracer.detector_list[self._det_ind].pos[2]
+                        self.det_pos = self.raytracer.detectors[self._det_ind].pos[2]
 
                     self.__detector_lock.release()
                     self.projection_method_enabled = \
-                        self.raytracer.detector_list[self._det_ind].surface.surface_type == "Sphere"
+                        self.raytracer.detectors[self._det_ind].surface.surface_type == "Sphere"
                     self._status["ChangingDetector"] -= 1
 
                 self.__detector_lock.acquire()
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
     @observe('det_pos')
@@ -1634,7 +1655,7 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
 
-        if not self._no_trait_action_flag and self.raytracer.detector_list and self._detector_plot_objects:
+        if not self._no_trait_action_flag and self.raytracer.detectors and self._detector_plot_objects:
 
             self._status["ChangingDetector"] += 1
 
@@ -1643,8 +1664,8 @@ class TraceGUI(HasTraits):
                 def on_finish():
 
                     # move surface
-                    xp, yp, zp = self.raytracer.detector_list[self._det_ind].pos
-                    self.raytracer.detector_list[self._det_ind].move_to([xp, yp, self.det_pos])
+                    xp, yp, zp = self.raytracer.detectors[self._det_ind].pos
+                    self.raytracer.detectors[self._det_ind].move_to([xp, yp, self.det_pos])
                     self._detector_plot_objects[self._det_ind][0].mlab_source.z += event.new - event.old
 
                     # move cylinder
@@ -1652,13 +1673,13 @@ class TraceGUI(HasTraits):
                         self._detector_plot_objects[self._det_ind][1].mlab_source.z += event.new - event.old
                         zl = self.det_pos + self.D_VIS / 2
                     else:
-                        obj = self.raytracer.detector_list[self._det_ind]
+                        obj = self.raytracer.detectors[self._det_ind]
                         zl = (obj.extent[4] + obj.extent[5])/2
 
                     # move label
                     self._detector_plot_objects[self._det_ind][3].z_position = zl
 
-                    # reinit detector_list and Selection to update z_pos in detector name
+                    # reinit detectors and Selection to update z_pos in detector name
                     self._init_detector_list()
                     with self._no_trait_action():
                         self.detector_selection = self.detector_names[self._det_ind]
@@ -1669,7 +1690,7 @@ class TraceGUI(HasTraits):
                 self.__detector_lock.acquire()
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
     def show_detector_cut(self) -> None:
@@ -1679,14 +1700,14 @@ class TraceGUI(HasTraits):
         """
         self.show_detector_image(cut=True)
 
-    @observe('detector_image_button, detector_cut_button')
+    @observe('_detector_image_button, _detector_cut_button')
     def show_detector_image(self, event=None, cut=False) -> None:
         """
         render a DetectorImage at the chosen Detector, uses a separate thread.
         :param event: optional event from traits observe decorator
         """
 
-        if self.raytracer.detector_list and self.raytracer.rays.N:
+        if self.raytracer.detectors and self.raytracer.rays.N:
 
             self._status["DetectorImage"] += 1
 
@@ -1706,7 +1727,7 @@ class TraceGUI(HasTraits):
                                                               int(self.image_pixels), self._det_ind, \
                                                               bool(self.flip_det_image), self.projection_method
 
-                            cut_args = dict(x=self.cut_value) if self.cut_dimension == "x dimension"\
+                            cut_args = dict(x=self.cut_value) if self.cut_dimension == "x"\
                                 else dict(y=self.cut_value)
 
                             if rerender:
@@ -1729,7 +1750,7 @@ class TraceGUI(HasTraits):
 
                 def on_finish() -> None:
                     with self._try():
-                        if (event is None and not cut) or (event is not None and event.name == "detector_image_button"):
+                        if (event is None and not cut) or (event is not None and event.name == "_detector_image_button"):
                             r_image_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc)
                         else:
                             r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **cut_args)
@@ -1738,17 +1759,17 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('detector_spectrum_button')
+    @observe('_detector_spectrum_button')
     def show_detector_spectrum(self, event=None) -> None:
         """
         render a Detector Spectrum for the chosen Source, uses a separate thread.
         :param event: optional event from traits observe decorator
         """
 
-        if self.raytracer.detector_list and self.raytracer.rays.N:
+        if self.raytracer.detectors and self.raytracer.rays.N:
 
             self._status["DetectorSpectrum"] += 1
 
@@ -1771,7 +1792,7 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
     def show_source_cut(self) -> None:
@@ -1781,14 +1802,14 @@ class TraceGUI(HasTraits):
         """
         self.show_source_image(cut=True)
 
-    @observe('source_spectrum_button')
+    @observe('_source_spectrum_button')
     def show_source_spectrum(self, event=None) -> None:
         """
         render a Source Spectrum for the chosen Source, uses a separate thread.
         :param event: optional event from traits observe decorator
         """
 
-        if self.raytracer.ray_source_list and self.raytracer.rays.N:
+        if self.raytracer.ray_sources and self.raytracer.rays.N:
 
             self._status["SourceSpectrum"] += 1
 
@@ -1808,10 +1829,10 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('source_image_button, source_cut_button')
+    @observe('_source_image_button, _source_cut_button')
     def show_source_image(self, event=None, cut=False) -> None:
         """
         render a source image for the chosen Source, uses a separate thread
@@ -1819,7 +1840,7 @@ class TraceGUI(HasTraits):
         :param cut:
         """
 
-        if self.raytracer.ray_source_list and self.raytracer.rays.N:
+        if self.raytracer.ray_sources and self.raytracer.rays.N:
 
             self._status["SourceImage"] += 1
 
@@ -1833,7 +1854,7 @@ class TraceGUI(HasTraits):
                         rerender = snap != self._last_source_snap or self.last_source_image is None
                         log, mode, px, source_index = bool(self.log_image), self.image_type, int(self.image_pixels), \
                             self._source_ind
-                        cut_args = dict(x=self.cut_value) if self.cut_dimension == "x dimension"\
+                        cut_args = dict(x=self.cut_value) if self.cut_dimension == "x"\
                             else dict(y=self.cut_value)
 
                         if rerender:
@@ -1854,7 +1875,7 @@ class TraceGUI(HasTraits):
 
                 def on_finish() -> None:
                     with self._try():
-                        if (event is None and not cut) or (event is not None and event.name == "source_image_button"):
+                        if (event is None and not cut) or (event is not None and event.name == "_source_image_button"):
                             r_image_plot(SImg, log=log, mode=mode, imc=Imc)
                         else:
                             r_image_cut_plot(SImg, log=log, mode=mode, imc=Imc, **cut_args)
@@ -1863,10 +1884,10 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('auto_focus_button')
+    @observe('_auto_focus_button')
     def move_to_focus(self, event=None) -> None:
         """
         Find a Focus.
@@ -1876,7 +1897,7 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
 
-        if self.raytracer.detector_list and self.raytracer.ray_source_list and self.raytracer.rays.N:
+        if self.raytracer.detectors and self.raytracer.ray_sources and self.raytracer.rays.N:
 
             self._status["Focussing"] += 1
             self._autofocus_information = ""
@@ -1895,17 +1916,17 @@ class TraceGUI(HasTraits):
                         return
 
                 with self.__detector_lock:
-                    if det_ind < len(self.raytracer.detector_list):  # pragma: no branch
-                        self.raytracer.detector_list[det_ind].move_to([*self.raytracer.detector_list[det_ind].pos[:2],
-                                                                      res.x])
+                    if det_ind < len(self.raytracer.detectors):  # pragma: no branch
+                        self.raytracer.detectors[det_ind].move_to([*self.raytracer.detectors[det_ind].pos[:2],
+                                                                   res.x])
 
                 # execute this function after thread has finished
                 def on_finish() -> None:
 
                     bounds, pos, N = afdict["bounds"], afdict["pos"], afdict["N"]
                     
-                    if det_ind < len(self.raytracer.detector_list):  # pragma: no branch
-                        self.det_pos = self.raytracer.detector_list[det_ind].pos[2]
+                    if det_ind < len(self.raytracer.detectors):  # pragma: no branch
+                        self.det_pos = self.raytracer.detectors[det_ind].pos[2]
 
                     if self.focus_cost_plot:
                         with self._try():
@@ -1920,7 +1941,7 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
     @observe('scene:activated')
@@ -1933,6 +1954,7 @@ class TraceGUI(HasTraits):
         self._init_status_text()
         self._init_crosshair()
         self._init_keyboard_shortcuts()
+
         self.plot_orientation_axes()
         self.replot()
         self.default_camera_view()  # this needs to be called after replot, which defines the visual scope
@@ -1953,7 +1975,7 @@ class TraceGUI(HasTraits):
                 "SourceSpectrum": "Generating Source Spectrum",
                 "DetectorSpectrum": "Generating Detector Spectrum",
                 "Drawing": "Drawing"}
-
+       
         # print messages to scene
         if not self._status["InitScene"] and self._status_text is not None:
             self._status_text.text = ""
@@ -2018,7 +2040,7 @@ class TraceGUI(HasTraits):
         Updates the Detector Selection and the corresponding properties.
         :param event: optional event from traits observe decorator
         """
-        if self.raytracer.ray_source_list:
+        if self.raytracer.ray_sources:
             self._source_ind = int(self.source_selection.split(":", 1)[0].split("RS")[1])
 
     @observe('raytracer_single_thread')
@@ -2048,7 +2070,7 @@ class TraceGUI(HasTraits):
         else:
             warnings.resetwarnings()
 
-    @observe('property_browser_button')
+    @observe('_property_browser_button')
     def open_property_browser(self, event=None) -> None:
         """
         Open a property browser for the gui, the scene, the raytracer and the shown rays.
@@ -2071,15 +2093,15 @@ class TraceGUI(HasTraits):
                 if obji is not None:
                     obji.actor.property.representation = repr_
 
-    @observe('clear_button')
+    @observe('_clear_button')
     def clear_history(self, event=None) -> None:
         """
         clear command history
         :param event: optional event from traits observe decorator
         """
-        self.command_history = ""
+        self._command_history = ""
     
-    @observe('run_button')
+    @observe('_run_button')
     def send_cmd(self, event=None) -> None:
         """
         Updates the Detector Selection and the corresponding properties.
@@ -2099,9 +2121,9 @@ class TraceGUI(HasTraits):
                      RImage=RImage, presets=presets, RImagePlot=r_image_plot, TMA=TMA,
 
                      # abbreviations for raytracer and object lists
-                     RT=self.raytracer, LL=self.raytracer.lens_list, FL=self.raytracer.filter_list,
-                     APL=self.raytracer.aperture_list, RSL=self.raytracer.ray_source_list,
-                     DL=self.raytracer.detector_list, ML=self.raytracer.marker_list)
+                     RT=self.raytracer, LL=self.raytracer.lenses, FL=self.raytracer.filters,
+                     APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
+                     DL=self.raytracer.detectors, ML=self.raytracer.markers)
 
         def background():
 
@@ -2119,7 +2141,7 @@ class TraceGUI(HasTraits):
 
             def on_finish():
 
-                self.command_history += ("\n" if self.command_history else "") + cmd
+                self._command_history += ("\n" if self._command_history else "") + cmd
 
                 with self._try():
                     hs = self.raytracer.property_snapshot()
@@ -2136,7 +2158,7 @@ class TraceGUI(HasTraits):
 
         if self._cmd != "":
             self._status["RunningCommand"] += 1
-            action = Thread(target=background)
+            action = Thread(target=background, daemon=True)
             action.start()
 
     # rescale axes texts when the window was resized

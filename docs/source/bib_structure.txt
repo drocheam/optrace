@@ -1,0 +1,69 @@
+./optrace
+├── gui
+│   ├── __init__.py
+│   ├── property_browser.py
+│   └── trace_gui.py
+├── __init__.py
+├── __metadata__.py
+├── plots
+│   ├── chromacity_plots.py
+│   ├── __init__.py
+│   ├── misc_plots.py
+│   ├── r_image_plots.py
+│   └── spectrum_plots.py
+├── ressources
+│   ├── illuminants.csv
+│   ├── images
+│   │   ├── bacteria.png
+│   │   ├── ColorChecker.jpg
+│   │   ├── EIA_Resolution_Chart_1956.png
+│   │   ├── ETDRS_Chart_inverted.png
+│   │   ├── ETDRS_Chart.png
+│   │   └── TestScreen_square.png
+│   └── observers.csv
+└── tracer
+    ├── base_class.py
+    ├── color
+    │   ├── illuminants.py
+    │   ├── __init__.py
+    │   ├── luv.py
+    │   ├── observers.py
+    │   ├── srgb.py
+    │   ├── tools.py
+    │   └── xyz.py
+    ├── geometry
+    │   ├── aperture.py
+    │   ├── detector.py
+    │   ├── element.py
+    │   ├── filter.py
+    │   ├── group.py
+    │   ├── __init__.py
+    │   ├── lens.py
+    │   ├── line.py
+    │   ├── marker.py
+    │   ├── point.py
+    │   ├── ray_source.py
+    │   ├── surface_function.py
+    │   └── surface.py
+    ├── __init__.py
+    ├── misc.py
+    ├── presets
+    │   ├── geometry.py
+    │   ├── image.py
+    │   ├── __init__.py
+    │   ├── light_spectrum.py
+    │   ├── refraction_index.py
+    │   ├── spectral_lines.py
+    │   └── spectrum.py
+    ├── ray_storage.py
+    ├── raytracer.py
+    ├── refraction_index.py
+    ├── r_image.py
+    ├── spectrum
+    │   ├── __init__.py
+    │   ├── light_spectrum.py
+    │   ├── spectrum.py
+    │   └── transmission_spectrum.py
+    └── transfer_matrix_analysis.py
+
+9 directories, 57 files

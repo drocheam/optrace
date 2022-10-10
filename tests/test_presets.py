@@ -86,7 +86,8 @@ class PresetTests(unittest.TestCase):
         }
 
         for ill in ot.presets.light_spectrum.standard:
-            coord = color.xyz_to_xyY(ill.get_xyz())[0, 0]
+            xyz = np.array([[[*ill.get_xyz()]]])
+            coord = color.xyz_to_xyY(xyz)[0, 0]
 
             # higher delta, because we get different results depending on interpolation method of the illuminant
             self.assertAlmostEqual(coord[0], coords[ill.desc][0], delta=0.0003)
@@ -97,18 +98,18 @@ class PresetTests(unittest.TestCase):
         # text xy and uv positions of srgb primaries
         # also tests the corresponding constants in ot.tracer.color
 
-        xy_coords = [color.SRGB_R_XY, color.SRGB_G_XY, color.SRGB_B_XY, color.SRGB_W_XY]
-        uv_coords = [color.SRGB_R_UV, color.SRGB_G_UV, color.SRGB_B_UV, color.SRGB_W_UV]
+        xy_coords = [color.SRGB_R_XY, color.SRGB_G_XY, color.SRGB_B_XY, color.WP_D65_XY]
+        uv_coords = [color.SRGB_R_UV, color.SRGB_G_UV, color.SRGB_B_UV, color.WP_D65_UV]
         prec = 2e-5
 
         for ch, coord_xy, coord_uv in zip(ot.presets.light_spectrum.srgb, xy_coords, uv_coords):
-
-            xy = color.xyz_to_xyY(ch.get_xyz())[0, 0]
+            xyz = np.array([[[*ch.get_xyz()]]])
+            xy = color.xyz_to_xyY(xyz)[0, 0]
             self.assertAlmostEqual(xy[0], coord_xy[0], delta=prec)
             self.assertAlmostEqual(xy[1], coord_xy[1], delta=prec)
             self.assertAlmostEqual(1-xy[0]-xy[1], 1-coord_xy[1]-coord_xy[0], delta=prec)
 
-            uv = color.luv_to_u_v_l(color.xyz_to_luv(ch.get_xyz()))[0, 0, :2]
+            uv = color.luv_to_u_v_l(color.xyz_to_luv(xyz))[0, 0, :2]
             self.assertAlmostEqual(uv[0], coord_uv[0], delta=prec)
             self.assertAlmostEqual(uv[1], coord_uv[1], delta=prec)
 
@@ -183,9 +184,9 @@ class PresetTests(unittest.TestCase):
 
             RT.trace(50000)
 
-            self.assertEqual(RT.detector_list[-1].surface.r, r_det)
-            self.assertEqual(RT.aperture_list[-1].surface.ri, P/2)
-            self.assertTrue(np.allclose(RT.lens_list[0].pos - pos, 0))
+            self.assertEqual(RT.detectors[-1].surface.r, r_det)
+            self.assertEqual(RT.apertures[-1].surface.ri, P / 2)
+            self.assertTrue(np.allclose(RT.lenses[0].pos - pos, 0))
 
         # test parameter of legrand eye
         for r_det, P, pos in zip([5, 8, 9, 10], [2, 3, 5, 5.7],
@@ -195,9 +196,9 @@ class PresetTests(unittest.TestCase):
             RT.add(geom)
             RT.trace(50000)
 
-            self.assertEqual(RT.detector_list[-1].surface.r, r_det)
-            self.assertEqual(RT.aperture_list[-1].surface.ri, P/2)
-            self.assertTrue(np.allclose(RT.lens_list[0].pos - pos - [0, 0, 0.25], 0))
+            self.assertEqual(RT.detectors[-1].surface.r, r_det)
+            self.assertEqual(RT.apertures[-1].surface.ri, P / 2)
+            self.assertTrue(np.allclose(RT.lenses[0].pos - pos - [0, 0, 0.25], 0))
 
 
 if __name__ == '__main__':

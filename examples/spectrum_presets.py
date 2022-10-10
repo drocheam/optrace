@@ -14,3 +14,4 @@ ot.plots.spectrum_plot(ot.presets.light_spectrum.srgb, colors=["r", "g", "b", "k
 
 ot.plots.spectrum_plot(ot.presets.spectrum.tristimulus, block=True, colors=["r", "g", "b"],
                        title="Tristimulus Curves", labels_off=True)
+        

@@ -126,7 +126,7 @@ class PropertyBrowser(HasTraits):
             set_cdict(self.raytracer, cdict, "System")
 
             # each lens
-            for i, L in enumerate(self.raytracer.lens_list):
+            for i, L in enumerate(self.raytracer.lenses):
                 set_cdict(L, cdict, f"Lens {i}")
 
             return cdict

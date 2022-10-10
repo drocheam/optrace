@@ -1,6 +1,8 @@
 
 import numpy as np
 
+from ..geometry import Aperture, Detector, Lens, Surface, Group
+from ..refraction_index import RefractionIndex
 
 # Eye models
 #######################################################################################################################
@@ -9,7 +11,7 @@ def arizona_eye(adaptation:  float = 0.,
                 pupil:       float = 5.7,
                 r_det:       float = 8,
                 pos:         list = None)\
-        -> 'list[Aperture | Lens | Detector]':
+        -> Group:
     """
     Arizona Eye Model from
     Schwiegerling J. Field Guide to Visual and Ophthalmic Optics. SPIE Publications: 2004.
@@ -17,13 +19,9 @@ def arizona_eye(adaptation:  float = 0.,
     See the source above for more info.
     """
 
-    # lazy import, otherwise would lead to a circular import
-    from ..geometry import Aperture, Detector, Lens, Surface
-    from ..refraction_index import RefractionIndex
-
     # absolute position
     pos0 = np.array(pos if pos is not None else [0, 0, 0])
-    geom = []
+    geom = Group(long_desc="Arizona Eye Model")
     
     # rename
     A = adaptation
@@ -42,24 +40,24 @@ def arizona_eye(adaptation:  float = 0.,
     front = Surface("Conic", r=5.25, R=7.8, k=-0.25)
     back = Surface("Conic", r=5.25, R=6.5, k=-0.25)
     L0 = Lens(front, back, d1=0, d2=0.55, pos=pos0+[0, 0, 0], n=n_Cornea, n2=n_Aqueous, desc="Cornea")
-    geom.append(L0)
+    geom.add(L0)
 
     # add Pupil
     ap = Surface("Ring", r=5.25, ri=pupil/2)
     AP = Aperture(ap, pos=pos0+[0, 0, 3.1], desc="Pupil")
-    geom.append(AP)
+    geom.add(AP)
 
     # add Lens
     front = Surface("Conic", r=5.25, R=12-0.4*A, k=-7.518749+1.285720*A)
     back = Surface("Conic", r=5.25, R=-5.224557+0.2*A, k=-1.353971-0.431762*A)
     L1 = Lens(front, back, d1=0, d2=d_Lens, pos=pos0+[0, 0, d_Aq+0.55],
               n=n_Lens, n2=n_Vitreous, desc="Lens")
-    geom.append(L1)
+    geom.add(L1)
 
     # add Detector
     DetS = Surface("Sphere", r=r_det, R=-13.4)
     Det = Detector(DetS, pos=pos0+[0, 0, 24], desc="Retina")
-    geom.append(Det)
+    geom.add(Det)
 
     return geom
 
@@ -67,7 +65,7 @@ def arizona_eye(adaptation:  float = 0.,
 def legrand_eye(pupil: float = 5.7,
                 r_det: float = 8.,
                 pos:   list = None)\
-        -> 'list[Aperture | Lens | Detector]':
+        -> Group:
     """
     LeGrand full theoretical eye, a paraxial schematic eye model, taken from
     Schwiegerling J. Field Guide to Visual and Ophthalmic Optics. SPIE Publications: 2004.
@@ -76,12 +74,8 @@ def legrand_eye(pupil: float = 5.7,
     Only useful for first order optical properties of the eye.
     """
 
-    # lazy import, otherwise would lead to a circular import
-    from ..geometry import Aperture, Detector, Lens, Surface
-    from ..refraction_index import RefractionIndex
-
     pos0 = np.array(pos if pos is not None else [0, 0, 0])
-    geom = []
+    geom = Group(long_desc="LeGrand Full Theoretical Eye")
 
     n_Cornea = RefractionIndex("Constant", n=1.3771, desc="n_Cornea")
     n_Aqueous = RefractionIndex("Constant", n=1.3374, desc="n_Aqueous")
@@ -92,24 +86,24 @@ def legrand_eye(pupil: float = 5.7,
     front = Surface("Sphere", r=5, R=7.8)
     back = Surface("Sphere", r=5, R=6.5)
     L0 = Lens(front, back, d1=0.25, d2=0.30, pos=pos0+[0, 0, 0.25], n=n_Cornea, n2=n_Aqueous, desc="Cornea")
-    geom.append(L0)
+    geom.add(L0)
 
     # add Aperture
     ap = Surface("Ring", r=5, ri=pupil/2)
     AP = Aperture(ap, pos=pos0+[0, 0, 3.3], desc="Pupil")
-    geom.append(AP)
+    geom.add(AP)
 
     # add Lens
     front = Surface("Sphere", r=4.5, R=10.2)
     back = Surface("Sphere", r=4.5, R=-6)
     L1 = Lens(front, back, d1=1.5, d2=2.5, pos=pos0+[0, 0, 5.10],
               n=n_Lens, n2=n_Vitreous, desc="Lens")
-    geom.append(L1)
+    geom.add(L1)
 
     # add Detector
     DetS = Surface("Sphere", r=r_det, R=-13.4)
     Det = Detector(DetS, pos=pos0+[0, 0, 24.197], desc="Retina")
-    geom.append(Det)
+    geom.add(Det)
 
     return geom
 

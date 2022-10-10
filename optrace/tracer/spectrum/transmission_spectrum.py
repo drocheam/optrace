@@ -4,9 +4,7 @@ from typing import Any  # Any type
 import numpy as np  # calculations
 
 from .spectrum import Spectrum  # parent class
-from .light_spectrum import LightSpectrum  # illumination
 from .. import color  # color conversion and illuminants
-from ..presets import light_spectrum as presets_spectrum  # D65 LightSpectrum
 from ..misc import PropertyChecker as pc  # check types and values
 
 
@@ -24,25 +22,30 @@ class TransmissionSpectrum(Spectrum):
         :return:
         """
         # illuminate the filter with daylight, get color of resulting spectrum
-        func1 = lambda wl: color.d65_illuminant(wl) * self(wl)
-        lspec = LightSpectrum("Function", func=func1)
+        wl = color.wavelengths(5000)
+        spec = color.d65_illuminant(wl) * self(wl)
+        return color.xyz_from_spectrum(wl, spec)
 
-        return lspec.get_xyz()
-
-    def get_color(self) -> tuple[float, float, float, float]:
+    def get_color(self, rendering_intent="Absolute", clip=True) -> tuple[float, float, float, float]:
         """
 
+        :param rendering_intent:
+        :param clip:
         :return:
         """
         XYZ = self.get_xyz()
-        Y0 = presets_spectrum.d65.get_xyz()[0, 0, 1]
+       
+        # Y of daylight spectrum
+        wl = color.wavelengths(5000)
+        Y0 = color.xyz_from_spectrum(wl, color.d65_illuminant(wl))[1]
 
         # 1 - Yc/Y0 is the ratio of visible ambient light coming through the filter
         # gamma correct for non-linear human vision
-        alpha = (1 - XYZ[0, 0, 1]/Y0) ** (1/2.2)
+        alpha = (1 - XYZ[1]/Y0) ** (1/2.4)
         XYZ /= Y0
 
-        RGB = color.xyz_to_srgb(XYZ)[0, 0]
+        XYZ = np.array([[[*XYZ]]])  # needs to be 3D
+        RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip)[0, 0]
 
         return RGB[0], RGB[1], RGB[2], alpha
 

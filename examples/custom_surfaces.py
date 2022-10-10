@@ -61,5 +61,5 @@ Det = ot.Detector(DetS, pos=[0, 0, 36])
 RT.add(Det)
 
 # Instantiate the class and configure its traits.
-sim = TraceGUI(RT, ray_alpha=-1.5)
+sim = TraceGUI(RT, ray_opacity=0.03)
 sim.run()

@@ -34,5 +34,5 @@ Det = ot.Detector(ot.Surface("Rectangle", dim=[30, 15]), pos=[0, 0, 23.])
 RT.add(Det)
 
 # run the simulator
-sim = TraceGUI(RT, coloring_type="Source", ray_alpha=-0.8)
+sim = TraceGUI(RT, coloring_type="Source", ray_opacity=0.12)
 sim.run()

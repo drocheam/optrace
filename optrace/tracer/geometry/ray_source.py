@@ -26,6 +26,7 @@ from . import Surface, Line, Point  # source types
 # spectrum and color
 from ..spectrum.light_spectrum import LightSpectrum  # spectrum of source
 from .. import color  # for random_wavelengths_from_srgb() and power_from_srgb()
+from ..presets.light_spectrum import d65 as d65_spectrum  # default light spectrum
 
 # misc
 from ..misc import PropertyChecker as pc  # check types and values
@@ -102,7 +103,7 @@ class RaySource(Element):
 
         # power and spectrum
         self.power = power
-        self.spectrum = spectrum
+        self.spectrum = spectrum if spectrum is not None else d65_spectrum
         self.pIf = None
         self.image = image
 
@@ -115,7 +116,7 @@ class RaySource(Element):
         self.div_angle = div_angle
         self.orientation = orientation
         self.or_func = or_func
-        self.or_kwargs = or_kwargs or {}
+        self.or_kwargs = or_kwargs if or_kwargs is not None else {}
         self.s = s if s is not None else [0, 0, 1]
         self.div_axis_angle = div_axis_angle
         self.div_func = div_func
@@ -137,8 +138,6 @@ class RaySource(Element):
 
             return *sRGB_mean[0, 0], 1.0
 
-        elif self.spectrum is None:
-            raise RuntimeError("spectrum not specified.")
         else:
             return self.spectrum.get_color()
 
@@ -163,8 +162,7 @@ class RaySource(Element):
         ################################################################################################################
 
         if self.image is None:
-            if self.spectrum is None:
-                raise RuntimeError("spectrum not specified.")
+            pc.check_type("RaySource.spectrum", self.spectrum, LightSpectrum)
             wavelengths = self.spectrum.random_wavelengths(N)
 
         ## Generate ray starting points
@@ -206,10 +204,8 @@ class RaySource(Element):
             case "Constant":
                 s_or = np.tile(self.s, (N, 1))
 
-            case "Function":
-                if self.or_func is None:
-                    raise RuntimeError("orientation='Function' but or_func not provided")
-
+            case "Function":  # pragma: no branch
+                pc.check_callable("RaySource.or_func", self.or_func)
                 s_or = self.or_func(p[:, 0], p[:, 1], **self.or_kwargs)
 
         ## Generate ray divergences relative to orientation
@@ -224,8 +220,8 @@ class RaySource(Element):
             P = np.array([1., 1.])
             theta = misc.random_from_distribution(t, P, N, kind="discrete")
 
-        if self.divergence == "Function" and self.div_func is None:
-            raise RuntimeError("divergence='Function' but div_func not provided")
+        if self.divergence == "Function":
+            pc.check_callable("RaySource.div_func", self.div_func)
 
         match self.divergence:
 
@@ -256,7 +252,7 @@ class RaySource(Element):
                 f = self.div_func(x) * np.sin(x)
                 alpha = misc.random_from_distribution(x, f, X0, kind="continuous")
 
-            case "Function" if self.div_2d:
+            case "Function" if self.div_2d:  # pragma: no branch
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 f = self.div_func(x)
                 alpha = misc.random_from_distribution(x, f, N, kind="continuous")
@@ -294,7 +290,7 @@ class RaySource(Element):
                     ang = misc.random_from_distribution(np.array([0, np.pi/2]), np.ones(2), N, kind="discrete")
                 case "Angle":   
                     ang = np.radians(self.pol_angle)
-                case "Random":  
+                case "Random": # pragma: no branch 
                     ang = misc.uniform(0, 2*np.pi, N)
 
             # pol is rotated by an axis perpendicular to the plane of base divergence s = [0, 0, 1]
@@ -388,7 +384,7 @@ class RaySource(Element):
                 pc.check_type(key, val, bool)
 
             case "spectrum":
-                pc.check_type(key, val, LightSpectrum | None)
+                pc.check_type(key, val, LightSpectrum)
 
             case ("or_func" | "div_func"):
                 pc.check_none_or_callable(key, val)

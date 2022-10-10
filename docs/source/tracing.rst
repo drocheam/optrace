@@ -6,6 +6,15 @@ Tracing
 Sampling
 ====================
 
+Optrace approximates optical effects by utilizing an Unbiased Quasi Monte Carlo simulation. 
+Inverse Transform Sampling is used as method for non-uniform random variate generation and Stratified Sampling as low discrepancy method for the generation of the initial uniform random variable.
+
+
+Alternative sampling methods: Importance Sampling, Rejection Sampling
+
+Erklärung Biased, Unbiased: https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/estimators
+
+
 Density
 ----------------
 

@@ -13,17 +13,22 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'Optrace'
-copyright = '2022, Damian Mendroch'
-author = 'Damian Mendroch'
+# load from file
+path = os.path.join("..", "..", "optrace", "__metadata__.py")
+with open(path) as f:
+    exec(f.read())
 
-# The full version, including alpha/beta/rc tags
-release = '0.9.8'
+# assign
+project = __name__
+copyright = __copyright__.replace("Copyright ", "")
+author = __author__
+release = __version__
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -64,7 +69,7 @@ html_theme = 'classic'
 html_static_path = ['_static']
 
 def setup(app):
-    app.add_css_file('css/custom.css')
+    app.add_css_file(os.path.join('css', 'custom.css'))
 
 html_theme_options = {
     # "rightsidebar": "false",

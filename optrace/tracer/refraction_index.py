@@ -14,6 +14,10 @@ from . import color  # for visible wavelength range
 from .misc import PropertyChecker as pc  # check types and values
 
 
+# TODO how to handle wavelengths outside the range of data provided
+# absorb?
+
+
 class RefractionIndex(Spectrum):
 
     # Refraction Index Models:
@@ -71,10 +75,10 @@ class RefractionIndex(Spectrum):
         :param wl: wavelengths in nm (numpy 1D array)
         :return: array of refraction indices
         """
-        wl_ = np.asarray_chkfinite(wl, dtype=np.float32)
+        wl_ = np.asarray_chkfinite(wl, dtype=np.float64)
 
-        if self.spectrum_type in ["Cauchy", "Conrady", "Sellmeier"] and self.coeff is None:
-            raise RuntimeError("coefficients coeff not defined.")
+        if self.spectrum_type in ["Cauchy", "Conrady", "Sellmeier"]:
+            pc.check_type("RefractionIndex.coeff", self.coeff, np.ndarray | list)
 
         match self.spectrum_type:
 
@@ -118,6 +122,33 @@ class RefractionIndex(Spectrum):
             raise RuntimeError(f"RefractionIndex below 1 with value {nm}.")
 
         return ns
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Equal operator. Compares self to 'other'.
+        :param other:
+        :return:
+        """
+
+        if type(self) is not type(other):
+            return False
+
+        elif self is other or (self.spectrum_type != "Data" and self.crepr() == other.crepr()):
+            return True
+
+        elif self.spectrum_type == "Data" and other.spectrum_type == "Data":
+            if np.all(self._wls == other._wls) and np.all(self._vals == other._vals)\
+               and self.quantity == other.quantity and self.unit == other.unit:
+                return True
+
+        return False
+
+    def __ne__(self, other: Any) -> bool:
+        """Not equal operator. Compares self to 'other'.
+        :param other:
+        :return:
+        """
+        return not self.__eq__(other)
 
     def __setattr__(self, key: str, val: Any) -> None:
         """
@@ -175,17 +206,19 @@ class RefractionIndex(Spectrum):
             case "V" if val is not None:
                 pc.check_type(key, val, float | int)
                 pc.check_above(key, val, 0)
+                np.asarray_chkfinite(val)
 
         super().__setattr__(key, val)
 
     def get_abbe_number(self, lines: list = None) -> float:
         """
-        Calculates the Abbe Number.
+        Calculates the Abbe Number. The spectral lines can be overwritten with the parameter.
+        Otherwise the RefractionIndex.lines parameter is used from its initialization, which defaults to FDC lines.
 
         :param lines: list of 3 wavelengths [short, center, long]
         :return:
         """
-        lines = lines if lines is not None else Lines.FDC  # default to FDC spectral lines
+        lines = lines if lines is not None else self.lines  # default to FDC spectral lines
         ns, nc, nl = tuple(self(lines))
         return (nc - 1) / (ns - nl) if ns != nl else np.inf
 

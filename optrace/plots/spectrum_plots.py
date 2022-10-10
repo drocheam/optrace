@@ -2,7 +2,7 @@
 import numpy as np  # calculations
 import matplotlib.pyplot as plt  # actual plotting
 
-from ..tracer import color  # color conversions for chromacity plots
+from ..tracer import color as mcolor  # color conversions for chromacity plots
 from ..tracer.spectrum import Spectrum, LightSpectrum
 from ..tracer.refraction_index import RefractionIndex
 from .misc_plots import _set_font, _show_grid
@@ -50,7 +50,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
                    steps:        int = 5000,
                    legend_off:   bool = False,
                    labels_off:   bool = False,
-                   colors:       str | list[str] = None,
+                   color:        str | list[str] = None,
                    block:        bool = False)\
         -> None:
     """Lower level plotting function. Don't use directly"""
@@ -63,11 +63,10 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     pc.check_type("legend_off", legend_off, bool)
     pc.check_type("labels_off", labels_off, bool)
     pc.check_type("block", block, bool)
-    pc.check_type("colors", colors, str | list | None)
+    pc.check_type("color", color, str | list | None)
 
     # wavelength range
-    wl0 = color.WL_MIN
-    wl1 = color.WL_MAX
+    wl0, wl1 = mcolor.WL_BOUNDS
 
     _set_font()
     fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [15, 1]})
@@ -81,7 +80,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
         # spectrum_type="Data" -> show actual data values and positions
         # otherwise we would have interpolation issues or fake accuracy
         # this could also lead to an incorrect power for a LightSpectrum in the next part
-        elif obj.spectrum_type == "Data":
+        elif obj.spectrum_type in ["Data", "Histogram"]:
             return obj._wls, obj._vals
         # default mode, crate wavelength range and just call the object
         else:
@@ -91,7 +90,10 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # single Spectrum
     if not isinstance(obj, list):
         wlp, val = get_val(obj)
-        ax1.plot(wlp, val, color=colors)
+        if obj.spectrum_type == "Histogram":
+            ax1.stairs(val, wlp, color=color)
+        else:
+            ax1.plot(wlp, val, color=color)
 
         # assign title. add total power if it is a LightSpectrum
         if isinstance(obj, LightSpectrum):
@@ -106,14 +108,21 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
         for i, obji in enumerate(obj):
             wlp, val = get_val(obji)
 
-            cl = colors[i] if colors is not None else None
-            axp = ax1.plot(wlp, val, color=cl)
+            cl = color[i] if color is not None else None
+
+            if obji.spectrum_type == "Histogram":
+                axp = ax1.stairs(val, wlp, color=cl)
+                tcolor = axp._original_edgecolor
+            else:
+                axp = ax1.plot(wlp, val, color=cl)
+                tcolor = axp[0].get_color()
+
             lg.append(obji.get_long_desc())
 
             # labels for each spectrum
             if not labels_off:
                 tp = int(i / len(obj) * wlp.shape[0] / 10)
-                ax1.text(wlp[tp], val[tp], obji.get_desc(), color=axp[0].get_color())
+                ax1.text(wlp[tp], val[tp], obji.get_desc(), color=tcolor)
 
         # add legend and title
         if not legend_off:
@@ -125,7 +134,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # add wavelength color bar
     # enforce image extent of 1:10 for every wavelength range,
     # otherwise the color bar size changes for different wavelength ranges
-    colors = np.array([color.spectral_colormap(wl0=plt.xlim()[0], wl1=plt.xlim()[1], N=1000)[:, :3]]) / 255
+    colors = np.array([mcolor.spectral_colormap(wl0=plt.xlim()[0], wl1=plt.xlim()[1], N=1000)[:, :3]]) / 255
     ax2.imshow(colors, extent=[*plt.xlim(), 0.1*plt.xlim()[0], 0.1*plt.xlim()[1]], aspect="auto")
 
     ax1.set(ylabel=ylabel)

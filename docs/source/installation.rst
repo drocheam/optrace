@@ -2,24 +2,26 @@
 Installation
 ################
 
+This library requires Python 3.10
 
-Requires Python 3.10
+**Instructions**
 
-External Libraries Backend:
+#. make sure you have Python 3.10 and pip installed on your system
+#. Download/clone the whole project repository. This is the folder that includes the ``optrace``-folder as well as the ``setup.py``
+#. open a terminal in the downloaded folder and run ``pip install .`` <- Note that the dot is part of the command.
 
-* `colorio <https://pypi.org/project/colorio/>`_
+This automatically runs the file setup.py, which provides all the required information for the installation.
+After this ``optrace`` should be installed on your system. To verify this, you can run the quickstart example in <>.
+
+External dependencies include
+
+* `mayavi <https://docs.enthought.com/mayavi/mayavi/>`_
+* `matplotlib <https://matplotlib.org/stable/users/index>`_
 * `numexpr <https://numexpr.readthedocs.io/projects/NumExpr3/en/latest/user_guide.html>`_
 * `numpy <https://numpy.org/doc/stable/user/index.html#user>`_
 * `Pillow <https://pillow.readthedocs.io/en/stable/>`_
 * `progressbar2 <https://pypi.org/project/progressbar2/>`_
 * `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
-
-Additional External Libraries Frontend
-
-* `matplotlib <https://matplotlib.org/stable/users/index>`_
-* `mayavi <https://docs.enthought.com/mayavi/mayavi/>`_
 * `PyQt5 <https://pypi.org/project/PyQt5/>`_
 * `traitsui <https://docs.enthought.com/traitsui/>`_
-* traits
-* pyface
 

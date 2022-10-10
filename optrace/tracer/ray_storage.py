@@ -2,6 +2,7 @@
 import numpy as np  # calculations
 
 from .geometry import RaySource  # create rays
+from .refraction_index import RefractionIndex  # media list
 from .base_class import BaseClass  # parent class
 from . import misc  # calculations
 
@@ -13,10 +14,15 @@ class RayStorage(BaseClass):
 
         :param kwargs:
         """
+        self._lock = False
         self.n_list = np.array([], dtype=int)
         self.b_list = np.array([], dtype=int)
+        self._RT = None
+        self._absorb_missing = False
         self.ray_source_list = []
         self.no_pol = False
+        self.absorb_missing = True
+        self._media = []
 
         self.p_list = np.array([])
         self.s0_list = np.array([])
@@ -30,18 +36,25 @@ class RayStorage(BaseClass):
              ray_source_list:   list[RaySource],
              N:                 int,
              nt:                int,
+             media:             list[RefractionIndex],
+             absorb_missing:    bool,
              no_pol:            bool = False)\
             -> None:
         """
 
+        :param RT:
         :param ray_source_list:
         :param N:
         :param nt:
+        :param media:
         :param no_pol:
+        :param absorb_missing:
         :return:
         """
         self._lock = False
         self.no_pol = no_pol
+        self._media = [med.copy() for med in media]  # enforce copies, otherwise referenced elements can be changed
+        self._absorb_missing = absorb_missing
 
         assert N >= 0
         assert nt >= 0
@@ -85,7 +98,7 @@ class RayStorage(BaseClass):
         return self.p_list.shape[0] if self.n_list.shape[0] else 0
 
     @property
-    def nt(self) -> int:
+    def Nt(self) -> int:
         """number of ray sections per ray"""
         return self.p_list.shape[1] if self.n_list.shape[0] else 0
 
@@ -123,7 +136,7 @@ class RayStorage(BaseClass):
 
         return self.p_list[Ns:Ne], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne],  self.w_list[Ns:Ne], self.wl_list[Ns:Ne]
 
-    def get_source_sections(self, index: int = None)\
+    def source_sections(self, index: int = None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
 
@@ -138,11 +151,41 @@ class RayStorage(BaseClass):
         return self.p_list[Ns:Ne, 0], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne, 0],\
             self.w_list[Ns:Ne, 0], self.wl_list[Ns:Ne]
 
-    def get_rays_by_mask(self,
-                         ch:           np.ndarray,
-                         ch2:          np.ndarray = None,
-                         ret:          list[bool | int] = None,
-                         normalize:    bool = True) \
+    def ray_lengths(self, ch: np.ndarray = None, ch2: np.ndarray = None) -> np.ndarray:
+        """
+        Euclidean lengths of ray sections.
+
+        :param ch:
+        :param ch2:
+        :return:
+        """
+        _, s, _, _, _, _ = self.rays_by_mask(ch, ch2, ret=[0, 1, 0, 0, 0, 0], normalize=False)
+        return np.linalg.norm(s, axis=s.ndim-1)
+    
+    def optical_lengths(self, ch: np.ndarray = None) -> np.ndarray:
+        """
+        
+        :param ch: boolean array for ray selection
+        :return: Optical path length for each ray section
+        """
+
+        if not self._absorb_missing:
+            raise RuntimeError("For this functionality the absorb_missing setting needs to be set to "
+                               "True before tracing.")
+
+        l = self.ray_lengths(ch)
+        _, s, _, _, wl, _ = self.rays_by_mask(ch, ret=[0, 0, 0, 0, 1, 0])
+
+        for i, n in enumerate(self._media):
+            l[:, i] *= n(wl)
+
+        return l
+    
+    def rays_by_mask(self,
+                     ch:           np.ndarray = None,
+                     ch2:          np.ndarray = None,
+                     ret:          list[bool | int] = None,
+                     normalize:    bool = True) \
             -> tuple[(np.ndarray | None), (np.ndarray | None), (np.ndarray | None),
                      (np.ndarray | None), (np.ndarray | None), (np.ndarray | None)]:
         """
@@ -154,12 +197,14 @@ class RayStorage(BaseClass):
         :return:
         """
         assert self.N, "ray_source_list has no rays stored."
-        assert ch.shape[0] == self.N
         
         # assign default parameter for ret
         ret = [1, 1, 1, 1, 1, 1] if ret is None else ret
 
+        ch = np.ones(self.N, dtype=bool) if ch is None else ch
         ch2 = slice(None) if ch2 is None else ch2
+      
+        assert ch.shape[0] == self.N
 
         # calculate source numbers
         if ret[5]:
@@ -172,7 +217,7 @@ class RayStorage(BaseClass):
         # calculate s
         if ret[1]:
             if not isinstance(ch2, slice):
-                ch21 = np.where(ch2 < self.nt-1, ch2 + 1, ch2)
+                ch21 = np.where(ch2 < self.Nt - 1, ch2 + 1, ch2)
                 s = self.p_list[ch, ch21] - self.p_list[ch, ch2]
                 if normalize:
                     s = misc.normalize(s)

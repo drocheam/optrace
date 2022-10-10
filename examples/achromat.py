@@ -82,5 +82,5 @@ print(f"{RT.tma(e).power[1]:.2f} dpt ({e:.2f} nm)")
 print(f"{RT.tma(C_).power[1]:.2f} dpt ({C_:.2f} nm)\n")
 
 # run the simulator
-sim = TraceGUI(RT, coloring_type="Wavelength", ray_alpha=-0.5)
+sim = TraceGUI(RT, coloring_type="Wavelength", ray_opacity=0.8)
 sim.run()

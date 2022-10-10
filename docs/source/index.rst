@@ -13,7 +13,9 @@ Optrace Documentation
 
    overview
    installation
+   quickstart
    usage
+   examples
    math
    API
    Development

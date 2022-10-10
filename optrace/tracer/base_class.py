@@ -72,7 +72,7 @@ class BaseClass:
         :param fallback: description string if the object has no desc and long_desc
         :return: verbose description
         """
-        return self.long_desc if self.long_desc != "" else BaseClass.get_desc(self, fallback)
+        return self.long_desc if self.long_desc != "" else self.get_desc(fallback)
 
     def get_desc(self, fallback: str = "") -> str:
         """

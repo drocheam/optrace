@@ -18,6 +18,7 @@ from progressbar import progressbar, ProgressBar  # fancy progressbars
 # needed for raytracing geometry and functionality
 from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface, Marker
 from .geometry.element import Element
+from .geometry.group import Group
 
 from .spectrum import LightSpectrum
 from .refraction_index import RefractionIndex
@@ -33,7 +34,7 @@ from .transfer_matrix_analysis import TMA
 
 # sub-threads for all actions should not throw! this would make exception handling difficult
 
-class Raytracer(BaseClass):
+class Raytracer(Group):
 
     N_EPS: float = 1e-11
     """ numerical epsilon. Used for floating number comparisions in some places or adding small differences """
@@ -90,15 +91,11 @@ class Raytracer(BaseClass):
         self.no_pol = no_pol  #: polarization calculation flag
         self.n0 = n0  #: ambient refraction index
 
-        self.lens_list = []  #: lenses in raytracing geometry
-        self.aperture_list = []  #: apertures in raytracing geometry
-        self.filter_list = []  #: filters in raytracing geometry
-        self.detector_list = []  #: detectors in raytracing geometry
-        self.ray_source_list = []  #: ray sources in raytracing geometry
-        self.marker_list = []  #: markers in raytracing geometry
         self.rays = RayStorage()  #: traced rays
         self._msgs = np.array([])
-        self._no_geometry_checks = False
+        self._ignore_geometry_error = False
+        self.geometry_error = False
+        self._force_threads = None
 
         super().__init__(**kwargs)
         self._new_lock = True
@@ -132,77 +129,17 @@ class Raytracer(BaseClass):
 
         super().__setattr__(key, val)
 
-    def add(self, el: Lens | Aperture | Filter | RaySource | Detector | Marker | list) -> None:
-        """
-        Add an element or a list of elements to the raytracer geometry.
+    @property
+    def extent(self):
+        return tuple(self.outline)
 
-        :param el: Element to add to raytracer
-        """
-
-        if not isinstance(el, list) and self.has(el):
-            self.print("Element already included in geometry. Make a copy to include it another time.")
-            return
-
-        match el:
-            case Aperture():    self.aperture_list.append(el)
-            case Filter():      self.filter_list.append(el)
-            case RaySource():   self.ray_source_list.append(el)
-            case Detector():    self.detector_list.append(el)
-            case Marker():      self.marker_list.append(el)
-            case Lens():        self.lens_list.append(el)
-
-            case list():
-                for eli in el:
-                    self.add(eli)
-            case _:
-                raise TypeError("Invalid element type.")
-
-    def remove(self, el: Lens | Aperture | Filter | RaySource | Detector | Marker | list) -> bool:
-        """
-        Remove the element specified by its id from raytracing geometry.
-        Returns True if element(s) have been found and removes, False otherwise.
-
-        :param el:
-        :return: if the element was found and removed
-        """
-        success = False
-
-        if isinstance(el, list):
-            for eli in el.copy():
-                success = self.remove(eli) or success
-        else:
-            for list_ in [self.lens_list, self.aperture_list, self.detector_list, 
-                          self.filter_list, self.ray_source_list, self.marker_list]:
-                for lel in list_.copy():
-                    if lel is el:
-                        list_.remove(lel)
-                        success = True
-
-        return success
-
-    def has(self, el) -> bool:
-        """
-        checks by id if element is included in geometry
-
-        :param el:
-        :return:
-        """
-        for list_ in [self.lens_list, self.aperture_list, self.detector_list, 
-                      self.filter_list, self.ray_source_list, self.marker_list]:
-            for lel in list_:
-                if lel is el:
-                    return True
-
-        return False
-
+    @property
+    def pos(self):
+        return np.mean(self.outline[:2]), np.mean(self.outline[2:4]), self.outline[4]
+    
     def clear(self) -> None:
-        """clear geometry"""
-        self.lens_list[:] = []
-        self.aperture_list[:] = []  
-        self.filter_list[:] = []
-        self.detector_list[:] = []
-        self.ray_source_list[:] = []
-        self.marker_list[:] = []
+        """clear geometry and rays"""
+        super().clear()
         self.rays.__init__()
 
     def tma(self, wl: float = 555.) -> TMA:
@@ -211,7 +148,7 @@ class Raytracer(BaseClass):
         :param wl:
         :return:
         """
-        return TMA(self.lens_list, wl=wl, n0=self.n0)
+        return super().tma(wl, self.n0)
 
     def property_snapshot(self) -> dict:
         """
@@ -221,12 +158,12 @@ class Raytracer(BaseClass):
         return dict(Rays=self.rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()],
                     TraceSettings=[self.no_pol, self.absorb_missing],
-                    Lenses=[D.crepr() for D in self.lens_list],
-                    Filters=[D.crepr() for D in self.filter_list],
-                    Apertures=[D.crepr() for D in self.aperture_list],
-                    RaySources=[D.crepr() for D in self.ray_source_list],
-                    Markers=[D.crepr() for D in self.marker_list],
-                    Detectors=[D.crepr() for D in self.detector_list])
+                    Lenses=[D.crepr() for D in self.lenses],
+                    Filters=[D.crepr() for D in self.filters],
+                    Apertures=[D.crepr() for D in self.apertures],
+                    RaySources=[D.crepr() for D in self.ray_sources],
+                    Markers=[D.crepr() for D in self.markers],
+                    Detectors=[D.crepr() for D in self.detectors])
 
     def compare_property_snapshot(self, h1: dict, h2: dict) -> dict:
         """
@@ -243,6 +180,42 @@ class Raytracer(BaseClass):
         diff["Any"] = any(val for val in diff.values())
 
         return diff
+
+    @property
+    def media(self) -> list[RefractionIndex]:
+        """
+        List of refractive media in z-order between outline and all RT.surfaces.
+        This includes surfaces of lenses, apertures and filters as well as the outline xy planes.
+        """
+        media = [self.n0]
+        els = [*self.lenses, *self.apertures, *self.filters]
+        els = sorted(els, key=lambda el: el.front.pos[2])
+
+        for el in els:
+            if isinstance(el, Lens):
+                media += [el.n, el.n2 or self.n0]
+            else:
+                media.append(media[-1])
+
+        return media
+    
+    @property
+    def surfaces(self) -> list[Surface]:
+        """
+        List of all tracing surfaces (lenses, apertures, filters).
+        Sorted by center z-position.
+        """
+        surfaces = []
+        els = [*self.lenses, *self.apertures, *self.filters]
+        els = sorted(els, key=lambda el: el.front.pos[2])
+
+        for el in els:
+            if el.has_back():
+                surfaces += [el.front, el.back]
+            else:
+                surfaces.append(el.front)
+
+        return surfaces
 
     def _set_messages(self, msgs: list[np.ndarray]) -> None:
         """
@@ -295,7 +268,7 @@ class Raytracer(BaseClass):
                                        f"{count} rays. This can be a result of surface collisions "
                                        "or incorrect sequentiality.")
 
-                        case self.INFOS.HIT_TIMEOUT:
+                        case self.INFOS.HIT_TIMEOUT:  # pragma: no branch
                             self.print(f"Non-convergence timeout for {count} rays at surface {surf}.")
 
     def trace(self, N: int) -> None:
@@ -305,15 +278,15 @@ class Raytracer(BaseClass):
         :param N: number of rays (int)
         """
 
-        if (N := int(N)) < 1000:
-            raise ValueError(f"Ray number N needs to be at least 1000, but is {N}.")
+        if (N := int(N)) < 1:
+            raise ValueError(f"Ray number N needs to be at least 1, but is {N}.")
 
         if N > self.MAX_RAYS:
             raise ValueError(f"Ray number exceeds maximum of {self.MAX_RAYS}")
 
         # absorb_missing = False is only possible, if all ambient refraction indices are the same
         if not self.absorb_missing:
-            for Lens_ in self.lens_list:
+            for Lens_ in self.lenses:
                 if Lens_.n2 is not None and self.n0 != Lens_.n2:
                     self.print("Outside refraction index defined for at least one lens, setting absorb_missing"
                                " simulation parameter to True")
@@ -321,15 +294,18 @@ class Raytracer(BaseClass):
                     break
 
         elements = self._make_element_list()
-        if not self._no_geometry_checks:
-            self.__geometry_checks(elements)
+        self.__geometry_checks(elements)
+        if self.geometry_error and not self._ignore_geometry_error:
+            self.print("ABORTED TRACING")
+            return
 
         # reserve space for all surface points, +1 for invisible aperture at the outline z-end
         # and +1 for the ray starting points
-        nt = 2 * len(self.lens_list) + len(self.filter_list) + len(self.aperture_list) + 1 + 1
+        nt = 2 * len(self.lenses) + len(self.filters) + len(self.apertures) + 1 + 1
 
         cores = ne.detect_number_of_cores()
         N_threads = cores if N/cores >= 10000 and self.threading else 1
+        N_threads = self._force_threads if self._force_threads is not None else N_threads  # overwrite if forced
 
         # will hold info messages from each thread
         msgs = [np.zeros((len(self.INFOS), nt), dtype=int) for i in range(N_threads)]
@@ -339,7 +315,9 @@ class Raytracer(BaseClass):
             if not self.silent else None
 
         # create rays from RaySources
-        self.rays.init(self.ray_source_list, N, nt, no_pol=self.no_pol)
+        self.rays.init(self.ray_sources, N, nt, self.media, self.absorb_missing, self.no_pol)
+
+        media = self.media
 
         def sub_trace(N_threads: int, N_t: int) -> None:
 
@@ -358,10 +336,9 @@ class Raytracer(BaseClass):
 
                 if isinstance(element, Lens):
 
-                    n_l = element.n(wavelengths)
-                    n1_l = n1(wavelengths)
-                    n2 = element.n2 or self.n0
-                    n2_l = element.n2(wavelengths) if element.n2 is not None else self.n0(wavelengths)
+                    n1_l = media[i](wavelengths)
+                    n_l = media[i+1](wavelengths)
+                    n2_l = media[i+2](wavelengths)
 
                     hw_front = hw.copy()
                     p[hw, i+1], hit_front = self.__find_surface_hit(element.front, p[hw, i], s[hw], i, msg)
@@ -397,9 +374,6 @@ class Raytracer(BaseClass):
                     # treat rays that go outside outline
                     hwnb = misc.part_mask(hw, ~hit_back)  # rays having power and not hitting lens back
                     self.__outline_intersection(p, s, weights, hwnb, i, msg)
-
-                    # last refrection index is starting refraction index for next lens
-                    n1 = n2
 
                 elif isinstance(element, Filter | Aperture):  # pragma: no branch
                     p[hw, i+1], hit = self.__find_surface_hit(element.surface, p[hw, i], s[hw], i, msg)
@@ -444,17 +418,17 @@ class Raytracer(BaseClass):
         :return: list of sorted elements
         """
 
-        # add a invisible (the filter is not in self.filter_list) to the outline area at +z
+        # add a invisible (the filter is not in self.filters) to the outline area at +z
         # it absorbs all light at this surface
         o = self.outline
         end_filter = Aperture(Surface("Rectangle", dim=[o[1] - o[0], o[3] - o[2]]),
                               pos=[(o[1] + o[0])/2, (o[2] + o[3])/2, o[5]])
 
         # add filters and lenses into one list,
-        elements = self.lens_list + self.filter_list + self.aperture_list + [end_filter]
+        elements = self.lenses + self.filters + self.apertures + [end_filter]
 
         # sort list in z order
-        return sorted(elements, key=lambda el: el.extent[4])
+        return sorted(elements, key=lambda el: el.front.pos[2])
 
     def __geometry_checks(self, elements: list[Lens | Filter | Aperture]) -> None:
         """
@@ -468,12 +442,16 @@ class Raytracer(BaseClass):
             o = self.outline + self.N_EPS*np.array([-1, 1, -1, 1, -1, 1])  # add eps because of finite float precision
             return o[0] <= e[0] and e[1] <= o[1] and o[2] <= e[2] and e[3] <= o[3] and o[4] <= e[4] and e[5] <= o[5]
 
-        if not self.ray_source_list:
-            raise RuntimeError("RaySource Missing.")
+        if not self.ray_sources:
+            self.print("RaySource Missing.")
+            self.geometry_error = True
+            return
 
         for i, el in enumerate(elements):
             if not is_inside(el.extent):
-                raise RuntimeError(f"Element{i} {el} with extent {el.extent} outside outline {self.outline}.")
+                self.print(f"Element{i} {el} with extent {el.extent} outside outline {self.outline}.")
+                self.geometry_error = True
+                return
 
             if i + 1 < len(elements):
                 coll, xc, yc = Element.check_collision(el.front, elements[i + 1].front)
@@ -482,19 +460,26 @@ class Raytracer(BaseClass):
                     coll, xc, yc = Element.check_collision(el.back, elements[i + 1].front)
 
                 if coll:
-                    raise RuntimeError(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}.")
+                    self.print(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}.")
+                    self.geometry_error = True
+                    return
 
-        for rs in self.ray_source_list:
+        for rs in self.ray_sources:
 
             if not is_inside(rs.extent):
-                raise RuntimeError(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
+                self.print(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
+                self.geometry_error = True
+                return
 
             if rs.pos[2] >= elements[0].extent[4]:
                 coll, xc, yc = Element.check_collision(rs.surface, elements[0].front)
                 if coll:
-                    raise RuntimeError(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}."
-                                        "RaySource needs to come before all lenses.")
+                    self.print(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}."
+                                "RaySource needs to come before all lenses.")
+                    self.geometry_error = True
+                    return
 
+        self.geometry_error = False
         # it's hard to check for surface collisions, for this we would need to find intersections of surfaces
         # instead we output a runtime error if the ray hits the surfaces at the wrong order while raytracing
 
@@ -945,16 +930,16 @@ class Raytracer(BaseClass):
         :param projection_method:
         :return:
         """
-        if not self.detector_list:
+        if not self.detectors:
             raise RuntimeError("Detector Missing")
 
         if not self.rays.N:
             raise RuntimeError("No rays traced.")
 
-        if source_index is not None and (source_index > len(self.ray_source_list) - 1 or source_index < 0):
+        if source_index is not None and (source_index > len(self.ray_sources) - 1 or source_index < 0):
             raise ValueError("Invalid source_index.")
 
-        if detector_index > len(self.detector_list) - 1 or detector_index < 0:
+        if detector_index > len(self.detectors) - 1 or detector_index < 0:
             raise ValueError("Invalid detector_index.")
 
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=4).start()\
@@ -963,80 +948,113 @@ class Raytracer(BaseClass):
         # range for selected rays in RayStorage
         Ns, Ne = self.rays.b_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
 
-        # current rays for loop iteration, this rays are used in hit finding for the next section
-        rs = np.zeros(self.rays.N, dtype=bool)  # gets updated at every iteration
-        rs[Ns:Ne] = True  # use rays of selected source
+        def threaded(Ns, Ne, list_, list_i, bar):
 
-        # check if ray positions are behind, in front or inside detector extent
-        bh_zmin = self.rays.p_list[Ns:Ne, :, 2] >= self.detector_list[detector_index].extent[4]
-        bh_zmax = self.rays.p_list[Ns:Ne, :, 2] >= self.detector_list[detector_index].extent[5]
-        
-        # conclude if rays start after detector or don't reach that far
-        no_start = np.all(bh_zmin & bh_zmax, axis=1)
-        no_reach = np.all(~bh_zmin & ~bh_zmax, axis=1)
-        ignore = no_start | no_reach
+            # current rays for loop iteration, this rays are used in hit finding for the next section
+            rs = np.zeros(self.rays.N, dtype=bool)  # gets updated at every iteration
+            rs[Ns:Ne] = True  # use rays of selected source
 
-        # index for ray position before intersection
-        rs2 = np.argmax(bh_zmin, axis=1) - 1
-        rs2[rs2 < 0] = 0
+            # check if ray positions are behind, in front or inside detector extent
+            bh_zmin = self.rays.p_list[Ns:Ne, :, 2] >= self.detectors[detector_index].extent[4]
+            bh_zmax = self.rays.p_list[Ns:Ne, :, 2] >= self.detectors[detector_index].extent[5]
+            
+            # conclude if rays start after detector or don't reach that far
+            no_start = np.all(bh_zmin & bh_zmax, axis=1)
+            no_reach = np.all(~bh_zmin & ~bh_zmax, axis=1)
+            ignore = no_start | no_reach
 
-        # exclude rays that start behind detector or end before it
-        rs2z = misc.part_mask(rs, ignore)
-        rs[rs2z] = False
-        rs2 = rs2[~ignore]
+            # index for ray position before intersection
+            rs2 = np.argmax(bh_zmin, axis=1) - 1
+            rs2[rs2 < 0] = 0
 
-        if bar is not None:
-            bar.update(1)
+            # exclude rays that start behind detector or end before it
+            rs2z = misc.part_mask(rs, ignore)
+            rs[rs2z] = False
+            rs2 = rs2[~ignore]
 
-        p, s, _, w, wl, _ = self.rays.get_rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 1, 0], normalize=True)
+            if bar is not None and not list_i:
+                bar.update(1)
 
-        if bar is not None:
-            bar.update(2)
+            p, s, _, w, wl, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 1, 0], normalize=True)
 
-        # init ph (position of hit) and is_hit bool array
-        ph = np.zeros_like(p, dtype=np.float64, order='F')
-        ish = np.zeros_like(wl, dtype=bool)
-        rs3 = np.ones_like(wl, dtype=bool)
+            if bar is not None and not list_i:
+                bar.update(2)
 
-        while np.any(rs):
+            # init ph (position of hit) and is_hit bool array
+            ph = np.zeros_like(p, dtype=np.float64, order='F')
+            ish = np.zeros_like(wl, dtype=bool)
+            rs3 = np.ones_like(wl, dtype=bool)
 
-            rs2 += 1  # increment next-section-indices
-            val = rs2 < self.rays.nt  # valid-array, indices are below section count
-            # these rays have no intersection with the detector, since they end at the last outline surface
+            while np.any(rs):
 
-            if not np.all(val):
-                rs = misc.part_mask(rs, val)  # only use valid rays
-                rsi = misc.part_mask(rs3, ~val)  # current rays that are not valid
-                rs3 = misc.part_mask(rs3, val)  # current rays that are not valid
-                w[rsi] = 0  # set invalid to weight of zero
-                p, s, rs2 = p[val], s[val], rs2[val]  # only use valid rays
+                rs2 += 1  # increment next-section-indices
+                val = rs2 < self.rays.Nt  # valid-array, indices are below section count
+                # these rays have no intersection with the detector, since they end at the last outline surface
 
-            msg = np.zeros((len(self.INFOS), 2), dtype=int)  # find_surface_hit needs a message array
-            ph[rs3], ish[rs3] = self.__find_surface_hit(self.detector_list[detector_index].surface, p, s,
-                                                        detector_index, msg)
+                if not np.all(val):
+                    rs = misc.part_mask(rs, val)  # only use valid rays
+                    rsi = misc.part_mask(rs3, ~val)  # current rays that are not valid
+                    rs3 = misc.part_mask(rs3, val)  # current rays that are not valid
+                    w[rsi] = 0  # set invalid to weight of zero
+                    p, s, rs2 = p[val], s[val], rs2[val]  # only use valid rays
 
-            self._set_messages([msg])  # assign messages
-            self._show_messages(s.shape[0])  # handle messages
+                msg = np.zeros((len(self.INFOS), 2), dtype=int)  # find_surface_hit needs a message array
+                ph[rs3], ish[rs3] = self.__find_surface_hit(self.detectors[detector_index].surface, p, s,
+                                                            detector_index, msg)
 
-            p2z = self.rays.p_list[rs, rs2, 2]
-            rs3 = ph[rs3, 2] > p2z
-            rs = misc.part_mask(rs, rs3)
+                self._set_messages([msg])  # assign messages
+                self._show_messages(s.shape[0])  # handle messages
 
-            if np.any(rs):
-                rs2 = rs2[rs3]
-                p, s, _, w[rs3], _, _ = self.rays.get_rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 0, 0])
+                p2z = self.rays.p_list[rs, rs2, 2]
+                rs3 = ph[rs3, 2] > p2z
+                rs = misc.part_mask(rs, rs3)
+
+                if np.any(rs):
+                    rs2 = rs2[rs3]
+                    p, s, _, w[rs3], _, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 0, 0])
+
+            list_[list_i] = [ph, w, wl, ish]
+
+        N_th = ne.detect_number_of_cores() if self.threading and Ne-Ns > 100000 else 1
+        N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
+
+        threads = []
+        list_ = [[]] * N_th
+
+        if N_th > 1:
+            for i in np.arange(N_th):
+                # ray start and end index for each thread
+                step = (Ne - Ns) // N_th
+                Nsi = Ns + i*step
+                Nei = Nsi + step if i != N_th - 1 else Ne
+
+                thread = Thread(target=threaded, args=(Nsi, Nei, list_, i, bar))
+                threads.append(thread)
+
+            [thread.start() for thread in threads]
+            [thread.join() for thread in threads]
+        else:
+            threaded(Ns, Ne, list_, 0, bar)
+
+        # make arrays from thread data
+        # it would be more efficient to have them assigned to their destination in the thread
+        # however we only work on rays reaching that far to the detector, a number that is not known beforehand
+        ph = np.vstack([list__[0] for list__ in list_])
+        w = np.concatenate([list__[1] for list__ in list_])
+        wl = np.concatenate([list__[2] for list__ in list_])
+        ish = np.concatenate([list__[3] for list__ in list_])
 
         hitw = ish & (w > 0)
         ph, w, wl = ph[hitw], w[hitw], wl[hitw]
         if bar is not None:
             bar.update(3)
 
-        if self.detector_list[detector_index].surface.no_z_extent():
-            coordinate_type = "Cartesian"
+        if self.detectors[detector_index].surface.no_z_extent():
+            projection = None
 
         else:
-            ph = self.detector_list[detector_index].surface.sphere_projection(ph, projection_method)
-            coordinate_type = "Polar"
+            ph = self.detectors[detector_index].surface.sphere_projection(ph, projection_method)
+            projection = projection_method
 
         # define the extent
         if isinstance(extent, list | np.ndarray):
@@ -1048,7 +1066,7 @@ class Raytracer(BaseClass):
             ph, w, wl = ph[inside], w[inside], wl[inside]
 
         elif extent is None:
-            extent_out = self.detector_list[detector_index].pos[:2].repeat(2)
+            extent_out = self.detectors[detector_index].pos[:2].repeat(2)
             if np.any(hitw):
                 extent_out[[0, 2]] = np.min(ph[:, :2], axis=0)
                 extent_out[[1, 3]] = np.max(ph[:, :2], axis=0)
@@ -1056,11 +1074,11 @@ class Raytracer(BaseClass):
         else:
             raise ValueError(f"Invalid extent '{extent}'.")
 
-        detector = self.detector_list[detector_index]
+        detector = self.detectors[detector_index]
         pname = f": {detector.desc}" if detector.desc != "" else ""
         desc = f"{Detector.abbr}{detector_index}{pname} at z = {detector.pos[2]:.5g} mm"
 
-        return ph, w, wl, extent_out, desc, coordinate_type, bar
+        return ph, w, wl, extent_out, desc, projection, bar
 
     def detector_image(self,
                        N:                 int,
@@ -1083,12 +1101,12 @@ class Raytracer(BaseClass):
         if N <= 0:
             raise ValueError(f"Pixel number N needs to be a positive int, but is {N}")
 
-        p, w, wl, extent_out, desc, coordinate_type, bar\
+        p, w, wl, extent_out, desc, projection, bar\
             = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
 
         # init image and extent, these are the default values when no rays hit the detector
-        img = RImage(desc=desc, extent=extent_out, coordinate_type=coordinate_type,
-                     threading=self.threading, silent=self.silent, projection_method=projection_method)
+        img = RImage(desc=desc, extent=extent_out, projection=projection,
+                     threading=self.threading, silent=self.silent)
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
@@ -1108,7 +1126,7 @@ class Raytracer(BaseClass):
         :param kwargs:
         :return:
         """
-        p, w, wl, extent, desc, coordinate_type, bar\
+        p, w, wl, extent, desc, _, bar\
             = self._hit_detector("Detector Spectrum", detector_index, source_index, extent)
 
         spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)
@@ -1122,41 +1140,54 @@ class Raytracer(BaseClass):
                          N_px_D:            int | list = 400,
                          N_px_S:            int | list = 400,
                          detector_index:    int | list = 0,
+                         projection_method: str | list = "Equidistant",
                          pos:               int | list = None,
                          silent:            bool = False,
                          no_sources:        bool = False,
                          extent:            list | np.ndarray = None)\
             -> tuple[list[RImage], list[RImage]]:
         """
+        Image render with N_rays rays.
+        First return value is a list of rendered sources, the second a list of rendered detector images.
+
+        If pos is not provided, a single detector image is rendered at the position of the detector specified by detector_index.
+        >> RT.iterative_render(N_rays=10000, detector_index=1) 
+        
+        If pos is provided as coordinate, the detector is moved beforehand.
+        >> RT.iterative_render(N_rays=10000, pos=[0, 1, 0], detector_index=1) 
+        
+        If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically repeated len(pos) times or can be specified as list with the same length as pos
+        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256]) 
 
         :param N_rays:
         :param N_px_D:
         :param N_px_S:
         :param detector_index:
         :param pos:
+        :param projection_method:
         :param silent:
         :param no_sources: don't render sources
         :param extent:
         :return:
         """
         
-        if not self.ray_source_list:
+        if not self.ray_sources:
             raise RuntimeError("Ray Sources Missing.")
         
         if (N_rays := int(N_rays)) <= 0:
             raise ValueError(f"Ray number N_rays needs to be a positive int, but is {N_rays}.")
 
-        if not self.detector_list and pos is not None:
+        if not self.detectors and pos is not None:
             raise RuntimeError("No detectors in geometry.")
 
         # if there are detectors
-        if self.detector_list:
+        if self.detectors:
 
             # use current detector position if pos is empty
             if pos is None:
                 if isinstance(detector_index, list):
                     raise ValueError("detector_index list needs to have the same length as pos list")
-                pos = [self.detector_list[detector_index].pos[2]]
+                pos = [self.detectors[detector_index].pos[2]]
 
             elif not isinstance(pos, list):
                 pos = [pos]
@@ -1173,6 +1204,12 @@ class Raytracer(BaseClass):
             elif len(detector_index) != len(pos):
                 raise ValueError("detector_index list needs to have the same length as pos list")
 
+            if not isinstance(projection_method, list):
+                projection_method = [projection_method] * len(pos)
+
+            elif len(projection_method) != len(pos):
+                raise ValueError("projection_method list needs to have the same length as pos list")
+
             if not isinstance(extent, list) or isinstance(extent[0], int | float):
                 extent = [extent] * len(pos)
 
@@ -1186,10 +1223,10 @@ class Raytracer(BaseClass):
             extentc = extent.copy()
 
         if not isinstance(N_px_S, list):
-            N_px_S = [N_px_S] * len(self.ray_source_list)
+            N_px_S = [N_px_S] * len(self.ray_sources)
 
-        elif len(N_px_S) != len(self.ray_source_list):
-            raise ValueError("N_px_S list needs to have the same length as ray_source_list")
+        elif len(N_px_S) != len(self.ray_sources):
+            raise ValueError("N_px_S list needs to have the same length as ray_sources")
 
         for npxsi in N_px_S:
             if not isinstance(npxsi, int) or npxsi <= 0:
@@ -1219,13 +1256,14 @@ class Raytracer(BaseClass):
 
             self.trace(N=rays_step)
 
-            if self.detector_list:
+            if self.detectors:
                 # for all detector positions
                 for j in np.arange(len(pos)):
-                    pos_new = np.concatenate((self.detector_list[detector_index[j]].pos[:2], [pos[j]]))
-                    self.detector_list[detector_index[j]].move_to(pos_new)
+                    pos_new = np.concatenate((self.detectors[detector_index[j]].pos[:2], [pos[j]]))
+                    self.detectors[detector_index[j]].move_to(pos_new)
                     Imi = self.detector_image(N=N_px_D[j], detector_index=detector_index[j], 
-                                              extent=extentc[j], _dont_rescale=True)
+                                              extent=extentc[j], _dont_rescale=True, 
+                                              projection_method=projection_method[j])
                     Imi._img *= rays_step / N_rays
 
                     # append image to list in first iteration, after that just add image content
@@ -1236,7 +1274,7 @@ class Raytracer(BaseClass):
                         DIm_res[j]._img += Imi._img
 
             if not no_sources:
-                for j, _ in enumerate(self.ray_source_list):
+                for j, _ in enumerate(self.ray_sources):
                     Imi = self.source_image(N=N_px_S[j], source_index=j, _dont_rescale=True)
                     Imi._img *= rays_step / N_rays
 
@@ -1265,24 +1303,24 @@ class Raytracer(BaseClass):
         :param source_index:
         :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
         """
-        if not self.ray_source_list:
+        if not self.ray_sources:
             raise RuntimeError("Ray Sources Missing.")
 
         if not self.rays.N:
             raise RuntimeError("No rays traced.")
 
-        if source_index > len(self.ray_source_list) - 1 or source_index < 0:
+        if source_index > len(self.ray_sources) - 1 or source_index < 0:
             raise ValueError("Invalid source_index.")
 
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=2).start()\
             if not self.silent else None
 
-        extent = self.ray_source_list[source_index].extent[:4]
-        p, _, _, w, wl = self.rays.get_source_sections(source_index)
+        extent = self.ray_sources[source_index].extent[:4]
+        p, _, _, w, wl = self.rays.source_sections(source_index)
         if bar is not None:
             bar.update(1)
 
-        rs = self.ray_source_list[source_index]
+        rs = self.ray_sources[source_index]
         pname = f": {rs.desc}" if rs.desc != "" else ""
         desc = f"{RaySource.abbr}{source_index}{pname} at z = {rs.pos[2]:.5g} mm"
 
@@ -1317,7 +1355,7 @@ class Raytracer(BaseClass):
 
         p, w, wl, extent, desc, bar = self._hit_source("Source Image", source_index)
 
-        img = RImage(desc=desc, extent=extent, coordinate_type="Cartesian",
+        img = RImage(desc=desc, extent=extent, projection=None,
                     threading=self.threading, silent=self.silent)
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:
@@ -1357,6 +1395,11 @@ class Raytracer(BaseClass):
 
         match mode:
 
+            # not enough rays, return cost of 1 and invalid position
+            case _ if w.shape[0] <= 1:
+                cost = 1
+                xm, ym, z_pos = np.nan, np.nan, np.nan
+
             case "Airy Disc Weighting":
                 expr = ne.evaluate("w * exp(-0.5*((x - xm)**2 + (y-ym)**2)/ (0.42*r0)**2)")
                 cost =  1 - np.sum(expr)/np.sum(w)
@@ -1386,14 +1429,14 @@ class Raytracer(BaseClass):
                     X, Y = np.mgrid[-1:1:N_px*1j, -1:1:N_px*1j]
                     cost = 1/np.mean((X**2 + Y**2)*Im)
                 else:
-                    Im /= (x_bin[1] - x_bin[0]) * (y_bin[1] - y_bin[0])  # convert to irradiance
-                    Im = Im[Im > 0]
+                    Im = Im[Im > 0]  # exclude empty pixels
+                    Ap = (x_bin[1] - x_bin[0]) * (y_bin[1] - y_bin[0])  # pixel area
 
                     if mode == "Irradiance Variance":
-                        cost = np.sqrt(1/np.std(Im))  # sqrt for better value range
+                        cost = np.sqrt(Ap/np.std(Im))  # sqrt for better value range
 
-                    elif mode == "Irradiance Maximum":
-                        cost = 1/np.sqrt(np.max(Im))  # sqrtt for better data range
+                    else: # mode == "Irradiance Maximum":
+                        cost = 1/np.sqrt(np.max(Im)/Ap)  # sqrt for better data range
                 
         if not ret_pos:
             return cost
@@ -1410,7 +1453,7 @@ class Raytracer(BaseClass):
         """
         Find the focal point using different methods. z_start defines the starting point,
         the search range is the region between lenses or the outline.
-        The influence of filters is neglected.
+        The influence of filters and apertures is neglected. Outline intersections of rays are ignored.
 
         :param method:
         :param z_start: starting position z (float)
@@ -1429,8 +1472,8 @@ class Raytracer(BaseClass):
         if method not in self.autofocus_methods:
             raise ValueError(f"Invalid method '{method}', should be one of {self.autofocus_methods}.")
 
-        if N < 1000:
-            raise ValueError(f"N should be at least 1000, but is {N}.")
+        if N < 1:
+            raise ValueError(f"N needs to be a positive value, but is {N}")
 
         if not self.rays.N:
             raise RuntimeError("No rays traced.")
@@ -1447,37 +1490,27 @@ class Raytracer(BaseClass):
         ################################################################################################################
 
         # sort list in z order
-        lenses = sorted(self.lens_list, key=lambda Element: Element.pos[2])
+        lenses = sorted(self.lenses, key=lambda Element: Element.pos[2])
 
-        # no lenses or region lies before first lens
-        if not lenses or z_start < lenses[0].pos[2]:
-            n_ambient = self.n0(550)
-            bounds = [self.outline[4], self.outline[5]] if not lenses else [self.outline[4], lenses[0].extent[4]]
+        # default bounds, left starts at end of all ray sources, right ends at outline
+        b0 = self.N_EPS + np.max([rs.extent[5] for rs in self.ray_sources])
+        b1 = self.outline[5] - self.N_EPS
+        n_ambient = self.n0(550)
 
-            # start position needs to be behind all raysources / selected source
-            if source_index is None:
-                for rs in self.ray_source_list:
-                    if rs.pos[2] > bounds[0]:
-                        bounds[0] = rs.extent[5] + self.N_EPS
-            else:
-                bounds[0] = self.ray_source_list[source_index].extent[5] + self.N_EPS
+        # find region between lenses
+        for i, lens in enumerate(lenses):
+            if z_start < lens.pos[2]:
+                b1 = lens.extent[4]
+                n_ambient_ = (lenses[i-1].n2 if i > 0 and lenses[i-1].n2 is not None else self.n0)
+                n_ambient = n_ambient_(550)
+                break
+            b0 = lens.extent[5]
 
-        # region lies behind last lens
-        elif z_start > lenses[-1].pos[2]:
-            n_ambient = self.n0(550) if lenses[-1].n2 is None else lenses[-1].n2(550)
-            bounds = [lenses[-1].extent[5], self.outline[5]-self.N_EPS]
-
-        # region lies between two lenses
-        else:
-            # find bounds between lenses
-            for ind, lens in enumerate(lenses):  # never exits normally # pragma: no branch
-                if z_start < lens.pos[2]:
-                    bounds = [lenses[ind-1].extent[5], lens.extent[4]]
-                    n_ambient = self.n0(550) if lens.n2 is None else lens.n2(550)
-                    break
+        # create bounds
+        bounds = [b0, b1]
 
         # show filter warning
-        for filter_ in (self.filter_list + self.aperture_list):
+        for filter_ in (self.filters + self.apertures):
             if bounds[0] <= filter_.pos[2] <= bounds[1]:
                 self.print("WARNING: The influence of the filters/apertures in the autofocus range will be ignored.")
 
@@ -1485,7 +1518,8 @@ class Raytracer(BaseClass):
         ################################################################################################################
 
         Nt = 1024  # cost function sampling points, divisible by 2, 4, 8, 16, 32 threads
-        N_th = ne.detect_number_of_cores()  # number of avaiable cpu cores
+        N_th = ne.detect_number_of_cores() if self.threading else 1
+        N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
         steps = int(Nt/64)
         steps += 2  # progressbas steps
         bar = ProgressBar(fd=sys.stdout, prefix="Finding Focus: ", max_value=steps).start()\
@@ -1514,7 +1548,12 @@ class Raytracer(BaseClass):
         N_act = np.count_nonzero(rays_pos)
         N_use = min(N, N_act) if method in ["Position Variance", "Airy Disc Weighting"] else N_act
         if N_use < 1000:  # throw error when no rays are present
-            raise RuntimeError(f"Less than 1000 rays for autofocus ({N_use}).")
+            self.print(f"WARNING: Less than 1000 rays for autofocus ({N_use}).")
+
+        # no rays are used, return placeholder variables
+        if N_use == 0:
+            return scipy.optimize.OptimizeResult(),\
+                dict(pos=[np.nan, np.nan, np.nan], bounds=bounds, z=np.full(Nt, np.nan), cost=np.full(Nt, np.nan), N=N_use)
 
         # select random rays from all valid
         rp = np.where(rays_pos)[0]
@@ -1526,7 +1565,7 @@ class Raytracer(BaseClass):
         pos = pos[rp2]
 
         # get Ray parts
-        p, s, _, weights, _, _ = self.rays.get_rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0])
+        p, s, _, weights, _, _ = self.rays.rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0])
 
         if not self.silent:
             bar.update(2)
@@ -1569,7 +1608,7 @@ class Raytracer(BaseClass):
                         bar.update(2+int(i/div + 1))
                     vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
 
-            if self.threading:
+            if N_th > 1:
                 threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, pa, sb, weights, r0))
                            for N_is in range(N_th)]
                 [th.start() for th in threads]

@@ -190,12 +190,13 @@ PDSM: RefractionIndex = RefractionIndex("Sellmeier", coeff=[1.0057, 0.013217], d
 see https://refractiveindex.info/?shelf=organic&book=polydimethylsiloxane&page=Schneider-RTV615"""
 
 
-PET: RefractionIndex = RefractionIndex("Data", wls=np.concatenate(([380], 400+10*np.arange(39))),
-                                       vals=[1.61891, 1.61027, 1.60595, 1.60212, 1.59847, 1.59528, 1.59247, 1.58988,
-                                             1.58716, 1.58496, 1.58304, 1.58111, 1.57927, 1.57769, 1.57630, 1.57470,
-                                             1.57333, 1.57194, 1.57086, 1.56993, 1.56904, 1.56811, 1.56696, 1.56627,
-                                             1.56527, 1.56478, 1.56368, 1.56317, 1.56225, 1.56199, 1.56131, 1.56052,
-                                             1.56013, 1.55933, 1.55868, 1.55854, 1.55817, 1.55795, 1.55723, 1.55583],
+PET: RefractionIndex = RefractionIndex("Data", wls=380+10*np.arange(41),
+                                       vals=[1.61891, 1.61459, 1.61027, 1.60595, 1.60212, 1.59847, 1.59528, 1.59247, 
+                                             1.58988, 1.58716, 1.58496, 1.58304, 1.58111, 1.57927, 1.57769, 1.57630, 
+                                             1.57470, 1.57333, 1.57194, 1.57086, 1.56993, 1.56904, 1.56811, 1.56696, 
+                                             1.56627, 1.56527, 1.56478, 1.56368, 1.56317, 1.56225, 1.56199, 1.56131, 
+                                             1.56052, 1.56013, 1.55933, 1.55868, 1.55854, 1.55817, 1.55795, 1.55723, 
+                                             1.55583],
                                        desc="PET", long_desc="Polyethylene terephthalate")
 """Polyethylene terephthalate,
 see https://refractiveindex.info/?shelf=organic&book=polyethylene_terephthalate&page=Zhang
