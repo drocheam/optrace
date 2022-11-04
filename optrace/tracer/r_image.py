@@ -1,8 +1,7 @@
-from typing import Callable, Any  # Callable and Any type
+from typing import Any  # Callable and Any type
 from threading import Thread  # multithreading
 
 import numpy as np  # calculations
-import numexpr as ne  # number of cores
 from PIL import Image  # saving as png
 import scipy.interpolate
 import scipy.constants  # for luminous efficacy

@@ -7,9 +7,6 @@ from optrace.gui import TraceGUI
 # make raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
-# ot.color.tools.WL_BOUNDS[1] = 850
-# globals().update(global ot.color.tools.WL_MAX = 850)
-
 # add Raysource
 RSS = ot.CircularSurface(r=1)
 RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
@@ -56,10 +53,9 @@ def func(l):
 fspec = ot.TransmissionSpectrum("Function", func=func)
 RT.add(ot.Filter(ap, pos=[0, 0, 45.2], spectrum=fspec))
 
-# add Detector
+# add Detectors
 Det = ot.Detector(ot.RectangularSurface(dim=[2,2]), pos=[0,0,60])
 RT.add(Det)
-
 Det2 = ot.Detector(ot.SphericalSurface(R=-1.1, r=1), pos=[0, 0, 40])
 RT.add(Det2)
 

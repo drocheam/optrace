@@ -1,13 +1,12 @@
 import os.path
 import numpy as np
 import chardet
-import numexpr as ne
 
 from .refraction_index import RefractionIndex
 from .geometry.group import Group
 from .geometry import Lens, Marker, Detector, Aperture
 from .geometry.surface import CircularSurface, ConicSurface, SphericalSurface,\
-                              FunctionSurface, RingSurface, AsphericSurface
+                              RingSurface, AsphericSurface
 
 from .presets import spectral_lines
 from .color.tools import WL_BOUNDS

@@ -1,7 +1,6 @@
 
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 import scipy.special  # error function and inverse
 from typing import Any  # Any type
 

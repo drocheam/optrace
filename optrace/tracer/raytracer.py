@@ -24,7 +24,6 @@ from .spectrum import LightSpectrum
 from .refraction_index import RefractionIndex
 from .ray_storage import RayStorage
 from .r_image import RImage
-from .base_class import BaseClass
 
 from . import misc  # calculations
 from .misc import PropertyChecker as pc  # check types and values

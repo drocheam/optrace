@@ -32,7 +32,7 @@ from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RIm
 from ..tracer.geometry.element import Element  # Element type
 from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
 
-from ..tracer import presets  # for server scope
+from ..tracer import presets  # for send_cmd scope
 from ..tracer import color  # for visible wavelength range
 from ..tracer import misc  # for partMask function
 

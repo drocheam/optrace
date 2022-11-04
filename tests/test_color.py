@@ -6,7 +6,6 @@ sys.path.append('.')
 import doctest
 import unittest
 import numpy as np
-import warnings
 import pytest
 import colorio
 

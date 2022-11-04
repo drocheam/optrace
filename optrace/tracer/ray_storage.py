@@ -2,7 +2,6 @@
 import numpy as np  # calculations
 
 from .geometry import RaySource  # create rays
-from .refraction_index import RefractionIndex  # media list
 from .base_class import BaseClass  # parent class
 from . import misc  # calculations
 

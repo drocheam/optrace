@@ -6,7 +6,6 @@ import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
 from .. import color  # color conversions
-from .. import misc  # faster calculations
 from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 

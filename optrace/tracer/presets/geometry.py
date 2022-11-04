@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from ..geometry import Aperture, Detector, Lens, SphericalSurface, CircularSurface, ConicSurface, RingSurface, Group
+from ..geometry import Aperture, Detector, Lens, SphericalSurface, ConicSurface, RingSurface, Group
 from ..refraction_index import RefractionIndex
 
 # Eye models

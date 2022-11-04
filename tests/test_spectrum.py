@@ -5,9 +5,6 @@ sys.path.append('.')
 
 import unittest
 import numpy as np
-import warnings
-import pytest
-
 from scipy.special import erf
 
 import optrace.tracer.misc as misc

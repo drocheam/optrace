@@ -3,15 +3,10 @@
 import sys
 sys.path.append('.')
 
-import urllib.request
 import pathlib
-       
 import os
 import requests
 import unittest
-import numpy as np
-import warnings
-import pytest
 
 import optrace as ot
 

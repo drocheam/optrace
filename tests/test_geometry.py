@@ -3,11 +3,9 @@
 import sys
 sys.path.append('.')
 
-import doctest
 import unittest
 import numpy as np
 import numexpr as ne
-import warnings
 import pytest
 
 import optrace.tracer.misc as misc

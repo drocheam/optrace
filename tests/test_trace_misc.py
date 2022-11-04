@@ -3,24 +3,24 @@
 import sys
 sys.path.append('.')
 
+import contextlib  # redirect stdout
+from pathlib import Path
 import os
 import time
 import doctest
 import unittest
+
 import numpy as np
-import warnings
 import pytest
 
-from pathlib import Path
 import optrace.tracer.misc as misc
 import optrace.tracer.color as color
 
 import optrace as ot
-from optrace.tracer.geometry.element import Element as SObject
 from optrace.tracer.base_class import BaseClass as BaseClass
 from optrace.tracer.ray_storage import RayStorage as RayStorage
 
-import contextlib  # redirect stdout
+
 
 
 class TracerMiscTests(unittest.TestCase):

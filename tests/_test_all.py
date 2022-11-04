@@ -8,6 +8,7 @@ from test_color import ColorTests
 from test_examples import ExampleTests
 from test_geometry import GeometryTests
 from test_gui import GUITests
+from test_load import LoadTests
 from test_plots import PlotTests
 from test_presets import PresetTests
 from test_spectrum import SpectrumTests
@@ -22,6 +23,7 @@ def suite():
     suite.addTest(unittest.makeSuite(ExampleTests))
     suite.addTest(unittest.makeSuite(GeometryTests))
     suite.addTest(unittest.makeSuite(GUITests))
+    suite.addTest(unittest.makeSuite(LoadTests))
     suite.addTest(unittest.makeSuite(PlotTests))
     suite.addTest(unittest.makeSuite(PresetTests))
     suite.addTest(unittest.makeSuite(SpectrumTests))

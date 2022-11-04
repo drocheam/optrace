@@ -3,11 +3,8 @@
 import sys
 sys.path.append('.')
 
-import doctest
 import unittest
 import numpy as np
-import warnings
-import pytest
 
 import optrace as ot
 from optrace.tracer.transfer_matrix_analysis import TMA as TMA

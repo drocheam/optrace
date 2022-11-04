@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import optrace as ot
 import optrace.tracer.color as color
 import scipy.optimize
 
