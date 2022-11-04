@@ -16,7 +16,7 @@ import scipy.optimize  # numerical optimization methods
 from progressbar import progressbar, ProgressBar  # fancy progressbars
 
 # needed for raytracing geometry and functionality
-from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface, Marker
+from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface, Marker, RectangularSurface, IdealLens
 from .geometry.element import Element
 from .geometry.group import Group
 
@@ -39,9 +39,6 @@ class Raytracer(Group):
     N_EPS: float = 1e-11
     """ numerical epsilon. Used for floating number comparisions in some places or adding small differences """
 
-    C_EPS: float = 1e-6
-    """ calculation epsilon. In some numerical methods this is the desired solution precision """
-    
     T_TH: float = 1e-4
     """ threshold for the transmission Filter
     values below this are handled as absorbed
@@ -61,7 +58,6 @@ class Raytracer(Group):
         ONLY_HIT_BACK = 4
         T_BELOW_TTH = 5
         SEQ_BROKEN = 6
-        HIT_TIMEOUT = 7
     """enum for info messages in raytracing"""
 
     autofocus_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
@@ -131,14 +127,19 @@ class Raytracer(Group):
 
     @property
     def extent(self):
+        """equals the outline of the raytracer"""
+        # overwrites Group.extent, which knows no outline
         return tuple(self.outline)
 
     @property
     def pos(self):
+        """center position of front xy-outline plane"""
+        # overwrites Group.pos, which knows no outline
         return np.mean(self.outline[:2]), np.mean(self.outline[2:4]), self.outline[4]
     
     def clear(self) -> None:
         """clear geometry and rays"""
+        # overwrites Group.clear, since we also clear the ray storage here
         super().clear()
         self.rays.__init__()
 
@@ -148,6 +149,7 @@ class Raytracer(Group):
         :param wl:
         :return:
         """
+        # overwrites Group.tma since n0 is known
         return super().tma(wl, self.n0)
 
     def property_snapshot(self) -> dict:
@@ -180,42 +182,6 @@ class Raytracer(Group):
         diff["Any"] = any(val for val in diff.values())
 
         return diff
-
-    @property
-    def media(self) -> list[RefractionIndex]:
-        """
-        List of refractive media in z-order between outline and all RT.surfaces.
-        This includes surfaces of lenses, apertures and filters as well as the outline xy planes.
-        """
-        media = [self.n0]
-        els = [*self.lenses, *self.apertures, *self.filters]
-        els = sorted(els, key=lambda el: el.front.pos[2])
-
-        for el in els:
-            if isinstance(el, Lens):
-                media += [el.n, el.n2 or self.n0]
-            else:
-                media.append(media[-1])
-
-        return media
-    
-    @property
-    def surfaces(self) -> list[Surface]:
-        """
-        List of all tracing surfaces (lenses, apertures, filters).
-        Sorted by center z-position.
-        """
-        surfaces = []
-        els = [*self.lenses, *self.apertures, *self.filters]
-        els = sorted(els, key=lambda el: el.front.pos[2])
-
-        for el in els:
-            if el.has_back():
-                surfaces += [el.front, el.back]
-            else:
-                surfaces.append(el.front)
-
-        return surfaces
 
     def _set_messages(self, msgs: list[np.ndarray]) -> None:
         """
@@ -268,9 +234,6 @@ class Raytracer(Group):
                                        f"{count} rays. This can be a result of surface collisions "
                                        "or incorrect sequentiality.")
 
-                        case self.INFOS.HIT_TIMEOUT:  # pragma: no branch
-                            self.print(f"Non-convergence timeout for {count} rays at surface {surf}.")
-
     def trace(self, N: int) -> None:
         """
         Execute raytracing, saves all rays in the internal RaySource object
@@ -293,15 +256,15 @@ class Raytracer(Group):
                     self.absorb_missing = True
                     break
 
-        elements = self._make_element_list()
+        elements = self.__make_tracing_element_list()
         self.__geometry_checks(elements)
         if self.geometry_error and not self._ignore_geometry_error:
             self.print("ABORTED TRACING")
             return
 
-        # reserve space for all surface points, +1 for invisible aperture at the outline z-end
+        # reserve space for all tracing surface intersections, +1 for invisible aperture at the outline z-end
         # and +1 for the ray starting points
-        nt = 2 * len(self.lenses) + len(self.filters) + len(self.apertures) + 1 + 1
+        nt = len(self.tracing_surfaces) + 2
 
         cores = ne.detect_number_of_cores()
         N_threads = cores if N/cores >= 10000 and self.threading else 1
@@ -315,19 +278,18 @@ class Raytracer(Group):
             if not self.silent else None
 
         # create rays from RaySources
-        self.rays.init(self.ray_sources, N, nt, self.media, self.absorb_missing, self.no_pol)
-
-        media = self.media
+        self.rays.init(self.ray_sources, N, nt, self.no_pol)
 
         def sub_trace(N_threads: int, N_t: int) -> None:
 
-            p, s, pols, weights, wavelengths = self.rays.make_thread_rays(N_threads, N_t)
+            p, s, pols, weights, wavelengths, ns = self.rays.make_thread_rays(N_threads, N_t)
             if not self.silent and N_t == 0:
                 bar.update(1)
 
             msg = msgs[N_t]
             i = 0  # surface counter
-            n1 = self.n0
+            n1 = self.n0  # ambient medium before all elements
+            ns[:, 0] = n1(wavelengths)  # assign refractive index
 
             for element in elements:
 
@@ -336,44 +298,60 @@ class Raytracer(Group):
 
                 if isinstance(element, Lens):
 
-                    n1_l = media[i](wavelengths)
-                    n_l = media[i+1](wavelengths)
-                    n2_l = media[i+2](wavelengths)
-
                     hw_front = hw.copy()
                     p[hw, i+1], hit_front = self.__find_surface_hit(element.front, p[hw, i], s[hw], i, msg)
                     hwh = misc.part_mask(hw, hit_front)  # rays having power and hitting lens front
-                    self.__refraction(element.front, p, s, weights, n1_l, n_l, pols, hwh, i, msg)
 
-                    # treat rays that go outside outline
-                    hwnh = misc.part_mask(hw, ~hit_front)  # rays having power and not hitting lens front
-                    self.__outline_intersection(p, s, weights, hwnh, i, msg)
+                    # index after lens
+                    n2 = element.n2 or self.n0
+                    n2_l = n2(wavelengths)
+                    
+                    if not element.is_ideal:
+                   
+                        n1_l = n1(wavelengths)
+                        n_l = element.n(wavelengths)
+                        
+                        self.__refraction(element.front, p, s, weights, n1_l, n_l, pols, hwh, i, msg)
 
-                    i += 1
-                    if not self.silent and N_t == 0:
-                        bar.update(i+1)
-                    p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
+                        # treat rays that go outside outline
+                        hwnh = misc.part_mask(hw, ~hit_front)  # rays having power and not hitting lens front
+                        self.__outline_intersection(p, s, weights, hwnh, i, msg)
 
-                    hw = weights[:, i] > 0
-                    p[hw, i+1], hit_back = self.__find_surface_hit(element.back, p[hw, i], s[hw], i, msg)
-                    hwb = misc.part_mask(hw, hit_back)  # rays having power and hitting lens back
-                    self.__refraction(element.back, p, s, weights, n_l, n2_l, pols, hwb, i, msg)
+                        i += 1
+                        if not self.silent and N_t == 0:
+                            bar.update(i+1)
+                        p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
+                        ns[:, i], ns[:, i+1] = n_l, n2_l
 
-                    # since we don't model the behaviour of the lens side cylinder, we need to absorb all rays passing
-                    # through the cylinder
-                    self.__absorb_cylinder_rays(p, weights, hw_front, hw, hit_front, hit_back, i, msg)
+                        hw = weights[:, i] > 0
+                        p[hw, i+1], hit_back = self.__find_surface_hit(element.back, p[hw, i], s[hw], i, msg)
+                        hwb = misc.part_mask(hw, hit_back)  # rays having power and hitting lens back
+                        self.__refraction(element.back, p, s, weights, n_l, n2_l, pols, hwb, i, msg)
+
+                        # since we don't model the behaviour of the lens side cylinder, we need to absorb all rays passing
+                        # through the cylinder
+                        self.__absorb_cylinder_rays(p, weights, hw_front, hw, hit_front, hit_back, i, msg)
+
+                    else:
+                        hit_back = hit_front
+                        self.__refraction_ideal_lens(element.front, element.D, p, s, pols, hwh, i, msg)
+                        ns[:, i+1] = n2_l
 
                     # absorb rays missing lens, overwrite p to last ray starting point (=end of lens front surface)
                     if self.absorb_missing and not np.all(hit_back):
                         miss_mask = misc.part_mask(hw, ~hit_back)
                         miss_count = np.count_nonzero(miss_mask)
                         weights[miss_mask, i+1] = 0
-                        p[miss_mask, i+1] = p[miss_mask, i]
+                        if not element.is_ideal:
+                            p[miss_mask, i+1] = p[miss_mask, i]
                         msg[self.INFOS.ABSORB_MISSING, i] += miss_count
 
-                    # treat rays that go outside outline
+                    # # treat rays that go outside outline
                     hwnb = misc.part_mask(hw, ~hit_back)  # rays having power and not hitting lens back
                     self.__outline_intersection(p, s, weights, hwnb, i, msg)
+
+                    # index after lens is index before lens in the next iteration
+                    n1 = n2
 
                 elif isinstance(element, Filter | Aperture):  # pragma: no branch
                     p[hw, i+1], hit = self.__find_surface_hit(element.surface, p[hw, i], s[hw], i, msg)
@@ -387,6 +365,8 @@ class Raytracer(Group):
                     # treat rays that go outside outline
                     hwnh = misc.part_mask(hw, ~hit)  # rays having power and not hitting filter
                     self.__outline_intersection(p, s, weights, hwnh, i, msg)
+
+                    ns[:, i+1] = ns[:, i]
 
                 i += 1
                 if not self.silent and N_t == 0:
@@ -403,32 +383,30 @@ class Raytracer(Group):
         # lock Storage
         self.rays.lock()
 
-        self._set_messages(msgs)
-
         # show info messages from tracing
         if not self.silent:
             bar.finish()
 
-        self._show_messages(N)  # also raises exceptions
+        self._set_messages(msgs)
+        self._show_messages(N)
 
-    def _make_element_list(self) -> list[Lens | Filter | Aperture]:
+    def __make_tracing_element_list(self) -> list[Lens | Filter | Aperture]:
         """
         Creates a sorted element list from filters and lenses.
 
         :return: list of sorted elements
         """
-
         # add a invisible (the filter is not in self.filters) to the outline area at +z
         # it absorbs all light at this surface
         o = self.outline
-        end_filter = Aperture(Surface("Rectangle", dim=[o[1] - o[0], o[3] - o[2]]),
+        end_filter = Aperture(RectangularSurface(dim=[o[1] - o[0], o[3] - o[2]]),
                               pos=[(o[1] + o[0])/2, (o[2] + o[3])/2, o[5]])
 
-        # add filters and lenses into one list,
-        elements = self.lenses + self.filters + self.apertures + [end_filter]
+        # add filters, apertures and lenses into one list,
+        elements = [el for el in self.elements if isinstance(el, Lens | Filter | Aperture)]
 
-        # sort list in z order
-        return sorted(elements, key=lambda el: el.front.pos[2])
+        # add end filter
+        return elements + [end_filter]
 
     def __geometry_checks(self, elements: list[Lens | Filter | Aperture]) -> None:
         """
@@ -480,8 +458,6 @@ class Raytracer(Group):
                     return
 
         self.geometry_error = False
-        # it's hard to check for surface collisions, for this we would need to find intersections of surfaces
-        # instead we output a runtime error if the ray hits the surfaces at the wrong order while raytracing
 
     def __absorb_cylinder_rays(self,
                                p:           np.ndarray,
@@ -588,6 +564,53 @@ class Raytracer(Group):
             coll_count = np.count_nonzero(hwi)
             msg[self.INFOS.OUTLINE_INTERSECTION, i] += coll_count
 
+    def __refraction_ideal_lens(self,
+                                surface:  Surface,
+                                D:        float,
+                                p:        np.ndarray,
+                                s:        np.ndarray,
+                                pols:     np.ndarray,
+                                hwh:      np.ndarray,
+                                i:        int,
+                                msg:      np.ndarray)\
+            -> None:
+        """
+        """
+        
+        # position relative to center
+        x = p[hwh, i+1, 0] - surface.pos[0]
+        y = p[hwh, i+1, 1] - surface.pos[1]
+
+        s0 = s.copy()
+        
+        # decomposition in x and y component of tan theta
+        # tan theta_x0 = sx / sz
+        # tan theta_y0 = sy / sz
+        s_z_inv = 1 / s[hwh, 2]
+        tan_x_0 = s[hwh, 0] * s_z_inv
+        tan_y_0 = s[hwh, 1] * s_z_inv
+
+        # tan components after refraction
+        # see https://www.sciencedirect.com/science/article/pii/S0030402615000364
+        tan_x_1 = tan_x_0 - x*D/1000
+        tan_y_1 = tan_y_0 - y*D/1000
+
+        # pythogras: (tan theta1)^2 = (tan theta_x1)^2 + (tan theta_y1)^2
+        # calculate theta_1, and phi1 = arctan2(theta_y1, theta_x1)
+        # these components can be used as spherical coordinates, which are calculated back into cartesian
+        # coordinates for the new vectors components of the direction s
+        # sx = sin(theta_1)*cos(phi1),   sy = sin(theta1)*sin(phi1),   sz= cos(theta1)
+        # actually, this can all can be simplified to the equations below
+        frac = ne.evaluate("1/sqrt(tan_x_1**2 + tan_y_1**2 + 1)")
+        s[hwh, 0] = tan_x_1 * frac
+        s[hwh, 1] = tan_y_1 * frac
+        s[hwh, 2] = frac
+
+        # calculate polarization
+        n = np.tile([0., 0., 1.], (x.shape[0], 1))
+        ns = s0[hwh, 2]
+        self.__rotate_polarization(ns, s0, s[hwh], n, pols, i, hwh)
+
     def __refraction(self,
                      surface:      Surface,
                      p:            np.ndarray,
@@ -636,44 +659,13 @@ class Raytracer(Group):
         N_m, ns_m, W_m = N[:, np.newaxis], ns[:, np.newaxis], W[:, np.newaxis]
         s_ = ne.evaluate("s_h*N_m - n*(N_m*ns_m - W_m)")
 
+        # rotate polarization vectors and calculate amplitude components in s and p plane
+        A_ts, A_tp = self.__rotate_polarization(ns, s, s_, n, pols, i, hwh)
+
         # reflection coefficients for non-magnetic (µ_r=1) and non-absorbing materials (κ=0)
         # according to the Fresnel equations
         # see https://de.wikipedia.org/wiki/Fresnelsche_Formeln#Spezialfall:_gleiche_magnetische_Permeabilit.C3.A4t
         #####
-
-        if not self.no_pol:
-            # calculate s polarization vector
-            # ns==1 means surface normal is parallel to ray direction, exclude these rays for now
-            mask = np.abs(ns) < 1-1e-9
-            mask2 = misc.part_mask(hwh, mask)
-            sm = s[mask2]
-
-            # reduce slicing by storing separately
-            polsm = pols[mask2, i]
-            s_m = s_[mask]
-
-            # s polarization vector
-            ps = misc.cross(sm, n[mask])
-            ps = misc.normalize(ps)
-            pp = misc.cross(ps, sm)
-
-            # init arrays
-            # default for A_ts, A_tp are 1/sqrt(2)
-            A_ts = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
-            A_tp = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
-
-            # A_ts is component of pol in ps
-            A_ts[mask] = misc.rdot(ps, polsm)
-            A_tp[mask] = misc.rdot(pp, polsm)
-
-            # new polarization vector after refraction
-            pp_ = misc.cross(ps, s_m)  # ps and s_m are unity vectors and perpendicular, so we need no normalization
-            A_tsm, A_tpm = A_ts[mask, np.newaxis], A_tp[mask, np.newaxis]
-            pols[mask2, i+1] = ne.evaluate("ps*A_tsm + pp_*A_tpm")
-
-        else:
-            A_ts, A_tp = 1/np.sqrt(2), 1/np.sqrt(2)
-
         cos_alpha, cos_beta = ns, W
         ts = ne.evaluate("2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)")
         tp = ne.evaluate("2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)")
@@ -688,6 +680,55 @@ class Raytracer(Group):
 
         weights[hwh, i+1] = weights[hwh, i]*T
         s[hwh] = s_
+
+    def __rotate_polarization(self, 
+                              ns:       np.ndarray, 
+                              s:        np.ndarray, 
+                              s_:       np.ndarray, 
+                              n:        np.ndarray, 
+                              pols:     np.ndarray, 
+                              i:        int, 
+                              hwh:      np.ndarray)\
+            -> tuple[np.ndarray, np.ndarray]:
+        """
+        rotate polarization vectors and calculate amplitude components in s and p plane
+        """
+           
+        # no polarization -> don't set anything and return equal amplitude components
+        if self.no_pol:
+            return 1/np.sqrt(2), 1/np.sqrt(2)
+
+        # calculate s polarization vector
+        # ns==1 means surface normal is parallel to ray direction, exclude these rays for now
+        mask = np.abs(ns) < 1-1e-9
+        mask2 = misc.part_mask(hwh, mask)
+        sm = s[mask2]
+
+        # reduce slicing by storing separately
+        polsm = pols[mask2, i]
+        s_m = s_[mask]
+
+        # s polarization vector
+        ps = misc.cross(sm, n[mask])
+        ps = misc.normalize(ps)
+        pp = misc.cross(ps, sm)
+
+        # init arrays
+        # default for A_ts, A_tp are 1/sqrt(2)
+        A_ts = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
+        A_tp = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
+
+        # A_ts is component of pol in ps
+        A_ts[mask] = misc.rdot(ps, polsm)
+        A_tp[mask] = misc.rdot(pp, polsm)
+
+        # new polarization vector after refraction
+        pp_ = misc.cross(ps, s_m)  # ps and s_m are unity vectors and perpendicular, so we need no normalization
+        A_tsm, A_tpm = A_ts[mask, np.newaxis], A_tp[mask, np.newaxis]
+        pols[mask2, i+1] = ne.evaluate("ps*A_tsm + pp_*A_tpm")
+
+        # return amplitude components
+        return A_ts, A_tp
 
     def __filter(self,
                  filter_:     Filter,
@@ -738,181 +779,13 @@ class Raytracer(Group):
         :return: positions of hit (shape as p), bool numpy 1D array if ray hits lens
         """
 
-        # use surface's own hit finding for analytical surfaces
-        if surface.has_hit_finding():
-            p_hit, is_hit = surface.find_hit(p, s)
-
-        else:
-            # get search bounds
-            t1, t2, f1, f2, p1, p2 = self.__find_hit_bounds(p, s, surface)
-
-            # contraction factor (m = 0.5 : Illinois Algorithm)
-            m = 0.5
-
-            # assign non-finite and rays converged in first iteration
-            w = np.ones(t1.shape, dtype=bool)  # bool array for hit search
-            w[~np.isfinite(t1) | ~np.isfinite(t2)] = False  # exclude non-finite t1, t2
-            w[(t2 - t1) < self.C_EPS] = False  # exclude rays that already converged
-            c = ~w  # bool array for which ray has converged
-
-            # arrays for estimated hit points
-            p_hit = np.zeros_like(s, dtype=np.float64, order='F')
-            p_hit[c] = p1[c]  # assign already converged rays
-
-            it = 1  # number of iteration
-            # do until all rays have converged
-            while np.any(w):
-
-                # secant root
-                t1w, t2w, f1w, f2w = t1[w], t2[w], f1[w], f2[w]
-                ts = ne.evaluate("t1w - f1w/(f2w-f1w)*(t2w-t1w)")
-
-                # position of root on rays
-                pl = p[w] + s[w]*ts[:, np.newaxis]
-
-                # difference between ray and surface at root
-                fts = pl[:, 2] - surface.get_values(pl[:, 0], pl[:, 1])
-
-                # sign of fts*f2 decides which case is handled for each ray
-                prod = fts*f2[w]
-
-                # case 1: fts, f2 different sign => change [t1, t2] interval to [t2, ts]
-                mask = prod < 0
-                wm = misc.part_mask(w, mask)
-                t1[wm], t2[wm], f1[wm], f2[wm] = t2[wm], ts[mask], f2[wm], fts[mask]
-
-                # case 2: fts, f2 same sign => change [t1, t2] interval to [t1, ts]
-                mask = prod > 0
-                wm = misc.part_mask(w, mask)
-                t2[wm], f1[wm], f2[wm] = ts[mask], m*f1[wm], fts[mask]
-
-                # case 3: fts or f2 is zero => ts and fts are the found solution
-                mask = prod == 0
-                wm = misc.part_mask(w, mask)
-                t1[wm], t2[wm], f1[wm], f2[wm] = ts[mask], ts[mask], fts[mask], fts[mask]
-
-                # masks for rays converged in this iteration
-                cn = t2[w]-t1[w] < self.C_EPS/10
-                wcn = misc.part_mask(w, cn)
-
-                # assign found hits and update bool arrays
-                p_hit[wcn] = pl[cn]
-                c[wcn] = True
-                w[wcn] = False
-
-                # timeout
-                if it == 40:  # how to check a timeout? # pragma: no cover
-                    msg[self.INFOS.HIT_TIMEOUT, i] += f1[w].shape[0]
-                    break
-                it += 1
-
-            is_hit = surface.get_mask(p_hit[:, 0], p_hit[:, 1])
+        p_hit, is_hit = surface.find_hit(p, s)
 
         # rays breaking sequentiality
         if np.any(p_hit[:, 2] < p[:, 2]):
             msg[self.INFOS.SEQ_BROKEN, i] += np.count_nonzero(p_hit[:, 2] < p[:, 2])
 
         return p_hit, is_hit
-
-    def __find_hit_bounds(self, p, s, surface):
-        """
-
-        :param p:
-        :param s:
-        :param surface:
-        :return:
-        """
-
-        # ray parameters for just above and below the surface
-        t1 = (surface.z_min - self.C_EPS / 10 - p[:, 2]) / s[:, 2]
-        t2 = (surface.z_max + self.C_EPS / 10 - p[:, 2]) / s[:, 2]
-
-        # set to -eps since we can't move in -z anyway (t1 <0)
-        t1[t1 < 0] = -self.C_EPS
-
-        # check if surface is defined for t1 and t2
-        p1 = p + s*t1[:, np.newaxis]
-        p2 = p + s*t2[:, np.newaxis]
-        mt1 = surface.get_mask(p1[:, 0], p1[:, 1])
-        mt2 = surface.get_mask(p2[:, 0], p2[:, 1])
-
-        # cost function values
-        f1 = np.full_like(t1, np.nan)
-        f2 = np.full_like(t1, np.nan)
-        
-        fb = ~(mt1 & mt2) & ~((s[:, 0] == 0) & (s[:, 1] == 0))  # need-to-fix-bounds bool array
-        # but can't do this when there is only propagation in z direction
-
-        if np.any(fb):
-
-            # equations taken from
-            # https://www.scratchapixel.com/lessons/3d-basic-rendering/
-            # minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
-
-            # the next part only works for a = D**2 != 0
-            # which is s[:, 0] == 0 and s[:, 1] == 0
-            # but we excluded this case above
-
-            R = surface.r - surface.N_EPS  # subtract eps so we are guaranteed on the surface
-            C = surface.pos[:2]
-            O = p[fb, :2]
-            D = s[fb, :2]
-            OMC = O-C
-            a = misc.rdot(D, D)
-            b = 2*misc.rdot(D, OMC)
-            c = misc.rdot(OMC, OMC) - R**2
-
-            D2 = ne.evaluate("sqrt(b**2 - 4*a*c)")
-            t1n = ne.evaluate("(-b - D2)/(2*a)")
-            t2n = ne.evaluate("(-b + D2)/(2*a)")
-
-            # coordinates for hit of x-y circle projection
-            p1n = p[fb] + s[fb]*t1n[:, np.newaxis]
-            p2n = p[fb] + s[fb]*t2n[:, np.newaxis]
-
-            # cost function = difference between ray z-postion and surface height at the same x, y
-            diff1 = p1n[:, 2] - surface.get_values(p1n[:, 0], p1n[:, 1])
-            diff2 = p2n[:, 2] - surface.get_values(p2n[:, 0], p2n[:, 1])
-
-            # assign rays with better t1
-            t1n_for_t1 = (diff1 < 0) & ((diff2 >= 0)) | ((diff2 < 0) & (diff1 > diff2))
-            t1c = np.where(t1n_for_t1, t1n, t2n)
-            p1c = np.where(t1n_for_t1[:, np.newaxis], p1n, p2n)
-            diff1c = np.where(t1n_for_t1, diff1, diff2)
-            make_t1 = (t1c > 0) & (t1c > t1[fb]) & (p1c[:, 2] < surface.z_max) & (p1c[:, 2] > surface.z_min)\
-                      & np.isfinite(t1c) & (diff1c < 0)
-            fbmt1 = misc.part_mask(fb, make_t1)
-            t1[fbmt1] = t1c[make_t1]
-            p1[fbmt1] = p1c[make_t1]
-            f1[fbmt1] = diff1c[make_t1]
-        
-            # assign rays with better t2
-            t2n_for_t2 = (diff2 > 0) & ((diff1 <= 0) | ((diff1 > 0) & (diff2 < diff1)))
-            t2c = np.where(t2n_for_t2, t2n, t1n)
-            p2c = np.where(t2n_for_t2[:, np.newaxis], p2n, p1n)
-            diff2c = np.where(t2n_for_t2, diff2, diff1)
-            make_t2 = (t2c > 0) & (t2c < t2[fb]) & (p2c[:, 2] < surface.z_max) & (p2c[:, 2] > surface.z_min)\
-                       & np.isfinite(t2c) & (diff2c > 0)
-            fbmt2 = misc.part_mask(fb, make_t2)
-            t2[fbmt2] = t2c[make_t2]
-            p2[fbmt2] = p2c[make_t2]
-            f2[fbmt2] = diff2c[make_t2]
-
-            assert ~np.any((t2c == t1c) & make_t1 & make_t2)
-
-        # assign missing f1
-        f1ci = np.isnan(f1)
-        f1[f1ci] = p1[f1ci, 2] - surface.get_values(p1[f1ci, 0], p1[f1ci, 1])
-
-        # assign missing f2
-        f2ci = np.isnan(f2)
-        f2[f2ci] = p2[f2ci, 2] - surface.get_values(p2[f2ci, 0], p2[f2ci, 1])
-       
-        # update mask arrays, since rays with fb changed their p1, p2
-        mt1[fb] = surface.get_mask(p1[fb, 0], p1[fb, 1])
-        mt2[fb] = surface.get_mask(p2[fb, 0], p2[fb, 1])
-
-        return t1, t2, f1, f2, p1, p2
 
     def _hit_detector(self,
                       info:              str,
@@ -946,7 +819,7 @@ class Raytracer(Group):
             if not self.silent else None
 
         # range for selected rays in RayStorage
-        Ns, Ne = self.rays.b_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
+        Ns, Ne = self.rays.B_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
 
         def threaded(Ns, Ne, list_, list_i, bar):
 
@@ -975,7 +848,7 @@ class Raytracer(Group):
             if bar is not None and not list_i:
                 bar.update(1)
 
-            p, s, _, w, wl, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 1, 0], normalize=True)
+            p, s, _, w, wl, _, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 1, 0, 0], normalize=True)
 
             if bar is not None and not list_i:
                 bar.update(2)
@@ -1011,7 +884,7 @@ class Raytracer(Group):
 
                 if np.any(rs):
                     rs2 = rs2[rs3]
-                    p, s, _, w[rs3], _, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 0, 0])
+                    p, s, _, w[rs3], _, _, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 0, 0, 0])
 
             list_[list_i] = [ph, w, wl, ish]
 
@@ -1049,7 +922,7 @@ class Raytracer(Group):
         if bar is not None:
             bar.update(3)
 
-        if self.detectors[detector_index].surface.no_z_extent():
+        if self.detectors[detector_index].surface.is_flat():
             projection = None
 
         else:
@@ -1085,6 +958,7 @@ class Raytracer(Group):
                        detector_index:    int = 0,
                        source_index:      int = None,
                        extent:            list | np.ndarray = None,
+                       limit:             float = None,
                        projection_method: str = "Equidistant",
                        **kwargs) -> RImage:
         """
@@ -1106,7 +980,7 @@ class Raytracer(Group):
 
         # init image and extent, these are the default values when no rays hit the detector
         img = RImage(desc=desc, extent=extent_out, projection=projection,
-                     threading=self.threading, silent=self.silent)
+                     threading=self.threading, silent=self.silent, limit=limit)
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
@@ -1341,7 +1215,7 @@ class Raytracer(Group):
 
         return spec
 
-    def source_image(self, N: int, source_index: int = 0, **kwargs) -> RImage:
+    def source_image(self, N: int, source_index: int = 0, limit: float=None, **kwargs) -> RImage:
         """
         Rendered Image of RaySource. rays were already traced.
 
@@ -1355,7 +1229,7 @@ class Raytracer(Group):
 
         p, w, wl, extent, desc, bar = self._hit_source("Source Image", source_index)
 
-        img = RImage(desc=desc, extent=extent, projection=None,
+        img = RImage(desc=desc, extent=extent, projection=None, limit=limit,
                     threading=self.threading, silent=self.silent)
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:
@@ -1481,9 +1355,9 @@ class Raytracer(Group):
         if source_index is not None and source_index < 0:
             raise ValueError(f"source_index needs to be >= 0, but is {source_index}")
 
-        if (source_index is not None and source_index > len(self.rays.n_list)) or len(self.rays.n_list) == 0:
+        if (source_index is not None and source_index > len(self.rays.N_list)) or len(self.rays.N_list) == 0:
             raise ValueError(f"source_index={source_index} larger than number of simulated sources "
-                             f"({len(self.rays.n_list)}. "
+                             f"({len(self.rays.N_list)}. "
                              "Either the source was not added or the new geometry was not traced.")
 
         # get search bounds
@@ -1501,7 +1375,7 @@ class Raytracer(Group):
         for i, lens in enumerate(lenses):
             if z_start < lens.pos[2]:
                 b1 = lens.extent[4]
-                n_ambient_ = (lenses[i-1].n2 if i > 0 and lenses[i-1].n2 is not None else self.n0)
+                n_ambient_ = lenses[i-1].n2 if i > 0 and lenses[i-1].n2 is not None else self.n0
                 n_ambient = n_ambient_(550)
                 break
             b0 = lens.extent[5]
@@ -1528,7 +1402,7 @@ class Raytracer(Group):
         # get rays and properties
         ################################################################################################################
         # select source
-        Ns, Ne = self.rays.b_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
+        Ns, Ne = self.rays.B_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
 
         # make bool array
         rays_pos = np.zeros(self.rays.N, dtype=bool)
@@ -1565,7 +1439,7 @@ class Raytracer(Group):
         pos = pos[rp2]
 
         # get Ray parts
-        p, s, _, weights, _, _ = self.rays.rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0])
+        p, s, _, weights, _, _, _ = self.rays.rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0, 0])
 
         if not self.silent:
             bar.update(2)
@@ -1588,10 +1462,10 @@ class Raytracer(Group):
             s_z = np.nanquantile(s[:, 2], 0.95)
             sin_alpha = np.sin(np.arccos(s_z))  # neglect outliers
 
-            # size of airy disc, default to 1µm when sin_alpha = 0
-            r0 = 0.61 * 550e-6 / (sin_alpha * n_ambient) if sin_alpha != 0 else 1e-3
+            # lambda / Fnum, default to 3µm when sin_alpha = 0
+            r0 = 550e-6 / (sin_alpha * n_ambient) if sin_alpha != 0 else 3e-3
         else:
-            r0 = 1e-3
+            r0 = 3e-3
 
         if method != "Position Variance" or return_cost:
             # sample smaller region around minimum with proper method
@@ -1638,7 +1512,7 @@ class Raytracer(Group):
         rrr = (bounds[1] - res.x) < 10*(bounds[1] - bounds[0]) / Nt
         if rrl or rrr:
             self.print("WARNING: Found minimum near search bounds, "
-                       "this could mean the focus is outside the search range")
+                       "this can mean the focus is outside of the search range.")
 
         pos = self.__autofocus_cost_func(res.x, method, pa, sb, weights, r0, ret_pos=True)[1]
         return res, dict(pos=pos, bounds=bounds, z=r, cost=vals, N=N_use)

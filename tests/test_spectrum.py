@@ -269,7 +269,7 @@ class SpectrumTests(unittest.TestCase):
         mean = np.sum(lines*vals)/np.sum(vals)
         self.assertAlmostEqual(np.mean(wl), mean, delta=0.005)
         # ^-- mean wavelength is correct
-        std_val = np.sqrt(np.sum((lines - mean)**2 * vals/np.sum(vals))) # standard deviation
+        std_val = np.sqrt(np.sum((lines - mean)**2 * vals/np.sum(vals)))  # standard deviation
         self.assertAlmostEqual(np.std(wl), std_val, delta=0.005)
         # ^-- standard deviation for a discrete variable
 
@@ -351,6 +351,7 @@ class SpectrumTests(unittest.TestCase):
         wl = spec.random_wavelengths(100000)
         self.assertAlmostEqual(mean(mu, sig, wlm0, wlm1), np.mean(wl), delta=0.005)
         self.assertAlmostEqual(std(mu, sig, wlm0, wlm1), np.std(wl), delta=0.005)
+        self.assertTrue(np.all(spec(wl[(wl < wlm0) | (wl > wlm1)]) == 0))  # values outside data range must be 0
 
     def test_light_spectrum_render(self):
         # check render

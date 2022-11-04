@@ -20,6 +20,10 @@ tracer.geometry.group
 _________________________________
 .. automodule:: optrace.tracer.geometry.group
 
+tracer.geometry.ideal_lens
+_________________________________
+.. automodule:: optrace.tracer.geometry.ideal_lens
+
 tracer.geometry.lens
 _________________________________
 .. automodule:: optrace.tracer.geometry.lens
@@ -35,12 +39,4 @@ _________________________________
 tracer.geometry.marker
 _________________________________
 .. automodule:: optrace.tracer.geometry.marker
-
-tracer.geometry.surface
-_________________________________
-.. automodule:: optrace.tracer.geometry.surface
-
-tracer.geometry.surface_function
-_________________________________
-.. automodule:: optrace.tracer.geometry.surface_function
 

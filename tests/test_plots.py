@@ -34,7 +34,7 @@ class PlotTests(unittest.TestCase):
     def test_r_image_plots(self) -> None:
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
-        RSS = ot.Surface("Rectangle", dim=[6, 6])
+        RSS = ot.RectangularSurface(dim=[6, 6])
         RS = ot.RaySource(RSS, pos=[0, 0, 0], image=ot.presets.image.color_checker)
         RT.add(RS)
 
@@ -66,8 +66,8 @@ class PlotTests(unittest.TestCase):
         check_plots(img)
 
         # polar plots with different projections
-        for proj in ot.Surface.sphere_projection_methods:
-            RT.add(ot.Detector(ot.Surface("Sphere", R=-10), pos=[0, 0, 3]))
+        for proj in ot.SphericalSurface.sphere_projection_methods:
+            RT.add(ot.Detector(ot.SphericalSurface(r=3, R=-10), pos=[0, 0, 3]))
             img = RT.detector_image(200, projection_method=proj)
             check_plots(img)
 
@@ -104,7 +104,7 @@ class PlotTests(unittest.TestCase):
     def test_chromacity_plots(self) -> None:
 
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
-        RSS = ot.Surface("Rectangle", dim=[6, 6])
+        RSS = ot.RectangularSurface(dim=[6, 6])
         RS = ot.RaySource(RSS, pos=[0, 0, 0], image=ot.presets.image.color_checker)
         RT.add(RS)
         RT.trace(200000)
@@ -223,7 +223,7 @@ class PlotTests(unittest.TestCase):
     def test_surface_profile_plot(self) -> None:
 
         SPP = otp.surface_profile_plot
-        L = ot.presets.geometry.arizona_eye()[0]
+        L = ot.presets.geometry.arizona_eye().elements[0]
         L.back.desc = "Test Legend"  # so plots shows desc as legend entry for this surface
 
         # check different paramter combinations

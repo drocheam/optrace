@@ -375,7 +375,8 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     RGBL = srgb_to_srgb_linear(rgb)
 
     if tools._WL_MIN0 < tools.WL_BOUNDS[0] or tools._WL_MAX0 > tools.WL_BOUNDS[1]:
-        raise RuntimeError(f"Wavelength range {tools.WL_BOUNDS} does not include range [{tools._WL_MIN0}, {tools._WL_MAX0}] needed for this feature.")
+        raise RuntimeError(f"Wavelength range {tools.WL_BOUNDS} does not include range "
+                           f"[{tools._WL_MIN0}, {tools._WL_MAX0}] needed for this feature.")
 
     wl = np.linspace(tools._WL_MIN0, tools._WL_MAX0, 10000)
 
@@ -421,8 +422,8 @@ def power_from_srgb(rgb: np.ndarray) -> np.ndarray:
 ########################################################################################################################
 
 def spectral_colormap(N:    int,
-                      wl0:  float = tools.WL_BOUNDS[0],
-                      wl1:  float = tools.WL_BOUNDS[1]) \
+                      wl0:  float = None,
+                      wl1:  float = None) \
         -> np.ndarray:
     """
     Get a spectral colormap with N steps in srgb
@@ -433,11 +434,13 @@ def spectral_colormap(N:    int,
     :return: sRGBA array (numpy 2D array, shape (N, 4))
 
     >>> spectral_colormap(3, 400, 600)
-    array([[5.13881984e+01, 1.52072554e+01, 9.39147181e+01, 2.55000000e+02],
-           [1.14346816e-04, 2.53016637e+02, 2.13677273e+02, 2.55000000e+02],
-           [2.46742969e+02, 1.10366813e+02, 8.12703774e+01, 2.55000000e+02]])
+    array([[3.81626223e+01, 9.30946402e+00, 7.20900561e+01, 2.55000000e+02],
+           [1.14017400e-04, 2.52697905e+02, 2.13400035e+02, 2.55000000e+02],
+           [2.41139375e+02, 1.07694238e+02, 7.92225931e+01, 2.55000000e+02]])
     """
     # wavelengths to XYZ color
+    wl0 = wl0 if wl0 is not None else tools.WL_BOUNDS[0]
+    wl1 = wl1 if wl1 is not None else tools.WL_BOUNDS[1]
     wl = np.linspace(wl0, wl1, N, dtype=np.float32)  # wavelength vector
     XYZ = np.column_stack((x_tristimulus(wl), y_tristimulus(wl), z_tristimulus(wl)))
 
@@ -460,7 +463,7 @@ def spectral_colormap(N:    int,
 
     # some smoothed rectangle function for brightness fall-off for low and large wavelengths
     # this is for visualization only, there is no physical or perceptual truth behind this
-    RGB *= (1 / 4 * (1 - np.tanh((wl - 650) / 40))*(1 + np.tanh((wl - 440) / 30)))[:, np.newaxis]
+    RGB *= (1 / 4 * (1 - np.tanh((wl - 650) / 50))*(1 + np.tanh((wl - 440) / 30)))[:, np.newaxis]
 
     # convert to sRGB
     RGB = srgb_linear_to_srgb(RGB[:, :3])

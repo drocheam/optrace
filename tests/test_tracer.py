@@ -12,6 +12,7 @@ from optrace.tracer import misc
 
 from test_gui import rt_example
 
+# def test polarization calculation of ideal lens
 
 
 class TracerTests(unittest.TestCase):
@@ -44,11 +45,11 @@ class TracerTests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 30])
 
         RS = ot.RaySource(ot.Point(), pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.led_b1)
-        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
-        DET = ot.Detector(ot.Surface("Circle"), pos=[0, 0, 10])
-        AP = ot.Aperture(ot.Surface("Ring"), pos=[0, 0, 10])
+        F = ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
+        DET = ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 10])
+        AP = ot.Aperture(ot.RingSurface(r=3, ri=0.2), pos=[0, 0, 10])
         M = ot.Marker("Test", pos=[0, 0, 10])
-        L = ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"),
+        L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3),
                        n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10])
 
         # test actions for different element types
@@ -68,6 +69,7 @@ class TracerTests(unittest.TestCase):
             self.assertTrue(cmp[ckey])
             if ckey == "Lenses":
                 self.assertTrue(cmp["Ambient"])
+            RT.remove(el2)
 
         # test Rays change detection
         snap = RT.property_snapshot()
@@ -125,10 +127,10 @@ class TracerTests(unittest.TestCase):
     def test_geometry_checks(self):
         """test geometry checks before tracing"""
         
-        RS = ot.RaySource(ot.Surface("Circle"), pos=[0, 0, 20], spectrum=ot.presets.light_spectrum.led_b1)
-        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
-        AP = ot.Aperture(ot.Surface("Ring"), pos=[0, 0, 10])
-        L = ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"),
+        RS = ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 20], spectrum=ot.presets.light_spectrum.led_b1)
+        F = ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
+        AP = ot.Aperture(ot.RingSurface(r=3, ri=0.5), pos=[0, 0, 10])
+        L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3),
                        n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10])
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 30], silent=True)
@@ -177,7 +179,7 @@ class TracerTests(unittest.TestCase):
         RS = ot.RaySource(ot.Point(), pos=[0, 0, -10])
         RT.add(RS)
 
-        RT.add(ot.Lens(ot.Surface("Sphere", r=3, R=-3.2), ot.Surface("Circle"), n=ot.presets.refraction_index.SF10, pos=[0, 0, 0], d=0.2))
+        RT.add(ot.Lens(ot.SphericalSurface(r=3, R=-3.2), ot.CircularSurface(r=3), n=ot.presets.refraction_index.SF10, pos=[0, 0, 0], d=0.2))
 
         RT.trace(10000)  # works
         self.assertFalse(RT.geometry_error)
@@ -199,12 +201,12 @@ class TracerTests(unittest.TestCase):
     def test_focus(self):
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 40], silent=True, n0=ot.RefractionIndex("Constant", n=1.1))
-        RSS = ot.Surface("Circle", r=0.5)
+        RSS = ot.CircularSurface(r=0.5)
         RS = ot.RaySource(RSS, pos=[0, 0, -3])
         RT.add(RS)
 
-        front = ot.Surface("Sphere", r=3, R=30)
-        back = ot.Surface("Conic", r=3, R=-20, k=1)
+        front = ot.SphericalSurface(r=3, R=30)
+        back = ot.ConicSurface(r=3, R=-20, k=1)
         n = ot.RefractionIndex("Constant", n=1.5)
         L = ot.Lens(front, back, n, de=0.1, pos=[0, 0, 0])
         RT.add(L)
@@ -270,7 +272,7 @@ class TracerTests(unittest.TestCase):
         RT.autofocus("Irradiance Variance", z_start=RT.outline[5])  
 
         # aperture blocks all light
-        RT.add(ot.Aperture(ot.Surface("Circle", r=3), pos=[0, 0, 0]))
+        RT.add(ot.Aperture(ot.CircularSurface(r=3), pos=[0, 0, 0]))
         RT.autofocus("Position Variance", z_start=10) # no rays here
 
     @pytest.mark.slow
@@ -284,14 +286,14 @@ class TracerTests(unittest.TestCase):
         """
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -100, 100], silent=True)
-        RS = ot.RaySource(ot.Surface("Circle", r=0.5), pos=[0, 0, 0], divergence="None")
+        RS = ot.RaySource(ot.CircularSurface(r=0.5), pos=[0, 0, 0], divergence="None")
         RT.add(RS)
 
-        aps = ot.Surface("Ring", r=2, ri=1)
+        aps = ot.RingSurface(r=2, ri=1)
         ap = ot.Aperture(aps, pos=[0, 0, 3])
         RT.add(ap)
 
-        dets = ot.Surface("Sphere", r=5, R=-6)
+        dets = ot.SphericalSurface(r=5, R=-6)
         det = ot.Detector(dets, pos=[0, 0, -10])
         RT.add(det)
 
@@ -319,14 +321,14 @@ class TracerTests(unittest.TestCase):
 
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 10], silent=True, n0=ot.RefractionIndex("Constant", n=1))
 
-        for surf in [ot.Surface("Circle", r=2), 
-                    ot.Surface("Rectangle", dim=[1, 1]), 
-                    ot.Surface("Rectangle", dim=[1, 0.75]), 
+        for surf in [ot.CircularSurface(r=2), 
+                    ot.RectangularSurface(dim=[1, 1]), 
+                    ot.RectangularSurface(dim=[1, 0.75]), 
                     ot.Line(), 
                     ot.Line(angle=30), 
                     ot.Line(angle=90), 
-                    ot.Surface("Ring", ri=1.5, r=2),
-                    ot.Surface("Ring", ri=0.25, r=2)]:
+                    ot.RingSurface(ri=1.5, r=2),
+                    ot.RingSurface(ri=0.25, r=2)]:
 
             RS = ot.RaySource(surf, pos=[0, 0, 0])
             RT.add(RS)
@@ -337,12 +339,12 @@ class TracerTests(unittest.TestCase):
             L /= np.max(L)
 
             if isinstance(surf, ot.Surface):
-                if surf.surface_type != "Rectangle":
+                if not isinstance(surf, ot.RectangularSurface):
                     Lx, Ly = L.shape[:2]
                     X, Y = np.mgrid[-Lx/2:Lx/2:Lx*1j, -Ly/2:Ly/2:Ly*1j]
                     m = X**2 + Y**2 < (Lx/2-1)**2
 
-                    if surf.surface_type == "Ring":
+                    if isinstance(surf, ot.RingSurface):
                         m2 = X**2 + Y**2 > (Lx/2 * surf.ri/surf.r+1)**2
                         m = m & m2
 
@@ -367,13 +369,13 @@ class TracerTests(unittest.TestCase):
         # make raytracer
         RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True)
 
-        RSS0 = ot.Surface("Rectangle", dim=[0.02, 0.02])
+        RSS0 = ot.RectangularSurface(dim=[0.02, 0.02])
         RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=True,
                 pos=[0, 0, 0], s=[0, 0, 1], div_angle=82)
         RT.add(RS0)
             
         # add Detector
-        DETS = ot.Surface("Rectangle", dim=[100, 100])
+        DETS = ot.RectangularSurface(dim=[100, 100])
         DET = ot.Detector(DETS, pos=[0, 0, 10])
         RT.add(DET)
 
@@ -480,7 +482,7 @@ class TracerTests(unittest.TestCase):
 
         # add Detector
         R = 90
-        DETS = ot.Surface("Sphere", r=(1-1e-10)*R, R=-R)
+        DETS = ot.SphericalSurface(r=(1-1e-10)*R, R=-R)
         DET = ot.Detector(DETS, pos=[0, 0, R])
         RT.add(DET)
 
@@ -504,12 +506,11 @@ class TracerTests(unittest.TestCase):
 
         # Equidistant projection method
         # equally radially spaced points on sphere should also be equally spaced in projection
-        RSS0 = ot.Surface("Rectangle", dim=[0.0001, 0.0001])
+        RSS0 = ot.RectangularSurface(dim=[0.0001, 0.0001])
         # add point sources with parallel rays
         for theta in [-89.99, -60, -30, 0.001, 30, 60, 89.99]:  # slightly decentered central value so we only hit one pixel
-            theta_r = np.radians(theta)
             RS0 = ot.RaySource(RSS0, divergence="None", div_2d=False,
-                    pos=[0, 0, 0], s=[np.sin(theta_r), 0, np.cos(theta_r)])
+                    pos=[0, 0, 0], ss=[theta, 0])
             RT.add(RS0)
 
         # check that hits are equally spaced in projection
@@ -533,15 +534,11 @@ class TracerTests(unittest.TestCase):
         # in the different projections circles near the sphere edge are distorted
         # here we check the side ratio of the generated detector image for each circle
         RSS0 = ot.Point()
-        for phi in np.linspace(0, 2*np.pi, 9):
+        for phi in np.linspace(0, 360, 9):
             for theta in np.linspace(0, 1, 5)*87:
                 # circular are on sphere at defined position
-                tr = np.radians(theta)
-                sx = np.sin(phi)*np.sin(tr)
-                sy = np.cos(phi)*np.sin(tr)
-                sz = np.cos(tr)
                 RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=False,
-                        pos=[0, 0, 0], s=[sx, sy, sz], div_angle=2)
+                        pos=[0, 0, 0], ss=[theta, phi], div_angle=2)
                 RT.add(RS0)
 
                 # make detector image and get extent
@@ -589,8 +586,8 @@ class TracerTests(unittest.TestCase):
                         # check power and number for each source
                         for Ni, RSi in enumerate(RT.ray_sources):
                             tup = RT.rays.source_sections(Ni)
-                            self.assertEqual(tup[0].shape[0], RT.rays.n_list[Ni])
-                            self.assertAlmostEqual(RT.rays.n_list[Ni]/RT.rays.N, RSi.power/P_s, delta=10/N)
+                            self.assertEqual(tup[0].shape[0], RT.rays.N_list[Ni])
+                            self.assertAlmostEqual(RT.rays.N_list[Ni]/RT.rays.N, RSi.power/P_s, delta=10/N)
 
                         # check source section call for all rays, call for each source has been tested above
                         tup = RT.rays.source_sections()
@@ -607,13 +604,14 @@ class TracerTests(unittest.TestCase):
                         N2 = np.count_nonzero(ch)
                         ch2 = np.random.randint(0, RT.rays.Nt, size=N2)
                         for ch2li in [None, ch2]:
-                            for retli in [None, [1, 0, 1, 1, 1, 1], [1, 1, 1, 1, 1, 0]]:
+                            for retli in [None, [1, 0, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 0, 0]]:
                                 for normli in [False, True]:
                                     tup = RT.rays.rays_by_mask(ch, ch2li, retli, normli)
                                     self.assertEqual(tup[3].shape[0], N2)  # correct shape 1
                                     self.assertEqual(tup[3].ndim, (1 if ch2li is not None else 2))  # correct shape 1
                                     self.assertTrue(retli is None or retli[1] or tup[1] is None)  # property omitted for ret[1] = 0
                                     self.assertTrue(retli is None or retli[5] or tup[5] is None)  # property omitted for ret[5] = 0
+                                    self.assertTrue(retli is None or retli[6] or tup[6] is None)  # property omitted for ret[5] = 0
                                     # check if s is normalized
                                     if normli and (retli is None or retli[1]):
                                         # mask out values that have zero vectors (due to absorption)
@@ -624,54 +622,6 @@ class TracerTests(unittest.TestCase):
             RT.remove(RT.ray_sources[-1])
 
         # ray_lengths is tested in tracing tests
-
-    def test_rt_media_surfaces(self):
-        """test if media and surface list is generated correctly"""
-
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -20, 80])
-
-        geom = ot.presets.geometry.arizona_eye()
-        geome = geom.elements
-
-        # two lenses, correct order
-        RT.clear()
-        RT.add([geome[0], geome[2]])
-        media = RT.media
-        surf = RT.surfaces
-        media2 = [RT.n0, geome[0].n, geome[0].n2, geome[2].n, geome[2].n2]
-        surf2 = [geome[0].front, geome[0].back, geome[2].front, geome[2].back]
-        self.assertEqual(media, media2)
-        self.assertEqual(surf, surf2)
-        
-        # two lenses wrong order
-        RT.clear()
-        RT.add([geome[2], geome[0]])
-        media = RT.media
-        surf = RT.surfaces
-        media2 = [RT.n0, geome[0].n, geome[0].n2, geome[2].n, geome[2].n2]
-        surf2 = [geome[0].front, geome[0].back, geome[2].front, geome[2].back]
-        self.assertEqual(media, media2)
-        self.assertEqual(surf, surf2)
-        
-        # two lenses and aperture
-        RT.clear()
-        RT.add([geome[2], geome[0], geome[1]])
-        media = RT.media
-        surf = RT.surfaces
-        media2 = [RT.n0, geome[0].n, geome[0].n2, geome[0].n2, geome[2].n, geome[2].n2]
-        surf2 = [geome[0].front, geome[0].back, geome[1].front, geome[2].front, geome[2].back]
-        self.assertEqual(media, media2)
-        self.assertEqual(surf, surf2)
-
-        # two lenses, aperture and filter
-        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, -1])
-        RT.add(F)
-        media = RT.media
-        surf = RT.surfaces
-        media2 = [RT.n0, RT.n0, geome[0].n, geome[0].n2, geome[0].n2, geome[2].n, geome[2].n2]
-        surf2 = [F.front, geome[0].front, geome[0].back, geome[1].front, geome[2].front, geome[2].back]
-        self.assertEqual(media, media2)
-        self.assertEqual(surf, surf2)
 
     def test_optical_lengths_ray_lengths(self):
        
@@ -685,13 +635,13 @@ class TracerTests(unittest.TestCase):
         RT.add(RS)
 
         n = ot.presets.refraction_index.SF10
-        L = ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"), n=n, pos=[0, 0, 1], d1=0, d2=1.2)
+        L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3), n=n, pos=[0, 0, 1], d1=0, d2=1.2)
         RT.add(L)
         
-        F = ot.Filter(ot.Surface("Circle"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
+        F = ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
         RT.add(F)
         
-        AP = ot.Aperture(ot.Surface("Circle"), pos=[0, 0, 9])
+        AP = ot.Aperture(ot.CircularSurface(r=3), pos=[0, 0, 9])
         RT.add(AP)
 
         RT.trace(1000)
@@ -714,11 +664,6 @@ class TracerTests(unittest.TestCase):
         lengths2[:, 3] = 4
         self.assertTrue(np.allclose(lengths - lengths2, 0, atol=1e-9, rtol=0))
 
-        # check checking of absorb_missing parameter
-        RT.absorb_missing = False
-        RT.trace(1000)
-        self.assertRaises(RuntimeError, RT.rays.optical_lengths)  # absorb_missing not True
-        
     def test_ray_storage_misc(self):
         # coverage tests
 
@@ -774,31 +719,32 @@ class TracerTests(unittest.TestCase):
             
             RT = ot.Raytracer(outline=[-5+x0, 5+x0, -5+y0, 5+y0, -10+z0, 50+z0], silent=True)
 
-            RSS = ot.Surface("Circle", r=0.2)
+            RSS = ot.CircularSurface(r=0.2)
             RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), 
                               divergence="None", pos=pos0+[0, 0, -3])
             RT.add(RS)
 
-            front = ot.Surface("Sphere", r=3, R=50)
-            back = ot.Surface("Conic", r=3, R=-50, k=-1.5)
+            front = ot.SphericalSurface(r=3, R=50)
+            back = ot.ConicSurface(r=3, R=-50, k=-1.5)
             L0 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 0])
             RT.add(L0)
 
-            front = ot.Surface("Function", r=3,
-                    func=ot.SurfaceFunction(func=lambda x, y: (x**2 + y**2)/50 + (x**2 +y**2)**2/5000, silent=True),
-                    curvature_circle=25)
-            back = ot.Surface("Circle", r=2)
+            front = ot.FunctionSurface(r=3,
+                                       func=lambda x, y: (x**2 + y**2)/50 + (x**2 +y**2)**2/5000,
+                                       silent=True,
+                                       parax_roc=25)
+            back = ot.CircularSurface(r=2)
             L1 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 10])
             RT.add(L1)
 
             X, Y = np.mgrid[-1:1:100j, -1:1:100j]
             data = 3 - (X**2 + Y**2)
-            front = ot.Surface("Data", data=data, r=4, silent=True)
-            back = ot.Surface("Circle", r=4, normal=[0, 0.01, 1])
+            front = ot.DataSurface(data=data, r=4, silent=True)
+            back = ot.TiltedSurface(r=4, normal=[0, 0.01, 1])
             L2 = ot.Lens(front, back, n=ot.presets.refraction_index.K5, pos=pos0+[0, 0, 20])
             RT.add(L2)
 
-            rect = ot.Surface("Rectangle", dim=[10, 10])
+            rect = ot.RectangularSurface(dim=[10, 10])
             Det = ot.Detector(rect, pos=pos0+[0., 0., 45])
             RT.add(Det)
 
@@ -837,12 +783,12 @@ class TracerTests(unittest.TestCase):
 
         n = ot.RefractionIndex("Constant", n=1.5)
 
-        front = ot.Surface("Data", data=Z, r=2, silent=True)
-        back = ot.Surface("Data", data=-Z, r=2, silent=True)
+        front = ot.DataSurface(data=Z, r=2, silent=True)
+        back = ot.DataSurface(data=-Z, r=2, silent=True)
         L = ot.Lens(front, back, n, pos=[0, 0, 0], d=0.4)
         RT.add(L)
 
-        RSS = ot.Surface("Circle", r=0.5)
+        RSS = ot.CircularSurface(r=0.5)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
         RT.add(RS)
 
@@ -852,6 +798,50 @@ class TracerTests(unittest.TestCase):
         f_should = self.lens_maker(R, -R, n(555), 1, L.d)
 
         self.assertAlmostEqual(res.x, f_should, delta=0.2)
+
+    def test_numeric_tracing_surface_hit_special_cases(self):
+
+        # in the next part "outside surface" relates to an x,y value outside the x,y value range of the surface
+        # cases: 0. ray starting above surface and hitting
+        #        1. ray starting outside surface and not hitting
+        #        2, ray starting outside and hitting lens center
+        #        3. ray starting outside surface, not hitting, while overflying surface xy extent
+        #        4. ray starting above surface and not hitting
+        #        5. ray starting outside surface and hitting surface, while it also could hit edge
+        #        6. ray starting outside surface and hitting only edge
+
+        # make raytracer
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
+
+        # Ray Sources
+        for x, sx in zip([0, -4, -8, -8, 0, -8, -8], [0, 0, 8, 16, 4.5, 13, 6]):
+            RSS = ot.Point()
+            RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
+                              pos=[x, 0, 0], s=[sx, 0, 10])
+            RT.add(RS)
+
+        # Data
+        X, Y = np.mgrid[-3:3:200j, -3:3:200j]
+        Z = -(X**2 + Y**2)/5
+
+        # add Lens 1
+        front = ot.DataSurface(r=3, data=Z)
+        back = ot.DataSurface(r=3, data=Z)
+        nL1 = ot.RefractionIndex("Constant", n=1)
+        L1 = ot.Lens(front, back, d=1.5, pos=[0, 0, 10], n=nL1)
+        RT.add(L1)
+
+        # one ray for each source
+        cnt = len(RT.ray_sources)
+        RT.trace(cnt)
+
+        # rays missing are absorbed
+        for w in RT.rays.w_list[[1, 3, 4, 6], 2]:
+            assert w == 0
+
+        # check rays hitting
+        mask = L1.front.get_mask(RT.rays.p_list[[0, 2, 5], 1, 0], RT.rays.p_list[[0, 2, 5], 1, 1])
+        assert np.all(mask)
 
     # lens maker equation
     def lens_maker(self, R1, R2, n, n0, d):
@@ -864,30 +854,31 @@ class TracerTests(unittest.TestCase):
 
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500], absorb_missing=False, silent=True)
 
-        RSS = ot.Surface("Circle", r=0.2)
+        RSS = ot.CircularSurface(r=0.2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
         RT.add(RS)
 
         # illuminated area is especially important for numeric surface_type="Data"
         for RS_r in [0.001, 0.01, 0.1, 0.5]:
 
-            RS.set_surface(ot.Surface("Circle", r=RS_r))
+            RS.set_surface(ot.CircularSurface(r=RS_r))
 
             # check different curvatures
             for R_ in [3, 10.2, 100]:
                 
                 r = 2
 
-                asph = ot.Surface("Conic", R=R_, k=-1, r=r)
-                sph = ot.Surface("Sphere", R=R_, r=r)
+                conic = ot.ConicSurface(R=R_, k=-1, r=r)
+                sph = ot.SphericalSurface(R=R_, r=r)
 
                 func = lambda x, y, R: 1/2/R*(x**2 + y**2)
                 func2 = lambda x, y: 0.78785 + 1/2/R_*(x**2 + y**2)  # some offset that needs to be removed
-                sfunc1 = ot.SurfaceFunction(func2, silent=True)
-                sfunc2 = ot.SurfaceFunction(func, func_args=dict(R=R_), silent=True)
 
-                surff1 = ot.Surface("Function", func=sfunc1, r=r, silent=True)
-                surff2 = ot.Surface("Function", func=sfunc2, r=r, z_min=0, z_max=func(0, r, R_), silent=True)
+                surff1 = ot.FunctionSurface(func=func2, r=r, silent=True)
+                surff2 = ot.FunctionSurface(func=func, r=r, z_min=0, z_max=func(0, r, R_), silent=True, func_args=dict(R=R_))
+
+                asph1 = ot.AsphericSurface(R=R_, r=r, k=-1, coeff=[0.], silent=True)  # same as conic
+                asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_], silent=True)  # conic can be neglected, only polynomial part
 
                 def surf_data_gen(N):
                     x = np.linspace(-r, r, N)
@@ -898,14 +889,14 @@ class TracerTests(unittest.TestCase):
                 # type "Data" with different resolutions and offsets
                 # and odd number defines a point in the center of the lens,
                 # for "even" the center is outside the grid
-                surf_data0 = ot.Surface("Data", silent=True, data=surf_data_gen(900), r=r)
-                surf_data1 = ot.Surface("Data", silent=True, data=surf_data_gen(200), r=r)
-                surf_data2 = ot.Surface("Data", silent=True, data=surf_data_gen(50), r=r)
-                surf_data3 = ot.Surface("Data", silent=True, data=surf_data_gen(901), r=r)
-                surf_data4 = ot.Surface("Data", silent=True, data=surf_data_gen(201), r=r)
-                surf_data5 = ot.Surface("Data", silent=True, data=surf_data_gen(51), r=r)
+                surf_data0 = ot.DataSurface(silent=True, data=surf_data_gen(900), r=r)
+                surf_data1 = ot.DataSurface(silent=True, data=surf_data_gen(200), r=r)
+                surf_data2 = ot.DataSurface(silent=True, data=surf_data_gen(50), r=r)
+                surf_data3 = ot.DataSurface(silent=True, data=surf_data_gen(901), r=r)
+                surf_data4 = ot.DataSurface(silent=True, data=surf_data_gen(201), r=r)
+                surf_data5 = ot.DataSurface(silent=True, data=surf_data_gen(51), r=r)
 
-                surf_circ = ot.Surface("Circle", r=r)
+                surf_circ = ot.CircularSurface(r=r)
 
                 n = 1.5
                 d = 0.1 + func(0, r, R_)
@@ -913,8 +904,9 @@ class TracerTests(unittest.TestCase):
                 f_list = []
 
                 # create lens, trace and find focus
-                for surf in [sph, asph, surff1, surff2, surf_data0, surf_data1, surf_data2,
-                            surf_data3, surf_data4, surf_data5]:
+                for surf in [sph, conic, surff1, surff2, surf_data0, surf_data1, surf_data2,
+                             surf_data3, surf_data4, surf_data5, asph1, asph2]:
+
                     L = ot.Lens(surf, surf_circ, n=ot.RefractionIndex("Constant", n=n),
                                 pos=[0, 0, +d/2], d=d)
                     RT.add(L)
@@ -925,8 +917,8 @@ class TracerTests(unittest.TestCase):
 
                     RT.remove(L)
             
-                self.assertAlmostEqual(f, f_list[1], delta=0.2)  # f and asphere almost equal
-                self.assertAlmostEqual(f_list[0], f_list[1], delta=0.2)  # sphere and asphere almost equal
+                self.assertAlmostEqual(f, f_list[1], delta=0.2)  # f and conic almost equal
+                self.assertAlmostEqual(f_list[0], f_list[1], delta=0.2)  # sphere and conic almost equal
 
                 # other surfaces almost equal
                 # since those use the exact same function, they should be nearly identical
@@ -944,12 +936,12 @@ class TracerTests(unittest.TestCase):
 
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
 
-        RSS = ot.Surface("Circle", r=2)
+        RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
         RT.add(RS)
 
-        surf1 = ot.Surface("Circle", r=3)
-        surf2 = ot.Surface("Circle", r=1e-6)
+        surf1 = ot.CircularSurface(r=3)
+        surf2 = ot.CircularSurface(r=1e-6)
         L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
         RT.add(L)
 
@@ -969,11 +961,11 @@ class TracerTests(unittest.TestCase):
 
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
 
-        RSS = ot.Surface("Circle", r=2)
+        RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
         RT.add(RS)
 
-        surf = ot.Surface("Circle", r=1e-6)
+        surf = ot.CircularSurface(r=1e-6)
         L = ot.Lens(surf, surf, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
         RT.add(L)
 
@@ -1017,13 +1009,13 @@ class TracerTests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False, silent=True, 
                           n0=ot.RefractionIndex("Constant", 100))
 
-        RSS = ot.Surface("Circle", r=2)
+        RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None",
                           pos=[0, 0, -3], s=[0, 0.1, 0.99])
         RT.add(RS)
 
-        surf1 = ot.Surface("Circle", r=10)
-        surf2 = ot.Surface("Circle", r=10)
+        surf1 = ot.CircularSurface(r=10)
+        surf2 = ot.CircularSurface(r=10)
         L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
         RT.add(L)
 
@@ -1038,13 +1030,13 @@ class TracerTests(unittest.TestCase):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False, silent=True)
 
-        RSS = ot.Surface("Circle", r=2)
+        RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Constant"), divergence="None",
                           pos=[0, 0, -3])
         RT.add(RS)
 
-        surf1 = ot.Surface("Circle", r=10)
-        surf2 = ot.Surface("Circle", r=10)
+        surf1 = ot.CircularSurface(r=10)
+        surf2 = ot.CircularSurface(r=10)
         F = ot.Filter(surf1, pos=[0, 0, 0], spectrum=ot.TransmissionSpectrum("Gaussian", mu=750, sig=0.1))
         RT.add(F)
 
@@ -1098,7 +1090,7 @@ class TracerTests(unittest.TestCase):
         RT = rt_example()
 
         # blocking aperture
-        RT.apertures[0] = ot.Aperture(ot.Surface("Circle", r=5), pos=RT.apertures[0].pos)
+        RT.apertures[0] = ot.Aperture(ot.CircularSurface(r=5), pos=RT.apertures[0].pos)
 
         # see if it is handled
         RT.trace(10000)
@@ -1262,7 +1254,7 @@ class TracerTests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], silent=True)
 
         # source parameters
-        RSS = ot.Surface("Circle", r=0.05)
+        RSS = ot.CircularSurface(r=0.05)
         spectrum = ot.LightSpectrum("Monochromatic", wl=550.)
         s = [0, np.sin(b_ang), np.cos(b_ang)]
 
@@ -1278,14 +1270,14 @@ class TracerTests(unittest.TestCase):
         RT.add(RS2)
 
 
-        surf_f = ot.SurfaceFunction(func=lambda x, y: np.tan(b_ang)*x, silent=True)
-        surf1 = ot.Surface("Function", func=surf_f, r=0.7, silent=True)
+        surf_f = lambda x, y: np.tan(b_ang)*x
+        surf1 = ot.FunctionSurface(func=surf_f, r=0.7, silent=True)
 
-        surf2 = ot.Surface("Circle", r=0.7, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
+        surf2 = ot.TiltedSurface(r=0.7, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
 
         X, Y = np.mgrid[-0.7:0.7:100j, -0.7:0.7:100j]
         Z = np.tan(b_ang)*X
-        surf3 = ot.Surface("Data", r=0.7, data=Z, silent=True)
+        surf3 = ot.DataSurface(r=0.7, data=Z, silent=True)
 
         for surf in [surf1, surf2, surf3]:
             L = ot.Lens(surf, surf, d=0.2, pos=[0, 0, 0.5], n=n)
@@ -1295,7 +1287,7 @@ class TracerTests(unittest.TestCase):
             RT.remove(L)
 
             # check if all rays are straight and get parallel shifted
-            p, s, _, _, _, _ = RT.rays.rays_by_mask(np.ones(RT.rays.N, dtype=bool), ret=[1, 1, 0, 0, 0, 0])
+            p, s, _, _, _, _, _ = RT.rays.rays_by_mask(np.ones(RT.rays.N, dtype=bool), ret=[1, 1, 0, 0, 0, 0, 0])
             self.assertAlmostEqual(np.mean(s[:, -2, 2]), 1)  # still straight
             self.assertTrue(np.allclose(p[:, -2, 0] - p[:, -3, 0], -0.0531867, atol=0.00001, rtol=0))  # parallel shift
 
@@ -1309,18 +1301,18 @@ class TracerTests(unittest.TestCase):
 
         RT = ot.Raytracer(outline=[-15, 15, -15, 15, -20, 50], silent=True)
 
-        RSS = ot.Surface("Circle", r=4)
+        RSS = ot.CircularSurface(r=4)
         RS = ot.RaySource(RSS, pos=[0, 0, -20])
         RT.add(RS)
 
         # )) - lens, second surface embracing first
         R1, R2 = 5, 10
-        front = ot.Surface("Sphere", r=0.999*R1, R=-R1)
-        back = ot.Surface("Sphere", r=0.999*R2, R=-R2)
+        front = ot.SphericalSurface(r=0.999*R1, R=-R1)
+        back = ot.SphericalSurface(r=0.999*R2, R=-R2)
         L = ot.Lens(front, back, pos=[0, 0, 0], n=ot.RefractionIndex(), d=0.5)
         RT.add(L)
 
-        FS = ot.Surface("Circle")
+        FS = ot.CircularSurface(r=3)
         F = ot.Filter(FS, spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 20])
         RT.add(F)
 
@@ -1330,8 +1322,8 @@ class TracerTests(unittest.TestCase):
         
         # (( - lens, first surface embracing second
         RT.remove(L)
-        front = ot.Surface("Sphere", r=0.999*R2, R=R2)
-        back = ot.Surface("Sphere", r=0.999*R1, R=R1)
+        front = ot.SphericalSurface(r=0.999*R2, R=R2)
+        back = ot.SphericalSurface(r=0.999*R1, R=R1)
         L = ot.Lens(front, back, pos=[0, 0, 0], n=ot.RefractionIndex(), d=0.5)
         RT.add(L)
         RT.trace(N)
@@ -1339,15 +1331,15 @@ class TracerTests(unittest.TestCase):
 
         # )), but this time hitting space between surfaces
         RT.remove(RS)
-        RS = ot.RaySource(ot.Surface("Ring", r=7, ri=6), pos=[0, 0, -20])
+        RS = ot.RaySource(ot.RingSurface(r=7, ri=6), pos=[0, 0, -20])
         RT.add(RS)
         RT.trace(N)
         self.assertTrue(np.all(RT.rays.w_list[:, -2] == 0))
         
         # ((, but this time hitting space between surfaces
         RT.remove(L)
-        front = ot.Surface("Sphere", r=0.999*R1, R=-R1)
-        back = ot.Surface("Sphere", r=0.999*R2, R=-R2)
+        front = ot.SphericalSurface(r=0.999*R1, R=-R1)
+        back = ot.SphericalSurface(r=0.999*R2, R=-R2)
         L = ot.Lens(front, back, pos=[0, 0, 0], n=ot.RefractionIndex(), d=0.5)
         RT.add(L)
         RT.trace(N)
@@ -1363,7 +1355,7 @@ class TracerTests(unittest.TestCase):
         # source parameters
         n = ot.RefractionIndex("Constant", n=1.55)
         b_ang = np.arctan(1.55/1)  # brewster angle
-        RSS = ot.Surface("Circle", r=0.05)
+        RSS = ot.CircularSurface(r=0.05)
         spectrum = ot.LightSpectrum("Monochromatic", wl=550.)
         s = [0, np.sin(b_ang), np.cos(b_ang)]
 
@@ -1379,7 +1371,7 @@ class TracerTests(unittest.TestCase):
         RT.add(RS2)
 
         # add refraction index step
-        rect = ot.Surface("Rectangle", dim=[10, 10])
+        rect = ot.RectangularSurface(dim=[10, 10])
         L1 = ot.Lens(rect, rect, de=0.5, pos=[0, 0, 0], n=n, n2=n)
         RT.add(L1)
 
@@ -1388,10 +1380,10 @@ class TracerTests(unittest.TestCase):
         def get_s_w_pol_source(index):
 
             mask = np.zeros(RT.rays.N, dtype=bool)
-            Ns, Ne = RT.rays.b_list[index:index + 2]
+            Ns, Ne = RT.rays.B_list[index:index + 2]
             mask[Ns:Ne] = True
 
-            p, s, pol, w, wl, _ = RT.rays.rays_by_mask(mask, slice(None))
+            p, s, pol, w, wl, _, _ = RT.rays.rays_by_mask(mask, slice(None))
             return s, pol, w
 
         sx, polx, wx = get_s_w_pol_source(0)
@@ -1433,6 +1425,9 @@ class TracerTests(unittest.TestCase):
         RT = rt_example()
         AP = RT.apertures[0]
 
+        # add ideal lens
+        RT.add(ot.IdealLens(r=3, D=1, pos=[0, 0, RT.outline[5]-1]))
+
         # remove apertures and filter so no rays are filtered
         for el in [*RT.apertures, *RT.filters]:
             RT.remove(el)
@@ -1463,6 +1458,53 @@ class TracerTests(unittest.TestCase):
             # add aperture and move it so that no rays reach detector or autofocus region
             RT.add(AP)
             RT.apertures[0].move_to(AP.pos + [0.2, 0.2, 0])
-        
+       
+    def test_ideal_lens_imaging(self):
+
+        # an ideal lens creates an ideal image
+        # this image is exactly the same as the input image, as all rays from each pixel are mapped into the same output pixel
+        # check if the images are the same
+
+        Image = ot.presets.image.test_screen
+
+        # make raytracer
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
+
+        # add Raysource
+        RSS = ot.RectangularSurface(dim=[4, 4])
+        RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8, image=Image, s=[0, 0, 1], pos=[0, 0, 0])
+        RT.add(RS)
+
+        # add Lens 1
+        L1 = ot.IdealLens(r=5, D=120, pos=[0, 0, 12])
+        RT.add(L1)
+
+        # position of image
+        zi = RT.tma().image_position(0)
+
+        # add Detector
+        DetS = ot.RectangularSurface(dim=[10, 10])
+        Det = ot.Detector(DetS, pos=[0, 0, zi])
+        RT.add(Det)
+
+        RT.trace(1000000)
+
+        # calculate image size from image magnification (A element in ABCD matrix)
+        beta = -RT.tma().matrix_at(0, zi)[0, 0]
+        dimg_ext = np.array(RSS.extent[:4]) * beta
+
+        simg = RT.source_image(500)
+        dimg = RT.detector_image(500, extent=dimg_ext)
+
+        # get pixel power image, detector image must be flipped
+        diff = simg.img[:, :, 3] - np.flipud(np.fliplr(dimg.img[:, :, 3]))
+        diffm = np.max(simg.img[:, :, 3])
+
+        # calculate maximum deviation
+        dev = np.max(np.abs(diff/diffm))
+
+        # should be minimal, only numerical errors
+        self.assertAlmostEqual(dev, 0, delta=1e-8)
+
 if __name__ == '__main__':
     unittest.main()

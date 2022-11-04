@@ -1,5 +1,6 @@
-Current Version: 0.9.8-1-g190828a 
+Current Version: 0.9.9 
 
+0.9.9           RImage now has an odd number of pixels. New Group class. New color submodule.
 0.9.8           New: Ray transfer matrix analysis. Different sphere projection methods. Markers for tracing geometry. Removed colorio dependency. New LED standard illuminants. More examples.
 0.9.7           Improved GUI and new UI actions. More tests. Package installing tools.
 0.9.6           Preset restructuring. Eye model geometry presets and examples. Improved multithreading in TraceGUI. Now possible to run commands via TCP from UI.

@@ -1,6 +1,4 @@
 from typing import Callable, Any  # Callable and Any type
-from datetime import datetime  # date for fallback file naming
-from pathlib import Path  # path handling for image saving
 from threading import Thread  # multithreading
 
 import numpy as np  # calculations
@@ -8,6 +6,7 @@ import numexpr as ne  # number of cores
 from PIL import Image  # saving as png
 import scipy.interpolate
 import scipy.constants  # for luminous efficacy
+import scipy.ndimage
 
 from . import color  # tristimulus curves and sRGB conversions
 from . import misc  # interpolation and calculation methods
@@ -52,6 +51,7 @@ class RImage(BaseClass):
     def __init__(self,
                  extent:            (list | np.ndarray),
                  projection:        str = None,
+                 limit:             float = None,
                  **kwargs)\
             -> None:
         """
@@ -62,6 +62,7 @@ class RImage(BaseClass):
         an image plotting type and an index for tagging.
 
         :param extent: image extent in the form [xs, xe, ys, ye]
+        :param limit: rayleigh limit, used to approximate wave optics using a gaussian blur filter
         """
         self._new_lock = False
 
@@ -72,6 +73,7 @@ class RImage(BaseClass):
         self._img = None
 
         self.projection = projection
+        self.limit = limit
 
         super().__init__(**kwargs)
         self._new_lock = True
@@ -84,6 +86,12 @@ class RImage(BaseClass):
         """throw exception when image is missing"""
         if not self.has_image():
             raise RuntimeError("Image was not calculated.")
+
+    @property
+    def _sigma(self) -> float:
+        # an airy disc with roots at +-0.5*d can be approximated by a gauss with sigma = 0.175*d
+        # limit (=d) needs to be converted from um to mm first
+        return 0.175*self.limit/1000 if self.limit is not None else self.limit
 
     @property
     def sx(self) -> float:
@@ -178,7 +186,10 @@ class RImage(BaseClass):
                 return self.K / self.Apx * self.img[:, :, 1]
 
             case "sRGB (Absolute RI)":
-                return self.get_rgb(log=log, rendering_intent="Absolute")
+                # return
+                rgb = self.get_rgb(log=log, rendering_intent="Absolute")
+
+                return rgb
 
             case "sRGB (Perceptual RI)":
                 return self.get_rgb(log=log, rendering_intent="Perceptual")
@@ -277,6 +288,10 @@ class RImage(BaseClass):
             self.extent[2] = ym - sx/MR/2
             self.extent[3] = ym + sx/MR/2
 
+        # when filtering is active, add 5 sigma to the edges
+        if self._sigma is not None:
+            self.extent += np.array([-1, 1, -1, 1]) * 5*self._sigma
+
     def rescale(self, N: int, _force=False) -> None:
         """
 
@@ -297,6 +312,18 @@ class RImage(BaseClass):
 
         # for each of the XYZW channels:
         def threaded(ind, in_, out):
+
+            # filter, if sigma provided
+            if self._sigma is not None:
+                # sigma size in pixel for each dimension
+                fcx = self._sigma / (self.sx/Nx)
+                fcy = self._sigma / (self.sy/Ny)
+              
+                # with this, with gaussian filtering the power sum in the image stays the same even after filtering
+                in_2 = scipy.ndimage.gaussian_filter(in_[:, :, ind], sigma=[fcy, fcx], mode="constant", cval=0)
+            else:
+                in_2 = in_[:, :, ind]
+
             # this code basically sums up all pixel values that go into a new pixel value
             # this is done by only two sums and reshaping
 
@@ -306,7 +333,7 @@ class RImage(BaseClass):
 
             # reshape and sum such that all horizontal pixels that are joined together are in each line
             # => [[A0, A1], [B0, B1], [A2, A3], [B2, B3], [C0, C1], [D0, D1], [C2, C3], [D2, D3]]
-            B2 = in_[:, :, ind].reshape((Ny*Nx//fact, fact))
+            B2 = in_2.reshape((Ny*Nx//fact, fact))
 
             # sum over rows,
             # => [[A0+A1], [B0+B1], [A2+A3], [B2+B3], [C0+C1], [D0+D1], [C2+C3], [D2+D3]]
@@ -324,11 +351,12 @@ class RImage(BaseClass):
             # out = [[A0+A1+A2+A3, B0+B1+B2+B3], [C0+C1+C2+C3, D0+D1+D2+D3]]
             out[:, :, ind] = B5.reshape((Ny//fact, Nx//fact), order='F')
 
-        if fact <= 1:
+
+        if fact <= 1 and self._sigma is None:
             self.img = self._img
 
-        # only rescale if target image size is different from current Image (but not if force is active)
-        elif self.img is None or _force or min(*self.img.shape[:2]) != Nm//fact:
+        else:
+
             self.img = np.zeros((Ny // fact, Nx // fact, Nz))
 
             if self.threading:
@@ -355,14 +383,15 @@ class RImage(BaseClass):
         """
         # save in float32 to save some space
         _img = np.array(self._img, dtype=np.float32) if save_32bit else self._img
+        limit = self.limit if self.limit is not None else np.nan
 
-        sdict = dict(_img=_img, extent=self.extent, N=min(*self.img.shape[:2]),
+        sdict = dict(_img=_img, extent=self.extent, N=min(*self.img.shape[:2]), limit=limit,
                      desc=self.desc, long_desc=self.long_desc, proj=str(self.projection))
 
         def sfunc(path_: str):
             np.savez_compressed(path_, **sdict)
 
-        return self.__save_with_fallback(path, sfunc, "RImage", ".npz", overwrite)
+        return misc.save_with_fallback(path, sfunc, "RImage", ".npz", overwrite, self.silent)
 
     def export_png(self,
                    path:         str,
@@ -403,46 +432,7 @@ class RImage(BaseClass):
         def sfunc(path_: str):
             imp.save(path_)
 
-        return self.__save_with_fallback(path, sfunc, "Image", ".png", overwrite)
-
-    def __save_with_fallback(self,
-                             path:        str,
-                             sfunc:       Callable,
-                             fname:       str,
-                             ending:      str,
-                             overwrite:   bool = False)\
-            -> str:
-        """saving with fallback path if the file exists and overwrite=False"""
-
-        # called when invalid path or file exists but overwrite=False
-        def fallback():
-            # create a valid path and filename
-            wd = Path.cwd()
-            filename = f"{fname}_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z') + ending
-            path_ = str(wd / filename)
-
-            # resave
-            self.print(f"Failed saving {fname}, resaving as \"{path_}\"")
-            sfunc(path_)
-
-            return path_
-
-        # append file ending if the path provided has none
-        if path[-len(ending):] != ending:
-            path += ending
-
-        # check if file already exists
-        exists = Path(path).exists()
-
-        if overwrite or not exists:
-            try:
-                sfunc(path)
-                self.print(f"Saved {fname} as \"{path}\"")
-                return path
-            except:
-                return fallback()
-        else:
-            return fallback()
+        return misc.save_with_fallback(path, sfunc, "Image", ".png", overwrite, self.silent)
 
     @staticmethod
     def load(path: str) -> 'RImage':
@@ -452,6 +442,9 @@ class RImage(BaseClass):
         io = np.load(path)
 
         im = RImage(io["extent"], long_desc=io["long_desc"][()], desc=io["desc"][()], projection=io["proj"][()])
+
+        im.limit = io["limit"][()] if not np.isnan(io["limit"]) else None
+
         im._img = np.array(io["_img"], dtype=np.float64)
         im.projection = None if im.projection == "None" else im.projection  # None has been saved as string
 
@@ -481,7 +474,12 @@ class RImage(BaseClass):
 
                 super().__setattr__(key, val2)
                 return
-            
+           
+            case "limit" if val is not None:
+                pc.check_type(key, val, float | int)
+                pc.check_above(key, val, 0)
+                val = float(val)
+
             case "projection":
                 pc.check_type(key, val, str | None)
 

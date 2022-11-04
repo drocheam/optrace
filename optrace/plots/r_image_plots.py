@@ -37,7 +37,6 @@ def r_image_plot(im:       RImage,
     _check_types(im, imc, block, log, flip, title, mode)
 
     Imd = imc.copy() if imc is not None else im.get_by_display_mode(mode, log=log)
-    Imd = np.flipud(Imd)  # flip upside down so element [0, 0] is in the bottom left
 
     _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, mode, log)
 
@@ -81,7 +80,7 @@ def r_image_plot(im:       RImage,
 
     # plot image
     fig = plt.figure()
-    plt.imshow(Imd, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, vmin=vmin, vmax=vmax)
+    plt.imshow(Imd, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, vmin=vmin, vmax=vmax, origin="lower")
 
     # plot labels
     plt.xlabel(xlabel)

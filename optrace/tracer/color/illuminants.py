@@ -18,7 +18,7 @@ import numpy as np  # calculations
 _ill_names = ["wl", "A", "C", "D50", "D55", "D65", "D75", "FL2", "FL7", "FL11",
               "LED-B1", "LED-B2", "LED-B3", "LED-B4", "LED-B5"]
 _ill_path = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "illuminants.csv"
-_illuminants = np.genfromtxt(_ill_path, skip_header=1, delimiter=",", dtype=np.float64)
+_illuminants = np.genfromtxt(_ill_path, skip_header=1, delimiter=",", filling_values=0, dtype=np.float64)
 
 
 def a_illuminant(wl: np.ndarray) -> np.ndarray:

@@ -41,15 +41,15 @@ RS3 = ot.RaySource(pt, spectrum=ot.LightSpectrum("Monochromatic", wl=550), pos=[
 RT.add(RS3)
 
 # Okular
-front = ot.Surface("Sphere", r=r1, R=R1/2)
-back = ot.Surface("Circle", r=r1)
+front = ot.SphericalSurface(r=r1, R=R1/2)
+back = ot.CircularSurface(r=r1)
 L1 = ot.Lens(front, back, n=n_, pos=[0, 0, 0], de=0.5)
 RT.add(L1)
 L1.move_to([0, 0, L1.pos[2] - L1.tma().vertex_point[0]])
 
 # Objective
-front = ot.Surface("Circle", r=r2)
-back = ot.Surface("Conic", r=r2, R=-R2/2, k=-0.78)
+front = ot.CircularSurface(r=r2)
+back = ot.ConicSurface(r=r2, R=-R2/2, k=-0.78)
 L2 = ot.Lens(front, back, n=n_, pos=[0, 0, 50], de=0.5)
 RT.add(L2)
 
@@ -61,7 +61,7 @@ L2.move_to([0, 0, L2.pos[2] - (L2.tma().focal_point[0] - L1.tma().focal_point[1]
 RT.trace(4)
 
 # find focus of rays and create a black filter there
-aps = ot.Surface("Rectangle", dim=[2*r2, 2*r2])
+aps = ot.RectangularSurface(dim=[2*r2, 2*r2])
 ap = ot.Aperture(aps, pos=[0, 0, RT.outline[5]])
 res, _ = RT.autofocus("Position Variance", z_start=RT.outline[5])
 ap.move_to([0, 0, res.x])

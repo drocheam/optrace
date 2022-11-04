@@ -1,6 +1,10 @@
 """
 helper
 """
+
+from datetime import datetime  # date for fallback file naming
+from pathlib import Path  # path handling for image saving
+
 from typing import Callable, Any  # Callable and Any types
 from functools import wraps  # wrapping of functions
 import time  # timing
@@ -64,7 +68,7 @@ def uniform(a, b, N):
         return np.array([], dtype=np.float64)
 
     dba = (b-a)/N  # grid spacing
-    x = np.linspace(a, b - dba, N) + np.random.uniform(0, dba, N)  # grid + dither
+    x = np.linspace(a, b - dba, N) + np.random.uniform(0., dba, N)  # grid + dither
     np.random.shuffle(x)
     return x
 
@@ -276,3 +280,45 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     ne.evaluate("x*y2 - y*x2", out=n[:, 2])
 
     return n
+
+def save_with_fallback(path:        str,
+                       sfunc:       Callable,
+                       fname:       str,
+                       ending:      str,
+                       overwrite:   bool = False,
+                       silent:      bool = False)\
+        -> str:
+    """saving with fallback path if the file exists and overwrite=False"""
+
+    # called when invalid path or file exists but overwrite=False
+    def fallback():
+        # create a valid path and filename
+        wd = Path.cwd()
+        filename = f"{fname}_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z') + ending
+        path_ = str(wd / filename)
+
+        # resave
+        if not silent:
+            print(f"Failed saving {fname}, resaving as \"{path_}\".")
+        sfunc(path_)
+
+        return path_
+
+    # append file ending if the path provided has none
+    if path[-len(ending):] != ending:
+        path += ending
+
+    # check if file already exists
+    exists = Path(path).exists()
+
+    if overwrite or not exists:
+        try:
+            sfunc(path)
+            if not silent:
+                print(f"Saved {fname} as \"{path}\".")
+            return path
+        except:
+            return fallback()
+    else:
+        return fallback()
+

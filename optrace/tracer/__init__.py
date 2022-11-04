@@ -11,16 +11,27 @@ from .spectrum.spectrum import Spectrum
 from .spectrum.light_spectrum import LightSpectrum
 from .spectrum.transmission_spectrum import TransmissionSpectrum
 
-from .geometry.surface_function import SurfaceFunction
-from .geometry.surface import Surface
+from .geometry.surface.surface import Surface
+from .geometry.surface.data_surface import DataSurface
+from .geometry.surface.function_surface import FunctionSurface
+from .geometry.surface.circular_surface import CircularSurface
+from .geometry.surface.rectangular_surface import RectangularSurface
+from .geometry.surface.ring_surface import RingSurface
+from .geometry.surface.conic_surface import ConicSurface
+from .geometry.surface.tilted_surface import TiltedSurface
+from .geometry.surface.spherical_surface import SphericalSurface
+from .geometry.surface.aspheric_surface import AsphericSurface
+
 from .geometry.point import Point
 from .geometry.line import Line
 
 from .geometry.lens import Lens
+from .geometry.ideal_lens import IdealLens
 from .geometry.aperture import Aperture
 from .geometry.filter import Filter
 from .geometry.detector import Detector
 from .geometry.marker import Marker
 from .geometry.group import Group
 
+from . import load
 

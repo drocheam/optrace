@@ -7,6 +7,10 @@ from .misc import PropertyChecker as pc  # type checking
 
 
 class BaseClass:
+    pass
+
+
+class BaseClass:
 
     def __init__(self,
                  desc:      str = "",
@@ -82,10 +86,8 @@ class BaseClass:
         """
         return self.desc if self.desc != "" else fallback
 
-    def copy(self) -> 'BaseClass':
-        """
-        :return: a fully independent copy
-        """
+    def copy(self) -> BaseClass:
+        """:return: a fully independent copy"""
         return copy.deepcopy(self)
 
     def lock(self) -> None:

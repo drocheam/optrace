@@ -52,18 +52,28 @@ Sphere
 Handled as conic with :math:`k=0`
 
 
-Planar Surfaces
+Rectangle
 --------------------
 
-Includes **Ring** and **Rectangle** and **Circle** with no normal specified.
+Surface with function :math:`z(x,~y)=z_0` and rectangular extent in the xy-plane,
+while its sides are parallel to the x and y-axis.
+Its center lies at :math:`\vec{q} = (x_0, y_0, z_0)`.
 
-Surface with center at :math:`\vec{q} = (x_0, y_0, z_0)` and surface function :math:`z(x,~y)=z_0`.
+Ring
+-------------
+
+Surface with function :math:`z(x,~y)=z_0` and being defined by a circular area around
+:math:`\vec{q} = (x_0, y_0, z_0)` with radius :math:`r` and inner radius :math:`0 < r_i < r`
 
 
-Tilted Circle
+Circle
+-------------
+
+Ring with :math:`r_i = 0`.
+
+
+Tilted Surface
 --------------------
-
-**Circle** with normal :math:`\vec{n}` specified
 
 .. math::
    \text{normal vector:}~~~~   \vec{n} &= (n_x, n_y, n_z)\\
@@ -310,24 +320,24 @@ With :math:`\varepsilon_\text{f} \approx 2.22\cdot 10^{-16}` for a 64bit floatin
 Optrace units are given in millimeters, so this is equivalent to a value of :math:`32.2\,` nm.
 
 
-Second derivative
------------------------
+..Second derivative
+..-----------------------
 
-For a second derivative of the form
+..For a second derivative of the form
 
-.. math::
-   f''(x) = \frac{f(x+\varepsilon) - 2 f(x) + f(x-\varepsilon)}{\varepsilon^2}
+.... math::
+   ..f''(x) = \frac{f(x+\varepsilon) - 2 f(x) + f(x-\varepsilon)}{\varepsilon^2}
 
-the optimal step width is
+..the optimal step width is
 
-.. math::
-   \varepsilon_\text{o} = \sqrt[4]{36 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(4)}(x)} \right|}
+.... math::
+   ..\varepsilon_\text{o} = \sqrt[4]{36 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(4)}(x)} \right|}
 
-with :math:`\varepsilon_\text{f}` being the machine precision for the used floating type.
-As stated before, higher polynomial orders are less prominent, so one valid assumption can be :math:`\left| \frac{f(x)}{f^{(4)}(x)} \right| = 50`. 
-While this might be different for every function, due to the cubic root a quotient being 1000 times larger only leads to a change of around factor :math:`5.62` in :math:`\varepsilon_\text{0}`.
+..with :math:`\varepsilon_\text{f}` being the machine precision for the used floating type.
+..As stated before, higher polynomial orders are less prominent, so one valid assumption can be :math:`\left| \frac{f(x)}{f^{(4)}(x)} \right| = 50`. 
+..While this might be different for every function, due to the cubic root a quotient being 1000 times larger only leads to a change of around factor :math:`5.62` in :math:`\varepsilon_\text{0}`.
 
-With :math:`\varepsilon_\text{f} \approx 2.22\cdot 10^{-16}` for a 64bit floating point number, we get :math:`\varepsilon_\text{o} \approx 7.95 \cdot 10^{-4}`. Optrace units are given in millimeters, so this is equivalent to a value of :math:`795\,` nm.
+..With :math:`\varepsilon_\text{f} \approx 2.22\cdot 10^{-16}` for a 64bit floating point number, we get :math:`\varepsilon_\text{o} \approx 7.95 \cdot 10^{-4}`. Optrace units are given in millimeters, so this is equivalent to a value of :math:`795\,` nm.
 
 Step Width Selection
 ---------------------------------
@@ -437,5 +447,4 @@ Circle
 
 Implemented as ring with :math:`r_\text{i} = 0`
 
-**Note:** Currently only implemented for a circle without tilt.
 

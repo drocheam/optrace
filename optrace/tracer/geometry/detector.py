@@ -7,10 +7,9 @@ rectangular plane perpendicular to optical axis for creation of Detector Images
 import numpy as np  # for ndarray type
 import numexpr as ne  # faster calculations
 
-from .surface import Surface  # for the Detector surface
 from .element import Element  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
-
+from .surface import Surface, RectangularSurface, CircularSurface, SphericalSurface
 
 
 class Detector(Element):
@@ -35,9 +34,7 @@ class Detector(Element):
     def __setattr__(self, key, val):
 
         if key == "front" and isinstance(val, Surface):
-            if not val.has_hit_finding():
-                raise RuntimeError(f"surface_type '{val.surface_type}' has no hit finding functionality.")
-            if val.surface_type not in ["Sphere", "Rectangle", "Circle"]:
+            if not isinstance(val, SphericalSurface | RectangularSurface | CircularSurface):
                 raise RuntimeError(f"Only surfaces with type Sphere, Rectangle, Circle are supported for detectors")
 
         super().__setattr__(key, val)

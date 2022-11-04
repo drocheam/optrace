@@ -185,16 +185,15 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
         mask = ~np.all(RGB == 0, axis=2)
         RGB[mask] /= np.sum(RGB[mask], axis=1)[:, np.newaxis]  # normalize brightness
 
-    # convert to sRGB and flip such that element [0, 0] is in the lower left of the diagram
+    # convert to sRGB
     sRGB = color.srgb_linear_to_srgb(RGB)
-    sRGB = np.flipud(sRGB)
 
     _set_font()
     plt.figure()
     plt.minorticks_on()
 
     # plot colored area, this also includes colors outside the gamut
-    plt.imshow(sRGB, extent=[x[0], x[-1], y[0], y[-1]], interpolation="bilinear", label='_nolegend_')
+    plt.imshow(sRGB, extent=[x[0], x[-1], y[0], y[-1]], interpolation="bilinear", label='_nolegend_', origin="lower")
 
     # we want to fill the regions outside the gamut black
     # the edge can be divided into a lower and upper part
@@ -224,7 +223,6 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
         text.set_path_effects([path_effects.Stroke(linewidth=1, foreground='black'), path_effects.Normal()])
 
     # draw sRGB gamut and whitepoint
-    # effect = [path_effects.Stroke(linewidth=2, foreground='w'), path_effects.Normal()]
     plt.plot([r[0], g[0], b[0], r[0]], [r[1], g[1], b[1], r[1]], "k-.", linewidth=1)
     plt.scatter(w[0], w[1], color="w", marker="o", s=20, edgecolor="k")
 

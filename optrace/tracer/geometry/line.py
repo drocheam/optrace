@@ -9,6 +9,10 @@ from ..misc import PropertyChecker as pc  # check types and values
 from .. import misc
 
 
+class Line:
+    pass
+
+
 class Line(BaseClass):
 
     def __init__(self,
@@ -56,6 +60,11 @@ class Line(BaseClass):
                self.pos[1] + self.r * np.sin(self.angle),\
                self.z_min,\
                self.z_max
+
+    def reverse(self) -> Line:
+        L = self.copy()
+        L.move_to([0, 0, 0])
+        return L
 
     def get_random_positions(self, N: int) -> np.ndarray:
         """

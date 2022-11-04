@@ -103,6 +103,8 @@ class TracerMiscTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 7])  # invalid extent
         self.assertRaises(ValueError, ot.RImage, [5, 6, 8, np.inf])  # invalid extent
         self.assertRaises(TypeError, ot.RImage, [5, 6, 8, 9], 5)  # invalid projection type
+        self.assertRaises(TypeError, ot.RImage, [5, 6, 8, 9], limit=[5])  # invalid limit type
+        self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 9], limit=-1)  # invalid limit value
 
         img = ot.RImage([-1, 1, -2, 2], silent=True)
         self.assertFalse(img.has_image())  # no image yet
@@ -186,35 +188,37 @@ class TracerMiscTests(unittest.TestCase):
 
         r = np.arange(1, ot.RImage.MAX_IMAGE_RATIO+3)
 
-        for ratio in [*tuple(1/r), *r]:  # different side ratios
+        for limit in [None, 20]:  # different resolution limits
 
-            img, P, L = self.gen_r_image(ratio=ratio)
-            
-            # check power sum
-            P0 = img.get_power()
-            L0 = img.get_luminous_power()
-            self.assertAlmostEqual(P0, P)
-            self.assertAlmostEqual(L0, L)
+            for ratio in [*tuple(1/r), *r]:  # different side ratios
 
-            ratio_act = img.Nx / img.Ny
-            sx0, sy0 = img.sx, img.sy
+                img, P, L = self.gen_r_image(ratio=ratio, limit=limit)
 
-            for th in [False, True]:  # threading on or off
-                for Npx in [*ot.RImage.SIZES, *np.random.randint(1, 2*ot.RImage.SIZES[-1], 10)]:  # different side lenghts
-                    img.threading = th
-                    img.rescale(Npx)
+                # check power sum
+                P0 = img.get_power()
+                L0 = img.get_luminous_power()
+                self.assertAlmostEqual(P0, P)
+                self.assertAlmostEqual(L0, L)
 
-                    # check that nearest matching side length was chosen
-                    siz = ot.RImage.SIZES
-                    near_siz = siz[np.argmin(np.abs(Npx - np.array(siz)))]
-                    cmp_siz1 = img.Nx if ratio_act < 1 else img.Ny
-                    self.assertEqual(near_siz, cmp_siz1)
+                ratio_act = img.Nx / img.Ny
+                sx0, sy0 = img.sx, img.sy
 
-                    self.assertAlmostEqual(P0, img.get_power())  # overall power stays the same even after rescaling
-                    self.assertAlmostEqual(ratio_act, img.Nx/img.Ny)  # ratio stayed the same
-                    self.assertEqual(sx0, img.sx)  # side length stayed the same
-                    self.assertEqual(sy0, img.sy)  # side length stayed the same
-                    self.assertAlmostEqual(img.sx*img.sy/img.Nx/img.Ny, img.Apx)  # check pixel area
+                for th in [False, True]:  # threading on or off
+                    for Npx in [*ot.RImage.SIZES, *np.random.randint(1, 2*ot.RImage.SIZES[-1], 10)]:  # different side lengths
+                        img.threading = th
+                        img.rescale(Npx)
+
+                        # check that nearest matching side length was chosen
+                        siz = ot.RImage.SIZES
+                        near_siz = siz[np.argmin(np.abs(Npx - np.array(siz)))]
+                        cmp_siz1 = img.Nx if ratio_act < 1 else img.Ny
+                        self.assertEqual(near_siz, cmp_siz1)
+
+                        self.assertAlmostEqual(P0, img.get_power())  # overall power stays the same even after rescaling
+                        self.assertAlmostEqual(ratio_act, img.Nx/img.Ny)  # ratio stayed the same
+                        self.assertEqual(sx0, img.sx)  # side length stayed the same
+                        self.assertEqual(sy0, img.sy)  # side length stayed the same
+                        self.assertAlmostEqual(img.sx*img.sy/img.Nx/img.Ny, img.Apx)  # check pixel area
 
         # test exceptions render
         self.assertRaises(ValueError, img.render, N=ot.RImage.MAX_IMAGE_SIDE*1.2)  # pixel number too large
@@ -255,9 +259,9 @@ class TracerMiscTests(unittest.TestCase):
         RIm.render(keep_extent=True)
         self.assertTrue(np.all(RIm.extent == Im_hasp_ext))
 
-    def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1):
+    def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1, limit=None):
         # create some image
-        img = ot.RImage([-1, 1, -1*ratio, 1*ratio], silent=True)
+        img = ot.RImage([-1, 1, -1*ratio, 1*ratio], silent=True, limit=limit)
         p = np.zeros((N, 2))
         p[:, 0] = np.random.uniform(img.extent[0], img.extent[1], N)
         p[:, 1] = np.random.uniform(img.extent[2], img.extent[3], N)
@@ -274,30 +278,35 @@ class TracerMiscTests(unittest.TestCase):
 
         # saving and loading for valid path
         path = "test_img.npz"
-        img.save(path)
-        img = ot.RImage.load(path)
-        img.silent = True
+        for silent in [False, True]:
+            img.silent = silent
+            path_ = img.save(path)
+            img = ot.RImage.load(path)
+        self.assertTrue(img.limit is None)  # None limit is None after loading
+        os.remove(path_)
 
         # saving and loading for valid path, overwrite file
+        img.limit = 5
         path0 = img.save(path, overwrite=True)
         img = ot.RImage.load(path0)
         img.silent = True
         self.assertEqual(path, path0)
+        self.assertEqual(img.limit, 5)  # limit is loaded correctly
         
         # saving and loading for valid path, don't overwrite file
         path1 = img.save(path, overwrite=False)
         img = ot.RImage.load(path1)
         img.silent = True
         self.assertNotEqual(path, path1)
-        
-        # saving and loading for invalid path
-        path2 = img.save(str(Path("hjkhjkljk") / "test_img.npz"))
-        img = ot.RImage.load(path2)
-
-        # delete files
         os.remove(path0)
         os.remove(path1)
-        os.remove(path2)
+        
+        # saving and loading for invalid path
+        for silent in [False, True]:
+            img.silent = silent
+            path2 = img.save(str(Path("hjkhjkljk") / "test_img.npz"))
+            img = ot.RImage.load(path2)
+            os.remove(path2)
 
         # png saving
         for ratio in [3, 1, 1/3]:
@@ -309,36 +318,96 @@ class TracerMiscTests(unittest.TestCase):
                 path3 = img.export_png(path, imm, log=False, overwrite=True, flip=True)
             os.remove(path3)
 
+    def test_r_image_filter(self):
+    
+        # render a point
+        # gaussian resolution limit filter makes a gaussian function from this
+        # check if standard deviation is correct
+        # this also means, that the gaussian curve is completly inside, meaning the image extent was enlarged
+
+        # rays at center of image
+        p = np.zeros((1000, 3))
+        w = np.ones(1000)
+        wl = np.full(1000, 500)
+
+        for k in [1, 0.3, 0.2, 3, 5]:  # different side ratios
+        
+            r0 = 1e-4  # smaller than resolution limit
+            img = ot.RImage([-r0, r0, -k/2*r0, k/2*r0])
+
+            for limit in [0.2, 5, 20]:
+
+                img.limit = limit
+                img.render(900, p, w, wl)
+                irr = img.img[:, :, 3]  # irradiance image
+
+                # radial distance in image
+                ny, nx = irr.shape[:2]
+                x = np.linspace(img.extent[0], img.extent[1], nx)
+                y = np.linspace(img.extent[2], img.extent[3], ny)
+                X, Y = np.meshgrid(x, y)
+                R = np.sqrt(X**2 + Y**2)
+
+                # get standard deviation and limit
+                # we need to divide by two since we only integrate over half the region
+                # because of R**2 > 0
+                sigma = np.sqrt(np.sum(R**2 * irr)/np.sum(irr)/2)
+                limit2 = sigma / 0.175*1000
+
+                # compare to limit
+                self.assertAlmostEqual(limit, limit2, delta=0.012)
+
     def test_refraction_index(self):
 
         func = lambda wl: 2.0 - wl/500/5 
+        func2 = lambda wl, a: a - wl/500/5 
+        wlf = color.wavelengths(1000)
+        funcf = func(wlf)
+        
+        n_list = [
+        # https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/archer.agf
+        (ot.RefractionIndex("Schott", coeff=[2.417473, -0.008685888, 0.01396835, 0.0006180845, -5.274288e-05, 3.679696e-06], desc="S-BAL3M"), 1.568151, 52.737315),
+        # https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/birefringent.agf
+        (ot.RefractionIndex("Sellmeier1", coeff=[1.29899, 0.0089232927, 43.17364, 1188.531, 0.0, 0.0], desc="ADP"), 1.523454, 52.25678),
+        (ot.RefractionIndex("Sellmeier4", coeff=[3.1399, 1.3786, 0.02941, 3.861, 225.9009], desc="ALN"), 2.154291, 50.733102),
+        (ot.RefractionIndex("Handbook of Optics 1", coeff=[2.7405, 0.0184, 0.0179, 0.0155], desc="BBO"), 1.670737, 52.593907),
+        (ot.RefractionIndex("Sellmeier3", coeff=[0.8559, 0.00345744, 0.8391, 0.019881, 0.0009, 0.038809, 0.6845, 49.070025], desc="CALCITE"), 1.658643, 48.541403),
+        (ot.RefractionIndex("Sellmeier5", coeff=[0.8559, 0.00345744, 0.8391, 0.019881, 0.0009, 0.038809, 0.6845, 49.070025, 0, 0], desc="CALCITE"), 1.658643, 48.541403),
+        (ot.RefractionIndex("Handbook of Optics 2", coeff=[2.81418, 0.87968, 0.09253764, 0.00711], desc="ZNO"), 2.003385, 12.424016),
+        # https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/hikari.agf
+        (ot.RefractionIndex("Extended3", coeff=[3.22566311, -0.0126719158, -0.000122584245, 0.0306900263, 0.000649958511, 1.0629994e-05, 1.20774149e-06, 0.0, 0.0], desc="Q-LASFH19S"), 1.82098, 42.656702),
+        (ot.RefractionIndex("Extended2", coeff=[2.54662904, -0.0122972332, 0.0187464623, 0.000460296583, 7.85351066e-07, 1.72720972e-06, -0.000133476806, 0.0], desc="E-KZFH1"), 1.61266, 44.461379),
+        # https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/infrared.agf
+        (ot.RefractionIndex("Herzberger", coeff=[2.2596285, 0.0311097853, 0.0010251756, -0.000594355286, 4.49796618e-07, -4.12852834e-09], desc="CLRTR_OLD"), 2.367678, 15.282309),
+        # https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/lightpath.agf
+        (ot.RefractionIndex("Conrady", coeff=[1.47444837, 0.0103147698, 0.00026742387], desc="NICHIA_MELT1"), 1.493724, 64.358478),
+        # https://refractiveindex.info/?shelf=glass&book=OHARA-PHM&page=PHM51
+        (ot.RefractionIndex("Extended", coeff=[2.5759016, -0.010553544, 0.013895937, 0.00026498331, -1.9680543e-06, 1.0989977e-07, 0, 0], desc="PHM"), 1.617,  62.8008),
+        # elements from presets
+        (ot.presets.refraction_index.COC, 1.5324098, 56.0522),
 
-        rargs = dict(V=50, coeff=[1.2, 1e-8], func=func, wls=[380, 780], vals=[1.5, 1.])
+        # different modes
+        (ot.RefractionIndex("Abbe", n=1.578, V=70), 1.578, 70),
+        (ot.RefractionIndex("Constant", n=1.2546), 1.2546, np.inf),
+        (ot.RefractionIndex("Function", func=func), 1.764976, 11.2404),
+        (ot.RefractionIndex("Function", func=func2, func_args=dict(a=2)), 1.764976, 11.2404),
+        (ot.RefractionIndex("Data", wls=wlf, vals=funcf), 1.764976, 11.2404),
+        ]
 
-        for type_ in ot.RefractionIndex.n_types:
-            n = ot.RefractionIndex(type_, **rargs)
-            n(550)
-            n.get_abbe_number()
-            n.is_dispersive()
+        for nl_ in n_list:
+            n, nc, V = nl_
 
-        # combinations to check for correct values
-        R = [ot.RefractionIndex("Constant", n=1.2),
-             ot.RefractionIndex("Cauchy", coeff=[1.2, 0.004]),
-             ot.RefractionIndex("Function", func=func)]
-                
-        # check values
-        wl = np.array([450., 580.])
-        Rval = np.array([[1.2, 1.2],
-                         [1.219753086, 1.211890606],
-                         [1.82, 1.768]])
+            n(color.wavelengths(1000))  # call with array
 
-        for i, Ri in enumerate(R):
-            for j, wlj in enumerate(wl):
-                self.assertAlmostEqual(Ri(wlj), Rval[i, j], places=5)
+            self.assertEqual(n.is_dispersive(), n.spectrum_type != "Constant")
+            self.assertAlmostEqual(n(np.array(ot.presets.spectral_lines.d)), nc, delta=5e-5)
+            self.assertAlmostEqual(n.get_abbe_number(), V, delta=0.3)
 
         # check if equal operator is working
         self.assertEqual(ot.presets.refraction_index.SF10, ot.presets.refraction_index.SF10)
-        self.assertEqual(R[1], R[1])
+        self.assertEqual(n_list[1][0], n_list[1][0])
+        assert n_list[-1][0].spectrum_type == "Data"
+        self.assertEqual(n_list[-1][0], n_list[-1][0])  # comparision of Data type
         self.assertEqual(ot.RefractionIndex("Function", func=func), ot.RefractionIndex("Function", func=func))
 
     def test_refraction_index_abbe_mode(self):
@@ -356,6 +425,7 @@ class TracerMiscTests(unittest.TestCase):
         # value exceptions
         self.assertRaises(ValueError, ot.RefractionIndex, "ABC")  # invalid type
         self.assertRaises(ValueError, ot.RefractionIndex, "Constant", n=0.99)  # n < 1
+        self.assertRaises(ValueError, ot.RefractionIndex, "Constant", n=np.inf)  # n not finite
         self.assertRaises(ValueError, ot.RefractionIndex, "Abbe", V=0)  # invalid V
         self.assertRaises(ValueError, ot.RefractionIndex, "Abbe", V=-1)  # invalid V
         self.assertRaises(ValueError, ot.RefractionIndex, "Abbe", V=np.inf)  # invalid V
@@ -371,14 +441,23 @@ class TracerMiscTests(unittest.TestCase):
         # type errors
         self.assertRaises(TypeError, ot.RefractionIndex, "Cauchy", coeff=1)  # invalid coeff type
         self.assertRaises(TypeError, ot.RefractionIndex, "Abbe", V=[1])  # invalid V type
+        self.assertRaises(TypeError, ot.RefractionIndex, "Constant", n=[5])  # n not a float
         n2 = ot.RefractionIndex("Function")
         self.assertRaises(TypeError, n2, 550)  # func missing
         self.assertRaises(TypeError, ot.RefractionIndex("Cauchy"), 550)  # coeffs not specified
         
         # misc
         self.assertRaises(AttributeError, n2.__setattr__, "aaa", 1)  # _new_lock active
-        self.assertRaises(RuntimeError, ot.RefractionIndex("Cauchy", coeff=[2, -1]), np.array([380., 780.]))  
+        self.assertRaises(RuntimeError, ot.RefractionIndex("Cauchy", coeff=[2, -1, 0, 0]), np.array([380., 780.]))  
         # n < 1 on runtime
+        
+        # check exceptions when wavelengths are outside data range
+        wl0, wl1 = color.WL_BOUNDS
+        color.WL_BOUNDS[1] = wl1 + 100
+        self.assertRaises(RuntimeError, ot.presets.refraction_index.PET, color.wavelengths(1000))
+        color.WL_BOUNDS[0] = wl0-100
+        color.WL_BOUNDS[1] = wl1
+        self.assertRaises(RuntimeError, ot.presets.refraction_index.PET, color.wavelengths(1000))
 
     def test_refraction_index_equality(self):
         # equal operator

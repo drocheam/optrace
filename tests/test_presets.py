@@ -51,7 +51,6 @@ class PresetTests(unittest.TestCase):
             self.assertNotEqual(spec.desc, "")
             self.assertNotEqual(spec.long_desc, "")
 
-
     def test_spectrum_presets(self):
         # check presets
         wl = color.wavelengths(1000)
@@ -63,6 +62,14 @@ class PresetTests(unittest.TestCase):
             # should have descriptions
             self.assertNotEqual(spec.desc, "")
             self.assertNotEqual(spec.long_desc, "")
+
+
+    def test_spectrum_outside_defintion(self):
+        # check that spectrum presets have constant 0 beyond their definition
+        for spec in [*ot.presets.light_spectrum.standard, *ot.presets.spectrum.tristimulus]:
+            if spec.desc != "E":
+                self.assertEqual(spec(10), 0)
+                self.assertEqual(spec(1000), 0)
 
     def test_illuminant_whitepoint(self):
 
@@ -148,7 +155,7 @@ class PresetTests(unittest.TestCase):
 
         for imgi in ot.presets.image.all_presets:
             RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
-            RSS = ot.Surface("Rectangle", dim=[6, 6])
+            RSS = ot.RectangularSurface(dim=[6, 6])
             RS = ot.RaySource(RSS, pos=[0, 0, 0], image=imgi)
             RT.add(RS)
             RT.trace(1000000)
@@ -163,7 +170,7 @@ class PresetTests(unittest.TestCase):
 
         def base_RT():
             RT = ot.Raytracer(outline=[-30, 30, -30, 30, -50, 200], silent=True)
-            RSS = ot.Surface("Circle", r=0.5)
+            RSS = ot.CircularSurface(r=0.5)
             RS = ot.RaySource(RSS, pos=[0, 0, -50], spectrum=ot.presets.light_spectrum.d65)
             RT.add(RS)
             return RT

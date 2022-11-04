@@ -94,24 +94,75 @@ Functions
 -------------
 
 Taken from https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
+and https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf
 
-See this website for other models.
+Wavelengths and coefficients are in powers of µm
 
 **Cauchy**
 
 .. math::
-   n = A+\frac{B}{\lambda^2}+\frac{C}{\lambda^4}+\frac{D}{\lambda^6}
+   n = c_0 + \frac{c_1}{\lambda^2} + \frac{c_2}{\lambda^4} + \frac{c_3}{\lambda^6}
 
 **Conrady**
 
 .. math::
-   n =A+\frac{B}{\lambda}+\frac{C}{\lambda^{3.5}}
+   n = c_0+ \frac{c_1} {\lambda} + \frac{c_2} {\lambda^{3.5}}
 
-**Sellmeier**
+**Extended**
 
 .. math::
-   n^2=1+\frac{A_1 \lambda^2}{\lambda^2-B_1}+\frac{A_2 \lambda^2}{\lambda^2-B_2}+\frac{A_3 \lambda^2}{\lambda^2-B_3}+\frac{A_4 \lambda^2}{\lambda^2-B_4}
-   
+   n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+ \frac{c_4} {\lambda^{6}}+ \frac{c_5} {\lambda^{8}}+ \frac{c_6} {\lambda^{10}}+\frac{c_7} {\lambda^{12}}
+
+**Extended2**
+
+.. math::
+   n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}+c_6 \lambda^4+c_7 \lambda^6
+
+**Handbook of Optics 1**
+
+.. math::
+   n^2 = c_0+\frac{c_1}{\lambda^2-c_2}-c_3 \lambda^2
+
+**Handbook of Optics 2**
+
+.. math::
+   n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}-c_3 \lambda^2
+
+**Herzberger**
+
+.. math::
+   n = c_0+c_1 L+c_2 L^2+c_3 \lambda^2+c_4 \lambda^4+c_5 \lambda^6 \text{,   with   } L= \frac{1} {\lambda^2-0.028 {\mu m^2}}
+
+**Sellmeier1**
+
+.. math::
+   n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}
+
+**Sellmeier2**
+
+.. math::
+   n^2 = 1+c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2^2}+\frac{c_3}{\lambda^2-c_4^2}
+
+**Sellmeier3**
+
+.. math::
+   n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}
+
+**Sellmeier4**
+
+.. math::
+   n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}+\frac{c_3 \lambda^2}{\lambda^2-c_4}
+
+**Sellmeier5**
+
+.. math::
+   n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}+\frac{c_8 \lambda^2}{\lambda^2-c_9}
+
+**Schott**
+
+.. math::
+   n^2 = c_0+c_1 \lambda^2+\frac{c_2}{ \lambda^{2}}+\frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}
+
 
 Abbe Number
 --------------
@@ -128,7 +179,7 @@ Curve from Abbe Number
 .. math::
    n = A + \frac{B}{\lambda^2 - d}
 
-With :math:`d=0.014\, \mu\text{m}^2` which is a compromise between the Cauchy (:math:`d=0`) and the Hetzberger (:math:`d=0.028\,\mu\text{m}^2`) model.
+With :math:`d=0.014\, \mu\text{m}^2` which is a compromise between the Cauchy (:math:`d=0`) and the Herzberger (:math:`d=0.028\,\mu\text{m}^2`) model.
 
 With :math:`n_\text{s}=n(\lambda_\text{s}),~n_\text{c}=n(\lambda_\text{c}),~n_\text{l}=n(\lambda_\text{l})` and the Abbe number equation in {} we can solve for :math:`A,~B`:
 

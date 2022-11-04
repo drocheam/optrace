@@ -8,6 +8,9 @@ from ..misc import PropertyChecker as pc
 from ..base_class import BaseClass
 
 
+class Marker:
+    pass
+
 class Marker(BaseClass):
 
     def __init__(self,
@@ -35,6 +38,9 @@ class Marker(BaseClass):
     def extent(self) -> tuple[float, float, float, float, float, float]:
         """"""
         return self.pos.repeat(2)
+
+    def reverse(self) -> Marker:
+        return self.copy()
 
     def __setattr__(self, key, val):
         """"""

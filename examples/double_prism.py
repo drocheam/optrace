@@ -23,15 +23,15 @@ print(f"Abbe Number: {n.get_abbe_number():.4g}")
 RT = ot.Raytracer(outline=[-4, 5, -3, 5, -1, 27.5])
 
 # add Raysource
-RSS = ot.Surface("Circle", r=0.05)
+RSS = ot.CircularSurface(r=0.05)
 RS = ot.RaySource(RSS, divergence="None", spectrum=RS_spectrum,
                   pos=[-2.5, 0, 0], s=[0.3, 0, 0.7])
 RT.add(RS)
 
 # Prism 1
 # the surfaces are tilted circles specified by a normal vector
-front = ot.Surface("Circle", r=3, normal=[-0.45, 0, np.sqrt(1-0.45**2)])
-back = ot.Surface("Circle", r=3, normal=[0.45, 0, np.sqrt(1-0.45**2)])
+front = ot.TiltedSurface(r=3, normal=[-0.45, 0, np.sqrt(1-0.45**2)])
+back = ot.TiltedSurface(r=3, normal=[0.45, 0, np.sqrt(1-0.45**2)])
 L1 = ot.Lens(front, back, de=0.5, pos=[0, 0, 10], n=n)
 RT.add(L1)
 
@@ -41,7 +41,7 @@ L2 = ot.Lens(back, front, de=0.5, pos=[0, 0, 16.5], n=n)
 RT.add(L2)
 
 # add Detector
-Det = ot.Detector(ot.Surface("Rectangle", dim=[5, 5]), pos=[0, 0, 23.])
+Det = ot.Detector(ot.RectangularSurface(dim=[5, 5]), pos=[0, 0, 23.])
 RT.add(Det)
 
 # run the simulator

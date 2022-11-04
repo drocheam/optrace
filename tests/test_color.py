@@ -19,12 +19,17 @@ import optrace.tracer.misc as misc
 class ColorTests(unittest.TestCase):
 
     def test_color_doctest(self):
-        doctest.testmod(ot.tracer.color)
+        doctest.testmod(ot.tracer.color.illuminants)
+        doctest.testmod(ot.tracer.color.observers)
+        doctest.testmod(ot.tracer.color.srgb)
+        doctest.testmod(ot.tracer.color.xyz)
+        doctest.testmod(ot.tracer.color.tools)
+        doctest.testmod(ot.tracer.color.luv)
 
     def test_white_d65(self):
         # raytracer geometry of only a Source
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
-        RSS = ot.Surface("Rectangle", dim=[6, 6])
+        RSS = ot.RectangularSurface(dim=[6, 6])
         RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65)
         RT.add(RS)
 
@@ -187,11 +192,18 @@ class ColorTests(unittest.TestCase):
                          color.luv_chroma(luv),
                          color.luv_hue(luv)))
 
-        diff = np.abs(lch - c.data.T)/100  # values are in range 0 - xxx
+        # check l and c
+        diff = np.abs(lch[:, :, :2] - c.data.T[:, :2])/100  # values are in range 0 - xxx
         where = np.argmax(diff.flatten())
         self.assertAlmostEqual(np.max(diff), 0, delta=1e-4)
         self.assertAlmostEqual(np.mean(diff), 0, delta=1e-6)
         
+        # hue needs to be handled differently, see
+        # https://stackoverflow.com/a/7869457
+        get_diff_ang = lambda a, b: (a-b + 180) % 360 - 180
+        diff_ang = np.max(np.abs(get_diff_ang(lch[:, :, 2], c.data.T[:, 2])))
+        self.assertAlmostEqual(diff_ang/360, 0, delta=0.003)  # 0.03% error, equals around 0.1 deg
+
         # special case 1: completely dark
         d = color.xyz_to_luv(np.zeros((1, 1, 3)), normalize=False)
         self.assertAlmostEqual(color.luv_chroma(d), 0, delta=1e-5)
@@ -309,7 +321,7 @@ class ColorTests(unittest.TestCase):
     def test_image_color_rendering(self):
         # return
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
-        RSS = ot.Surface("Rectangle", dim=[6, 6])
+        RSS = ot.RectangularSurface(dim=[6, 6])
         RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65)
         RT.add(RS)
         
@@ -335,11 +347,18 @@ class ColorTests(unittest.TestCase):
                 self.assertAlmostEqual(RSp, Cp, delta=0.0012)
 
     def test_non_default_wavelength_range(self):
-        # TODO check that there are exceptions for spectral lines outside the wavelength range
-        # TODO check that continuous spectra (gauss, blackbody,  e illuminant, ...) work outside the initial range
-        # TODO check that all things work with a smaller range
+        # change wavelength range
+        wl0, wl1 = color.WL_BOUNDS
+        color.WL_BOUNDS[:] = [200, 700]  # we need to 
+        wl = color.wavelengths(2)
+        self.assertEqual(wl[0], 200.)
+        self.assertEqual(wl[1], 700.)
 
-        pass
+        # reset range
+        color.WL_BOUNDS[:] = [wl0, wl1]
+        wl = color.wavelengths(2)
+        self.assertEqual(wl[0], wl0)
+        self.assertEqual(wl[1], wl1)
 
     def test_additional_coverage(self):
 

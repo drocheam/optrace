@@ -28,6 +28,7 @@ Properties with FrontSurface + BackSurface:
 
 
 from typing import Any  # Any type
+import copy
 
 import numpy as np  # calculations
 
@@ -36,6 +37,9 @@ from . import Surface, Point, Line
 from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 
+
+class Element:
+    pass
 
 class Element(BaseClass):
 
@@ -151,33 +155,45 @@ class Element(BaseClass):
         :param fallback: unused parameter
         :return:
         """
-        stype1 = self.front.surface_type if isinstance(self.front, Surface)\
-                else type(self.front).__name__
+        stype1 = type(self.front).__name__
 
         if self.has_back():
-            stype2 = self.back.surface_type if isinstance(self.back, Surface)\
-                else type(self.back).__name__
-            fallback = f"{stype1} + {stype2} "\
-                       f"at [{self.pos[0]:.04g}, {self.pos[1]:.04g}, {self.pos[2]:.04g}]"
+            stype2 = type(self.back).__name__
+            fallback = f"{stype1} + {stype2}, z = {self.pos[2]:.04g}"
         else:
-            fallback = f"{stype1} at [{self.pos[0]:.04g}, "\
-                       f"{self.pos[1]:.04g}, {self.pos[2]:.04g}]"
+            fallback = f"{stype1}, z = {self.pos[2]:.04g}"
 
         return super().get_desc(fallback)
 
-    def get_cylinder_surface(self, nc: int = 100, d: float = 0.1) \
+    def get_cylinder_surface(self, nc: int = 100) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get a 3D surface representation of the Element cylinder for plotting.
 
         :param nc: number of surface edge points (int)
-        :param d: thickness for visualization (float)
         :return: tuple of coordinate arrays X, Y, Z (2D numpy arrays)
         """
         X1, Y1, Z1 = self.front.get_edge(nc)
-        X2, Y2, Z2 = self.back.get_edge(nc) if self.has_back() else (X1, Y1, Z1 + d)
+        X2, Y2, Z2 = self.back.get_edge(nc) if self.has_back() else (X1, Y1, Z1)
 
         return np.column_stack((X1, X2)), np.column_stack((Y1, Y2)), np.column_stack((Z1, Z2))
+
+    def reverse(self) -> Element:
+
+        if self.has_back():
+            front = self.back.reverse()
+            back = self.front.reverse()
+
+            args = {}
+            for key, val in self.__dict__.items():
+                if not key.startswith("_") and not key in ["front", "back", "pos", "d1", "d2"]:
+                    args[key] = copy.deepcopy(val)
+
+            return type(self)(front, back, pos=self.pos, d1=self.d2, d2=self.d1, **args)
+        else:
+            el = self.copy()
+            el.set_surface(self.front.reverse())
+            return el
 
     @staticmethod
     def check_collision(front: Surface | Line | Point, back: Surface | Line | Point, res: int = 100)\

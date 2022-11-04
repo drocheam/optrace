@@ -15,6 +15,18 @@ from optrace.tracer.transfer_matrix_analysis import TMA as TMA
 
 class TMATests(unittest.TestCase):
 
+    def test_tma_empty(self):
+
+        tma = TMA([])
+
+        # abcd matrix is unity matrix
+        self.assertTrue(np.allclose(tma.abcd - np.eye(2), 0))
+
+        # all other properties are set to nan
+        for val in [tma.ffl, tma.bfl, tma.efl, tma.efl_n, tma.power, tma.power_n, tma.focal_length, tma.vertex_point,
+                    tma.focal_point, tma.nodal_point, tma.principal_point, tma.d, tma.focal_length_n]:
+            self.assertTrue(np.all(np.isnan(val)))
+
     def test_tma_single_lens_efl(self):
 
         R1 = 100
@@ -26,11 +38,11 @@ class TMATests(unittest.TestCase):
         nc = ot.RefractionIndex("Constant", n=1)
         n1 = ot.RefractionIndex("Abbe", n=1.3, V=60)
         n2 = ot.RefractionIndex("Abbe", n=1.1, V=60)
-        spa = ot.Surface("Sphere", r=3, R=R1)
-        spb = ot.Surface("Sphere", r=3, R=-R2)
-        aspa = ot.Surface("Conic", r=3, R=R1)
-        aspb = ot.Surface("Conic", r=3, R=-R2)
-        circ = ot.Surface("Circle", r=3)
+        spa = ot.SphericalSurface(r=3, R=R1)
+        spb = ot.SphericalSurface(r=3, R=-R2)
+        aspa = ot.ConicSurface(r=3, R=R1, k=-0.4564)
+        aspb = ot.ConicSurface(r=3, R=-R2, k=0.5)
+        circ = ot.CircularSurface(r=3)
 
         # lens maker equation
         def getf(R1, R2, n, n1, n2, d):
@@ -73,11 +85,11 @@ class TMATests(unittest.TestCase):
         nc = ot.RefractionIndex("Constant", n=1)
         n1 = ot.RefractionIndex("Constant", n=1.3)
         n2 = ot.RefractionIndex("Constant", n=1.1)
-        spa = ot.Surface("Sphere", r=3, R=R1)
-        spb = ot.Surface("Sphere", r=3, R=-R2)
-        spc = ot.Surface("Sphere", r=3, R=-R1)
-        spd = ot.Surface("Sphere", r=3, R=R2)
-        circ = ot.Surface("Circle", r=3)
+        spa = ot.SphericalSurface(r=3, R=R1)
+        spb = ot.SphericalSurface(r=3, R=-R2)
+        spc = ot.SphericalSurface(r=3, R=-R1)
+        spd = ot.SphericalSurface(r=3, R=R2)
+        circ = ot.CircularSurface(r=3)
 
         def cmp_props(L, list2, n0=ot.RefractionIndex("Constant", n=1)):
             tma = L.tma(n0=n0)
@@ -195,7 +207,7 @@ class TMATests(unittest.TestCase):
 
     def test_tma_image_object_distances(self):
 
-        L = ot.Lens(ot.Surface("Sphere", R=100), ot.Surface("Sphere", R=-200), de=0, pos=[0, 0, 2],
+        L = ot.Lens(ot.SphericalSurface(r=1, R=100), ot.SphericalSurface(r=2, R=-200), de=0, pos=[0, 0, 2],
                     n=ot.RefractionIndex("Constant", n=1.5))
         Ltma = L.tma()
         Lf = 2/(1/100 + 1/200)
@@ -243,7 +255,7 @@ class TMATests(unittest.TestCase):
 
     def test_tma_error_cases(self):
 
-        L = ot.Lens(ot.Surface("Circle"), ot.Surface("Circle"), pos=[0, 0, 0], n=ot.presets.refraction_index.SF10)
+        L = ot.Lens(ot.CircularSurface(r=1), ot.CircularSurface(r=1), pos=[0, 0, 0], n=ot.presets.refraction_index.SF10)
         
         self.assertRaises(TypeError, TMA, [L], wl=None)  # invalid wl type
         self.assertRaises(TypeError, TMA, L, wl=None)  # invalid lenses type
@@ -251,10 +263,8 @@ class TMATests(unittest.TestCase):
         self.assertRaises(ValueError, TMA, [L], wl=10)  # wl to small
         self.assertRaises(ValueError, TMA, [L], wl=1000)  # wl to large
 
-        self.assertRaises(ValueError, TMA, [])  # empty lens list
-
         # check if only symmetric lenses
-        self.assertRaises(RuntimeError, ot.Lens(ot.Surface("Circle"), ot.Surface("Circle", normal=[0, 1, 1]),
+        self.assertRaises(RuntimeError, ot.Lens(ot.CircularSurface(r=1), ot.TiltedSurface(r=1, normal=[0, 1, 1]),
                           n=ot.presets.refraction_index.SF10, pos=[0, 0, 0]).tma)
 
         # check surface collision
@@ -277,10 +287,28 @@ class TMATests(unittest.TestCase):
         self.assertRaises(AttributeError, tma.__setattr__, "n78", ot.presets.refraction_index.LAK8)  # invalid property
         self.assertRaises(RuntimeError, tma.__setattr__, "wl", 560)  # object locked
 
+    def test_tma_ideal_lens(self):
+
+        for D in [30.4897, -12.5]:  # different optical powers
+
+            L0 = ot.IdealLens(r=2, D=D, pos=[0, 0, 1])
+            L1 = ot.IdealLens(r=2, D=D, n2=ot.RefractionIndex("Constant", n=2), pos=[0, 0, 1])
+
+            RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 60])
+            RT.add(L0)
+
+            LL = [ot.IdealLens(r=2, D=D*2/3, pos=[0, 0, 0]), ot.IdealLens(r=2, D=D/3, pos=[0, 0, 1e-9])]
+
+            for tma in [L0.tma(), L1.tma(), RT.tma(), ot.TMA(LL)]:
+                abcd1 = tma.abcd
+                abcd = np.array([[1, 0], [-D/1000, 1]])  # 30dpt (1/m) ->  0.03 (1/mm)
+                self.assertTrue(np.allclose(abcd1-abcd, 0))
+                self.assertAlmostEqual(tma.power[1], D)
+
     def test_tma_misc(self):
 
         # test tma.trace
-        L = ot.Lens(ot.Surface("Sphere", R=100), ot.Surface("Sphere", R=-200), de=0, pos=[0, 0, 2],
+        L = ot.Lens(ot.SphericalSurface(r=1, R=100), ot.SphericalSurface(r=1, R=-200), de=0, pos=[0, 0, 2],
                     n=ot.RefractionIndex("Constant", n=1.5))
         Ltma = L.tma()
         Ltma.trace([1.2, -0.7])  # list input

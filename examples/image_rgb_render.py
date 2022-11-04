@@ -10,20 +10,20 @@ Image_path = ot.presets.image.test_screen
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
 # add Raysource
-RSS = ot.Surface("Rectangle", dim=[4, 4])
+RSS = ot.RectangularSurface(dim=[4, 4])
 RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8,
                   image=Image_path, s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 
 # add Lens 1
-front = ot.Surface("Sphere", r=3, R=8)
-back = ot.Surface("Sphere", r=3, R=-8)
+front = ot.SphericalSurface(r=3, R=8)
+back = ot.SphericalSurface(r=3, R=-8)
 nL1 = ot.RefractionIndex("Constant", n=1.5)
 L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
 RT.add(L1)
 
 # add Detector
-Det = ot.Detector(ot.Surface("Rectangle", dim=[10, 10]), pos=[0, 0, 36])
+Det = ot.Detector(ot.RectangularSurface(dim=[10, 10]), pos=[0, 0, 36])
 RT.add(Det)
 
 # render and show detector image

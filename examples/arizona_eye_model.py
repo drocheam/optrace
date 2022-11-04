@@ -26,7 +26,7 @@ def F(x, y):
 RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], absorb_missing=True, no_pol=False)
 
 # add RaySource
-RSS = ot.Surface("Rectangle", dim=[2*G, 2*G])
+RSS = ot.RectangularSurface(dim=[2*G, 2*G])
 RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=sr_angle, image=ot.presets.image.ETDRS_chart_inverted, 
                pos=[0, 0, -g], orientation="Function", or_func=F, desc="USAF Chart")
 RT.add(RS)
@@ -36,5 +36,5 @@ geom = ot.presets.geometry.arizona_eye(adaptation=A, pupil=P)
 RT.add(geom)
 
 # Instantiate the class and configure its traits.
-TG = TraceGUI(RT, ray_count=1000000, flip_det_image=True, ray_opacity=-2.25)
+TG = TraceGUI(RT, ray_count=1000000, flip_det_image=True, ray_opacity=0.01)
 TG.run()

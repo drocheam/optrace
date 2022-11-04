@@ -15,6 +15,7 @@ After this ``optrace`` should be installed on your system. To verify this, you c
 
 External dependencies include
 
+* `chardet <https://chardet.readthedocs.io/en/latest/>`
 * `mayavi <https://docs.enthought.com/mayavi/mayavi/>`_
 * `matplotlib <https://matplotlib.org/stable/users/index>`_
 * `numexpr <https://numexpr.readthedocs.io/projects/NumExpr3/en/latest/user_guide.html>`_

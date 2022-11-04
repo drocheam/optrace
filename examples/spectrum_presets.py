@@ -9,9 +9,9 @@ ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_led, labels_off=True, 
 ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_fl, labels_off=True, title="Standard Illuminants Fluorescent")
 
 ot.plots.chromacities_cie_1931(ot.presets.light_spectrum.srgb)
-ot.plots.spectrum_plot(ot.presets.light_spectrum.srgb, colors=["r", "g", "b", "k"],
+ot.plots.spectrum_plot(ot.presets.light_spectrum.srgb, color=["r", "g", "b", "k"],
                        labels_off=True, title="sRGB Primaries")
 
-ot.plots.spectrum_plot(ot.presets.spectrum.tristimulus, block=True, colors=["r", "g", "b"],
+ot.plots.spectrum_plot(ot.presets.spectrum.tristimulus, block=True, color=["r", "g", "b"],
                        title="Tristimulus Curves", labels_off=True)
         

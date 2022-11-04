@@ -8,7 +8,7 @@ if __name__ == '__main__':
 
     # load package information
     path = os.path.join("optrace", "__metadata__.py")
-    with open(path) as f:
+    with open(path, "r") as f:
         exec(f.read())
 
     # metadata is found in ./optrace/__metadata__.py
@@ -42,10 +42,10 @@ if __name__ == '__main__':
                          "Topic :: Software Development :: Libraries"],
             #
             python_requires='>=3.10, <3.11',
-            packages=["optrace", "optrace.tracer", "optrace.tracer.color", "optrace.tracer.geometry",
+            packages=["optrace", "optrace.tracer", "optrace.tracer.color", "optrace.tracer.geometry", "optrace.tracer.geometry.surface",
                       "optrace.tracer.spectrum", "optrace.tracer.presets", "optrace.gui", "optrace.plots"],
-            install_requires=['numpy>1.21', 'numexpr', 'scipy', 'Pillow', 'vtk', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi'],
-            tests_require=['pynput', 'tox', 'colorio'],
+            install_requires=['numpy>1.21', 'numexpr', 'chardet', 'scipy', 'Pillow', 'vtk', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi'],
+            tests_require=['pynput', 'tox', 'colorio', 'requests'],
             package_data={"": ["*.png", "*.jpg", "*.csv"]},   # includes tables and images
             include_package_data=True,
         )

@@ -8,7 +8,7 @@ from optrace.gui import TraceGUI
 RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 300])
 
 # object
-RSS = ot.Surface("Rectangle", dim=[200e-3, 200e-3])
+RSS = ot.RectangularSurface(dim=[200e-3, 200e-3])
 RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.bacteria,
                   pos=[0, 0, 0], s=[0, 0, 1], div_angle=27, desc="Bacteria")
 RT.add(RS)
@@ -23,14 +23,14 @@ R2 = -7.29
 objective = ot.Group(desc="Objective")
 
 # Lens 1 of doublet
-front = ot.Surface("Circle", r=5.5)
-back = ot.Surface("Sphere", r=5.5, R=-R2)
+front = ot.CircularSurface(r=5.5)
+back = ot.SphericalSurface(r=5.5, R=-R2)
 L01 = ot.Lens(front, back, d1=0.5, d2=0, pos=[0, 0, 0], n=n2, n2=n2)
 objective.add(L01)
 
 # Lens 2 of doublet
-front = ot.Surface("Sphere", r=5.5, R=-R2)
-back = ot.Surface("Conic", r=5.5, R=-R1, k=-0.55)
+front = ot.SphericalSurface(r=5.5, R=-R2)
+back = ot.ConicSurface(r=5.5, R=-R1, k=-0.55)
 L02 = ot.Lens(front, back, d1=0, d2=5.3, pos=[0, 0, 0.0001], n=n1)
 objective.add(L02)
 
@@ -46,7 +46,7 @@ RT.add(objective)
 z_img0 = 225
 
 # detector for tubus image
-square = ot.Surface("Rectangle", dim=[6, 6])
+square = ot.RectangularSurface(dim=[6, 6])
 det = ot.Detector(square, pos=[0, 0, z_img0], desc="Tubus Image")
 RT.add(det)
 
@@ -59,14 +59,14 @@ R2 = -9.25
 eyepiece = ot.Group(desc="Eyepiece")
 
 # Eyepiece doublet lens 1
-front = ot.Surface("Conic", r=4, R=R1, k=-0.55)
-back = ot.Surface("Sphere", r=4, R=R2)
+front = ot.ConicSurface(r=4, R=R1, k=-0.55)
+back = ot.SphericalSurface(r=4, R=R2)
 L11 = ot.Lens(front, back, de=0.5, pos=[0, 0, 0], n=n1, n2=n1)
 eyepiece.add(L11)
 
 # Eyepiece doublet lens 2
-front = ot.Surface("Sphere", r=4, R=R2)
-back = ot.Surface("Circle", r=4)
+front = ot.SphericalSurface(r=4, R=R2)
+back = ot.CircularSurface(r=4)
 L12 = ot.Lens(front, back, d1=0, d2=0.5, pos=[0, 0, L11.extent[5]+0.0001], n=n2)
 eyepiece.add(L12)
 

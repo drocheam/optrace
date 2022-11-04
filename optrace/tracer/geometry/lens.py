@@ -15,10 +15,15 @@ from ..misc import PropertyChecker as pc  # check types and values
 from ..transfer_matrix_analysis import TMA
 
 
+class Lens:
+    pass
+
 class Lens(Element):
 
     abbr: str = "L"  #: object abbreviation
     _allow_non_2D: bool = False  # don't allow points or lines as surfaces
+    
+    is_ideal: bool = False
 
     def __init__(self,
                  front:   Surface,

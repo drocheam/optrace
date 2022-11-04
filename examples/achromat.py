@@ -46,7 +46,7 @@ print(f"D1 = {D1:.2f} dpt, D2 = {D2:.2f} dpt\n")
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, -15, 60])
 
 # Source 1
-RSS1 = ot.Surface("Circle", r=0.05)
+RSS1 = ot.CircularSurface(r=0.05)
 RS1 = ot.RaySource(RSS1, divergence="None", spectrum=ot.presets.light_spectrum.F_eC_,
                   pos=[3, 0, -10], s=[0, 0, 1])
 RT.add(RS1)
@@ -57,21 +57,21 @@ RS2.move_to([-3, 0, -10])
 RT.add(RS2)
 
 # Lens 1 of doublet
-front = ot.Surface("Sphere", r=4, R=R1)
-back = ot.Surface("Sphere", r=4, R=R2)
+front = ot.SphericalSurface(r=4, R=R1)
+back = ot.SphericalSurface(r=4, R=R2)
 L1 = ot.Lens(front, back, de=0.2, pos=[0, 0, 0], n=n1)
 RT.add(L1)
 
 # Lens 2 of doublet
-front = ot.Surface("Sphere", r=4, R=R2)
-back = ot.Surface("Circle", r=4)
+front = ot.SphericalSurface(r=4, R=R2)
+back = ot.CircularSurface(r=4)
 # set d1=0, so "pos" is relative to the lens front vertex. In this case d2 is the overall thickness at the optical axis
 # Set pos so that lens 2 comes directly after lens 1 with only a tight air gap
 L2 = ot.Lens(front, back, d1=0, d2=0.5, pos=[0, 0, L1.extent[5]+0.001], n=n2)
 RT.add(L2)
 
 # add Detector
-DETS = ot.Surface("Rectangle", dim=[10, 10])
+DETS = ot.RectangularSurface(dim=[10, 10])
 DET = ot.Detector(DETS, pos=[0, 0, 60])
 RT.add(DET)
 

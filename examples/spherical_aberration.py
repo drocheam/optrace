@@ -22,8 +22,8 @@ RT = ot.Raytracer(outline=[-10, 10, -10, 10, -25, 40])
 
 # all elements in the geometry (sources, lenses, detectors, ...) consist of Surfaces
 # a Surface object describes a specific height behaviour depending on 2D coordinates relative to its center
-# for the raysource we define a circle perpendicular to the z-axis with a radius of 1
-RSS0 = ot.Surface("Circle", r=1)
+# for the raysource we define a circle surface, which is perpendicular to the z-axis with a radius of 1
+RSS0 = ot.CircularSurface(r=1)
 
 # a raysource creates the rays for raytracing, it consists of a surface, a ray divergence behaviour, 
 # a specific light spectrum, a specific base orientation of the rays as well as a specific polarization
@@ -39,7 +39,7 @@ RT.add(RS0)
 
 # we create a similar ray source, this time with a ring as surface
 # a ring is basically a circle, with an inner circle with radius ri cut out
-RSS1 = ot.Surface("Ring", r=4.5, ri=1)
+RSS1 = ot.RingSurface(r=4.5, ri=1)
 RS1 = ot.RaySource(RSS1, divergence="None", spectrum=ot.presets.light_spectrum.d65,
                   pos=[0, 0, -15], s=[0, 0, 1])
 RT.add(RS1)
@@ -54,8 +54,8 @@ n = ot.RefractionIndex("Constant", n=1.5)
 # a lens consists of a front and back spherical surface
 # for this we need a Surface with mode "Sphere", as before r specifies the maximum extent from the surface center
 # R specifies the sphere curvature. For a biconvex lens the front has a positive curvature and the back a negative one
-front = ot.Surface("Sphere", r=5, R=15)
-back = ot.Surface("Sphere", r=5, R=-15)
+front = ot.SphericalSurface(r=5, R=15)
+back = ot.SphericalSurface(r=5, R=-15)
 # when creating the lens we need to provide both front and back surface
 # there are multiple ways to provide the thickness property of the lens or rather the distance between surfaces
 # in our case we provide de, which is a thickness extension between front and back surface
@@ -69,7 +69,7 @@ RT.add(L)
 # as the source in consists of a single surface
 # in our case we want a rectangular detector with side lengths 20mm
 # for this we define a Surface with mode "Rectangle" and a dim vector of [20, 20]
-DETS = ot.Surface("Rectangle", dim=[20, 20])
+DETS = ot.RectangularSurface(dim=[20, 20])
 # a detector takes a surface and a position
 DET = ot.Detector(DETS, pos=[0, 0, 23.])
 RT.add(DET)

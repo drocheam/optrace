@@ -22,6 +22,7 @@ import numexpr as ne  # faster calculations
 # geometries
 from .element import Element  # parent class
 from . import Surface, Line, Point  # source types
+from .surface.rectangular_surface import RectangularSurface
 
 # spectrum and color
 from ..spectrum.light_spectrum import LightSpectrum  # spectrum of source
@@ -57,6 +58,7 @@ class RaySource(Element):
                  # Divergence Parameters
                  divergence:         str = "None",
                  s:                  (list | np.ndarray) = None,
+                 ss:                 (list | np.ndarray) = None,
                  div_angle:          float = 0.5,
                  div_2d:             bool = False,
                  div_axis_angle:     float = 0,
@@ -105,6 +107,7 @@ class RaySource(Element):
         self.power = power
         self.spectrum = spectrum if spectrum is not None else d65_spectrum
         self.pIf = None
+        self._mean_img_color = None
         self.image = image
 
         # polarization 
@@ -117,7 +120,14 @@ class RaySource(Element):
         self.orientation = orientation
         self.or_func = or_func
         self.or_kwargs = or_kwargs if or_kwargs is not None else {}
-        self.s = s if s is not None else [0, 0, 1]
+
+        if ss is None:
+            self.s = s if s is not None else [0, 0, 1]
+        else:
+            pc.check_type("ss", ss, list | np.ndarray)
+            theta, phi = np.radians(ss[0]), np.radians(ss[1])
+            self.s = [np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi), np.cos(theta)]
+
         self.div_axis_angle = div_axis_angle
         self.div_func = div_func
         self.div_2d = div_2d
@@ -125,21 +135,18 @@ class RaySource(Element):
         # lock assignment of new properties. New properties throw an error.
         self._new_lock = True
 
-    def get_color(self) -> tuple[float, float, float, float]:
+    def get_color(self, rendering_intent: str = "Ignore", clip=False) -> tuple[float, float, float]:
         """
 
+        :param rendering_intent:
+        :param clip:
         :return:
         """
         if self.image is not None:
-            # mean color needs to calculated in a linear colorspace, hence sRGBLinear
-            sRGBL = color.srgb_to_srgb_linear(self.image)
-            sRGBL_mean = np.mean(sRGBL, axis=(0, 1))
-            sRGB_mean = color.srgb_linear_to_srgb(np.array([[[*sRGBL_mean]]]))
-
-            return *sRGB_mean[0, 0], 1.0
+            return self._mean_img_color
 
         else:
-            return self.spectrum.get_color()
+            return self.spectrum.get_color(rendering_intent, clip)
 
     def create_rays(self, N: int, no_pol: bool = False, power: float = None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -172,8 +179,8 @@ class RaySource(Element):
             p = self.surface.get_random_positions(N)
 
         else:
-            if not isinstance(self.surface, Surface) or self.surface.surface_type != "Rectangle":
-                raise RuntimeError("Images can only be used with surface_type='Rectangle'")
+            if not isinstance(self.surface, RectangularSurface):
+                raise RuntimeError("Images can only be used with RectangularSurface")
 
             # special case image with only one pixel
             if self.image.shape[0] == 1 and self.image.shape[1] == 1:
@@ -419,11 +426,18 @@ class RaySource(Element):
 
                 self.pIf = 1/Ifs*If
 
+                # calculate mean image color, needed for self.get_color
+                # mean color needs to calculated in a linear colorspace, hence sRGBLinear
+                sRGBL = color.srgb_to_srgb_linear(img)
+                sRGBL_mean = np.mean(sRGBL, axis=(0, 1))
+                sRGB_mean = color.srgb_linear_to_srgb(np.array([[[*sRGBL_mean]]]))
+                self._mean_img_color = sRGB_mean[0, 0]
+
                 super().__setattr__(key, img)
                 return
 
             case "front":
-                if not (isinstance(val, Point | Line) or (isinstance(val, Surface) and val.no_z_extent())):
+                if not (isinstance(val, Point | Line) or (isinstance(val, Surface) and val.is_flat())):
                     raise ValueError("Currently only planar surfaces are supported for RaySources.")
 
         super().__setattr__(key, val)

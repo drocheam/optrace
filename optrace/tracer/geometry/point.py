@@ -6,6 +6,9 @@ import numpy as np  # calculations
 from ..base_class import BaseClass  # parent class
 
 
+class Point:
+    pass
+
 class Point(BaseClass):
 
     def __init__(self,
@@ -36,6 +39,11 @@ class Point(BaseClass):
         self.z_max = pos[2]
 
         self.lock()
+
+    def reverse(self) -> Point:
+        P = self.copy()
+        P.move_to([0, 0, 0])
+        return P
 
     @property
     def extent(self) -> tuple[float, float, float, float, float, float]:

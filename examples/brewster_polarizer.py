@@ -18,7 +18,7 @@ b_ang = np.arctan(1.55/1)
 RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], threading=True, absorb_missing=False)
 
 # source parameters
-RSS = ot.Surface("Circle", r=0.05)
+RSS = ot.CircularSurface(r=0.05)
 spectrum = ot.LightSpectrum("Monochromatic", wl=550.)
 s = [0, np.sin(b_ang), np.cos(b_ang)]
 
@@ -34,13 +34,13 @@ RT.add(RS1)
 RT.add(RS2)
 
 # add refraction index steps
-surf = ot.Surface("Circle", r=2, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
+surf = ot.TiltedSurface(r=2, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
 for i in np.arange(12):
     L = ot.Lens(surf, surf, d=0.2, pos=[-0.4, 0, 2*i*0.25], n=n)
     RT.add(L)
 
 # add Detector
-Det = ot.Detector(ot.Surface("Rectangle", dim=[6, 6]), pos=[0, 0, 12])
+Det = ot.Detector(ot.RectangularSurface(dim=[6, 6]), pos=[0, 0, 12])
 RT.add(Det)
 
 # Instantiate the class and configure its traits.

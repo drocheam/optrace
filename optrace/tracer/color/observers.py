@@ -5,7 +5,7 @@ import numpy as np  # calculations
 # load observers
 _obs_names = ["wl", "x", "y", "z"]
 _obs_path = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "observers.csv"
-_observers = np.genfromtxt(_obs_path, skip_header=1, delimiter=",", dtype=np.float64)
+_observers = np.genfromtxt(_obs_path, skip_header=1, delimiter=",", filling_values=0, dtype=np.float64)
 
 # Sources tristimulus values:
 # https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer

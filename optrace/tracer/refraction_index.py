@@ -14,16 +14,21 @@ from . import color  # for visible wavelength range
 from .misc import PropertyChecker as pc  # check types and values
 
 
-# TODO how to handle wavelengths outside the range of data provided
-# absorb?
-
 
 class RefractionIndex(Spectrum):
 
     # Refraction Index Models:
     # see https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
 
-    n_types: list[str] = ["Abbe", "Cauchy", "Conrady", "Sellmeier", "Constant", "Data", "Function"]
+    _coeff_count = {"Cauchy": 4, "Conrady": 3, "Sellmeier1": 6, "Sellmeier2": 5, "Sellmeier3": 8, 
+                    "Sellmeier4": 5, "Sellmeier5": 10, "Herzberger": 6, "Extended": 8, "Extended2": 8, 
+                    "Handbook of Optics 1": 4, "Handbook of Optics 2": 4, "Schott": 6, "Extended3": 9}
+    
+    n_types: list[str] = ["Abbe", "Cauchy", "Conrady", "Constant", "Data", "Extended", "Extended2", 
+                          "Extended3", "Function", "Handbook of Optics 1", "Handbook of Optics 2", 
+                          "Sellmeier1", "Sellmeier2", "Sellmeier3", "Sellmeier4", 
+                          "Sellmeier5", "Herzberger", "Schott"]
+
     spectrum_types: list[str] = n_types  # alias
 
     quantity: str = "Refraction Index n"
@@ -61,7 +66,7 @@ class RefractionIndex(Spectrum):
         self.coeff = coeff
         self.V = V
 
-        lines = lines if lines is not None else Lines.FDC
+        lines = lines if lines is not None else Lines.FdC
 
         super().__init__(n_type, val=n, lines=lines, **kwargs)
 
@@ -76,17 +81,20 @@ class RefractionIndex(Spectrum):
         :return: array of refraction indices
         """
         wl_ = np.asarray_chkfinite(wl, dtype=np.float64)
+            
+        # load coefficients into dict
+        if self.coeff is not None:
+            coeff_dict = {f"c{i}": c for i, c in enumerate(self.coeff)}
 
-        if self.spectrum_type in ["Cauchy", "Conrady", "Sellmeier"]:
-            pc.check_type("RefractionIndex.coeff", self.coeff, np.ndarray | list)
+        # check that they are provided
+        elif self.spectrum_type not in ["Constant", "Data", "Function", "Abbe"]:
+            raise TypeError(f"coefficient variable 'coeff' needs to be provided for n_type='{self.spectrum_type}'.")
+        
+        # most formula use lambda^2 in µm^2
+        if self.spectrum_type not in ["Constant", "Function", "Conrady"]:
+            wl2 = ne.evaluate("(wl_*1e-3)**2")
 
         match self.spectrum_type:
-
-            case "Cauchy":
-                # parameters are specified in 1/µm^n, so convert nm wavelengths to µm with factor 1e-3
-                l = wl_*1e-3
-                A, B, C, D, = tuple(self.coeff)[:4]
-                ns = ne.evaluate("A + B/l**2 + C/l**4 + D/l**6")
 
             case "Abbe":
                 # estimate a refractive index curve from abbe number
@@ -96,30 +104,85 @@ class RefractionIndex(Spectrum):
                 l = 1e-3*np.array(self.lines)
                 nc = self.val
 
-                # compromise between Cauchy (d=0) and Hetzberger (d=0.028)
+                # compromise between Cauchy (d=0) and Herzberger (d=0.028)
                 d = 0.014
 
                 # solve for B and A from Abbe Number and center refraction index
                 B = 1/self.V * (nc - 1) / (1/(l[0]**2-d) - 1/(l[2]**2-d))
                 A = nc - B/(l[1]**2-d)
 
-                ns = A + B/((1e-3*wl_)**2-d)
+                ns = A + B/(wl2-d)
 
             case "Conrady":
                 l = wl_*1e-3
-                A, B, C = tuple(self.coeff)[:3]
-                ns = ne.evaluate("A + B/l + C/l**3.5")
+                ns = ne.evaluate("c0 + c1/l + c2/l**3.5", local_dict=locals() | coeff_dict)
 
-            case "Sellmeier":
-                wl2 = ne.evaluate("(wl_*1e-3)**2") # since Cs are specified in µm, not in nm
-                A1, B1, A2, B2, A3, B3, A4, B4 = tuple(self.coeff)
-                ns = ne.evaluate("sqrt(1 + A1*wl2/(wl2-B1) + A2*wl2/(wl2-B2) + A3*wl2/(wl2-B3) + A4*wl2/(wl2-B4))")
+            case "Cauchy":
+                ns = ne.evaluate("c0 + c1/wl2 + c2/wl2**2 + c3/wl2**3", local_dict=locals() | coeff_dict)
+            
+            case "Sellmeier1":
+                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5))",
+                                 local_dict=locals() | coeff_dict)
+            
+            case "Sellmeier2":
+                ns = ne.evaluate("sqrt(1 + c0 + c1*wl2/(wl2-c2**2) + c3/(wl2-c4**2))", local_dict=locals() | coeff_dict)
+            
+            case "Sellmeier3":
+                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5) + c6*wl2/(wl2-c7))", 
+                                 local_dict=locals() | coeff_dict)
+            
+            case "Sellmeier4":
+                ns = ne.evaluate("sqrt(c0 + c1*wl2/(wl2-c2) + c3*wl2/(wl2-c4))", local_dict=locals() | coeff_dict)
+            
+            case "Sellmeier5":
+                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5)"
+                                 " + c6*wl2/(wl2-c7)+ c8*wl2/(wl2-c9))", local_dict=locals() | coeff_dict)
 
+            case "Schott":
+                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3 + c5/wl2**4)", 
+                                 local_dict=locals() | coeff_dict)
+            
+            case "Herzberger":
+                L = 1/(wl2 - 0.028)
+                ns = ne.evaluate("c0 + c1*L + c2*L**2 + c3*wl2 + c4*wl2**2 + c5*wl2**3", 
+                                 local_dict=locals() | coeff_dict)
+
+            case "Handbook of Optics 1":
+                ns = ne.evaluate("sqrt(c0 + c1/(wl2 - c2) - c3*wl2)", local_dict=locals() | coeff_dict)
+            
+            case "Handbook of Optics 2":
+                ns = ne.evaluate("sqrt(c0 + c1*wl2/(wl2 - c2) - c3*wl2)", local_dict=locals() | coeff_dict)
+            
+            case "Extended":
+                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3"
+                                 " + c5/wl2**4 + c6/wl2**5 + c7/wl2**6)", local_dict=locals() | coeff_dict)
+
+            case "Extended2":
+                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3 + c5/wl2**4"
+                                 " + c6*wl2**2 + c7*wl2**3)", local_dict=locals() | coeff_dict)
+
+            case "Extended3":
+                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2*wl2**2 + c3/wl2 + c4/wl2**2 + c5/wl2**3"
+                                 " + c6*wl2**4 + c7*wl2**5 + c8/wl2**6)", local_dict=locals() | coeff_dict)
+
+            case "Data" if self._wls is not None:
+                # no extrapolation in "Data" Mode
+                wlmin = np.min(wl_)
+                wlmax = np.max(wl_)
+
+                if wlmin < self._wls[0] or wlmax > self._wls[-1]:
+                    raise RuntimeError(f"Wavelength range [{wlmin:.5g}, {wlmax:.5g}] larger than data range"
+                                       f" [{self._wls[0]}, {self._wls[-1]}] for this material.")
+
+                ns = super().__call__(wl_)
+            
             case _:
                 ns = super().__call__(wl_)
 
-        if (nm := np.min(ns)) < 1:
-            raise RuntimeError(f"RefractionIndex below 1 with value {nm}.")
+
+        wlb = np.argmin(ns)
+        if (nm := ns.flat[wlb]) < 1:
+            raise RuntimeError(f"Refraction index below 1 with value {nm:.4g} at {wl_.flat[wlb]:.4g}nm.")
 
         return ns
 
@@ -158,32 +221,22 @@ class RefractionIndex(Spectrum):
         """
         match key:
 
-            case "val" if isinstance(val, int | float):
+            case "val":
+                pc.check_type(key, val, int | float)
+                np.asarray_chkfinite(val)
                 pc.check_not_below(key, val, 1)
 
             case "coeff" if val is not None:
 
                 pc.check_type(key, val, list)
+                cnt = self._coeff_count[self.spectrum_type]
 
-                match self.spectrum_type:
-                    case "Cauchy":      cnt = 4
-                    case "Conrady":     cnt = 3
-                    case "Sellmeier":   cnt = 8
-                    case _:             cnt = 8
+                if len(val) != cnt:
+                    raise ValueError(f"{key} needs to be a list with exactly {cnt} numeric coefficients for mode "
+                                     f"{self.spectrum_type}, but got {len(val)}.")
 
-                if len(val) > cnt:
-                    raise ValueError(f"{key} needs to be a list with maximum {cnt} numeric coefficients")
-
-                # pad to 8 coeffs
-                val2 = val.copy()
-                val2 += [0] * (8 - len(val))
-
-                super().__setattr__(key, val2)
+                super().__setattr__(key, val.copy())
                 return
-
-                # validity of coeffs is checked in __call__
-                # otherwise it would be possible that the coeffs seem invalid,
-                # but the n_type is changed afterwards, making them valid
 
             case "_vals" if val is not None:
                 if np.min(val) < 1:

@@ -13,7 +13,7 @@ class PropertyBrowser(HasTraits):
 
     update_button: Button = Button(label="Update", desc="updates the browser")
     unit_label: Str = Str("Distances in mm, optical power in dpt")
-
+    
     scene_dict: Dict = Dict()
     trace_gui_dict: Dict = Dict()
     raytracer_dict: Dict = Dict()
@@ -21,6 +21,7 @@ class PropertyBrowser(HasTraits):
     card_dict: Dict = Dict()
 
     view = View(
+                Item('update_button', label=" Update Dictionaries"),
                 Group(
                     Group(
                         Item('raytracer_dict', editor=ValueEditor(), width=900, height=700, show_label=False),
@@ -45,7 +46,6 @@ class PropertyBrowser(HasTraits):
                     ),
                     layout="tabbed",
                 ),
-                Item('update_button', show_label=False),
                 resizable=True,
                 title="Property Browser")
 
@@ -80,6 +80,11 @@ class PropertyBrowser(HasTraits):
                 return val
 
             elif isinstance(val, np.ndarray):
+                # unpack arrays with only one element
+                if val.size == 1:
+                    return repr_(val[()])
+
+                # force convert to float, but only if size is not gigantic
                 return np.array(val, dtype=np.float64) if val.size < 1e5 else val
 
             elif isinstance(val, list):
@@ -105,15 +110,15 @@ class PropertyBrowser(HasTraits):
 
         :return:
         """
-        # print for lens
+        # get properties for lens
         def set_cdict(w, cdict, name):
             cdict[name] = dict()
 
-            # print for wavelengths
+            # get properties for wavelengths
             for wl in spec_lines.FdC:
                 tma = w.tma(wl=wl)
                 cdict[name][f"{wl:.4g}nm"] = \
-                    dict(nodal_points=tma.nodal_point,
+                    dict(nodal_points=tma.nodal_point, d=tma.d, n1=tma.n1, n2=tma.n2,
                          focal_points=tma.focal_point, focal_lengths=tma.focal_length,
                          focal_lengths_n=tma.focal_length_n, principal_points=tma.principal_point,
                          vertex_points=tma.vertex_point, abcd=tma.abcd, efl=tma.efl, efl_n=tma.efl_n,
