@@ -13,6 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install Qt5
+      run: |
+        sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
     - name: Setup headless display
       uses: pyvista/setup-headless-display-action@v1
     - name: Set up Python ${{ matrix.python-version }}
