@@ -111,7 +111,7 @@ class GUITests(unittest.TestCase):
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore")
-    
+
     def tearDown(self) -> None:
         warnings.simplefilter("default")
     
@@ -125,6 +125,7 @@ class GUITests(unittest.TestCase):
     def _try(self, sim, *args, **kwargs):
         """try TraceGUI actions. Exceptions are catched and saved in the class to be later
         raised by raise_thread_exceptions(). In all cases the gui is closed normally"""
+        time.sleep(0.5)
         sim._wait_for_idle()
         try:
             yield

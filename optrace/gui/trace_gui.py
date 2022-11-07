@@ -1300,8 +1300,8 @@ class TraceGUI(HasTraits):
                     f"\nRay Power After:          {pw*1e6:>10.5g} µW" + \
                     (f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm" if ol1 else "") + \
                     (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "") + \
-                    ("\n\nSurface Information:\n" if surf is not None else "") + \
-                    (surf.info if surf is not None else "")
+                    ("\n\nSurface Information:\n" if is_surf else "") + \
+                    (surf.info if is_surf else "")
             else:
                 text = f"Ray {pos}" +  \
                     f" from Source {snum}" +  \

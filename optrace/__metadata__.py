@@ -9,7 +9,7 @@ __maintainer__ = "Damian Mendroch"
 __email__ = "damian.mendroch@th-koeln.de"
 __status__ = "Beta"
 __url__ = "http://github.com/drocheam/optrace/"
-__description__ = "A optics simulation package with sequential raytracing, image rendering and a gui frontend"
+__description__ = "An optics simulation package with sequential raytracing, image rendering and a gui frontend"
 __keywords__ = ["simulation", "optics", "raytracing"]
 
 __all__ = ["__name__", "__version__", "__author__", "__copyright__", "__credits__", "__keywords__", 

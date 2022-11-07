@@ -251,9 +251,9 @@ class GeometryTests(unittest.TestCase):
                 # check if p_hit is actually a valid position on the ray
                 t = (p_hit[:, 2] - p[:, 2])/s[:, 2]
                 p_ray = p + s*t[:, np.newaxis]
-                self.assertTrue(np.allclose(p_ray[:, 0] - p_hit[:, 0], 0))
-                self.assertTrue(np.allclose(p_ray[:, 1] - p_hit[:, 1], 0))
-                self.assertTrue(np.allclose(p_ray[:, 2] - p_hit[:, 2], 0))
+                self.assertTrue(np.allclose(p_ray[:, 0] - p_hit[:, 0], 0, atol=Si.C_EPS))
+                self.assertTrue(np.allclose(p_ray[:, 1] - p_hit[:, 1], 0, atol=Si.C_EPS))
+                self.assertTrue(np.allclose(p_ray[:, 2] - p_hit[:, 2], 0, atol=Si.C_EPS))
 
                 # random positions only for planar types
                 if isinstance(Si, ot.RectangularSurface | ot.CircularSurface | ot.RingSurface):
