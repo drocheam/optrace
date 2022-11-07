@@ -38,6 +38,11 @@ class SphericalSurface(ConicSurface):
         super().__init__(r, R, k=0, **kwargs)
         self.lock()
 
+    @property
+    def info(self) -> str:
+        """property string for UI information"""
+        return super(ConicSurface, self).info + f", R = {self.R:.5g} mm"
+    
     def sphere_projection(self, p: np.ndarray, projection_method: str = "Equidistant") -> np.ndarray:
         """
 

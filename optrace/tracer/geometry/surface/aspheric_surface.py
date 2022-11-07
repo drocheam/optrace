@@ -44,6 +44,11 @@ class AsphericSurface(FunctionSurface):
 
         self.lock()
 
+    @property
+    def info(self) -> str:
+        return super().info + f", R = {self.R:.5g} mm, k = {self.k:.5g}\n"\
+            f"coeff = {self.coeff}"
+
     def _asph(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
 
         r = ne.evaluate("sqrt(x**2 + y**2)")

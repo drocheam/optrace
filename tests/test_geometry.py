@@ -219,6 +219,9 @@ class GeometryTests(unittest.TestCase):
                 Si.get_edge(nc=100)
                 Si.get_normals(x, y)
 
+                # get info
+                Si.info
+
                 # check if moving actually moved the origin of the function
                 self.assertEqual(Si.get_values(np.array([pos_new[0]]), np.array([pos_new[1]]))[0], pos_new[2])
 

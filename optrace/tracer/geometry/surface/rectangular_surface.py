@@ -32,6 +32,12 @@ class RectangularSurface(Surface):
         self.lock()
 
     @property
+    def info(self) -> str:
+        """property string for UI information"""
+        return f"{type(self).__name__}, pos = [{self.pos[0]:.5g} mm, {self.pos[1]:.5g} mm, "\
+                f"{self.pos[2]:.5g} mm], dim = [{self.dim[0]:.5g} mm, {self.dim[1]:.5g} mm]"
+
+    @property
     def extent(self) -> tuple[float, float, float, float, float, float]:
         """
         """

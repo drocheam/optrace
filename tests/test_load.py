@@ -20,6 +20,14 @@ class LoadTests(unittest.TestCase):
         with open(path,'wb') as f:
             f.write(r.content)
 
+    # run first
+    def test_0_download_schott(self):
+        self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf")
+
+    # run last
+    def test_zzzzzzzzzz_delete_schott(self):
+        os.remove("schott.agf")
+
     def test_readlines(self):
 
         self.assertRaises(FileNotFoundError, ot.load._read_lines, "jiohunzuiznuiIz")  # no such file
@@ -158,7 +166,6 @@ class LoadTests(unittest.TestCase):
         RT.add(RS)
 
         self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/Smith1998b.zmx", "temp.zmx") 
-        self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf") 
 
         n_schott = ot.load.agf("schott.agf")
 
@@ -174,7 +181,6 @@ class LoadTests(unittest.TestCase):
         self.assertAlmostEqual(RT.tma().efl, 52.0, delta=0.1)
 
         os.remove("temp.zmx")
-        os.remove("schott.agf")
 
     def test_zmx_achromat(self):
         
@@ -183,7 +189,6 @@ class LoadTests(unittest.TestCase):
         RT.add(RS)
 
         self.save_file("https://www.edmundoptics.com/document/download/391148", "temp.zmx") 
-        self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf") 
 
         n_schott = ot.load.agf("schott.agf")
 
@@ -201,7 +206,6 @@ class LoadTests(unittest.TestCase):
         self.assertAlmostEqual(tma.efl, 100, delta=0.05)
 
         os.remove("temp.zmx")
-        os.remove("schott.agf")
 
     def test_zmx_microscope_objective(self):
 
@@ -210,7 +214,6 @@ class LoadTests(unittest.TestCase):
         RT.add(RS)
 
         self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/4037934a.zmx", "temp.zmx") 
-        self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf") 
 
         n_schott = ot.load.agf("schott.agf")
 
@@ -225,7 +228,6 @@ class LoadTests(unittest.TestCase):
         self.assertAlmostEqual(RT.tma().efl, 1, delta=0.002)
 
         os.remove("temp.zmx")
-        os.remove("schott.agf")
 
 
 if __name__ == '__main__':

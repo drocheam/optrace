@@ -50,6 +50,12 @@ class TiltedSurface(Surface):
 
         self.lock()
 
+    @property
+    def info(self) -> str:
+        """property string for UI information"""
+        return super().info + f", normal = [{self.normal[0]:.4f}, {self.normal[1]:.4f},"\
+            f" {self.normal[2]:.4f}]"
+
     def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.

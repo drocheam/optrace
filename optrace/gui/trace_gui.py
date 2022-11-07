@@ -1262,18 +1262,18 @@ class TraceGUI(HasTraits):
                 normal_sph = to_sph_coords(normal)
 
             l = self.raytracer.rays.ray_lengths(RayMask)[0]
-            ol = self.raytracer.rays.optical_lengths(RayMask)[0] if self.raytracer.absorb_missing else None
+            ol = self.raytracer.rays.optical_lengths(RayMask)[0] 
             l0 = l[n2_ - 1] if n2_ > 0 else None
             l1 = l[n2_] if n2_ < l.shape[0] else None
-            ol0 = ol[n2_ - 1] if ol is not None and n2_ > 0 else None
-            ol1 = ol[n2_] if ol is not None and n2_ < ol.shape[0] else None
+            ol0 = ol[n2_ - 1] if n2_ > 0 else None
+            ol1 = ol[n2_] if n2_ < ol.shape[0] else None
 
             # differentiate between Click and Shift+Click
             if self.scene.interactor.shift_key:
                 text = f"Ray {pos}" +  \
                     f" from Source {snum}" +  \
                     (f" at surface {n2_}\n\n" if n2_ else " at ray source\n\n") + \
-                    f"Intersection Position: ({p[0]:>10.5g} mm, {p[1]:>10.5g} mm, {p[2]:>10.5g} mm)\n\n" + \
+                    f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n" + \
                     "Vectors:                        Cartesian (x, y, z)                   " + \
                     "Spherical (theta, phi)\n" + \
                     (f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})" if n2_ else "") + \
@@ -1299,7 +1299,9 @@ class TraceGUI(HasTraits):
                     (f"        Optical Distance to Last Intersection:  {ol0:>10.5g} mm" if ol0 else "") + \
                     f"\nRay Power After:          {pw*1e6:>10.5g} µW" + \
                     (f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm" if ol1 else "") + \
-                    (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "")
+                    (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "") + \
+                    ("\n\nSurface Information:\n" if surf is not None else "") + \
+                    (surf.info if surf is not None else "")
             else:
                 text = f"Ray {pos}" +  \
                     f" from Source {snum}" +  \

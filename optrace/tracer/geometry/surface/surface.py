@@ -49,13 +49,18 @@ class Surface(BaseClass):
 
         super().__init__(**kwargs)
 
-
     def is_flat(self) -> bool:
         """:return: if the surface has no extent in z-direction"""
         return self.z_max == self.z_min
 
     def has_rotational_symmetry(self) -> bool:
         return self.parax_roc is not None
+
+    @property
+    def info(self) -> str:
+        """property string for UI information"""
+        return f"{type(self).__name__}, pos = [{self.pos[0]:.5g} mm, {self.pos[1]:.5g} mm, "\
+               f"{self.pos[2]:.5g} mm], r = {self.r:.5g} mm"
 
     def _find_bounds(self) -> tuple[float, float]:
         """

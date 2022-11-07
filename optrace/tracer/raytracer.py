@@ -575,35 +575,31 @@ class Raytracer(Group):
             -> None:
         """
         """
+       
+        # parallel rays hit at the same point in the focal plane
+        # we can therefore shift the ray towards the lens centre and calculate this focal point
+        # the new direction vector is just the difference between this point and the hit point on the lens
+        # point in focal plane: (sx/sz*f, sy/sz*f, sz/sz*f) with s = [sx, sy, sz] being the direction vector
+        # and f the focal distance.
+        # subtract the point (x, y, 0) relative to the lens center
+        # after that we only need to normalize the direction vector
+
+        # copy, needed later
+        s0 = s.copy()
         
-        # position relative to center
+        # position relative to lens center
         x = p[hwh, i+1, 0] - surface.pos[0]
         y = p[hwh, i+1, 1] - surface.pos[1]
 
-        s0 = s.copy()
-        
-        # decomposition in x and y component of tan theta
-        # tan theta_x0 = sx / sz
-        # tan theta_y0 = sy / sz
-        s_z_inv = 1 / s[hwh, 2]
-        tan_x_0 = s[hwh, 0] * s_z_inv
-        tan_y_0 = s[hwh, 1] * s_z_inv
+        # helper variables
+        f = 1000 / D
+        fsz = f / s0[hwh, 2]
 
-        # tan components after refraction
-        # see https://www.sciencedirect.com/science/article/pii/S0030402615000364
-        tan_x_1 = tan_x_0 - x*D/1000
-        tan_y_1 = tan_y_0 - y*D/1000
-
-        # pythogras: (tan theta1)^2 = (tan theta_x1)^2 + (tan theta_y1)^2
-        # calculate theta_1, and phi1 = arctan2(theta_y1, theta_x1)
-        # these components can be used as spherical coordinates, which are calculated back into cartesian
-        # coordinates for the new vectors components of the direction s
-        # sx = sin(theta_1)*cos(phi1),   sy = sin(theta1)*sin(phi1),   sz= cos(theta1)
-        # actually, this can all can be simplified to the equations below
-        frac = ne.evaluate("1/sqrt(tan_x_1**2 + tan_y_1**2 + 1)")
-        s[hwh, 0] = tan_x_1 * frac
-        s[hwh, 1] = tan_y_1 * frac
-        s[hwh, 2] = frac
+        # calculate and normalize new vector
+        s[hwh, 0] = s0[hwh, 0] * fsz - x
+        s[hwh, 1] = s0[hwh, 1] * fsz - y
+        s[hwh, 2] = f
+        s[hwh] = misc.normalize(s[hwh])
 
         # calculate polarization
         n = np.tile([0., 0., 1.], (x.shape[0], 1))

@@ -44,6 +44,9 @@ class RingSurface(Surface):
 
         self.lock()
 
+    @property
+    def info(self) -> str:
+        return super().info + ", ri = {self.ri:.5g} mm"
 
     def get_plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
