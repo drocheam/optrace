@@ -1,4 +1,4 @@
-Current Version: 1.0.0-1-ge0321b8 
+Current Version: 1.0.0-2-gc6be15a 
 
 1.0.0           Import of agf and zmx files. New Group class, raytracer is a subclass of this. Reverse() action on elements, surfaces and group. GUI high contrast mode. Surface types now have their own classes. New aspheric surface type. Optional gaussian filter to simulate diffraction limit in RImages.
 0.9.9           RImage now has an odd number of pixels. New Group class. New color submodule.

@@ -10,9 +10,28 @@ Optrace approximates optical effects by utilizing an Unbiased Quasi Monte Carlo 
 Inverse Transform Sampling is used as method for non-uniform random variate generation and Stratified Sampling as low discrepancy method for the generation of the initial uniform random variable.
 
 
-Alternative sampling methods: Importance Sampling, Rejection Sampling
+A brief, not entirely accurate description of these terms:
 
-Erklärung Biased, Unbiased: https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/estimators
+**Monte Carlo Simulation:** An algorithm class, that approximates a physical or mathematical problem with many degrees of freedom by randomly chosing and simulating a subset of all property and variable combinations.
+
+**Quasi Monte Carlo Simulation:** Monte Carlo Simulation, but the sampling is not truly random or pseudo-random. Instead it has some underlying deterministic or semi-deterministic nature to it. See low-discrepancy methods below.
+
+**Unbiased and Biased Methods:** Performing an unbiased monte carlo simulation with an infinitely large set of samples produces an exact description of the physical system. Starting with few samples, with a larger and larger number the simulation converges towards this exact behavior. In contrast, a biased simulation never reaches a fully accurate description of the system.
+Biased methods can consist of neural network tasks or algorithms that comprise of some simplification of the system model.
+A more mathematical descriptions of biasedness can be found here:
+https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/estimators
+
+**Non-Uniform Random Variate Generation:** Generating random numbers, while some numbers are more likely to be chosen than others. The probability distribution is non-uniform.
+
+**Low Discrepancy Method:** Methods that generate numbers, where the distribution of these values inside are given interval only deviates weakly from an equidistribution. White noise would be a high discrepancy method, while a regular value grid is a zero discrepancy method. Low discrepancy methods can be seen as a compromise between those two, trying to create values that fill an interval or area more uniformly than random values, but are less "obviously deterministic" than simple grids.
+
+**Stratified Sampling:** One of many low discrepancy methods. Random values are chosen from a set of sub-groups.
+It is guaranteed, that values are chosen from every sub-group (e.g. different intervals), but the values inside each sub-group are chosen randomly (e.g. random positions inside each interval)
+
+**Inverse Transform Sampling:** Generating non-uniform random numbers according to a known distribution function by utilizing the inverse transform method.
+See below for a mathematical definition.
+Important, alternative sampling methods include: Importance Sampling, Rejection Sampling
+
 
 
 Density

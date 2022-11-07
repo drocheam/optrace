@@ -320,25 +320,6 @@ With :math:`\varepsilon_\text{f} \approx 2.22\cdot 10^{-16}` for a 64bit floatin
 Optrace units are given in millimeters, so this is equivalent to a value of :math:`32.2\,` nm.
 
 
-..Second derivative
-..-----------------------
-
-..For a second derivative of the form
-
-.... math::
-   ..f''(x) = \frac{f(x+\varepsilon) - 2 f(x) + f(x-\varepsilon)}{\varepsilon^2}
-
-..the optimal step width is
-
-.... math::
-   ..\varepsilon_\text{o} = \sqrt[4]{36 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(4)}(x)} \right|}
-
-..with :math:`\varepsilon_\text{f}` being the machine precision for the used floating type.
-..As stated before, higher polynomial orders are less prominent, so one valid assumption can be :math:`\left| \frac{f(x)}{f^{(4)}(x)} \right| = 50`. 
-..While this might be different for every function, due to the cubic root a quotient being 1000 times larger only leads to a change of around factor :math:`5.62` in :math:`\varepsilon_\text{0}`.
-
-..With :math:`\varepsilon_\text{f} \approx 2.22\cdot 10^{-16}` for a 64bit floating point number, we get :math:`\varepsilon_\text{o} \approx 7.95 \cdot 10^{-4}`. Optrace units are given in millimeters, so this is equivalent to a value of :math:`795\,` nm.
-
 Step Width Selection
 ---------------------------------
 
@@ -361,6 +342,60 @@ Curvature Circle
 =======================
 
 TODO
+
+Sphere Projections
+=========================
+
+The relative distance to center and the z-position of the other sphere end are
+
+.. math::
+   r &= \sqrt{(x-x_0)^2  + (y - y_0)^2}\\
+   z_m &= z_0 + R
+
+**Equidistant**
+
+https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection
+
+.. math::
+   \theta &= \arctan\left(\frac{r}{z-z_m}\right)\\
+   \phi &= \text{arctan2}(y-y_0, ~x-x_0)\\
+
+The projected coordinates are then
+
+.. math::
+   x_p &= -\theta \cdot \text{sgn}(R) \cos(\phi)\\
+   y_p &= -\theta \cdot \text{sgn}(R) \sin(\phi)\\
+
+**Stereographic**
+
+https://en.wikipedia.org/wiki/Stereographic_map_projection
+
+.. math::
+   \theta &= \frac{\pi}{2} - \arctan\left(\frac{r}{z-z_m}\right)\\
+   \phi &= \text{arctan2}(y-y_0, ~x-x_0)\\
+   r &= 2 \tan\left(\frac{\pi}{4} - \frac{\theta}{2}\right)\\
+   
+The projected coordinates are then
+
+.. math::
+   x_p &= -r \cdot  \text{sgn}(R) \cos(\phi)\\
+   y_p &= -r \cdot \text{sgn}(R) \sin(\phi)\\
+
+**Equal-Area**
+
+https://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection
+
+.. math::
+   x_r = \frac{x - x_0} {\lvert R \rvert}\\
+   y_r = \frac{y - y_0} {\lvert R \rvert}\\
+   z_r = \frac{z - z_m} {R}\\
+
+The projected coordinates are then
+
+.. math::
+   x_p = \sqrt{\frac{2}{1-z_r} x_r}\\
+   y_p = \sqrt{\frac{2}{1-z_r} y_r}\\
+
 
 Random Sampling
 =======================

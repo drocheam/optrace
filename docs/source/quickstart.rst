@@ -4,14 +4,16 @@ Quickstart
 ################
 
 
-The library comes with a variety of different examples that can be found in <>.
+The library comes with a variety of different example scripts that can be found in <>.
 
-As a quickstart the "spherical_aberration.py" from the example folder is suitable, as it demonstrates some functionality.
+The ``spherical_aberration.py`` script, also from this folder, provides a good quickstart introduction.
+
 Below you can find its code with detailed comments.
 
-Make sure to follow the installation instructions in <>. Then you can read and run the example below.
+Before running make sure to follow the installation instructions in <>.
 
-More details on working with the raytracer and the frontend can be found in <> and <>
+Further details on working with the raytracer and the frontend can be found in <> and <>
+
 
 **Code**
 
