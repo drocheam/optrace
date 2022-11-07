@@ -1,4 +1,4 @@
-name: Tox Testing and Coverage Report
+name: Tests
 
 on:
   - push
