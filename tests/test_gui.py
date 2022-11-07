@@ -680,7 +680,6 @@ class GUITests(unittest.TestCase):
         keyboard = Controller()
 
         def send_key(sim, key):
-            sim._do_in_main(sim.scene.scene_editor._content.setFocus)
             keyboard.press(key)
             keyboard.release(key)
 
