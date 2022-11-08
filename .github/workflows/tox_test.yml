@@ -5,10 +5,8 @@ name: Tests
 on:
   push:
     paths:
-      - '**.py'
-    paths-ignore:
-      - 'examples/**'
-      - 'tests/**'
+      - 'optrace/**'
+
       
 jobs:
   build:
