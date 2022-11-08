@@ -24,7 +24,8 @@ class LoadTests(unittest.TestCase):
     # run first
     @pytest.mark.os
     def test_0_download_schott(self):
-        self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf")
+        # self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf")
+        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/schott.agf", "schott.agf")
 
     # run last
     @pytest.mark.os
