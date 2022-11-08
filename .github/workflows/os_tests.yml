@@ -1,8 +1,15 @@
 name: OS Tests
 
+# do testing on commits, but only if python files changed
+# and files are not in examples/ or tests/
 on:
-  - push
-
+  push:
+    paths:
+      - '**.py'
+    paths-ignore:
+      - 'examples/**'
+      - 'tests/**'
+      
 jobs:
   build:
     strategy:
