@@ -330,7 +330,7 @@ class ColorTests(unittest.TestCase):
                                     [[0, 0, 0], [0.2, 0.5, 1], [0.01, 1, 1], [0.01, 0.01, 0.01], [0, 0, 0]],
                                     [[0.2, 0.5, 0.1], [0, 0.8, 1.0], [0.5, 0.3, 0.5], [0.1, 0., 0.7], [0, 0, 0]],
                                     [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]], dtype=np.float32)
-        SIm, _ = RT.iterative_render(150000000, N_px_S=5, silent=True)
+        SIm, _ = RT.iterative_render(100000000, N_px_S=5, silent=True)
 
         # get Source Image
         RS_XYZ = np.flipud(SIm[0].get_xyz())  # flip so element [0, 0] is in lower left
@@ -343,7 +343,7 @@ class ColorTests(unittest.TestCase):
         # Unfortunately many rays are needed for the color to be near the actual value
         for i in range(len(Im_px)):
             for RSp, Cp in zip(RS_px[i], Im_px[i]):
-                self.assertAlmostEqual(RSp, Cp, delta=0.0012)
+                self.assertAlmostEqual(RSp, Cp, delta=0.002)
 
     def test_non_default_wavelength_range(self):
         # change wavelength range

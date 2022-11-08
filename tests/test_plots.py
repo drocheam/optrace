@@ -113,15 +113,15 @@ class PlotTests(unittest.TestCase):
         # ChromacityPlots
         # different paramter combinations
         for el in [ot.presets.light_spectrum.d65, ot.presets.light_spectrum.standard, img, []]:
-            for cie in [otp.chromacities_cie_1931, otp.chromacities_cie_1976]:
-                for title in [None, "Test title"]:
-                    for normi in otp.chromacity_norms: 
-                        cie(el, norm=normi, block=self.manual)
-                        if isinstance(el, ot.RImage):
-                            for RIi in color.SRGB_RENDERING_INTENTS:
-                                args = dict(title=title) if title is not None else {}
-                                cie(el, norm=normi, rendering_intent=RIi, block=self.manual, **args)
-                    plt.close("all")
+            for i, cie in enumerate([otp.chromacities_cie_1931, otp.chromacities_cie_1976]):
+                for normi in otp.chromacity_norms: 
+                    title = None if not i else "Test title"  # sometimes set a different title
+                    cie(el, norm=normi, block=self.manual)
+                    if isinstance(el, ot.RImage):
+                        for RIi in color.SRGB_RENDERING_INTENTS:
+                            args = dict(title=title) if title is not None else {}
+                            cie(el, norm=normi, rendering_intent=RIi, block=self.manual, **args)
+                plt.close("all")
 
         # exception tests
         self.assertRaises(TypeError, otp.chromacities_cie_1931, ot.Point())  # invalid type
@@ -130,9 +130,10 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.chromacities_cie_1976, ot.Point())  # invalid type
         self.assertRaises(TypeError, otp.chromacities_cie_1976, [ot.presets.light_spectrum.d65, 
                                                                ot.Point()])  # invalid type in list
-       
+
+    @pytest.mark.os 
     @pytest.mark.slow
-    def test_0spectrum_plots(self):
+    def test_spectrum_plots(self):
 
         self.assertRaises(RuntimeError, otp.spectrum_plot, ot.presets.light_spectrum.FDC)  # discrete type can't be plotted
         self.assertRaises(TypeError, otp.refraction_index_plot, ot.Point())
@@ -172,10 +173,10 @@ class PlotTests(unittest.TestCase):
                     for leg in [False, True]:
                         for lab in [False, True]:
                             for steps in [500, 5000]:
-                                for title in [None, "abc"]:
-                                    args = dict(labels_off=lab, legend_off=leg, block=self.manual, color=color_)
-                                    args = args if title is None else (args | dict(title=title))
-                                    otp.spectrum_plot(list_, **args)
+                                title = None if not lab else "abc"  # sometimes set a different title
+                                args = dict(labels_off=lab, legend_off=leg, block=self.manual, color=color_)
+                                args = args if title is None else (args | dict(title=title))
+                                otp.spectrum_plot(list_, **args)
 
                             plt.close("all")
 
@@ -214,11 +215,11 @@ class PlotTests(unittest.TestCase):
         for ri in [ot.presets.refraction_index.misc, [ot.presets.refraction_index.air,\
                    ot.presets.refraction_index.vacuum], [ot.presets.refraction_index.SF10], []]:
             for lines in [None, ot.presets.spectral_lines.rgb]:
-                for title in [None, "Test title"]:
-                    for sil in [False, True]:
-                        args = dict(lines=lines, silent=sil) | (dict(title=title) if title is not None else {})
-                        otp.abbe_plot(ri,  **args, block=self.manual)
-                plt.close("all")
+                for sil in [False, True]:
+                    title = None if not sil else "Test title"  # sometimes set a different title
+                    args = dict(lines=lines, silent=sil) | (dict(title=title) if title is not None else {})
+                    otp.abbe_plot(ri,  **args, block=self.manual)
+            plt.close("all")
 
     def test_surface_profile_plot(self) -> None:
 
@@ -230,11 +231,10 @@ class PlotTests(unittest.TestCase):
         for sl in [L.front, [L.front, L.back], []]:
             for pos in [[0, 0, 0], [1, -1, 5]]:
                 L.move_to(pos)
-                for sil in [False, True]:
-                    for ro in [False, True]:
-                        for xb in [[None, None], [None, 1], [1, None], [-1, 2], [1, 2], [None, 12], [-10, 12], [15, 18]]:
-                            SPP(sl, remove_offset=ro, silent=sil, x0=xb[0], xe=xb[1], block=self.manual)
-                        plt.close("all")
+                for ro in [False, True]:
+                    for xb in [[None, None], [None, 1], [1, None], [-1, 2], [1, 2], [None, 12], [-10, 12], [15, 18]]:
+                        SPP(sl, remove_offset=ro, silent=ro, x0=xb[0], xe=xb[1], block=self.manual)
+                plt.close("all")
 
         # check type checking
         self.assertRaises(TypeError, SPP, L.front, title=2)

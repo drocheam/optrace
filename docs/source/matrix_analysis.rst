@@ -52,7 +52,7 @@ Thin Lens with focal length :math:`f`. This focal length needs to be the actual 
     \text{M}_\text{thin} =
    \left[\begin{array}{cc}
    1 & 0 \\
-   -\frac{1}{f} & 1
+   -\frac{1}{f} & \frac{n_i}{n_o}
    \end{array}\right]
 
 Thick Lens 
@@ -254,15 +254,20 @@ For special cases around :math:`\pm\infty`
 
 Optrace sets all cases with :math:`\emptyset, \mathbb{R}` to NaN (not a number), since both are impractical.
 
-For :math:`\text{M} = \text{M}_\text{thin}` (thin lens approximation), therefore :math:`A=1, ~B=0, ~C=-\frac{1}{f}, ~D=1` the equations simplify to
+For :math:`\text{M} = \text{M}_\text{thin}` (thin lens approximation), therefore :math:`A=1, ~B=0, ~C=-\frac{1}{f}, ~D=\frac{n_i}{n_o}` the equations simplify to
 
 .. math::
-   b(g) = \frac{fg}{g-f}
+   b(g) = -\frac{fg}{g-f\frac{n_i}{n_o}}
 
 .. math::
-   g(b) = \frac{fb}{b-f}
+   g(b) = -\frac{fb}{b-f\frac{n_i}{n_o}}
 
 Which is the form known from the imaging equation:
+
+.. math::
+   \frac{n_o}{f} = \frac{n_i}{g} + \frac{n_o}{b}
+
+And for :math:`n_i = 1, ~~n_o = 1`:
 
 .. math::
    \frac{1}{f} = \frac{1}{g} + \frac{1}{b}

@@ -2,9 +2,10 @@
 
 import sys
 sys.path.append('.')
-
 import pathlib
 import os
+
+import pytest
 import requests
 import unittest
 
@@ -21,13 +22,16 @@ class LoadTests(unittest.TestCase):
             f.write(r.content)
 
     # run first
+    @pytest.mark.os
     def test_0_download_schott(self):
         self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf")
 
     # run last
+    @pytest.mark.os
     def test_zzzzzzzzzz_delete_schott(self):
         os.remove("schott.agf")
 
+    @pytest.mark.os
     def test_readlines(self):
 
         self.assertRaises(FileNotFoundError, ot.load._read_lines, "jiohunzuiznuiIz")  # no such file
@@ -55,6 +59,7 @@ class LoadTests(unittest.TestCase):
             ns = ot.load.agf(str(path), silent=sil)
             self.assertEqual(len(ns), 1)  # one valid, two invalid
 
+    @pytest.mark.os
     def test_agf_valid_files(self):
 
         # not sure about the copyright of these files, that's while download it only for testing
@@ -159,6 +164,7 @@ class LoadTests(unittest.TestCase):
 
         os.remove("temp.zmx")
     
+    @pytest.mark.os
     def test_zmx_smith_tessar(self):
 
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)

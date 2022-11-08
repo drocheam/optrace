@@ -3,6 +3,7 @@
 import sys
 sys.path.append('.')
 
+import pytest
 import unittest
 import numpy as np
 from scipy.special import erf
@@ -233,6 +234,7 @@ class SpectrumTests(unittest.TestCase):
 
         # other spectra are tested in the presets test for standard illuminants
         
+    @pytest.mark.os
     def test_light_spectrum_random_wavelengths(self):
 
         # Monochromatic
@@ -350,6 +352,7 @@ class SpectrumTests(unittest.TestCase):
         self.assertAlmostEqual(std(mu, sig, wlm0, wlm1), np.std(wl), delta=0.005)
         self.assertTrue(np.all(spec(wl[(wl < wlm0) | (wl > wlm1)]) == 0))  # values outside data range must be 0
 
+    @pytest.mark.os
     def test_light_spectrum_render(self):
         # check render
         wl = np.random.uniform(*ot.color.WL_BOUNDS, 10000)

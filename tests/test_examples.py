@@ -45,6 +45,7 @@ class ExampleTests(unittest.TestCase):
         self.execute("image_rgb_render.py", 70)
 
     @pytest.mark.slow
+    @pytest.mark.os
     def test_complex(self):
         self.execute("more_complex_example.py")
     

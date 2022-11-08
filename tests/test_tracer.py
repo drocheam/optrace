@@ -37,6 +37,7 @@ class TracerTests(unittest.TestCase):
         # coverage: init with refraction index
         ot.Raytracer(outline=[-1, 1, -1, 1, -1, 1], n0=ot.RefractionIndex("Constant", n=1.2))
 
+    @pytest.mark.os
     def test_raytracer_snapshot(self):
         """
         checks add, remove, property_snapshot, compare_property_snapshot, has() and clear()
@@ -124,6 +125,7 @@ class TracerTests(unittest.TestCase):
         RT.clear()
         self.assertFalse(RT.rays.N > 0)
 
+    @pytest.mark.os
     def test_geometry_checks(self):
         """test geometry checks before tracing"""
         
@@ -221,7 +223,7 @@ class TracerTests(unittest.TestCase):
 
         for method in RT.autofocus_methods:  # all methods
             for N in [5000, 20000, 50000]:  # N cases: less rays, all rays, more rays than simulated
-                for N_th in [1, 2, 3, 4, 8, 16]:  # different thread counts
+                for N_th in [1, 4, 8]:  # different thread counts
                     RT._force_threads = N_th
                     res, _ = RT.autofocus(method, z_start=5.0, N=N, return_cost=False)
                     self.assertAlmostEqual(res.x, fs, delta=0.15)
@@ -552,6 +554,7 @@ class TracerTests(unittest.TestCase):
                 # some remaining difference because of rays not being exactly at the edge, 
                 # but positions are random inside circular area
 
+    @pytest.mark.os
     @pytest.mark.slow
     def test_ray_storage(self):
         
@@ -569,7 +572,7 @@ class TracerTests(unittest.TestCase):
         for i in np.arange(2):  # different number of sources (1 source gets removed after each iteration)
             for powersi in powers:  # different power ratios
                 for N in Ns:  # different rays numbers
-                    for N_th in [1, 2, 3, 4, 8]:  # different number of threads
+                    for N_th in [1, 4, 8]:  # different number of threads
 
                         RS0.power, RS1.power, RS2.power = powersi
 
@@ -799,6 +802,7 @@ class TracerTests(unittest.TestCase):
 
         self.assertAlmostEqual(res.x, f_should, delta=0.2)
 
+    @pytest.mark.os
     def test_numeric_tracing_surface_hit_special_cases(self):
 
         # in the next part "outside surface" relates to an x,y value outside the x,y value range of the surface
@@ -1228,10 +1232,10 @@ class TracerTests(unittest.TestCase):
         # coverage tests:
 
         # do multiple iterative steps
-        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*3, silent=True)
+        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2, silent=True)
 
         # do multiple iterative steps with an un-full last iteration
-        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*3+100, silent=True)
+        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2+100, silent=True)
         
         # render without detectors
         RT.detectors = []

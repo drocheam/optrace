@@ -5,6 +5,7 @@ sys.path.append('.')
 
 import unittest
 import numpy as np
+import pytest
 
 import optrace as ot
 from optrace.tracer.transfer_matrix_analysis import TMA as TMA
@@ -74,6 +75,7 @@ class TMATests(unittest.TestCase):
         self.assertAlmostEqual(ot.Lens(aspa, aspb, n2=n2, **largs).tma(wl=wl2, n0=n1).efl, 
                                getf(R1, -R2, n(wl2), n1(wl2), n2(wl2), d))  # different wl
 
+    @pytest.mark.os
     def test_tma_single_lens_cardinal(self):
         R1 = 76
         R2 = 35

@@ -186,11 +186,9 @@ class TracerMiscTests(unittest.TestCase):
     @pytest.mark.slow
     def test_r_image_render_and_rescaling(self):
 
-        r = np.arange(1, ot.RImage.MAX_IMAGE_RATIO+3)
-
         for limit in [None, 20]:  # different resolution limits
 
-            for ratio in [*tuple(1/r), *r]:  # different side ratios
+            for ratio in [1/6, 0.45, 1, 3, 5]:  # different side ratios
 
                 img, P, L = self.gen_r_image(ratio=ratio, limit=limit)
 
@@ -203,22 +201,21 @@ class TracerMiscTests(unittest.TestCase):
                 ratio_act = img.Nx / img.Ny
                 sx0, sy0 = img.sx, img.sy
 
-                for th in [False, True]:  # threading on or off
-                    for Npx in [*ot.RImage.SIZES, *np.random.randint(1, 2*ot.RImage.SIZES[-1], 10)]:  # different side lengths
-                        img.threading = th
-                        img.rescale(Npx)
+                for i, Npx in enumerate([*ot.RImage.SIZES, *np.random.randint(1, 2*ot.RImage.SIZES[-1], 3)]):  # different side lengths
+                    img.threading = bool(i % 2)  # sometimes threading, sometimes not
+                    img.rescale(Npx)
 
-                        # check that nearest matching side length was chosen
-                        siz = ot.RImage.SIZES
-                        near_siz = siz[np.argmin(np.abs(Npx - np.array(siz)))]
-                        cmp_siz1 = img.Nx if ratio_act < 1 else img.Ny
-                        self.assertEqual(near_siz, cmp_siz1)
+                    # check that nearest matching side length was chosen
+                    siz = ot.RImage.SIZES
+                    near_siz = siz[np.argmin(np.abs(Npx - np.array(siz)))]
+                    cmp_siz1 = img.Nx if ratio_act < 1 else img.Ny
+                    self.assertEqual(near_siz, cmp_siz1)
 
-                        self.assertAlmostEqual(P0, img.get_power())  # overall power stays the same even after rescaling
-                        self.assertAlmostEqual(ratio_act, img.Nx/img.Ny)  # ratio stayed the same
-                        self.assertEqual(sx0, img.sx)  # side length stayed the same
-                        self.assertEqual(sy0, img.sy)  # side length stayed the same
-                        self.assertAlmostEqual(img.sx*img.sy/img.Nx/img.Ny, img.Apx)  # check pixel area
+                    self.assertAlmostEqual(P0, img.get_power())  # overall power stays the same even after rescaling
+                    self.assertAlmostEqual(ratio_act, img.Nx/img.Ny)  # ratio stayed the same
+                    self.assertEqual(sx0, img.sx)  # side length stayed the same
+                    self.assertEqual(sy0, img.sy)  # side length stayed the same
+                    self.assertAlmostEqual(img.sx*img.sy/img.Nx/img.Ny, img.Apx)  # check pixel area
 
         # test exceptions render
         self.assertRaises(ValueError, img.render, N=ot.RImage.MAX_IMAGE_SIDE*1.2)  # pixel number too large
@@ -271,6 +268,7 @@ class TracerMiscTests(unittest.TestCase):
         return img, np.sum(w), np.sum(w*color.y_tristimulus(wl)*683)  # 683 lm/W conversion factor
 
     @pytest.mark.slow
+    @pytest.mark.os
     def test_r_image_saving_loading(self):
        
         # create some image
@@ -330,7 +328,7 @@ class TracerMiscTests(unittest.TestCase):
         w = np.ones(1000)
         wl = np.full(1000, 500)
 
-        for k in [1, 0.3, 0.2, 3, 5]:  # different side ratios
+        for k in [1, 0.3, 0.2, 5]:  # different side ratios
         
             r0 = 1e-4  # smaller than resolution limit
             img = ot.RImage([-r0, r0, -k/2*r0, k/2*r0])
@@ -622,7 +620,6 @@ class TracerMiscTests(unittest.TestCase):
         self.assertTrue(b2x)  # check if shuffled x
         self.assertTrue(b1y)  # check if dithered y
         self.assertTrue(b2y)  # check if shuffled y
-
 
     def test_misc_calc(self):
        

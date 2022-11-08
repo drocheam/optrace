@@ -63,7 +63,6 @@ class PresetTests(unittest.TestCase):
             self.assertNotEqual(spec.desc, "")
             self.assertNotEqual(spec.long_desc, "")
 
-
     def test_spectrum_outside_defintion(self):
         # check that spectrum presets have constant 0 beyond their definition
         for spec in [*ot.presets.light_spectrum.standard, *ot.presets.spectrum.tristimulus]:
@@ -136,7 +135,6 @@ class PresetTests(unittest.TestCase):
             self.assertAlmostEqual(xy0[0], xy1[0], delta=0.00001)
             self.assertAlmostEqual(xy0[1], xy1[1], delta=0.00001)
 
-
     def test_lines(self):
         # check type and value of spectral lines
 
@@ -150,6 +148,7 @@ class PresetTests(unittest.TestCase):
         lines = ot.presets.spectral_lines.all_lines
         self.assertTrue(np.all(np.diff(lines) > 0))
 
+    @pytest.mark.os
     @pytest.mark.slow
     def test_image_presets(self) -> None:
 

@@ -172,6 +172,7 @@ class GeometryTests(unittest.TestCase):
                                    deriv_func=lambda x, y: (np.zeros_like(x), np.zeros_like(x)), 
                                    mask_func=lambda x, y: x+y < 2, r=3)
 
+    @pytest.mark.os
     def test_surface_behavior(self):
 
         sfunc = self.example_sfunc()
@@ -537,6 +538,7 @@ class GeometryTests(unittest.TestCase):
             self.assertTrue(np.allclose(S2.get_normals(*pars) - normal, 0))
             self.assertTrue(np.allclose(S2.find_hit(*pars2)[0] - hits(*pars20, normal)[0] - pos, 0))
 
+    @pytest.mark.os
     @pytest.mark.slow
     def test_surface_numerical_precision(self):
 

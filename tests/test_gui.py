@@ -125,7 +125,6 @@ class GUITests(unittest.TestCase):
     def _try(self, sim, *args, **kwargs):
         """try TraceGUI actions. Exceptions are catched and saved in the class to be later
         raised by raise_thread_exceptions(). In all cases the gui is closed normally"""
-        time.sleep(0.5)
         sim._wait_for_idle()
         try:
             yield
@@ -135,6 +134,7 @@ class GUITests(unittest.TestCase):
             sim._wait_for_idle()
             sim._do_in_main(sim.close)
 
+    @pytest.mark.os
     @pytest.mark.slow 
     def test_gui_inits(self) -> None:
 
@@ -451,6 +451,7 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
+    @pytest.mark.os
     @pytest.mark.slow
     def test_missing(self) -> None:
         """test TraceGUI operation when Filter, Lenses, Detectors or Sources are missing"""
@@ -522,6 +523,7 @@ class GUITests(unittest.TestCase):
         self.assertTrue(not RT.ray_sources)
         test_features(RT)
 
+    @pytest.mark.os
     @pytest.mark.slow
     def test_action_spam(self):
         """spam the gui with many possible actions to check threading locks and for race conditions"""
@@ -592,7 +594,7 @@ class GUITests(unittest.TestCase):
                 rtp = RT.property_snapshot()
                 cmp = RT.compare_property_snapshot(rtp, rtp)
 
-                for i in np.arange(30):
+                for i in np.arange(20):
                     cmp = copy.deepcopy(cmp)
                     any_ = False
                     # random change combinations
@@ -633,7 +635,7 @@ class GUITests(unittest.TestCase):
                         ('_cmd', 'scene.render()'), ('_cmd', 'scene.z_minus_view()'), ('maximize_scene', False), ('maximize_scene', True),
                          ('activate_filter', False), ('activate_filter', True), ('high_contrast', False), ('high_contrast', True)]
 
-                for i in np.arange(250):
+                for i in np.arange(200):
                     # the expected value (mean time for a large number) is integral n*10^n from n0 to n1
                     # n0=-4, n1=0.5 the mean time would therefore be around 90ms per loop iteration for sleeping
                     n = np.random.uniform(-4, 0.5)
@@ -670,7 +672,8 @@ class GUITests(unittest.TestCase):
         
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
-    
+   
+    @pytest.mark.os
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
@@ -680,6 +683,7 @@ class GUITests(unittest.TestCase):
         keyboard = Controller()
 
         def send_key(sim, key):
+            sim._do_in_main(sim.scene.scene_editor._content.setFocus)
             keyboard.press(key)
             keyboard.release(key)
 
@@ -749,6 +753,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
     
+    @pytest.mark.os
     def test_send_cmd(self):
         """test command setting and sending as well as automatic replotting"""
 
@@ -803,6 +808,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.os
     def test_resize(self):
         """
         this test checks if
@@ -1169,6 +1175,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.os
     def test_picker(self):
         """
         test picker interaction in the scene
