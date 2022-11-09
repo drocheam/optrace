@@ -564,11 +564,10 @@ class GeometryTests(unittest.TestCase):
 
         # check precision for different surfaces, radii, offsets and regions
         for k, surf_f in zip([-1, 0], [surf_f_1, surf_f_2]):
-
             for R in [0.1, 10, 10000]:
+                for z0 in [0, -80, -10000]:
+                    for fr in [0.002, 0.7]:
 
-                for z0 in [0, -10, -1000, -10000]:
-                    for fr in [0.002, 0.5, 0.7]:
                         r = fr*R
 
                         # type "Function"
@@ -1020,11 +1019,11 @@ class GeometryTests(unittest.TestCase):
                             RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, 
                                               polarization=pol_type, image=Im, **rargs)
                             RS.get_color()
-                            p, s, pols, weights, wavelengths = RS.create_rays(10000)
+                            p, s, pols, weights, wavelengths = RS.create_rays(8000)
 
                             self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
                             self.assertGreater(np.min(weights), 0)  # no zero weight rays
-                            self.assertEqual(np.sum(weights), rargs["power"])  # rays amount to power
+                            self.assertAlmostEqual(np.sum(weights), rargs["power"])  # rays amount to power
                             self.assertGreaterEqual(np.min(wavelengths), color.WL_BOUNDS[0])  # inside visible range
                             self.assertLessEqual(np.max(wavelengths), color.WL_BOUNDS[1])  # inside visible range
 
@@ -1037,11 +1036,11 @@ class GeometryTests(unittest.TestCase):
 
                             # s needs to be a unity vector
                             ss = s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2
-                            self.assertTrue(np.allclose(ss, 1, atol=0.00001, rtol=0))
+                            self.assertTrue(np.allclose(ss, 1, atol=0.00002, rtol=0))
 
                             # pol needs to be a unity vector
                             polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
-                            self.assertTrue(np.allclose(polss, 1, atol=0.00001, rtol=0))
+                            self.assertTrue(np.allclose(polss, 1, atol=0.00002, rtol=0))
 
         # special image shapes
 

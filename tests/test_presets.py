@@ -157,7 +157,7 @@ class PresetTests(unittest.TestCase):
             RSS = ot.RectangularSurface(dim=[6, 6])
             RS = ot.RaySource(RSS, pos=[0, 0, 0], image=imgi)
             RT.add(RS)
-            RT.trace(1000000)
+            RT.trace(500000)
             img = RT.source_image(256)
             
             otp.r_image_plot(img)

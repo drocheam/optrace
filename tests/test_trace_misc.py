@@ -143,20 +143,18 @@ class TracerMiscTests(unittest.TestCase):
     @pytest.mark.slow
     def test_r_image_cut(self):
        
-        r = 1 + 2*np.arange(0, (ot.RImage.MAX_IMAGE_RATIO-1)//2)
-        
-        for ratio in [*tuple(1/r), *r]:  # different side ratios
-            for Npx in ot.RImage.SIZES:
+        for ratio in [1/6, 0.9, 3, 5]:  # different side ratios
+            for Npx in ot.RImage.SIZES:  # different pixel numbers
 
                 img, P, L = self.gen_r_image(ratio=ratio, N_px=Npx)
             
-                for p in [-0.1, 0, 0.163485, 0.4654, 1, 1.01]:
+                for p in [-0.1, 0, 0.163485, 1, 1.01]: # different relative position inside image
                     for cut_ in ["x", "y"]:
                         ext = img.extent[:2] if cut_ == "x" else img.extent[2:]
                         ext2 = img.extent[2:] if cut_ == "x" else img.extent[:2]
                         kwargs = {cut_: ext[0] + p*(ext[1] - ext[0])}
 
-                        for dm in ot.RImage.display_modes:
+                        for dm in ["sRGB (Absolute RI)", "Irradiance"]:  # modes with three and one channel
 
                             if p < 0 or p > 1:
                                 self.assertRaises(ValueError, img.cut, dm, **kwargs)
@@ -188,7 +186,7 @@ class TracerMiscTests(unittest.TestCase):
 
         for limit in [None, 20]:  # different resolution limits
 
-            for ratio in [1/6, 0.45, 1, 3, 5]:  # different side ratios
+            for ratio in [1/6, 0.38, 1, 5]:  # different side ratios
 
                 img, P, L = self.gen_r_image(ratio=ratio, limit=limit)
 
@@ -328,12 +326,12 @@ class TracerMiscTests(unittest.TestCase):
         w = np.ones(1000)
         wl = np.full(1000, 500)
 
-        for k in [1, 0.3, 0.2, 5]:  # different side ratios
+        for k in [1, 0.3, 5]:  # different side ratios
         
             r0 = 1e-4  # smaller than resolution limit
             img = ot.RImage([-r0, r0, -k/2*r0, k/2*r0])
 
-            for limit in [0.2, 5, 20]:
+            for limit in [0.2, 20]:  # different limits
 
                 img.limit = limit
                 img.render(900, p, w, wl)

@@ -241,7 +241,7 @@ class TracerTests(unittest.TestCase):
         # enlargen outline so imaging works
         # the outline was smaller before to improve focus finding
         RT.outline = [-3, 3, -3, 3, -70, 80]
-        RT.trace(200000)
+        RT.trace(100000)
 
         # source_index=0 with two raysources should lead to the same result as if the second RS was missing
         res, _ = RT.autofocus(RT.autofocus_methods[0], z_start=5.0, source_index=0, N=N, return_cost=False)
@@ -373,7 +373,7 @@ class TracerTests(unittest.TestCase):
 
         RSS0 = ot.RectangularSurface(dim=[0.02, 0.02])
         RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=True,
-                pos=[0, 0, 0], s=[0, 0, 1], div_angle=82)
+                pos=[0, 0, 0], s=[0, 0, 1], div_angle=82, spectrum=ot.LightSpectrum("Monochromatic", wl=550))
         RT.add(RS0)
             
         # add Detector
@@ -559,14 +559,14 @@ class TracerTests(unittest.TestCase):
     def test_ray_storage(self):
         
         RT = rt_example()
-        RT.add(ot.RaySource(ot.Point(), spectrum=ot.presets.light_spectrum.d55, pos=[0, 0, 0]))
+        RT.add(ot.RaySource(ot.Point(), spectrum=ot.LightSpectrum("Monochromatic", wl=550), pos=[0, 0, 0]))
         
         # we want the ray sources to be two and have different power
         assert len(RT.ray_sources) == 3
         
         RS0, RS1, RS2 = tuple(RT.ray_sources)
         powers = [(1, 1, 1), (2, 1, 1), (0.3456465, 4.57687168, np.pi/2)] 
-        Ns = [100000, 52657, 30000, 30001]
+        Ns = [30000, 30001, 52657]
 
         # test tracing for different number of rays, sources and different power ratios and threads
         for i in np.arange(2):  # different number of sources (1 source gets removed after each iteration)
@@ -1437,7 +1437,7 @@ class TracerTests(unittest.TestCase):
             RT.remove(el)
 
         for i in range(2):  # without and with rays filtered
-            for N in [950, 50, 3, 1]:  # ray numbers
+            for N in [70, 3, 1]:  # ray numbers
 
                 RT.trace(N)
 

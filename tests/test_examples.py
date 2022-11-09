@@ -1,29 +1,19 @@
 #!/bin/env python3
 
-import unittest
-import subprocess
-import warnings
-import pytest  # slow decorator
-
 from pathlib import Path
-
-# how to ensure installed version for examples is the same as the current development version?
 
 # add PYTHONPATH to env, so the examples can find optrace
 import os
 os.environ["PYTHONPATH"] = "."
 
+import unittest
+import subprocess
+import pytest  # slow decorator
+
+
 
 class ExampleTests(unittest.TestCase):
 
-    def setUp(self) -> None:
-        # deactivate warnings
-        warnings.simplefilter("ignore")
-    
-    def tearDown(self) -> None:
-        # reset warnings
-        warnings.simplefilter("default")
-    
     # execute, but kill after timeout, since everything should be automated
     # higher timeout for a human viewer to see if everything is working
     def execute(self, name, timeout=15):
@@ -37,18 +27,10 @@ class ExampleTests(unittest.TestCase):
         except subprocess.TimeoutExpired:
             process.kill()
 
-    # tests are sorted alphabetically
-    # ensure this gets run at the end by using zzzz prefix
-    # zzzz, so it gets tested at the end
     @pytest.mark.slow
-    def test_zzzz_rgb_render(self):
+    def test_rgb_render(self):
         self.execute("image_rgb_render.py", 70)
 
-    @pytest.mark.slow
-    @pytest.mark.os
-    def test_complex(self):
-        self.execute("more_complex_example.py")
-    
     @pytest.mark.slow
     def test_presets_refraction_index(self):
         self.execute("refraction_index_presets.py")
@@ -73,6 +55,7 @@ class ExampleTests(unittest.TestCase):
     def test_achromat(self):
         self.execute("achromat.py")
     
+    @pytest.mark.os
     @pytest.mark.slow
     def test_microscope(self):
         self.execute("microscope.py")
@@ -99,8 +82,5 @@ class ExampleTests(unittest.TestCase):
     
 
 if __name__ == '__main__':
-    # deactivate warnings temporarily
-    warnings.simplefilter("ignore")
     unittest.main()
-    warnings.simplefilter("default")
 

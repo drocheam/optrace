@@ -39,26 +39,23 @@ class Filter(Element):
 
     def __call__(self, wl: np.ndarray) -> np.ndarray:
         """
-        Return filter transmittance for specified wavelengths.
-
-        :param wl: wavelengths (1D np.ndarray)
-        :return: transmittance (1D np.ndarray)
+        Return filter transmittance for specified wavelengths,
+        pass-through of spectrum.__call__, see this method for details
         """
         return self.spectrum(wl)
 
     def get_color(self, rendering_intent="Absolute", clip=True) -> tuple[float, float, float, float]:
         """
         Get Filter color under daylight (D65).
-
-        :param rendering_intent:
-        :param clip:
-        :return: sRGBA color tuple, with each channel in range [0, 1]
+        pass-through of spectrum.get_color, see this method for details
         """
         return self.spectrum.get_color(rendering_intent, clip)
 
     def __setattr__(self, key: str, val: Any) -> None:
         """
-        assigns the value of an attribute
+        Assigns the value of an attribute.
+        Also performs type checking.
+
         :param key: attribute name
         :param val: value to assign
         """

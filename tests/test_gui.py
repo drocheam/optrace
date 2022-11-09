@@ -951,7 +951,7 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("coloring_type", "Polarization yz")
                 sim._wait_for_idle()
              
-                # make sure x polarization gets plotted at least one time
+                # make sure x polarization gets plotted at least once
                 RT.no_pol = False
                 RT.ray_sources[0].polarization = "x"
                 sim._set_in_main("coloring_type", "Polarization yz")

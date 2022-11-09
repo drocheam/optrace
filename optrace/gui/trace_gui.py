@@ -94,11 +94,11 @@ class TraceGUI(HasTraits):
     """gaussian filter constant standard deviation"""
 
     ray_amount_shown: Range = Range(1, 10000, 2000, desc='Percentage of N Which is Drawn', enter_set=False,
-                                    auto_set=False, label="Rays Shown", mode='logslider')
+                                    auto_set=False, label="Count", mode='logslider')
     """Number of rays shown in mayavi scenen"""
 
     det_pos: Range = Range(low='_det_pos_min', high='_det_pos_max', value='_det_pos_max', mode='slider',
-                           desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_pos")
+                           desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_det")
     """z-Position of Detector. Lies inside z-range of :obj:`Backend.raytracer.outline`"""
 
     ray_opacity: Range = Range(1e-5, 1, 0.01, desc='Opacity of the rays/Points', enter_set=True,
@@ -172,7 +172,7 @@ class TraceGUI(HasTraits):
     """Show stats from garbage collector"""
 
     raytracer_single_thread: \
-        List = List(editor=CheckListEditor(values=['No Multithreading in Raytracer'], format_func=lambda x: x),
+        List = List(editor=CheckListEditor(values=['No Raytracer Multithreading'], format_func=lambda x: x),
                     desc="if raytracer backend uses only one thread")
     """limit raytracer backend operation to one thread (excludes the TraceGUI)"""
     
@@ -211,7 +211,7 @@ class TraceGUI(HasTraits):
     image_type: Enum = Enum(*RImage.display_modes, desc="Image Type Presented")
     """Image Type"""
    
-    projection_method_enabled: Bool = False  #: if projection method is selectable
+    projection_method_enabled: Bool = False  #: if projection method is selectable, only the case for spherical detectors
     projection_method: Enum = Enum(*SphericalSurface.sphere_projection_methods, desc="Projection Method for spherical detectors")
     """sphere surface projection method"""
 
@@ -229,9 +229,8 @@ class TraceGUI(HasTraits):
     detector_selection: Enum = Enum(values='detector_names', desc="Detector Selection")
     """Detector Selection. Holds the name of one of the Detectors."""
 
-    image_pixels: Enum = Enum(RImage.SIZES,
-                                desc='Detector Image Pixels in Smaller of x or y Dimension',
-                                label="Pixels_xy")
+    image_pixels: Enum = Enum(RImage.SIZES, label="Pixels_xy",
+                              desc='Detector Image Pixels in Smaller of x or y Dimension')
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
 
@@ -329,7 +328,7 @@ class TraceGUI(HasTraits):
                             Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
-                            Item('det_pos', label="Det_z"),
+                            Item('det_pos'),
                             _separator,
                             Item("_image_label", style='readonly', show_label=False, emphasized=True),
                             Item('image_type', label='Mode'),
@@ -356,7 +355,7 @@ class TraceGUI(HasTraits):
                             Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
-                            Item('det_pos', label="Det_z"),
+                            Item('det_pos'),
                             _separator,
                             _separator,
                             Item("_spectrum_label", style='readonly', show_label=False, emphasized=True),
@@ -370,7 +369,7 @@ class TraceGUI(HasTraits):
                             Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
-                            Item('det_pos', label="Det_z"),
+                            Item('det_pos'),
                             _separator,
                             _separator,
                             Item("_autofocus_label", style='readonly', show_label=False, emphasized=True),
@@ -405,11 +404,13 @@ class TraceGUI(HasTraits):
                             TGroup(
                                 _separator,
                                 _separator,
+                                _separator,
                                 Item("_debug_options_label", style='readonly', show_label=False, emphasized=True),
                                 Item('raytracer_single_thread', style="custom", show_label=False),
                                 Item('show_all_warnings', style="custom", show_label=False),
                                 Item('garbage_collector_stats', style="custom", show_label=False),
                                 Item('wireframe_surfaces', style="custom", show_label=False),
+                                _separator,
                                 _separator,
                                 _separator,
                                 Item("_debug_command_label", style='readonly', show_label=False, emphasized=True),
@@ -492,7 +493,6 @@ class TraceGUI(HasTraits):
 
         # assign scene background color
         self._set_colors()
-        # self.scene.background = self.BACKGROUND_COLOR
         
         # set the properties after this without leading to a re-draw
         self._no_trait_action_flag = False
@@ -731,7 +731,6 @@ class TraceGUI(HasTraits):
             a.axes.trait_set(font_factor=ff_old, fly_mode='none', label_format=lform, x_label=label,
                              y_label=label, z_label=label, layer_number=1)
 
-            # a.property.trait_set(display_location='background')
             a.title_text_property.trait_set(**self.TEXT_STYLE, color=self._axis_color, opacity=self._axis_alpha)
             a.label_text_property.trait_set(**self.TEXT_STYLE, color=self._axis_color, opacity=self._axis_alpha)
             a.actors[0].pickable = False
@@ -777,6 +776,15 @@ class TraceGUI(HasTraits):
         # replace None values of Lenses n2 with the ambient n0
         nList = [self.raytracer.n0 if ni is None else ni for ni in nList]
 
+        # delete boxes with too small extent
+        i = 0
+        while i < len(nList)-2:
+            # delete if negative or small positive value
+            if BoundList[i+1][0] - BoundList[i][1] < 5e-4:
+                del nList[i], BoundList[i]
+            else:
+                i += 1
+        
         # join boxes with the same refraction index
         i = 0
         while i < len(nList)-2:
@@ -791,11 +799,6 @@ class TraceGUI(HasTraits):
 
         # plot boxes
         for i in range(len(BoundList)-1):
-
-            # skip plotting if bound difference is small (e.g. for lenses in contact, like achromatic one)
-            bdiff = (BoundList[i+1][0] - BoundList[i][1])
-            if bdiff < 1e-3 or np.abs(bdiff) < 1e-3:
-                continue
 
             # plot outline
             self.scene.engine.add_source(ParametricSurface(name=f"Refraction Index Outline {i}"), self.scene)
@@ -839,6 +842,7 @@ class TraceGUI(HasTraits):
         self._raysource_alpha = 0.55
         self._axis_color = (1, 1, 1) if not self.high_contrast else (0, 0, 0)
         self._axis_alpha = 0.55
+        self._info_frame_color = (0, 0, 0) if not self.high_contrast else (1, 1, 1)
         self._info_opacity = 0.2
 
     def _plot_element(self,
@@ -994,7 +998,7 @@ class TraceGUI(HasTraits):
 
             case _:  # Plain
                 s = np.ones_like(w_)
-                cm = "Greys"
+                cm = "Greys" if not self.high_contrast else "Wistia"
                 title = "None"
 
         self._rays_plot.mlab_source.trait_set(scalars=s)
@@ -1098,7 +1102,10 @@ class TraceGUI(HasTraits):
         # add ray info text
         self._ray_text_parent = self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
         self._ray_text = self.scene.mlab.text(0.02, 0.97, "")
-        self._on_ray_pick()  # call to set default text
+        self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
+                                          opacity=1, color=self.scene.foreground, vertical_justification="top")
+        self._ray_text.actor.text_scale_mode = 'none'
+        self._ray_text.text = ""
 
     def _init_status_text(self) -> None:
         """init GUI status text display"""
@@ -1172,22 +1179,17 @@ class TraceGUI(HasTraits):
 
         # differentiate between Click and Shift+Click
         if self.scene.interactor.shift_key:
-            if self._crosshair is not None:
-                self._crosshair.visible = False
             if self.raytracer.detectors:
                 # set outside position to inside of outline
                 pos_z = max(self._det_pos_min, pos[2])
                 pos_z = min(self._det_pos_max, pos_z)
 
-                # assign detector position, calls moveDetector()
-                self.det_pos = pos_z
-
-                # call with no parameter resets text
-                self._on_ray_pick()
+                self.det_pos = pos_z  # move detector
+                self._ray_text.text = ""  # reset info text
+                if self._crosshair is not None:
+                    self._crosshair.visible = False  # hide crosshair
         else:
             self._ray_text.text = f"Pick Position: ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, {pos[2]:>9.6g} mm)"
-            self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
-                                              opacity=1, color=self.scene.foreground)
             if self._crosshair is not None:
                 self._crosshair.mlab_source.trait_set(x=[pos[0]], y=[pos[1]], z=[pos[2]])
                 self._crosshair.visible = True
@@ -1198,8 +1200,7 @@ class TraceGUI(HasTraits):
         Shows ray properties on screen.
         :param picker_obj:
         """
-
-        if not self._ray_text:
+        if self._ray_text is None:
             return
 
         # it seems that picker_obj.point_id is only present for the first element in the picked list,
@@ -1271,7 +1272,7 @@ class TraceGUI(HasTraits):
             # differentiate between Click and Shift+Click
             if self.scene.interactor.shift_key:
                 text = f"Ray {pos}" +  \
-                    f" from Source {snum}" +  \
+                    f" from RS{snum}" +  \
                     (f" at surface {n2_}\n\n" if n2_ else " at ray source\n\n") + \
                     f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n" + \
                     "Vectors:                        Cartesian (x, y, z)                   " + \
@@ -1323,10 +1324,6 @@ class TraceGUI(HasTraits):
             self._ray_text.text = ""
             if self._crosshair is not None:
                 self._crosshair.visible = False
-
-        # text settings
-        self._ray_text.property.trait_set(vertical_justification="top")
-        self._ray_text.actor.text_scale_mode = 'none'
 
     def _init_keyboard_shortcuts(self) -> None:
         """Init shift key press detection"""
@@ -1565,9 +1562,13 @@ class TraceGUI(HasTraits):
         # reassign ray source colors
         self._assign_ray_source_colors()
 
-        # invert rays in coloring mode white
+        # in coloring type Plain the ray color is changed from white to a bright orange
         if self.coloring_type == "Plain" and self._rays_plot is not None:
+            self._rays_plot.parent.scalar_lut_manager.lut_mode = "Greys" if not self.high_contrast else "Wistia"
             self._rays_plot.parent.scalar_lut_manager.reverse_lut = bool(self.high_contrast)
+
+        if self._ray_text is not None:
+            self._ray_text.property.background_color = self._info_frame_color
 
     @observe('ray_amount_shown')
     def replot_rays(self, event=None) -> None:
@@ -1603,7 +1604,7 @@ class TraceGUI(HasTraits):
                         self._change_ray_representation()
 
                     # reset picker text
-                    self._on_ray_pick()
+                    self._ray_text.text = ""
 
                     self._status["Drawing"] -= 1
 
@@ -2021,9 +2022,9 @@ class TraceGUI(HasTraits):
         Initialize the GUI. Inits a variety of things.
         :param event: optional event from traits observe decorator
         """
+        self._init_crosshair()
         self._init_ray_info_text()
         self._init_status_text()
-        self._init_crosshair()
         self._init_keyboard_shortcuts()
 
         self._plot_orientation_axes()

@@ -21,10 +21,12 @@ class LoadTests(unittest.TestCase):
         with open(path,'wb') as f:
             f.write(r.content)
 
+    # normally we would download the file in __init__ and delete in __del__
+    # but using unittest multiple objects of this class are created
+    
     # run first
     @pytest.mark.os
     def test_0_download_schott(self):
-        # self.save_file("http://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf", "schott.agf")
         self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/schott.agf", "schott.agf")
 
     # run last
