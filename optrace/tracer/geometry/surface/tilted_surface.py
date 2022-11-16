@@ -18,11 +18,16 @@ class TiltedSurface:
     pass
 
 
+
 class TiltedSurface(Surface):
+    
+    rotational_symmetry: bool = False
+
 
     def __init__(self,
-                 r:                 float = 3.,
+                 r:                 float,
                  normal:            (list | np.ndarray) = None,
+                 normal_sph:        (list | np.ndarray) = None,
                  **kwargs)\
             -> None:
         """
@@ -38,9 +43,18 @@ class TiltedSurface(Surface):
         super().__init__(r, **kwargs)
 
         self.r = r
-        self.normal = normal
         self.parax_roc = None
         self.z_min = self.z_max = self.pos[2]
+
+        # assign normal
+        if normal is not None:
+            self.normal = normal
+        elif normal_sph is not None:
+            pc.check_type("normal_sph", normal_sph, list | np.ndarray)
+            theta, phi = np.radians(normal_sph[0]), np.radians(normal_sph[1])
+            self.normal = [np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi), np.cos(theta)]
+        else:
+            raise RuntimeError("normal or normal_sph parameter needs to be specified.")
 
         phi = np.arctan2(self.normal[1], self.normal[0])
         R = self.r
@@ -99,21 +113,29 @@ class TiltedSurface(Surface):
         normal = np.broadcast_to(self.normal, (p.shape[0], 3))
         t = misc.rdot(self.pos - p, normal) / misc.rdot(s, normal)
         p_hit = p + s*t[:, np.newaxis]
+        is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])  # rays not hitting
 
-        # rays don't hit -> intersect with xy plane at z=z_max
-        m = is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
-        tnm = (self.z_max - p[~m, 2])/s[~m, 2]
-        p_hit[~m] = p[~m] + s[~m]*tnm[:, np.newaxis]
+        # handle rays that start behind surface or inside its extent 
+        self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
         return p_hit, is_hit
 
-    def reverse(self) -> TiltedSurface:
+    def flip(self) -> None:
 
-        normal = self.normal.copy()
-        normal[:2] *= -1
+        # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
+        # we need to negate this, so the vector points in +z direction
+        # -> [-x, y, z]
+        self._lock = False
+        self.normal.flags.writeable = True
+        self.normal[0] *= -1
+        self.lock()
 
-        return TiltedSurface(r=self.r, normal=normal, silent=self.silent, desc=self.desc, long_desc=self.long_desc,
-                             threading=self.threading)
+    def rotate(self, angle: float) -> None:
+        
+        self._lock = False
+        self.normal.flags.writeable = True
+        self.normal[:2] = self._rotate_rc(self.normal[0], self.normal[1], np.deg2rad(angle))
+        self.lock()
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

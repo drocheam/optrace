@@ -16,7 +16,7 @@ RSS0 = ot.Point()
 for theta, num in zip([0, 25, 50, 75], [1, 6, 12, 12]):
     for n in np.arange(num)/num:
         RS0 = ot.RaySource(RSS0, divergence="Isotropic", spectrum=ot.presets.light_spectrum.d65, div_2d=False,
-                           pos=[0, 0, 0], ss=[theta, 360*n], div_angle=5)
+                           pos=[0, 0, 0], s_sph=[theta, 360*n], div_angle=5)
         RT.add(RS0)
     
 # add Detector

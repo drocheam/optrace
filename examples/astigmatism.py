@@ -13,11 +13,11 @@ z0 = -30
 x0 = np.tan(np.radians(oa_angle)) * z0
 RSS = ot.Point()
 RS0 = ot.RaySource(RSS, divergence="Isotropic", div_2d=True, spectrum=ot.presets.light_spectrum.d65,
-                  pos=[x0, 0, z0], ss=[oa_angle, 0], div_angle=2, div_axis_angle=90, desc="Sagittal")
+                  pos=[x0, 0, z0], s_sph=[oa_angle, 0], div_angle=2, div_axis_angle=90, desc="Sagittal")
 RT.add(RS0)
 
 RS1 = ot.RaySource(RSS, divergence="Isotropic", div_2d=True, spectrum=ot.presets.light_spectrum.d65,
-                  pos=[x0, 0, z0], ss=[oa_angle, 0], div_angle=2, div_axis_angle=0, desc="Meridional")
+                  pos=[x0, 0, z0], s_sph=[oa_angle, 0], div_angle=2, div_axis_angle=0, desc="Meridional")
 RT.add(RS1)
 
 n = ot.RefractionIndex("Constant", n=1.5)

@@ -16,7 +16,8 @@ import scipy.optimize  # numerical optimization methods
 from progressbar import progressbar, ProgressBar  # fancy progressbars
 
 # needed for raytracing geometry and functionality
-from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface, Marker, RectangularSurface, IdealLens
+from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface, Marker,\
+                      RectangularSurface, IdealLens, Line, Point, SphericalSurface
 from .geometry.element import Element
 from .geometry.group import Group
 
@@ -56,7 +57,6 @@ class Raytracer(Group):
         ONLY_HIT_FRONT = 3
         ONLY_HIT_BACK = 4
         T_BELOW_TTH = 5
-        SEQ_BROKEN = 6
     """enum for info messages in raytracing"""
 
     autofocus_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
@@ -135,7 +135,7 @@ class Raytracer(Group):
         """center position of front xy-outline plane"""
         # overwrites Group.pos, which knows no outline
         return np.mean(self.outline[:2]), np.mean(self.outline[2:4]), self.outline[4]
-    
+   
     def clear(self) -> None:
         """clear geometry and rays"""
         # overwrites Group.clear, since we also clear the ray storage here
@@ -228,11 +228,6 @@ class Raytracer(Group):
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                        f"missing lens front but hitting back, setting to absorbed.")
 
-                        case self.INFOS.SEQ_BROKEN:
-                            self.print(f"Hit point behind last starting point at surface {surf} for "
-                                       f"{count} rays. This can be a result of surface collisions "
-                                       "or incorrect sequentiality.")
-
     def trace(self, N: int) -> None:
         """
         Execute raytracing, saves all rays in the internal RaySource object
@@ -298,7 +293,7 @@ class Raytracer(Group):
                 if isinstance(element, Lens):
 
                     hw_front = hw.copy()
-                    p[hw, i+1], hit_front = self.__find_surface_hit(element.front, p[hw, i], s[hw], i, msg)
+                    p[hw, i+1], hit_front = element.front.find_hit(p[hw, i], s[hw])
                     hwh = misc.part_mask(hw, hit_front)  # rays having power and hitting lens front
 
                     # index after lens
@@ -323,7 +318,7 @@ class Raytracer(Group):
                         ns[:, i], ns[:, i+1] = n_l, n2_l
 
                         hw = weights[:, i] > 0
-                        p[hw, i+1], hit_back = self.__find_surface_hit(element.back, p[hw, i], s[hw], i, msg)
+                        p[hw, i+1], hit_back = element.back.find_hit(p[hw, i], s[hw])
                         hwb = misc.part_mask(hw, hit_back)  # rays having power and hitting lens back
                         self.__refraction(element.back, p, s, weights, n_l, n2_l, pols, hwb, i, msg)
 
@@ -353,7 +348,7 @@ class Raytracer(Group):
                     n1 = n2
 
                 elif isinstance(element, Filter | Aperture):  # pragma: no branch
-                    p[hw, i+1], hit = self.__find_surface_hit(element.surface, p[hw, i], s[hw], i, msg)
+                    p[hw, i+1], hit = element.surface.find_hit(p[hw, i], s[hw])
                     hwh = misc.part_mask(hw, hit)  # rays having power and hitting filter
 
                     if isinstance(element, Filter):
@@ -430,16 +425,26 @@ class Raytracer(Group):
                 self.geometry_error = True
                 return
 
+            coll = False
+            
+            # collision of front and next front
             if i + 1 < len(elements):
-                coll, xc, yc = Element.check_collision(el.front, elements[i + 1].front)
+                coll, xc, yc = self.check_collision(el.front, elements[i + 1].front)
+            
+            if el.has_back():
+                # collision of front and back of element
+                if not coll:
+                    coll, xc, yc = self.check_collision(el.front, el.back)
 
-                if not coll and el.has_back():
-                    coll, xc, yc = Element.check_collision(el.back, elements[i + 1].front)
+                # collision of back and next front
+                if not coll:
+                    coll, xc, yc = self.check_collision(el.back, elements[i + 1].front)
 
-                if coll:
-                    self.print(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}.")
-                    self.geometry_error = True
-                    return
+            # handle collision
+            if coll:
+                self.print(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}.")
+                self.geometry_error = True
+                return
 
         for rs in self.ray_sources:
 
@@ -449,7 +454,7 @@ class Raytracer(Group):
                 return
 
             if rs.pos[2] >= elements[0].extent[4]:
-                coll, xc, yc = Element.check_collision(rs.surface, elements[0].front)
+                coll, xc, yc = self.check_collision(rs.surface, elements[0].front)
                 if coll:
                     self.print(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}."
                                 "RaySource needs to come before all lenses.")
@@ -457,6 +462,92 @@ class Raytracer(Group):
                     return
 
         self.geometry_error = False
+
+    @staticmethod
+    def check_collision(front: Surface | Line | Point, back: Surface | Line | Point, res: int = 100)\
+            -> tuple[bool, np.ndarray, np.ndarray]:
+        """
+        
+        Check for surface collisions.
+        A collision is defined as the front surface havin a higher z-value than the back surface,
+        at a point where both surfaces are defined
+
+        :param front:
+        :param back:
+        :param res:
+        :return:
+        """
+
+        # we only compare when at least one object is a surface
+        if not (isinstance(front, Surface) or isinstance(back, Surface)):
+            raise TypeError(f"At least one object needs to be a Surface for collision detection")
+        
+        # check if point and surface hit. Basically if order of surface and point parameter is correct
+        elif isinstance(front, Point) or isinstance(back, Point):
+            rev, pt, surf = (False, front, back) if isinstance(front, Point) else (True, back, front)
+
+            # check value at surface
+            x, y = np.array([pt.pos[0]]), np.array([pt.pos[1]])
+            z = surf.get_values(x, y)
+
+            # check if hitting, surface needs to be defined at this point
+            hit = (z < pt.pos[2]) if not rev else (z > pt.pos[2])
+            hit = hit & surf.get_mask(x, y)
+            where = np.where(hit)[0]
+            return np.any(hit), x[where], y[where]
+
+        # intersection of surface and line
+        elif isinstance(front, Line) or isinstance(back, Line):
+            rev, line, surf = (False, front, back) if isinstance(front, Line) else (True, back, front)
+
+            # some line x, y values
+            t = np.linspace(-line.r, line.r, 10*res)
+            x = line.pos[0] + np.cos(line.angle)*t
+            y = line.pos[1] + np.sin(line.angle)*t
+            z = surf.get_values(x, y)
+
+            # check if hitting and order correct
+            hit = (z < line.pos[2]) if not rev else (z > line.pos[2])
+            hit = hit & surf.get_mask(x, y)
+            where = np.where(hit)[0]
+            return np.any(hit), x[where], y[where]
+
+        # extent of front and back
+        xsf, xef, ysf, yef, zsf, zef = front.extent
+        xsb, xeb, ysb, yeb, zsb, zeb = back.extent
+
+        # no overlap of z extents -> no collision
+        if zef < zsb:
+            return False, np.array([]), np.array([])
+
+        # get rectangular overlap area in xy-plane projection
+        xs = max(xsf, xsb)
+        xe = min(xef, xeb)
+        ys = max(ysf, ysb)
+        ye = min(yef, yeb)
+
+        # no overlap in xy plane projection -> no collision
+        if xs > xe or ys > ye:
+            return False, np.array([]), np.array([])
+
+        # grid for overlap area
+        X, Y = np.mgrid[xs:xe:res*1j, ys:ye:res*1j]
+
+        # sample surface mask
+        x2, y2 = X.flatten(), Y.flatten()
+        valid = front.get_mask(x2, y2) & back.get_mask(x2, y2)
+
+        # sample valid surface values
+        x2v, y2v = x2[valid], y2[valid]
+        zfv = front.get_values(x2v, y2v)
+        zbv = back.get_values(x2v, y2v)
+
+        # check for collisions
+        coll = zfv > zbv
+        where = np.where(coll)[0]
+
+        # return flag and collision samples
+        return np.any(coll), x2v[where], y2v[where]
 
     def __absorb_cylinder_rays(self,
                                p:           np.ndarray,
@@ -761,27 +852,6 @@ class Raytracer(Group):
 
         weights[hwh, i+1] = weights[hwh, i]*T
 
-    def __find_surface_hit(self, surface: Surface, p: np.ndarray, s: np.ndarray, i: int, msg: np.ndarray)\
-            -> tuple[np.ndarray, np.ndarray]:
-        """
-        Find the position of hits on surface using the iterative regula falsi algorithm.
-
-        :param surface: Surface object
-        :param p: position array (numpy 2D array, shape (N, 3))
-        :param s: direction array (numpy 2D array, shape (N, 3))
-        :param i:
-        :param msg:
-        :return: positions of hit (shape as p), bool numpy 1D array if ray hits lens
-        """
-
-        p_hit, is_hit = surface.find_hit(p, s)
-
-        # rays breaking sequentiality
-        if np.any(p_hit[:, 2] < p[:, 2]):
-            msg[self.INFOS.SEQ_BROKEN, i] += np.count_nonzero(p_hit[:, 2] < p[:, 2])
-
-        return p_hit, is_hit
-
     def _hit_detector(self,
                       info:              str,
                       detector_index:    int = 0,
@@ -816,6 +886,10 @@ class Raytracer(Group):
         # range for selected rays in RayStorage
         Ns, Ne = self.rays.B_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
 
+        dsurf = self.detectors[detector_index].surface  # detector surface
+        silent = dsurf.silent  # backup silent parameter
+        dsurf.silent = True  # force silent, ignores warnings that are intended for tracing
+        
         def threaded(Ns, Ne, list_, list_i, bar):
 
             # current rays for loop iteration, this rays are used in hit finding for the next section
@@ -823,8 +897,8 @@ class Raytracer(Group):
             rs[Ns:Ne] = True  # use rays of selected source
 
             # check if ray positions are behind, in front or inside detector extent
-            bh_zmin = self.rays.p_list[Ns:Ne, :, 2] >= self.detectors[detector_index].extent[4]
-            bh_zmax = self.rays.p_list[Ns:Ne, :, 2] >= self.detectors[detector_index].extent[5]
+            bh_zmin = self.rays.p_list[Ns:Ne, :, 2] >= dsurf.extent[4]
+            bh_zmax = self.rays.p_list[Ns:Ne, :, 2] >= dsurf.extent[5]
             
             # conclude if rays start after detector or don't reach that far
             no_start = np.all(bh_zmin & bh_zmax, axis=1)
@@ -853,6 +927,16 @@ class Raytracer(Group):
             ish = np.zeros_like(wl, dtype=bool)
             rs3 = np.ones_like(wl, dtype=bool)
 
+            # N: number of rays
+            # Nt: number of rays in detector region and assigned to current thread
+            # Ni: number of rays hitting the detector at the current surface in the current thread
+            # Nn: number of rays in current thread that have not hit anything yet
+
+            # rs: bool array with shape N, with true values being of number Nn
+            # rs3: bool array with shape Nt, with true values being of number Nn
+            # rs2: int array with shape Nn, holding the surface index for each ray
+            # rs4: shape Nt, holds if the hit is valid
+
             while np.any(rs):
 
                 rs2 += 1  # increment next-section-indices
@@ -866,19 +950,15 @@ class Raytracer(Group):
                     w[rsi] = 0  # set invalid to weight of zero
                     p, s, rs2 = p[val], s[val], rs2[val]  # only use valid rays
 
-                msg = np.zeros((len(self.INFOS), 2), dtype=int)  # find_surface_hit needs a message array
-                ph[rs3], ish[rs3] = self.__find_surface_hit(self.detectors[detector_index].surface, p, s,
-                                                            detector_index, msg)
-
-                self._set_messages([msg])  # assign messages
-                self._show_messages(s.shape[0])  # handle messages
+                ph[rs3], ish[rs3] = dsurf.find_hit(p, s)  # find hit
 
                 p2z = self.rays.p_list[rs, rs2, 2]
-                rs3 = ph[rs3, 2] > p2z
-                rs = misc.part_mask(rs, rs3)
+                rs4 = ph[rs3, 2] > p2z + dsurf.C_EPS  # hit point behind next surface intersection -> no valid hit
+                rs3 = misc.part_mask(rs3, rs4)
+                rs = misc.part_mask(rs, rs4)
 
                 if np.any(rs):
-                    rs2 = rs2[rs3]
+                    rs2 = rs2[rs4]
                     p, s, _, w[rs3], _, _, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 0, 0, 0])
 
             list_[list_i] = [ph, w, wl, ish]
@@ -904,6 +984,8 @@ class Raytracer(Group):
         else:
             threaded(Ns, Ne, list_, 0, bar)
 
+        dsurf.silent = silent  # restore silent state
+
         # make arrays from thread data
         # it would be more efficient to have them assigned to their destination in the thread
         # however we only work on rays reaching that far to the detector, a number that is not known beforehand
@@ -917,12 +999,11 @@ class Raytracer(Group):
         if bar is not None:
             bar.update(3)
 
-        if self.detectors[detector_index].surface.is_flat():
-            projection = None
-
-        else:
+        if isinstance(self.detectors[detector_index].surface, SphericalSurface):
             ph = self.detectors[detector_index].surface.sphere_projection(ph, projection_method)
             projection = projection_method
+        else:
+            projection = None
 
         # define the extent
         if isinstance(extent, list | np.ndarray):
@@ -1004,6 +1085,7 @@ class Raytracer(Group):
 
         return spec
 
+    # TODO what about the filter constant?
     def iterative_render(self,
                          N_rays:            int,
                          N_px_D:            int | list = 400,
@@ -1025,7 +1107,8 @@ class Raytracer(Group):
         If pos is provided as coordinate, the detector is moved beforehand.
         >> RT.iterative_render(N_rays=10000, pos=[0, 1, 0], detector_index=1) 
         
-        If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically repeated len(pos) times or can be specified as list with the same length as pos
+        If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically
+        repeated len(pos) times or can be specified as list with the same length as pos
         >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256]) 
 
         :param N_rays:

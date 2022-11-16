@@ -8,7 +8,14 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
+class RectangularSurface:
+    pass
+
+
 class RectangularSurface(Surface):
+    
+    rotational_symmetry: bool = False
+
 
     def __init__(self,
                  dim:               (list | np.ndarray),
@@ -22,7 +29,10 @@ class RectangularSurface(Surface):
         :param dim:
         """
         self._lock = False
-        
+      
+        # angle for rotation
+        self._angle = 0
+
         super().__init__(1, **kwargs)
         
         self.dim = np.asarray_chkfinite(dim, dtype=np.float64)
@@ -41,8 +51,30 @@ class RectangularSurface(Surface):
     def extent(self) -> tuple[float, float, float, float, float, float]:
         """
         """
-        return *(self.pos[:2].repeat(2) + self.dim.repeat(2)/2 * np.array([-1, 1, -1, 1])), \
+        # side lengths get rotated       
+        sx = np.abs(self.dim[0] * np.cos(self._angle)) + np.abs(self.dim[1] * np.sin(self._angle))
+        sy = np.abs(self.dim[0] * np.sin(self._angle)) + np.abs(self.dim[1] * np.cos(self._angle))
+        
+        return self.pos[0]-sx/2, self.pos[0]+sx/2,\
+               self.pos[1]-sy/2, self.pos[1]+sy/2,\
                self.z_min, self.z_max
+
+    @property
+    def _extent(self) -> tuple[float, float, float, float, float, float]:
+        """extent relative to center"""
+        return -self.dim[0]/2, self.dim[0]/2, -self.dim[1]/2, self.dim[1]/2, 0., 0.
+   
+    def rotate(self, angle: float) -> None:
+
+        # create an copy with an incremented angle
+        self._lock = False
+        self._angle += np.deg2rad(angle)
+        self.lock()
+
+    def flip(self) -> None:
+        self._lock = False
+        self._angle *= -1
+        self.lock()
 
     def get_plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -55,9 +87,12 @@ class RectangularSurface(Surface):
         if N < 10:
             raise ValueError("Expected at least N=10.")
 
-        xs, xe, ys, ye, _, _ = self.extent
+        # create a rotated grid
+        xs, xe, ys, ye = self._extent[:4]
+        X, Y = np.mgrid[xs:xe:N*1j, xs:xe:N*1j]
+        x2, y2 = self._rotate_rc(X.flatten(), Y.flatten(), self._angle)
+        X, Y = self.pos[0] + x2.reshape(X.shape), self.pos[1] + y2.reshape(Y.shape)
 
-        X, Y = np.mgrid[xs:xe:N*1j, ys:ye:N*1j]
         Z = np.full_like(Y, self.pos[2], dtype=np.float64)
 
         return X, Y, Z
@@ -70,8 +105,11 @@ class RectangularSurface(Surface):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        xs, xe, ys, ye = self.extent[:4]
-        inside = (xs-self.N_EPS <= x) & (x <= xe+self.N_EPS) & (ys-self.N_EPS <= y) & (y <= ye+self.N_EPS)
+        # instead of rotating the mask we rotate the relative point positions towards an unrotated rectangle
+        xr, yr = self._rotate_rc(x-self.pos[0], y-self.pos[1], -self._angle)
+        xs, xe, ys, ye = self._extent[:4]
+
+        inside = (xs-self.N_EPS <= xr) & (xr <= xe+self.N_EPS) & (ys-self.N_EPS <= yr) & (yr <= ye+self.N_EPS)
         return inside
 
     def get_edge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -87,7 +125,7 @@ class RectangularSurface(Surface):
 
         N4 = int(nc/4)
         dn = nc - 4*N4
-        xs, xe, ys, ye = self.extent[:4]
+        xs, xe, ys, ye = self._extent[:4]
 
         x = np.concatenate((np.linspace(xs, xe, N4),
                             np.full(N4, xe),
@@ -99,7 +137,10 @@ class RectangularSurface(Surface):
                             np.full(N4, ye),
                             np.flip(np.linspace(ys, ye, N4+dn))))
 
-        return x, y, np.full_like(y, self.pos[2])
+        # rotate the edge points around the rectangle center
+        x, y = self._rotate_rc(x, y, self._angle)
+
+        return self.pos[0]+x, self.pos[1]+y, np.full_like(y, self.pos[2])
 
     def get_random_positions(self, N: int) -> np.ndarray:
         """
@@ -108,7 +149,13 @@ class RectangularSurface(Surface):
         :return:
         """
         p = np.zeros((N, 3), dtype=np.float64, order='F')
-        p[:, 0], p[:, 1] = misc.uniform2(*self.extent[:4], N)
+        # grid for unrotated rectangle at (0, 0, 0)
+        x, y = misc.uniform2(*self._extent[:4], N)
+
+        # rotate and add offset (=position)
+        p[:, 0], p[:, 1] = self._rotate_rc(x, y, self._angle)
+        p[:, 0] += self.pos[0]
+        p[:, 1] += self.pos[1]
         p[:, 2] = self.pos[2]
 
         return p

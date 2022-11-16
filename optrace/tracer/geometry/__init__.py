@@ -13,6 +13,7 @@ from .surface.aspheric_surface import AsphericSurface
 from .line import Line
 from .point import Point
 
+from .element import Element
 from .filter import Filter
 from .aperture import Aperture
 from .detector import Detector

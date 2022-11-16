@@ -7,9 +7,9 @@ from .geometry.group import Group
 from .geometry import Lens, Marker, Detector, Aperture
 from .geometry.surface import CircularSurface, ConicSurface, SphericalSurface,\
                               RingSurface, AsphericSurface
-
 from .presets import spectral_lines
 from .color.tools import WL_BOUNDS
+
 
 
 _agf_modes = ["Schott", "Sellmeier1", "Herzberger", "Sellmeier2", "Conrady", "Sellmeier3", "Handbook of Optics 1",
@@ -81,7 +81,7 @@ def agf(path: str, silent: bool = True) -> dict:
         # get formula coefficients
         elif lin[:2] == "CD" and not skip:
             coeff0 = [float(a) for a in lin.split()[1:]]  # str to float list
-            cnt = RefractionIndex._coeff_count[mode]  # number of needed coefficients
+            cnt = RefractionIndex.coeff_count[mode]  # number of needed coefficients
             coeff = coeff0[0:cnt]  # slice list so we have correct number of coefficients
             coeff = coeff + [0.]*(cnt-len(coeff))  # fill missing coefficients with zeros
 
@@ -99,7 +99,7 @@ def agf(path: str, silent: bool = True) -> dict:
                 # for infrared materials there is no overlap with the visible range
                 if wl0 > WL_BOUNDS[1] or wl1 < WL_BOUNDS[0]:
                     if not silent:
-                        print(f"WARNING: Wavelength range for material {name} (in nm) [{wl0}, {wl1}] has no overlap"
+                        print(f"WARNING: Wavelength range for material {name} (in nm) [{wl0}, {wl1}] has no overlap "
                               f"with raytracer range {WL_BOUNDS}.")
                 
                 else:
@@ -131,12 +131,15 @@ def agf(path: str, silent: bool = True) -> dict:
     return n_dict
 
 
-def zmx(filename: str, n_dict: dict = None, no_marker: bool = False) -> Group:
+def zmx(filename: str, n_dict: dict = None, no_marker: bool = False, silent: bool = False) -> Group:
+
+    # see https://documents.pub/document/zemaxmanual.html?page=461
+
 
     lines = _read_lines(filename)
     n_dict = n_dict or {}
 
-    Surfaces, dds, long_desc = _zmx_to_surface_dicts(lines, n_dict)
+    Surfaces, dds, long_desc = _zmx_to_surface_dicts(lines, n_dict, silent)
 
     G = _surface_dicts_to_geometry(Surfaces, dds, long_desc, no_marker)
 
@@ -163,7 +166,7 @@ def _make_surface(surf: dict) -> AsphericSurface | ConicSurface | CircularSurfac
         raise RuntimeError(f"Surface mode " + str(surf["stype"]) + " not supported yet.")
 
 
-def _zmx_to_surface_dicts(lines, n_dict) -> tuple[list, list, str]:
+def _zmx_to_surface_dicts(lines, n_dict, silent) -> tuple[list, list, str]:
 
     Surfaces = []
     dds = []
@@ -172,7 +175,7 @@ def _zmx_to_surface_dicts(lines, n_dict) -> tuple[list, list, str]:
     for i, l in enumerate(lines):
 
         if l[:4] == "NAME":
-            long_desc = l[4:]
+            long_desc = l[5:-1]
 
         elif l[:4] == "UNIT":
             unit1 = l.split()[1]
@@ -215,7 +218,12 @@ def _zmx_to_surface_dicts(lines, n_dict) -> tuple[list, list, str]:
 
             # comment
             elif l[2:6] == "COMM":
-                surf["desc"] = l[7:]
+                surf["desc"] = l[7:-1]
+            
+            # coating
+            elif l[2:6] == "COAT":
+                if not silent:
+                    print(f"Ignoring coating '{l[7:-1]}'")
             
             # aperture stop
             elif l[2:6] == "STOP":

@@ -176,10 +176,10 @@ class TraceGUI(HasTraits):
                     desc="if raytracer backend uses only one thread")
     """limit raytracer backend operation to one thread (excludes the TraceGUI)"""
     
-    command_dont_wait: \
+    command_dont_skip: \
         List = List(editor=CheckListEditor(values=["Don't Wait for Idle State"], format_func=lambda x: x),
-                    desc="don't wait for idle state while running a command. Can lead to race conditions.")
-    """don't wait for idle state before running an user command.
+                    desc="don't skip when other actions are running. Can lead to race conditions.")
+    """Run command even if background tasks are active..
     Useful for debugging, but can lead to race conditions"""
     
     command_dont_replot: \
@@ -415,7 +415,7 @@ class TraceGUI(HasTraits):
                                 _separator,
                                 Item("_debug_command_label", style='readonly', show_label=False, emphasized=True),
                                 Item('command_dont_replot', style="custom", show_label=False),
-                                Item('command_dont_wait', style="custom", show_label=False),
+                                Item('command_dont_skip', style="custom", show_label=False),
                                 _separator),
                             label="Debug",
                             ),
@@ -514,7 +514,7 @@ class TraceGUI(HasTraits):
                 if key in ["absorb_missing", "minimalistic_view", "log_image", "flip_det_image", "wireframe_surfaces",
                            "focus_cost_plot", "af_one_source", "det_image_one_source", "det_spectrum_one_source",
                            "raytracer_single_thread", "show_all_warnings", "garbage_collector_stats", "high_contrast",
-                           "command_dont_wait", "command_dont_replot", "maximize_scene", "activate_filter"]\
+                           "command_dont_skip", "command_dont_replot", "maximize_scene", "activate_filter"]\
                                    and isinstance(val, bool):
                     kwargs[key] = [self._trait(key, 0).editor.values[0]] if val else []
 
@@ -538,10 +538,10 @@ class TraceGUI(HasTraits):
             key in ["absorb_missing", "minimalistic_view", "log_image", "flip_det_image", "focus_cost_plot",
                     "det_spectrum_one_source", "af_one_source", "det_image_one_source", "raytracer_single_thread",
                     "show_all_warnings", "wireframe_surfaces", "garbage_collector_stats", "high_contrast",
-                    "command_dont_wait", "command_dont_replot", "maximize_scene", "activate_filter"]:
+                    "command_dont_skip", "command_dont_replot", "maximize_scene", "activate_filter"]:
             val = [self._trait(key, 0).editor.values[0]] if val else []
 
-        # the detector can only be changed, if it isn't locked (__detetector_lock)
+        # the detector can only be changed, if it isn't locked (__detector_lock)
         # but while waiting for the release, the detector position and therefore its label can change
         # making the old name invalid
         # workaround: get index from name and use updated name
@@ -762,8 +762,6 @@ class TraceGUI(HasTraits):
 
         self.__remove_objects(self._index_box_plots)
 
-        # TODO don't plot any boxes if relevant boxes would be too small
-
         # sort Element list in z order
         Lenses = sorted(self.raytracer.lenses, key=lambda Element: Element.pos[2])
 
@@ -926,14 +924,18 @@ class TraceGUI(HasTraits):
         """
 
         p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=True)
-        self._ray_property_dict.update(p=p_, s=s_, pol=pol_, w=w_, wl=wl_, snum=snum_, n=n_,
+
+        # force copies
+        self._ray_property_dict.update(p=p_.copy(), s=s_.copy(), pol=pol_.copy(), w=w_.copy(), wl=wl_.copy(), snum=snum_.copy(), n=n_.copy(),
                                        index=np.where(self._ray_selection)[0])
 
         # get flattened list of the coordinates
         _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=False,
                                                                ret=[0, 1, 0, 0, 0, 0, 0])
-        x, y, z = p_[:, :, 0].ravel(), p_[:, :, 1].ravel(), p_[:, :, 2].ravel()
-        u, v, w = s_un[:, :, 0].ravel(), s_un[:, :, 1].ravel(), s_un[:, :, 2].ravel()
+        
+        # use flatten instead of ravel so we have guaranteed copies
+        x, y, z = p_[:, :, 0].flatten(), p_[:, :, 1].flatten(), p_[:, :, 2].flatten()
+        u, v, w = s_un[:, :, 0].flatten(), s_un[:, :, 1].flatten(), s_un[:, :, 2].flatten()
         s = np.ones_like(z)
 
         return x, y, z, u, v, w, s
@@ -1258,7 +1260,9 @@ class TraceGUI(HasTraits):
                 surf = None
 
             is_surf = isinstance(surf, Surface)
-            if is_surf:
+            surf_hit = is_surf and surf.get_mask(np.array([p[0]]), np.array([p[1]]))[0]
+            
+            if is_surf and surf_hit:
                 normal = surf.get_normals(np.array([p[0]]), np.array([p[1]]))[0]
                 normal_sph = to_sph_coords(normal)
 
@@ -1288,9 +1292,9 @@ class TraceGUI(HasTraits):
                     f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})" + \
                     f"         ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°)\n" + \
                     (f"Surface Normal:        ({normal[0]:>10.5f}, {normal[1]:>10.5f}, {normal[2]:>10.5f})"
-                    if pw > 0  and is_surf else "") + \
+                    if pw > 0  and is_surf and surf_hit else "") + \
                     (f"         ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°)\n\n"
-                    if pw > 0 and is_surf else "\n") + \
+                    if pw > 0 and is_surf and surf_hit else "\n") + \
                     f"Wavelength:               {wv:>10.2f} nm" + \
                     (f"\nRefraction Index Before:  {n0:>10.4f}" if n2_ else "") + \
                     (f"           Distance to Last Intersection:          {l0:>10.5g} mm" if l0 else "") + \
@@ -1301,8 +1305,8 @@ class TraceGUI(HasTraits):
                     f"\nRay Power After:          {pw*1e6:>10.5g} µW" + \
                     (f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm" if ol1 else "") + \
                     (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "") + \
-                    ("\n\nSurface Information:\n" if is_surf else "") + \
-                    (surf.info if is_surf else "")
+                    ("\n\nSurface Information:\n" if is_surf and surf_hit else "") + \
+                    (surf.info if is_surf and surf_hit else "")
             else:
                 text = f"Ray {pos}" +  \
                     f" from Source {snum}" +  \
@@ -1634,26 +1638,39 @@ class TraceGUI(HasTraits):
             # run this in background thread
             def background() -> None:
 
+                error_state = False
                 self.raytracer.absorb_missing = bool(self.absorb_missing)
 
                 with self.__ray_access_lock:
                     with self._try() as error:
                         self.raytracer.trace(N=self.ray_count)
-                    if error or not self.raytracer.rays.N:  # error or raytracing failed (= no rays)
-                        self._status["Tracing"] -= 1
-                        # gets unset on first run
-                        if self._status["DisplayingGUI"]:
-                            pyface_gui.invoke_later(self._set_gui_loaded)
-                        return
+                        
+                    # error or raytracing failed (= no rays)
+                    if error or self.raytracer.geometry_error or not self.raytracer.rays.N:  
+                        error_state = True
 
                 # execute this after thread has finished
                 def on_finish() -> None:
-                    with self._no_trait_action():
-                        # reset parameter to value of raytracer.absorb_missing, since it can refuse this value
-                        self.absorb_missing = self.raytracer.absorb_missing
 
-                    self._status["Tracing"] -= 1
-                    self.replot_rays()
+                    if error_state:
+                        # remove ray plot
+                        if self._rays_plot is not None:
+                            self._rays_plot.parent.parent.remove()
+                            self._rays_plot = None
+                            
+                        self._status["Tracing"] -= 1
+
+                        # gets unset on first run
+                        if self._status["DisplayingGUI"]:
+                            pyface_gui.invoke_later(self._set_gui_loaded)
+
+                    else:
+                        with self._no_trait_action():
+                            # reset parameter to value of raytracer.absorb_missing, since it can refuse this value
+                            self.absorb_missing = self.raytracer.absorb_missing
+
+                        self._status["Tracing"] -= 1
+                        self.replot_rays()
 
                 pyface_gui.invoke_later(on_finish)
 
@@ -2176,7 +2193,6 @@ class TraceGUI(HasTraits):
     @observe('_run_button')
     def send_cmd(self, event=None) -> None:
         """
-        Updates the Detector Selection and the corresponding properties.
         :param event: optional event from traits observe decorator
         """
         dict_ = dict(  # GUI and scene
@@ -2188,36 +2204,29 @@ class TraceGUI(HasTraits):
                      APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
                      DL=self.raytracer.detectors, ML=self.raytracer.markers)
 
-        def background():
-
-            cmd = self._cmd
-
-            # wait until all other actions have finished
-            if not self.command_dont_wait:
-                while sum(self._status.values()) != self._status["RunningCommand"]:
-                    time.sleep(0.05)
-
-            def on_finish():
-
-                self._command_history += ("\n" if self._command_history else "") + cmd
-
-                with self._try():
-                    hs = self.raytracer.property_snapshot()
-                    exec(cmd, locals() | dict_, globals())
-
-                    if not self.command_dont_replot:
-                        hs2 = self.raytracer.property_snapshot()
-                        cmp = self.raytracer.compare_property_snapshot(hs, hs2)
-                        self.replot(cmp)
-
-                self._status["RunningCommand"] -= 1
-
-            pyface_gui.invoke_later(on_finish)
-
         if self._cmd != "":
+
+            pyface_gui.process_events()
+
+            if self.busy and not self.command_dont_skip:
+                if not self.silent:
+                    print("Other actions running, try again when the program is idle.")
+                return
+
             self._status["RunningCommand"] += 1
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._command_history += ("\n" if self._command_history else "") + self._cmd
+
+            with self._try():
+                hs = self.raytracer.property_snapshot()
+
+                exec(self._cmd, locals() | dict_, globals())
+        
+                if not self.command_dont_replot:
+                    hs2 = self.raytracer.property_snapshot()
+                    cmp = self.raytracer.compare_property_snapshot(hs, hs2)
+                    self.replot(cmp)
+
+            self._status["RunningCommand"] -= 1
 
     # rescale axes texts when the window was resized
     # for some reasons these are the only ones having no text_scaling_mode = 'none' option

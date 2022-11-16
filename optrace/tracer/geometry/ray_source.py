@@ -58,7 +58,7 @@ class RaySource(Element):
                  # Divergence Parameters
                  divergence:         str = "None",
                  s:                  (list | np.ndarray) = None,
-                 ss:                 (list | np.ndarray) = None,
+                 s_sph:              (list | np.ndarray) = None,
                  div_angle:          float = 0.5,
                  div_2d:             bool = False,
                  div_axis_angle:     float = 0,
@@ -121,11 +121,11 @@ class RaySource(Element):
         self.or_func = or_func
         self.or_kwargs = or_kwargs if or_kwargs is not None else {}
 
-        if ss is None:
+        if s_sph is None:
             self.s = s if s is not None else [0, 0, 1]
         else:
-            pc.check_type("ss", ss, list | np.ndarray)
-            theta, phi = np.radians(ss[0]), np.radians(ss[1])
+            pc.check_type("s_sph", s_sph, list | np.ndarray)
+            theta, phi = np.radians(s_sph[0]), np.radians(s_sph[1])
             self.s = [np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi), np.cos(theta)]
 
         self.div_axis_angle = div_axis_angle

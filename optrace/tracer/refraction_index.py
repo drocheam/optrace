@@ -20,7 +20,7 @@ class RefractionIndex(Spectrum):
     # Refraction Index Models:
     # see https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
 
-    _coeff_count = {"Cauchy": 4, "Conrady": 3, "Sellmeier1": 6, "Sellmeier2": 5, "Sellmeier3": 8, 
+    coeff_count = {"Cauchy": 4, "Conrady": 3, "Sellmeier1": 6, "Sellmeier2": 5, "Sellmeier3": 8, 
                     "Sellmeier4": 5, "Sellmeier5": 10, "Herzberger": 6, "Extended": 8, "Extended2": 8, 
                     "Handbook of Optics 1": 4, "Handbook of Optics 2": 4, "Schott": 6, "Extended3": 9}
     
@@ -229,7 +229,7 @@ class RefractionIndex(Spectrum):
             case "coeff" if val is not None:
 
                 pc.check_type(key, val, list)
-                cnt = self._coeff_count[self.spectrum_type]
+                cnt = self.coeff_count[self.spectrum_type]
 
                 if len(val) != cnt:
                     raise ValueError(f"{key} needs to be a list with exactly {cnt} numeric coefficients for mode "

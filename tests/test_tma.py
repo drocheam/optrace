@@ -288,19 +288,22 @@ class TMATests(unittest.TestCase):
 
     def test_tma_ideal_lens(self):
 
+        n01 = ot.RefractionIndex("Constant", n=2)
+        n02 = ot.RefractionIndex("Constant", n=1.5)
+
         for D in [30.4897, -12.5]:  # different optical powers
 
             L0 = ot.IdealLens(r=2, D=D, pos=[0, 0, 1])
-            L1 = ot.IdealLens(r=2, D=D, n2=ot.RefractionIndex("Constant", n=2), pos=[0, 0, 1])
+            L1 = ot.IdealLens(r=2, D=D, n2=n01, pos=[0, 0, 1])
 
             RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 60])
             RT.add(L0)
 
             LL = [ot.IdealLens(r=2, D=D*2/3, pos=[0, 0, 0]), ot.IdealLens(r=2, D=D/3, pos=[0, 0, 1e-9])]
 
-            for tma in [L0.tma(), L1.tma(), RT.tma(), ot.TMA(LL)]:
+            for tma in [L0.tma(), L1.tma(), RT.tma(), ot.TMA(LL, n0=n02)]:
                 abcd1 = tma.abcd
-                abcd = np.array([[1, 0], [-D/1000, 1]])  # 30dpt (1/m) ->  0.03 (1/mm)
+                abcd = np.array([[1, 0], [-D/1000, tma.n1/tma.n2]])  # 30dpt (1/m) ->  0.03 (1/mm)
                 self.assertTrue(np.allclose(abcd1-abcd, 0))
                 self.assertAlmostEqual(tma.power[1], D)
 

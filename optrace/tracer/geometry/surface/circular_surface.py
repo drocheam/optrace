@@ -15,6 +15,9 @@ from .surface import Surface
 
 class CircularSurface(Surface):
 
+    rotational_symmetry: bool = True
+    
+
     def __init__(self,
                  r:        float,
                  **kwargs)\

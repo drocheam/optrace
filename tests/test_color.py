@@ -319,7 +319,7 @@ class ColorTests(unittest.TestCase):
     @pytest.mark.slow
     def test_image_color_rendering(self):
         # return
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True, no_pol=True)
         RSS = ot.RectangularSurface(dim=[6, 6])
         RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65)
         RT.add(RS)

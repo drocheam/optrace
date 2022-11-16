@@ -29,6 +29,9 @@ class Surface(BaseClass):
     N_EPS: float = 1e-10
     """numerical epsilon. Used for floating number comparisons. As well as adding small differences for plotting"""
 
+    rotational_symmetry: bool = False
+
+
     def __init__(self,
                  r:                 float,
                  **kwargs)\
@@ -178,10 +181,9 @@ class Surface(BaseClass):
         if N < 10:
             raise ValueError("Expected at least N=10.")
 
-        # get z-values on rectangular grid
+        # rectangular grid
         X, Y = np.mgrid[-self.r:self.r:N*1j,
                         -self.r:self.r:N*1j]
-        z = self._get_values(X.ravel(), Y.ravel())
 
         # convert to polar coordinates
         R = np.sqrt(X**2 + Y**2)
@@ -191,6 +193,10 @@ class Surface(BaseClass):
         r = self.r
         mask = R.ravel() >= r
         mask2 = R >= r
+        
+        # values inside circular area
+        z = np.zeros(mask.shape, dtype=np.float64)
+        z[~mask] = self._get_values(X[~mask2].ravel(), Y[~mask2].ravel())
 
         # move values outside surface to the surface edge
         # this defines the edge with more points, making it more circular instead of step-like
@@ -307,6 +313,8 @@ class Surface(BaseClass):
             p_hit = p + s*t[:, np.newaxis]
             is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
 
+            self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
+
             return p_hit, is_hit
 
         else:
@@ -325,6 +333,14 @@ class Surface(BaseClass):
             # arrays for estimated hit points
             p_hit = np.zeros_like(s, dtype=np.float64, order='F')
             p_hit[c] = p1[c]  # assign already converged rays
+
+            # we need values with different signs to find the root
+            ill = f1*f2 > 0
+            if np.any(ill):
+                illc = np.count_nonzero(ill)
+                self.print(f"WARNING: There are {illc} rays that are ill-conditioned for numerical hit finding."
+                           "Their hit position will certainly be wrong."
+                           " A possible cause can be a ray hitting a surface multiple times.")
 
             it = 1  # number of iteration
             # do until all rays have converged
@@ -375,8 +391,9 @@ class Surface(BaseClass):
             # check if hit is an actual hit. For this the surface needs to be defined at this x and y
             # as well as the actual surface value being near
             is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
-            zs = self.get_values(p_hit[:, 0], p_hit[:, 1])
-            is_hit = is_hit & (np.abs(zs - p_hit[:, 2]) < self.C_EPS)
+
+            # handle rays that start behind surface or inside its extent 
+            self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
         return p_hit, is_hit
 
@@ -496,14 +513,54 @@ class Surface(BaseClass):
 
         return t1, t2, f1, f2, p1, p2
     
-    def reverse(self) -> Surface:
+    def flip(self) -> None:
+        assert self.is_flat()  # flip otherwise not implemented
 
-        assert self.is_flat()  # reverse otherwise not implemented
+    def rotate(self, angle: float) -> None:
+        assert self.rotational_symmetry
 
-        # reversed version has same properties, but pos at [0, 0, 0]
-        S = self.copy()
-        S.move_to([0, 0, 0])
-        return S
+    def _rotate_rc(self, x, y, alpha) -> tuple[np.ndarray, np.ndarray]:
+
+        if alpha:
+            return x*np.cos(alpha) - y*np.sin(alpha),\
+                x*np.sin(alpha) + y*np.cos(alpha)
+
+        return x, y
+
+    def _find_hit_handle_abnormal(self, p, s, p_hit, is_hit):
+        """
+        this handles "abnormal" rays.
+        Ray starts after z_max -> p_hit = p
+        Ray starts after the surface but before z=z_max  -> intersect ray with plane z=z_max
+        Hit is in negative z-direction -> intersect ray at plane z=z_max
+        Other kind of deviation between hit z-value and surface z-value -> intersect with plane z=z_max
+        All these rays are set as non-hitting by updating is_hit
+
+        All normal rays are kept intact.
+        """
+
+        zs = self.get_values(p_hit[:, 0], p_hit[:, 1])  # surface values
+        dev = np.abs(p_hit[:, 2] - zs) > self.C_EPS  # z-value deviates
+        beh = p[:, 2] > self.z_max + self.N_EPS  # rays start after surface
+        neg = p_hit[:, 2] < p[:, 2] - self.C_EPS  # hit is behind ray start
+        bet = (neg | dev) & ~beh
+        # ^-- rays don't hit, hit in negative direction or start after surface, but before highest surface value
+        
+        # "bet"-rays should intersect plane at z=z_max
+        tnm = (self.z_max - p[bet, 2])/s[bet, 2]
+        p_hit[bet] = p[bet] + s[bet]*tnm[:, np.newaxis]
+        is_hit[bet] = False # ray starting behind the surface don't count as hit
+
+        # "beh" rays should keep their coordinates
+        p_hit[beh] = p[beh]
+        is_hit[beh] = False
+
+        # TODO test this?
+        brok = bet | beh
+        if np.any(brok):
+            brokc = np.count_nonzero(brok)
+            self.print(f"WARNING: Broken sequentiality. {brokc} rays start behind the current surface. "
+                       "The simulation results for these rays are most likely wrong. Check the geometry.")
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

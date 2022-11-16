@@ -13,6 +13,9 @@ class AsphericSurface:
 
 class AsphericSurface(FunctionSurface):
 
+    rotational_symmetry: bool = True
+
+
     def __init__(self,
                  r:                 float,
                  R:                 float,
@@ -80,26 +83,27 @@ class AsphericSurface(FunctionSurface):
         # x and y components are just the radial component rotated by phi
         return fr*np.cos(phi), fr*np.sin(phi)
 
-    def reverse(self) -> AsphericSurface:
-
-        # let the parent class do the reversing
-        # this moves the surface to the origin, sets z_min, z_max and the parax_roc
-        S = super().reverse()
+    def flip(self) -> None:
 
         # but now we have simply -1 as factor,
         # instead we'd like a factor of 1 and to negate R and the coefficients
         # so we reset the sign and negate those properties
 
-        S._lock = False
+        self._lock = False
         
-        S._sign = 1
-        S.R *= -1
-        S.coeff.flags.writeable = True
-        S.coeff *= -1
+        self.R *= -1
+        self.coeff.flags.writeable = True
+        self.coeff *= -1
+        self.parax_roc *= -1
+        a = self.pos[2] - (self.z_max - self.pos[2])
+        b = self.pos[2] + (self.pos[2] - self.z_min)
+        self.z_min, self.z_max = a, b
 
-        S.lock()
+        self.lock()
 
-        return S
+    # override rotate function of FunctionSurface parent class
+    def rotate(self, angle: float) -> None:
+        pass
 
     @property
     def _np_coeff(self) -> np.ndarray:

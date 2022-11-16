@@ -14,6 +14,10 @@ from test_gui import rt_example
 
 # def test polarization calculation of ideal lens
 
+# lens maker equation
+def lens_maker(R1, R2, n, n0, d):
+    D = (n-n0)/n0 * (1/R1 - 1/R2 + (n - n0) * d / (n*R1*R2))
+    return 1 / D if D else np.inf 
 
 class TracerTests(unittest.TestCase):
 
@@ -39,9 +43,6 @@ class TracerTests(unittest.TestCase):
 
     @pytest.mark.os
     def test_raytracer_snapshot(self):
-        """
-        checks add, remove, property_snapshot, compare_property_snapshot, has() and clear()
-        """
         
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 30])
 
@@ -109,7 +110,7 @@ class TracerTests(unittest.TestCase):
 
         RT = rt_example()
 
-        # check outline and pos
+        # check extent and pos
         self.assertTrue(np.allclose(RT.extent - RT.outline, 0))  # extent is outline
         posrt = [(RT.outline[0] + RT.outline[1])/2, (RT.outline[2] + RT.outline[3])/2, RT.outline[4]]
         self.assertTrue(np.allclose(np.array(RT.pos) - posrt, 0))  # position is position of first xy plane
@@ -199,6 +200,98 @@ class TracerTests(unittest.TestCase):
         RT.trace(1000)  # source behind lens
         self.assertTrue(RT.geometry_error)
 
+        # load eye, flip back of cornea (=meniscus lens)
+        # this leads to a surface overlap of front and back surface,
+        # which should be detected by the geometry check
+        RT.clear()
+        RT.add(ot.presets.geometry.arizona_eye())
+        RT.lenses[-2].back.flip()
+        RT.trace(1000)
+        self.assertTrue(RT.geometry_error)
+
+    def test_element_collisions(self):
+
+        # check collisions
+
+        # get geometry
+        geom = ot.presets.geometry.arizona_eye()
+        geome = geom.elements
+
+        # z overlap but no x-y overlap -> no collision
+        geome[1].move_to(geome[0].front.pos + [0, 20, 0.01])
+        self.assertFalse(ot.Raytracer.check_collision(geome[0].front, geome[1].front)[0])
+        
+        # no z-overlap -> no collision
+        self.assertFalse(ot.Raytracer.check_collision(geome[0].front, geome[2].front)[0])
+        # z-overlap but no collision
+        self.assertFalse(ot.Raytracer.check_collision(geome[0].front, geome[0].back)[0])
+        
+        # collision
+        geome[1].move_to(geome[0].front.pos + [0, 0, 0.01])  # cornea is now inside empty area of pupil
+        coll, x, y = ot.Raytracer.check_collision(geome[0].front, geome[1].front)
+        self.assertTrue(coll)
+        self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[1].front.get_values(x, y)))
+
+        # another collision
+        geom = ot.presets.geometry.arizona_eye()
+        geome = geom.elements
+        geome[2].move_to(geome[0].front.pos + [0, 0, 0.2])
+        coll, x, y = ot.Raytracer.check_collision(geome[0].front, geome[2].front)
+        self.assertTrue(coll)
+        self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[2].front.get_values(x, y)))
+
+        # collision point - surface
+
+        surf = ot.SphericalSurface(r=1, R=-5)
+        point = ot.Point()
+
+        # point in front of surface, only "hit" when order is reversed
+        point.move_to([0, 0, -1])
+        hit, _, _ = ot.Raytracer.check_collision(point, surf)
+        self.assertFalse(hit)
+        hit, _, _ = ot.Raytracer.check_collision(surf, point)
+        self.assertTrue(hit)
+
+        # point in behind surface, only "hit" when order is reversed
+        point.move_to([0, 0, 1])
+        hit, _, _ = ot.Raytracer.check_collision(point, surf)
+        self.assertTrue(hit)
+        hit, _, _ = ot.Raytracer.check_collision(surf, point)
+        self.assertFalse(hit)
+        
+        # collision line - surface
+
+        surf = ot.SphericalSurface(r=4, R=-5)
+        line = ot.Line(r=0.1)
+
+        # line in front of surface, only "hit" when order is reversed
+        line.move_to([0, 0, -10])
+        hit, _, _ = ot.Raytracer.check_collision(line, surf)
+        self.assertFalse(hit)
+        hit, _, _ = ot.Raytracer.check_collision(surf, line)
+        self.assertTrue(hit)
+
+        # line behind surface, only "hit" when order is reversed
+        line.move_to([0, 0, 1])
+        hit, _, _ = ot.Raytracer.check_collision(line, surf)
+        self.assertTrue(hit)
+        hit, _, _ = ot.Raytracer.check_collision(surf, line)
+        self.assertFalse(hit)
+        
+        # Line no intersects surface, so regarless of order we get a collision
+        line = ot.Line(r=5)
+        line.move_to([0, 0, -0.1])
+        hit, _, _ = ot.Raytracer.check_collision(line, surf)
+        self.assertTrue(hit)
+        hit, _, _ = ot.Raytracer.check_collision(surf, line)
+        self.assertTrue(hit)
+
+        # Coverage
+
+        # type errors
+        self.assertRaises(TypeError, ot.Raytracer.check_collision, ot.Point(), ot.Point())
+        self.assertRaises(TypeError, ot.Raytracer.check_collision, ot.Line(), ot.Line())
+
     @pytest.mark.slow
     def test_focus(self):
         
@@ -276,46 +369,6 @@ class TracerTests(unittest.TestCase):
         # aperture blocks all light
         RT.add(ot.Aperture(ot.CircularSurface(r=3), pos=[0, 0, 0]))
         RT.autofocus("Position Variance", z_start=10) # no rays here
-
-    @pytest.mark.slow
-    def test_sphere_detector_range_hits(self):
-        """
-        this function checks if the detector hit finding correctly handles:
-        * rays starting after the detector
-        * rays ending before the detector
-        * rays starting inside of detector extent
-        for different number of threads
-        """
-
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -100, 100], silent=True)
-        RS = ot.RaySource(ot.CircularSurface(r=0.5), pos=[0, 0, 0], divergence="None")
-        RT.add(RS)
-
-        aps = ot.RingSurface(r=2, ri=1)
-        ap = ot.Aperture(aps, pos=[0, 0, 3])
-        RT.add(ap)
-
-        dets = ot.SphericalSurface(r=5, R=-6)
-        det = ot.Detector(dets, pos=[0, 0, -10])
-        RT.add(det)
-
-        # angular extent for projection_method = "Equidistant"
-        ext0 = np.arcsin(RS.surface.r/np.abs(det.surface.R))
-        ext = np.array(ext0).repeat(4)*[-1, 1, -1, 1]
-
-        RT.trace(400000)
-
-        for z in [RT.outline[4], RS.pos[2]+1, ap.pos[2]-1, ap.pos[2]+1, RS.pos[2]+1+det.surface.R, RT.outline[5]-RT.N_EPS, RT.outline[5] + 1]:
-            det.move_to([0, 0, z])
-            for N_th in [1, 2, 3, 4, 8, 16]:
-                RT._force_threads = N_th
-                img = RT.detector_image(16, projection_method="Equidistant")
-                
-                if RT.outline[5] > z > RS.surface.pos[2]:
-                    self.assertAlmostEqual(img.get_power(), RS.power)  # correctly lit
-                    self.assertTrue(np.allclose(img.extent-ext, 0, atol=1e-2, rtol=0))  # extent correct
-                else:
-                    self.assertAlmostEqual(img.get_power(), 0)
 
     @pytest.mark.slow
     def test_uniform_emittance(self):
@@ -512,7 +565,7 @@ class TracerTests(unittest.TestCase):
         # add point sources with parallel rays
         for theta in [-89.99, -60, -30, 0.001, 30, 60, 89.99]:  # slightly decentered central value so we only hit one pixel
             RS0 = ot.RaySource(RSS0, divergence="None", div_2d=False,
-                    pos=[0, 0, 0], ss=[theta, 0])
+                    pos=[0, 0, 0], s_sph=[theta, 0])
             RT.add(RS0)
 
         # check that hits are equally spaced in projection
@@ -540,7 +593,7 @@ class TracerTests(unittest.TestCase):
             for theta in np.linspace(0, 1, 5)*87:
                 # circular are on sphere at defined position
                 RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=False,
-                        pos=[0, 0, 0], ss=[theta, phi], div_angle=2)
+                        pos=[0, 0, 0], s_sph=[theta, phi], div_angle=2)
                 RT.add(RS0)
 
                 # make detector image and get extent
@@ -706,73 +759,8 @@ class TracerTests(unittest.TestCase):
         RT.no_pol = True
         RT.trace(10000)
 
-    def test_offset_system_equality(self):
-        """
-        this function tests if the same geometry behaves the same if it is shifted by a vector
-        also checks numeric precision for some larger offset values
-        """
-
-        im = None
-        abcd = None
-
-        for pos0 in [(0, 0, 0), (5.789, 0.123, -45.6), (0, 16546.789789, -4654), (1e8, -1e10, 15)]:
-
-            x0, y0, z0 = (*pos0,)
-            pos0 = np.array(pos0)
-            
-            RT = ot.Raytracer(outline=[-5+x0, 5+x0, -5+y0, 5+y0, -10+z0, 50+z0], silent=True)
-
-            RSS = ot.CircularSurface(r=0.2)
-            RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), 
-                              divergence="None", pos=pos0+[0, 0, -3])
-            RT.add(RS)
-
-            front = ot.SphericalSurface(r=3, R=50)
-            back = ot.ConicSurface(r=3, R=-50, k=-1.5)
-            L0 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 0])
-            RT.add(L0)
-
-            front = ot.FunctionSurface(r=3,
-                                       func=lambda x, y: (x**2 + y**2)/50 + (x**2 +y**2)**2/5000,
-                                       silent=True,
-                                       parax_roc=25)
-            back = ot.CircularSurface(r=2)
-            L1 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 10])
-            RT.add(L1)
-
-            X, Y = np.mgrid[-1:1:100j, -1:1:100j]
-            data = 3 - (X**2 + Y**2)
-            front = ot.DataSurface(data=data, r=4, silent=True)
-            back = ot.TiltedSurface(r=4, normal=[0, 0.01, 1])
-            L2 = ot.Lens(front, back, n=ot.presets.refraction_index.K5, pos=pos0+[0, 0, 20])
-            RT.add(L2)
-
-            rect = ot.RectangularSurface(dim=[10, 10])
-            Det = ot.Detector(rect, pos=pos0+[0., 0., 45])
-            RT.add(Det)
-
-            # render image, so we can compare side length and power
-            RT.trace(100000)
-            im2 = RT.detector_image(100)
-
-            # remove not symmetric element and compare abcd matrix
-            RT.remove(L2)
-            abcd2 = RT.tma().abcd
-
-            # first run: save reference values
-            if im is None:
-                abcd = abcd2
-                im = im2.copy()
-            # run > 1: compare values
-            if im is not None:
-                self.assertTrue(np.allclose(im.extent-im2.extent+pos0[:2].repeat(2), 0, atol=0.001, rtol=0))
-                self.assertAlmostEqual(im.extent[1]-im.extent[0], im2.extent[1]-im2.extent[0], delta=0.001)
-                self.assertAlmostEqual(im.extent[3]-im.extent[2], im2.extent[3]-im2.extent[2], delta=0.001)
-                self.assertAlmostEqual(im.get_power(), im2.get_power(), places=4)
-                self.assertTrue(np.allclose(abcd-abcd2, 0, atol=0.0001, rtol=0))
-
     def test_numeric_tracing(self):
-        """checks RT.find_hit for a numeric surface and Surface of type "Data" """
+        """checks RT.find_hit for a numeric surface and DataSurface """
 
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], silent=True)
 
@@ -798,166 +786,10 @@ class TracerTests(unittest.TestCase):
         RT.trace(100000)
         res, _ = RT.autofocus(RT.autofocus_methods[0], 5)
 
-        f_should = self.lens_maker(R, -R, n(555), 1, L.d)
+        f_should = lens_maker(R, -R, n(555), 1, L.d)
 
         self.assertAlmostEqual(res.x, f_should, delta=0.2)
 
-    @pytest.mark.os
-    def test_numeric_tracing_surface_hit_special_cases(self):
-
-        # in the next part "outside surface" relates to an x,y value outside the x,y value range of the surface
-        # cases: 0. ray starting above surface and hitting
-        #        1. ray starting outside surface and not hitting
-        #        2, ray starting outside and hitting lens center
-        #        3. ray starting outside surface, not hitting, while overflying surface xy extent
-        #        4. ray starting above surface and not hitting
-        #        5. ray starting outside surface and hitting surface, while it also could hit edge
-        #        6. ray starting outside surface and hitting only edge
-
-        # make raytracer
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
-
-        # Ray Sources
-        for x, sx in zip([0, -4, -8, -8, 0, -8, -8], [0, 0, 8, 16, 4.5, 13, 6]):
-            RSS = ot.Point()
-            RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
-                              pos=[x, 0, 0], s=[sx, 0, 10])
-            RT.add(RS)
-
-        # Data
-        X, Y = np.mgrid[-3:3:200j, -3:3:200j]
-        Z = -(X**2 + Y**2)/5
-
-        # add Lens 1
-        front = ot.DataSurface(r=3, data=Z)
-        back = ot.DataSurface(r=3, data=Z)
-        nL1 = ot.RefractionIndex("Constant", n=1)
-        L1 = ot.Lens(front, back, d=1.5, pos=[0, 0, 10], n=nL1)
-        RT.add(L1)
-
-        # one ray for each source
-        cnt = len(RT.ray_sources)
-        RT.trace(cnt)
-
-        # rays missing are absorbed
-        for w in RT.rays.w_list[[1, 3, 4, 6], 2]:
-            assert w == 0
-
-        # check rays hitting
-        mask = L1.front.get_mask(RT.rays.p_list[[0, 2, 5], 1, 0], RT.rays.p_list[[0, 2, 5], 1, 1])
-        assert np.all(mask)
-
-    # lens maker equation
-    def lens_maker(self, R1, R2, n, n0, d):
-        D = (n-n0)/n0 * (1/R1 - 1/R2 + (n - n0) * d / (n*R1*R2))
-        return 1 / D if D else np.inf 
-
-    @pytest.mark.slow
-    def test_same_surface_behavior(self):
-        """check if different surface modes describing the same surface shape actually behave the same"""
-
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500], absorb_missing=False, silent=True)
-
-        RSS = ot.CircularSurface(r=0.2)
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
-        RT.add(RS)
-
-        # illuminated area is especially important for numeric surface_type="Data"
-        for RS_r in [0.001, 0.01, 0.1, 0.5]:
-
-            RS.set_surface(ot.CircularSurface(r=RS_r))
-
-            # check different curvatures
-            for R_ in [3, 10.2, 100]:
-                
-                r = 2
-
-                conic = ot.ConicSurface(R=R_, k=-1, r=r)
-                sph = ot.SphericalSurface(R=R_, r=r)
-
-                func = lambda x, y, R: 1/2/R*(x**2 + y**2)
-                func2 = lambda x, y: 0.78785 + 1/2/R_*(x**2 + y**2)  # some offset that needs to be removed
-
-                surff1 = ot.FunctionSurface(func=func2, r=r, silent=True)
-                surff2 = ot.FunctionSurface(func=func, r=r, z_min=0, z_max=func(0, r, R_), silent=True, func_args=dict(R=R_))
-
-                asph1 = ot.AsphericSurface(R=R_, r=r, k=-1, coeff=[0.], silent=True)  # same as conic
-                asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_], silent=True)  # conic can be neglected, only polynomial part
-
-                def surf_data_gen(N):
-                    x = np.linspace(-r, r, N)
-                    y = np.linspace(-r, r, N)
-                    X, Y = np.meshgrid(x, y)
-                    return 4.657165 + 1/2/R_ * (X**2 + Y**2)  # some random offset
-
-                # type "Data" with different resolutions and offsets
-                # and odd number defines a point in the center of the lens,
-                # for "even" the center is outside the grid
-                surf_data0 = ot.DataSurface(silent=True, data=surf_data_gen(900), r=r)
-                surf_data1 = ot.DataSurface(silent=True, data=surf_data_gen(200), r=r)
-                surf_data2 = ot.DataSurface(silent=True, data=surf_data_gen(50), r=r)
-                surf_data3 = ot.DataSurface(silent=True, data=surf_data_gen(901), r=r)
-                surf_data4 = ot.DataSurface(silent=True, data=surf_data_gen(201), r=r)
-                surf_data5 = ot.DataSurface(silent=True, data=surf_data_gen(51), r=r)
-
-                surf_circ = ot.CircularSurface(r=r)
-
-                n = 1.5
-                d = 0.1 + func(0, r, R_)
-                f = self.lens_maker(R_, np.inf, n, 1, d)
-                f_list = []
-
-                # create lens, trace and find focus
-                for surf in [sph, conic, surff1, surff2, surf_data0, surf_data1, surf_data2,
-                             surf_data3, surf_data4, surf_data5, asph1, asph2]:
-
-                    L = ot.Lens(surf, surf_circ, n=ot.RefractionIndex("Constant", n=n),
-                                pos=[0, 0, +d/2], d=d)
-                    RT.add(L)
-
-                    RT.trace(100000)
-                    res, _ = RT.autofocus(RT.autofocus_methods[0], 5)
-                    f_list.append(res.x)
-
-                    RT.remove(L)
-            
-                self.assertAlmostEqual(f, f_list[1], delta=0.2)  # f and conic almost equal
-                self.assertAlmostEqual(f_list[0], f_list[1], delta=0.2)  # sphere and conic almost equal
-
-                # other surfaces almost equal
-                # since those use the exact same function, they should be nearly identical
-                f_list2 = f_list[1:]
-                for i, fl in enumerate(f_list2):
-                    if i + 1 < len(f_list2):
-                        self.assertAlmostEqual(fl, f_list2[i+1], delta=0.001)
-
-    def test_abnormal_rays(self):
-        """
-        rays that hit the lens cylinder edge in any way are absorbed
-        case 1: ray hits lens front, but not back
-        case 2: ray misses front, but hits back
-        """
-
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
-
-        RSS = ot.CircularSurface(r=2)
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
-        RT.add(RS)
-
-        surf1 = ot.CircularSurface(r=3)
-        surf2 = ot.CircularSurface(r=1e-6)
-        L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        RT.add(L)
-
-        N = 10000
-        
-        RT.trace(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_BACK, 2] / N, places=3)
-
-        RT.lenses[0] = ot.Lens(surf1, surf2, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        RT.trace(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_FRONT, 1] / N, places=3)
-       
     def test_absorb_missing(self):
         """
         infinitely small lens -> almost all rays miss and are set to absorbed (due to absorb_missing = False)
@@ -1071,34 +903,6 @@ class TracerTests(unittest.TestCase):
         self.assertTrue(RT.geometry_error)  # object collision
         self.assertEqual(RT.rays.N, 0)  # not traced
 
-    def test_seq_violation(self):
-
-        # make raytracer
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60], silent=True)
-        RT._ignore_geometry_error = True  # deactivate checks so we can enforce a seq violation
-
-        # add Raysource
-        RSS = ot.Point()
-        RS = ot.RaySource(RSS, divergence="Isotropic", pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
-        RT.add(RS)
-        
-        geom = ot.presets.geometry.arizona_eye()
-        geom.elements[1].move_to([0, 0, 0.01])
-        RT.add(geom)
-
-        RT.trace(10000)
-        self.assertTrue(RT._msgs[RT.INFOS.SEQ_BROKEN, 2] > 0)  # check if seq violation set
-
-    def test_ray_reach(self):
-
-        RT = rt_example()
-
-        # blocking aperture
-        RT.apertures[0] = ot.Aperture(ot.CircularSurface(r=5), pos=RT.apertures[0].pos)
-
-        # see if it is handled
-        RT.trace(10000)
-
     def test_image_render_parameter(self):
 
         RT = rt_example()
@@ -1142,6 +946,7 @@ class TracerTests(unittest.TestCase):
     @pytest.mark.slow
     def test_iterative_render(self):
         RT = rt_example()
+        RT.no_pol = True
 
         # testing only makes sense with multiple sources and detectors
         assert len(RT.ray_sources) > 1
@@ -1246,109 +1051,6 @@ class TracerTests(unittest.TestCase):
         RT.ray_sources = []
         self.assertRaises(RuntimeError, RT.iterative_render, 10000)  # no ray_sources
 
-    def test_tilted_plane_different_surface_types(self):
-        """
-        similar to brewster polarizer example
-        checks bound fixing in numerical RT.find_surface_hit
-        """
-
-        n = ot.RefractionIndex("Constant", n=1.55)
-        b_ang = np.arctan(1.55/1)
-
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], silent=True)
-
-        # source parameters
-        RSS = ot.CircularSurface(r=0.05)
-        spectrum = ot.LightSpectrum("Monochromatic", wl=550.)
-        s = [0, np.sin(b_ang), np.cos(b_ang)]
-
-        # create sources
-        RS0 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0.5, 0, -4], 
-                          polarization="x", desc="x-pol")
-        RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, 0, -4], 
-                          polarization="y", desc="y-pol")
-        RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[-0.5, 0, -4],
-                          polarization="Random", desc="no pol")
-        RT.add(RS0)
-        RT.add(RS1)
-        RT.add(RS2)
-
-
-        surf_f = lambda x, y: np.tan(b_ang)*x
-        surf1 = ot.FunctionSurface(func=surf_f, r=0.7, silent=True)
-
-        surf2 = ot.TiltedSurface(r=0.7, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
-
-        X, Y = np.mgrid[-0.7:0.7:100j, -0.7:0.7:100j]
-        Z = np.tan(b_ang)*X
-        surf3 = ot.DataSurface(r=0.7, data=Z, silent=True)
-
-        for surf in [surf1, surf2, surf3]:
-            L = ot.Lens(surf, surf, d=0.2, pos=[0, 0, 0.5], n=n)
-            RT.add(L)
-
-            RT.trace(10000)
-            RT.remove(L)
-
-            # check if all rays are straight and get parallel shifted
-            p, s, _, _, _, _, _ = RT.rays.rays_by_mask(np.ones(RT.rays.N, dtype=bool), ret=[1, 1, 0, 0, 0, 0, 0])
-            self.assertAlmostEqual(np.mean(s[:, -2, 2]), 1)  # still straight
-            self.assertTrue(np.allclose(p[:, -2, 0] - p[:, -3, 0], -0.0531867, atol=0.00001, rtol=0))  # parallel shift
-
-    @pytest.mark.slow
-    def test_non_sequental_surface_extent(self):
-        """
-        one surface has a larger z-extent and second surface starts at a lower z-value
-        or second case, first surface ends at larger z-extent
-        make sure we get no tracing or geometry check errors and cylinder ray detection works
-        """
-
-        RT = ot.Raytracer(outline=[-15, 15, -15, 15, -20, 50], silent=True)
-
-        RSS = ot.CircularSurface(r=4)
-        RS = ot.RaySource(RSS, pos=[0, 0, -20])
-        RT.add(RS)
-
-        # )) - lens, second surface embracing first
-        R1, R2 = 5, 10
-        front = ot.SphericalSurface(r=0.999*R1, R=-R1)
-        back = ot.SphericalSurface(r=0.999*R2, R=-R2)
-        L = ot.Lens(front, back, pos=[0, 0, 0], n=ot.RefractionIndex(), d=0.5)
-        RT.add(L)
-
-        FS = ot.CircularSurface(r=3)
-        F = ot.Filter(FS, spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 20])
-        RT.add(F)
-
-        N = 100000
-        RT.trace(N)
-        self.assertTrue(np.all(RT.rays.w_list[:, -2] > 0))
-        
-        # (( - lens, first surface embracing second
-        RT.remove(L)
-        front = ot.SphericalSurface(r=0.999*R2, R=R2)
-        back = ot.SphericalSurface(r=0.999*R1, R=R1)
-        L = ot.Lens(front, back, pos=[0, 0, 0], n=ot.RefractionIndex(), d=0.5)
-        RT.add(L)
-        RT.trace(N)
-        self.assertTrue(np.all(RT.rays.w_list[:, -2] > 0))
-
-        # )), but this time hitting space between surfaces
-        RT.remove(RS)
-        RS = ot.RaySource(ot.RingSurface(r=7, ri=6), pos=[0, 0, -20])
-        RT.add(RS)
-        RT.trace(N)
-        self.assertTrue(np.all(RT.rays.w_list[:, -2] == 0))
-        
-        # ((, but this time hitting space between surfaces
-        RT.remove(L)
-        front = ot.SphericalSurface(r=0.999*R1, R=-R1)
-        back = ot.SphericalSurface(r=0.999*R2, R=-R2)
-        L = ot.Lens(front, back, pos=[0, 0, 0], n=ot.RefractionIndex(), d=0.5)
-        RT.add(L)
-        RT.trace(N)
-        self.assertTrue(np.all(RT.rays.w_list[:, -2] == 0))
-
     def test_brewster_and_fresnel_transmission(self):
         """
         test polarization and transmission for a setup with brewster angle
@@ -1423,47 +1125,19 @@ class TracerTests(unittest.TestCase):
             crosss = cross[:, 0]**2 + cross[:, 1]**2 + cross[:, 2]**2
             self.assertTrue(np.allclose(crosss, 1, atol=0.0001, rtol=0))
 
-    def test_few_rays_action(self):
-        """test how the raytracer handles few or no rays"""
+    def test_source_detector_image_spectrum(self):
+        # different projection methods are tested in surface tests
+        # hit_detector, hit_source are tested in iterative_render
+        # different plot modes and parameter pass-through (projection_method, desc, ...) is tested in test_plots
+        # hit_detector special cases are tested in test_tracer_special
+        pass
 
-        RT = rt_example()
-        AP = RT.apertures[0]
-
-        # add ideal lens
-        RT.add(ot.IdealLens(r=3, D=1, pos=[0, 0, RT.outline[5]-1]))
-
-        # remove apertures and filter so no rays are filtered
-        for el in [*RT.apertures, *RT.filters]:
-            RT.remove(el)
-
-        for i in range(2):  # without and with rays filtered
-            for N in [70, 3, 1]:  # ray numbers
-
-                RT.trace(N)
-
-                # test renders
-                RT.source_image(289)
-                RT.detector_image(289)
-                RT.source_spectrum()
-                RT.detector_spectrum()
-                RT.iterative_render(N)
-
-                # test autofocus
-                for fm in RT.autofocus_methods:
-                    RT.autofocus(fm, z_start=30)
-
-                # ray storage
-                RT.rays.source_sections()
-                RT.rays.source_sections(0)
-                RT.rays.source_sections(1)
-                RT.rays.rays_by_mask(np.full_like(RT.rays.wl_list, 0, dtype=bool))
-                RT.rays.rays_by_mask(np.full_like(RT.rays.wl_list, 1, dtype=bool))
-
-            # add aperture and move it so that no rays reach detector or autofocus region
-            RT.add(AP)
-            RT.apertures[0].move_to(AP.pos + [0.2, 0.2, 0])
-       
     def test_ideal_lens_imaging(self):
+
+        # TODO test polarization state
+        # TODO check polarization in more complex, real lens setup
+        # TODO test different detector types: tilted_surface, conic_surface and ring_surface as detectors
+        # TODO test detector that intersects >3 surfaces in z-direction
 
         # an ideal lens creates an ideal image
         # this image is exactly the same as the input image, as all rays from each pixel are mapped into the same output pixel

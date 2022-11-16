@@ -18,6 +18,9 @@ class ConicSurface:
     pass
 
 class ConicSurface(Surface):
+    
+    rotational_symmetry: bool = True
+
 
     def __init__(self,
                  r:            float,
@@ -149,9 +152,13 @@ class ConicSurface(Surface):
         # choose t that leads to z-position inside z-range of surface and 
         # to a larger z-position than starting point (since for us rays only propagate in +z direction)
         z1 = p[:, 2] + sz*t1
+        z2 = p[:, 2] + sz*t2
         z = p[:, 2]
-        z_min, z_max = self.z_min, self.z_max
-        t = ne.evaluate("where((z_min <= z1) & (z1 <= z_max) & (z1 >= z), t1, t2)")
+        z_min, z_max = self.z_min - self.N_EPS, self.z_max + self.N_EPS
+        t = ne.evaluate("where((z_min <= z1) & (z1 <= z_max) & (z1 >= z) &"\
+                        " ~((z_min <= z2) & (z2 <= z_max) & (z2 >= z) & (t2 < t1)), t1, t2)")
+        # chose the smaller one of t1, t2 that produces a z-value inside the surface extent
+        # and a hit point behind the starting point
 
         # calculate hit points and hit mask
         p_hit = p + s*t[:, np.newaxis]
@@ -184,12 +191,21 @@ class ConicSurface(Surface):
 
         np.seterr(**old_err)  # restore numpy error settings
 
+        # set hit to current position when ray starts after surface
+        m = p[:, 2] > self.z_max
+        p_hit[m] = p[m]
+        is_hit[m] = False
+
         return p_hit, is_hit
 
-    def reverse(self) -> ConicSurface:
-
-        return ConicSurface(r=self.r, R=-self.R, k=self.k, desc=self.desc, long_desc=self.long_desc,
-                            silent=self.silent, threading=self.threading)
+    def flip(self) -> None:
+        self._lock = False
+        self.R *= -1
+        self.parax_roc *= -1
+        a = self.pos[2] - (self.z_max - self.pos[2])
+        b = self.pos[2] + (self.pos[2] - self.z_min)
+        self.z_min, self.z_max = a, b
+        self.lock()
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

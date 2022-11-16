@@ -20,6 +20,9 @@ class FunctionSurface:
 
 
 class FunctionSurface(Surface):
+    
+    rotational_symmetry: bool = False
+
 
     def __init__(self,
                  r:                 float,
@@ -48,7 +51,10 @@ class FunctionSurface(Surface):
 
         # sign used for reversing the surface
         self._sign = 1 
-        
+       
+        # angle for rotation of the surface
+        self._angle = 0
+
         # funcs
         self.func = func
         self.mask_func = mask_func
@@ -107,14 +113,14 @@ class FunctionSurface(Surface):
     def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
-        And without masking out values beyond the surface extent
+        And without masking out values beyond the surface extent or own additional mask
 
         :param x: x-coordinate array (numpy 1D or 2D array)
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        # additional mask function is handled in get_values()
-        return self._sign*(self.func(x, y, **self._func_args) - self._offset)
+        x_, y_ = self._rotate_rc(x, y, -self._angle)
+        return self._sign*(self.func(x_, self._sign*y_, **self._func_args) - self._offset)
 
     def get_mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
@@ -128,7 +134,15 @@ class FunctionSurface(Surface):
 
         # additionally evaluate SurfaceFunction mask if defined
         if self.mask_func is not None:
-            mask = mask & self.mask_func(x - self.pos[0], y - self.pos[1], **self._mask_args)
+            
+            # relative coordinates
+            xm = x - self.pos[0]
+            ym = y - self.pos[1]
+        
+            # rotate surface
+            x_, y_ = self._rotate_rc(xm, ym, -self._angle)
+
+            mask = mask & self.mask_func(x_, self._sign*y_, **self._mask_args)
 
         return mask
 
@@ -149,11 +163,22 @@ class FunctionSurface(Surface):
 
             # coordinates actually on surface
             m = self.get_mask(x, y)
-            xm, ym = x[m], y[m]
+            
+            # relative coordinates
+            xm = x[m] - self.pos[0]
+            ym = y[m] - self.pos[1]
+        
+            # rotate surface
+            x_, y_ = self._rotate_rc(xm, ym, -self._angle)
 
-            nxn, nyn = self.deriv_func(xm - self.pos[0], ym - self.pos[1], **self._deriv_args)
-            n[m, 0] = -nxn*self._sign
-            n[m, 1] = -nyn*self._sign
+            # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
+            # we need to negate this, so the vector points in +z direction
+            # -> [-x, y, z]
+        
+            nxn, nyn = self.deriv_func(xm, self._sign*ym, **self._deriv_args)
+            # ^-- y is negative, since surface is flipped
+
+            n[m, 0], n[m, 1] = self._rotate_rc(-nxn*self._sign, -nyn, self._angle)
             n[m] = misc.normalize(n[m])
 
             return n
@@ -166,8 +191,8 @@ class FunctionSurface(Surface):
         :return:
         """
         # numerical hit finding when no hit_func is defined
-        # or when the function is reversed
-        if self.hit_func is None or self._sign == -1:
+        # or when the function is flipped
+        if self.hit_func is None or self._sign != 1:
             return super().find_hit(p, s)
 
         else:
@@ -175,40 +200,58 @@ class FunctionSurface(Surface):
             # _offset is removed, since it was introduced by Surface and is unknown to the SurfaceFunction object
             dp = self.pos - [0, 0, self._offset]
 
-            p_hit0 = self.hit_func(p - dp, s, **self._hit_args)
-            is_hit = self.mask_func(p_hit0[:, 0], p_hit0[:, 1], **self._mask_args)
+            p2 = p.copy() - dp
+            p2[:, 0], p2[:, 1] = self._rotate_rc(p2[:, 0], p2[:, 1], -self._angle)
 
-            return p_hit0 + dp, is_hit  # transform to standard coordinates
+            s2 = s.copy()
+            s2[:, 0], s2[:, 1] = self._rotate_rc(s2[:, 0], s2[:, 1], -self._angle)
 
-    def reverse(self) -> FunctionSurface:
-       
-        # to spare ourselves the costly init phase we copy the current object and invert some properties
+            p_hit = self.hit_func(p2, s2, **self._hit_args)
 
-        # make copy and move to origin
-        S = self.copy()
-        S.move_to([0, 0, 0])
+            p_hit[:, 0], p_hit[:, 1] = self._rotate_rc(p_hit[:, 0], p_hit[:, 1], self._angle)
+            p_hit += dp
+
+            is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
+            miss = ~is_hit
+
+            # intersect non-hitting rays with plane z=z_max            
+            tnm = (self.z_max - p[miss, 2])/s[miss, 2]
+            p_hit[miss] = p[miss] + s[miss]*tnm[:, np.newaxis]
+
+            # handle rays that start behind surface or inside its extent 
+            self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
+
+            return p_hit, is_hit  # transform to standard coordinates
+
+    def flip(self) -> None:
        
         # unlock
-        S._lock = False
+        self._lock = False
 
         # invert sign
-        S._sign *= -1
+        self._sign *= -1
 
         # invert curvature circle if given
-        S.parax_roc = self.parax_roc if self.parax_roc is None else -self.parax_roc
+        self.parax_roc = self.parax_roc if self.parax_roc is None else -self.parax_roc
 
         # assign new values for z_min, z_max. Both are negated and switched
-        S.z_min = -(self.z_max - self.pos[2])
-        S.z_max = -(self.z_min - self.pos[2])
+        a = self.pos[2] - (self.z_max - self.pos[2])
+        b = self.pos[2] - (self.z_min - self.pos[2])
+        self.z_min, self.z_max = a, b
 
         # lock
-        S.lock()
+        self.lock()
 
-        if S._sign == -1 and S.hit_func is not None:
-            self.print(f"WARNING: Neglecting hit_func parameter, since the function surface is now reversed/negated.")
+        if self._sign == -1 and self.hit_func is not None:
+            self.print(f"WARNING: Neglecting hit_func parameter, since the function surface is now flipped/negated."\
+                       " This means hit calculation is now numerical.")
+    
+    def rotate(self, angle: float) -> None:
 
-        return S
-
+        self._lock = False
+        self._angle += np.deg2rad(angle)
+        self.lock()
+       
     def __setattr__(self, key: str, val: Any) -> None:
         """
         assigns the value of an attribute

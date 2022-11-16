@@ -201,7 +201,8 @@ class LoadTests(unittest.TestCase):
 
         n_schott = ot.load.agf("schott.agf")
 
-        G = ot.load.zmx("temp.zmx", n_schott)  # coverage test with no_marker
+        for silent in [False, True]:
+            G = ot.load.zmx("temp.zmx", n_schott, silent)
 
         RT.add(G)
         RT.trace(10000)
@@ -237,7 +238,43 @@ class LoadTests(unittest.TestCase):
         self.assertAlmostEqual(RT.tma().efl, 1, delta=0.002)
 
         os.remove("temp.zmx")
+    
+    def test_zmx_plan_concave(self):
+        """zmx of a single lens, so only two surfaces"""
 
+        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
+        RS = ot.RaySource(ot.CircularSurface(r=1.2), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
+        RT.add(RS)
+
+        self.save_file("https://www.edmundoptics.de/document/download/389048", "temp.zmx") 
+
+        n_schott = ot.load.agf("schott.agf")
+
+        G = ot.load.zmx("temp.zmx", n_schott, no_marker=True)  # coverage test with no_marker
+
+        RT.add(G)
+        RT.trace(10000)
+        self.assertFalse(RT.geometry_error)
+
+        # test focal length. see
+        # https://www.edmundoptics.de/f/uncoated-plano-poncave-pcv-lenses/12263/
+        tma = RT.tma(587.6)
+        self.assertAlmostEqual(tma.efl, -6.00, delta=0.02)
+        self.assertAlmostEqual(tma.bfl, -6.56, delta=0.02)
+        self.assertAlmostEqual(tma.d, 1, delta=0.02)
+
+        os.remove("temp.zmx")
+
+    def test_zmx_minimal(self):
+        # minimal example from https://documents.pub/document/zemaxmanual.html?page=461
+        # there should be no surfaces and lenses created, only a marker
+        # which gets ignored with no_marker=True
+
+        path = pathlib.Path(__file__).resolve().parent / "test_files" / "minimal.zmx"
+        G = ot.load.zmx(str(path), no_marker=True)  # coverage test with no_marker
+
+        # check if empty
+        self.assertEqual(len(G.elements), 0)
 
 if __name__ == '__main__':
     unittest.main()

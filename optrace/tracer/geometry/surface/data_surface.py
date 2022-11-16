@@ -7,11 +7,19 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
+# TODO DataSurface -> DataSurface2D
+# TODO New DataSurface1D, r and values are provided as arrays, no need for them to be equally spaced
+# spline interpolateion as in DataSurface. Add mirrored copy for r < 0 so we have a smooth curvature at r = 0
+
+
 class DataSurface:
     pass
 
 
 class DataSurface(Surface):
+    
+    rotational_symmetry: bool = False
+
 
     def __init__(self,
                  r:                 float,
@@ -34,6 +42,8 @@ class DataSurface(Surface):
 
         # sign used for reversing the function
         self._sign = 1
+    
+        self._angle = 0
 
         self._interp, self._offset = None, 0.
         self.parax_roc = parax_roc
@@ -92,10 +102,10 @@ class DataSurface(Surface):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        x0, y0, z0 = self.pos
+        x_, y_ = self._rotate_rc(x, y, -self._angle)
 
         # uses quadratic interpolation for smooth surfaces and a constantly changing slope
-        return self._sign*(self._interp(x, y, grid=False) - self._offset)
+        return self._sign*(self._interp(x_, self._sign*y_, grid=False) - self._offset)
 
     def get_normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
@@ -110,38 +120,52 @@ class DataSurface(Surface):
 
         # coordinates actually on surface
         m = self.get_mask(x, y)
-        xm, ym = x[m], y[m]
+       
+        # relative coordinates
+        xm = x[m] - self.pos[0]
+        ym = y[m] - self.pos[1]
+
+        # rotate surface
+        x_, y_ = self._rotate_rc(xm, ym, -self._angle)
+        
+        # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
+        # we need to negate this, so the vector points in +z direction
+        # -> [-x, y, z]
+
+        # the y value for the interpolation needs to be negated, since the surface is flipped around the x-axis
+
+        nxn = self._interp(x_, self._sign*y_, dx=1, dy=0, grid=False)*self._sign
+        nyn = self._interp(x_, self._sign*y_, dx=0, dy=1, grid=False)
+        nxn, nyn = self._rotate_rc(nxn, nyn, self._angle)
 
         # the interpolation object provides partial derivatives
-        n[m, 0] = -self._interp(xm - self.pos[0], ym - self.pos[1], dx=1, dy=0, grid=False)*self._sign
-        n[m, 1] = -self._interp(xm - self.pos[0], ym - self.pos[1], dx=0, dy=1, grid=False)*self._sign
+        n[m, 0] = -nxn
+        n[m, 1] = -nyn
         n[m] = misc.normalize(n[m])
 
         return n
 
-    def reverse(self) -> DataSurface:
+    def flip(self) -> None:
         
-        # to spare ourselves the costly init phase we copy the current object and invert some properties
-
-        # make copy and move to origin
-        S = self.copy()
-        S.move_to([0, 0, 0])
-       
         # unlock
-        S._lock = False
+        self._lock = False
 
         # invert sign
-        S._sign *= -1
+        self._sign *= -1
 
         # invert curvature circle if given
-        S.parax_roc = self.parax_roc if self.parax_roc is None else -self.parax_roc
+        self.parax_roc = self.parax_roc if self.parax_roc is None else -self.parax_roc
 
         # assign new values for z_min, z_max. Both are negated and switched
-        S.z_min = -(self.z_max - self.pos[2])
-        S.z_max = -(self.z_min - self.pos[2])
+        a = self.pos[2] - (self.z_max - self.pos[2])
+        b = self.pos[2] - (self.z_min - self.pos[2])
+        self.z_min, self.z_max = a, b
 
         # lock
-        S.lock()
+        self.lock()
+    
+    def rotate(self, angle: float) -> None:
 
-        return S
-        
+        self._lock = False
+        self._angle += np.deg2rad(angle)  # add relative rotation
+        self.lock()

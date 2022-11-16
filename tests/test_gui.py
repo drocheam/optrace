@@ -1023,7 +1023,7 @@ class GUITests(unittest.TestCase):
                 sim._source_ind = 0
 
                 # command debugging options
-                sim._set_in_main("command_dont_wait", True)
+                sim._set_in_main("command_dont_skip", True)
                 sim._wait_for_idle()
                 sim._set_in_main("command_dont_replot", True)
                 sim._wait_for_idle()
@@ -1343,13 +1343,13 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 # pick RaySource Point
-                RT.add(ot.RaySource(ot.Point(), pos=[0, 0, 0], ss=[20, 0]))
+                RT.add(ot.RaySource(ot.Point(), pos=[0, 0, 0], s_sph=[20, 0]))
                 sim._do_in_main(sim.replot)
                 pick_shift_combs()
 
                 # pick RaySource Surface
                 RT.remove(RT.ray_sources[0])
-                RT.add(ot.RaySource(ot.CircularSurface(r=0.1), pos=[0, 0, 0], ss=[20, 0]))
+                RT.add(ot.RaySource(ot.CircularSurface(r=0.1), pos=[0, 0, 0], s_sph=[20, 0]))
                 sim._do_in_main(sim.replot)
                 pick_shift_combs()
 

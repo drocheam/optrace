@@ -51,7 +51,7 @@ class BaseClass:
 
         for key, val in self.__dict__.items():
 
-            if key[0] != "_" and key not in ["silent", "threading"]:
+            if key not in ["silent", "threading", "_lock"]:
 
                 if isinstance(val, list):
                     cl.append(tuple(val))
@@ -60,7 +60,7 @@ class BaseClass:
                     cl.append(val.crepr())
 
                 elif isinstance(val, np.ndarray):
-                    cl.append(tuple(val) if val.size < 20 else id(val))
+                    cl.append(tuple(val.flat) if val.size < 20 else id(val))
 
                 elif callable(val):
                     cl.append(id(val))

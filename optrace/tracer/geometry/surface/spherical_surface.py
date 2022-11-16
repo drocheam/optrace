@@ -19,6 +19,8 @@ class SphericalSurface(ConicSurface):
 
     sphere_projection_methods: list[str] = ["Equidistant", "Equal-Area", "Stereographic"]
     """projection methods for mapping a sphere surface onto a plane"""
+    
+    rotational_symmetry: bool = True
 
     def __init__(self,
                  r:                 float,
@@ -42,7 +44,10 @@ class SphericalSurface(ConicSurface):
     def info(self) -> str:
         """property string for UI information"""
         return super(ConicSurface, self).info + f", R = {self.R:.5g} mm"
-    
+
+    # TODO add otrhographic projection
+    # in this case we can just use the x, y coordinates
+
     def sphere_projection(self, p: np.ndarray, projection_method: str = "Equidistant") -> np.ndarray:
         """
 
@@ -106,9 +111,4 @@ class SphericalSurface(ConicSurface):
                              f"must be one of {self.sphere_projection_methods}.")
 
         return p_hit
-
-    def reverse(self) -> SphericalSurface:
-
-        return SphericalSurface(r=self.r, R=-self.R, desc=self.desc, long_desc=self.long_desc,
-                                silent=self.silent, threading=self.threading)
 

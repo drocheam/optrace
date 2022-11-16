@@ -41,6 +41,7 @@ from ..misc import PropertyChecker as pc  # check types and values
 class Element:
     pass
 
+
 class Element(BaseClass):
 
     abbr: str = "EL"  #: abbreviation for objects of this class
@@ -79,12 +80,6 @@ class Element(BaseClass):
                 raise ValueError(f"Thicknesses d1, d2 need to be non-negative but are {d1=} and {d2=}.")
 
         self.move_to(pos)
-
-        # double surface object -> check for collisions between back and front
-        if self.has_back():
-            collision, xc, yc = self.check_collision(self.front, self.back)
-            if collision:
-                raise RuntimeError(f"Collision of front and back surface of {self} at {xc=}, {yc=}.")
 
         super().__init__(**kwargs)
         self._geometry_lock = True
@@ -178,109 +173,30 @@ class Element(BaseClass):
 
         return np.column_stack((X1, X2)), np.column_stack((Y1, Y2)), np.column_stack((Z1, Z2))
 
-    def reverse(self) -> Element:
+    def flip(self) -> None:
 
         if self.has_back():
-            front = self.back.reverse()
-            back = self.front.reverse()
+            # flip and swap both surfaces, swap d1, d2
+            self._geometry_lock = False
+            self.back.flip()
+            self.front.flip()
+            zp = self.pos[2]
+            self.front.move_to([*self.front.pos[:2], zp + self.d1])
+            self.back.move_to([*self.back.pos[:2], zp - self.d2])
+            self.front, self.back = self.back, self.front
+            self.d1, self.d2 = self.d2, self.d1
+            self._geometry_lock = True
 
-            args = {}
-            for key, val in self.__dict__.items():
-                if not key.startswith("_") and not key in ["front", "back", "pos", "d1", "d2"]:
-                    args[key] = copy.deepcopy(val)
-
-            return type(self)(front, back, pos=self.pos, d1=self.d2, d2=self.d1, **args)
         else:
-            el = self.copy()
-            el.set_surface(self.front.reverse())
-            return el
+            self.front.flip()
 
-    @staticmethod
-    def check_collision(front: Surface | Line | Point, back: Surface | Line | Point, res: int = 100)\
-            -> tuple[bool, np.ndarray, np.ndarray]:
-        """
+    def rotate(self, angle: float) -> Element:
         
-        Check for collisions.
-        A collision is defined as the front surface havin a higher z-value than the back surface,
-        at a point where both surfaces are defined
-
-        :param front:
-        :param back:
-        :param res:
-        :return:
-        """
-
-        # we only compare when at least one object is a surface
-        if not (isinstance(front, Surface) or isinstance(back, Surface)):
-            raise TypeError(f"At least one object needs to be a Surface for collision detection")
+        self.front.rotate(angle)
         
-        # check if point and surface hit. Basically if order of surface and point parameter is correct
-        elif isinstance(front, Point) or isinstance(back, Point):
-            rev, pt, surf = (False, front, back) if isinstance(front, Point) else (True, back, front)
-
-            # check value at surface
-            x, y = np.array([pt.pos[0]]), np.array([pt.pos[1]])
-            z = surf.get_values(x, y)
-
-            # check if hitting, surface needs to be defined at this point
-            hit = (z < pt.pos[2]) if not rev else (z > pt.pos[2])
-            hit = hit & surf.get_mask(x, y)
-            where = np.where(hit)[0]
-            return np.any(hit), x[where], y[where]
-
-        # intersection of surface and line
-        elif isinstance(front, Line) or isinstance(back, Line):
-            rev, line, surf = (False, front, back) if isinstance(front, Line) else (True, back, front)
-
-            # some line x, y values
-            t = np.linspace(-line.r, line.r, 10*res)
-            x = line.pos[0] + np.cos(line.angle)*t
-            y = line.pos[1] + np.sin(line.angle)*t
-            z = surf.get_values(x, y)
-
-            # check if hitting and order correct
-            hit = (z < line.pos[2]) if not rev else (z > line.pos[2])
-            hit = hit & surf.get_mask(x, y)
-            where = np.where(hit)[0]
-            return np.any(hit), x[where], y[where]
-
-        # extent of front and back
-        xsf, xef, ysf, yef, zsf, zef = front.extent
-        xsb, xeb, ysb, yeb, zsb, zeb = back.extent
-
-        # no overlap of z extents -> no collision
-        if zef < zsb:
-            return False, np.array([]), np.array([])
-
-        # get rectangular overlap area in xy-plane projection
-        xs = max(xsf, xsb)
-        xe = min(xef, xeb)
-        ys = max(ysf, ysb)
-        ye = min(yef, yeb)
-
-        # no overlap in xy plane projection -> no collision
-        if xs > xe or ys > ye:
-            return False, np.array([]), np.array([])
-
-        # grid for overlap area
-        X, Y = np.mgrid[xs:xe:res*1j, ys:ye:res*1j]
-
-        # sample surface mask
-        x2, y2 = X.flatten(), Y.flatten()
-        valid = front.get_mask(x2, y2) & back.get_mask(x2, y2)
-
-        # sample valid surface values
-        x2v, y2v = x2[valid], y2[valid]
-        zfv = front.get_values(x2v, y2v)
-        zbv = back.get_values(x2v, y2v)
-
-        # check for collisions
-        coll = zfv > zbv
-        where = np.where(coll)[0]
-
-        # return flag and collision samples
-        return np.any(coll), x2v[where], y2v[where]
-
+        if self.has_back():
+            self.back.rotate(angle)
+       
     def __setattr__(self, key: str, val: Any) -> None:
         """
         assigns the value of an attribute

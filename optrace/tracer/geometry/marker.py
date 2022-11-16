@@ -5,13 +5,16 @@
 import numpy as np  # for ndarray type
 
 from ..misc import PropertyChecker as pc
-from ..base_class import BaseClass
+from .element import Element
+from .point import Point
 
 
-class Marker:
-    pass
+# a Marker is an Element, where the front surface is a point
+# Markers are used as point and/or text annotations in the tracing geometry
+# text only: provide a text string and set the parameter label_only=True
+# marker/point only: leave the text empty
 
-class Marker(BaseClass):
+class Marker(Element):
 
     def __init__(self,
                  desc:          str,
@@ -22,25 +25,24 @@ class Marker(BaseClass):
                  **kwargs)\
             -> None:
         """
+        Create a new Marker.
+
+        :param desc: text to display
+        :param pos: position of marker
+        :param text_factor: text scaling factor
+        :param marker_factor: marker scaling factor
+        :param label_only: don't plot marker, only text
+        :param **kwargs: additional keyword args for class Element and BaseClass
         """
         self.marker_factor = marker_factor
         self.text_factor = text_factor
         self.label_only = label_only
-        self.pos = pos
+        
+        super().__init__(Point(), pos, desc=desc, **kwargs)
 
-        super().__init__(desc=desc, **kwargs)
-        self._new_lock = True  # no new properties after this
-
-    def move_to(self, pos: np.ndarray | list):
-        self.pos = pos
-
-    @property
-    def extent(self) -> tuple[float, float, float, float, float, float]:
-        """"""
-        return self.pos.repeat(2)
-
-    def reverse(self) -> Marker:
-        return self.copy()
+        # lock object
+        self._geometry_lock = True
+        self._new_lock = True
 
     def __setattr__(self, key, val):
         """"""
@@ -52,12 +54,6 @@ class Marker(BaseClass):
             
             case "label_only":
                 pc.check_type(key, val, bool)
-
-            case "pos":
-                pc.check_type(key, val, list | np.ndarray)
-                val2 = np.asarray_chkfinite(val, dtype=np.float64)
-                super().__setattr__(key, val2)
-                return
 
         super().__setattr__(key, val)
 

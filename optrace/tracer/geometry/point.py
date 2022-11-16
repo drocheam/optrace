@@ -40,10 +40,11 @@ class Point(BaseClass):
 
         self.lock()
 
-    def reverse(self) -> Point:
-        P = self.copy()
-        P.move_to([0, 0, 0])
-        return P
+    def flip(self) -> None:
+        pass
+    
+    def rotate(self, angle: float) -> None:
+        pass
 
     @property
     def extent(self) -> tuple[float, float, float, float, float, float]:

@@ -164,8 +164,6 @@ class RayStorage(BaseClass):
         _, _, _, _, _, _, n = self.rays_by_mask(ch, ret=[0, 0, 0, 0, 0, 0, 1])
         return l*n
 
-    # TODO return dict, if caller want the values he can call .values()
-    # integrate ray_lengths and optical_lengths, instead of using separate functions
     def rays_by_mask(self,
                      ch:           np.ndarray = None,
                      ch2:          np.ndarray = None,

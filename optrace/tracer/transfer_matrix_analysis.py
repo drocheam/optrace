@@ -127,8 +127,11 @@ class TMA(BaseClass):
             if i > 0 and not np.isclose(L[i].pos[0], L[i-1].pos[0]) or not np.isclose(L[i].pos[1], L[i-1].pos[1]):
                 raise RuntimeError("Lenses don't share one axis")
        
+            n1_ = L[i-1].n2(self.wl) if i and L[i-1].n2 is not None else self.n1
+            n2_ = L[i].n2(self.wl) if L[i].n2 is not None else self.n1
+            
             if L[i].is_ideal: # IdealLens
-                l_matrix = np.array([[1, 0], [-L[i].D/1000, 1]])
+                l_matrix = np.array([[1, 0], [-L[i].D/1000, n1_/n2_]])
 
             else:
                 if L[i].front.parax_roc is None or L[i].back.parax_roc is None:
@@ -136,8 +139,6 @@ class TMA(BaseClass):
                 
                 # lens properties
                 n_ = L[i].n(self.wl)
-                n1_ = L[i-1].n2(self.wl) if i and L[i-1].n2 is not None else self.n1
-                n2_ = L[i].n2(self.wl) if L[i].n2 is not None else self.n1
                 R2 = L[i].front.parax_roc
                 R1 = L[i].back.parax_roc
 

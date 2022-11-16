@@ -12,9 +12,11 @@ from test_load import LoadTests
 from test_plots import PlotTests
 from test_presets import PresetTests
 from test_spectrum import SpectrumTests
+from test_surface import SurfaceTests
 from test_tma import TMATests
 from test_trace_misc import TracerMiscTests
 from test_tracer import TracerTests
+from test_tracer_special import TracerSpecialTests
 
 
 def suite():
@@ -27,9 +29,11 @@ def suite():
     suite.addTest(unittest.makeSuite(PlotTests))
     suite.addTest(unittest.makeSuite(PresetTests))
     suite.addTest(unittest.makeSuite(SpectrumTests))
+    suite.addTest(unittest.makeSuite(SurfaceTests))
     suite.addTest(unittest.makeSuite(TMATests))
-    suite.addTest(unittest.makeSuite(TracerTests))
     suite.addTest(unittest.makeSuite(TracerMiscTests))
+    suite.addTest(unittest.makeSuite(TracerSpecialTests))
+    suite.addTest(unittest.makeSuite(TracerTests))
     return suite
 
 

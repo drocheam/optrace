@@ -9,7 +9,7 @@ import numexpr as ne  # faster calculations
 
 from .element import Element  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
-from .surface import Surface, RectangularSurface, CircularSurface, SphericalSurface
+from .surface import Surface, DataSurface, FunctionSurface
 
 
 class Detector(Element):
@@ -33,8 +33,7 @@ class Detector(Element):
 
     def __setattr__(self, key, val):
 
-        if key == "front" and isinstance(val, Surface):
-            if not isinstance(val, SphericalSurface | RectangularSurface | CircularSurface):
-                raise RuntimeError(f"Only surfaces with type Sphere, Rectangle, Circle are supported for detectors")
+        if key == "front" and isinstance(val, DataSurface | FunctionSurface):
+            raise RuntimeError(f"Classes and subclasses of DataSurface, FunctionSurface are not supported as Detector surfaces.")
 
         super().__setattr__(key, val)

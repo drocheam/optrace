@@ -46,6 +46,10 @@ z_img0 = 225
 
 # detector for tubus image
 square = ot.RectangularSurface(dim=[6, 6])
+square = ot.TiltedSurface(r=3.5, normal=[2, 0, 1])
+# square = ot.FunctionSurface(r=3, func=lambda x, y: x**2)
+# square = ot.ConicSurface(r=3, R=1, k=-0.9)
+# square = ot.RingSurface(r=3, ri=1)
 det = ot.Detector(square, pos=[0, 0, z_img0], desc="Tubus Image")
 RT.add(det)
 
