@@ -999,8 +999,8 @@ class Raytracer(Group):
         if bar is not None:
             bar.update(3)
 
-        if isinstance(self.detectors[detector_index].surface, SphericalSurface):
-            ph = self.detectors[detector_index].surface.sphere_projection(ph, projection_method)
+        if isinstance(dsurf, SphericalSurface):
+            ph = dsurf.sphere_projection(ph, projection_method)
             projection = projection_method
         else:
             projection = None

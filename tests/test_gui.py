@@ -630,7 +630,7 @@ class GUITests(unittest.TestCase):
                         ('ray_opacity', 0.06), ('ray_width', 12), ('af_one_source', False), ('af_one_source', True), ('det_image_one_source', False),
                         ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), ('flip_det_image', False),
                         ('det_spectrum_one_source', True), ('det_image_one_source', False), ('log_image', False), ('log_image', True),
-                        ('raytracer_single_thread', True), ('raytracer_single_thread', True), ('wireframe_surfaces', True), 
+                        ('raytracer_single_thread', False), ('raytracer_single_thread', True), ('wireframe_surfaces', True), 
                         ('wireframe_surfaces', False), ('focus_cost_plot', True), ('focus_cost_plot', False), ('_cmd', 'GUI.replot()'),
                         ('_cmd', 'scene.render()'), ('_cmd', 'scene.z_minus_view()'), ('maximize_scene', False), ('maximize_scene', True),
                          ('activate_filter', False), ('activate_filter', True), ('high_contrast', False), ('high_contrast', True)]

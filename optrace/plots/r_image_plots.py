@@ -87,7 +87,7 @@ def r_image_plot(im:       RImage,
     plt.ylabel(ylabel)
 
     # hide numbers from axis if the projection is not linear
-    if im.projection not in ["Equidistant", None]:
+    if im.projection not in ["Equidistant", "Orthographic", None]:
         fig.axes[0].set_xticklabels([])
         fig.axes[0].set_yticklabels([])
 
@@ -176,7 +176,7 @@ def r_image_cut_plot(im:       RImage,
     plt.ylabel(zlabel)
 
     # turn off labels with non linear axes
-    if im.projection not in ["Equidistant", None]:
+    if im.projection not in ["Equidistant", None, "Orthographic"]:
         fig.axes[0].set_xticklabels([])
 
     # major and finer grid
@@ -220,7 +220,7 @@ def _get_labels(im: RImage, mode: str, log: bool) -> tuple[str, str, str, str, s
     
     # x, y labels
     match im.projection:
-        case None:
+        case None | "Orthographic":
             xname, xunit, xlabel = "x", "mm", "x / mm"
             yname, yunit, ylabel = "y", "mm", "y / mm"
         case "Equidistant":

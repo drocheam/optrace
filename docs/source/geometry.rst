@@ -366,6 +366,11 @@ The projected coordinates are then
    x_p &= -\theta \cdot \text{sgn}(R) \cos(\phi)\\
    y_p &= -\theta \cdot \text{sgn}(R) \sin(\phi)\\
 
+**Orthographic**
+
+The hit coordinates :math:`x` and :math:`y` are kept as is.
+
+
 **Stereographic**
 
 https://en.wikipedia.org/wiki/Stereographic_map_projection

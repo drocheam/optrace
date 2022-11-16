@@ -289,9 +289,11 @@ class SurfaceTests(unittest.TestCase):
 
                     # test all projection methods
                     for projm in ot.SphericalSurface.sphere_projection_methods:
+                        p1m = p1 if projm != "Orthographic" else p1 + [x0, y0, z0]  
+                        # ^--  in orthographic mode we need to add the position, since it uses absolute coordinates
                         pp = surf.sphere_projection(p, projm)
-                        self.assertTrue(np.all(np.sign(pp[1:, :2]) == np.sign(p1[1:, :2])))  # correct quadrant
-                        self.assertTrue(np.allclose(pp[0, :2] - p1[0, :2], 0, atol=1e-9, rtol=0))  # projection at center
+                        self.assertTrue(np.all(np.sign(pp[1:, :2]) == np.sign(p1m[1:, :2])))  # correct quadrant
+                        self.assertTrue(np.allclose(pp[0, :2] - p1m[0, :2], 0, atol=1e-9, rtol=0))  # projection at center
 
     def test_surface_zmin_zmax_special_types(self):
 

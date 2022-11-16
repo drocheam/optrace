@@ -178,7 +178,7 @@ class PlotTests(unittest.TestCase):
                                 args = args if title is None else (args | dict(title=title))
                                 otp.spectrum_plot(list_, **args)
 
-                            plt.close("all")
+                    plt.close("all")
 
     def test_autofocus_cost_plot(self):
 

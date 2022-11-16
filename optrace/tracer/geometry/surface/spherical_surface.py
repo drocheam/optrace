@@ -17,7 +17,7 @@ class SphericalSurface:
 
 class SphericalSurface(ConicSurface):
 
-    sphere_projection_methods: list[str] = ["Equidistant", "Equal-Area", "Stereographic"]
+    sphere_projection_methods: list[str] = ["Equidistant", "Orthographic", "Equal-Area", "Stereographic"]
     """projection methods for mapping a sphere surface onto a plane"""
     
     rotational_symmetry: bool = True
@@ -45,9 +45,6 @@ class SphericalSurface(ConicSurface):
         """property string for UI information"""
         return super(ConicSurface, self).info + f", R = {self.R:.5g} mm"
 
-    # TODO add otrhographic projection
-    # in this case we can just use the x, y coordinates
-
     def sphere_projection(self, p: np.ndarray, projection_method: str = "Equidistant") -> np.ndarray:
         """
 
@@ -60,6 +57,8 @@ class SphericalSurface(ConicSurface):
         :param projection_method:
         :return:
         """
+        if projection_method == "Orthographic":
+            return p.copy()
 
         x, y, z = p[:, 0], p[:, 1], p[:, 2]
         x0, y0, z0 = self.pos

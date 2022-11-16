@@ -607,6 +607,25 @@ class TracerTests(unittest.TestCase):
                 # some remaining difference because of rays not being exactly at the edge, 
                 # but positions are random inside circular area
 
+        # for parallel light a circle and a sphere with orthographic projection produce the same image,
+        # since the x,y hit coordinates are unchanged when projecting
+        # and because of the parallel rays both surfaces have the same hit x,y coordinates
+        RT.clear()
+        RS = ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0], divergence="None", s=[0, 0, 1])
+        det0 = ot.Detector(ot.CircularSurface(r=3.01), pos=[0, 0, 10])
+        det1 = ot.Detector(ot.SphericalSurface(r=3.01, R=-3.2), pos=[0, 0, 10])
+
+        RT.add([RS, det0, det1])
+        RT.trace(100000)
+
+        img0 = RT.detector_image(100, detector_index=0)
+        img1 = RT.detector_image(100, detector_index=1, projection_method="Orthographic")
+
+        # check that images on both detectors are equal
+        ma = np.max(img0._img)
+        mdev = np.mean(np.abs(img0._img - img1._img)/ma)
+        self.assertAlmostEqual(mdev, 0, delta=1e-7)
+
     @pytest.mark.os
     @pytest.mark.slow
     def test_ray_storage(self):
