@@ -684,7 +684,7 @@ class GUITests(unittest.TestCase):
         keyboard = Controller()
 
         def send_key(sim, key):
-            sim._do_in_main(sim.scene.scene_editor._content.setFocus)
+            # sim._do_in_main(sim.scene.scene_editor._content.setFocus)
             keyboard.press(key)
             time.sleep(0.2)
             keyboard.release(key)
@@ -829,20 +829,20 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 SceneSize0 = sim._scene_size
-                Window = sim.scene.scene_editor._content.window()
+                Window = sim.scene.scene_editor._content.window
 
                 # properties before resizing
                 ff = sim._axis_plots[0][0].axes.font_factor
                 zoom = sim._orientation_axes.widgets[0].zoom
                 pos2 = sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2
 
-                qsize = Window.size()
+                qsize = Window().size()
                 ss0 = np.array([qsize.width(), qsize.height()])
                 ss1 = ss0 * 1.3
                 ss2 = ss1 / 1.2
 
                 # enlarge
-                sim._do_in_main(Window.resize, *ss1.astype(int))
+                sim._do_in_main(Window().resize, *ss1.astype(int))
                 time.sleep(0.5)  # how to check how much time it takes?
 
                 # check if scale properties changed
@@ -855,17 +855,17 @@ class GUITests(unittest.TestCase):
                 self.assertNotAlmostEqual(pos2[1],
                                           sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
 
-                sim._do_in_main(Window.resize, *ss2.astype(int))
+                sim._do_in_main(Window().resize, *ss2.astype(int))
                 time.sleep(0.5)
-                sim._do_in_main(Window.showFullScreen)
+                sim._do_in_main(Window().showFullScreen)
                 time.sleep(0.5)
-                sim._do_in_main(Window.showMaximized)
+                sim._do_in_main(Window().showMaximized)
                 time.sleep(0.5)
-                sim._do_in_main(Window.showMinimized)
+                sim._do_in_main(Window().showMinimized)
                 time.sleep(0.5)
-                sim._do_in_main(Window.showNormal)
+                sim._do_in_main(Window().showNormal)
                 time.sleep(0.5)
-                sim._do_in_main(Window.resize, *ss0.astype(int))
+                sim._do_in_main(Window().resize, *ss0.astype(int))
                 time.sleep(0.5)
                
                 # check if scale properties are back at their default state
@@ -881,7 +881,7 @@ class GUITests(unittest.TestCase):
 
                 # coverage test: delete orientation:axes and resize
                 sim._orientation_axes = None
-                sim._do_in_main(Window.resize, *ss2.astype(int))
+                sim._do_in_main(Window().resize, *ss2.astype(int))
                 time.sleep(0.5)
                 
         sim.debug(_func=interact, silent=True, _args=(sim,))
@@ -1206,6 +1206,7 @@ class GUITests(unittest.TestCase):
                
                 # ray picked -> show verbose info
                 keyboard.press(Key.shift)
+                time.sleep(0.1)
                 sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)
@@ -1263,6 +1264,7 @@ class GUITests(unittest.TestCase):
 
                 # space picked -> show coordinates
                 keyboard.release(Key.shift)
+                time.sleep(0.1)
                 sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 3, sim._scene_size[1] / 3, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)
@@ -1272,6 +1274,7 @@ class GUITests(unittest.TestCase):
                 
                 # valid space picked with shift -> move detector
                 keyboard.press(Key.shift)
+                time.sleep(0.1)
                 old_pos = RT.detectors[0].pos
                 sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 3, sim._scene_size[1] / 3, 0, sim.scene.renderer)
                 sim._wait_for_idle()
@@ -1303,6 +1306,7 @@ class GUITests(unittest.TestCase):
 
                 # release shift key
                 keyboard.release(Key.shift)
+                time.sleep(0.1)
                 
                 # remove crosshair and pick without shift key
                 sim._do_in_main(sim._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
