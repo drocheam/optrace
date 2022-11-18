@@ -1,18 +1,16 @@
 
-"""
-"""
-
 import numpy as np  # for ndarray type
 
 from ..misc import PropertyChecker as pc
 from .element import Element
 from .point import Point
 
-
-# a Marker is an Element, where the front surface is a point
-# Markers are used as point and/or text annotations in the tracing geometry
-# text only: provide a text string and set the parameter label_only=True
-# marker/point only: leave the text empty
+"""
+A Marker is an Element, where the front surface is a point
+Markers are used as point and/or text annotations in the tracing geometry
+text only: provide a text string and set the parameter label_only=True
+marker/point only: leave the text empty
+"""
 
 class Marker(Element):
 
@@ -32,7 +30,7 @@ class Marker(Element):
         :param text_factor: text scaling factor
         :param marker_factor: marker scaling factor
         :param label_only: don't plot marker, only text
-        :param **kwargs: additional keyword args for class Element and BaseClass
+        :param kwargs: additional keyword args for class Element and BaseClass
         """
         self.marker_factor = marker_factor
         self.text_factor = text_factor

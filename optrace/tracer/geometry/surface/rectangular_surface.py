@@ -8,9 +8,6 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-class RectangularSurface:
-    pass
-
 
 class RectangularSurface(Surface):
     

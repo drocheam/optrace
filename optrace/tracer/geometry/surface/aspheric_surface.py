@@ -7,9 +7,6 @@ from .function_surface import FunctionSurface
 from ...misc import PropertyChecker as pc
 
 
-class AsphericSurface:
-    pass
-
 
 class AsphericSurface(FunctionSurface):
 

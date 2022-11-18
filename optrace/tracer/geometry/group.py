@@ -26,11 +26,11 @@ class Group(BaseClass):
 
     def __init__(self, elements: list[Element] = None, **kwargs) -> None:
         """
-        Create a group by including elements from the "elements" parameter.
+        Create a group by including elements from the 'elements' parameter.
         Without this parameter an empty group is created.
 
         :param elements: list of elements to add. Can be empty
-        :param **kwargs: additional keyword arguments for the BaseClass class
+        :param kwargs: additional keyword arguments for the BaseClass class
         """
 
         self.lenses = []  #: lenses in raytracing geometry

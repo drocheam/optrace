@@ -11,8 +11,8 @@ from .spectrum.spectrum import Spectrum
 from .spectrum.light_spectrum import LightSpectrum
 from .spectrum.transmission_spectrum import TransmissionSpectrum
 
-from .geometry.surface.surface import Surface
-from .geometry.surface.data_surface import DataSurface
+from .geometry.surface.data_surface_1d import DataSurface1D
+from .geometry.surface.data_surface_2d import DataSurface2D
 from .geometry.surface.function_surface import FunctionSurface
 from .geometry.surface.circular_surface import CircularSurface
 from .geometry.surface.rectangular_surface import RectangularSurface

@@ -40,8 +40,8 @@ Z = np.zeros_like(X)
 Z[m] = -(X[m]**2 + Y[m]**2)/40
 Z[~m] = -(X[~m]**2 + Y[~m]**2)/40 - X[~m]**2/20
 front = ot.SphericalSurface(r=r, R=-20)
-front = ot.DataSurface(r=r, data=-Z)
-back = ot.DataSurface(r=r, data=Z)
+front = ot.DataSurface2D(r=r, data=-Z)
+back = ot.DataSurface2D(r=r, data=Z)
 nL2 = ot.RefractionIndex("Constant", n=1.6)
 L2 = ot.Lens(front, back, de=0, pos=[0, 0, 21], n=nL2)
 RT.add(L2)

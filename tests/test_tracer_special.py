@@ -93,7 +93,7 @@ class TracerSpecialTests(unittest.TestCase):
 
             X, Y = np.mgrid[-1:1:100j, -1:1:100j]
             data = 3 - (X**2 + Y**2)
-            front = ot.DataSurface(data=data, r=4, silent=True)
+            front = ot.DataSurface2D(data=data, r=4, silent=True)
             back = ot.TiltedSurface(r=4, normal=[0, 0.01, 1])
             L2 = ot.Lens(front, back, n=ot.presets.refraction_index.K5, pos=pos0+[0, 0, 20])
             RT.add(L2)
@@ -149,8 +149,8 @@ class TracerSpecialTests(unittest.TestCase):
         Z = -(X**2 + Y**2)/5
 
         # add Lens 1
-        front = ot.DataSurface(r=3, data=Z)
-        back = ot.DataSurface(r=3, data=Z)
+        front = ot.DataSurface2D(r=3, data=Z)
+        back = ot.DataSurface2D(r=3, data=Z)
         nL1 = ot.RefractionIndex("Constant", n=1)
         L1 = ot.Lens(front, back, d=1.5, pos=[0, 0, 10], n=nL1)
         RT.add(L1)
@@ -199,21 +199,22 @@ class TracerSpecialTests(unittest.TestCase):
                 asph1 = ot.AsphericSurface(R=R_, r=r, k=-1, coeff=[0.], silent=True)  # same as conic
                 asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_], silent=True)  # conic can be neglected, only polynomial part
 
-                def surf_data_gen(N):
-                    x = np.linspace(-r, r, N)
-                    y = np.linspace(-r, r, N)
-                    X, Y = np.meshgrid(x, y)
-                    return 4.657165 + 1/2/R_ * (X**2 + Y**2)  # some random offset
-
                 # type "Data" with different resolutions and offsets
                 # and odd number defines a point in the center of the lens,
                 # for "even" the center is outside the grid
-                surf_data0 = ot.DataSurface(silent=True, data=surf_data_gen(900), r=r)
-                surf_data1 = ot.DataSurface(silent=True, data=surf_data_gen(200), r=r)
-                surf_data2 = ot.DataSurface(silent=True, data=surf_data_gen(50), r=r)
-                surf_data3 = ot.DataSurface(silent=True, data=surf_data_gen(901), r=r)
-                surf_data4 = ot.DataSurface(silent=True, data=surf_data_gen(201), r=r)
-                surf_data5 = ot.DataSurface(silent=True, data=surf_data_gen(51), r=r)
+                surfs = []
+                for N in [900, 200, 50, 901, 201, 51]:
+                    # 2D surface
+                    X, Y = np.mgrid[-r:r:N*1j, -r:r:N*1j]
+                    data = 4.657165 + 1/2/R_ * (X**2 + Y**2)  # some random offset
+                    surf_ = ot.DataSurface2D(silent=True, r=r, data=data)
+                    surfs.append(surf_)
+
+                    # 1D surface
+                    r_ = np.linspace(0, r, N)
+                    data = 4.657165 + 1/2/R_ * r_**2  # some random offset
+                    surf_ = ot.DataSurface1D(silent=True, r=r, data=data)
+                    surfs.append(surf_)
 
                 surf_circ = ot.CircularSurface(r=r)
 
@@ -223,8 +224,7 @@ class TracerSpecialTests(unittest.TestCase):
                 f_list = []
 
                 # create lens, trace and find focus
-                for surf in [sph, conic, surff1, surff2, surf_data0, surf_data1, surf_data2,
-                             surf_data3, surf_data4, surf_data5, asph1, asph2]:
+                for surf in [sph, conic, surff1, surff2, *surfs, asph1, asph2]:
 
                     L = ot.Lens(surf, surf_circ, n=ot.RefractionIndex("Constant", n=n),
                                 pos=[0, 0, +d/2], d=d)
@@ -310,7 +310,6 @@ class TracerSpecialTests(unittest.TestCase):
         RT.add(RS1)
         RT.add(RS2)
 
-
         surf_f = lambda x, y: np.tan(b_ang)*x
         surf1 = ot.FunctionSurface(func=surf_f, r=0.7, silent=True)
 
@@ -318,7 +317,7 @@ class TracerSpecialTests(unittest.TestCase):
 
         X, Y = np.mgrid[-0.7:0.7:100j, -0.7:0.7:100j]
         Z = np.tan(b_ang)*X
-        surf3 = ot.DataSurface(r=0.7, data=Z, silent=True)
+        surf3 = ot.DataSurface2D(r=0.7, data=Z, silent=True)
 
         for surf in [surf1, surf2, surf3]:
             L = ot.Lens(surf, surf, d=0.2, pos=[0, 0, 0.5], n=n)

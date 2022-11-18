@@ -11,9 +11,6 @@ import numexpr as ne  # faster calculations
 from .conic_surface import ConicSurface
 
 
-class SphericalSurface:
-    pass
-
 
 class SphericalSurface(ConicSurface):
 

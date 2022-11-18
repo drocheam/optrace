@@ -1,9 +1,4 @@
 
-"""
-Lens class:
-A lens is an geometrical object with two refractive surfaces.
-A refractive index is specified for the material and one for the area behind the lens (optional)
-"""
 from typing import Any  # Any type
 
 import numpy as np  # calculations and ndarray type
@@ -14,9 +9,12 @@ from .element import Element  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 from ..transfer_matrix_analysis import TMA
 
+"""
+Lens class:
+A lens is an geometrical object with two refractive surfaces.
+A refractive index is specified for the material and one for the area behind the lens (optional)
+"""
 
-class Lens:
-    pass
 
 class Lens(Element):
 

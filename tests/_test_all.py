@@ -11,6 +11,7 @@ from test_gui import GUITests
 from test_load import LoadTests
 from test_plots import PlotTests
 from test_presets import PresetTests
+from test_scope import ScopeTests
 from test_spectrum import SpectrumTests
 from test_surface import SurfaceTests
 from test_tma import TMATests
@@ -28,6 +29,7 @@ def suite():
     suite.addTest(unittest.makeSuite(LoadTests))
     suite.addTest(unittest.makeSuite(PlotTests))
     suite.addTest(unittest.makeSuite(PresetTests))
+    suite.addTest(unittest.makeSuite(ScopeTests))
     suite.addTest(unittest.makeSuite(SpectrumTests))
     suite.addTest(unittest.makeSuite(SurfaceTests))
     suite.addTest(unittest.makeSuite(TMATests))

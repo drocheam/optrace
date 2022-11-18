@@ -22,7 +22,6 @@ from optrace.tracer.ray_storage import RayStorage as RayStorage
 
 
 
-
 class TracerMiscTests(unittest.TestCase):
 
     def test_ray_storage(self):

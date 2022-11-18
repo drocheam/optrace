@@ -26,15 +26,14 @@ from mayavi.sources.parametric_surface import ParametricSurface  # provides outl
 
 # provides types and plotting functionality, most of these are also imported for the TCP protocol scope
 from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex,\
-                     Surface, SphericalSurface, DataSurface, FunctionSurface, ConicSurface, RectangularSurface,\
+                     SphericalSurface, DataSurface1D, DataSurface2D, FunctionSurface,\
+                     ConicSurface, RectangularSurface,\
                      RingSurface, CircularSurface, TiltedSurface, Spectrum, LightSpectrum, TransmissionSpectrum,\
                      Point, Line, TMA, Group, Marker, AsphericSurface, IdealLens
-from ..tracer.geometry.element import Element  # Element type
+from ..tracer.geometry import Surface, Element
 from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
 
-from ..tracer import presets  # for send_cmd scope
-from ..tracer import color  # for visible wavelength range
-from ..tracer import misc  # for partMask function
+from ..tracer import presets, color, misc
 
 from .property_browser import PropertyBrowser  # dictionary browser
 
@@ -97,7 +96,7 @@ class TraceGUI(HasTraits):
                                     auto_set=False, label="Count", mode='logslider')
     """Number of rays shown in mayavi scenen"""
 
-    det_pos: Range = Range(low='_det_pos_min', high='_det_pos_max', value='_det_pos_max', mode='slider',
+    det_pos: Range = Range(low='_det_pos_min', high='_det_pos_max', value='_det_pos_max', mode='text',
                            desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_det")
     """z-Position of Detector. Lies inside z-range of :obj:`Backend.raytracer.outline`"""
 

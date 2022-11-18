@@ -63,7 +63,7 @@ class PresetTests(unittest.TestCase):
             self.assertNotEqual(spec.desc, "")
             self.assertNotEqual(spec.long_desc, "")
 
-    def test_spectrum_outside_defintion(self):
+    def test_spectrum_outside_definition(self):
         # check that spectrum presets have constant 0 beyond their definition
         for spec in [*ot.presets.light_spectrum.standard, *ot.presets.spectrum.tristimulus]:
             if spec.desc != "E":

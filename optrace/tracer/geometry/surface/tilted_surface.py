@@ -14,9 +14,6 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-class TiltedSurface:
-    pass
-
 
 
 class TiltedSurface(Surface):

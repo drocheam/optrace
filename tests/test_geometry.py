@@ -15,6 +15,7 @@ import optrace as ot
 from optrace.tracer.geometry.element import Element
 from optrace.tracer.base_class import BaseClass as BaseClass
 
+from optrace.tracer.geometry.surface import Surface
 
 # TODO example with ideal lenses
 
@@ -156,7 +157,7 @@ class GeometryTests(unittest.TestCase):
         
         # surface has no hit finding
         surf = ot.RectangularSurface(dim=[3, 3])
-        self.assertRaises(RuntimeError, ot.Detector, ot.DataSurface(data=np.ones((50, 50)), r=3), pos=[0, 0, 0])  
+        self.assertRaises(RuntimeError, ot.Detector, ot.DataSurface2D(data=np.ones((50, 50)), r=3), pos=[0, 0, 0])  
         
         # invalid detector type
         self.assertRaises(RuntimeError, ot.Detector, ot.AsphericSurface(r=3, R=12, k=-5, coeff=[0, 0.001]), pos=[0, 0, 0])  
@@ -453,7 +454,7 @@ class GeometryTests(unittest.TestCase):
                         for Im in [None, ot.presets.image.color_checker]:
 
                             # only check RectangleSurface with Image being active/set
-                            if Im is not None and (not isinstance(Surf, ot.Surface) or not isinstance(Surf, ot.RectangularSurface)):
+                            if Im is not None and (not isinstance(Surf, Surface) or not isinstance(Surf, ot.RectangularSurface)):
                                 continue
 
                             RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, 

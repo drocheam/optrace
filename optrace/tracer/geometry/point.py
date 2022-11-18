@@ -6,8 +6,6 @@ import numpy as np  # calculations
 from ..base_class import BaseClass  # parent class
 
 
-class Point:
-    pass
 
 class Point(BaseClass):
 

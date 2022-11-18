@@ -355,7 +355,7 @@ class SpectrumTests(unittest.TestCase):
     @pytest.mark.os
     def test_light_spectrum_render(self):
         # check render
-        wl = np.random.uniform(*ot.color.WL_BOUNDS, 10000)
+        wl = np.random.uniform(*color.WL_BOUNDS, 10000)
         w = np.random.uniform(0, 1, 10000)
         P, N, desc = np.sum(w), 100, "ABC"
         spec = ot.LightSpectrum.render(wl, w, desc=desc)
@@ -369,12 +369,12 @@ class SpectrumTests(unittest.TestCase):
         self.assertFalse(spec._wls[0] == spec._wls[-1])
         
         # special case: minimal wavelength
-        spec = ot.LightSpectrum.render(np.array([ot.color.WL_BOUNDS[0]]), np.array([1.]))
-        self.assertFalse(spec._wls[0] < ot.color.WL_BOUNDS[0])
+        spec = ot.LightSpectrum.render(np.array([color.WL_BOUNDS[0]]), np.array([1.]))
+        self.assertFalse(spec._wls[0] < color.WL_BOUNDS[0])
         
         # special case: maximal wavelength
-        spec = ot.LightSpectrum.render(np.array([ot.color.WL_BOUNDS[1]]), np.array([1.]))
-        self.assertFalse(spec._wls[-1] > ot.color.WL_BOUNDS[1])
+        spec = ot.LightSpectrum.render(np.array([color.WL_BOUNDS[1]]), np.array([1.]))
+        self.assertFalse(spec._wls[-1] > color.WL_BOUNDS[1])
         
         # special case: empty arrays
         spec = ot.LightSpectrum.render(np.array([]), np.array([]))

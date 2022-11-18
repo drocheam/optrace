@@ -1,5 +1,8 @@
-Current Version: 1.0.0-18-g19c5fea 
+Current Version: 1.0.3 
 
+1.0.3           New Orthographic sphere projection method.
+1.0.2           Surface/geometry reverse() changed to a flip() function that flips around the x-axis. rotate() operation to rotate around z-axis.
+1.0.1           Minor UI improvements. Index Boxes are now joined if the spacing between
 1.0.0           Import of agf and zmx files. New Group class, raytracer is a subclass of this. Reverse() action on elements, surfaces and group. GUI high contrast mode. Surface types now have their own classes. New aspheric surface type. Optional gaussian filter to simulate diffraction limit in RImages.
 0.9.9           RImage now has an odd number of pixels. New Group class. New color submodule.
 0.9.8           New: Ray transfer matrix analysis. Different sphere projection methods. Markers for tracing geometry. Removed colorio dependency. New LED standard illuminants. More examples.

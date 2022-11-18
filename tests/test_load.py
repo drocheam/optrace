@@ -101,6 +101,7 @@ class LoadTests(unittest.TestCase):
             # remove file
             os.remove(temp_file)
 
+    @pytest.mark.os
     def test_zmx_errors(self):
 
         path0 = pathlib.Path(__file__).resolve().parent / "test_files"
@@ -109,6 +110,7 @@ class LoadTests(unittest.TestCase):
         self.assertRaises(RuntimeError, ot.load.zmx, str(path0 / "zmx_invalid_surface_type.zmx"))
         self.assertRaises(RuntimeError, ot.load.zmx, str(path0 / "zmx_invalid_material.zmx"))
 
+    @pytest.mark.os
     def test_zmx_endoscope(self):
 
         RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 200], silent=True)
@@ -239,6 +241,7 @@ class LoadTests(unittest.TestCase):
 
         os.remove("temp.zmx")
     
+    @pytest.mark.os
     def test_zmx_plan_concave(self):
         """zmx of a single lens, so only two surfaces"""
 
@@ -265,6 +268,7 @@ class LoadTests(unittest.TestCase):
 
         os.remove("temp.zmx")
 
+    @pytest.mark.os
     def test_zmx_minimal(self):
         # minimal example from https://documents.pub/document/zemaxmanual.html?page=461
         # there should be no surfaces and lenses created, only a marker

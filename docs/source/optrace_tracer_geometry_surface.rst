@@ -16,9 +16,13 @@ tracer.geometry.surface.conic_surface
 ____________________________________________
 .. automodule:: optrace.tracer.geometry.surface.conic_surface
 
-tracer.geometry.surface.data_surface
+tracer.geometry.surface.data_surface_1d
 ____________________________________________
-.. automodule:: optrace.tracer.geometry.surface.data_surface
+.. automodule:: optrace.tracer.geometry.surface.data_surface_1d
+
+tracer.geometry.surface.data_surface_2d
+____________________________________________
+.. automodule:: optrace.tracer.geometry.surface.data_surface_2d
 
 tracer.geometry.surface.function_surface
 ____________________________________________

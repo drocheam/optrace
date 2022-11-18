@@ -15,9 +15,6 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-class FunctionSurface:
-    pass
-
 
 class FunctionSurface(Surface):
     

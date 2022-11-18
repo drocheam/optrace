@@ -2,7 +2,7 @@
 import numexpr as ne
 import numpy as np
 
-from . import misc
+from .. import misc
 from . import tools
 from .xyz import xyz_to_xyY, WP_D65_XY
 from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV

@@ -9,10 +9,11 @@ import numpy as np
 
 import optrace as ot
 from optrace.tracer import misc
+from optrace.tracer.geometry.surface import Surface
 
 from test_gui import rt_example
 
-# def test polarization calculation of ideal lens
+# TODO test polarization calculation of ideal lens
 
 # lens maker equation
 def lens_maker(R1, R2, n, n0, d):
@@ -393,7 +394,7 @@ class TracerTests(unittest.TestCase):
             L = im.get_by_display_mode("Irradiance")
             L /= np.max(L)
 
-            if isinstance(surf, ot.Surface):
+            if isinstance(surf, Surface):
                 if not isinstance(surf, ot.RectangularSurface):
                     Lx, Ly = L.shape[:2]
                     X, Y = np.mgrid[-Lx/2:Lx/2:Lx*1j, -Ly/2:Ly/2:Ly*1j]
@@ -793,8 +794,8 @@ class TracerTests(unittest.TestCase):
 
         n = ot.RefractionIndex("Constant", n=1.5)
 
-        front = ot.DataSurface(data=Z, r=2, silent=True)
-        back = ot.DataSurface(data=-Z, r=2, silent=True)
+        front = ot.DataSurface2D(data=Z, r=2, silent=True)
+        back = ot.DataSurface2D(data=-Z, r=2, silent=True)
         L = ot.Lens(front, back, n, pos=[0, 0, 0], d=0.4)
         RT.add(L)
 

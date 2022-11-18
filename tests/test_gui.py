@@ -525,6 +525,7 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.os
     @pytest.mark.slow
+    @pytest.mark.skip(reason="there seems to be some issue with qt4, leads to segmentation faults.")
     def test_action_spam(self):
         """spam the gui with many possible actions to check threading locks and for race conditions"""
 

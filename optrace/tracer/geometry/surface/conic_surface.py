@@ -14,8 +14,6 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-class ConicSurface:
-    pass
 
 class ConicSurface(Surface):
     
@@ -87,7 +85,7 @@ class ConicSurface(Surface):
         :param y: y-coordinates (numpy 1D array)
         :return: normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)
         """
-        n = np.zeros((x.shape[0], 3), dtype=np.float64)
+        n = np.tile(np.array([0., 0., 1.], dtype=np.float64), (x.shape[0], 1))
 
         # coordinates actually on surface
         m = self.get_mask(x, y)

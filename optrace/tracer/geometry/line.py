@@ -9,9 +9,6 @@ from ..misc import PropertyChecker as pc  # check types and values
 from .. import misc
 
 
-class Line:
-    pass
-
 
 class Line(BaseClass):
 

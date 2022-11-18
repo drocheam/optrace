@@ -8,7 +8,7 @@ os.environ["PYTHONPATH"] = "."
 
 import unittest
 import subprocess
-import pytest  # slow decorator
+import pytest  
 
 
 
@@ -26,6 +26,9 @@ class ExampleTests(unittest.TestCase):
             process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
             process.kill()
+
+        # examples return exit code 0 or nothing (= None) since they are killed
+        self.assertTrue(process.returncode in [None, 0])
 
     @pytest.mark.slow
     def test_rgb_render(self):

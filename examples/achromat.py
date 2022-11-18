@@ -3,6 +3,7 @@
 import optrace as ot
 from optrace.gui import TraceGUI
 
+
 D = 30  # desired lens power
 achromat = True  # compensate chromatic dispersion
 

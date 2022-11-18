@@ -141,12 +141,16 @@ class LightSpectrum(Spectrum):
             pc.check_type("vals", self._vals, np.ndarray)
             assert len(self._wls) == len(self._vals) + 1
 
+            # check values
             wl_ = np.asarray_chkfinite(wl, dtype=np.float64)
-            ins = (wl_ < self._wls[-1]) & (wl_ >= self._wls[0])
+
+            # get bin indices, exclude ones that are zero or len(bins)
+            ind = np.digitize(wl_, self._wls)
+            ins = (ind > 0) & (ind < self._wls.shape[0])
             
             res = np.zeros_like(wl_)
-            ind = (wl_[ins] - self._wls[0]) / (self._wls[1] - self._wls[0])
-            res[ins] = self._vals[ind.astype(int)]
+            res[ins] = self._vals[ind[ins]-1]
+           
             return res
         else:
             return super().__call__(wl)

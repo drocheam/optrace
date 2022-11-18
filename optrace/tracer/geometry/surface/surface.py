@@ -18,8 +18,6 @@ from ...misc import PropertyChecker as pc  # check types and values
 # for higher classes like Element and Marker the objects itself maintains its position
 
 
-class Surface:
-    pass
 
 class Surface(BaseClass):
 
@@ -384,7 +382,7 @@ class Surface(BaseClass):
                 w[wcn] = False
 
                 # timeout
-                if it == 100:  # how to check a timeout? # pragma: no cover
+                if it == 200:  # how to check a timeout? # pragma: no cover
                     raise RuntimeError(f"Timeout after {it} iterations in hit finding.") 
                 it += 1
 

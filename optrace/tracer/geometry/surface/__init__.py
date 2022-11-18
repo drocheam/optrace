@@ -1,6 +1,7 @@
 
 from .surface import Surface
-from .data_surface import DataSurface
+from .data_surface_1d import DataSurface1D
+from .data_surface_2d import DataSurface2D
 from .function_surface import FunctionSurface
 from .circular_surface import CircularSurface
 from .rectangular_surface import RectangularSurface

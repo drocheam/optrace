@@ -7,19 +7,15 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-# TODO DataSurface -> DataSurface2D
-# TODO New DataSurface1D, r and values are provided as arrays, no need for them to be equally spaced
-# spline interpolateion as in DataSurface. Add mirrored copy for r < 0 so we have a smooth curvature at r = 0
+# TODO document use of _1D
 
 
-class DataSurface:
-    pass
-
-
-class DataSurface(Surface):
+class DataSurface2D(Surface):
     
     rotational_symmetry: bool = False
 
+    _1D: bool = False
+    """1D or 2D data surface"""
 
     def __init__(self,
                  r:                 float,
@@ -51,36 +47,66 @@ class DataSurface(Surface):
         pc.check_type("data", data, np.ndarray | list)
         Z = np.asarray_chkfinite(data, dtype=np.float64)
 
-        ny, nx = Z.shape
-        if nx != ny:
-            raise ValueError("Array 'data' needs to have a square shape.")
-
+        nx = Z.shape[0]
         if nx < 50:
-            raise ValueError("For a good surface representation 'data' should be at least 50x50")
+            raise ValueError("For a good surface representation 'data' should have at least 50 values per dimension")
 
         if nx < 200:
-            self.print("200x200 or larger is advised for a 'data' matrix.")
+            self.print("At least 200 values per dimension are advised for a 'data' matrix.")
 
-        xy = np.linspace(-self.r, self.r, nx)  # numeric r vector
+        if self._1D:
+            
+            if Z.ndim != 1:
+                raise ValueError("data array needs to have exactly one dimension.")
+            
+            Z -= Z[0]
+        
+            # create r vector
+            r0 = np.linspace(0, self.r, Z.shape[0], dtype=np.float64)
 
-        # remove offset at center
-        if nx % 2:
-            Z -= np.array([Z[ny//2, nx//2], Z[ny//2+1, nx//2], Z[ny//2, nx//2+1], Z[ny//2+1, nx//2+1]]).mean()
+            # mirror values around r axis
+            r2 = np.concatenate((-np.flip(r0[1:]), r0))
+            z2 = np.concatenate((np.flip(Z[1:]), Z))
+
+            # we need spline order n=4 so curvature and curvature changes are smooth
+            self._interp = scipy.interpolate.InterpolatedUnivariateSpline(r2, z2, k=4)
+            self._offset = self._call(0, 0)  # remaining z_offset at center
+        
+            rn = np.linspace(0, self.r, 10000)
+            zn = self._get_values(rn, np.zeros_like(rn))
+            self.z_min, self.z_max = np.min(zn), np.max(zn)
+
+            z_range0 = np.max(Z) - np.min(Z)
+
         else:
-            Z -= Z[ny//2, nx//2]
+            if Z.ndim != 2:
+                raise ValueError("data array needs to have exactly two dimensions.")
+            
+            ny, nx = Z.shape
+            if nx != ny:
+                raise ValueError("Array 'data' needs to have a square shape.")
+            
+            # remove offset at center
+            if nx % 2:
+                Z -= np.array([Z[ny//2, nx//2], Z[ny//2+1, nx//2], Z[ny//2, nx//2+1], Z[ny//2+1, nx//2+1]]).mean()
+            else:
+                Z -= Z[ny//2, nx//2]
+        
+            xy = np.linspace(-self.r, self.r, nx)  # numeric r vector
 
-        # we need spline order n=4 so curvature and curvature changes are smooth
-        self._interp = scipy.interpolate.RectBivariateSpline(xy, xy, Z, kx=4, ky=4)
-        self._offset = self._interp(0, 0, grid=False)  # remaining z_offset at center
+            # we need spline order n=4 so curvature and curvature changes are smooth
+            self._interp = scipy.interpolate.RectBivariateSpline(xy, xy, Z, kx=4, ky=4)
+            self._offset = self._call(0, 0)  # remaining z_offset at center
 
-        # self.z_min, self.z_max = np.nanmin(Z), np.nanmax(Z)  # provisional values
-        self.z_min, self.z_max = self._find_bounds()
+            # self.z_min, self.z_max = np.nanmin(Z), np.nanmax(Z)  # provisional values
+            self.z_min, self.z_max = self._find_bounds()
+        
+            X, Y = np.meshgrid(xy, xy)
+            M = self.get_mask(X.ravel(), Y.ravel()).reshape(X.shape)
+            z_range0 = np.max(Z[M]) - np.min(Z[M])
       
         # biquadratic interpolation can lead to an increased z-value range
         # e.g. spheric surface, but the center is not defined by a data point
-        X, Y = np.meshgrid(xy, xy)
-        M = self.get_mask(X.ravel(), Y.ravel()).reshape(X.shape)
-        z_range0 = np.max(Z[M]) - np.min(Z[M])
         z_range1 = self.z_max - self.z_min
         if np.abs(z_range0 - z_range1) > self.N_EPS:
             z_change = (z_range1 - z_range0) / z_range0
@@ -93,6 +119,14 @@ class DataSurface(Surface):
 
         self.lock()
 
+    def _call(self, x, y, **kwargs):
+
+        if self._1D:
+            r = np.hypot(x, y)
+            return self._interp(r, **kwargs)
+        else:
+            return self._interp(x, y, grid=False, **kwargs)
+
     def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
@@ -102,10 +136,10 @@ class DataSurface(Surface):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        x_, y_ = self._rotate_rc(x, y, -self._angle)
+        x_, y_ = self._rotate_rc(x, y, -self._angle) if not self._1D else (x, y)
 
         # uses quadratic interpolation for smooth surfaces and a constantly changing slope
-        return self._sign*(self._interp(x_, self._sign*y_, grid=False) - self._offset)
+        return self._sign*(self._call(x_, self._sign*y_) - self._offset)
 
     def get_normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
@@ -125,18 +159,22 @@ class DataSurface(Surface):
         xm = x[m] - self.pos[0]
         ym = y[m] - self.pos[1]
 
-        # rotate surface
-        x_, y_ = self._rotate_rc(xm, ym, -self._angle)
-        
-        # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
-        # we need to negate this, so the vector points in +z direction
-        # -> [-x, y, z]
+        if not self._1D:
+            # rotate surface
+            x_, y_ = self._rotate_rc(xm, ym, -self._angle)
+            
+            # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
+            # we need to negate this, so the vector points in +z direction
+            # -> [-x, y, z]
 
-        # the y value for the interpolation needs to be negated, since the surface is flipped around the x-axis
-
-        nxn = self._interp(x_, self._sign*y_, dx=1, dy=0, grid=False)*self._sign
-        nyn = self._interp(x_, self._sign*y_, dx=0, dy=1, grid=False)
-        nxn, nyn = self._rotate_rc(nxn, nyn, self._angle)
+            # the y value for the interpolation needs to be negated, since the surface is flipped around the x-axis
+            nxn = self._call(x_, self._sign*y_, dx=1, dy=0)*self._sign
+            nyn = self._call(x_, self._sign*y_, dx=0, dy=1)
+            nxn, nyn = self._rotate_rc(nxn, nyn, self._angle)
+        else:
+            phi = np.arctan2(ym, xm)
+            nr = self._sign*self._call(xm, ym, nu=1)
+            nxn, nyn = nr*np.cos(phi), nr*np.sin(phi)
 
         # the interpolation object provides partial derivatives
         n[m, 0] = -nxn
@@ -166,6 +204,7 @@ class DataSurface(Surface):
     
     def rotate(self, angle: float) -> None:
 
-        self._lock = False
-        self._angle += np.deg2rad(angle)  # add relative rotation
-        self.lock()
+        if not self._1D:
+            self._lock = False
+            self._angle += np.deg2rad(angle)  # add relative rotation
+            self.lock()

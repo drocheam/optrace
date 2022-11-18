@@ -38,8 +38,6 @@ from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 
 
-class Element:
-    pass
 
 
 class Element(BaseClass):
@@ -190,7 +188,7 @@ class Element(BaseClass):
         else:
             self.front.flip()
 
-    def rotate(self, angle: float) -> Element:
+    def rotate(self, angle: float) -> None:
         
         self.front.rotate(angle)
         
