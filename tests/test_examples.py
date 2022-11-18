@@ -4,13 +4,14 @@ from pathlib import Path
 
 # add PYTHONPATH to env, so the examples can find optrace
 import os
-os.environ["PYTHONPATH"] = "."
 
 import unittest
 import subprocess
 import pytest  
 
 
+if "TOX_ENV_DIR" not in os.environ:
+    os.environ["PYTHONPATH"] = "."
 
 class ExampleTests(unittest.TestCase):
 
@@ -78,6 +79,7 @@ class ExampleTests(unittest.TestCase):
     def test_brewster(self):
         self.execute("brewster_polarizer.py")
     
+    @pytest.mark.os
     @pytest.mark.slow
     def test_eye_model(self):
         self.execute("arizona_eye_model.py")

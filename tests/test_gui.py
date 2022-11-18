@@ -196,6 +196,7 @@ class GUITests(unittest.TestCase):
         self.assertRaises(RuntimeError, TraceGUI, RT, source_selection="RS1")
         self.assertRaises(RuntimeError, TraceGUI, RT, det_pos=0)
 
+    @pytest.mark.os
     @pytest.mark.slow
     def test_interaction1(self) -> None:
 
@@ -523,7 +524,6 @@ class GUITests(unittest.TestCase):
         self.assertTrue(not RT.ray_sources)
         test_features(RT)
 
-    @pytest.mark.os
     @pytest.mark.slow
     @pytest.mark.skip(reason="there seems to be some issue with qt4, leads to segmentation faults.")
     def test_action_spam(self):
@@ -674,7 +674,6 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
    
-    @pytest.mark.os
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
@@ -684,7 +683,7 @@ class GUITests(unittest.TestCase):
         keyboard = Controller()
 
         def send_key(sim, key):
-            # sim._do_in_main(sim.scene.scene_editor._content.setFocus)
+            sim._do_in_main(sim.scene.scene_editor._content.setFocus)
             keyboard.press(key)
             time.sleep(0.2)
             keyboard.release(key)
@@ -810,7 +809,6 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
-    @pytest.mark.os
     def test_resize(self):
         """
         this test checks if
@@ -829,20 +827,20 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 SceneSize0 = sim._scene_size.copy()
-                Window = sim.scene.scene_editor._content.window
+                Window = sim.scene.scene_editor._content.window()
 
                 # properties before resizing
                 ff = sim._axis_plots[0][0].axes.font_factor
                 zoom = sim._orientation_axes.widgets[0].zoom
                 pos2 = sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2
 
-                qsize = Window().size()
+                qsize = Window.size()
                 ss0 = np.array([qsize.width(), qsize.height()])
                 ss1 = ss0 * 1.3
                 ss2 = ss1 / 1.2
 
                 # enlarge
-                sim._do_in_main(Window().resize, *ss1.astype(int))
+                sim._do_in_main(Window.resize, *ss1.astype(int))
                 time.sleep(0.5)  # how to check how much time it takes?
 
                 # check if scale properties changed
@@ -855,17 +853,17 @@ class GUITests(unittest.TestCase):
                 self.assertNotAlmostEqual(pos2[1],
                                           sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
 
-                sim._do_in_main(Window().resize, *ss2.astype(int))
+                sim._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(0.5)
-                sim._do_in_main(Window().showFullScreen)
+                sim._do_in_main(Window.showFullScreen)
                 time.sleep(0.5)
-                sim._do_in_main(Window().showMaximized)
+                sim._do_in_main(Window.showMaximized)
                 time.sleep(0.5)
-                sim._do_in_main(Window().showMinimized)
+                sim._do_in_main(Window.showMinimized)
                 time.sleep(0.5)
-                sim._do_in_main(Window().showNormal)
+                sim._do_in_main(Window.showNormal)
                 time.sleep(0.5)
-                sim._do_in_main(Window().resize, *ss0.astype(int))
+                sim._do_in_main(Window.resize, *ss0.astype(int))
                 time.sleep(0.5)
                
                 # check if scale properties are back at their default state
@@ -881,7 +879,7 @@ class GUITests(unittest.TestCase):
 
                 # coverage test: delete orientation:axes and resize
                 sim._orientation_axes = None
-                sim._do_in_main(Window().resize, *ss2.astype(int))
+                sim._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(0.5)
                 
         sim.debug(_func=interact, silent=True, _args=(sim,))
@@ -1177,7 +1175,6 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
-    @pytest.mark.os
     def test_picker(self):
         """
         test picker interaction in the scene
@@ -1325,6 +1322,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.os
     def test_picker_coverage(self):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10], silent=True)

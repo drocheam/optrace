@@ -5,7 +5,9 @@ sys.path.append('.')
 
 # add PYTHONPATH to env, so the examples can find optrace
 import os
-os.environ["PYTHONPATH"] = "."
+
+if "TOX_ENV_DIR" not in os.environ:
+    os.environ["PYTHONPATH"] = "."
 
 import unittest
 import subprocess
