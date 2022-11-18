@@ -125,6 +125,7 @@ class GUITests(unittest.TestCase):
     def _try(self, sim, *args, **kwargs):
         """try TraceGUI actions. Exceptions are catched and saved in the class to be later
         raised by raise_thread_exceptions(). In all cases the gui is closed normally"""
+        time.sleep(2)
         sim._wait_for_idle()
         try:
             yield
@@ -133,6 +134,7 @@ class GUITests(unittest.TestCase):
         finally:
             sim._wait_for_idle()
             sim._do_in_main(sim.close)
+            time.sleep(2)
 
     @pytest.mark.slow 
     def test_gui_inits(self) -> None:
@@ -380,7 +382,7 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
-    @pytest.mark.os
+    # @pytest.mark.os
     def test_interaction3(self) -> None:
 
         def interact3(sim):
@@ -427,6 +429,7 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("raytracer_single_thread", False)
                 sim._wait_for_idle()
                 self.assertEqual(sim.raytracer.threading, True)
+                sim._wait_for_idle()
                
                 sim._set_in_main("wireframe_surfaces", True)
                 sim._wait_for_idle()
