@@ -58,7 +58,6 @@ class ExampleTests(unittest.TestCase):
     def test_achromat(self):
         self.execute("achromat.py")
     
-    @pytest.mark.os
     @pytest.mark.slow
     def test_microscope(self):
         self.execute("microscope.py")

@@ -3,7 +3,9 @@
 import sys
 sys.path.append('.')
 
+# add PYTHONPATH to env, so the examples can find optrace
 import os
+os.environ["PYTHONPATH"] = "."
 
 import unittest
 import subprocess
@@ -31,7 +33,6 @@ class ScopeTests(unittest.TestCase):
 
         return process.returncode
 
-    @pytest.mark.os
     def test_scope_partial_load(self):
         """test that importing optrace does not import optrace.plots and optrace.gui by default"""
         
@@ -56,7 +57,6 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(code, 0)
 
     # needs to be run first, otherwise ot.plots and ot.gui are already loaded
-    @pytest.mark.os
     def test_scope_main(self):
         """test that internal/unneeded things in optrace.tracer and optrace itself are not loaded"""
         
@@ -95,7 +95,6 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(NameError, eval, "PIL", loc)
         self.assertRaises(NameError, eval, "pathlib", loc)
     
-    @pytest.mark.os
     def test_scope_plots(self):
         """test that internal/unneeded things in optrace.plots are not loaded"""
         
@@ -110,7 +109,6 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "otp._CONV_XYZ_NORM", locals())
         self._test_scope_ext_libs(locals())
     
-    @pytest.mark.os
     def test_scope_gui(self):
         """test that internal/unneeded things in optrace.gui are not loaded"""
 

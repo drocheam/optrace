@@ -294,7 +294,7 @@ def save_with_fallback(path:        str,
     def fallback():
         # create a valid path and filename
         wd = Path.cwd()
-        filename = f"{fname}_" + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.%f%z') + ending
+        filename = f"{fname}_" + datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f%z') + ending
         path_ = str(wd / filename)
 
         # resave

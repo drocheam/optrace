@@ -686,6 +686,7 @@ class GUITests(unittest.TestCase):
         def send_key(sim, key):
             sim._do_in_main(sim.scene.scene_editor._content.setFocus)
             keyboard.press(key)
+            time.sleep(0.2)
             keyboard.release(key)
 
         def interact(sim):
@@ -1335,6 +1336,7 @@ class GUITests(unittest.TestCase):
             def pick_shift_combs():
                 pick()
                 keyboard.press(Key.shift)
+                time.sleep(0.2)
                 pick()
                 keyboard.release(Key.shift)
 
