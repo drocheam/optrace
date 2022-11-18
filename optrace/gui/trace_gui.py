@@ -2004,8 +2004,7 @@ class TraceGUI(HasTraits):
 
                 with self.__detector_lock:
                     if det_ind < len(self.raytracer.detectors):  # pragma: no branch
-                        self.raytracer.detectors[det_ind].move_to([*self.raytracer.detectors[det_ind].pos[:2],
-                                                                   res.x])
+                        self.raytracer.detectors[det_ind].move_to([*self.raytracer.detectors[det_ind].pos[:2], res.x])
 
                 # execute this function after thread has finished
                 def on_finish() -> None:

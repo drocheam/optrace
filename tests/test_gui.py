@@ -828,7 +828,7 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("coloring_type", "Power")  # shows a side bar, that also needs to be rescaled
                 sim._wait_for_idle()
 
-                SceneSize0 = sim._scene_size
+                SceneSize0 = sim._scene_size.copy()
                 Window = sim.scene.scene_editor._content.window
 
                 # properties before resizing
