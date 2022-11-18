@@ -322,6 +322,7 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
+    @pytest.mark.os
     def test_interaction2(self) -> None:
 
         def interact2(sim):
@@ -375,6 +376,11 @@ class GUITests(unittest.TestCase):
                     sim._do_in_main(sim.show_detector_cut)
                     sim._wait_for_idle()
                     self.assertEqual(sim.last_det_image.projection, pm)
+                
+                # open browsers
+                sim._do_in_main(sim.open_property_browser)
+                sim._wait_for_idle()
+                time.sleep(2)  # wait some time so windows can be seen by a human user
 
         RT = rt_example()
         sim = TraceGUI(RT)
@@ -382,7 +388,6 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
-    # @pytest.mark.os
     def test_interaction3(self) -> None:
 
         def interact3(sim):
@@ -416,11 +421,6 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.show_detector_cut)
                 sim._wait_for_idle()
                 plt.close('all')
-
-                # open browsers
-                sim._do_in_main(sim.open_property_browser)
-                sim._wait_for_idle()
-                time.sleep(2)  # wait some time so windows can be seen by a human user
 
                 # tracing with only one thread
                 sim._set_in_main("raytracer_single_thread", True)
