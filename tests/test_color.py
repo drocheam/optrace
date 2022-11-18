@@ -25,6 +25,7 @@ class ColorTests(unittest.TestCase):
         doctest.testmod(ot.tracer.color.tools)
         doctest.testmod(ot.tracer.color.luv)
 
+    @pytest.mark.os
     def test_white_d65(self):
         # raytracer geometry of only a Source
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)

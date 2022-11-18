@@ -42,7 +42,6 @@ class TracerTests(unittest.TestCase):
         # coverage: init with refraction index
         ot.Raytracer(outline=[-1, 1, -1, 1, -1, 1], n0=ot.RefractionIndex("Constant", n=1.2))
 
-    @pytest.mark.os
     def test_raytracer_snapshot(self):
         
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 30])
@@ -127,7 +126,6 @@ class TracerTests(unittest.TestCase):
         RT.clear()
         self.assertFalse(RT.rays.N > 0)
 
-    @pytest.mark.os
     def test_geometry_checks(self):
         """test geometry checks before tracing"""
         
@@ -627,7 +625,6 @@ class TracerTests(unittest.TestCase):
         mdev = np.mean(np.abs(img0._img - img1._img)/ma)
         self.assertAlmostEqual(mdev, 0, delta=1e-7)
 
-    @pytest.mark.os
     @pytest.mark.slow
     def test_ray_storage(self):
         

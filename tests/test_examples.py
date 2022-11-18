@@ -79,7 +79,6 @@ class ExampleTests(unittest.TestCase):
     def test_brewster(self):
         self.execute("brewster_polarizer.py")
     
-    @pytest.mark.os
     @pytest.mark.slow
     def test_eye_model(self):
         self.execute("arizona_eye_model.py")

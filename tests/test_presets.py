@@ -35,6 +35,7 @@ class PresetTests(unittest.TestCase):
             if material.is_dispersive():
                 self.assertTrue(np.all(np.diff(n) < 0)) # steadily declining
 
+    @pytest.mark.os
     def test_light_spectrum_presets(self):
         # check presets
         wl = color.wavelengths(1000)
@@ -51,6 +52,7 @@ class PresetTests(unittest.TestCase):
             self.assertNotEqual(spec.desc, "")
             self.assertNotEqual(spec.long_desc, "")
 
+    @pytest.mark.os
     def test_spectrum_presets(self):
         # check presets
         wl = color.wavelengths(1000)
@@ -70,6 +72,7 @@ class PresetTests(unittest.TestCase):
                 self.assertEqual(spec(10), 0)
                 self.assertEqual(spec(1000), 0)
 
+    @pytest.mark.os
     def test_illuminant_whitepoint(self):
 
         # coordinates from https://en.wikipedia.org/wiki/Standard_illuminant#Illuminant_A

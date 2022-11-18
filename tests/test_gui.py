@@ -134,7 +134,6 @@ class GUITests(unittest.TestCase):
             sim._wait_for_idle()
             sim._do_in_main(sim.close)
 
-    @pytest.mark.os
     @pytest.mark.slow 
     def test_gui_inits(self) -> None:
 
@@ -196,7 +195,6 @@ class GUITests(unittest.TestCase):
         self.assertRaises(RuntimeError, TraceGUI, RT, source_selection="RS1")
         self.assertRaises(RuntimeError, TraceGUI, RT, det_pos=0)
 
-    @pytest.mark.os
     @pytest.mark.slow
     def test_interaction1(self) -> None:
 
@@ -382,6 +380,7 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
+    @pytest.mark.os
     def test_interaction3(self) -> None:
 
         def interact3(sim):
@@ -452,7 +451,6 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
-    @pytest.mark.os
     @pytest.mark.slow
     def test_missing(self) -> None:
         """test TraceGUI operation when Filter, Lenses, Detectors or Sources are missing"""
@@ -754,7 +752,6 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
     
-    @pytest.mark.os
     def test_send_cmd(self):
         """test command setting and sending as well as automatic replotting"""
 
@@ -1322,7 +1319,6 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
-    @pytest.mark.os
     def test_picker_coverage(self):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10], silent=True)

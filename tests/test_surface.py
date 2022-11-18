@@ -148,7 +148,6 @@ class SurfaceTests(unittest.TestCase):
                 # TODO test FunctionSurface normals
                 # TODO test DataSurfacce normals
 
-    @pytest.mark.os
     def test_surface_values(self):
         
         x = np.linspace(-0.7, 5.3, 1000)

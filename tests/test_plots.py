@@ -131,7 +131,6 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.chromacities_cie_1976, [ot.presets.light_spectrum.d65, 
                                                                ot.Point()])  # invalid type in list
 
-    @pytest.mark.os 
     @pytest.mark.slow
     def test_spectrum_plots(self):
 
@@ -201,6 +200,7 @@ class PlotTests(unittest.TestCase):
         otp.autofocus_cost_plot(sci, afdict, block=self.manual)
         otp.autofocus_cost_plot(sci, afdict, title="Test title", block=self.manual)
 
+    @pytest.mark.os
     def test_abbe_plot(self):
 
         # check type checking
