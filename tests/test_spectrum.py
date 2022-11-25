@@ -30,6 +30,9 @@ class SpectrumTests(unittest.TestCase):
         # call without parameters works
         ot.Spectrum()
 
+        # coverage: call get_desc of spectrum
+        ot.presets.spectrum.x.get_desc()
+
     def test_spectrum_exceptions(self):
 
         spec = ot.Spectrum("Function")

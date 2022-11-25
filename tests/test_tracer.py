@@ -13,7 +13,6 @@ from optrace.tracer.geometry.surface import Surface
 
 from test_gui import rt_example
 
-# TODO test polarization calculation of ideal lens
 
 # lens maker equation
 def lens_maker(R1, R2, n, n0, d):
@@ -227,7 +226,7 @@ class TracerTests(unittest.TestCase):
         
         # collision
         geome[1].move_to(geome[0].front.pos + [0, 0, 0.01])  # cornea is now inside empty area of pupil
-        coll, x, y = ot.Raytracer.check_collision(geome[0].front, geome[1].front)
+        coll, x, y, _ = ot.Raytracer.check_collision(geome[0].front, geome[1].front)
         self.assertTrue(coll)
         self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[1].front.get_values(x, y)))
 
@@ -235,7 +234,7 @@ class TracerTests(unittest.TestCase):
         geom = ot.presets.geometry.arizona_eye()
         geome = geom.elements
         geome[2].move_to(geome[0].front.pos + [0, 0, 0.2])
-        coll, x, y = ot.Raytracer.check_collision(geome[0].front, geome[2].front)
+        coll, x, y, _ = ot.Raytracer.check_collision(geome[0].front, geome[2].front)
         self.assertTrue(coll)
         self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[2].front.get_values(x, y)))
 
@@ -246,16 +245,16 @@ class TracerTests(unittest.TestCase):
 
         # point in front of surface, only "hit" when order is reversed
         point.move_to([0, 0, -1])
-        hit, _, _ = ot.Raytracer.check_collision(point, surf)
+        hit, _, _, _ = ot.Raytracer.check_collision(point, surf)
         self.assertFalse(hit)
-        hit, _, _ = ot.Raytracer.check_collision(surf, point)
+        hit, _, _, _ = ot.Raytracer.check_collision(surf, point)
         self.assertTrue(hit)
 
         # point in behind surface, only "hit" when order is reversed
         point.move_to([0, 0, 1])
-        hit, _, _ = ot.Raytracer.check_collision(point, surf)
+        hit, _, _, _ = ot.Raytracer.check_collision(point, surf)
         self.assertTrue(hit)
-        hit, _, _ = ot.Raytracer.check_collision(surf, point)
+        hit, _, _, _ = ot.Raytracer.check_collision(surf, point)
         self.assertFalse(hit)
         
         # collision line - surface
@@ -265,24 +264,24 @@ class TracerTests(unittest.TestCase):
 
         # line in front of surface, only "hit" when order is reversed
         line.move_to([0, 0, -10])
-        hit, _, _ = ot.Raytracer.check_collision(line, surf)
+        hit, _, _, _ = ot.Raytracer.check_collision(line, surf)
         self.assertFalse(hit)
-        hit, _, _ = ot.Raytracer.check_collision(surf, line)
+        hit, _, _, _ = ot.Raytracer.check_collision(surf, line)
         self.assertTrue(hit)
 
         # line behind surface, only "hit" when order is reversed
         line.move_to([0, 0, 1])
-        hit, _, _ = ot.Raytracer.check_collision(line, surf)
+        hit, _, _, _ = ot.Raytracer.check_collision(line, surf)
         self.assertTrue(hit)
-        hit, _, _ = ot.Raytracer.check_collision(surf, line)
+        hit, _, _, _ = ot.Raytracer.check_collision(surf, line)
         self.assertFalse(hit)
         
         # Line no intersects surface, so regarless of order we get a collision
         line = ot.Line(r=5)
         line.move_to([0, 0, -0.1])
-        hit, _, _ = ot.Raytracer.check_collision(line, surf)
+        hit, _, _, _ = ot.Raytracer.check_collision(line, surf)
         self.assertTrue(hit)
-        hit, _, _ = ot.Raytracer.check_collision(surf, line)
+        hit, _, _, _ = ot.Raytracer.check_collision(surf, line)
         self.assertTrue(hit)
 
         # Coverage
@@ -346,9 +345,9 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=0, N=0)  # N too small
         self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=-100)  # z_start outside outline
         self.assertRaises(ValueError, RT.autofocus, "AA", z_start=10)  # invalid mode
-        self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=10, source_index=-1)
+        self.assertRaises(IndexError, RT.autofocus, RT.autofocus_methods[0], z_start=10, source_index=-1)
         # index negative
-        self.assertRaises(ValueError, RT.autofocus, RT.autofocus_methods[0], z_start=10, source_index=10)
+        self.assertRaises(IndexError, RT.autofocus, RT.autofocus_methods[0], z_start=10, source_index=10)
         # index too large
 
         # coverage tests
@@ -935,18 +934,18 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(ValueError, RT.detector_image, 0)  # zero number of pixels
         self.assertRaises(ValueError, RT.source_image, -5)  # negative number of pixels
         self.assertRaises(ValueError, RT.source_image, 0)  # zero number of pixels
-        self.assertRaises(ValueError, RT.detector_image, 500, detector_index=3)  # invalid index
-        self.assertRaises(ValueError, RT.detector_spectrum, detector_index=3)  # invalid index
-        self.assertRaises(ValueError, RT.detector_image, 500, detector_index=-3)  # invalid index
-        self.assertRaises(ValueError, RT.detector_spectrum, detector_index=-3)  # invalid index
-        self.assertRaises(ValueError, RT.detector_image, 500, source_index=3)  # invalid index
-        self.assertRaises(ValueError, RT.detector_spectrum, source_index=3)  # invalid index
-        self.assertRaises(ValueError, RT.detector_image, 500, source_index=-3)  # invalid index
-        self.assertRaises(ValueError, RT.detector_spectrum, source_index=-3)  # invalid index
-        self.assertRaises(ValueError, RT.source_image, 500, source_index=3)  # invalid index
-        self.assertRaises(ValueError, RT.source_spectrum, source_index=3)  # invalid index
-        self.assertRaises(ValueError, RT.source_image, 500, source_index=-3)  # invalid index
-        self.assertRaises(ValueError, RT.source_spectrum, source_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, 500, detector_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_spectrum, detector_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, 500, detector_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_spectrum, detector_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, 500, source_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_spectrum, source_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, 500, source_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_spectrum, source_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.source_image, 500, source_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.source_spectrum, source_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.source_image, 500, source_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.source_spectrum, source_index=-3)  # invalid index
 
         self.assertRaises(ValueError, RT.detector_image, 500, extent="abc")  # invalid extent
         self.assertRaises(ValueError, RT.detector_image, 500, extent=[1, 2, 1, np.inf])  # invalid extent
@@ -1151,11 +1150,6 @@ class TracerTests(unittest.TestCase):
 
     def test_ideal_lens_imaging(self):
 
-        # TODO test polarization state
-        # TODO check polarization in more complex, real lens setup
-        # TODO test different detector types: tilted_surface, conic_surface and ring_surface as detectors
-        # TODO test detector that intersects >3 surfaces in z-direction
-
         # an ideal lens creates an ideal image
         # this image is exactly the same as the input image, as all rays from each pixel are mapped into the same output pixel
         # check if the images are the same
@@ -1200,6 +1194,41 @@ class TracerTests(unittest.TestCase):
 
         # should be minimal, only numerical errors
         self.assertAlmostEqual(dev, 0, delta=1e-8)
+
+    def test_ideal_lens_polarization(self):
+        """test polarization for ideal lenses. Case 1: perpendicular light, case 2: divergent/convergent light"""
+
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 40])
+
+        # add Raysource
+        RSS = ot.RectangularSurface(dim=[4, 4])
+        RS = ot.RaySource(RSS, divergence="None", s=[0, 0, 1], pos=[0, 0, 0])
+        RT.add(RS)
+
+        # add Lenses
+        RT.add(ot.IdealLens(r=5, D=120, pos=[0, 0, 12]))
+        RT.add(ot.IdealLens(r=6, D=-50, pos=[0, 0, 24]))
+
+        RT.trace(200000)
+        _, s, pol, w, _, _, _ = RT.rays.rays_by_mask(ret=[0, 1, 1, 0, 0, 0, 0])
+        scal = np.sum(s*pol, axis=2)[:, :-1]
+        self.assertAlmostEqual(np.ptp(scal), 0, delta=1e-7)  # s and pol are perpendicular
+        self.assertTrue(np.allclose(np.sum(pol*pol, axis=2)[:, :-1], 1))  # length is 1
+
+    def test_polarization(self):
+        """test polarization in a more complex setup"""
+
+        RT = rt_example()
+        RT.trace(200000)
+
+        _, s, pol, _, _, _, _ = RT.rays.rays_by_mask(ret=[0, 1, 1, 0, 0, 0, 0])
+        scal = np.sum(s*pol, axis=2)
+        m = np.isnan(scal)
+        scal = scal[~m]
+        self.assertAlmostEqual(np.ptp(scal), 0, delta=1e-7)  # s and pol are perpendicular
+        polpol = np.sum(pol*pol, axis=2)
+        m = ~np.isnan(polpol)
+        self.assertTrue(np.allclose(polpol[m], 1))  # length is 1
 
 if __name__ == '__main__':
     unittest.main()

@@ -58,6 +58,16 @@ class TracerMiscTests(unittest.TestCase):
         BC = BaseClass()
         self.assertEqual(BC.get_long_desc(fallback="abc"), "abc")
 
+        # printing
+        BC.silent = False
+        BC.print("abc")
+        BC.silent = True
+        BC.print("abc")
+
+        # coverage: crepr of different member types
+        L = ot.presets.geometry.arizona_eye().lenses[0]
+        L.crepr()
+
     def test_property_checker(self):
 
         pc = misc.PropertyChecker
@@ -79,11 +89,15 @@ class TracerMiscTests(unittest.TestCase):
         pc.check_none_or_callable("", print)  # valid
         pc.check_callable("", lambda x: x)  # valid
         pc.check_callable("", print)  # valid
-        self.assertRaises(TypeError, pc.check_callable, None)
-        self.assertRaises(TypeError, pc.check_callable, 5)
-        self.assertRaises(TypeError, pc.check_none_or_callable, 5)
+        self.assertRaises(TypeError, pc.check_callable, "", None)
+        self.assertRaises(TypeError, pc.check_callable, "", 5)
+        self.assertRaises(TypeError, pc.check_none_or_callable, "", 5)
         
         # values
+        pc.check_above("", 5, 4)
+        pc.check_not_above("", 4, 4)
+        pc.check_below("", 4, 5)
+        pc.check_not_below("", 4, 4)
         self.assertRaises(ValueError, pc.check_below, "", 5, 4)  # 5 > 4
         self.assertRaises(ValueError, pc.check_not_above, "", 5, 4)  # 5 > 4
         self.assertRaises(ValueError, pc.check_not_below, "", 4, 5)  # 5 > 4
@@ -185,9 +199,9 @@ class TracerMiscTests(unittest.TestCase):
 
         for limit in [None, 20]:  # different resolution limits
 
-            for ratio in [1/6, 0.38, 1, 5]:  # different side ratios
+            for i, ratio in enumerate([1/6, 0.38, 1, 5]):  # different side ratios
 
-                img, P, L = self.gen_r_image(ratio=ratio, limit=limit)
+                img, P, L = self.gen_r_image(ratio=ratio, limit=limit, threading=bool(i % 2))  # toggle threading
 
                 # check power sum
                 P0 = img.get_power()
@@ -199,7 +213,6 @@ class TracerMiscTests(unittest.TestCase):
                 sx0, sy0 = img.sx, img.sy
 
                 for i, Npx in enumerate([*ot.RImage.SIZES, *np.random.randint(1, 2*ot.RImage.SIZES[-1], 3)]):  # different side lengths
-                    img.threading = bool(i % 2)  # sometimes threading, sometimes not
                     img.rescale(Npx)
 
                     # check that nearest matching side length was chosen
@@ -253,9 +266,9 @@ class TracerMiscTests(unittest.TestCase):
         RIm.render(keep_extent=True)
         self.assertTrue(np.all(RIm.extent == Im_hasp_ext))
 
-    def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1, limit=None):
+    def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1, limit=None, threading=True):
         # create some image
-        img = ot.RImage([-1, 1, -1*ratio, 1*ratio], silent=True, limit=limit)
+        img = ot.RImage([-1, 1, -1*ratio, 1*ratio], silent=True, limit=limit, threading=threading)
         p = np.zeros((N, 2))
         p[:, 0] = np.random.uniform(img.extent[0], img.extent[1], N)
         p[:, 1] = np.random.uniform(img.extent[2], img.extent[3], N)
@@ -401,6 +414,7 @@ class TracerMiscTests(unittest.TestCase):
         # check if equal operator is working
         self.assertEqual(ot.presets.refraction_index.SF10, ot.presets.refraction_index.SF10)
         self.assertEqual(n_list[1][0], n_list[1][0])
+        self.assertNotEqual(n_list[1][0], n_list[2][0])
         assert n_list[-1][0].spectrum_type == "Data"
         self.assertEqual(n_list[-1][0], n_list[-1][0])  # comparision of Data type
         self.assertEqual(ot.RefractionIndex("Function", func=func), ot.RefractionIndex("Function", func=func))

@@ -89,6 +89,20 @@ class ColorTests(unittest.TestCase):
         d = color.xyz_to_srgb_linear(np.array([[[*color.WP_D65_XYZ]]]), normalize=False)
         self.assertTrue(np.allclose(d, 1))
 
+    def test_outside_srgb(self):
+
+        # negative srgb values are outside the gamut
+        srgbl = np.random.uniform(-1, 1, (500, 500, 3))
+
+        # convert to xyz
+        xyz = color.srgb_linear_to_xyz(srgbl)
+
+        # check which lie outside
+        og = color.outside_srgb_gamut(xyz)
+
+        # check if those are true that had negative srgb values to begin with
+        self.assertTrue(np.all(og == np.any(srgbl < 0, axis=2)))
+
     def test_srgb_conversion(self):
         """test xyz -> srgb conversion by comparing to colorios conversion"""
     
@@ -177,6 +191,16 @@ class ColorTests(unittest.TestCase):
         d_ = color.luv_to_u_v_l(d)
         should = [*color.WP_D65_LUV[1:], color.WP_D65_LUV[0]]
         self.assertTrue(np.allclose(d_ - should, 0, atol=1e-5))
+
+        # check normalize parameter, maximum L should be 100, rest is unchanged
+        luvn = color.xyz_to_luv(np.array([XYZ]), normalize=True)[0]
+        self.assertAlmostEqual(np.max(luvn[:, 0]), 100)
+
+        # chroma gets scaled with lightness, therefore normalize color by lightness
+        # indendent of lightness normalization the ratio should stay the same
+        m = luvn[:, 0] > 0  # only for values with non-zero lighness
+        diff = luvn[m, 1:]/luvn[m, 0, np.newaxis] - luv[m, 1:]/luv[m, 0, np.newaxis]
+        self.assertTrue(np.allclose(diff, 0))
 
     def test_luv_chroma_hue(self):
         """test xyz -> CIELCH conversion by comparing to colorios conversion"""

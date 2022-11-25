@@ -418,6 +418,19 @@ class GeometryTests(unittest.TestCase):
             self.assertAlmostEqual(di, Li.d, 8)
             self.assertAlmostEqual(di, Li.de + Li.front.dp + Li.back.dn, 8)
 
+        # check cylinder surface
+        for Li in L:
+            N = int(np.random.uniform(40, 200))
+            X, Y, Z = Li.get_cylinder_surface(N)
+            self.assertTrue(X.shape[0] == Y.shape[0] == Z.shape[0] == N)
+            de = np.abs(Li.front.get_edge(20)[2][0] - Li.back.get_edge(20)[2][0])
+            self.assertTrue(np.allclose(np.abs(Z[:, 0] - Z[:, 1]), de))
+
+        # coverage: test tma. actual values will be checked in test_tma.py
+        L[0].tma()
+        L[0].tma(550)
+        L[0].tma(550, n0=ot.RefractionIndex("Abbe", n=1.2, V=50))
+
         # is_ideal correctly set
         self.assertFalse(L[0].is_ideal)
         
@@ -449,39 +462,41 @@ class GeometryTests(unittest.TestCase):
 
         for Surf in Surfaces:
             for dir_type in ot.RaySource.divergences:
-                for or_type in ot.RaySource.orientations:
-                    for pol_type in ot.RaySource.polarizations:
-                        for Im in [None, ot.presets.image.color_checker]:
+                for div_2d in [False, True]:
+                    for or_type in ot.RaySource.orientations:
+                        for pol_type in ot.RaySource.polarizations:
+                            for Im in [None, ot.presets.image.color_checker]:
 
-                            # only check RectangleSurface with Image being active/set
-                            if Im is not None and (not isinstance(Surf, Surface) or not isinstance(Surf, ot.RectangularSurface)):
-                                continue
+                                # only check RectangleSurface with Image being active/set
+                                if Im is not None and (not isinstance(Surf, Surface)\
+                                        or not isinstance(Surf, ot.RectangularSurface)):
+                                    continue
 
-                            RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, 
-                                              polarization=pol_type, image=Im, **rargs)
-                            RS.get_color()
-                            p, s, pols, weights, wavelengths = RS.create_rays(8000)
+                                RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, div_2d=div_2d,
+                                                  polarization=pol_type, image=Im, **rargs)
+                                RS.get_color()
+                                p, s, pols, weights, wavelengths = RS.create_rays(8000)
 
-                            self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
-                            self.assertGreater(np.min(weights), 0)  # no zero weight rays
-                            self.assertAlmostEqual(np.sum(weights), rargs["power"])  # rays amount to power
-                            self.assertGreaterEqual(np.min(wavelengths), color.WL_BOUNDS[0])  # inside visible range
-                            self.assertLessEqual(np.max(wavelengths), color.WL_BOUNDS[1])  # inside visible range
+                                self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
+                                self.assertGreater(np.min(weights), 0)  # no zero weight rays
+                                self.assertAlmostEqual(np.sum(weights), rargs["power"])  # rays amount to power
+                                self.assertGreaterEqual(np.min(wavelengths), color.WL_BOUNDS[0])  # inside visible range
+                                self.assertLessEqual(np.max(wavelengths), color.WL_BOUNDS[1])  # inside visible range
 
-                            # check positions
-                            self.assertTrue(np.all(p[:, 2] == rargs["pos"][2]))  # rays start at correct z-position
-                            self.assertGreaterEqual(np.min(p[:, 0]), RS.surface.extent[0])
-                            self.assertLessEqual(np.max(p[:, 0]), RS.surface.extent[1])
-                            self.assertGreaterEqual(np.min(p[:, 1]), RS.surface.extent[2])
-                            self.assertLessEqual(np.max(p[:, 1]), RS.surface.extent[3])
+                                # check positions
+                                self.assertTrue(np.all(p[:, 2] == rargs["pos"][2]))  # rays start at correct z-position
+                                self.assertGreaterEqual(np.min(p[:, 0]), RS.surface.extent[0])
+                                self.assertLessEqual(np.max(p[:, 0]), RS.surface.extent[1])
+                                self.assertGreaterEqual(np.min(p[:, 1]), RS.surface.extent[2])
+                                self.assertLessEqual(np.max(p[:, 1]), RS.surface.extent[3])
 
-                            # s needs to be a unity vector
-                            ss = s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2
-                            self.assertTrue(np.allclose(ss, 1, atol=0.00002, rtol=0))
+                                # s needs to be a unity vector
+                                ss = s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2
+                                self.assertTrue(np.allclose(ss, 1, atol=0.00002, rtol=0))
 
-                            # pol needs to be a unity vector
-                            polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
-                            self.assertTrue(np.allclose(polss, 1, atol=0.00002, rtol=0))
+                                # pol needs to be a unity vector
+                                polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
+                                self.assertTrue(np.allclose(polss, 1, atol=0.00002, rtol=0))
 
         # special image shapes
 
@@ -788,6 +803,9 @@ class GeometryTests(unittest.TestCase):
         self.assertTrue(np.allclose(mark.pos - [3, -1, 5], 0))
         self.assertTrue(np.allclose(det.pos - [3, -1, 0], 0))
         self.assertAlmostEqual(det.surface._angle, np.pi)
+
+        # coverage: rotate empty group
+        ot.Group().rotate(5)
 
     # TODO test rotate and flip combined for group?
 

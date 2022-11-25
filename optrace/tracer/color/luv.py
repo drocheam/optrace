@@ -26,9 +26,6 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     :return:
     """
 
-    # all XYZ values need to be below that of D65 reference white,
-    # we therefore need to normalize
-    Xn, Yn, Zn = WP_D65_XYZ
     _, un, vn = WP_D65_LUV
 
     # exclude Y = 0 otherwise divisions by zero occur
@@ -39,12 +36,11 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
         return np.zeros_like(xyz)
 
     if normalize:
-        XYZm = np.array([np.nanmax(X), np.nanmax(Y), np.nanmax(Z)])
-        nmax = max(XYZm/WP_D65_XYZ)
+        Yn = np.nanmax(Y)
     else:
-        nmax = 1
+        Yn = WP_D65_XYZ[1]
 
-    # we only need to normalize t using nmax (see definition of t below), since u and v consist of XYZ ratios
+    # we only need to normalize t using Yn (see definition of t below), since u and v consist of XYZ ratios
 
     # conversion using
     # http://www.brucelindbloom.com/Eqn_XYZ_to_Luv.html
@@ -54,7 +50,7 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
 
     k = 903.3
     e = 0.008856
-    t = 1/nmax/Yn * Y
+    t = 1/Yn * Y
 
     mask2 = t > e  # t > e for L > 0
     mask3 = misc.part_mask(mask, mask2)  # Y > 0 and t > e

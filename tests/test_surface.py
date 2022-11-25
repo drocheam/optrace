@@ -52,7 +52,7 @@ class SurfaceTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.RectangularSurface, dim=[-5, 5])  # size negative
         self.assertRaises(ValueError, ot.RectangularSurface, dim=[5, np.inf])  # size non finite
         self.assertRaises(ValueError, ot.DataSurface2D, r=2, data=np.array([[1, 2], [3, 4]]))  # data needs to be at least 50x5
-        self.assertRaises(ValueError, ot.DataSurface2D, r=2, data=np.array([[1, 2, 3], [4, 5, 6]]))  # matrix not square
+        self.assertRaises(ValueError, ot.DataSurface2D, r=2, data=np.ones((100, 101)))  # matrix not square
         self.assertRaises(ValueError, ot.DataSurface2D, r=2, data=np.array([[1, np.nan], [4, 5]]))  # nan in data
         self.assertRaises(ValueError, ot.DataSurface2D, r=2, data=np.ones((100, 100, 100)))  # data needs to be 2D
         self.assertRaises(ValueError, ot.DataSurface1D, r=2, data=np.ones(10))  # not enough values

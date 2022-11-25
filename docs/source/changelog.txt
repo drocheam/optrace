@@ -1,5 +1,6 @@
-Current Version: 1.0.3 
+Current Version: 1.0.4-12-g920bba4 
 
+1.0.4           DataSurface has been renamed to DataSurface2D. New DataSurface1D class for radial data profiles.
 1.0.3           New Orthographic sphere projection method.
 1.0.2           Surface/geometry reverse() changed to a flip() function that flips around the x-axis. rotate() operation to rotate around z-axis.
 1.0.1           Minor UI improvements. Index Boxes are now joined if the spacing between

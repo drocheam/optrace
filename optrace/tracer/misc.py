@@ -129,14 +129,14 @@ class PropertyChecker:
             raise ValueError(f"Property '{key}' needs to be below {cmp}, but is {val}.")
 
     @staticmethod
-    def check_none_or_callable(key, val) -> None:
-        if val is not None and not callable(val):
-            raise TypeError(f"{key} needs to be callable or None, but is {type(val)}.")
-
-    @staticmethod
     def check_callable(key, val) -> None:
         if not callable(val):
             raise TypeError(f"{key} needs to be callable, but is {type(val)}.")
+    
+    @staticmethod
+    def check_none_or_callable(key, val) -> None:
+        if val is not None and not callable(val):
+            raise TypeError(f"{key} needs to be callable or None, but is {type(val)}.")
     
     @staticmethod
     def check_if_element(key, val, list_) -> None:

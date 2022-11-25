@@ -7,15 +7,13 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-# TODO document use of _1D
-
 
 class DataSurface2D(Surface):
     
     rotational_symmetry: bool = False
 
     _1D: bool = False
-    """1D or 2D data surface"""
+    """1D or 2D data surface, basically if we use an 1D profile as whole surface description"""
 
     def __init__(self,
                  r:                 float,
@@ -39,6 +37,7 @@ class DataSurface2D(Surface):
         # sign used for reversing the function
         self._sign = 1
     
+        # rotation angl
         self._angle = 0
 
         self._interp, self._offset = None, 0.
@@ -47,10 +46,12 @@ class DataSurface2D(Surface):
         pc.check_type("data", data, np.ndarray | list)
         Z = np.asarray_chkfinite(data, dtype=np.float64)
 
+        # too few values exception
         nx = Z.shape[0]
         if nx < 50:
             raise ValueError("For a good surface representation 'data' should have at least 50 values per dimension")
 
+        # too few values warning
         if nx < 200:
             self.print("At least 200 values per dimension are advised for a 'data' matrix.")
 
@@ -59,12 +60,13 @@ class DataSurface2D(Surface):
             if Z.ndim != 1:
                 raise ValueError("data array needs to have exactly one dimension.")
             
+            # remove offset at first value, actual offset at center will be removed later
             Z -= Z[0]
         
             # create r vector
             r0 = np.linspace(0, self.r, Z.shape[0], dtype=np.float64)
 
-            # mirror values around r axis
+            # mirror values around r axis, we now have a symmetric profile including the lens center
             r2 = np.concatenate((-np.flip(r0[1:]), r0))
             z2 = np.concatenate((np.flip(Z[1:]), Z))
 
@@ -72,10 +74,12 @@ class DataSurface2D(Surface):
             self._interp = scipy.interpolate.InterpolatedUnivariateSpline(r2, z2, k=4)
             self._offset = self._call(0, 0)  # remaining z_offset at center
         
+            # get max and min z values
             rn = np.linspace(0, self.r, 10000)
             zn = self._get_values(rn, np.zeros_like(rn))
             self.z_min, self.z_max = np.min(zn), np.max(zn)
 
+            # range of input data, not to be confused with height of interpolated data
             z_range0 = np.max(Z) - np.min(Z)
 
         else:
@@ -84,7 +88,7 @@ class DataSurface2D(Surface):
             
             ny, nx = Z.shape
             if nx != ny:
-                raise ValueError("Array 'data' needs to have a square shape.")
+                raise ValueError("Array 'data' needs to be of square shape.")
             
             # remove offset at center
             if nx % 2:
@@ -100,12 +104,13 @@ class DataSurface2D(Surface):
 
             # self.z_min, self.z_max = np.nanmin(Z), np.nanmax(Z)  # provisional values
             self.z_min, self.z_max = self._find_bounds()
-        
+       
+            # get range of input data, but only inside circular area (= enforced by masking)
             X, Y = np.meshgrid(xy, xy)
             M = self.get_mask(X.ravel(), Y.ravel()).reshape(X.shape)
             z_range0 = np.max(Z[M]) - np.min(Z[M])
       
-        # biquadratic interpolation can lead to an increased z-value range
+        # interpolation can lead to an increased z-value range
         # e.g. spheric surface, but the center is not defined by a data point
         z_range1 = self.z_max - self.z_min
         if np.abs(z_range0 - z_range1) > self.N_EPS:
@@ -117,9 +122,12 @@ class DataSurface2D(Surface):
                        f" has increased from {z_range0} to {z_range1},"
                        f" a change of {z_change*100:.5g}%. {add_warning}")
 
+        # lock properties
         self.lock()
 
     def _call(self, x, y, **kwargs):
+        """internal function.
+        get surface values relative to center, directly works on interpolation object without rotation or flipping"""
 
         if self._1D:
             r = np.hypot(x, y)
@@ -136,7 +144,8 @@ class DataSurface2D(Surface):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        x_, y_ = self._rotate_rc(x, y, -self._angle) if not self._1D else (x, y)
+        # rotate if needed and surface has no rotational symmetry
+        x_, y_ = self._rotate_rc(x, y, -self._angle) if not self.rotational_symmetry else (x, y)
 
         # uses quadratic interpolation for smooth surfaces and a constantly changing slope
         return self._sign*(self._call(x_, self._sign*y_) - self._offset)
@@ -172,6 +181,7 @@ class DataSurface2D(Surface):
             nyn = self._call(x_, self._sign*y_, dx=0, dy=1)
             nxn, nyn = self._rotate_rc(nxn, nyn, self._angle)
         else:
+            # get vector n = (n_r, n_z) and rotate n_r to get n = (nx, ny, nz)
             phi = np.arctan2(ym, xm)
             nr = self._sign*self._call(xm, ym, nu=1)
             nxn, nyn = nr*np.cos(phi), nr*np.sin(phi)
@@ -203,8 +213,7 @@ class DataSurface2D(Surface):
         self.lock()
     
     def rotate(self, angle: float) -> None:
-
-        if not self._1D:
+        if not self.rotational_symmetry:
             self._lock = False
             self._angle += np.deg2rad(angle)  # add relative rotation
             self.lock()

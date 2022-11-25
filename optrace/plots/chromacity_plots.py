@@ -9,7 +9,7 @@ from ..tracer.r_image import RImage
 from ..tracer.spectrum import LightSpectrum
 from ..tracer import color  # color conversions for chromacity plots
 from ..plots.misc_plots import _set_font
-
+from ..tracer.misc import PropertyChecker as pc
 
 chromacity_norms: list[str, str, str] = ["Ignore", "Largest", "Sum"]
 """possible norms for the chromacity diagrams"""
@@ -110,6 +110,11 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
         -> None:
     """Lower level plotting function. Don't use directly"""
 
+    pc.check_type("title", title, str)
+    pc.check_type("block", block, bool)
+    pc.check_if_element("rendering_intent", rendering_intent, color.srgb.SRGB_RENDERING_INTENTS)
+    pc.check_if_element("norm", norm, chromacity_norms)
+    
     # RImage -> plot Pixel colors (RI != "Ignore" means sRGB conversion with said rendering intent)
     if isinstance(img, RImage):
         XYZ = img.get_xyz() if rendering_intent == "Ignore" \

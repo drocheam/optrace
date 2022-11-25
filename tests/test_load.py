@@ -204,7 +204,7 @@ class LoadTests(unittest.TestCase):
         n_schott = ot.load.agf("schott.agf")
 
         for silent in [False, True]:
-            G = ot.load.zmx("temp.zmx", n_schott, silent)
+            G = ot.load.zmx("temp.zmx", n_schott, silent=silent)
 
         RT.add(G)
         RT.trace(10000)

@@ -482,6 +482,9 @@ class TraceGUI(HasTraits):
         self.silent = False
         self._exit = False
 
+        # markers for geometric errors like collisions
+        self._fault_markers = []
+
         self._last_det_snap = None
         self.last_det_image = None
         self._last_source_snap = None
@@ -1471,11 +1474,22 @@ class TraceGUI(HasTraits):
 
         self._status["Drawing"] -= 1
 
-    def _wait_for_idle(self) -> None:
+    def _wait_for_idle(self, timeout=30) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
+
+        def raise_timeout():
+            keys = [key for key, val in self._status.items() if val]
+            raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
+
+        tsum = 0.3
         time.sleep(0.3)  # wait for flags to be set, this could also be trait handlers, which could take longer
         while self.busy:
             time.sleep(0.05)
+            tsum += 0.05
+
+            if tsum > timeout:
+                pyface_gui.invoke_later(raise_timeout)
+                return
 
     @property
     def busy(self) -> bool:
@@ -1656,7 +1670,22 @@ class TraceGUI(HasTraits):
                         if self._rays_plot is not None:
                             self._rays_plot.parent.parent.remove()
                             self._rays_plot = None
-                            
+                           
+                        # plot fault positions if they are provided
+                        if self.raytracer.geometry_error and self.raytracer.fault_pos.shape[0]:
+
+                            # chose some random fault positions, maximum 5
+                            pfault = self.raytracer.fault_pos
+                            ch = min(5, pfault.shape[0])
+                            f_ind = np.random.choice(np.arange(pfault.shape[0]), size=ch, replace=False)
+
+                            # remove old markers, generate and plot new ones
+                            self.raytracer.remove(self._fault_markers)
+                            self._fault_markers = [Marker("COLLISION", pos=pfault[ind], text_factor=1.5, marker_factor=1.5)\
+                                                  for ind in f_ind]
+                            self.raytracer.add(self._fault_markers)
+                            self._plot_markers()
+
                         self._status["Tracing"] -= 1
 
                         # gets unset on first run
@@ -1664,6 +1693,12 @@ class TraceGUI(HasTraits):
                             pyface_gui.invoke_later(self._set_gui_loaded)
 
                     else:
+                        # remove old fault markers
+                        if self._fault_markers:
+                            self.raytracer.remove(self._fault_markers)
+                            self._fault_markers = []
+                            self._plot_markers()
+
                         with self._no_trait_action():
                             # reset parameter to value of raytracer.absorb_missing, since it can refuse this value
                             self.absorb_missing = self.raytracer.absorb_missing

@@ -130,7 +130,11 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.chromacities_cie_1976, ot.Point())  # invalid type
         self.assertRaises(TypeError, otp.chromacities_cie_1976, [ot.presets.light_spectrum.d65, 
                                                                ot.Point()])  # invalid type in list
-
+        self.assertRaises(TypeError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, block=[])  # invalid block type
+        self.assertRaises(TypeError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, title=[])  # invalid title type
+        self.assertRaises(ValueError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, norm="abc")  # invalid norm
+        self.assertRaises(ValueError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, rendering_intent="abc")  # invalid rendering_intent
+        
     @pytest.mark.slow
     def test_spectrum_plots(self):
 

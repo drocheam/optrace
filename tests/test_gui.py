@@ -920,7 +920,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
-    def test_additional_coverage(self):
+    def test_0additional_coverage(self):
         """additionial coverage tests"""
 
         RT = rt_example()
@@ -1048,6 +1048,18 @@ class GUITests(unittest.TestCase):
                 sim._status["InitScene"] = 0
                 sim._wait_for_idle()
 
+                # check waiting timeout, while InitScene is set GUI.busy is always true
+                # timeout ensures we return back from waiting
+                sim._status["InitScene"] = 1
+                start = time.time()
+                sim._wait_for_idle(timeout=5)
+                self.assertTrue(time.time() - start < 6)
+
+                # running the action is skipped because a different action (InitScene) is running
+                sim._set_in_main(sim._cmd, "self.replot()")
+                sim._do_in_main(sim.send_cmd)
+                sim._wait_for_idle()
+
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
@@ -1078,7 +1090,9 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             with self._try(sim):
                 # no rays traced because of error in geometry
-                self.assertEqual(sim.raytracer.rays.N, 0)
+                self.assertEqual(sim.raytracer.rays.N, 0)  # nothing traced
+                self.assertTrue(len(sim._fault_markers) > 0)  # fault markers in GUI
+                self.assertTrue(len(RT.markers) > 0)  # fault markers in RT
 
                 # retrace and print error message
                 sim.silent = False
@@ -1116,6 +1130,15 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
+
+                # leave only one lens, now it can be traced
+                # this also removes the old fault markers
+                RT.remove(RT.lenses[1:])
+                sim._do_in_main(sim.replot)
+                sim._wait_for_idle()
+                self.assertTrue(RT.rays.N > 0)  # rays traced
+                self.assertEqual(len(sim._fault_markers), 0)  # no faul_marker in GUI
+                self.assertEqual(len(RT.markers), 0)  # no fault markers in RT
 
         sim = TraceGUI(RT)
         sim.debug(_func=interact, silent=True, _args=(sim,))

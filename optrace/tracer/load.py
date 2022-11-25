@@ -6,7 +6,7 @@ from .refraction_index import RefractionIndex
 from .geometry.group import Group
 from .geometry import Lens, Marker, Detector, Aperture
 from .geometry.surface import CircularSurface, ConicSurface, SphericalSurface,\
-                              RingSurface, AsphericSurface
+                              RingSurface, AsphericSurface, Surface, RectangularSurface
 from .presets import spectral_lines
 from .color.tools import WL_BOUNDS
 
@@ -172,7 +172,7 @@ def _zmx_to_surface_dicts(lines, n_dict, silent) -> tuple[list, list, str]:
     dds = []
     long_desc = ""
 
-    for i, l in enumerate(lines):
+    for i, l in enumerate(lines):  # never exits normally # pragma: no branch
 
         if l[:4] == "NAME":
             long_desc = l[5:-1]
@@ -203,10 +203,7 @@ def _zmx_to_surface_dicts(lines, n_dict, silent) -> tuple[list, list, str]:
         
             # surface type
             if l[2:6] == "TYPE":
-                stype = l.split()[1]
-                if stype not in ["STANDARD", "EVENASPH"]:
-                    raise RuntimeError(f"Unsupported surface type {stype}.")
-                surf["stype"] = stype
+                surf["stype"] = l.split()[1]
 
             # diameter
             elif l[2:6] == "DIAM":
@@ -236,6 +233,7 @@ def _zmx_to_surface_dicts(lines, n_dict, silent) -> tuple[list, list, str]:
             
             elif l[2:6] == "DISZ":
                 dd = float(l.split()[1])
+                dd = max(dd, 3*Surface.N_EPS)  # distance needs to be above zero
 
             elif l[2:6] == "PARM":
                 ind, val = l.split()[1:3]
@@ -253,6 +251,7 @@ def _zmx_to_surface_dicts(lines, n_dict, silent) -> tuple[list, list, str]:
 
                 elif material not in n_dict.keys():
                     raise RuntimeError(f"Material {material} missing in n_dict parameter.")
+
                 else:
                     surf["n"] = n_dict[material]
 
@@ -284,7 +283,9 @@ def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_mar
 
             # last surface is a detector, but only if it has r > 0
             if i + 1 == len(Surfaces) and "r" in Surfaces[i]:
-                surf = _make_surface(Surfaces[i])
+                # add square detector
+                r = Surfaces[i]["r"]
+                surf = RectangularSurface(dim=[2*r, 2*r], desc=Surfaces[i]["desc"])
                 DET = Detector(surf, pos=[0, 0, z])
                 G.add(DET)
             

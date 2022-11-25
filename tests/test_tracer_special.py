@@ -424,6 +424,75 @@ class TracerSpecialTests(unittest.TestCase):
             # add aperture and move it so that no rays reach detector or autofocus region
             RT.add(AP)
             RT.apertures[0].move_to(AP.pos + [0.2, 0.2, 0])
-       
+      
+    def test_hit_dector_many_surfaces_different_detector_surfaces(self):
+
+        # the following is an part of the microscope example
+
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 300])
+
+        RSS = ot.RectangularSurface(dim=[200e-3, 200e-3])
+        RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.bacteria,
+                          pos=[0, 0, 0], s=[0, 0, 1], div_angle=27, desc="Bacteria")
+        RT.add(RS)
+
+        # objective doublet properties
+        n1, n2 = ot.presets.refraction_index.LAK8, ot.presets.refraction_index.SF10
+        R1, R2 = 7.74, -7.29
+
+        # objective group
+        objective = ot.Group(desc="Objective")
+
+        # Lens 1 of doublet
+        front = ot.CircularSurface(r=5.5)
+        back = ot.SphericalSurface(r=5.5, R=-R2)
+        L01 = ot.Lens(front, back, d1=0.5, d2=0, pos=[0, 0, 0], n=n2, n2=n2)
+        objective.add(L01)
+
+        # Lens 2 of doublet
+        front = ot.SphericalSurface(r=5.5, R=-R2)
+        back = ot.ConicSurface(r=5.5, R=-R1, k=-0.55)
+        L02 = ot.Lens(front, back, d1=0, d2=5.3, pos=[0, 0, 0.0001], n=n1)
+        objective.add(L02)
+
+        # move objective lens so that its focal point is 0.6mm behind object
+        L0f0 = objective.tma().focal_point[0]
+        objective.move_to([0, 0, L01.pos[2] - (L0f0 - RS.pos[2] - 0.6)])
+
+        # add group to raytracer
+        RT.add(objective)
+
+        tilt = ot.TiltedSurface(r=3.5, normal=[2, 0, 1])
+        det = ot.Detector(tilt, pos=[0, 0, 12.125])
+        RT.add(det)
+
+        # detector extent should be larger than that objective
+        assert det.extent[5] > L02.extent[5]
+        assert det.extent[4] < L01.extent[4]
+
+        RT.trace(200000)
+
+        # tilted surface intersects with 4 surfaces, check if correctly renders image
+        img = RT.detector_image(500)
+        self.assertTrue(img.get_power() > 0.55)
+
+        # check ring detector
+        RT.add(ot.Detector(ot.RingSurface(r=3.5, ri=0.3), pos=[0, 0, 12]))
+        img = RT.detector_image(500, detector_index=1)
+        self.assertTrue(img.get_power() > 0.4)
+        ny, nx = img._img.shape[:2]
+        self.assertEqual(img._img[ny//2, nx//2, 3], 0)  
+        # ^-- due to hole in detector there is no light detected in its center
+        
+        # check circle detector
+        RT.add(ot.Detector(ot.CircularSurface(r=3.5), pos=[0, 0, 12]))
+        img = RT.detector_image(500, detector_index=2)
+        self.assertTrue(img.get_power() > 0.4)
+        
+        # check conic surface detector
+        RT.add(ot.Detector(ot.ConicSurface(r=3.5, R=-10, k=2), pos=[0, 0, 12]))
+        img = RT.detector_image(500, detector_index=3)
+        self.assertTrue(img.get_power() > 0.4)
+
 if __name__ == '__main__':
     unittest.main()

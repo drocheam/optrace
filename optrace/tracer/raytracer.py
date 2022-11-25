@@ -91,6 +91,7 @@ class Raytracer(Group):
         self._ignore_geometry_error = False
         self.geometry_error = False
         self._force_threads = None
+        self.fault_pos = np.array([])
 
         super().__init__(**kwargs)
         self._new_lock = True
@@ -250,6 +251,7 @@ class Raytracer(Group):
                     self.absorb_missing = True
                     break
 
+        self.fault_pos = np.array([])
         elements = self.__make_tracing_element_list()
         self.__geometry_checks(elements)
         if self.geometry_error and not self._ignore_geometry_error:
@@ -419,53 +421,54 @@ class Raytracer(Group):
             self.geometry_error = True
             return
 
+        coll = False
         for i, el in enumerate(elements):
             if not is_inside(el.extent):
                 self.print(f"Element{i} {el} with extent {el.extent} outside outline {self.outline}.")
                 self.geometry_error = True
                 return
 
-            coll = False
-            
             # collision of front and next front
             if i + 1 < len(elements):
-                coll, xc, yc = self.check_collision(el.front, elements[i + 1].front)
+                coll, xc, yc, zc = self.check_collision(el.front, elements[i + 1].front)
             
-            if el.has_back():
-                # collision of front and back of element
-                if not coll:
-                    coll, xc, yc = self.check_collision(el.front, el.back)
+            # collision of front and back of element
+            if not coll and el.has_back():
+                coll, xc, yc, zc = self.check_collision(el.front, el.back)
 
-                # collision of back and next front
-                if not coll:
-                    coll, xc, yc = self.check_collision(el.back, elements[i + 1].front)
+            # collision of back and next front
+            if not coll and el.has_back():
+                coll, xc, yc, zc = self.check_collision(el.back, elements[i + 1].front)
 
-            # handle collision
             if coll:
-                self.print(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}.")
-                self.geometry_error = True
-                return
+                break
 
-        for rs in self.ray_sources:
+        if not coll:
+            for rs in self.ray_sources:
 
-            if not is_inside(rs.extent):
-                self.print(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
-                self.geometry_error = True
-                return
-
-            if rs.pos[2] >= elements[0].extent[4]:
-                coll, xc, yc = self.check_collision(rs.surface, elements[0].front)
-                if coll:
-                    self.print(f"Collision between Element{i} and Element{i+1} at x={xc}, y={yc}."
-                                "RaySource needs to come before all lenses.")
+                if not is_inside(rs.extent):
+                    self.print(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
                     self.geometry_error = True
                     return
+
+                if rs.pos[2] >= elements[0].extent[4]:
+                    coll, xc, yc, zc = self.check_collision(rs.surface, elements[0].front)
+
+                if coll:
+                    break
+
+        if coll:
+            self.print(f"Collision between two Surfaces at {xc[0], yc[0], zc[0]}"
+                       f" and {xc.shape[0]} other positions.")
+            self.geometry_error = True
+            self.fault_pos = np.column_stack((xc, yc, zc))
+            return
 
         self.geometry_error = False
 
     @staticmethod
     def check_collision(front: Surface | Line | Point, back: Surface | Line | Point, res: int = 100)\
-            -> tuple[bool, np.ndarray, np.ndarray]:
+            -> tuple[bool, np.ndarray, np.ndarray, np.ndarray]:
         """
         
         Check for surface collisions.
@@ -494,7 +497,7 @@ class Raytracer(Group):
             hit = (z < pt.pos[2]) if not rev else (z > pt.pos[2])
             hit = hit & surf.get_mask(x, y)
             where = np.where(hit)[0]
-            return np.any(hit), x[where], y[where]
+            return np.any(hit), x[where], y[where], z[where]
 
         # intersection of surface and line
         elif isinstance(front, Line) or isinstance(back, Line):
@@ -510,7 +513,7 @@ class Raytracer(Group):
             hit = (z < line.pos[2]) if not rev else (z > line.pos[2])
             hit = hit & surf.get_mask(x, y)
             where = np.where(hit)[0]
-            return np.any(hit), x[where], y[where]
+            return np.any(hit), x[where], y[where], z[where]
 
         # extent of front and back
         xsf, xef, ysf, yef, zsf, zef = front.extent
@@ -518,7 +521,7 @@ class Raytracer(Group):
 
         # no overlap of z extents -> no collision
         if zef < zsb:
-            return False, np.array([]), np.array([])
+            return False, np.array([]), np.array([]), np.array([])
 
         # get rectangular overlap area in xy-plane projection
         xs = max(xsf, xsb)
@@ -528,7 +531,7 @@ class Raytracer(Group):
 
         # no overlap in xy plane projection -> no collision
         if xs > xe or ys > ye:
-            return False, np.array([]), np.array([])
+            return False, np.array([]), np.array([]), np.array([])
 
         # grid for overlap area
         X, Y = np.mgrid[xs:xe:res*1j, ys:ye:res*1j]
@@ -547,7 +550,7 @@ class Raytracer(Group):
         where = np.where(coll)[0]
 
         # return flag and collision samples
-        return np.any(coll), x2v[where], y2v[where]
+        return np.any(coll), x2v[where], y2v[where], zfv[where]
 
     def __absorb_cylinder_rays(self,
                                p:           np.ndarray,
@@ -784,9 +787,9 @@ class Raytracer(Group):
         if self.no_pol:
             return 1/np.sqrt(2), 1/np.sqrt(2)
 
-        # calculate s polarization vector
-        # ns==1 means surface normal is parallel to ray direction, exclude these rays for now
-        mask = np.abs(ns) < 1-1e-9
+        # exclude rays where direction did not change
+        # these are the rays where p and s plane are not defined and the polarization stays the same
+        mask = np.any(s[hwh] != s_, axis=1)
         mask2 = misc.part_mask(hwh, mask)
         sm = s[mask2]
 
@@ -794,8 +797,9 @@ class Raytracer(Group):
         polsm = pols[mask2, i]
         s_m = s_[mask]
 
-        # s polarization vector
-        ps = misc.cross(sm, n[mask])
+        # ps is perpendicular to the plane of s and s_
+        # pp is perpendicular to ps and s
+        ps = misc.cross(s_m, sm)
         ps = misc.normalize(ps)
         pp = misc.cross(ps, sm)
 
@@ -875,10 +879,10 @@ class Raytracer(Group):
             raise RuntimeError("No rays traced.")
 
         if source_index is not None and (source_index > len(self.ray_sources) - 1 or source_index < 0):
-            raise ValueError("Invalid source_index.")
+            raise IndexError("Invalid source_index.")
 
         if detector_index > len(self.detectors) - 1 or detector_index < 0:
-            raise ValueError("Invalid detector_index.")
+            raise IndexError("Invalid detector_index.")
 
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=4).start()\
             if not self.silent else None
@@ -1122,7 +1126,7 @@ class Raytracer(Group):
         :param extent:
         :return:
         """
-        
+       
         if not self.ray_sources:
             raise RuntimeError("Ray Sources Missing.")
         
@@ -1262,7 +1266,7 @@ class Raytracer(Group):
             raise RuntimeError("No rays traced.")
 
         if source_index > len(self.ray_sources) - 1 or source_index < 0:
-            raise ValueError("Invalid source_index.")
+            raise IndexError("Invalid source_index.")
 
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=2).start()\
             if not self.silent else None
@@ -1431,10 +1435,10 @@ class Raytracer(Group):
             raise RuntimeError("No rays traced.")
 
         if source_index is not None and source_index < 0:
-            raise ValueError(f"source_index needs to be >= 0, but is {source_index}")
+            raise IndexError(f"source_index needs to be >= 0, but is {source_index}")
 
         if (source_index is not None and source_index > len(self.rays.N_list)) or len(self.rays.N_list) == 0:
-            raise ValueError(f"source_index={source_index} larger than number of simulated sources "
+            raise IndexError(f"source_index={source_index} larger than number of simulated sources "
                              f"({len(self.rays.N_list)}. "
                              "Either the source was not added or the new geometry was not traced.")
 
