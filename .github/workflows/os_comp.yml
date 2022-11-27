@@ -9,7 +9,7 @@ on:
       - 'optrace/**'
       
 jobs:
-  build:
+  os_test:
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
