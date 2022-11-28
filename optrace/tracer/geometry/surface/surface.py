@@ -553,7 +553,6 @@ class Surface(BaseClass):
         p_hit[beh] = p[beh]
         is_hit[beh] = False
 
-        # TODO test this?
         brok = bet | beh
         if np.any(brok):
             brokc = np.count_nonzero(brok)

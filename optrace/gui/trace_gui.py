@@ -1477,8 +1477,7 @@ class TraceGUI(HasTraits):
     def _wait_for_idle(self, timeout=30) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
 
-        def raise_timeout():
-            keys = [key for key, val in self._status.items() if val]
+        def raise_timeout(keys):
             raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
 
         tsum = 0.3
@@ -1488,7 +1487,8 @@ class TraceGUI(HasTraits):
             tsum += 0.05
 
             if tsum > timeout:
-                pyface_gui.invoke_later(raise_timeout)
+                keys = [key for key, val in self._status.items() if val]
+                pyface_gui.invoke_later(raise_timeout, keys)
                 return
 
     @property

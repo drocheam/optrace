@@ -1025,13 +1025,42 @@ class GUITests(unittest.TestCase):
                 # command debugging options
                 sim._set_in_main("command_dont_skip", True)
                 sim._wait_for_idle()
+                sim._set_in_main("command_dont_skip", False)
+                sim._wait_for_idle()
                 sim._set_in_main("command_dont_replot", True)
                 sim._wait_for_idle()
                 sim._set_in_main("_cmd", "RT.remove(APL[0])")
                 sim._do_in_main(sim.send_cmd)
                 sim._wait_for_idle()
                 self.assertEqual(len(sim._aperture_plots), 1)  # plot object still there, not replotted
+                sim._set_in_main("command_dont_replot", False)
+                sim._wait_for_idle()
 
+                # check waiting timeout, while InitScene is set GUI.busy is always true
+                # timeout ensures we return back from waiting
+                sim._status["InitScene"] = 1
+                start = time.time()
+                sim._wait_for_idle(timeout=5)
+                self.assertTrue(time.time() - start < 6)
+
+                # running the action is skipped because a different action (InitScene) is running
+                sim._set_in_main("_cmd", "self.replot()")
+                sim._set_in_main("silent", True)
+                sim._do_in_main(sim.send_cmd)
+                sim._wait_for_idle(timeout=2)
+                sim._set_in_main("silent", False)
+                sim._do_in_main(sim.send_cmd)
+                sim._wait_for_idle(timeout=2)
+
+                sim._status["InitScene"] = 0
+                sim._wait_for_idle()
+
+                # remove old ray plot when an error tracing occurred
+                RT.lenses[0].move_to(RT.lenses[1].pos)
+                sim._do_in_main(sim.replot)
+                sim._wait_for_idle()
+                self.assertTrue(sim._rays_plot is None)
+                
                 # still works when some objects are none
                 sim._orientation_axes = None
                 tn4 = (None, None, None, None)
@@ -1046,18 +1075,6 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim._change_minimalistic_view)
                 time.sleep(2)  # make sure it gets executed, can't call wait_for_idle since we set InitScene
                 sim._status["InitScene"] = 0
-                sim._wait_for_idle()
-
-                # check waiting timeout, while InitScene is set GUI.busy is always true
-                # timeout ensures we return back from waiting
-                sim._status["InitScene"] = 1
-                start = time.time()
-                sim._wait_for_idle(timeout=5)
-                self.assertTrue(time.time() - start < 6)
-
-                # running the action is skipped because a different action (InitScene) is running
-                sim._set_in_main(sim._cmd, "self.replot()")
-                sim._do_in_main(sim.send_cmd)
                 sim._wait_for_idle()
 
         sim.debug(_func=interact, silent=True, _args=(sim,))
