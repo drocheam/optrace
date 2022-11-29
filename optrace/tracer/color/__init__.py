@@ -2,7 +2,7 @@ from .tools import WL_BOUNDS, wavelengths, blackbody
 from .illuminants import a_illuminant, c_illuminant, d50_illuminant, d55_illuminant, d65_illuminant, d75_illuminant,\
     e_illuminant, fl2_illuminant, fl7_illuminant, fl11_illuminant, led_b1_illuminant, led_b2_illuminant,\
     led_b3_illuminant, led_b4_illuminant, led_b5_illuminant
-from .observers import x_tristimulus, y_tristimulus, z_tristimulus
+from .observers import x_observer, y_observer, z_observer
 
 from .xyz import xyz_to_xyY, xyz_from_spectrum, xyY_to_xyz, WP_D65_XY, WP_D65_XYZ
 from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, luv_saturation, luv_chroma, luv_hue, WP_D65_LUV, WP_D65_UV,\

@@ -6,7 +6,7 @@ from .. import misc
 from . import tools
 from .xyz import xyz_to_xyY, WP_D65_XY
 from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV
-from .observers import x_tristimulus, y_tristimulus, z_tristimulus
+from .observers import x_observer, y_observer, z_observer
 
 
 SRGB_RENDERING_INTENTS: list[str, str, str] = ["Ignore", "Absolute", "Perceptual"]
@@ -348,8 +348,8 @@ def srgb_b_primary(wl: np.ndarray) -> np.ndarray:
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
     """
-    bs = 1.1583866011
-    b = 47.7997918851 * bs * (gauss(wl, 454.494831, 20.1804518) + 0.199993596 * gauss(wl, 457.757081, 69.1909777))
+    bs = 1.16364585503
+    b = 47.99521746361 * bs * (gauss(wl, 454.833119, 20.1460206) + 0.184484176 * gauss(wl, 459.658190, 71.0927568))
     return b
 
 
@@ -358,7 +358,7 @@ def srgb_b_primary(wl: np.ndarray) -> np.ndarray:
 # g is kept constant, factors for the standard wavelength range are given below
 _SRGB_R_PRIMARY_POWER_FACTOR = 0.885651229244
 _SRGB_G_PRIMARY_POWER_FACTOR = 1.000000000000
-_SRGB_B_PRIMARY_POWER_FACTOR = 0.778363814295
+_SRGB_B_PRIMARY_POWER_FACTOR = 0.775993481741
 
 ########################################################################################################################
 
@@ -442,7 +442,7 @@ def spectral_colormap(N:    int,
     wl0 = wl0 if wl0 is not None else tools.WL_BOUNDS[0]
     wl1 = wl1 if wl1 is not None else tools.WL_BOUNDS[1]
     wl = np.linspace(wl0, wl1, N, dtype=np.float32)  # wavelength vector
-    XYZ = np.column_stack((x_tristimulus(wl), y_tristimulus(wl), z_tristimulus(wl)))
+    XYZ = np.column_stack((x_observer(wl), y_observer(wl), z_observer(wl)))
 
     # we want a colorful spectrum with smooth gradients like in reality
     # unfortunately this isn't really possible with sRGB

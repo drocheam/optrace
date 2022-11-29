@@ -7,9 +7,9 @@ import scipy.optimize
 
 def cost_func0(wl, ref):
     wl_ = np.array(wl)
-    XYZ = np.array([np.vstack((color.x_tristimulus(wl_),
-                               color.y_tristimulus(wl_),
-                               color.z_tristimulus(wl_)))])
+    XYZ = np.array([np.vstack((color.x_observer(wl_),
+                               color.y_observer(wl_),
+                               color.z_observer(wl_)))])
     XYZs = np.swapaxes(XYZ, 2, 1)
     XYZ2 = color.srgb_linear_to_xyz(color.xyz_to_srgb_linear(XYZs, rendering_intent="Absolute"))
     xy = color.xyz_to_xyY(XYZ2)[0, 0, :2]
@@ -22,9 +22,9 @@ def cost_func(args, lines):
     # rgb lines have same dominant wavelength as rgb primaries
     # so with srgb conversion with mode "Absolute" we should get the same chromacities as the primaries
     BGR = np.array(lines)
-    XYZ = np.array([np.vstack((color.x_tristimulus(BGR)*args,
-                               color.y_tristimulus(BGR)*args,
-                               color.z_tristimulus(BGR)*args))])
+    XYZ = np.array([np.vstack((color.x_observer(BGR) * args,
+                               color.y_observer(BGR) * args,
+                               color.z_observer(BGR) * args))])
     XYZs = np.array([np.sum(XYZ, axis=2)])
     xy = color.xyz_to_xyY(XYZs)[0, 0, :2]
 

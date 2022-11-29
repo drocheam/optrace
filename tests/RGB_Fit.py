@@ -6,14 +6,14 @@ import numpy as np
 import scipy.optimize
 
 import optrace.tracer.color as color
-
+from optrace.tracer.color.srgb import gauss
 
 def xy_point(params):
     mu, sig = params
 
-    xc = np.sum(color.x_tristimulus(wl) * color.gauss(wl, mu, sig))
-    yc = np.sum(color.y_tristimulus(wl) * color.gauss(wl, mu, sig))
-    zc = np.sum(color.z_tristimulus(wl) * color.gauss(wl, mu, sig))
+    xc = np.sum(color.x_observer(wl) * gauss(wl, mu, sig))
+    yc = np.sum(color.y_observer(wl) * gauss(wl, mu, sig))
+    zc = np.sum(color.z_observer(wl) * gauss(wl, mu, sig))
     bsum = xc + yc + zc
 
     cord = np.array([xc / bsum, yc / bsum])
@@ -24,9 +24,9 @@ def xy_point(params):
 def xy_point_gauss2(params):
     mu, sig, mu2, sig2, k = params
 
-    xc = np.sum(color.x_tristimulus(wl) * (color.gauss(wl, mu, sig) + k*color.gauss(wl, mu2, sig2)))
-    yc = np.sum(color.y_tristimulus(wl) * (color.gauss(wl, mu, sig) + k*color.gauss(wl, mu2, sig2)))
-    zc = np.sum(color.z_tristimulus(wl) * (color.gauss(wl, mu, sig) + k*color.gauss(wl, mu2, sig2)))
+    xc = np.sum(color.x_observer(wl) * (gauss(wl, mu, sig) + k * gauss(wl, mu2, sig2)))
+    yc = np.sum(color.y_observer(wl) * (gauss(wl, mu, sig) + k * gauss(wl, mu2, sig2)))
+    zc = np.sum(color.z_observer(wl) * (gauss(wl, mu, sig) + k * gauss(wl, mu2, sig2)))
     bsum = xc + yc + zc
 
     cord = np.array([xc / bsum, yc / bsum])
@@ -59,7 +59,7 @@ cord_soll_z = color.SRGB_B_XY
 res_y = scipy.optimize.minimize(cost, x0=[560, 20], args=(cord_soll_y), tol=1e-12, options={'ftol':1e-12, 'xtol':1e-12, 'maxiter': 100},
                                 bounds=((400, 650), (20, 100)), method='Powell')
 
-res_z = scipy.optimize.minimize(cost_gauss2, x0=[470, 20, 450, 60, 0.2], args=(cord_soll_z), tol=1e-12, options={'ftol':1e-12, 'xtol':1e-12, 'maxiter': 300},
+res_z = scipy.optimize.minimize(cost_gauss2, x0=[454, 20, 458, 69, 0.19], args=(cord_soll_z), tol=1e-12, options={'ftol':1e-12, 'xtol':1e-12, 'maxiter': 300},
                                 bounds=((430, 500), (5, 60), (400, 500), (40, 100), (0, 1)), method='Powell')
 
 res_x = scipy.optimize.minimize(cost_gauss2, x0=[640, 30, 420, 80, 0.05], args=(cord_soll_x), tol=1e-12, 
@@ -81,16 +81,16 @@ print(res_z.x)
 print(xy_point_gauss2(res_z.x))
 
 
-r = color.gauss(wl, *res_x.x[:2]) + res_x.x[4]*color.gauss(wl, *res_x.x[2:4])
-g = color.gauss(wl, *res_y.x)
-b = color.gauss(wl, *res_z.x[:2]) + res_z.x[4]*color.gauss(wl, *res_z.x[2:4])
+r = gauss(wl, *res_x.x[:2]) + res_x.x[4]*gauss(wl, *res_x.x[2:4])
+g = gauss(wl, *res_y.x)
+b = gauss(wl, *res_z.x[:2]) + res_z.x[4]*gauss(wl, *res_z.x[2:4])
 
 # scale such that the maximum is 1
 wl_r_max = wl[np.argmax(r)]
-norm_r = 1 / (color.gauss(wl_r_max, *res_x.x[:2]) + res_x.x[4]*color.gauss(wl_r_max, *res_x.x[2:4]))
-norm_g = 1 / color.gauss(np.array(res_y.x[0]), *res_y.x)
+norm_r = 1 / (gauss(wl_r_max, *res_x.x[:2]) + res_x.x[4]*gauss(wl_r_max, *res_x.x[2:4]))
+norm_g = 1 / gauss(np.array(res_y.x[0]), *res_y.x)
 wl_b_max = wl[np.argmax(b)]
-norm_b = 1 / (color.gauss(wl_b_max, *res_z.x[:2])+ res_z.x[4]*color.gauss(wl_b_max, *res_z.x[2:4]))
+norm_b = 1 / (gauss(wl_b_max, *res_z.x[:2])+ res_z.x[4]*gauss(wl_b_max, *res_z.x[2:4]))
 
 
 # scale rgb curves
@@ -99,9 +99,9 @@ g *= norm_g
 b *= norm_b
 
 # scale factors for same Y brightness as the sRGB primaries
-Y_norm_r = 0.2126729 / np.sum(color.y_tristimulus(wl) * r)
-Y_norm_g = 0.7151522 / np.sum(color.y_tristimulus(wl) * g)
-Y_norm_b = 0.0721750 / np.sum(color.y_tristimulus(wl) * b)
+Y_norm_r = 0.2126729 / np.sum(color.y_observer(wl) * r)
+Y_norm_g = 0.7151522 / np.sum(color.y_observer(wl) * g)
+Y_norm_b = 0.0721750 / np.sum(color.y_observer(wl) * b)
 
 # normalize the Y_norm scale values such that Y_norm_g = 1
 norm2 = Y_norm_g

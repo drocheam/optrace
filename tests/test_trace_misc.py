@@ -275,7 +275,7 @@ class TracerMiscTests(unittest.TestCase):
         w = np.random.uniform(1e-9, 1, N)
         wl = np.random.uniform(*color.WL_BOUNDS, N)
         img.render(N_px, p, w, wl)
-        return img, np.sum(w), np.sum(w*color.y_tristimulus(wl)*683)  # 683 lm/W conversion factor
+        return img, np.sum(w), np.sum(w * color.y_observer(wl) * 683)  # 683 lm/W conversion factor
 
     @pytest.mark.slow
     @pytest.mark.os

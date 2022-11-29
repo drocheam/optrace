@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from .observers import x_tristimulus, y_tristimulus, z_tristimulus
+from .observers import x_observer, y_observer, z_observer
 
 
 WP_D65_XYZ: list[float, float, float] = [0.95047, 1.00000, 1.08883]
@@ -59,7 +59,7 @@ def xyz_from_spectrum(wl, spec, method="sum") -> np.ndarray:
     """
     integrate = np.sum if method  == "sum" else np.trapz
 
-    xyz = np.array([integrate(spec * x_tristimulus(wl)),
-                    integrate(spec * y_tristimulus(wl)),
-                    integrate(spec * z_tristimulus(wl))])
+    xyz = np.array([integrate(spec * x_observer(wl)),
+                    integrate(spec * y_observer(wl)),
+                    integrate(spec * z_observer(wl))])
     return xyz

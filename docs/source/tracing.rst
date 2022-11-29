@@ -23,7 +23,7 @@ https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/
 
 **Non-Uniform Random Variate Generation:** Generating random numbers, while some numbers are more likely to be chosen than others. The probability distribution is non-uniform.
 
-**Low Discrepancy Method:** Methods that generate numbers, where the distribution of these values inside are given interval only deviates weakly from an equidistribution. White noise would be a high discrepancy method, while a regular value grid is a zero discrepancy method. Low discrepancy methods can be seen as a compromise between those two, trying to create values that fill an interval or area more uniformly than random values, but are less "obviously deterministic" than simple grids.
+**Low Discrepancy Method:** Methods that generate numbers, where the distribution of these values inside are given interval only deviates weakly from an equidistribution. White noise would be a high discrepancy method, since many samples are needed to approximate an true equidistribution. A regular value grid is a zero discrepancy method, since the values are always regularly distributed. Low discrepancy methods can be seen as a compromise between those two, trying to create values that fill an interval or area more uniformly than random values, but are less "obviously deterministic" than simple grids.
 
 **Stratified Sampling:** One of many low discrepancy methods. Random values are chosen from a set of sub-groups.
 It is guaranteed, that values are chosen from every sub-group (e.g. different intervals), but the values inside each sub-group are chosen randomly (e.g. random positions inside each interval)

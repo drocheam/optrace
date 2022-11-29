@@ -56,7 +56,7 @@ class PresetTests(unittest.TestCase):
     def test_spectrum_presets(self):
         # check presets
         wl = color.wavelengths(1000)
-        for spec in ot.presets.spectrum.tristimulus:
+        for spec in ot.presets.spectrum.xyz_observers:
 
             if spec.is_continuous():
                 spec(wl)  # call
@@ -67,7 +67,7 @@ class PresetTests(unittest.TestCase):
 
     def test_spectrum_outside_definition(self):
         # check that spectrum presets have constant 0 beyond their definition
-        for spec in [*ot.presets.light_spectrum.standard, *ot.presets.spectrum.tristimulus]:
+        for spec in [*ot.presets.light_spectrum.standard, *ot.presets.spectrum.xyz_observers]:
             if spec.desc != "E":
                 self.assertEqual(spec(10), 0)
                 self.assertEqual(spec(1000), 0)
@@ -127,9 +127,9 @@ class PresetTests(unittest.TestCase):
         # rgb lines have same dominant wavelength as rgb primaries
         # so with srgb conversion with mode "Absolute" we should get the same chromacities as the primaries
         BGR = np.array(ot.presets.spectral_lines.rgb)
-        XYZ = np.array([np.vstack((color.x_tristimulus(BGR),
-                                   color.y_tristimulus(BGR),
-                                   color.z_tristimulus(BGR)))])
+        XYZ = np.array([np.vstack((color.x_observer(BGR),
+                                   color.y_observer(BGR),
+                                   color.z_observer(BGR)))])
         XYZ = np.swapaxes(XYZ, 2, 1)
         XYZ2 = color.srgb_linear_to_xyz(color.xyz_to_srgb_linear(XYZ, rendering_intent="Absolute"))
         xyY = color.xyz_to_xyY(XYZ2)

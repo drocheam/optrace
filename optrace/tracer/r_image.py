@@ -7,7 +7,7 @@ import scipy.interpolate
 import scipy.constants  # for luminous efficacy
 import scipy.ndimage
 
-from . import color  # tristimulus curves and sRGB conversions
+from . import color  # xyz_observers curves and sRGB conversions
 from . import misc  # interpolation and calculation methods
 
 from .base_class import BaseClass  # parent class
@@ -529,7 +529,7 @@ class RImage(BaseClass):
             # threading function
             def func(img, ind):
                
-                tri = [color.x_tristimulus, color.y_tristimulus, color.z_tristimulus]
+                tri = [color.x_observer, color.y_observer, color.z_observer]
                 w_ = tri[ind](wl) * w if ind < 3 else w
 
                 img[:, :, ind], _, _ = np.histogram2d(p[:, 0], p[:, 1], weights=w_, bins=[Nx, Ny], 

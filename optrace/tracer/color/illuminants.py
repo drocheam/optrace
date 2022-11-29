@@ -6,7 +6,7 @@ import numpy as np  # calculations
 # Sources A, C, E, D50, D55, D65, D75, F2, F7, F11:
 # CIE Colorimetry, 3. Edition, 2004
 
-# Sources tristimulus values:
+# Sources xyz_observers values:
 # https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer
 
 # Sources LED Series:

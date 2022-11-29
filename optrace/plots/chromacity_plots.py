@@ -154,9 +154,9 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
 
     # convert wavelength to coordinates in diagram
     def wl_to_xy(wl):
-        XYZ = np.column_stack((color.x_tristimulus(wl),
-                               color.y_tristimulus(wl),
-                               color.z_tristimulus(wl)))
+        XYZ = np.column_stack((color.x_observer(wl),
+                               color.y_observer(wl),
+                               color.z_observer(wl)))
 
         XYZ = np.array([XYZ])
         return conv(XYZ)

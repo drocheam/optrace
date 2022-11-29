@@ -1,28 +1,28 @@
-from .. import color  # tristimulus curves
+from .. import color  # xyz observers
 from ..spectrum import Spectrum  # spectrum class
 
 
-# Tristimulus Curves
+# CIE 1931 XYZ observer color matching functions
 #######################################################################################################################
 
-x: Spectrum = Spectrum("Function", func=color.x_tristimulus,
-                       desc="x", long_desc="Tristimulus x Curve", quantity="Relative Response", unit="")
-"""tristimulus x curve"""
+x: Spectrum = Spectrum("Function", func=color.x_observer,
+                       desc="x", long_desc="x observer", quantity="Relative Response", unit="")
+"""CIE 1931 x curve"""
 
-y: Spectrum = Spectrum("Function", func=color.y_tristimulus,
-                       desc="y", long_desc="Tristimulus y Curve", quantity="Relative Response", unit="")
-"""tristimulus y curve"""
+y: Spectrum = Spectrum("Function", func=color.y_observer,
+                       desc="y", long_desc="y observer", quantity="Relative Response", unit="")
+"""CIE 1931 y curve"""
 
-z: Spectrum = Spectrum("Function", func=color.z_tristimulus,
-                       desc="z", long_desc="Tristimulus z Curve", quantity="Relative Response", unit="")
-"""tristimulus z curve"""
+z: Spectrum = Spectrum("Function", func=color.z_observer,
+                       desc="z", long_desc="z observer", quantity="Relative Response", unit="")
+"""CIE 1931 z curve"""
 
 
-tristimulus: list = [x, y, z]
-"""tristimulus curve spectrum presets in one list"""
+xyz_observers: list = [x, y, z]
+"""x, y, z observer curve spectrum presets in one list"""
 
 
 #######################################################################################################################
 
-all_presets: list = [*tristimulus]
+all_presets: list = [*xyz_observers]
 """all spectrum presets in one list"""
