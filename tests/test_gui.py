@@ -322,7 +322,6 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
-    @pytest.mark.os
     def test_interaction2(self) -> None:
 
         def interact2(sim):
@@ -393,14 +392,6 @@ class GUITests(unittest.TestCase):
 
         def interact3(sim):
             with self._try(sim):
-                # test source and detector spectrum
-                sim._do_in_main(sim.show_source_spectrum)
-                sim._wait_for_idle()
-                sim._do_in_main(sim.show_detector_spectrum)
-                sim._wait_for_idle()
-                sim._set_in_main("det_spectrum_one_source", True)
-                sim._do_in_main(sim.show_detector_spectrum)
-                sim._wait_for_idle()
 
                 # test image cuts
                 sim._do_in_main(sim.show_source_cut)
@@ -453,6 +444,30 @@ class GUITests(unittest.TestCase):
         sim = TraceGUI(RT)
         sim.debug(_func=interact3, silent=True, _args=(sim,))
         plt.close('all')
+        self.raise_thread_exceptions()
+
+    @pytest.mark.os
+    def test_0interaction4(self) -> None:
+
+        def interact4(sim):
+            with self._try(sim):
+                # test source and detector spectrum
+                sim._do_in_main(sim.show_source_spectrum)
+                sim._wait_for_idle()
+                sim._do_in_main(sim.show_detector_spectrum)
+                sim._wait_for_idle()
+                sim._set_in_main("det_spectrum_one_source", True)
+                sim._do_in_main(sim.show_detector_spectrum)
+                sim._wait_for_idle()
+
+                # open property browser
+                sim._do_in_main(sim.open_property_browser)
+                time.sleep(2)
+                sim._wait_for_idle()
+                
+        RT = rt_example()
+        sim = TraceGUI(RT)
+        sim.debug(_func=interact4, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -921,7 +936,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
-    def test_0additional_coverage(self):
+    def test_additional_coverage(self):
         """additionial coverage tests"""
 
         RT = rt_example()
