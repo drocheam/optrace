@@ -336,8 +336,9 @@ The resulting spectrum for sRGB white (coordinates :math:`[1.0, 1.0, 1.0]`) look
    :width: 600
    :align: center
 
-.. note::
-   At :math:`\lambda = 380\,` nm and :math:`\lambda = 780\,` nm the curves are cut off mathematically. This ensures that all ratios and constants can be kept equal, even if the wavelength simulation range should be extended beyond this default range.
+.. topic:: Note
+   
+    At :math:`\lambda = 380\,` nm and :math:`\lambda = 780\,` nm the curves are cut off mathematically. This ensures that all ratios and constants can be kept equal, even if the wavelength simulation range should be extended beyond this default range.
 
 In a later step the channel primary functions are interpreted as probability distribution functions (pdf). Such a pdf needs to have a normalized area such that the overall probability is 1.
 This cancels out any prefactors in the channel curves and the ratios between the channels.

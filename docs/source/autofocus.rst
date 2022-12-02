@@ -36,7 +36,8 @@ Below you can find multiple application cases an preferred autofocus methods.
  * **preferred methods:** Image Sharpness, in some specific edge cases Irradiance Variance/Maximum might work.
 
 
-.. note::
+.. topic:: Note
+
    Generally it is recommended to plot the cost function of the optimization so one can see if there are multiple minima and how distinct the found value is.
    The TraceGUI has an option for plotting the cost function.
 

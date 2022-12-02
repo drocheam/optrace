@@ -1,8 +1,15 @@
 
+
+
+/**change font since default of theme "pyramid" is ugly**/
+body{
+	font-family:"Times New Roman";
+}
+
+
 /** fix for equation numbers being display on top instead of on the right side
  * see https://github.com/readthedocs/sphinx_rtd_theme/pull/383#issuecomment-348803509
  * **/
-
 
 div.math {
     position: relative;

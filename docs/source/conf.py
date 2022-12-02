@@ -59,9 +59,9 @@ bibtex_bibfiles = ['bib.bib']
 # a list of builtin themes.
 #
 # needs sphinx-rtd-theme installed
-# html_theme = 'sphinx_rtd_theme'
+html_theme = 'pyramid'
 # html_theme = 'sphinx_pdj_theme'
-html_theme = 'classic'
+# html_theme = 'classic'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -73,10 +73,11 @@ def setup(app):
 
 html_theme_options = {
     # "rightsidebar": "false",
-    "relbarbgcolor": "GoldenRod",
-    "footerbgcolor": "GoldenRod",
-    "sidebarbgcolor": "black",
-    "stickysidebar": True,
+    # "relbarbgcolor": "GoldenRod",
+    # "footerbgcolor": "GoldenRod",
+    # "sidebarbgcolor": "black",
+    # "stickysidebar": True,
+    "sidebarwidth": 380,
     "body_max_width" : 1080
 }
 

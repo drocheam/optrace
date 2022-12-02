@@ -52,7 +52,7 @@ def chromacities_cie_1931(img:                  RImage | LightSpectrum | list[Li
         xyY = np.dstack((xg, yg, yg))
         return 1/_CONV_XYZ_NORM * color.xyY_to_xyz(xyY)
 
-    ext = [0, 0.8, 0, 0.9]  # extent of diagram
+    ext = [0, 0.83, 0, 0.9]  # extent of diagram
     _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
                        title, "x", "y", **kwargs)
 
@@ -170,7 +170,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     xss, yss = wl_to_xy(wls)
 
     # coordinates for some spectral curve labels
-    wls2 = np.array([380, 470, 480, 490, 500, 510, 520, 540,  560, 580, 600, 620, 780], dtype=np.float64)
+    wls2 = np.array([380, 460, 480, 500, 520, 540, 560, 580, 600, 620, 780], dtype=np.float64)
     xss2, yss2 = wl_to_xy(wls2)
 
     # calculate chromacity shoe area
@@ -222,9 +222,9 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     plt.plot([xs[0], xs[-1]], [ys[0], ys[-1]], color="k", linewidth=1, zorder=4, label='_nolegend_')
 
     # add spectral wavelength labels and markers
-    plt.scatter(xss, yss, marker="+", color="0.7", linewidth=1, s=15, zorder=5, label='_nolegend_')
+    plt.scatter(xss, yss, marker="+", color="0.9", linewidth=1, s=15, zorder=5, label='_nolegend_')
     for i, wli in enumerate(wls2.tolist()):
-        text = plt.text(xss2[i], yss2[i], str(int(wli)), fontsize=9, color="w", zorder=10, label='_nolegend_')
+        text = plt.text(xss2[i], yss2[i], str(int(wli))+"nm", fontsize=10, color="w", zorder=10, label='_nolegend_')
         text.set_path_effects([path_effects.Stroke(linewidth=1, foreground='black'), path_effects.Normal()])
 
     # draw sRGB gamut and whitepoint
