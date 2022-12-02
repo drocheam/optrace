@@ -63,8 +63,7 @@ Minimizing the position variance :math:`\sigma^2` of lateral ray positions :math
 
 A virtual detector with roughly the spatial sensitivity :math:`S` of an airy disc.
 The numerical aperture :math:`\text{NA}` needed is estimated using the ray angles.
-Only the zeroth order of the airy disc is used, there it can be approximated using a gaussian.
-See https://en.wikipedia.org/wiki/Airy_disk#Approximation_using_a_Gaussian_profile
+Only the zeroth order of the airy disc is used, there it can be approximated using a gaussian, see :cite:`AiryWiki`.
 
 The stimulus for one ray is the product of gauss function value at radial position :math:`r_i(z)` from the disc center and ray power :math:`P_i(z)`. Summing up all ray stimuli and dividing by the overall power we get the cost function value for position :math:`z`.
 
@@ -146,9 +145,11 @@ This method is independent of the image size, since we used the power image inst
 Additional Notes
 ======================
 
- * As the name suggests, minimization methods in scipy try to find the minimum of a cost function. Some methods above however require a maximization. In these cases the cost function was simply inverted or subtracted from a reference value.
- * For the methods Irradiance Variance and Maximum the root of the cost function is taken, so the value range and value changes are more smooth.
- * focus finding always searches in the region between two lenses or a lens and the outline. 
- * focus finding ignores filters, apertures and the outline while finding the focus. So if a ray exists inside the search region but is absorbed or filtered in the region it is assumed as not being so.
- * if any rays in this region intersect with the tracing outline, this is not handled.
+.. topic:: Notes
+
+   * As the name suggests, minimization methods in scipy try to find the minimum of a cost function. Some methods above however require a maximization. In these cases the cost function was simply inverted or subtracted from a reference value.
+   * For the methods Irradiance Variance and Maximum the root of the cost function is taken, so the value range and value changes are more smooth.
+   * focus finding always searches in the region between two lenses or a lens and the outline. 
+   * focus finding ignores filters, apertures and the outline while finding the focus. So if a ray exists inside the search region but is absorbed or filtered in the region it is assumed as not being so.
+   * if any rays in this region intersect with the tracing outline, this is not handled.
 

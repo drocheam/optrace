@@ -20,7 +20,7 @@ def wavelengths(N: int) -> np.ndarray:
     :return: wavelength vector in nm, 1D numpy array
 
     >>> wavelengths(5)
-    array([380., 480., 580., 680., 780.])
+    array([ 380., 480., 580., 680., 780.])
     """
     return np.linspace(WL_BOUNDS[0], WL_BOUNDS[1], N)
 
@@ -34,7 +34,7 @@ def blackbody(wl: np.ndarray, T: float = 6504.) -> np.ndarray:
     :return: blackbody curve values (numpy 1D array)
 
     >>> blackbody(np.array([380., 500., 600.]), T=5500)
-    array([1.54073437e+13, 2.04744373e+13, 1.98272922e+13])
+    array([ 1.54073437e+13, 2.04744373e+13, 1.98272922e+13])
     """
 
     # physical constants

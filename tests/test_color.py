@@ -7,23 +7,28 @@ import doctest
 import unittest
 import numpy as np
 import pytest
-import colorio
+import colour
 
 import optrace as ot
 import optrace.tracer.color as color
 import optrace.tracer.misc as misc
 
+from optrace.tracer.color.tools import _WL_MIN0, _WL_MAX0
 
 
 class ColorTests(unittest.TestCase):
 
     def test_color_doctest(self):
-        doctest.testmod(ot.tracer.color.illuminants)
-        doctest.testmod(ot.tracer.color.observers)
-        doctest.testmod(ot.tracer.color.srgb)
-        doctest.testmod(ot.tracer.color.xyz)
-        doctest.testmod(ot.tracer.color.tools)
-        doctest.testmod(ot.tracer.color.luv)
+        # normalize whitespace in doc strings and raise exceptions on errors, so pytest etc. notice errors
+        optionflags = doctest.NORMALIZE_WHITESPACE
+        opts = dict(optionflags=optionflags, raise_on_error=True)
+
+        doctest.testmod(ot.tracer.color.illuminants, **opts)
+        doctest.testmod(ot.tracer.color.observers, **opts)
+        doctest.testmod(ot.tracer.color.srgb, **opts)
+        doctest.testmod(ot.tracer.color.xyz, **opts)
+        doctest.testmod(ot.tracer.color.tools, **opts)
+        doctest.testmod(ot.tracer.color.luv, **opts)
 
     @pytest.mark.os
     def test_white_d65(self):
@@ -66,17 +71,18 @@ class ColorTests(unittest.TestCase):
         return color.xyY_to_xyz(xyY)
     
     def test_srgb_linear_conversion(self):
-        """test xyz -> srgb linear conversion by comparing to colorios conversion"""
+        """test xyz -> srgb linear conversion by comparing to colour science conversion"""
 
         # some XYZ values
         XYZ = np.random.uniform(0, 1.5, (1000000, 3))
        
         # test xyz -> srgb linear
-        c = colorio.cs.ColorCoordinates(XYZ.T, "xyz1")
-        c.convert("srgblinear", mode="clip")
+        c = colour.XYZ_to_sRGB(XYZ, apply_cctf_encoding=False)
+        c = np.clip(c, 0, 1)
+
         srgb2 = color.xyz_to_srgb_linear(np.array([XYZ]), normalize=False, rendering_intent="Ignore")[0]
         srgb2 = np.clip(srgb2, 0, 1)
-        diff = np.abs(srgb2 - c.data.T)
+        diff = np.abs(srgb2 - c)
         self.assertTrue(np.max(diff) < 0.0005)
         self.assertTrue(np.mean(diff) < 1e-4)
         
@@ -104,16 +110,18 @@ class ColorTests(unittest.TestCase):
         self.assertTrue(np.all(og == np.any(srgbl < 0, axis=2)))
 
     def test_srgb_conversion(self):
-        """test xyz -> srgb conversion by comparing to colorios conversion"""
+        """test xyz -> srgb conversion by comparing to colour-science conversion"""
     
         # some XYZ values
         XYZ = np.random.uniform(0, 1.5, (1000000, 3))
         
-        # test xyz -> srgb
-        c = colorio.cs.ColorCoordinates(XYZ.T, "xyz1")
-        c.convert("srgb1", mode="clip")
+        # test xyz -> srgb with invalid values clipped
+        c = colour.XYZ_to_sRGB(XYZ)
+        c = np.clip(c, 0, 1)
+
         srgb2 = color.xyz_to_srgb(np.array([XYZ]), normalize=False, clip=True, rendering_intent="Ignore")[0]
-        diff = np.abs(srgb2 - c.data.T)
+
+        diff = np.abs(srgb2 - c)
         self.assertTrue(np.max(diff) < 0.008)
         self.assertTrue(np.mean(diff) < 1e-4)
     
@@ -127,16 +135,16 @@ class ColorTests(unittest.TestCase):
         self.assertTrue(np.allclose(d, 1))
 
     def test_xyY_conversion(self):
-        """test xyz -> xyY conversion by comparing to colorios conversion"""
+        """test xyz -> xyY conversion by comparing to colour-science conversion"""
 
         # some XYZ values
         XYZ = np.random.uniform(0, 1.5, (1000000, 3))
        
-        # test xyz -> xyY
-        c = colorio.cs.ColorCoordinates(XYZ.T, "xyz1")
-        c.convert("xyy1")
-        xyy = color.xyz_to_xyY(np.array([XYZ]))[0]
-        diff = np.abs(xyy - c.data.T)
+        # test xyz -> xy
+        c = colour.XYZ_to_xy(XYZ)
+
+        xyy = color.xyz_to_xyY(np.array([XYZ]))[0, :, :2]
+        diff = np.abs(xyy - c)
         self.assertTrue(np.max(diff) < 1e-10)
         self.assertTrue(np.mean(diff) < 1e-10)
 
@@ -166,18 +174,16 @@ class ColorTests(unittest.TestCase):
         self.assertTrue(np.any(XYZ1 != XYZ2))  # different results depending on method
 
     def test_luv_conversion(self):
-        """test xyz -> CIELUV conversion by comparing to colorios conversion"""
+        """test xyz -> CIELUV conversion by comparing to colour-science conversion"""
         
         # some XYZ values
         XYZ = np.random.uniform(0, 1.5, (1000000, 3))
 
-        # test xyz -> luv
-        c = colorio.cs.ColorCoordinates(XYZ.T, "xyz1")
-        c.convert("cieluv")
+        c = colour.XYZ_to_Luv(XYZ)
         luv = color.xyz_to_luv(np.array([XYZ]), normalize=False)[0]
-        diff = np.abs(luv - c.data.T)/100
-        self.assertTrue(np.max(diff) < 0.00003)
-        self.assertTrue(np.mean(diff) < 1e-7)
+        diff = np.abs(luv - c)/100
+        self.assertTrue(np.max(diff) < 0.0003)
+        self.assertTrue(np.mean(diff) < 2e-4)
         
         # special case 1: completely dark
         d = color.xyz_to_luv(np.zeros((1, 1, 3)), normalize=False)
@@ -203,30 +209,33 @@ class ColorTests(unittest.TestCase):
         self.assertTrue(np.allclose(diff, 0))
 
     def test_luv_chroma_hue(self):
-        """test xyz -> CIELCH conversion by comparing to colorios conversion"""
+        """test xyz -> CIELCH conversion by comparing to colour-science conversion"""
         
         # some XYZ values
         XYZ = np.random.uniform(0, 1.5, (1000000, 3))
 
         # test xyz -> lch
-        c = colorio.cs.ColorCoordinates(XYZ.T, "xyz1")
-        c.convert("ciehcl")
+        c = colour.XYZ_to_Luv(XYZ)
+        c = colour.Luv_to_LCHuv(c)
+
         luv = color.xyz_to_luv(np.array([XYZ]), normalize=False)
         lch = np.dstack((luv[:, :, 0],
                          color.luv_chroma(luv),
-                         color.luv_hue(luv)))
+                         color.luv_hue(luv)))[0]
 
         # check l and c
-        diff = np.abs(lch[:, :, :2] - c.data.T[:, :2])/100  # values are in range 0 - xxx
+        diff = np.abs(lch[:, :2] - c[:, :2])/100  # values are in range 0 - xxx
         where = np.argmax(diff.flatten())
-        self.assertAlmostEqual(np.max(diff), 0, delta=1e-4)
-        self.assertAlmostEqual(np.mean(diff), 0, delta=1e-6)
-        
+        self.assertAlmostEqual(np.max(diff), 0, delta=5e-4)
+        self.assertAlmostEqual(np.mean(diff), 0, delta=1e-4)
+       
         # hue needs to be handled differently, see
         # https://stackoverflow.com/a/7869457
         get_diff_ang = lambda a, b: (a-b + 180) % 360 - 180
-        diff_ang = np.max(np.abs(get_diff_ang(lch[:, :, 2], c.data.T[:, 2])))
-        self.assertAlmostEqual(diff_ang/360, 0, delta=0.003)  # 0.03% error, equals around 0.1 deg
+        diff_ang = np.mean(np.abs(get_diff_ang(lch[:, 2], c[:, 2])))
+
+        # colour science seems to do conversion a little differently, therefore larger mean error
+        self.assertAlmostEqual(diff_ang/360, 0, delta=0.0001)  # 0.01% mean error
 
         # special case 1: completely dark
         d = color.xyz_to_luv(np.zeros((1, 1, 3)), normalize=False)
@@ -414,6 +423,15 @@ class ColorTests(unittest.TestCase):
         sRGBL0 = color.xyz_to_srgb_linear(Img0)  # zero image in conversion
         sRGB0 = color.srgb_linear_to_srgb(sRGBL0)  # default setting is clip=True
         Luv0 = color.xyz_to_luv(Img0)  # zero image in Luv conversion
+
+    def test_rgb_primaries_outside_range(self):
+        """test that srgb primaries are strictly zero outside range"""
+        
+        for prim in [color.srgb_r_primary, color.srgb_g_primary, color.srgb_b_primary]:
+            arr = np.array([_WL_MIN0-1, _WL_MAX0+1])
+            val = prim(arr)
+            self.assertEqual(val[0], 0)
+            self.assertEqual(val[1], 0)
 
 if __name__ == '__main__':
     unittest.main()

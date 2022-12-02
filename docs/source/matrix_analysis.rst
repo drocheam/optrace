@@ -6,6 +6,8 @@ Ray Transfer Matrix Analysis
 ABCD Matrix 
 =================================================
 
+:cite:`TMAWiki`
+
 .. math::
    \left[\begin{array}{l}
    x_2 \\
@@ -21,7 +23,7 @@ ABCD Matrix
 Propagation through Free Space 
 =================================================
 
-Free Space with distance :math:`d`:
+Free Space with distance :math:`d` :cite:`TMAWiki`:
 
 .. math::
    \text{M}_\text{s} =
@@ -33,7 +35,7 @@ Free Space with distance :math:`d`:
 Refraction on a Curved Interface 
 =================================================
 
-Refraction on a curved interface with curvature circle :math:`R`, medium :math:`n_i` before and :math:`n_o` after the interface.
+Refraction on a curved interface with curvature circle :math:`R`, medium :math:`n_i` before and :math:`n_o` after the interface. :cite:`TMAWiki`
 
 .. math::
    \text{M}_\text{c} =
@@ -46,7 +48,7 @@ Refraction on a curved interface with curvature circle :math:`R`, medium :math:`
 Thin Lens 
 =================================================
 
-Thin Lens with focal length :math:`f`. This focal length needs to be the actual distance from principal plane to focus and not some distance scaled or normalized by a refraction index.
+Thin Lens with focal length :math:`f`. This focal length needs to be the actual distance from principal plane to focus and not some distance scaled or normalized by a refraction index. :cite:`TMAWiki`
 
 .. math::
     \text{M}_\text{thin} =
@@ -61,6 +63,7 @@ Thick Lens
 Thick Lens with refraction index :math:`n`, front surface curvature :math:`R_1`, thickness :math:`d`, back surface curvature :math:`R_2`, medium with :math:`n_1` in front and medium with :math:`n_2` behind the lens.
 Using ray transfer matrix analysis this is the product of the matrix of the front surface matrix :math:`\text{M}_\text{c1}`, free space propagation matrix :math:`\text{M}_\text{s}` and back surface matrix :math:`\text{M}_\text{c2}`.
 Note that matrices are multiplied from right to left.
+The resulting matrix is then: :cite:`TMAWiki`
 
 .. math::
    \text{M}_\text{thick} =&~ \text{M}_\text{c2} \cdot \text{M}_\text{s} \cdot \text{M}_\text{c1}\\
@@ -82,7 +85,7 @@ Note that matrices are multiplied from right to left.
 Lensmaker Equation 
 =================================================
 
-As for the thin lens, element :math:`\text{M}_\text{thick}[1, 0]` can be seen as :math:`-\frac{1}{f}`.
+As for the thin lens, element :math:`C=\text{M}_\text{thick}[1, 0]` can be seen as :math:`-\frac{1}{f}`.
 Calculating this element and rearranging leads to:
 
 .. math::
@@ -93,7 +96,7 @@ Doing the same calculations with media and curvatures swapped, one gets:
 .. math::
    f_1 = -\frac{n_1}{n_2} f_2
 
-for :math:`n_0 := n_1 = n_2`
+for :math:`n_0 := n_1 = n_2`: :cite:`LinsenschleiferWiki`
 
 .. math::
    \frac{1}{f_2} = \frac{n-n_0}{n_0}\left(\frac{1}{R_1} - \frac{1}{R_2} + \frac{n-n_0}{n R_1 R_2}d \right)
@@ -118,12 +121,12 @@ With the surface optical powers :math:`D_\text{s1} = \frac{n-n_1}{R_1}` and :mat
 .. math::
    D = D_\text{s1} + D_\text{s2} - D_\text{s1} D_\text{s2} \frac{d}{n}
 
-Which is known as the Gullstrand equation.
+Which is known as Gullstrand's equation. :cite:`GullstrandHyper`
 
 Cardinal Points 
 =================================================
 
-The following calculations are derived from https://www.montana.edu/ddickensheets/documents/abcdCardinal%202.pdf
+The following calculations are derived from :cite:`DickenABCD`.
 
 The vertex points :math:`V_1` and :math:`V_2` are the position of the lens front and center at the optical axis.
 
@@ -267,7 +270,7 @@ Which is the form known from the imaging equation:
 .. math::
    \frac{n_o}{f} = \frac{n_i}{g} + \frac{n_o}{b}
 
-And for :math:`n_i = 1, ~~n_o = 1`:
+And for :math:`n_i = 1, ~~n_o = 1`: :cite:`LinsenGleichungWiki`
 
 .. math::
    \frac{1}{f} = \frac{1}{g} + \frac{1}{b}

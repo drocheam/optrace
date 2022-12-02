@@ -195,6 +195,7 @@ Normal Calculation
 General
 --------------------
 
+Equation for a normal vector: :cite:`NormalWiki`
 
 .. math::
    \vec{n_0} = 
@@ -292,12 +293,6 @@ With :math:`k=0` and :math:`\rho := \frac{1}{R}` the conic normal simplifies to
 Numerical Differentiation
 =============================
 
-Source step width equations: http://www.uio.no/studier/emner/matnat/math/MAT-INF1100/h08/kompendiet/diffint.pdf
-
-the C++ boost library does it in a similar way, but also ensuring x+9h is representable:
-https://github.com/boostorg/math/blob/1ce6dda2fb9b8d3cd2f54c76fe5a8cc3d0e430f9/include/boost/math/differentiation/finite_difference.hpp
-
-
 Central first derivative
 --------------------------
 
@@ -306,7 +301,7 @@ For a first derivative of the form
 .. math::
    f'(x) = \frac{f(x+\varepsilon) - f(x-\varepsilon)}{2 \varepsilon}
 
-the optimal step width is
+the optimal step width is :cite:`DiffIntMorken`:
 
 .. math::
    \varepsilon_\text{o} = \sqrt[3]{3 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(3)}(x)} \right|} 
@@ -354,7 +349,7 @@ The relative distance to center and the z-position of the other sphere end are
 
 **Equidistant**
 
-https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection
+Adapted version of :cite:`EquidistantProjWiki`.
 
 .. math::
    \theta &= \arctan\left(\frac{r}{z-z_m}\right)\\
@@ -369,11 +364,11 @@ The projected coordinates are then
 **Orthographic**
 
 The hit coordinates :math:`x` and :math:`y` are kept as is.
-
+Related: :cite:`OrthographicProjWiki`.
 
 **Stereographic**
 
-https://en.wikipedia.org/wiki/Stereographic_map_projection
+Adapted version of :cite:`SteographicProjWiki`.
 
 .. math::
    \theta &= \frac{\pi}{2} - \arctan\left(\frac{r}{z-z_m}\right)\\
@@ -388,7 +383,7 @@ The projected coordinates are then
 
 **Equal-Area**
 
-https://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection
+Adapted version of :cite:`EqualAreaProjWiki`.
 
 .. math::
    x_r = \frac{x - x_0} {\lvert R \rvert}\\
@@ -485,6 +480,7 @@ Resulting 3D positions are then
 Circle
 ------------
 
-Implemented as ring with :math:`r_\text{i} = 0`
+Implemented as ring with :math:`r_\text{i} = 0`.
 
+Related: :cite:`WolframDiskPicking`.
 

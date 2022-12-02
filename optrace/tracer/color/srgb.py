@@ -303,7 +303,7 @@ def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     :return:
 
     >>> gauss(np.array([0., 0.5, 1.5]), 0.75, 1)
-    array([0.30113743, 0.38666812, 0.30113743])
+    array([ 0.30113743, 0.38666812, 0.30113743])
     """
     return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 * (x - mu) ** 2 / sig ** 2)
 
@@ -324,9 +324,13 @@ def srgb_r_primary(wl: np.ndarray) -> np.ndarray:
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
     """
+    r = np.zeros_like(wl)
+    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
+    wlm = wl[m]
+
     rs = 0.951190393
-    r = 75.1660756583 * rs * (gauss(wl, 639.854491, 30.0) + 0.0500907584 * gauss(wl, 418.905848, 80.6220465))
-    return r
+    r[m] = 75.1660756583 * rs * (gauss(wlm, 639.854491, 30.0) + 0.0500907584 * gauss(wlm, 418.905848, 80.6220465))
+    return r 
 
 
 def srgb_g_primary(wl: np.ndarray) -> np.ndarray:
@@ -336,8 +340,12 @@ def srgb_g_primary(wl: np.ndarray) -> np.ndarray:
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
     """
+    g = np.zeros_like(wl)
+    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
+    wlm = wl[m]
+    
     gs = 1
-    g = 83.4999222966 * gs * gauss(wl, 539.13108974, 33.31164968)
+    g[m] = 83.4999222966 * gs * gauss(wlm, 539.13108974, 33.31164968)
     return g
 
 
@@ -348,8 +356,12 @@ def srgb_b_primary(wl: np.ndarray) -> np.ndarray:
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
     """
+    b = np.zeros_like(wl)
+    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
+    wlm = wl[m]
+    
     bs = 1.16364585503
-    b = 47.99521746361 * bs * (gauss(wl, 454.833119, 20.1460206) + 0.184484176 * gauss(wl, 459.658190, 71.0927568))
+    b[m] = 47.99521746361 * bs * (gauss(wlm, 454.833119, 20.1460206) + 0.184484176 * gauss(wlm, 459.658190, 71.0927568))
     return b
 
 
@@ -434,9 +446,9 @@ def spectral_colormap(N:    int,
     :return: sRGBA array (numpy 2D array, shape (N, 4))
 
     >>> spectral_colormap(3, 400, 600)
-    array([[3.81626223e+01, 9.30946402e+00, 7.20900561e+01, 2.55000000e+02],
-           [1.14017400e-04, 2.52697905e+02, 2.13400035e+02, 2.55000000e+02],
-           [2.41139375e+02, 1.07694238e+02, 7.92225931e+01, 2.55000000e+02]])
+    array([[ 3.81626223e+01, 9.30946402e+00, 7.20900561e+01, 2.55000000e+02],
+           [ 1.14017400e-04, 2.52697905e+02, 2.13400035e+02, 2.55000000e+02],
+           [ 2.41139375e+02, 1.07694238e+02, 7.92225931e+01, 2.55000000e+02]])
     """
     # wavelengths to XYZ color
     wl0 = wl0 if wl0 is not None else tools.WL_BOUNDS[0]

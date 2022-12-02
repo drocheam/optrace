@@ -18,8 +18,7 @@ A brief, not entirely accurate description of these terms:
 
 **Unbiased and Biased Methods:** Performing an unbiased monte carlo simulation with an infinitely large set of samples produces an exact description of the physical system. Starting with few samples, with a larger and larger number the simulation converges towards this exact behavior. In contrast, a biased simulation never reaches a fully accurate description of the system.
 Biased methods can consist of neural network tasks or algorithms that comprise of some simplification of the system model.
-A more mathematical descriptions of biasedness can be found here:
-https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/monte-carlo-methods-mathematical-foundations/estimators
+A more mathematical descriptions of biasedness can be found here: :cite:`ScratchEstimators`
 
 **Non-Uniform Random Variate Generation:** Generating random numbers, while some numbers are more likely to be chosen than others. The probability distribution is non-uniform.
 
@@ -47,7 +46,7 @@ Density
 
 **Inverse Transform Sampling**
 
-To calculate a random variable :math:`\mathcal{T}` with probability distribution function :math:`\text{pdf}(x)` from a uniform random variable :math:`\mathcal{U}_{[0,~1]}` we make use of the inverse transform sampling theorem.
+To calculate a random variable :math:`\mathcal{T}` with probability distribution function :math:`\text{pdf}(x)` from a uniform random variable :math:`\mathcal{U}_{[0,~1]}` we make use of the inverse transform sampling theorem. :cite:`ITSWiki`
 
 .. math::
    \mathcal{T}_{[0,~1]} = \text{cdf}^{-1}(\mathcal{U}_{[0,~1]})

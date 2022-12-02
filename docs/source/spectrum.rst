@@ -29,8 +29,7 @@ Functions
 
 **Blackbody**
 
-Spectral radiance according to Planck's Law:
-(https://en.wikipedia.org/wiki/Planck%27s_law)
+Spectral radiance according to Planck's Law: :cite:`PlanckWiki`
 
 .. math::
    B_\lambda (\lambda, ~T) = \frac{2 h c^2}{\lambda^5} \frac{1}{\exp\left(\frac{h  c } {\lambda k_\text{B}  T}\right) - 1}
@@ -43,8 +42,9 @@ Spectral radiance according to Planck's Law:
 
 :math:`\lambda` must be specified in meters.
 
-Note: The spectral radiance :math:`B_\lambda` (Power per solid angle, source area and wavelength) is given in units :math:`\text{W}/(\text{m}^3~\text{sr})`, whereas the units in this class should be :math:`\text{W/nm}` (Power per wavelength). Since :math:`B_\lambda` is constant over the source area and angle independent, converting it corresponds to a simple rescaling. 
-This is done while raytracing, where a specfic desired power is matched.
+.. Note::
+   The spectral radiance :math:`B_\lambda` (Power per solid angle, source area and wavelength) is given in units :math:`\text{W}/(\text{m}^3~\text{sr})`, whereas the units in this class should be :math:`\text{W/nm}` (Power per wavelength). Since :math:`B_\lambda` is constant over the source area and angle independent, converting it corresponds to a simple rescaling. 
+   This is done while raytracing, where a specfic desired power is matched.
 
 
 Color
@@ -93,8 +93,7 @@ Definition
 Functions
 -------------
 
-Taken from https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
-and https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf
+Taken from :cite:`ComsolDispersion` and :cite:`ZemaxHagen`.
 
 Wavelengths and coefficients are in powers of µm
 

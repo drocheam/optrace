@@ -118,6 +118,11 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "otg.PropertyBrowser", locals())
         self._test_scope_ext_libs(locals())
 
+    def test_scope_WL_BOUNDS(self):
+        """tests that WL_BOUNDS are exposed to optrace namespace"""
+        import optrace as ot
+        print(ot.WL_BOUNDS)
+
 if __name__ == '__main__':
     unittest.main()
 
