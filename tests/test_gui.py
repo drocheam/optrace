@@ -358,6 +358,7 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("det_image_one_source", True)
                 sim._wait_for_idle()
                 sim._do_in_main(sim.show_detector_image)
+                sim._wait_for_idle()
 
                 # high contrast mode
                 sim._set_in_main("high_contrast", True)
@@ -684,7 +685,7 @@ class GUITests(unittest.TestCase):
         keyboard = Controller()
 
         def send_key(sim, key):
-            sim._do_in_main(sim.scene.scene_editor._content.setFocus)
+            # sim._do_in_main(sim.scene.scene_editor._content.setFocus)
             keyboard.press(key)
             time.sleep(0.2)
             keyboard.release(key)

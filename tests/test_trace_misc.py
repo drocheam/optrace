@@ -482,10 +482,10 @@ class TracerMiscTests(unittest.TestCase):
 
     def test_misc_doctest(self):
         # normalize whitespace in doc strings and raise exceptions on errors, so pytest etc. notice errors
-        optionflags = doctest.NORMALIZE_WHITESPACE
+        optionflags = doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
         opts = dict(optionflags=optionflags, raise_on_error=True)
 
-        doctest.testmod(ot.tracer.misc, **opts)
+        doctest.testmod(ot.tracer.misc,optionflags=optionflags)
 
     def test_misc_timer(self):
         # test timer
