@@ -13,14 +13,10 @@ from contextlib import contextmanager  # context manager for _no_trait_action()
 import pytest
 
 import matplotlib.pyplot as plt
-from pynput.keyboard import Controller, Key
+import pyautogui
 
 import optrace as ot
 from optrace.gui import TraceGUI
-
-
-# Things not checked:
-#  * "beauty" of geometry and UI
 
 
 def rt_example() -> ot.Raytracer:
@@ -447,7 +443,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.os
-    def test_0interaction4(self) -> None:
+    def test_interaction4(self) -> None:
 
         def interact4(sim):
             with self._try(sim):
@@ -697,14 +693,9 @@ class GUITests(unittest.TestCase):
         RT = rt_example()
         sim = TraceGUI(RT)
 
-        keyboard = Controller()
-
         def send_key(sim, key):
             sim._do_in_main(sim.scene.scene_editor._content.setFocus)
-            time.sleep(0.2)
-            keyboard.press(key)
-            time.sleep(0.2)
-            keyboard.release(key)
+            pyautogui.press(key)
             time.sleep(0.2)
 
         def interact(sim):
@@ -1242,7 +1233,6 @@ class GUITests(unittest.TestCase):
         """
 
         RT = rt_example()
-        keyboard = Controller()
         
         def interact(sim):
             with self._try(sim):
@@ -1260,7 +1250,7 @@ class GUITests(unittest.TestCase):
                 self.assertNotEqual(text1, default_text)  # shows a ray info text
                
                 # ray picked -> show verbose info
-                keyboard.press(Key.shift)
+                pyautogui.keyDown("shiftleft")
                 time.sleep(0.1)
                 sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
                 sim._wait_for_idle()
@@ -1318,7 +1308,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 # space picked -> show coordinates
-                keyboard.release(Key.shift)
+                pyautogui.keyUp("shiftleft")
                 time.sleep(0.1)
                 sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 3, sim._scene_size[1] / 3, 0, sim.scene.renderer)
                 sim._wait_for_idle()
@@ -1328,7 +1318,7 @@ class GUITests(unittest.TestCase):
                 self.assertNotEqual(text3, text2)  # not the old text
                 
                 # valid space picked with shift -> move detector
-                keyboard.press(Key.shift)
+                pyautogui.keyDown("shiftleft")
                 time.sleep(0.1)
                 old_pos = RT.detectors[0].pos
                 sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 3, sim._scene_size[1] / 3, 0, sim.scene.renderer)
@@ -1360,7 +1350,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 # release shift key
-                keyboard.release(Key.shift)
+                pyautogui.keyUp("shiftleft")
                 time.sleep(0.1)
                 
                 # remove crosshair and pick without shift key
@@ -1383,7 +1373,6 @@ class GUITests(unittest.TestCase):
     def test_picker_coverage(self):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10], silent=True)
-        keyboard = Controller()
         
         def interact(sim):
             def pick():    
@@ -1394,10 +1383,10 @@ class GUITests(unittest.TestCase):
 
             def pick_shift_combs():
                 pick()
-                keyboard.press(Key.shift)
+                pyautogui.keyDown("shiftleft")
                 time.sleep(0.2)
                 pick()
-                keyboard.release(Key.shift)
+                pyautogui.keyUp("shiftleft")
 
             with self._try(sim):
                 # change to z+ view, so there are rays at the middle of the scene
