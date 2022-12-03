@@ -704,6 +704,7 @@ class GUITests(unittest.TestCase):
             keyboard.press(key)
             time.sleep(0.2)
             keyboard.release(key)
+            time.sleep(0.2)
 
         def interact(sim):
             with self._try(sim):
