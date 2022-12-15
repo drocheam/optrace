@@ -115,6 +115,11 @@ class RImage(BaseClass):
         return self.img.shape[0]
 
     @property
+    def N(self) -> int:
+        """returns smaller side pixel length of Nx, Ny"""
+        return min(self.Nx, self.Ny)
+
+    @property
     def Apx(self) -> float:
         """ area per pixel """
         self.__check_for_image()
@@ -291,11 +296,10 @@ class RImage(BaseClass):
         if self._sigma is not None:
             self.extent += np.array([-1, 1, -1, 1]) * 5*self._sigma
 
-    def rescale(self, N: int, _force=False) -> None:
+    def rescale(self, N: int) -> None:
         """
 
         :param N:
-        :param _force:
         :return:
         """
         N = int(N)  # enforce int
@@ -365,6 +369,10 @@ class RImage(BaseClass):
             else:
                 for i in range(Nz):
                     threaded(i, self._img, self.img)
+
+    def refilter(self) -> None:
+        """reapplies image filtering with the current limit setting"""
+        self.rescale(self.N)
 
     def save(self,
              path:       str,

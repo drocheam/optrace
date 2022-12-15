@@ -1,5 +1,7 @@
-Current Version: 1.0.4-12-g920bba4 
+Current Version: 1.0.6-14-g9763a78 
 
+1.0.6           Removed colorio dependency from tests. sRGB primaries are now strictly 0 beyond visible range. Improved testing and documentation.
+1.0.5           Fixed polarization calculation bug. Surface collisions are now plotted inside GUI. More tests.
 1.0.4           DataSurface has been renamed to DataSurface2D. New DataSurface1D class for radial data profiles.
 1.0.3           New Orthographic sphere projection method.
 1.0.2           Surface/geometry reverse() changed to a flip() function that flips around the x-axis. rotate() operation to rotate around z-axis.

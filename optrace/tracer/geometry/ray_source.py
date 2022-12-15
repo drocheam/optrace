@@ -225,7 +225,7 @@ class RaySource(Element):
         if self.div_2d:
             t = np.radians(self.div_axis_angle).repeat(2) + [0, np.pi]
             P = np.array([1., 1.])
-            theta = misc.random_from_distribution(t, P, N, kind="discrete")
+            alpha = misc.random_from_distribution(t, P, N, kind="discrete")
 
         if self.divergence == "Function":
             pc.check_callable("RaySource.div_func", self.div_func)
@@ -237,32 +237,32 @@ class RaySource(Element):
 
             case "Lambertian" if not self.div_2d:
                 # see https://www.particleincell.com/2015/cosine-distribution/
-                theta, X0 = misc.uniform2(0, 2*np.pi, 0, np.sin(np.radians(self.div_angle))**2, N)
-                alpha = np.arcsin(np.sqrt(X0)) 
+                alpha, X0 = misc.uniform2(0, 2*np.pi, 0, np.sin(np.radians(self.div_angle))**2, N)
+                theta = np.arcsin(np.sqrt(X0)) 
             
             case "Lambertian" if self.div_2d:
                 X0 = misc.uniform(0, np.sin(np.radians(self.div_angle)), N)
-                alpha = np.arcsin(X0)
+                theta = np.arcsin(X0)
 
             case "Isotropic" if not self.div_2d:
                 # see https://mathworld.wolfram.com/SpherePointPicking.html
-                theta, X0 = misc.uniform2(0, 2*np.pi, np.cos(np.radians(self.div_angle)), 1, N)
-                alpha = np.arccos(X0)
+                alpha, X0 = misc.uniform2(0, 2*np.pi, np.cos(np.radians(self.div_angle)), 1, N)
+                theta = np.arccos(X0)
             
             case "Isotropic" if self.div_2d:
-                alpha = misc.uniform(0, np.radians(self.div_angle), N)
+                theta = misc.uniform(0, np.radians(self.div_angle), N)
 
             case "Function" if not self.div_2d:
                 # see https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
-                theta, X0 = misc.uniform2(0, 2*np.pi, 0, 1, N)
+                alpha, X0 = misc.uniform2(0, 2*np.pi, 0, 1, N)
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 f = self.div_func(x) * np.sin(x)
-                alpha = misc.random_from_distribution(x, f, X0, kind="continuous")
+                theta = misc.random_from_distribution(x, f, X0, kind="continuous")
 
             case "Function" if self.div_2d:  # pragma: no branch
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 f = self.div_func(x)
-                alpha = misc.random_from_distribution(x, f, N, kind="continuous")
+                theta = misc.random_from_distribution(x, f, N, kind="continuous")
 
         if self.divergence != "None":
             # vector perpendicular to s, created using  sy = [1, 0, 0] x s_or
@@ -276,7 +276,7 @@ class RaySource(Element):
 
             # vector s has a component alpha in the sx-sy plane
             theta_, alpha_ = theta[:, np.newaxis], alpha[:, np.newaxis]
-            s = ne.evaluate("cos(alpha_)*s_or + sin(alpha_)*(cos(theta_)*sx + sin(theta_)*sy)")
+            s = ne.evaluate("cos(theta_)*s_or + sin(theta_)*(cos(alpha_)*sx + sin(alpha_)*sy)")
 
         if np.any(s[:, 2] <= 0):
             raise RuntimeError("All ray divergences s need to be in positive z-divergence")

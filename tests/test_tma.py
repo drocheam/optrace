@@ -68,7 +68,7 @@ class TMATests(unittest.TestCase):
                                getf(R1, -R2, n(wl2), n2(wl2), n2(wl2), d))  # different wl
 
         # ambient n on one side
-        self.assertAlmostEqual(ot.Lens(spa, spb, n2=n2, **largs).tma(wl=wl, ).efl, 
+        self.assertAlmostEqual(ot.Lens(spa, spb, n2=n2, **largs).tma(wl=wl).efl, 
                                getf(R1, -R2, n(wl), 1, n2(wl), d))  # ambient n
         self.assertAlmostEqual(ot.Lens(spa, spb, n2=nc, **largs).tma(wl=wl, n0=n2).efl, 
                                getf(R1, -R2, n(wl), n2(wl), 1, d))  # ambient n
@@ -100,6 +100,9 @@ class TMATests(unittest.TestCase):
 
             for el1, el2 in zip(list1, list2):
                 self.assertAlmostEqual(el1, el2, delta=0.0002)
+               
+            # check determinant
+            self.assertAlmostEqual(np.linalg.det(tma.abcd), tma.n1/tma.n2)
 
         # values from
         # https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/
@@ -203,6 +206,7 @@ class TMATests(unittest.TestCase):
         self.assertAlmostEqual(tma.focal_length[1], 1000 / 59.940 * tma.n2, delta=0.001)
         self.assertAlmostEqual(tma.ffl, tma.focal_point[0] - tma.vertex_point[0])
         self.assertAlmostEqual(tma.bfl, tma.focal_point[1] - tma.vertex_point[1])
+        self.assertAlmostEqual(np.linalg.det(tma.abcd), tma.n1/tma.n2)
 
     def test_tma_image_object_distances(self):
 
@@ -306,6 +310,7 @@ class TMATests(unittest.TestCase):
                 abcd = np.array([[1, 0], [-D/1000, tma.n1/tma.n2]])  # 30dpt (1/m) ->  0.03 (1/mm)
                 self.assertTrue(np.allclose(abcd1-abcd, 0))
                 self.assertAlmostEqual(tma.power[1], D)
+                self.assertAlmostEqual(np.linalg.det(tma.abcd), tma.n1/tma.n2)  # check determinant
 
     def test_tma_misc(self):
 

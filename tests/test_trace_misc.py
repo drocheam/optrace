@@ -214,6 +214,7 @@ class TracerMiscTests(unittest.TestCase):
 
                 for i, Npx in enumerate([*ot.RImage.SIZES, *np.random.randint(1, 2*ot.RImage.SIZES[-1], 3)]):  # different side lengths
                     img.rescale(Npx)
+                    self.assertEqual(img.N, min(img.Nx, img.Ny))
 
                     # check that nearest matching side length was chosen
                     siz = ot.RImage.SIZES

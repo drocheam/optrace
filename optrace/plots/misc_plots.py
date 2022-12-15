@@ -79,6 +79,7 @@ def abbe_plot(ri:     list[RefractionIndex],
     lines = Lines.FdC if lines is None else lines
     _set_font()
     plt.figure()
+    _show_grid()
 
     for i, RIi in enumerate(ri):
 
@@ -93,12 +94,11 @@ def abbe_plot(ri:     list[RefractionIndex],
             continue  # skip plotting
 
         # plot point and label
-        sc = plt.scatter(Vd, nd, marker="x")
+        sc = plt.scatter(Vd, nd, marker="x", zorder=100)
         col = sc.get_facecolors()[0].tolist()
         plt.text(Vd, nd, RIi.get_desc(), color=col)
 
     plt.xlim([plt.xlim()[1], plt.xlim()[0]])  # reverse direction of x-axis
-    _show_grid()
     plt.xlabel("Abbe Number V")
     plt.ylabel(r"Refraction Index n ($\lambda$" + f" = {lines[1]}nm)")
     plt.title(title)

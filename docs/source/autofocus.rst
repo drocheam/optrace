@@ -58,13 +58,13 @@ Minimizing the position variance :math:`\sigma^2` of lateral ray positions :math
    \text{minimize}~~ R_\text{v}(z) := \sqrt{\sigma^2_P(X_z) + \sigma^2_P(Y_z)}
    :label: autofocus_position
 
-
+This procedure is simple and performant. However, the disadvantage of this method is that it minimizes the position variance of all beams. For example, if there is a strong outlying halo, the method also tries to keep it as small as possible, which can lead to a compromise between the halo and the size of the actual focus.
 
 **Airy Disc Weighting**
 
 A virtual detector with roughly the spatial sensitivity :math:`S` of an airy disc.
 The numerical aperture :math:`\text{NA}` needed is estimated using the ray angles.
-Only the zeroth order of the airy disc is used, there it can be approximated using a gaussian, see :cite:`AiryWiki`.
+Only the zeroth order of the airy disc is used, there it can be approximated using a gaussian, see :footcite:`AiryWiki`.
 
 The stimulus for one ray is the product of gauss function value at radial position :math:`r_i(z)` from the disc center and ray power :math:`P_i(z)`. Summing up all ray stimuli and dividing by the overall power we get the cost function value for position :math:`z`.
 
@@ -88,14 +88,33 @@ It can be shown, that when the light is also distributed according to a gaussian
 
 Exemplary values for :math:`S_k` can be found in the following table
 
+.. list-table:: Values for :math:`S_k` 
+   :widths: 50 50 50 50 50 50 50 50 50
+   :header-rows: 1
+   :align: center
 
-+------------+---+----+----+----+----+----+----+--------------+
-| :math:`k`  | 0 | 1  |  2 |  3 |  5 |  10|  20|:math:`\infty`|
-+------------+---+----+----+----+----+----+----+--------------+
-| :math:`S_k`| 1 |0.71|0.45|0.32|0.20|0.10|0.05|0             |
-+------------+---+----+----+----+----+----+----+--------------+
+   * - :math:`k`
+     - 0
+     - 1
+     - 2
+     - 3
+     - 5
+     - 10
+     - 20
+     - :math:`\infty`
+   * - :math:`S_k`
+     - 1.00
+     - 0.71
+     - 0.45
+     - 0.32
+     - 0.20
+     - 0.10
+     - 0.05
+     - 0.00
+
 
 In physical reality we can't get a higher value for :math:`S_k` than that for :math:`k=1` since this is equivalent to the resolution limit. Since the simulation does not factor in wave-optical properties, they can nevertheless appear in the raytracer.
+Another disadvantage of the method is that it ignores all behavior of the beams far outside the sensitive range of the virtual receiver. 
 
 Image Methods
 ==============
@@ -140,6 +159,7 @@ We want to maximize this product, which is large when there are many high freque
 
 .. math::
    \text{maximize}~~ F_\text{p}(z) := p_\text{f} \cdot \sqrt{f^2_x + f^2_y}
+   :label: autofocus_image_sharpness
 
 This method is independent of the image size, since we used the power image instead of a irradiance image.
 
@@ -153,4 +173,13 @@ Additional Notes
    * focus finding always searches in the region between two lenses or a lens and the outline. 
    * focus finding ignores filters, apertures and the outline while finding the focus. So if a ray exists inside the search region but is absorbed or filtered in the region it is assumed as not being so.
    * if any rays in this region intersect with the tracing outline, this is not handled.
+
+
+
+
+------------
+
+**Sources**
+
+.. footbibliography::
 

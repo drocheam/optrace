@@ -51,10 +51,11 @@ def uniform2(a, b, c, d, N):
     # shuffle order
     ind = np.arange(N)
     np.random.shuffle(ind)
+
     return x[ind], y[ind]
 
 
-def uniform(a, b, N):
+def uniform(a, b, N):   
     """
     Stratified Sampling 1D.
 
@@ -69,8 +70,48 @@ def uniform(a, b, N):
 
     dba = (b-a)/N  # grid spacing
     x = np.linspace(a, b - dba, N) + np.random.uniform(0., dba, N)  # grid + dither
+
     np.random.shuffle(x)
     return x
+
+
+def ring_uniform(ri: float, r: float, N: int) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Generate uniform random positions inside a ring area (annulus) with stratified sampling.
+
+    This is done by equi-areal mapping from grid to disc to annulus.
+    
+    :param ri: inner radius
+    :param r:  outer radius
+    :param N:  number of points
+    :return: random x and y positions
+    """
+    x, y = uniform2(-r, r, -r, r, N)
+
+    r_ = np.zeros_like(x)
+    theta = np.zeros_like(x)
+    x2, y2 = x**2, y**2  # store since used multiple times
+
+    # Shirley's Equal-Area Mapping
+    # see https://jcgt.org/published/0005/02/01/paper.pdf
+
+    m = x2 > y2
+    r_[m] = xm = x[m]
+    ym, pi = y[m], np.pi
+    theta[m] = ne.evaluate("pi/4 * ym/xm")
+
+    m = (x2 <= y2) & (y2 > 0)
+    r_[m] = ym = y[m]
+    xm = x[m]
+    theta[m] = ne.evaluate("pi/2 - pi/4 * xm/ym")
+
+    # equi-areal disc to ring mapping
+    if ri:
+        # (1 - ((r < 0) << 1)) is a fast inline method for: 1 if r >= 0, -1 if r < 0
+        r_ = ne.evaluate("(1 - ((r_ < 0) << 1)) * sqrt(ri**2 + r_**2*(1 - (ri/r)**2))")
+
+    # convert to cartesian coordinates
+    return r_*np.cos(theta), r_*np.sin(theta)
 
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837

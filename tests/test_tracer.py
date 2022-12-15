@@ -377,17 +377,19 @@ class TracerTests(unittest.TestCase):
         for surf in [ot.CircularSurface(r=2), 
                     ot.RectangularSurface(dim=[1, 1]), 
                     ot.RectangularSurface(dim=[1, 0.75]), 
+                    ot.RectangularSurface(dim=[1, 0.3]),
                     ot.Line(), 
                     ot.Line(angle=30), 
                     ot.Line(angle=90), 
                     ot.RingSurface(ri=1.5, r=2),
+                    ot.RingSurface(ri=0.05, r=2),
                     ot.RingSurface(ri=0.25, r=2)]:
 
             RS = ot.RaySource(surf, pos=[0, 0, 0])
             RT.add(RS)
             RT.trace(200000)
 
-            im = RT.source_image(32)
+            im = RT.source_image(45)
             L = im.get_by_display_mode("Irradiance")
             L /= np.max(L)
 
@@ -974,6 +976,7 @@ class TracerTests(unittest.TestCase):
         sim, dim = RT.iterative_render(N_rays, silent=True)
         self.assertEqual(len(sim), len(RT.ray_sources))
         self.assertEqual(len(dim), 1)
+        self.assertTrue(dim[0].limit is None)
         
         # default call with no sources
         sim, dim = RT.iterative_render(N_rays, no_sources=True, silent=True)
@@ -991,14 +994,22 @@ class TracerTests(unittest.TestCase):
         sim, dim = RT.iterative_render(N_rays, detector_index=1, silent=True)
         
         # call with explicit detector pixel number
-        sim, dim = RT.iterative_render(N_rays, N_px_D=400, silent=True)
+        sim, dim = RT.iterative_render(N_rays, N_px_D=315, silent=True)
+        self.assertEqual(dim[0].N, 315)
         
         # call with explicit source pixel number
-        sim, dim = RT.iterative_render(N_rays, N_px_S=400, silent=True)
+        sim, dim = RT.iterative_render(N_rays, N_px_S=315, silent=True)
+        self.assertEqual(sim[0].N, 315)
         
         # call with explicit projection_method
         sim, dim = RT.iterative_render(N_rays, N_px_S=400, silent=True, detector_index=1, 
                                        projection_method="Stereographic")
+        self.assertEqual(dim[0].projection, "Stereographic")
+        
+        # call with explicit limit
+        sim, dim = RT.iterative_render(N_rays, N_px_S=400, silent=True, detector_index=1, 
+                                       limit=5)
+        self.assertEqual(dim[0].limit, 5)
         
         # call with multiple positions
         sim, dim = RT.iterative_render(N_rays, pos=[0, 5], silent=True)
@@ -1021,6 +1032,12 @@ class TracerTests(unittest.TestCase):
                                        N_px_D=500, silent=True, detector_index=1,
                                        projection_method=["Equidistant", "Equal-Area"])
         self.assertNotEqual(dim[0].projection, dim[1].projection) 
+        
+        # call with multiple positions and limits
+        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[0, 5], 
+                                       N_px_D=500, silent=True, detector_index=1,
+                                       limit=[10, 12])
+        self.assertNotEqual(dim[0].limit, dim[1].limit) 
         
         # call with multiple source pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4),
@@ -1049,6 +1066,8 @@ class TracerTests(unittest.TestCase):
         # len(detector_index) != len(pos)
         self.assertRaises(ValueError, RT.iterative_render, 10000, detector_index=[0, 1], pos=[0])  
         # len(detector_index) != len(pos)
+        self.assertRaises(ValueError, RT.iterative_render, 10000, limit=[4, 1], pos=[0])  
+        # len(limit) != len(pos)
         
         # coverage tests:
 

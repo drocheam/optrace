@@ -1089,13 +1089,13 @@ class Raytracer(Group):
 
         return spec
 
-    # TODO what about the filter constant?
     def iterative_render(self,
                          N_rays:            int,
                          N_px_D:            int | list = 400,
                          N_px_S:            int | list = 400,
                          detector_index:    int | list = 0,
                          projection_method: str | list = "Equidistant",
+                         limit:             float | list = None,
                          pos:               int | list = None,
                          silent:            bool = False,
                          no_sources:        bool = False,
@@ -1103,7 +1103,7 @@ class Raytracer(Group):
             -> tuple[list[RImage], list[RImage]]:
         """
         Image render with N_rays rays.
-        First return value is a list of rendered sources, the second a list of rendered detector images.
+        First returned value is a list of rendered sources, the second a list of rendered detector images.
 
         If pos is not provided, a single detector image is rendered at the position of the detector specified by detector_index.
         >> RT.iterative_render(N_rays=10000, detector_index=1) 
@@ -1112,8 +1112,14 @@ class Raytracer(Group):
         >> RT.iterative_render(N_rays=10000, pos=[0, 1, 0], detector_index=1) 
         
         If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically
-        repeated len(pos) times or can be specified as list with the same length as pos
+        repeated len(pos) times or can be specified as list with the same length as pos.
+        Exemplary calls:
         >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256]) 
+        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
+
+        N_px_S can also be provided as list, note however, that when provided as list it needs to have the same length as the number of sources.
+
+        By default, source images are also rendered. Providing no_sources=True skips source rendering and simply returns an empty list.
 
         :param N_rays:
         :param N_px_D:
@@ -1121,6 +1127,7 @@ class Raytracer(Group):
         :param detector_index:
         :param pos:
         :param projection_method:
+        :param limit: resolution limits for detector images
         :param silent:
         :param no_sources: don't render sources
         :param extent:
@@ -1165,6 +1172,12 @@ class Raytracer(Group):
 
             elif len(projection_method) != len(pos):
                 raise ValueError("projection_method list needs to have the same length as pos list")
+            
+            if not isinstance(limit, list):
+                limit = [limit] * len(pos)
+
+            elif len(limit) != len(pos):
+                raise ValueError("limit list needs to have the same length as pos list")
 
             if not isinstance(extent, list) or isinstance(extent[0], int | float):
                 extent = [extent] * len(pos)
@@ -1240,10 +1253,16 @@ class Raytracer(Group):
                     else:
                         SIm_res[j]._img += Imi._img
 
+        # apply limit to detector images
+        # filter gets applied in rescale operation below
+        if limit:
+            for lim, DIm in zip(limit, DIm_res):
+                DIm.limit = lim
+
         # rescale images to update Im.Im, we only added Im._Im each
         # force rescaling even if Im has the same size as _Im, since only _Im holds the sum image of all iterations
-        [SIm.rescale(N_px_S[i], _force=True) for i, SIm in enumerate(SIm_res)]
-        [DIm.rescale(N_px_D[i], _force=True) for i, DIm in enumerate(DIm_res)]
+        [SIm.rescale(N_px_S[i]) for i, SIm in enumerate(SIm_res)]
+        [DIm.rescale(N_px_D[i]) for i, DIm in enumerate(DIm_res)]
 
         # revert silent to its state
         self.silent = silent_old

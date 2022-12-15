@@ -11,7 +11,7 @@ Defined by its coordinate :math:`x_0,~y_0,~z_0` and is only defined there.
 Line
 ===============
 
-Lwt :math:`R` be half the length of the line and :math:`\alpha` its angle relative to the x-axis.
+:math:`R` be half the length of the line and :math:`\alpha` its angle relative to the x-axis.
 
 The random cartesian coordinates are then
 
@@ -21,6 +21,8 @@ The line is then defined for :math:`r \in [-R, ~R]`
    x =&~ x_0 + r \cos \alpha\\ 
    y =&~ y_0 + r \sin \alpha\\ 
    z =&~ z_0
+   :label: line_formula
+
 
 Surfaces
 ===============
@@ -51,6 +53,16 @@ Sphere
 
 Handled as conic with :math:`k=0`
 
+
+Asphere
+---------------------------
+
+An aspheric surface is a conic surface with additional :math:`m` even order polynomial components :math:`a_1, ..., a_m`.
+
+.. math::
+   :label: asphere
+
+   z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}} + \sum_{i=1}^{m} a_i \cdot r^{2i}
 
 Rectangle
 --------------------
@@ -84,22 +96,26 @@ point normal equation for a plane:
 
 .. math::
    (\vec{p} - \vec{q})\cdot \vec{n} = 0
+   :label: plane_normal_eq_tilted_surface
 
 being equivalent to
 
 .. math::
    (x - x_0) \cdot n_x + (y- y_0) \cdot n_y + (z-z_0)\cdot n_z = 0
+   :label: tilted_surface0
 
 can be rearranged to the surface function for :math:`n_z \neq 0`:
 
 .. math::
    z(x, y) = z_0 - (x - x_0) \cdot \frac{n_x}{n_z} - (y- y_0) \cdot \frac{n_y}{n_z}
+   :label: tilted_surface
 
 
-Hit Detection
-===============
 
-A numerical method can be found in {}
+.. _analytical_hit_find:
+
+Analytical Hit Detection
+============================
 
 Intersection Ray with xy-Plane
 -----------------------------------
@@ -114,21 +130,25 @@ surface point normal equation:
 
 .. math::
    (\vec{p} - \vec{q})\cdot \vec{n} = 0
+   :label: plane_normal_eq_intersection
 
-ray equation in depencence of ray paramter :math:`t`:
+ray equation in dependence of ray paramter :math:`t`:
 
 .. math::
    \vec{p} = \vec{p_0} + \vec{s} \cdot t
+   :label: line_equation_common
 
 inserting these equations into each other leads to
 
 .. math::
     (\vec{p_0} + \vec{s}\cdot t_\text{h} - \vec{q}) \cdot \vec{n} = 0
+   :label: plane_intersection_formula0
 
 rearranging gives us the ray parameter for the hit point :math:`t_\text{h}`:
 
 .. math::
    t_\text{h} = \frac{(\vec{q} - \vec{p_0})\cdot \vec{n}}{\vec{s} \cdot \vec{n}}
+   :label: plane_intersection_formula
 
 which can be inserted into the ray equation to get the hit point
 
@@ -189,13 +209,58 @@ Surface Extension
    Surface Extension
 
 
+.. _numerical_hit_find:
+
+Numerical Hit Detection
+==========================
+
+Bound Calculation
+-----------------------
+
+Intersections
+--------------------
+
+.. math::
+   \text{Ray support vector:}~~~~   \vec{p_0} &= (p_x, p_y, p_z)\\
+   \text{Ray direction vector:}~~~~ \vec{s} &= (s_x, s_y, s_z)\\
+   \text{Point on Ray:}~~~~ \vec{p_t} &= (x_t, y_t, z_t)\\
+
+Ray line equation depending on ray parameter :math:`t`:
+
+.. math::
+   \vec{p_t}(t)=\vec{p}_{0}+t \cdot \vec{s}
+   :label: pt
+
+Cost function :math:`G` with surface function :math:`f`:
+
+.. math::
+   G(t)=z_{t}-f\left(x_{t}, y_{t}\right)
+   :label: G
+
+
+The parameters :math:`x_t,y_t,z_t` can be determined from equation :math:numref:`pt`. 
+For the position determination of the hit, the root of this scalar function :math:`G` must now be found. 
+Typical optimization algorithms are suitable for this purpose. 
+
+However, these have the disadvantage that they do not have a guaranteed convergence. 
+Therefore, the ray tracer uses the Regula-Falsi method. 
+This is a simple iterative method, which is guaranteed to converge superlinearly with a slight modification. 
+The prerequisite for the procedure is, however, that an interval with a root is known.
+Since the minimum and maximum extent of the surface in the z-direction in the raytracer is known, this criterion is given, because a hit can only occur within this range. The method basically works by trying to shrink the interval including the function root in every iteration. 
+A well-written explanation can be found in :footcite:`RegulaFalsiWiki`.
+
+Now, in some cases the interval may hardly decrease in size from one iteration to the next. 
+To prevent slow convergence the procedure is therefore extended to the so called Illinois algorithm, which is explained in :footcite:`IllinoisAlgoWiki`.
+
+The implementation in optrace differs only in parallelizing the optimization and only iterating the next step with not already converged rays.
+
 Normal Calculation
 ====================
 
 General
 --------------------
 
-Equation for a normal vector: :cite:`NormalWiki`
+Equation for a normal vector: :footcite:`NormalWiki`
 
 .. math::
    \vec{n_0} = 
@@ -209,7 +274,7 @@ Equation for a normal vector: :cite:`NormalWiki`
 Needs to be normalized using
 
 .. math::
-   \vec{n} = \frac{\vec{n_0}}{\lvert n_0 \rvert}
+   \vec{n} = \frac{\vec{n_0}}{|| \vec{n_0} ||}
    :label: normal_general_norm
 
 Numerical
@@ -227,7 +292,7 @@ Numerical
 Needs to be normalized using
 
 .. math::
-   \vec{n} = \frac{\vec{n_0}}{\lvert n_0 \rvert}
+   \vec{n} = \frac{\vec{n_0}}{|| \vec{n_0} ||}
    :label: normal_numerical_norm
 
 
@@ -290,6 +355,34 @@ With :math:`k=0` and :math:`\rho := \frac{1}{R}` the conic normal simplifies to
    :label: sphere_n
 
 
+Asphere 
+---------------------------
+
+The radial derivative of an asphere is
+
+.. math::
+   n_r = \frac{\rho r}{\sqrt{1 - (k+1)\rho^2 r^2}} + \sum_{i=1}^{m}  2i \cdot  a_i \cdot r^{2i - 1}
+   :label: asphere_deriv
+
+
+This radial component needs to be rotated around the center by angle the positional angle :math:`\phi`.
+According to the general normal calculation the normal is then
+
+.. math::
+   \vec{n_0} = 
+   \begin{pmatrix}
+        - n_r \cos \phi\\
+        - n_r \sin \phi\\
+        1\\
+   \end{pmatrix}
+   :label: normal_general_asph
+
+This needs to be normalized using
+
+.. math::
+   \vec{n} = \frac{\vec{n_0}}{|| \vec{n_0} ||}
+   :label: normal_general_norm_asph
+
 Numerical Differentiation
 =============================
 
@@ -300,11 +393,13 @@ For a first derivative of the form
 
 .. math::
    f'(x) = \frac{f(x+\varepsilon) - f(x-\varepsilon)}{2 \varepsilon}
+   :label: central_first_deric
 
-the optimal step width is :cite:`DiffIntMorken`:
+the optimal step width is :footcite:`DiffIntMorken`:
 
 .. math::
    \varepsilon_\text{o} = \sqrt[3]{3 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(3)}(x)} \right|} 
+   :label: optimal_step_width
 
 with :math:`\varepsilon_\text{f}` being the machine precision for the used floating type.
 Expecting mostly spherical surfaces, the main function component is :math:`x^2`.
@@ -324,6 +419,7 @@ With :math:`R` being the largest absolute distance on the surface the minimal bo
 
 .. math::
    \varepsilon_\text{n} = R ~\varepsilon_\text{f}
+   :label: machine_eps_scaling
 
 It is recommended to center the surface at :math:`x=0` so :math:`R` is minimal. This only works if the surface is centered beforehand, shifting afterwards also ruins numerical precision.
 
@@ -331,6 +427,7 @@ The finally chosen step width is the higher one:
 
 .. math::
    \varepsilon = \max (\varepsilon_\text{o}, ~\varepsilon_\text{n})
+   :label: eps_selection
 
 
 Curvature Circle
@@ -346,56 +443,66 @@ The relative distance to center and the z-position of the other sphere end are
 .. math::
    r &= \sqrt{(x-x_0)^2  + (y - y_0)^2}\\
    z_m &= z_0 + R
+   :label: sph_projections_pars
 
 **Equidistant**
 
-Adapted version of :cite:`EquidistantProjWiki`.
+Adapted version of :footcite:`EquidistantProjWiki`.
 
 .. math::
    \theta &= \arctan\left(\frac{r}{z-z_m}\right)\\
    \phi &= \text{arctan2}(y-y_0, ~x-x_0)\\
+   :label: equidistant_proj_pars
 
 The projected coordinates are then
 
 .. math::
    x_p &= -\theta \cdot \text{sgn}(R) \cos(\phi)\\
    y_p &= -\theta \cdot \text{sgn}(R) \sin(\phi)\\
+   :label: equidistant_proj_eq
 
 **Orthographic**
 
 The hit coordinates :math:`x` and :math:`y` are kept as is.
-Related: :cite:`OrthographicProjWiki`.
+Related: :footcite:`OrthographicProjWiki`.
 
 **Stereographic**
 
-Adapted version of :cite:`SteographicProjWiki`.
+Adapted version of :footcite:`SteographicProjWiki`.
 
 .. math::
    \theta &= \frac{\pi}{2} - \arctan\left(\frac{r}{z-z_m}\right)\\
    \phi &= \text{arctan2}(y-y_0, ~x-x_0)\\
    r &= 2 \tan\left(\frac{\pi}{4} - \frac{\theta}{2}\right)\\
+   :label: stereographic_proj_pars
    
 The projected coordinates are then
 
 .. math::
    x_p &= -r \cdot  \text{sgn}(R) \cos(\phi)\\
    y_p &= -r \cdot \text{sgn}(R) \sin(\phi)\\
+   :label: stereographic_proj_eq
 
 **Equal-Area**
 
-Adapted version of :cite:`EqualAreaProjWiki`.
+Adapted version of :footcite:`EqualAreaProjWiki`.
 
 .. math::
    x_r = \frac{x - x_0} {\lvert R \rvert}\\
    y_r = \frac{y - y_0} {\lvert R \rvert}\\
    z_r = \frac{z - z_m} {R}\\
+   :label: equal_area_proj_pars
 
 The projected coordinates are then
 
 .. math::
    x_p = \sqrt{\frac{2}{1-z_r} x_r}\\
    y_p = \sqrt{\frac{2}{1-z_r} y_r}\\
+   :label: equal_area_proj_eq
 
+
+
+.. _random_positions_surfaces:
 
 Random Sampling
 =======================
@@ -416,6 +523,7 @@ The random cartesian coordinates are then
    x =&~ x_0 + \mathcal{U}_{[-R,R]} \cos \alpha\\ 
    y =&~ y_0 + \mathcal{U}_{[-R,R]} \sin \alpha\\ 
    z =&~ z_0
+   :label: line_sampling
 
 :math:`x_0,~y_0,~z_0` are the central coordinates of the line and :math:`\alpha` is its angle relative to the x-axis.
 
@@ -430,6 +538,8 @@ The random cartesian coordinates are then
    x =&~ \mathcal{U}_{[x_0,x_1]}\\
    y =&~ \mathcal{U}_{[y_0,y_1]}\\
    z =&~ z_0
+   :label: rect_sampling
+
 
 Ring
 --------------
@@ -438,37 +548,44 @@ An area element of a circle in polar coordinates can be represented as:
 
 .. math::
    \text{d}A = \text{d}r  ~\text{d}\phi
+   :label: ring_sampling_area_element
 
 :math:`\text{d}\phi` can be rewritten as circle segment
 
 .. math::
    \text{d}A = \text{d}r  ~\frac{2 \pi}{N} r
+   :label: ring_sampling_area_element2
 
 with :math:`N` being the number of segments.
 Let us define a function :math:`r(u)` which gives us radial values and its derivative outputs radial spacing values.
 
 .. math::
    \text{d}A = r'(u)  ~\frac{2 \pi}{N} r(u)
+   :label: ring_sampling_area_element_diff_eq
 
 For uniformly sampled data, :math:`\text{d}A` needs to be kept constant in regards to a uniform variable :math:`u`. This is equivalent to the condition :math:`\frac{\text{d}A}{\text{d}u} = 0`.
 
 .. math::
    \frac{\text{d}A}{\text{d}u} = \frac{2\pi}{N} \frac{\text{d}}{\text{d}u} r'(u)  r(u) = r''(u) r(u) + (r'(u))^2 = 0
+   :label: ring_sampling_area_element_diff_eq2
 
 Solutions of this non linear differential equation of second order are in the form of
 
 .. math::
    r(u) = \sqrt{c_1 + c_2 u}
+   :label: ring_sampling_area_element_diff_eq_solution
 
 For convenience we set the constants to :math:`c_1 = 0, ~c_2=1`. For output values in :math:`[r_i, ~R]` the corresponding input values are then :math:`[r^2_i, ~R^2]`. Rewriting :math:`r` and :math:`u` as random variables gives us:
 
 .. math::
    \mathcal{R} = \sqrt{\mathcal{U}_{[r^2_\text{i}, R^2]}}
+   :label: ring_sampling_R
 
 The polar angle is uniformly spaced
 
 .. math::
    \Phi = \mathcal{U}_{[0, 2\pi]}
+   :label: ring_sampling_Phi
 
 Resulting 3D positions are then
 
@@ -476,11 +593,26 @@ Resulting 3D positions are then
    x =&~ x_0 + \mathcal{R} \cos \Phi\\ 
    y =&~ y_0 + \mathcal{R} \sin \Phi\\ 
    z =&~ z_0
+   :label: ring_sampling_xyz
+
+
+.. _circle_sampling:
 
 Circle
 ------------
 
 Implemented as ring with :math:`r_\text{i} = 0`.
 
-Related: :cite:`WolframDiskPicking`.
+Related: :footcite:`WolframDiskPicking`.
+
+
+
+.. TODO part about rotation and flipping
+
+
+------------
+
+**Sources**
+
+.. footbibliography::
 

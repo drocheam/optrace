@@ -10,7 +10,7 @@ The ``spherical_aberration.py`` script, also from this folder, provides a good q
 
 Below you can find its code with detailed comments.
 
-Before running make sure to follow the installation instructions in <>.
+Before running make sure to follow the installation instructions in :numref:`installation`.
 
 Further details on working with the raytracer and the frontend can be found in <> and <>
 

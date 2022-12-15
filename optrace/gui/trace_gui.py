@@ -39,23 +39,6 @@ from .property_browser import PropertyBrowser  # dictionary browser
 
 from ..__metadata__ import __version__
 
-# threading rules:
-# + some ideas from: https://traits-futures.readthedocs.io/en/latest/guide/threading.html
-# * GUI changes only in main thread
-# * the GUI must be responsive at all costs
-# * simplified RayStorage access model: only one thread can read and write (_RayAccessLock)
-# * no locks in main thread, waiting for locks only in worker threads
-#
-#
-# Locks:
-# * _DetectorImageLock: locks saved detector image for reading and writing
-# * _SourceImageLock: locks saved source image for reading and writing
-# * _DetectorLock: locks Detector in place (moveToFocus(), DetectorImage(), changeSelectedDetector(),),
-#                   changes of detector_selection and det_pos are intercepted and prevented in the main thread
-# * _RayAccessLock: locks the RayStorage for reading or writing. Needed for moveToFocus(), DetectorImage(),
-#                   SourceImage(), trace() and replotRays()
-#                   actually also needed for the picker, but we don't want to block the main thread,
-#                   so we prevent picking in this case
 
 
 class TraceGUI(HasTraits):

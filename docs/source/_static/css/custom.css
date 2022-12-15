@@ -1,10 +1,18 @@
 
 
 
-/**change font since default of theme "pyramid" is ugly**/
+/**change font family since default of theme "pyramid" is ugly**/
 body{
-	font-family:"Times New Roman";
+	font-family:"Times New Roman", serif;
 }
+
+
+/*navigation, footer and side bar are way too small (defaults for pyramid theme are in the range 0.7em-0.9em*/
+/*increase the size*/
+div.related, div.footer, div.sphinxsidebar {
+	font-size: 0.95em;
+}
+
 
 
 /** fix for equation numbers being display on top instead of on the right side

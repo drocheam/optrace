@@ -112,17 +112,11 @@ class RingSurface(Surface):
         :param N:
         :return:
         """
-        p = np.zeros((N, 3), dtype=np.float64, order='F')
-
-        # weight with square root to get equally distributed points
-        r, theta = misc.uniform2(self.ri**2, self.r**2, 0, 2*np.pi, N)
-        r = np.sqrt(r)
-
-        x0, y0 = self.pos[0], self.pos[1]
-
-        p[:, 0] = ne.evaluate("x0 + r*cos(theta)")
-        p[:, 1] = ne.evaluate("y0 + r*sin(theta)")
-        p[:, 2] = self.pos[2]
+        x, y = misc.ring_uniform(self.ri, self.r, N)
+        
+        p = np.tile(self.pos, (N, 1))
+        p[:, 0] += x
+        p[:, 1] += y
 
         return p
 

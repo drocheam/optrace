@@ -59,12 +59,12 @@ class SphericalSurface(ConicSurface):
 
         x, y, z = p[:, 0], p[:, 1], p[:, 2]
         x0, y0, z0 = self.pos
+
         R = self.R
         Rs = np.sign(R)
         pi = np.pi
 
         zm = z0 + R  # center z-position of sphere
-        r = ne.evaluate("sqrt((x-x0)**2  + (y-y0)**2)")
 
         # different sign convention than for mathematical rotation angles
         # in our case the coordinates are positive, when they point in the same direction
@@ -73,23 +73,25 @@ class SphericalSurface(ConicSurface):
         if projection_method == "Equidistant":
             # https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection
 
-            theta = ne.evaluate("arctan(r/(z-zm))")
+            r = ne.evaluate("sqrt((x-x0)**2  + (y-y0)**2)")
+            theta = ne.evaluate("-Rs*arctan(r/(z-zm))")
             phi = ne.evaluate("arctan2(y-y0, x-x0)")
         
             p_hit = p.copy()
-            p_hit[:, 0] = ne.evaluate("-Rs*theta*cos(phi)")
-            p_hit[:, 1] = ne.evaluate("-Rs*theta*sin(phi)")
+            p_hit[:, 0] = ne.evaluate("theta*cos(phi)")
+            p_hit[:, 1] = ne.evaluate("theta*sin(phi)")
 
         elif projection_method == "Stereographic":
 
             # https://en.wikipedia.org/wiki/Stereographic_map_projection
+            r = ne.evaluate("sqrt((x-x0)**2  + (y-y0)**2)")
             theta = ne.evaluate("pi/2 - arctan(r/(z-zm))")
             phi = ne.evaluate("arctan2(y-y0, x-x0)")
-            r = ne.evaluate("2*tan(pi/4 - theta/2)")
+            r = ne.evaluate("-2*Rs*tan(pi/4 - theta/2)")
             
             p_hit = p.copy()
-            p_hit[:, 0] = -r*Rs*np.cos(phi)
-            p_hit[:, 1] = -r*Rs*np.sin(phi)
+            p_hit[:, 0] = ne.evaluate("r*cos(phi)")
+            p_hit[:, 1] = ne.evaluate("r*sin(phi)")
 
         elif projection_method == "Equal-Area":
 

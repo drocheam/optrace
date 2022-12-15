@@ -114,7 +114,8 @@ class SurfaceTests(unittest.TestCase):
                 self.assertEqual(Si.get_values(np.array([pos_new[0]]), np.array([pos_new[1]]))[0], pos_new[2])
 
     def test_surface_normals(self):
-        
+       
+        # test test_surfaces
         for i, Si in enumerate(self._test_surfaces()):
             with self.subTest(i=i, Surface=type(Si).__name__):
        
@@ -142,41 +143,81 @@ class SurfaceTests(unittest.TestCase):
                 if isinstance(Si, ot.TiltedSurface):
                     self.assertTrue(np.all(n[m] == Si.normal))
 
-                # TODO test sphere normals
-                # TODO test conic normals
-                # TODO test asphere normals
-                # TODO test FunctionSurface normals
-                # TODO test DataSurfacce normals
+
+        # list of non-flat surfaces and normal values for the x, y vectors below
+        iter_ = zip([ot.SphericalSurface(r=5, R=-10),
+                     ot.ConicSurface(r=5, R=12, k=3),
+                     ot.ConicSurface(r=5, R=-12, k=3),
+                     ot.AsphericSurface(r=5, R=12, k=3, coeff=[0, 1e-4, 1e-8]),
+                     ot.TiltedSurface(r=2, normal_sph=[20, 50]),
+                     ot.DataSurface1D(r=3, data=-1+np.linspace(0, 3, 200)**1.25),
+                     ot.FunctionSurface(r=4, func=lambda x, y: x**2 + y**2/2),
+                     ot.DataSurface2D(r=3, data=1+np.mgrid[-3:3:100j, -3:3:100j][1] + np.linspace(-3, 3, 100)**2)],
+                    [[0.1,        0.05,       0.99373035],
+                     [-0.08444007, -0.04222003,  0.9955337],
+                     [0.08444007, 0.04222003, 0.9955337],
+                     [-0.08493345, -0.04246673,  0.99548123],
+                     [0.21984631, 0.26200263, 0.93969262],
+                     [-0.70594412, -0.35297206,  0.61404693],
+                     [-0.87287156, -0.21821789,  0.43643578]])
+
+        # some offset
+        x0, y0, z0 = 1.24, -5.8, 0.01
+
+        # check values
+        for surf, n in iter_:
+            surf.move_to([x0, y0, z0])
+
+            x = np.array([x0+1])
+            y = np.array([y0+0.5])
+
+            na = surf.get_normals(x, y)
+            self.assertTrue(np.allclose(n - na, 0))
 
     def test_surface_values(self):
         
         x = np.linspace(-0.7, 5.3, 1000)
         y = np.linspace(-8, -2, 1000)
 
-        S = self._test_surfaces()
-       
-        for i, Si in enumerate(S):
-            with self.subTest(i=i, Surface=type(Si).__name__):
-                
+        # check flat surfaces 
+        for Si in self._test_surfaces():
+            if Si.is_flat():
                 pos_new = np.array([2.3, -5, 10])
                 Si.move_to(pos_new)
                 z = Si.get_values(x, y)
 
-                # check values
-                if Si.is_flat():
-                    self.assertTrue(np.all(z == Si.pos[2]))
-                elif Si is S[1]:  # Sphere
-                    self.assertAlmostEqual(z[0], 10.94461486)
-                    self.assertAlmostEqual(z[500], 10.0000009)
-                elif Si is S[2]:  # Conic
-                    self.assertAlmostEqual(z[0], 10.)  # == z_max since it's outside
-                    self.assertAlmostEqual(z[300], 9.78499742)
-                elif Si is S[3]:  # asphere
-                    self.assertAlmostEqual(z[200], 221.73914214)
+                self.assertTrue(np.all(z == Si.pos[2]))
 
-                # TODO TiltedSurface values
-                # TODO DataSurface values
-                # TODO FunctionSurface values
+        # list of non-flat surfaces and values for the x, y vectors below
+        iter_ = zip([ot.SphericalSurface(r=5, R=-10),
+                     ot.ConicSurface(r=5, R=12, k=3),
+                     ot.AsphericSurface(r=5, R=12, k=3, coeff=[0, 1e-4, 1e-8]),
+                     ot.TiltedSurface(r=2, normal_sph=[20, 50]),
+                     ot.DataSurface1D(r=3, data=-1+np.linspace(0, 3, 200)**1.25),
+                     ot.FunctionSurface(r=4, func=lambda x, y: x**2 + y**2/2),
+                     ot.DataSurface2D(r=3, data=1+np.mgrid[-3:3:100j, -3:3:100j][1] + np.linspace(-3, 3, 100)**2)],
+                    [[-0.06269654, -0.01250782],
+                    [0.05254347, 0.01043481],
+                    [0.05269974, 0.01044106],
+                    [-0.37336424,  0.13940869],
+                    [1.14965824, 0.42044821],
+                    [1.125, 0.125],
+                    [0.75, -0.25]])
+
+        # some offset
+        x0, y0, z0 = 1.24, -5.8, 0.01
+
+        # check values
+        for surf, z in iter_:
+            surf.move_to([x0, y0, z0])
+
+            x = np.array([x0+1, x0])
+            y = np.array([y0+0.5, y0-0.5])
+
+            za = surf.get_values(x, y) - z0
+            
+            for zi1, zi2 in zip(z, za):
+                self.assertAlmostEqual(zi1, zi2)
 
     @pytest.mark.os
     def test_surface_hit_finding(self):
@@ -318,12 +359,19 @@ class SurfaceTests(unittest.TestCase):
 
     def test_surface_paraxial_radius_of_curvature(self):
 
-        # parax_roc tests
+        # spheric and aspheric
         self.assertAlmostEqual(ot.SphericalSurface(r=3, R=10).parax_roc, 10)
         self.assertAlmostEqual(ot.ConicSurface(r=3, k=1, R=-5.897).parax_roc, -5.897)
+        self.assertAlmostEqual(ot.AsphericSurface(r=3, k=1, R=5.897, coeff=[0]).parax_roc, 5.897)
+        self.assertAlmostEqual(ot.AsphericSurface(r=3, k=1, R=5.897, coeff=[-1e-3]).parax_roc, 5.967379271)
+        # ^-- r^2 of polynomial contributes to curvature
+
+        # flat
         self.assertAlmostEqual(ot.CircularSurface(r=2).parax_roc, np.inf)
         self.assertAlmostEqual(ot.RingSurface(r=2, ri=0.5).parax_roc, np.inf)
         self.assertAlmostEqual(ot.RectangularSurface(dim=[1, 1]).parax_roc, np.inf)
+
+        # data and function surfaces
         self.assertEqual(ot.DataSurface2D(data=np.ones((50, 50)), r=3).parax_roc, None)
         self.assertAlmostEqual(ot.DataSurface2D(data=np.ones((50, 50)), r=3, parax_roc=5).parax_roc, 5)  # (factually wrong)
         self.assertAlmostEqual(ot.DataSurface1D(data=np.ones(50), r=3, parax_roc=5).parax_roc, 5)  # (factually wrong)

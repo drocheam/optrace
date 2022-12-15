@@ -1,8 +1,5 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Path setup --------------------------------------------------------------
 
@@ -38,7 +35,6 @@ release = __version__
 extensions = [
         'sphinx.ext.autodoc',
         'sphinx.ext.intersphinx',
-        'sphinx_rtd_theme',
         'sphinx.ext.mathjax',
         'sphinxcontrib.bibtex',
 ]
@@ -52,6 +48,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 bibtex_bibfiles = ['bib.bib']
+bibtex_default_style = 'unsrt'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -60,8 +57,6 @@ bibtex_bibfiles = ['bib.bib']
 #
 # needs sphinx-rtd-theme installed
 html_theme = 'pyramid'
-# html_theme = 'sphinx_pdj_theme'
-# html_theme = 'classic'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -72,11 +67,6 @@ def setup(app):
     app.add_css_file(os.path.join('css', 'custom.css'))
 
 html_theme_options = {
-    # "rightsidebar": "false",
-    # "relbarbgcolor": "GoldenRod",
-    # "footerbgcolor": "GoldenRod",
-    # "sidebarbgcolor": "black",
-    # "stickysidebar": True,
     "sidebarwidth": 380,
     "body_max_width" : 1080
 }
