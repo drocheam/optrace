@@ -1398,12 +1398,6 @@ class TraceGUI(HasTraits):
                 if len(self.raytracer.ray_sources):
                     self.source_selection = self.source_names[self._source_ind]
 
-            if all_ or change["TraceSettings"]:
-                # reassign absorb_missing if it has changed
-                if self.raytracer.absorb_missing != bool(self.absorb_missing):
-                    with self._no_trait_action():
-                        self.absorb_missing = self.raytracer.absorb_missing
-
             rdh = False  # if GUILoaded Status should be reset in this function
             if self.raytracer.ray_sources:
                 if all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
@@ -1681,10 +1675,6 @@ class TraceGUI(HasTraits):
                             self.raytracer.remove(self._fault_markers)
                             self._fault_markers = []
                             self._plot_markers()
-
-                        with self._no_trait_action():
-                            # reset parameter to value of raytracer.absorb_missing, since it can refuse this value
-                            self.absorb_missing = self.raytracer.absorb_missing
 
                         self._status["Tracing"] -= 1
                         self.replot_rays()

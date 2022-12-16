@@ -12,6 +12,7 @@ import unittest
 
 import numpy as np
 import pytest
+from PIL import Image as PILImage  # image loading
 
 import optrace.tracer.misc as misc
 import optrace.tracer.color as color
@@ -317,15 +318,39 @@ class TracerMiscTests(unittest.TestCase):
             img = ot.RImage.load(path2)
             os.remove(path2)
 
-        # png saving
-        for ratio in [3, 1, 1/3]:
+    @pytest.mark.slow
+    @pytest.mark.os
+    def test_r_image_export(self):
+
+        path = "export_image"
+
+        # check display modes and channels
+        for ratio in [0.746, 1, 2.45]:
             img = self.gen_r_image(ratio=ratio)[0]
-            img.rescale(9)
             img.silent = True
+            img.rescale(90)
+                
             for imm in ot.RImage.display_modes:
                 path3 = img.export_png(path, imm, log=True, overwrite=True, flip=False)
                 path3 = img.export_png(path, imm, log=False, overwrite=True, flip=True)
-            os.remove(path3)
+                im3 = np.asarray(PILImage.open(path3), dtype=np.float64)  # load from disc
+                self.assertTrue(im3.ndim == (2 if not imm.startswith("sRGB") else 3))  # check number of channels
+
+        # check shapes
+        for ratio in [0.746, 1, 2.45]:
+            img = self.gen_r_image(ratio=ratio)[0]
+            img.silent = True
+
+            for Npx in [9, 90, 1000]:
+
+                img.rescale(Npx)
+                
+                for Ns in [256, 512, 984]:
+                    path3 = img.export_png(path, imm, log=False, overwrite=True, flip=True, size=Ns)
+                    im3 = np.asarray(PILImage.open(path3), dtype=np.float64)  # load from disc
+                    self.assertAlmostEqual(ratio, im3.shape[0]/im3.shape[1], delta=2/Ns)  # check ratio
+
+        os.remove(path3)
 
     def test_r_image_filter(self):
     

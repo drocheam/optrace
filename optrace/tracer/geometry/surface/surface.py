@@ -153,6 +153,16 @@ class Surface(BaseClass):
         else:
             inside = self.get_mask(x, y)
             z[inside] = self.pos[2] + self._get_values(x[inside] - self.pos[0], y[inside] - self.pos[1])
+            r = self.r - self.N_EPS
+
+            # continue the edge value in radial direction
+            # TODO test these
+            if np.any(~inside):
+                if not self.rotational_symmetry:
+                    phi = np.arctan2(y[~inside] - self.pos[1], x[~inside] - self.pos[0])
+                    z[~inside] = self.pos[2] + self._get_values(r*np.cos(phi), r*np.sin(phi))
+                else:
+                    z[~inside] = self.pos[2] + self._get_values(np.array([r]), np.array([0.]))[0]
 
             return z
 
@@ -244,18 +254,11 @@ class Surface(BaseClass):
         m = self.get_mask(x, y)
         xm, ym = x[m], y[m]
 
-        # approximate optimal step width for differentiation
-        # for a second derivative of form (f(x+h) - f(x-h)) / (2h) the optimal h is
+        # approximate optimal step width for differentiation  for a second derivative
+        # of form (f(x+h) - f(x-h)) / (2h) the optimal h is
         # h* = (3*e*abs(f(x)/f'''(x))^(1/3)  with e being the machine precision
-        # for us one general assumption can be abs(f(x)/f'''(x) = 50
-        # another condition is that x+h* != x, meaning it is representable
-        # so make sure x+h* is representable as float number for every point on the surface
-        # in a latter step we will use relative coordinates from the center
-        # so for eps_deriv we are scaling e with s_max, the maximal extent in x, y or z dimension
-        # source h* formula: 
-        # http://www.uio.no/studier/emner/matnat/math/MAT-INF1100/h08/kompendiet/diffint.pdf, p.241
-        # the C++ boost library does it the same way:
-        # https://github.com/boostorg/math/blob/1ce6dda2fb9b8d3cd2f54c76fe5a8cc3d0e430f9/include/boost/math/differentiation/finite_difference.hpp
+        # for us one general assumption can be e.g. abs(f(x)/f'''(x) = 50, additionally x+h needs to be representable
+        # check the documentation for more info
         eps_f = np.finfo(np.float64).eps
         eps_deriv = (3*eps_f*50)**(1/3)
         ext = np.array(self.extent)
@@ -316,8 +319,20 @@ class Surface(BaseClass):
             return p_hit, is_hit
 
         else:
-            # get search bounds
-            t1, t2, f1, f2, p1, p2 = self._find_hit_bounds(p, s)
+            # ray parameters for just above and below the surface
+            t1 = (self.z_min - self.C_EPS / 10 - p[:, 2]) / s[:, 2]
+            t2 = (self.z_max + self.C_EPS / 10 - p[:, 2]) / s[:, 2]
+
+            # set to -eps since we can't move in -z anyway (t1 <0)
+            t1[t1 < 0] = -self.C_EPS
+
+            # check if surface is defined for t1 and t2
+            p1 = p + s*t1[:, np.newaxis]
+            p2 = p + s*t2[:, np.newaxis]
+
+            # cost function values
+            f1 = p1[:, 2] - self.get_values(p1[:, 0], p1[:, 1])
+            f2 = p2[:, 2] - self.get_values(p2[:, 0], p2[:, 1])
 
             # contraction factor (m = 0.5 : Illinois Algorithm)
             m = 0.5
@@ -395,122 +410,6 @@ class Surface(BaseClass):
 
         return p_hit, is_hit
 
-    def _find_hit_bounds(self, p, s):
-        """
-
-        Surface hits can only occur inside the cylindrical extent of the surface.
-        This is the smallest cylinder with rotation axis in z-direction that encompasses all of the surface.
-        Find intersections between the ray projected in xy direction and surface projected onto a xy circle,
-        but only the ray section starts or ends outside of it.
-
-        If the intersections reduce the search range, while also starting above and ending behind the surface,
-        we use these bound values from now on.
-
-        Why do we do this?
-        The area outside a valid surface extent is set to a constant value, where the numeric algorithm has problems
-        converging and finding the correct regions. While ensuring the rays are only in xy regions, 
-        where the surface is defined, we reduce these issues.
-        Another thing is, that a hit with this infinite outside-plane is guaranteed for every ray,
-        but in most cases there is also a hit with the surface.
-        This procedure also ensures that the actual hit position is preferred.
-
-        :param p:
-        :param s:
-        :param surface:
-        :return:
-        """
-
-        # ray parameters for just above and below the surface
-        t1 = (self.z_min - self.C_EPS / 10 - p[:, 2]) / s[:, 2]
-        t2 = (self.z_max + self.C_EPS / 10 - p[:, 2]) / s[:, 2]
-
-        # set to -eps since we can't move in -z anyway (t1 <0)
-        t1[t1 < 0] = -self.C_EPS
-
-        # check if surface is defined for t1 and t2
-        p1 = p + s*t1[:, np.newaxis]
-        p2 = p + s*t2[:, np.newaxis]
-        mt1 = self.get_mask(p1[:, 0], p1[:, 1])
-        mt2 = self.get_mask(p2[:, 0], p2[:, 1])
-
-        # cost function values
-        f1 = np.full_like(t1, np.nan)
-        f2 = np.full_like(t1, np.nan)
-        
-        fb = ~(mt1 & mt2) & ~((s[:, 0] == 0) & (s[:, 1] == 0))  # need-to-fix-bounds bool array
-        # but can't do this when there is only propagation in z direction
-
-        if np.any(fb):
-
-            # equations taken from
-            # https://www.scratchapixel.com/lessons/3d-basic-rendering/
-            # minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
-
-            # the next part only works for a = D**2 != 0
-            # which is s[:, 0] == 0 and s[:, 1] == 0
-            # but we excluded this case above
-
-            R = self.r - self.C_EPS  # slightly smaller so we are on the surrface without doubt
-            C = self.pos[:2]
-            O = p[fb, :2]
-            D = s[fb, :2]
-            OMC = O-C
-            a = misc.rdot(D, D)
-            b = 2*misc.rdot(D, OMC)
-            c = misc.rdot(OMC, OMC) - R**2
-
-            D2 = ne.evaluate("sqrt(b**2 - 4*a*c)")
-            t1n = ne.evaluate("(-b - D2)/(2*a)")
-            t2n = ne.evaluate("(-b + D2)/(2*a)")
-
-            # coordinates for hit of x-y circle projection
-            p1n = p[fb] + s[fb]*t1n[:, np.newaxis]
-            p2n = p[fb] + s[fb]*t2n[:, np.newaxis]
-
-            # cost function = difference between ray z-postion and self height at the same x, y
-            diff1 = p1n[:, 2] - self.get_values(p1n[:, 0], p1n[:, 1])
-            diff2 = p2n[:, 2] - self.get_values(p2n[:, 0], p2n[:, 1])
-
-            # assign rays with better t1
-            t1n_for_t1 = (diff1 < 0) & ((diff2 >= 0)) | ((diff2 < 0) & (diff1 > diff2))
-            t1c = np.where(t1n_for_t1, t1n, t2n)
-            p1c = np.where(t1n_for_t1[:, np.newaxis], p1n, p2n)
-            diff1c = np.where(t1n_for_t1, diff1, diff2)
-            make_t1 = (t1c > 0) & (t1c > t1[fb]) & (p1c[:, 2] < self.z_max) & (p1c[:, 2] > self.z_min)\
-                      & np.isfinite(t1c) & (diff1c < 0)
-            fbmt1 = misc.part_mask(fb, make_t1)
-            t1[fbmt1] = t1c[make_t1]
-            p1[fbmt1] = p1c[make_t1]
-            f1[fbmt1] = diff1c[make_t1]
-        
-            # assign rays with better t2
-            t2n_for_t2 = (diff2 > 0) & ((diff1 <= 0) | ((diff1 > 0) & (diff2 < diff1)))
-            t2c = np.where(t2n_for_t2, t2n, t1n)
-            p2c = np.where(t2n_for_t2[:, np.newaxis], p2n, p1n)
-            diff2c = np.where(t2n_for_t2, diff2, diff1)
-            make_t2 = (t2c > 0) & (t2c < t2[fb]) & (p2c[:, 2] < self.z_max) & (p2c[:, 2] > self.z_min)\
-                       & np.isfinite(t2c) & (diff2c > 0)
-            fbmt2 = misc.part_mask(fb, make_t2)
-            t2[fbmt2] = t2c[make_t2]
-            p2[fbmt2] = p2c[make_t2]
-            f2[fbmt2] = diff2c[make_t2]
-
-            assert ~np.any((t2c == t1c) & make_t1 & make_t2)
-
-        # assign missing f1
-        f1ci = np.isnan(f1)
-        f1[f1ci] = p1[f1ci, 2] - self.get_values(p1[f1ci, 0], p1[f1ci, 1])
-
-        # assign missing f2
-        f2ci = np.isnan(f2)
-        f2[f2ci] = p2[f2ci, 2] - self.get_values(p2[f2ci, 0], p2[f2ci, 1])
-       
-        # update mask arrays, since rays with fb changed their p1, p2
-        mt1[fb] = self.get_mask(p1[fb, 0], p1[fb, 1])
-        mt2[fb] = self.get_mask(p2[fb, 0], p2[fb, 1])
-
-        return t1, t2, f1, f2, p1, p2
-    
     def flip(self) -> None:
         assert self.is_flat()  # flip otherwise not implemented
 

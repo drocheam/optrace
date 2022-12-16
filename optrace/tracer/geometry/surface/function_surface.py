@@ -15,22 +15,18 @@ from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-
 class FunctionSurface(Surface):
     
     rotational_symmetry: bool = False
-
 
     def __init__(self,
                  r:                 float,
                  func:              Callable[[np.ndarray, np.ndarray], np.ndarray],
                  mask_func:         Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
                  deriv_func:        Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] = None,
-                 hit_func:          Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
                  func_args:         dict = None,
                  mask_args:         dict = None,
                  deriv_args:        dict = None,
-                 hit_args:          dict = None,
                  z_min:             float = None,
                  z_max:             float = None,
                  parax_roc:         float = None,
@@ -56,18 +52,26 @@ class FunctionSurface(Surface):
         self.func = func
         self.mask_func = mask_func
         self.deriv_func = deriv_func
-        self.hit_func = hit_func
 
         # use empty dict or provided dict, if not empty
         self._func_args = func_args or {}
         self._mask_args = mask_args or {}
         self._deriv_args = deriv_args or {}
-        self._hit_args = hit_args or {}
         
         self._offset = 0  # provisional offset
-        self._offset = self._get_values(np.array([0]), np.array([0]))[0]
-        self.z_min, self.z_max = self._find_bounds()
+        self._offset = self._get_values(np.array([0.]), np.array([0.]))[0]
         self.parax_roc = parax_roc
+
+        self.__set_zmin_zmax(z_min, z_max)
+
+        self.lock()
+
+    def __set_zmin_zmax(self, z_min: float, z_max: float) -> None:
+        """
+        Assign zmin, zmax depending on find bounds or user provided values.
+        Check for plausibility and output messages.
+        """        
+        self.z_min, self.z_max = self._find_bounds()
 
         if z_max is not None and z_min is not None:
             z_range_probed = self.z_max - self.z_min
@@ -105,8 +109,6 @@ class FunctionSurface(Surface):
         else:
             raise ValueError(f"z_max and z_min need to be both None or both need a value")
 
-        self.lock()
-
     def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
@@ -117,7 +119,12 @@ class FunctionSurface(Surface):
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
         x_, y_ = self._rotate_rc(x, y, -self._angle)
-        return self._sign*(self.func(x_, self._sign*y_, **self._func_args) - self._offset)
+        vals = self.func(x_, self._sign*y_, **self._func_args)
+
+        assert isinstance(vals, np.ndarray), "func must return a np.ndarray"
+        assert not vals.shape[0] or isinstance(vals[0], np.float64), "Elements of return value of func must be of type np.float64"
+
+        return self._sign*(vals - self._offset)
 
     def get_mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
@@ -129,7 +136,7 @@ class FunctionSurface(Surface):
         """
         mask = super().get_mask(x, y)
 
-        # additionally evaluate SurfaceFunction mask if defined
+        # additionally evaluate FunctionSurface mask if defined
         if self.mask_func is not None:
             
             # relative coordinates
@@ -139,7 +146,12 @@ class FunctionSurface(Surface):
             # rotate surface
             x_, y_ = self._rotate_rc(xm, ym, -self._angle)
 
-            mask = mask & self.mask_func(x_, self._sign*y_, **self._mask_args)
+            maskf = self.mask_func(x_, self._sign*y_, **self._mask_args)
+            
+            assert isinstance(maskf, np.ndarray), "mask_func must return a np.ndarray"
+            assert not maskf.shape[0] or isinstance(maskf[0], bool | np.bool_), f"Elements of return value of mask_func must be of type bool"
+
+            mask = mask & maskf
 
         return mask
 
@@ -174,51 +186,16 @@ class FunctionSurface(Surface):
         
             nxn, nyn = self.deriv_func(xm, self._sign*ym, **self._deriv_args)
             # ^-- y is negative, since surface is flipped
+            
+            assert isinstance(nxn, np.ndarray), "deriv_func must return two np.ndarray"
+            assert isinstance(nyn, np.ndarray), "deriv_func must return two np.ndarray"
+            assert not nxn.shape[0] or isinstance(nxn[0], np.float64), "Elements of return value of deriv_func must be of type np.float64"
+            assert not nyn.shape[0] or isinstance(nyn[0], np.float64), "Elements of return value of deriv_func must be of type np.float64"
 
             n[m, 0], n[m, 1] = self._rotate_rc(-nxn*self._sign, -nyn, self._angle)
             n[m] = misc.normalize(n[m])
 
             return n
-
-    def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        """
-
-        :param p:
-        :param s:
-        :return:
-        """
-        # numerical hit finding when no hit_func is defined
-        # or when the function is flipped
-        if self.hit_func is None or self._sign != 1:
-            return super().find_hit(p, s)
-
-        else:
-            # spatial 3D shift so we have coordinates relative to the surface center
-            # _offset is removed, since it was introduced by Surface and is unknown to the SurfaceFunction object
-            dp = self.pos - [0, 0, self._offset]
-
-            p2 = p.copy() - dp
-            p2[:, 0], p2[:, 1] = self._rotate_rc(p2[:, 0], p2[:, 1], -self._angle)
-
-            s2 = s.copy()
-            s2[:, 0], s2[:, 1] = self._rotate_rc(s2[:, 0], s2[:, 1], -self._angle)
-
-            p_hit = self.hit_func(p2, s2, **self._hit_args)
-
-            p_hit[:, 0], p_hit[:, 1] = self._rotate_rc(p_hit[:, 0], p_hit[:, 1], self._angle)
-            p_hit += dp
-
-            is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
-            miss = ~is_hit
-
-            # intersect non-hitting rays with plane z=z_max            
-            tnm = (self.z_max - p[miss, 2])/s[miss, 2]
-            p_hit[miss] = p[miss] + s[miss]*tnm[:, np.newaxis]
-
-            # handle rays that start behind surface or inside its extent 
-            self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
-
-            return p_hit, is_hit  # transform to standard coordinates
 
     def flip(self) -> None:
        
@@ -239,10 +216,6 @@ class FunctionSurface(Surface):
         # lock
         self.lock()
 
-        if self._sign == -1 and self.hit_func is not None:
-            self.print(f"WARNING: Neglecting hit_func parameter, since the function surface is now flipped/negated."\
-                       " This means hit calculation is now numerical.")
-    
     def rotate(self, angle: float) -> None:
 
         self._lock = False
@@ -261,13 +234,13 @@ class FunctionSurface(Surface):
                 pc.check_type(key, val, float | int)
                 val = float(val)
 
-            case ("deriv_func" | "hit_func" | "mask_func"):
+            case ("deriv_func" | "mask_func"):
                 pc.check_none_or_callable(key, val)
 
             case ("func"):
                 pc.check_callable(key, val)
             
-            case ("_deriv_args" | "_func_args" | "_hit_args" | "_mask_args"):
+            case ("_deriv_args" | "_func_args" | "_mask_args"):
                 pc.check_type(key, val, dict)
                 super().__setattr__(key, copy.deepcopy(val))  # enforce deepcopy of dict
                 return

@@ -18,6 +18,8 @@ RSS = ot.CircularSurface(r=2)
 
 # add Rectangular Raysource
 # RSS = ot.RingSurface(ri=1, r=2)
+                    
+RSS = ot.RectangularSurface(dim=[1, 1/3])
 
 RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
                   pos=[0, 5, 0], s=[0, 0, 1], polarization="y")

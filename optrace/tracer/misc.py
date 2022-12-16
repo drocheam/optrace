@@ -15,6 +15,32 @@ import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
 
+
+# with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
+# can be used as decorator @timer around a function
+def timer(func: Callable) -> Any:
+    """
+    timing wrapper for function timings
+    write a @timer decorator around a function to time it
+
+    :param func: function to wrap
+    :return: function return value
+    """
+    @wraps(func)
+    def _time_it(*args, **kwargs) -> Any:
+        start = time.time()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            diff = time.time() - start
+
+            unit = "ms" if diff < 0.1 else "s"
+            time_ = 1000*diff if diff < 0.1 else diff
+
+            print(f"Timing: {time_:.3f} {unit} for {func}")
+
+    return _time_it
+
 def uniform2(a, b, c, d, N):
     """
     Stratified Sampling 2D.
@@ -112,32 +138,6 @@ def ring_uniform(ri: float, r: float, N: int) -> tuple[np.ndarray, np.ndarray]:
 
     # convert to cartesian coordinates
     return r_*np.cos(theta), r_*np.sin(theta)
-
-
-# with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
-# can be used as decorator @timer around a function
-def timer(func: Callable) -> Any:
-    """
-    timing wrapper for function timings
-    write a @timer decorator around a function to time it
-
-    :param func: function to wrap
-    :return: function return value
-    """
-    @wraps(func)
-    def _time_it(*args, **kwargs) -> Any:
-        start = time.time()
-        try:
-            return func(*args, **kwargs)
-        finally:
-            diff = time.time() - start
-
-            unit = "ms" if diff < 0.1 else "s"
-            time_ = 1000*diff if diff < 0.1 else diff
-
-            print(f"Timing: {time_:.3f} {unit} for {func}")
-
-    return _time_it
 
 
 # class only used for separate namespace

@@ -57,6 +57,7 @@ class Raytracer(Group):
         ONLY_HIT_FRONT = 3
         ONLY_HIT_BACK = 4
         T_BELOW_TTH = 5
+        ABSORB_MEDIA_TRANS = 6
     """enum for info messages in raytracing"""
 
     autofocus_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
@@ -211,6 +212,11 @@ class Raytracer(Group):
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                        f"missing surface {surf}, "
                                        "set to absorbed because of parameter absorb_missing=True.")
+                       
+                        case self.INFOS.ABSORB_MEDIA_TRANS:
+                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                       f"at refractive media transition at surface {surf} but outside the lens, "
+                                       "set to absorbed.")
 
                         case self.INFOS.OUTLINE_INTERSECTION:
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
@@ -242,15 +248,7 @@ class Raytracer(Group):
         if N > self.MAX_RAYS:
             raise ValueError(f"Ray number exceeds maximum of {self.MAX_RAYS}")
 
-        # absorb_missing = False is only possible, if all ambient refraction indices are the same
-        if not self.absorb_missing:
-            for Lens_ in self.lenses:
-                if Lens_.n2 is not None and self.n0 != Lens_.n2:
-                    self.print("Outside refraction index defined for at least one lens, setting absorb_missing"
-                               " simulation parameter to True")
-                    self.absorb_missing = True
-                    break
-
+        # make element list and check geometry
         self.fault_pos = np.array([])
         elements = self.__make_tracing_element_list()
         self.__geometry_checks(elements)
@@ -333,14 +331,19 @@ class Raytracer(Group):
                         self.__refraction_ideal_lens(element.front, element.D, p, s, pols, hwh, i, msg)
                         ns[:, i+1] = n2_l
 
+                    # absorb rays if absorb_missing=True or if we have a media transition but the rays hit outside the lens
                     # absorb rays missing lens, overwrite p to last ray starting point (=end of lens front surface)
-                    if self.absorb_missing and not np.all(hit_back):
+                    if (self.absorb_missing or n1 != n2) and not np.all(hit_back):
                         miss_mask = misc.part_mask(hw, ~hit_back)
                         miss_count = np.count_nonzero(miss_mask)
                         weights[miss_mask, i+1] = 0
+
                         if not element.is_ideal:
                             p[miss_mask, i+1] = p[miss_mask, i]
-                        msg[self.INFOS.ABSORB_MISSING, i] += miss_count
+
+                        # assign to correct message
+                        msgtype = self.INFOS.ABSORB_MISSING if self.absorb_missing else self.INFOS.ABSORB_MEDIA_TRANS    
+                        msg[msgtype, i] += miss_count
 
                     # # treat rays that go outside outline
                     hwnb = misc.part_mask(hw, ~hit_back)  # rays having power and not hitting lens back
@@ -409,7 +412,7 @@ class Raytracer(Group):
         Checks geometry in raytracer for errors.
         Markers and Detectors can be outside the tracing outline, Filters, Apertures, Lenses and Sources not
 
-        :param elements: element list from __makeElementList()
+        :param elements: element list from __make_element_list()
         """
 
         def is_inside(e: tuple | list) -> bool:
@@ -668,15 +671,19 @@ class Raytracer(Group):
                                 msg:      np.ndarray)\
             -> None:
         """
+        Calculate polarization and direction for refraction at an ideal lens.
+
+        :param surface: lens surface
+        :param D: optical power of the ideal lens
+        :param p: absolute position array
+        :param s;  direction vector array
+        :param pols: polarization array
+        :param hwh: have-weight-and-hit-surface boolean array
+        :param i: surface number
+        :param msg: message array
         """
        
-        # parallel rays hit at the same point in the focal plane
-        # we can therefore shift the ray towards the lens centre and calculate this focal point
-        # the new direction vector is just the difference between this point and the hit point on the lens
-        # point in focal plane: (sx/sz*f, sy/sz*f, sz/sz*f) with s = [sx, sy, sz] being the direction vector
-        # and f the focal distance.
-        # subtract the point (x, y, 0) relative to the lens center
-        # after that we only need to normalize the direction vector
+        # check the documentation for the math on this
 
         # copy, needed later
         s0 = s.copy()
@@ -697,8 +704,7 @@ class Raytracer(Group):
 
         # calculate polarization
         n = np.tile([0., 0., 1.], (x.shape[0], 1))
-        ns = s0[hwh, 2]
-        self.__rotate_polarization(ns, s0, s[hwh], n, pols, i, hwh)
+        self.__compute_polarization(s0, s[hwh], n, pols, i, hwh)
 
     def __refraction(self,
                      surface:      Surface,
@@ -749,7 +755,7 @@ class Raytracer(Group):
         s_ = ne.evaluate("s_h*N_m - n*(N_m*ns_m - W_m)")
 
         # rotate polarization vectors and calculate amplitude components in s and p plane
-        A_ts, A_tp = self.__rotate_polarization(ns, s, s_, n, pols, i, hwh)
+        A_ts, A_tp = self.__compute_polarization(s, s_, n, pols, i, hwh)
 
         # reflection coefficients for non-magnetic (µ_r=1) and non-absorbing materials (κ=0)
         # according to the Fresnel equations
@@ -770,17 +776,24 @@ class Raytracer(Group):
         weights[hwh, i+1] = weights[hwh, i]*T
         s[hwh] = s_
 
-    def __rotate_polarization(self, 
-                              ns:       np.ndarray, 
+    def __compute_polarization(self, 
                               s:        np.ndarray, 
                               s_:       np.ndarray, 
                               n:        np.ndarray, 
                               pols:     np.ndarray, 
                               i:        int, 
                               hwh:      np.ndarray)\
-            -> tuple[np.ndarray, np.ndarray]:
+            -> tuple[np.ndarray | float, np.ndarray | float]:
         """
-        rotate polarization vectors and calculate amplitude components in s and p plane
+        compute new polarization vectors and calculate amplitude components in s and p plane
+
+        :param s:  direction vectors before
+        :param s_: direction vectors after (hwh mask alreay applied)
+        :param n: surface normal
+        :param pols: initial polarization
+        :param i: surface number
+        :param hwh: have-weight-and-hit-surface boolean array
+        :return: amplitude components in s and p polarization direction
         """
            
         # no polarization -> don't set anything and return equal amplitude components
@@ -805,8 +818,8 @@ class Raytracer(Group):
 
         # init arrays
         # default for A_ts, A_tp are 1/sqrt(2)
-        A_ts = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
-        A_tp = np.full_like(ns, 1/np.sqrt(2), dtype=np.float32)
+        A_ts = np.full(s_.shape[0], 1/np.sqrt(2), dtype=np.float32)
+        A_tp = np.full(s_.shape[0], 1/np.sqrt(2), dtype=np.float32)
 
         # A_ts is component of pol in ps
         A_ts[mask] = misc.rdot(ps, polsm)

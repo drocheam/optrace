@@ -377,19 +377,18 @@ class TracerTests(unittest.TestCase):
         for surf in [ot.CircularSurface(r=2), 
                     ot.RectangularSurface(dim=[1, 1]), 
                     ot.RectangularSurface(dim=[1, 0.75]), 
-                    ot.RectangularSurface(dim=[1, 0.3]),
+                    ot.RectangularSurface(dim=[1, 1/3]),
                     ot.Line(), 
                     ot.Line(angle=30), 
                     ot.Line(angle=90), 
                     ot.RingSurface(ri=1.5, r=2),
-                    ot.RingSurface(ri=0.05, r=2),
                     ot.RingSurface(ri=0.25, r=2)]:
 
             RS = ot.RaySource(surf, pos=[0, 0, 0])
             RT.add(RS)
             RT.trace(200000)
 
-            im = RT.source_image(45)
+            im = RT.source_image(35)
             L = im.get_by_display_mode("Irradiance")
             L /= np.max(L)
 
@@ -810,7 +809,7 @@ class TracerTests(unittest.TestCase):
 
     def test_absorb_missing(self):
         """
-        infinitely small lens -> almost all rays miss and are set to absorbed (due to absorb_missing = False)
+        infinitely small lens -> almost all rays miss and are set to absorbed (due to absorb_missing = True)
         """
 
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
@@ -827,16 +826,35 @@ class TracerTests(unittest.TestCase):
         RT.absorb_missing = True
         RT.trace(N)
         self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 1] / N, places=3)
+        self.assertTrue(np.all(RT.rays.p_list[:, -1, 2] < RT.outline[5] - 1))  # absorbed before hitting outline
         
         # don't absorb with absorb_missing = False
         RT.absorb_missing = False
         RT.trace(N)
         self.assertEqual(RT._msgs[RT.INFOS.ABSORB_MISSING, 1], 0)
+        self.assertTrue(np.allclose(RT.rays.p_list[:, -1, 2] - RT.outline[5], 0))  # hitting outline
+    
+    def test_absorb_missing_different_media(self):
+        """
+        infinitely small lens -> almost all rays miss and are set to absorbed because a media transition
+        """
 
-        # absorb_missing is forced when there are different ambient n0
-        L.n2 = ot.RefractionIndex("Constant", 1.1)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
+
+        RSS = ot.CircularSurface(r=2)
+        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
+        RT.add(RS)
+
+        surf = ot.CircularSurface(r=1e-6)
+        L = ot.Lens(surf, surf, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1, n2=ot.presets.refraction_index.SF10)
+        RT.add(L)
+
+        # check if they are absorbed before reaching the outline
+        # and check message
+        N = 10000
         RT.trace(N)
-        self.assertTrue(RT.absorb_missing)
+        self.assertAlmostEqual(RT._msgs[RT.INFOS.ABSORB_MEDIA_TRANS, 1] / N, 1, places=3)
+        self.assertTrue(np.all(RT.rays.p_list[:, -1, 2] < RT.outline[5] - 1))  # absorbed before hitting outline
 
     def test_outline_intersection(self):
         """

@@ -174,7 +174,7 @@ class RImage(BaseClass):
         Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ
 
         :param mode:
-        :param log:
+        :param log: logarithmic image (sRGB modes only)
         :return:
         """
 
@@ -403,6 +403,8 @@ class RImage(BaseClass):
     def export_png(self,
                    path:         str,
                    mode:         str,
+                   size:         int = 512,
+                   resample:     int = -1,
                    log:          bool = False,
                    flip:         bool = False,
                    overwrite:    bool = False)\
@@ -411,11 +413,17 @@ class RImage(BaseClass):
         Export the RImage in a given display mode as png.
         The image is rescaled (and therefore interpolated) so we have square pixels before the export.
         Note that the side ratio slightly changes, since only integer side lengths are valid for the output,
-        but the RImage side lengths can be of arbirtrary precision.
+        but the RImage side lengths can be of arbitrary precision.
+
+        Note that "size" specifies the image resolution of the saved image.
+        The RImage itself is not rescaled, but interpolated.
 
         :param path: path to save to
         :param mode: display mode for getByDisplayMode()
-        :param log: logarithmic image (bool)
+        :param size: resolution of smaller size of image
+        :param resample: resample mode from PIL.Image.Resampling, defaults to nearest neighbor interpolation for 
+                         scaling up relative to RImage resolution and bilinear interpolation for scaling down
+        :param log: logarithmic image (bool), only for sRGB modes
         :param flip: rotate image by 180 degrees
         :param overwrite: file if it exists, otherwise saved in a fallback path
         :return: path of saved file
@@ -425,16 +433,24 @@ class RImage(BaseClass):
             im = np.fliplr(np.flipud(im))
 
         # approximate size we need to rescale to to make square pixels
-        sh = im.shape[:2]
         if self.sx > self.sy:
-            siz = (int(sh[0]*self.sx/self.sy), sh[0])  # specified as width, height
+            siz = (int(size*self.sx/self.sy), size)  # specified as width, height
         else:
-            siz = (sh[1], int(sh[1]*self.sy/self.sx))
-        
+            siz = (size, int(size*self.sy/self.sx))
+       
+        # convert to 8bit
         maxi = np.max(im)
         im = im/maxi*255 if maxi else im
-        imp = Image.fromarray(im.astype(np.uint8))
-        imp = imp.resize(siz)  # rescale so pixels are square
+        im = im.astype(np.uint8)
+
+        # resampling option
+        if resample == -1:
+            resample = Image.Resampling.NEAREST if min(*siz) > self.N else Image.Resampling.BILINEAR
+        
+        # convert to image and resize
+        mode = "L" if im.ndim == 2 else "RGB"  # greyscale or rgb
+        imp = Image.fromarray(im, mode=mode)
+        imp = imp.resize(siz, resample=resample)  # rescale so pixels are square
 
         def sfunc(path_: str):
             imp.save(path_)

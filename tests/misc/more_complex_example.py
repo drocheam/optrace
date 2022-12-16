@@ -9,7 +9,7 @@ RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
 # add Raysource
 RSS = ot.CircularSurface(r=1)
-RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
+RS = ot.RaySource(RSS, divergence="Isotropic", div_angle=6, spectrum=ot.presets.light_spectrum.FDC,
                   pos=[0, 0, 0], s=[0, 0, 1], polarization="y", desc="Centered Circle")
 RT.add(RS)
 

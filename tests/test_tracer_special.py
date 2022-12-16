@@ -133,12 +133,13 @@ class TracerSpecialTests(unittest.TestCase):
         #        4. ray starting above surface and not hitting
         #        5. ray starting outside surface and hitting surface, while it also could hit edge
         #        6. ray starting outside surface and hitting only edge
+        #        7. ray starting inside surface, hitting lens, but extension to zmax of surface would not hit
 
         # make raytracer
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
 
         # Ray Sources
-        for x, sx in zip([0, -4, -8, -8, 0, -8, -8], [0, 0, 8, 16, 4.5, 13, 6]):
+        for x, sx in zip([0, -4, -8, -8, 0, -8, -8, 2.5], [0, 0, 8, 16, 4.5, 13, 6, 0.65]):
             RSS = ot.Point()
             RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
                               pos=[x, 0, 0], s=[sx, 0, 10])
@@ -164,7 +165,7 @@ class TracerSpecialTests(unittest.TestCase):
             assert w == 0
 
         # check rays hitting
-        mask = L1.front.get_mask(RT.rays.p_list[[0, 2, 5], 1, 0], RT.rays.p_list[[0, 2, 5], 1, 1])
+        mask = L1.front.get_mask(RT.rays.p_list[[0, 2, 5, 7], 1, 0], RT.rays.p_list[[0, 2, 5, 7], 1, 1])
         assert np.all(mask)
 
     @pytest.mark.slow
@@ -369,14 +370,14 @@ class TracerSpecialTests(unittest.TestCase):
         RT.trace(N)
         self.assertTrue(np.all(RT.rays.w_list[:, -2] > 0))
 
-        # )), but this time hitting space between surfaces
+        # )), but this time hitting space between surfaces (=edge)
         RT.remove(RS)
         RS = ot.RaySource(ot.RingSurface(r=7, ri=6), pos=[0, 0, -20])
         RT.add(RS)
         RT.trace(N)
         self.assertTrue(np.all(RT.rays.w_list[:, -2] == 0))
         
-        # ((, but this time hitting space between surfaces
+        # ((, but this time hitting space between surfaces (=edge)
         RT.remove(L)
         front = ot.SphericalSurface(r=0.999*R1, R=-R1)
         back = ot.SphericalSurface(r=0.999*R2, R=-R2)
