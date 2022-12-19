@@ -36,6 +36,7 @@ from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectru
 from ..tracer import presets, color, misc
 
 from .property_browser import PropertyBrowser  # dictionary browser
+from .command_window import CommandWindow
 
 from ..__metadata__ import __version__
 
@@ -219,9 +220,8 @@ class TraceGUI(HasTraits):
     # Buttons
 
     _detector_image_button:      Button = Button(label="Detector Image", desc="Generating a Detector Image")
-    _run_button:                 Button = Button(label="Run", desc="runs the specified command")
-    _clear_button:               Button = Button(label="Clear", desc="clear command history")
     _property_browser_button:    Button = Button(label="Open Property Browser", desc="property browser is opened")
+    _command_window_button:      Button = Button(label="Open Command Window", desc="command window is opened")
     _source_spectrum_button:     Button = Button(label="Source Spectrum", desc="sources spectrum is shown")
     _detector_spectrum_button:   Button = Button(label="Detector Spectrum", desc="detector spectrum is shown")
     _source_cut_button:          Button = Button(label="Source Image Cut", desc="source image cut is shown")
@@ -232,18 +232,14 @@ class TraceGUI(HasTraits):
 
     # Strings and Labels
 
-    _cmd:                        Str = Str()
     _autofocus_information:      Str = Str()
-    _execute_label:              Str = Str('Command:')
-    _history_label:              Str = Str('History:')
-    _command_history:            Str = Str('')
     _debug_options_label:        Str = Str('Debugging Options:')
     _debug_command_label:        Str = Str('Command Running Options:')
     _spectrum_label:             Str = Str('Generate Spectrum:')
     _image_label:                Str = Str('Render Image:')
     _geometry_label:             Str = Str('Geometry:')
     _autofocus_label:            Str = Str('Autofocus:')
-    _property_label:             Str = Str('Properties:')
+    _property_label:             Str = Str('Additional Windows:')
     _trace_label:                Str = Str('Trace Settings:')
     _plotting_label:             Str = Str('Ray Plotting Modes:')
     _ray_visual_label:           Str = Str('Ray Visual Settings:')
@@ -302,6 +298,7 @@ class TraceGUI(HasTraits):
                             _separator,
                             Item("_property_label", style='readonly', show_label=False, emphasized=True),
                             Item('_property_browser_button', show_label=False),
+                            Item('_command_window_button', show_label=False),
                             _separator,
                             label="Main"
                             ),
@@ -364,22 +361,6 @@ class TraceGUI(HasTraits):
                             Item("_autofocus_information", show_label=False, style="custom"),
                             _separator,
                             label="Focus",
-                            ),
-                        TGroup(
-                            TGroup(
-                                Item("_execute_label", style='readonly', show_label=False, emphasized=True),
-                                Item('_cmd', editor=CodeEditor(), show_label=False, style="custom"), 
-                                Item("_run_button", show_label=False),
-                                style_sheet="*{max-height:200px; max-width:320px}"
-                            ),
-                            _separator,
-                            TGroup(
-                                Item("_history_label", style='readonly', show_label=False, emphasized=True),
-                                Item("_command_history", editor=CodeEditor(), show_label=False, style="custom"),
-                                Item("_clear_button", show_label=False),
-                                style_sheet="*{max-width:320px; max-height:500px}"
-                            ),
-                            label="Run"
                             ),
                         HSplit(  # hsplit with whitespace group so we have a left margin in this tab
                             TGroup(Item("_whitespace_label", style='readonly', show_label=False, width=50)),
@@ -452,6 +433,8 @@ class TraceGUI(HasTraits):
         self._index_box_plots = []
         self._crosshair = None
         self._orientation_axes = None
+
+        self._cdb = None
 
         # minimal/maximal z-positions of Detector_obj
         self._det_pos_min = self.raytracer.outline[4]
@@ -2164,6 +2147,15 @@ class TraceGUI(HasTraits):
             warnings.simplefilter("always")
         else:
             warnings.resetwarnings()
+    
+    @observe('_command_window_button')
+    def open_command_window(self, event=None) -> None:
+        """
+        :param event: optional event from traits observe decorator
+        """
+        if self._cdb is None:
+            self._cdb = CommandWindow(self)
+        self._cdb.edit_traits()
 
     @observe('_property_browser_button')
     def open_property_browser(self, event=None) -> None:
@@ -2188,18 +2180,8 @@ class TraceGUI(HasTraits):
                 if obji is not None:
                     obji.actor.property.representation = repr_
 
-    @observe('_clear_button')
-    def clear_history(self, event=None) -> None:
+    def send_cmd(self, cmd) -> None:
         """
-        clear command history
-        :param event: optional event from traits observe decorator
-        """
-        self._command_history = ""
-    
-    @observe('_run_button')
-    def send_cmd(self, event=None) -> None:
-        """
-        :param event: optional event from traits observe decorator
         """
         dict_ = dict(  # GUI and scene
                      mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
@@ -2210,22 +2192,21 @@ class TraceGUI(HasTraits):
                      APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
                      DL=self.raytracer.detectors, ML=self.raytracer.markers)
 
-        if self._cmd != "":
+        if cmd != "":
 
             pyface_gui.process_events()
 
             if self.busy and not self.command_dont_skip:
                 if not self.silent:
                     print("Other actions running, try again when the program is idle.")
-                return
+                return False
 
             self._status["RunningCommand"] += 1
-            self._command_history += ("\n" if self._command_history else "") + self._cmd
 
             with self._try():
                 hs = self.raytracer.property_snapshot()
 
-                exec(self._cmd, locals() | dict_, globals())
+                exec(cmd, locals() | dict_, globals())
         
                 if not self.command_dont_replot:
                     hs2 = self.raytracer.property_snapshot()
@@ -2233,6 +2214,9 @@ class TraceGUI(HasTraits):
                     self.replot(cmp)
 
             self._status["RunningCommand"] -= 1
+            return True
+
+        return False
 
     # rescale axes texts when the window was resized
     # for some reasons these are the only ones having no text_scaling_mode = 'none' option

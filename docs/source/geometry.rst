@@ -541,6 +541,8 @@ The random cartesian coordinates are then
    :label: rect_sampling
 
 
+.. _ring_sampling:
+
 Ring
 --------------
 

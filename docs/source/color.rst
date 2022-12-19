@@ -3,6 +3,8 @@ Color Conversion
 ***********************
 
 
+.. _xyz_color_space:
+
 XYZ Color Space
 =================================================
 

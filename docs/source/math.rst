@@ -4,9 +4,9 @@ Math
 
 
 .. toctree::
-   geometry
    sampling
    tracing
+   geometry
    spectrum
    matrix_analysis
    autofocus

@@ -235,29 +235,54 @@ class RaySource(Element):
             case "None":
                 s = s_or
 
+            # TODO explain in the documentation that stratified sampling for a cone leads to the same artefacts as the disc sampling
+            # TODO explain in div_3d how r and alpha are generated alternatively
+            # TODO explain why artefacts are especially bad in the center of a distribution
+            # TODO refer in documentation to part in the shirley paper
+            
+            # TODO test if actually better
             case "Lambertian" if not self.div_2d:
-                # see https://www.particleincell.com/2015/cosine-distribution/
-                alpha, X0 = misc.uniform2(0, 2*np.pi, 0, np.sin(np.radians(self.div_angle))**2, N)
-                theta = np.arcsin(np.sqrt(X0)) 
+                # see https://doi.org/10.1080/10867651.1997.10487479
+                r, alpha = misc.ring_uniform(0, np.sin(np.radians(self.div_angle)), N, polar=True)
+                theta = ne.evaluate("arcsin(r)")
+
+            # case "Lambertian" if not self.div_2d:
+                # # see https://www.particleincell.com/2015/cosine-distribution/
+                # alpha, X0 = misc.uniform2(0, 2*np.pi, 0, np.sin(np.radians(self.div_angle))**2, N)
+                # theta = np.arcsin(np.sqrt(X0)) 
             
             case "Lambertian" if self.div_2d:
                 X0 = misc.uniform(0, np.sin(np.radians(self.div_angle)), N)
                 theta = np.arcsin(X0)
 
             case "Isotropic" if not self.div_2d:
-                # see https://mathworld.wolfram.com/SpherePointPicking.html
-                alpha, X0 = misc.uniform2(0, 2*np.pi, np.cos(np.radians(self.div_angle)), 1, N)
-                theta = np.arccos(X0)
+                # see https://doi.org/10.1080/10867651.1997.10487479
+                r, alpha = misc.ring_uniform(0, np.sin(np.radians(self.div_angle)), N, polar=True)
+                theta = ne.evaluate("arccos(1 - r**2)")
+            
+            # case "Isotropic" if not self.div_2d:
+                # # see https://mathworld.wolfram.com/SpherePointPicking.html
+                # alpha, X0 = misc.uniform2(0, 2*np.pi, np.cos(np.radians(self.div_angle)), 1, N)
+                # theta = np.arccos(X0)
             
             case "Isotropic" if self.div_2d:
                 theta = misc.uniform(0, np.radians(self.div_angle), N)
-
+           
+            # TODO explain
             case "Function" if not self.div_2d:
-                # see https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
-                alpha, X0 = misc.uniform2(0, 2*np.pi, 0, 1, N)
+                div_sin = np.sin(np.radians(self.div_angle))
+                r, alpha = misc.ring_uniform(0, div_sin, N, polar=True)
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 f = self.div_func(x) * np.sin(x)
+                X0 = r**2 / div_sin**2
                 theta = misc.random_from_distribution(x, f, X0, kind="continuous")
+
+            # case "Function" if not self.div_2d:
+                # # see https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
+                # alpha, X0 = misc.uniform2(0, 2*np.pi, 0, 1, N)
+                # x = np.linspace(0, np.radians(self.div_angle), 1000)
+                # f = self.div_func(x) * np.sin(x)
+                # theta = misc.random_from_distribution(x, f, X0, kind="continuous")
 
             case "Function" if self.div_2d:  # pragma: no branch
                 x = np.linspace(0, np.radians(self.div_angle), 1000)

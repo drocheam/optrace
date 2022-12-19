@@ -565,9 +565,8 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.show_source_image)
 
                 time.sleep(0.1)
-                sim._set_in_main("_cmd", "GUI.replot()")
                 sim._do_in_main(sim.replot_rays)
-                sim._do_in_main(sim.send_cmd)
+                sim._do_in_main(sim.send_cmd, "GUI.replot()")
                 sim._do_in_main(sim.show_detector_image)
                 sim._set_in_main("detector_selection", sim.detector_names[1])
 
@@ -635,8 +634,8 @@ class GUITests(unittest.TestCase):
 
         def interact(sim):
             with self._try(sim):
-                funcs = [sim.send_cmd, sim.show_detector_image, sim.show_source_image, sim.show_source_spectrum, sim.move_to_focus,
-                         sim.replot_rays, sim.open_property_browser,
+                funcs = [sim.show_detector_image, sim.show_source_image, sim.show_source_spectrum, sim.move_to_focus,
+                         sim.replot_rays, sim.open_property_browser, sim.open_command_window,
                          sim.show_detector_spectrum, sim.show_detector_cut, sim.show_source_cut, sim.replot]
 
                 props = [('ray_amount_shown', 500), ('ray_amount_shown', 2000), ('minimalistic_view', True), ('minimalistic_view', False), 
@@ -645,9 +644,9 @@ class GUITests(unittest.TestCase):
                         ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), ('flip_det_image', False),
                         ('det_spectrum_one_source', True), ('det_image_one_source', False), ('log_image', False), ('log_image', True),
                         ('raytracer_single_thread', False), ('raytracer_single_thread', True), ('wireframe_surfaces', True), 
-                        ('wireframe_surfaces', False), ('focus_cost_plot', True), ('focus_cost_plot', False), ('_cmd', 'GUI.replot()'),
-                        ('_cmd', 'scene.render()'), ('_cmd', 'scene.z_minus_view()'), ('maximize_scene', False), ('maximize_scene', True),
-                         ('activate_filter', False), ('activate_filter', True), ('high_contrast', False), ('high_contrast', True)]
+                        ('wireframe_surfaces', False), ('focus_cost_plot', True), ('focus_cost_plot', False), 
+                        ('maximize_scene', False), ('maximize_scene', True),
+                        ('activate_filter', False), ('activate_filter', True), ('high_contrast', False), ('high_contrast', True)]
 
                 for i in np.arange(200):
                     # the expected value (mean time for a large number) is integral n*10^n from n0 to n1
@@ -655,7 +654,7 @@ class GUITests(unittest.TestCase):
                     n = np.random.uniform(-4, 0.5)
                     time.sleep(10**n)
 
-                    match np.random.randint(0, 10):
+                    match np.random.randint(0, 11):
                         case 0:
                             sim._do_in_main(np.random.choice(funcs))
                         case 1:
@@ -679,6 +678,10 @@ class GUITests(unittest.TestCase):
                             sim._set_in_main("det_pos", np.random.uniform(RT.outline[4], RT.outline[5]))
                         case 9:
                             sim._set_in_main("image_pixels", np.random.choice(ot.RImage.SIZES))
+                        case 10:
+                            cmds = ['GUI.replot()', 'scene.render()', 'scene.z_minus_view()']
+                            cmd = np.random.choice(cmds)
+                            sim._do_in_main(sim.send_cmd, cmd)
 
                     # close plots from time to time
                     if i % 20 == 0:
@@ -771,20 +774,16 @@ class GUITests(unittest.TestCase):
         sim = TraceGUI(RT, silent=True)
 
         def send(cmd):
-            sim._set_in_main("_cmd", cmd)
-            sim._do_in_main(sim.send_cmd)
+            sim._do_in_main(sim.send_cmd, cmd)
             sim._wait_for_idle()
 
         def interact(sim):
             with self._try(sim):
                 state = RT.rays.crepr()
-                self.assertEqual(sim._command_history, "")
                 send("GUI.replot()")
-                self.assertNotEqual(sim._command_history, "")  # history changed
                 self.assertFalse(state == RT.rays.crepr())  # check if raytraced
-                sim._do_in_main(sim.clear_history)
-                sim._wait_for_idle()
-                self.assertEqual(sim._command_history, "")
+
+                sim._do_in_main(sim.open_command_window)
 
                 send("GUI.show_detector_image()")
                 self.assertTrue(sim.last_det_image is not None)  # check if raytraced
@@ -807,6 +806,8 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(len(sim._aperture_plots), 0)  # check if aperture plot is removed
                 self.assertFalse(state == RT.rays.crepr())  # check if raytraced
               
+                sim._do_in_main(sim.open_command_window)
+                
                 send("")  # check empty command
 
                 send("throw RuntimeError()")  # check if exceptions are handled
@@ -1038,8 +1039,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim._set_in_main("command_dont_replot", True)
                 sim._wait_for_idle()
-                sim._set_in_main("_cmd", "RT.remove(APL[0])")
-                sim._do_in_main(sim.send_cmd)
+                sim._do_in_main(sim.send_cmd, "RT.remove(APL[0])")
                 sim._wait_for_idle()
                 self.assertEqual(len(sim._aperture_plots), 1)  # plot object still there, not replotted
                 sim._set_in_main("command_dont_replot", False)
@@ -1053,12 +1053,11 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(time.time() - start < 6)
 
                 # running the action is skipped because a different action (InitScene) is running
-                sim._set_in_main("_cmd", "self.replot()")
                 sim._set_in_main("silent", True)
-                sim._do_in_main(sim.send_cmd)
+                sim._do_in_main(sim.send_cmd, "self.replot()")
                 sim._wait_for_idle(timeout=2)
                 sim._set_in_main("silent", False)
-                sim._do_in_main(sim.send_cmd)
+                sim._do_in_main(sim.send_cmd, "self.replot()")
                 sim._wait_for_idle(timeout=2)
 
                 sim._status["InitScene"] = 0
@@ -1210,8 +1209,7 @@ class GUITests(unittest.TestCase):
                 RT.markers[0].label_only = True
 
                 # check replotting of markers
-                sim._set_in_main("_cmd", "RT.remove(ML[-1])")  # also checks that alias ML exists
-                sim._do_in_main(sim.send_cmd)
+                sim._do_in_main(sim.send_cmd, "RT.remove(ML[-1])") # also checks that alias ML exists
                 sim._wait_for_idle()
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
                 self.assertEqual(len(sim._marker_plots), 1)  # element was removed in scene
@@ -1302,9 +1300,8 @@ class GUITests(unittest.TestCase):
                 # but I don't know how to make the Picker.pick() function pick with a right click
                 # so currently we overide the RayPicker with the onSpacePick method
                 # do via command string, so it is guaranteed to run in main thread
-                sim._set_in_main("_cmd", "self._ray_picker = self.scene.mlab.gcf().on_mouse_pick("
+                sim._do_in_main(sim.send_cmd, "self._ray_picker = self.scene.mlab.gcf().on_mouse_pick("
                                          "self._on_space_pick, button='Left')")
-                sim._do_in_main(sim.send_cmd)
                 sim._wait_for_idle()
 
                 # space picked -> show coordinates

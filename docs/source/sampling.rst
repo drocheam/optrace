@@ -121,7 +121,7 @@ with :math:`F(x)` being injective :math:`\forall x \in [a, b]` as:
 
 **Proof of** :math:numref:`ITS_F_interval` **and** :math:numref:`ITS_T_interval` **:**
 
-1. :math:`F^{-1}(F(x)) = x ~\forall~ x``, this is why a change of interval :math:`\mathcal{U}_{[0,~1]} \to \mathcal{U}_{[\text{F}(a),~\text{F}(b)]}` leads to :math:`\mathcal{T}_{[0,~1]} \to \mathcal{T}_{[a,~b]}`.
+1. :math:`F^{-1}(F(x)) = x ~\forall~ x \in [a, b]`, this is why a change of interval :math:`\mathcal{U}_{[0,~1]} \to \mathcal{U}_{[\text{F}(a),~\text{F}(b)]}` leads to :math:`\mathcal{T}_{[0,~1]} \to \mathcal{T}_{[a,~b]}`.
 
 2. Sampling only from interval :math:`x \in [a, ~b]` leads to zero probability for :math:`x < a`, the integration bounds for :math:`f` therefore need to start at :math:`\chi = a` instead of :math:`\chi = -\infty` as in :math:numref:`ITS_cdf`. Alternatively the bounds can be left unchanged and we could instead set :math:`f = 0 ~\forall~ x < a`.
 
@@ -213,16 +213,9 @@ Disc/Annulus Sampling
 
 **Issue with polar grids**
 
-.. TODO Abschnitt umbenennen
 
 Stratified sampling generates a rectangular grid, but for a circular surface this gets transformed into a polar grid.
 While this done uniformly in :numref:`circle_sampling`, there are some circular artefacts visible, especially at the center.
-Although for many rays the artefacts become less and less visible, a different approach would be suitable to remove them altogether.
-
-
-Instead our implementation samples a square grid, where in the next step the grid is mapped onto a disc. 
-If needed, the disc can be mapped to a annulus (surface between two concentric circles).
-Note that equi-areal mapping methods are needed, since we want to keep the point density and uniformity of the noise.
 
 .. list-table::
 
@@ -238,36 +231,45 @@ Note that equi-areal mapping methods are needed, since we want to keep the point
 
           200k rays on a circular area with positions mapped from stratified grid, image rendered with 189 x 189 pixel
 
+These artefacts arise from the highly distorted initial rectangular cells, that in those regions become circular sectors. At the disc edge the rectangular cells are less distorted. In the inner region the area elements consist of small arc lengths and a large radial component, while going further outside the arc lengths increase and the radial lengths decrease. Near the center the area elements appear *zoomed in* to the human eye. You can see such a grid and its distortion in :footcite:`doi:10.1080/10867651.1997.10487479`, figure 5, as well as the alternative method that is showcased next.
+
+Although for many rays the mentioned artefacts become less and less visible, a different approach would be suitable to remove them altogether.
 
 **Square to Disc Mapping**
 
-Shirley Square - Disc Mapping:
-https://paperzz.com/doc/8612181/a-low-distortion-map-between-disk-and-square
+Reducing those artefacts is done by first sampling a square grid that then gets mapped onto a disc.
+The difference is that using special mapping methods the square cells comparatively get less distorted, or alternatively get distorted more uniformly. Note that equi-areal mapping methods are needed, since we want to keep the point density and uniformity of the noise.
 
-Simplification of the formulas:
-https://psgraphics.blogspot.com/2011/01/improved-code-for-concentric-map.html
+One such method is the Square-Disc Mapping method from :footcite:p:`doi:10.1080/10867651.1997.10487479`. ``optrace`` implements a simplified method from :footcite:`ShirleyCode`.
 
 
-:math:`x,~y` inside grid with bounds :math:`(-r_o, r_o, -r_o, r_o)`
+Sampled grid values :math:`x,~y` lie inside a grid with bounds :math:`(-r_\text{o}, ~r_\text{o}, ~-r_\text{o}, ~r_\text{o})` and get transformed to radial disc coordinates using:
 
 .. math::
    (r, \varphi)= 
-   \begin{cases}\left(x, \frac{\pi}{4} \frac{y}{x}\right) & \text { if } x^2>y^2 \\ 
-   \left(y, \frac{\pi}{2}-\frac{\pi}{4} \frac{x}{y}\right) & \text { if } x^2 \leq y^2 \text { and } y^2>0 \\
-   (0,0), & \text { otherwise }
+   \begin{cases}\left(x, ~\frac{\pi}{4} \frac{y}{x}\right) & \text { if } x^2>y^2 \\ 
+   \left(y, ~\frac{\pi}{2}-\frac{\pi}{4} \frac{x}{y}\right) & \text { if } x^2 \leq y^2 \text { and } y^2>0 \\
+   (0,~0) & \text { otherwise }
    \end{cases}
    :label: square_disc_mapping
 
+Where :math:`r_\text{o}` is the outer radius of the circle. Note that :math:`r` is signed, contrary to standard polar coordinates.
+
 **Disc to Annulus Mapping**
+
+When a annulus (surface between to concentric circles) is needed, the disc coordinates can be transformed by rescaling the radius :math:`r`. However, this needs to be done in a non-linear way, such that the local area stays constant.
+In :numref:`ring_sampling` we talk about how the linear values need to be inserted into a square function to archieve an equal-area mapping for a ring. Here this is done in a similar way.
+The mapped radius :math:`r_\text{A}` from an annulus with inner radius :math:`r_\text{i}`, outer radius :math:`r_\text{o}` and radial coordinates :math:`r \in [0,~r_\text{o}]` from :math:numref:`square_disc_mapping` is then:
 
 .. math::
    r_\text{A} = 
    \begin{cases}
-   \text{sign}(r) \sqrt{r^2_{i} + r^2 \left(1 - \frac{r^2_i}{r^2_{o}}\right)} & \text{ if } r \neq 0\\
-   r_i & \text{ if } r = 0\\
+   \text{sign}(r) \sqrt{r^2_\text{i} + r^2 \left(1 - \frac{r^2_\text{i}}{r^2_\text{o}}\right)} & \text{ if } r \neq 0\\
+   r_\text{i} & \text{ if } r = 0\\
    \end{cases}
    :label: disc_annulus_mapping
 
+The sign function needs to be applied, since, like mentioned before, the radius :math:`r` has a sign, which is also need for :math:`r_\text{A}`. Introducing the sign function however leads to a mapping :math:`r=0 \to r_\text{A} = 0`, that is avoided with a special case in this situation.
 
 Power Sampling
 ==========================

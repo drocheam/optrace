@@ -1,33 +1,35 @@
-Current Version: 1.0.6-14-g9763a78 
-
-1.0.6           Removed colorio dependency from tests. sRGB primaries are now strictly 0 beyond visible range. Improved testing and documentation.
-1.0.5           Fixed polarization calculation bug. Surface collisions are now plotted inside GUI. More tests.
-1.0.4           DataSurface has been renamed to DataSurface2D. New DataSurface1D class for radial data profiles.
-1.0.3           New Orthographic sphere projection method.
-1.0.2           Surface/geometry reverse() changed to a flip() function that flips around the x-axis. rotate() operation to rotate around z-axis.
-1.0.1           Minor UI improvements. Index Boxes are now joined if the spacing between
-1.0.0           Import of agf and zmx files. New Group class, raytracer is a subclass of this. Reverse() action on elements, surfaces and group. GUI high contrast mode. Surface types now have their own classes. New aspheric surface type. Optional gaussian filter to simulate diffraction limit in RImages.
-0.9.9           RImage now has an odd number of pixels. New Group class. New color submodule.
-0.9.8           New: Ray transfer matrix analysis. Different sphere projection methods. Markers for tracing geometry. Removed colorio dependency. New LED standard illuminants. More examples.
-0.9.7           Improved GUI and new UI actions. More tests. Package installing tools.
-0.9.6           Preset restructuring. Eye model geometry presets and examples. Improved multithreading in TraceGUI. Now possible to run commands via TCP from UI.
-0.9.5           Improved RImage saving. Added optional RImage offset. More plot and backend tests.
-0.9.4           Project restructuring. New RefractionIndex Presets. New AbbePlot.
-0.9.3           Project restructuring
-0.9.2           New RefractionIndex presets. Functions for plotting RefractionIndex, Spectrum and chromaticity diagrams. Functions for creating spectra at Detector and RaySource. Plots for Image cuts. iterativeDetectorImage is now iterativeRender, also renders RaySource Images.
-0.9.1           Spectrum class for Filter and RaySource. Common BaseClass for almost all optrace.tracer classes. Spectral line presets. Two new RefractionIndex Formulas and mutiple new presets. DetectorImage now possible for selected source only.
-0.9.0           Image now can be saved and loaded. Holds higher resolution version internally, that can be rescaled to. New sRGB Rendering Intents. New Image modes (Outside Gamut, Lightness, Hue, Chroma, Saturation). RaySource for autofocus can be selected.
-0.8.9           Information messages are now displayed combined from all tracing threads. RaySource rays are now created in threads.
-0.8.8           Project restructuring 2.
-0.8.7           Backend now has a progress bar for operations.
-0.8.6           Project restructuring.
-0.8.5           New 'Cleaner View'-option in GUI. Simpler and more cleaned up GUI code. Minor bug fixes.
-0.8.4           TCP Server for controlling the GUI. Automatic RT change detection and GUI replotting. New restrictions to when the user can define or assign some class properties.
-0.8.3           Improvement of Autofocus and Debug Plot. Opacity simulation of filter in GUI. RaySource Color adapts to Ray Coloring Mode. GUI now has an advanced picking mode.
-0.8.2           GUI shell interface and interface functions. Additional GUI Tests.
-0.8.1           List of RaySources now belongs to Raytracer. Renamed RaySourceList to RayStorage. Globally defined wavelength range. Own Misc.calc() instead of numexpr.evaluate().
-0.8.0           Restructuring: Lens, Filter, Detector, RaySource now have a common parent class 'SObject'
-0.7.4           GUI class: Now plotting with a common function for RaySource, Filter, Detector
-0.7.3           GUI Object Labels are now centered.
-0.7.2           Testing: More GUI Tests added. GUI class: Minor Cleanup.
-0.7.1           First named version
+ Version  |      Date      |                                 Description 
+-------------------------------------------------------------------------------------------------------------------------------------
+  1.1.0   |   2022-12-16   |   Simplified numeric tracing. Removed FunctionSurface hit_func. RImage export_png now can export in different resolutions and rescaling modes. New Raytracer.absorb_missing behavior: no restictions, but not-lens-hitting-rays at medium transition get absorbed. 
+  1.0.7   |   2022-12-15   |   Improved documentation. Ring and Circle sampling now without artefacts at the center. 
+  1.0.6   |   2022-12-02   |   Removed colorio dependency from tests. sRGB primaries are now strictly 0 beyond visible range. Improved testing and documentation. 
+  1.0.5   |   2022-11-25   |   Fixed polarization calculation bug. Surface collisions are now plotted inside GUI. More tests. 
+  1.0.4   |   2022-11-18   |   DataSurface has been renamed to DataSurface2D. New DataSurface1D class for radial data profiles. 
+  1.0.3   |   2022-11-16   |   New Orthographic sphere projection method. 
+  1.0.2   |   2022-11-16   |   Surface/geometry reverse() changed to a flip() function that flips around the x-axis. rotate() operation to rotate around z-axis. 
+  1.0.1   |   2022-11-09   |   Minor UI improvements. Index Boxes are now joined if the spacing between them is small. 
+  1.0.0   |   2022-11-04   |   Import of agf and zmx files. New Group class, raytracer is a subclass of this. Reverse() action on elements, surfaces and group. GUI high contrast mode. Surface types now have their own classes. New aspheric surface type. Optional gaussian filter to simulate diffraction limit in RImages. 
+  0.9.9   |   2022-10-10   |   RImage now has an odd number of pixels. New Group class. New color submodule. 
+  0.9.8   |   2022-09-23   |   New: Ray transfer matrix analysis. Different sphere projection methods. Markers for tracing geometry. Removed colorio dependency. New LED standard illuminants. More examples. 
+  0.9.7   |   2022-08-02   |   Improved GUI and new UI actions. More tests. Package installing tools. 
+  0.9.6   |   2022-07-23   |   Preset restructuring. Eye model geometry presets and examples. Improved multithreading in TraceGUI. Now possible to run commands via TCP from UI. 
+  0.9.5   |   2022-07-08   |   Improved RImage saving. Added optional RImage offset. More plot and backend tests. 
+  0.9.4   |   2022-05-29   |   Project restructuring. New RefractionIndex Presets. New AbbePlot. 
+  0.9.3   |   2022-05-28   |   Project restructuring 
+  0.9.2   |   2022-05-28   |   New RefractionIndex presets. Functions for plotting RefractionIndex, Spectrum and chromaticity diagrams. Functions for creating spectra at Detector and RaySource. Plots for Image cuts. iterativeDetectorImage is now iterativeRender, also renders RaySource Images. 
+  0.9.1   |   2022-05-10   |   Spectrum class for Filter and RaySource. Common BaseClass for almost all optrace.tracer classes. Spectral line presets. Two new RefractionIndex Formulas and mutiple new presets. DetectorImage now possible for selected source only. 
+  0.9.0   |   2022-04-26   |   Image now can be saved and loaded. Holds higher resolution version internally, that can be rescaled to. New sRGB Rendering Intents. New Image modes (Outside Gamut, Lightness, Hue, Chroma, Saturation). RaySource for autofocus can be selected. 
+  0.8.9   |   2022-04-09   |   Information messages are now displayed combined from all tracing threads. RaySource rays are now created in threads. 
+  0.8.8   |   2022-04-08   |   Project restructuring 2. 
+  0.8.7   |   2022-04-08   |   Backend now has a progress bar for operations. 
+  0.8.6   |   2022-04-07   |   Project restructuring. 
+  0.8.5   |   2022-04-06   |   New 'Cleaner View'-option in GUI. Simpler and more cleaned up GUI code. Minor bug fixes. 
+  0.8.4   |   2022-04-05   |   TCP Server for controlling the GUI. Automatic RT change detection and GUI replotting. New restrictions to when the user can define or assign some class properties. 
+  0.8.3   |   2022-04-01   |   Improvement of Autofocus and Debug Plot. Opacity simulation of filter in GUI. RaySource Color adapts to Ray Coloring Mode. GUI now has an advanced picking mode. 
+  0.8.2   |   2022-03-31   |   GUI shell interface and interface functions. Additional GUI Tests. 
+  0.8.1   |   2022-03-29   |   List of RaySources now belongs to Raytracer. Renamed RaySourceList to RayStorage. Globally defined wavelength range. Own Misc.calc() instead of numexpr.evaluate(). 
+  0.8.0   |   2022-03-28   |   Restructuring: Lens, Filter, Detector, RaySource now have a common parent class 'SObject' 
+  0.7.4   |   2022-03-28   |   GUI class: Now plotting with a common function for RaySource, Filter, Detector 
+  0.7.3   |   2022-03-28   |   GUI Object Labels are now centered. 
+  0.7.2   |   2022-03-28   |   Testing: More GUI Tests added. GUI class: Minor Cleanup. 
+  0.7.1   |   2022-03-28   |   First named version 

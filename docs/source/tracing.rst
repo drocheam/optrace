@@ -4,6 +4,14 @@ Tracing
 *********************************
 
 
+Pathtracing versus Raytracing
+==================================
+
+
+Units and Conventions
+=========================
+
+
 Tracing Process
 ========================
 
@@ -27,18 +35,13 @@ The following figure shows the refraction of a ray on a curved surface.
 
 Commonly found forms of the law of refraction are composed of an input and output angle. For the tracing process a form having only vectors as parameters, as well as circumventing the calculation of any angles, would be more convenient. 
 
-**Case 1**
-
-For :math:`s \nparallel n` such an equation can be found in :footcite:`OptikHaferkorn`:
+Such an equation can be found in :footcite:`OptikHaferkorn`:
 
 .. math::
    s^{\prime}=\frac{n_1}{n_2} s-n\left\{\frac{n_1}{n_2}(n s)-\sqrt{1-\left(\frac{n_1}{n_2}\right)^{2}\left[1-(n s)^{2}\right]}\right\}
    :label: refraction
 
-
-**Case 2**
-
-For :math:`s \parallel n` the output direction :math:`s'` is simply equal to :math:`s`.
+In case of total internal reflection (TIR) the root argument becomes negative. In ``optrace`` TIR rays get absorbed, as reflections are not modelled, and the user is notified with a message.
 
 
 .. _tracing_pol:
@@ -51,7 +54,7 @@ The polarization vector :math:`E` can be decomposed into a :math:`E_\text{p}` -c
 Note that for our calculations all vectors are unity vectors, while length information of the polarization components is contained in the scaling factors :math:`A_\text{tp}, A_\text{ts}`.
 
 .. figure:: images/refraction_interface_polarization.svg
-   :width: 500
+   :width: 620
    :align: center
 
    Ray polarization components before and after refraction.
@@ -129,7 +132,7 @@ Optics tells us that ideally parallel rays meet in the same position in the foca
 .. _image_ideal_refraction:
 
 .. figure:: images/ideal_refraction.svg
-   :width: 550
+   :width: 500
    :align: center
 
    Geometry for refraction on an ideal lens.

@@ -101,7 +101,7 @@ def uniform(a, b, N):
     return x
 
 
-def ring_uniform(ri: float, r: float, N: int) -> tuple[np.ndarray, np.ndarray]:
+def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.ndarray, np.ndarray]:
     """
     Generate uniform random positions inside a ring area (annulus) with stratified sampling.
 
@@ -110,9 +110,13 @@ def ring_uniform(ri: float, r: float, N: int) -> tuple[np.ndarray, np.ndarray]:
     :param ri: inner radius
     :param r:  outer radius
     :param N:  number of points
+    :param polar: if polar coordinates should be returned instead of cartesian
     :return: random x and y positions
     """
     x, y = uniform2(-r, r, -r, r, N)
+
+    if ri:
+        x
 
     r_ = np.zeros_like(x)
     theta = np.zeros_like(x)
@@ -136,9 +140,13 @@ def ring_uniform(ri: float, r: float, N: int) -> tuple[np.ndarray, np.ndarray]:
         # (1 - ((r < 0) << 1)) is a fast inline method for: 1 if r >= 0, -1 if r < 0
         r_ = ne.evaluate("(1 - ((r_ < 0) << 1)) * sqrt(ri**2 + r_**2*(1 - (ri/r)**2))")
 
-    # convert to cartesian coordinates
-    return r_*np.cos(theta), r_*np.sin(theta)
+    if not polar:
+        return r_*np.cos(theta), r_*np.sin(theta)
 
+    else:
+        # r is signed, remove sign and convert it to an angle
+        theta[r_ < 0] -= np.pi
+        return np.abs(r_), theta
 
 # class only used for separate namespace
 class PropertyChecker:

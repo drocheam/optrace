@@ -1,9 +1,9 @@
 #!/bin/bash
 
-history=$(git tag -n | sort -r)
-current=$(git describe)
-
-out=$(printf 'Current Version: %s \n\n%s' "$current" "$history")
-
-touch ./docs/source/changelog.txt
+out=" Version  |      Date      |                                 Description "
+out+=$'\n'
+out+="-------------------------------------------------------------------------------------------------------------------------------------"
 echo "$out" > ./docs/source/changelog.txt
+
+git tag -l --sort=-refname --format='  %(refname:short)   |   %(creatordate:short)   |   %(contents:subject) %(contents:body)' >> ./docs/source/changelog.txt
+

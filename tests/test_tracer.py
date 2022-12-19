@@ -412,13 +412,16 @@ class TracerTests(unittest.TestCase):
             RT.remove(RS)
 
     @pytest.mark.slow
-    def test_ray_source_divergence(self):
+    def test_0ray_source_divergence(self):
         """
         tests the behaviour of different ray source divergence modes in 2D and 3D mode
         to check the function f we multiply the irradiance curve on the detector with 1/f
         the resulting function curve should be a constant with some noise
         we check the standard deviation on this curve
         """
+
+        # we can't use spherical detectorsf for testing, 
+        # since the projection is not equidistant and equal-area at the same time
 
         # make raytracer
         RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True)
@@ -500,7 +503,7 @@ class TracerTests(unittest.TestCase):
 
         # Lambertian divergence in 3D, leads to 1/cos(e)**4 on detector
         RS0.divergence = "Lambertian"
-        RT.trace(2000000)
+        RT.trace(4000000)
         img0 = RT.detector_image(63)
         img = img0.get_by_display_mode("Irradiance")
         x0, x1, y0, y1 = img0.extent
@@ -527,7 +530,7 @@ class TracerTests(unittest.TestCase):
         r = np.sqrt(X**2 + Y**2)
         Z = img / ( 1 + np.sqrt(np.arctan(r/10)))/np.cos(np.arctan(r/10))**3
         self.assertTrue(np.std(Z/np.max(Z)) < 0.05)
-   
+  
     @pytest.mark.slow
     def test_sphere_projections(self):
 

@@ -127,7 +127,7 @@ F_eC_: LightSpectrum = LightSpectrum("Lines", lines=Lines.F_eC_, line_vals=[1, 1
 """Spectral Lines F', e, C'"""
 
 rgb_lines: LightSpectrum = LightSpectrum("Lines", lines=Lines.rgb, line_vals=[0.5745000, 0.5985758, 0.3895581],
-                                         desc="RGB Lines'", long_desc="Spectral Lines 450, 550, 650nm")
+                                         desc="RGB Lines'", long_desc="sRGB Primary Dominant Wavelengths")
 """Spectral Lines 450, 550, 650nm with a power ratio producing neutral D65 white"""
 
 lines: list = [FDC, FdC, FeC, F_eC_, rgb_lines]

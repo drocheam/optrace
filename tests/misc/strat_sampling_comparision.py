@@ -11,10 +11,10 @@ RT = ot.Raytracer(outline=[-10, 10, -10, 10, -5, 60])
 # v--- uncomment the one needed
 
 # add Rectangular Raysource
-RSS = ot.RectangularSurface(dim=[2, 2])
+RSS = ot.RectangularSurface(dim=[2, 10])
 
 # add Rectangular Raysource
-RSS = ot.CircularSurface(r=2)
+# RSS = ot.CircularSurface(r=2)
 
 # add Rectangular Raysource
 # RSS = ot.RingSurface(ri=1, r=2)

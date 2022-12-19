@@ -11,7 +11,57 @@ Definition
 Functions
 ------------
 
-.. TODO implement
+
+**Monochromatic**
+
+This implements a monochromatic source with wavelength :math:`\lambda_0`.
+
+.. math::
+   S(\lambda) = \delta(\lambda - \lambda_0)
+   :label: eq_spectrum_mono
+
+**Lines**
+
+A line spectrum consist of multiple monochromatic sources, parameters are a set of power and wavelength combinations
+:math:`L=\left\{(P_1,~\lambda_1),~(P_2,~\lambda_2),~\dots\right\}`
+
+.. math::
+   S(\lambda) = \sum_{(P_i, ~\lambda_i) \in L}  P_i \, \delta(\lambda - \lambda_i)
+   :label: eq_spectrum_lines
+
+**Constant**
+
+Constant spectrum with value :math:`S_0`
+
+.. math::
+   S(\lambda) = S_0
+   :label: eq_spectrum_const
+
+Note that while the function is constant, only rays inside the visible range (default being the 380-780 nanometer range) are simulated.
+
+**Rectangle**
+
+Spectrum with a rectangular function :math:`\Pi(\lambda)` with bounds :math:`\lambda_0,~\lambda_1` and a scaling factor :math:`S_0`.
+
+.. math::
+   S(\lambda) = S_0\, \Pi_{[\lambda_0,~\lambda_1]}(\lambda)
+   :label: eq_spectrum_rect
+
+**Gaussian**
+
+A gaussian spectrum is modelled with a scaling factor :math:`S_0`, a center wavelength :math:`\lambda_0` and a standard deviation :math:`\lambda_\sigma`.
+
+.. math::
+   S(\lambda) = S_0 \exp \left( -\frac{\left(\lambda - \lambda_0\right)^2}{2 \lambda^2_\sigma}\right)
+   :label: eq_spectrum_gauss
+
+**User Data/Function**
+
+With Data/Function mode the spectrum is simply modelled by a user function/ data set. With a data set data is linearly interpolated.
+
+.. math::
+   S(\lambda) = S_F(\lambda)
+   :label: eq_spectrum_user
 
 
 Presets
@@ -38,7 +88,7 @@ Functions
 
 **Blackbody**
 
-Spectral radiance according to Planck's Law: :footcite:`PlanckWiki`
+The spectral radiance for a blackbody according to Planck's Law is: :footcite:`PlanckWiki`
 
 .. math::
    B_\lambda (\lambda, ~T) = \frac{2 h c^2}{\lambda^5} \frac{1}{\exp\left(\frac{h  c } {\lambda k_\text{B}  T}\right) - 1}
@@ -64,6 +114,17 @@ Note that :math:`\lambda` must be specified in meters.
 Color
 ----------
 
+Analogously to :numref:`xyz_color_space` the tristimulus values for the light spectrum :math:`S(\lambda)` can be calculated with:
+
+.. math::
+   X &=\int_{\lambda} S(\lambda) \cdot x(\lambda) ~d \lambda \\
+   Y &=\int_{\lambda} S(\lambda) \cdot y(\lambda) ~d \lambda \\
+   Z &=\int_{\lambda} S(\lambda) \cdot z(\lambda) ~d \lambda
+   :label: XYZ_Calc_Spectrum
+
+From there on, typical color model conversions can be applied.
+
+
 .. _random_wavelengths:
    
 Random Wavelengths
@@ -72,21 +133,67 @@ Random Wavelengths
 .. TODO different wavelength generations, mention inverse transform sampling
 
 
+**Monochromatic**
+
+
+The set of wavelengths :math:`\Lambda` is simply the monochromatic wavelength repeated many times.
+
+.. math::
+   \Lambda = \left\{\lambda_0,~\lambda_0, \dots\right\}
+   :label: eq_lspectrum_random_mono
+
+**Lines**
+
+The sum power of all sources is
+
+.. math::
+   P = \sum_{(P_i,~\lambda_i \in L)} P_i
+   :label: eq_lspectrum_lines_P
+
+The probabilities are then 
+
+.. math::
+   p = \left\{\frac{P_i}{P} ~~:~~ (P_i, \lambda_i) \in L \right\}
+   :label: eq_lspectrum_lines_p
+
+:math:`\Lambda` is then a random variable choosing from the set :math:`\left\{\lambda_0,~\lambda_1, ~\dots\right\}` with probabilities :math:`\left\{p_1,~p_2,~\dots\right\}`.
+
+
+**Constant**
+
+With *Constant* mode, the wavelengths are chosen from within the visible range with uniform random variable :math:`\mathcal{U}`.
+
+.. math::
+   \Lambda = \mathcal{U}_{[380\,\text{nm},~780\,\text{nm}]}
+   :label: eq_lspectrum_random_const
+
+**Rectangle**
+
+In the case of a rectangular light spectrum the random variable is a uniform variable with the bounds being equal to the rectangle bounds.
+
+.. math::
+   \Lambda = \mathcal{U}_{[\lambda_0,~\lambda_1]}
+   :label: eq_lspectrum_random_rect
+
 **Gaussian**
 
-.. math::
-   \lambda_0 =&~ \frac{1}{2}\left(1 + \text{erf}\left(\frac{\lambda_\text{min} - \mu}{\sqrt{2} \sigma}\right)\right)\\
-   \lambda_1 =&~ \frac{1}{2}\left(1 + \text{erf}\left(\frac{\lambda_\text{max} - \mu}{\sqrt{2} \sigma}\right)\right)
-   :label: gaussian_trunc_lambda_bounds
-                
-.. math::
-    \Lambda = \mathcal{U}_{[\lambda_0, ~\lambda_1]} 
-   :label: gaussian_trunc_lambda_distr
+A gaussian with :math:`\lambda` being limited to :math:`\lambda \in [\lambda_l,~\lambda_r]` the distribution is called a *truncated gaussian distribution*.
+For this function the anti-derivative integration bounds :math:`\xi_a,~\xi_b` need to be calculated first before performing the inverse transform method.
 
 .. math::
-   \lambda = \mu + \sqrt{2} ~ \sigma ~  \text{erf}^{-1}(2\Lambda-1)
+   \xi_a =&~ \frac{1}{2}\left(1 + \text{erf}\left(\frac{\lambda_\text{l} - \lambda_0}{\sqrt{2} \lambda_\sigma}\right)\right)\\
+   \xi_b =&~ \frac{1}{2}\left(1 + \text{erf}\left(\frac{\lambda_\text{r} - \lambda_0}{\sqrt{2} \lambda_\sigma}\right)\right)
+   :label: gaussian_trunc_lambda_bounds
+         
+With these bounds the random wavelengths are then
+
+.. math::
+   \Lambda = \lambda_0 + \sqrt{2} ~ \lambda_\sigma ~  \text{erf}^{-1}\left(2\,\mathcal{U}_{[\xi_a, ~\xi_b]}-1\right)
    :label: gaussian_trunc_lambda
 
+**User Function/ User Data / Blackbody**
+
+For these the inverse transform method in :numref:`inverse_transform` can be applied.
 
 
 Presets
@@ -115,6 +222,96 @@ Definition
 Color
 -----------
 
+Spectral Lines
+======================
+
+``optrace`` has some spectral wavelength lines defined in its presets.
+While there are many such lines, only those relevant for the calculation of the Abbe number are built-in.
+More about the Abbe number can be found in :numref:`abbe_number`.
+
+.. list-table:: Fraunhofer lines commonly used for Abbe number determination :footcite:`AbbeWiki`
+   :widths: 70 70 70 70
+   :header-rows: 1
+   :align: center
+   
+   * - Name
+     - | Wavelength 
+       | in nm
+     - Element
+     - Color
+   * - h
+     - 404.6561
+     - Hg
+     - violet
+   * - g
+     - 435.8343
+     - Hg
+     - blue
+   * - F'
+     - 479.9914
+     - Cd
+     - blue
+   * - F
+     - 486.1327
+     - H
+     - blue
+   * - e
+     - 546.0740
+     - Hg
+     - green
+   * - d
+     - 587.5618
+     - He
+     - yellow
+   * - D
+     - 589.2938
+     - Na
+     - yellow
+   * - C'
+     - 643.8469
+     - Cd
+     - red
+   * - C
+     - 656.272
+     - H
+     - red
+   * - r
+     - 706.5188
+     - He
+     - red
+   * - A'
+     - 768.2
+     - K
+     - IR-A
+
+Due to limitations in python variable names, the presets with a trailing apostrophe are instead named with an trailing underscore, for instance F' is named ``F_``.
+
+The most common wavelength combinations for Abbe numbers are FdC, FDC, FeC and F'eC'.
+
+
+In the next table the dominant wavelengths of the sRGB primaries can be found. The dominant wavelength is the wavelength that produces a color with the same hue as the reference color.
+The scaling factors are dimensioned such that the sum of these three monochromatic light sources produces sRGB-white.
+
+
+.. list-table:: Dominant wavelengths of sRGB primaries. Own work. 
+   :widths: 70 70 70
+   :header-rows: 1
+   :align: center
+   
+   * - Name
+     - | Wavelength 
+       | in nm
+     - Scaling Factor
+   * - R
+     - 611.2826
+     - 0.5745000
+   * - G
+     - 549.1321
+     - 0.5985758
+   * - B
+     - 464.3118
+     - 0.3895581
+
 RefractionIndex
 ===================
 
@@ -124,9 +321,10 @@ Definition
 Functions
 -------------
 
-Taken from :footcite:`ComsolDispersion` and :footcite:`ZemaxHagen`.
+The subsequent equations describe common refractive index models used in simulation software.
+They are taken from :footcite:`ComsolDispersion` and :footcite:`ZemaxHagen`.
 
-Wavelengths and coefficients are in powers of µm
+Generally, all coefficients must be given in powers of µm, while the same is true for the wavelength input.
 
 **Cauchy**
 
@@ -213,33 +411,52 @@ Wavelengths and coefficients are in powers of µm
    :label: n_schott 
 
 
+.. _abbe_number:
+
 Abbe Number
 --------------
+
+The Abbe number, also called :math:`V`-number, is a simple, scalar quantity describing the optical dispersive behavior of a medium. It is calculated from the refractive indices at three different wavelength.
 
 .. math::
    V = \frac{n_\text{c} - 1}{n_\text{s} - n_\text{l}}
    :label: abbe_eq
 
 With :math:`n_\text{s},~n_\text{c},~n_\text{l}` are the short, center and long wavelength refraction index.
+A higher Abbe number is desirable, as it corresponds to less chromatic dispersion.
+In addition, most materials have a *normal dispersion*, categorized as being :math:`\frac{\text{n}}{\text{d}\lambda}<0`, so the index falls off with larger wavelengths.
+The :math:`V`-number is therefore positive for such materials.
+A material with :math:`V=0` is an ideal material with no dispersion.
+
+Selecting different glasses is often done with the help of a *Abbe diagram*, where the center refractive index as well as the :math:`V`-number of the material are plotted as a scatter diagram. Examples can be found in :numref:`refraction_index_presets`.
 
 Curve from Abbe Number
 -----------------------
 
+In many cases only refractive index and the Abbe number are known or provided. 
+To simulate such materials a wavelength dependent model must be generated first.
+While there are infinite possible curves that produce the same parameters, it is expected that real materials with the same index and Abbe number differ only slightly in the visible region, where these parameters are provided for.
+
+We assume a model in the form of:
 
 .. math::
-   n = A + \frac{B}{\lambda^2 - d}
+   n(\lambda) = A + \frac{B}{\lambda^2 - d}
    :label: n_from_abbe_base
 
-With :math:`d=0.014\, \mu\text{m}^2` which is a compromise between the Cauchy (:math:`d=0`) and the Herzberger (:math:`d=0.028\,\mu\text{m}^2`) model.
+With :math:`d=0.014\, \mu\text{m}^2`, which is a compromise between the Cauchy (:math:`d=0`) and the Herzberger (:math:`d=0.028\,\mu\text{m}^2`) model.
 
-With :math:`n_\text{s}=n(\lambda_\text{s}),~n_\text{c}=n(\lambda_\text{c}),~n_\text{l}=n(\lambda_\text{l})` and the Abbe number equation in {} we can solve for :math:`A,~B`:
+With :math:`n_\text{s}:=n(\lambda_\text{s}),~n_\text{c}:=n(\lambda_\text{c}),~n_\text{l}:=n(\lambda_\text{l})` and the Abbe number equation in :math:numref:`n_from_abbe_base` one can solve for :math:`A,~B`:
 
 .. math::
    B =&~ \frac{1}{V}\frac{n_\text{c}-1}{\frac{1}{\lambda^2_\text{s} - d} - \frac{1}{\lambda^2_\text{l}-d}}\\
    A =&~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}
    :label: n_from_abbe_solution
 
-:math:`V`, :math:`n_\text{c}` and the spectral lines :math:`\lambda_\text{s},~\lambda_\text{c},~\lambda_\text{l}` are provided by the user.
+Parameters :math:`V`, :math:`n_\text{c}` and the spectral lines :math:`\lambda_\text{s},~\lambda_\text{c},~\lambda_\text{l}` are provided by the user.
+
+
+
+.. _refraction_index_presets:
 
 Presets
 --------------
