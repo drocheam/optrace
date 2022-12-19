@@ -1032,14 +1032,14 @@ class TraceGUI(HasTraits):
                 RSColor = []
                 for RS in self.raytracer.ray_sources:
                     
-                    if RS.polarization in ["x", "y", "Angle"]:
+                    if RS.polarization in ["x", "y", "Constant"]:
 
                         match RS.polarization:
                             case "x":
                                 pol_ang = 0
                             case "y":
                                 pol_ang = np.pi/2
-                            case "Angle":  # pragma: no branch
+                            case "Constant":  # pragma: no branch
                                 pol_ang = np.deg2rad(RS.pol_angle)
                     
                         proj = np.sin(pol_ang) if self.coloring_type == "Polarization yz" else np.cos(pol_ang)

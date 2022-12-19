@@ -15,7 +15,7 @@ RT.add(RS)
 
 RSS2 = ot.CircularSurface(r=1)
 RS2 = ot.RaySource(RSS2, divergence="None", s=[0, 0, 1], spectrum=ot.LightSpectrum("Blackbody", T=5000),
-                   pos=[0, 1, -3], polarization="Angle", pol_angle=25, power=2, desc="Decentered Circle")
+                   pos=[0, 1, -3], polarization="Constant", pol_angle=25, power=2, desc="Decentered Circle")
 RT.add(RS2)
 
 # add Lens 1

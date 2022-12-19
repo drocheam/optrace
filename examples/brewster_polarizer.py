@@ -28,7 +28,7 @@ RS0 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0.5, 0, -4],
 RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, 0, -4], 
                   polarization="y", desc="y-pol")
 RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[-0.5, 0, -4],
-                  polarization="Random", desc="no pol")
+                  polarization="Uniform", desc="no pol")
 RT.add(RS0)
 RT.add(RS1)
 RT.add(RS2)

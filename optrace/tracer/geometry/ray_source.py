@@ -42,7 +42,7 @@ class RaySource(Element):
     orientations: list[str] = ["Constant", "Function"]
     """Possible orientation types"""
 
-    polarizations: list[str] = ["Angle", "Random", "x", "y", "xy"]
+    polarizations: list[str] = ["Constant", "Uniform", "List", "Function", "x", "y", "xy"]
     """Possible polarization types"""
 
     abbr: str = "RS"  #: object abbreviation
@@ -56,13 +56,14 @@ class RaySource(Element):
                  pos:               (list | np.ndarray) = None,
 
                  # Divergence Parameters
-                 divergence:         str = "None",
-                 s:                  (list | np.ndarray) = None,
-                 s_sph:              (list | np.ndarray) = None,
-                 div_angle:          float = 0.5,
-                 div_2d:             bool = False,
-                 div_axis_angle:     float = 0,
-                 div_func:           Callable[[np.ndarray], np.ndarray] = None,
+                 divergence:        str = "None",
+                 s:                 (list | np.ndarray) = None,
+                 s_sph:             (list | np.ndarray) = None,
+                 div_angle:         float = 0.5,
+                 div_2d:            bool = False,
+                 div_axis_angle:    float = 0,
+                 div_func:          Callable[[np.ndarray], np.ndarray] = None,
+                 div_kwargs:        dict = None,
 
                  # Light Parameters
                  spectrum:          LightSpectrum = None,
@@ -75,8 +76,12 @@ class RaySource(Element):
                  or_kwargs:         dict = None,
 
                  # Polarization Parameters
-                 polarization:      str = "Random",
+                 polarization:      str = "Uniform",
                  pol_angle:         float = 0.,
+                 pol_angles:        list[float] = None,
+                 pol_probs:         list[float] = None,
+                 pol_func:          Callable[[np.ndarray], np.ndarray] = None,
+                 pol_kwargs:        dict = None,
 
                  **kwargs)\
             -> None:
@@ -90,7 +95,7 @@ class RaySource(Element):
         :param div_angle: cone opening angle in degree in mode divergence_type="Diverging"
         :param pos: 3D position of RaySource center
         :param power: total power of RaySource in W
-        :param pol: polarisation angle as float. Specify 'x' or 'y' for x- or y-polarisation, 'xy' for both
+        :param pol_angle: polarisation angle as float. Specify 'x' or 'y' for x- or y-polarisation, 'xy' for both
                     and leave empty for unpolarized light
         :param or_func: orientation function for orientation_type="Function",
             takes 1D array of x and y coordinates as input, returns (N, 3) numpy 2D array with orientations
@@ -113,6 +118,10 @@ class RaySource(Element):
         # polarization 
         self.polarization = polarization
         self.pol_angle = pol_angle
+        self.pol_func = pol_func
+        self.pol_angles = pol_angles
+        self.pol_probs = pol_probs
+        self.pol_kwargs = pol_kwargs if pol_kwargs is not None else {}
 
         # orientation and divergence
         self.divergence = divergence
@@ -131,6 +140,7 @@ class RaySource(Element):
         self.div_axis_angle = div_axis_angle
         self.div_func = div_func
         self.div_2d = div_2d
+        self.div_kwargs = div_kwargs if div_kwargs is not None else {}
 
         # lock assignment of new properties. New properties throw an error.
         self._new_lock = True
@@ -235,58 +245,37 @@ class RaySource(Element):
             case "None":
                 s = s_or
 
-            # TODO explain in the documentation that stratified sampling for a cone leads to the same artefacts as the disc sampling
-            # TODO explain in div_3d how r and alpha are generated alternatively
-            # TODO explain why artefacts are especially bad in the center of a distribution
-            # TODO refer in documentation to part in the shirley paper
-            
-            # TODO test if actually better
             case "Lambertian" if not self.div_2d:
                 # see https://doi.org/10.1080/10867651.1997.10487479
+                # # see https://www.particleincell.com/2015/cosine-distribution/
                 r, alpha = misc.ring_uniform(0, np.sin(np.radians(self.div_angle)), N, polar=True)
                 theta = ne.evaluate("arcsin(r)")
 
-            # case "Lambertian" if not self.div_2d:
-                # # see https://www.particleincell.com/2015/cosine-distribution/
-                # alpha, X0 = misc.uniform2(0, 2*np.pi, 0, np.sin(np.radians(self.div_angle))**2, N)
-                # theta = np.arcsin(np.sqrt(X0)) 
-            
             case "Lambertian" if self.div_2d:
                 X0 = misc.uniform(0, np.sin(np.radians(self.div_angle)), N)
                 theta = np.arcsin(X0)
 
             case "Isotropic" if not self.div_2d:
                 # see https://doi.org/10.1080/10867651.1997.10487479
+                # related https://mathworld.wolfram.com/SpherePointPicking.html
                 r, alpha = misc.ring_uniform(0, np.sin(np.radians(self.div_angle)), N, polar=True)
                 theta = ne.evaluate("arccos(1 - r**2)")
-            
-            # case "Isotropic" if not self.div_2d:
-                # # see https://mathworld.wolfram.com/SpherePointPicking.html
-                # alpha, X0 = misc.uniform2(0, 2*np.pi, np.cos(np.radians(self.div_angle)), 1, N)
-                # theta = np.arccos(X0)
             
             case "Isotropic" if self.div_2d:
                 theta = misc.uniform(0, np.radians(self.div_angle), N)
            
-            # TODO explain
             case "Function" if not self.div_2d:
                 div_sin = np.sin(np.radians(self.div_angle))
                 r, alpha = misc.ring_uniform(0, div_sin, N, polar=True)
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
-                f = self.div_func(x) * np.sin(x)
+                # related https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
+                f = self.div_func(x, **self.div_kwargs) * np.sin(x)
                 X0 = r**2 / div_sin**2
                 theta = misc.random_from_distribution(x, f, X0, kind="continuous")
 
-            # case "Function" if not self.div_2d:
-                # # see https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
-                # alpha, X0 = misc.uniform2(0, 2*np.pi, 0, 1, N)
-                # x = np.linspace(0, np.radians(self.div_angle), 1000)
-                # f = self.div_func(x) * np.sin(x)
-                # theta = misc.random_from_distribution(x, f, X0, kind="continuous")
-
             case "Function" if self.div_2d:  # pragma: no branch
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
-                f = self.div_func(x)
+                f = self.div_func(x, **self.div_kwargs)
                 theta = misc.random_from_distribution(x, f, N, kind="continuous")
 
         if self.divergence != "None":
@@ -314,16 +303,35 @@ class RaySource(Element):
 
         else:
             match self.polarization:
+
                 case "x":       
                     ang = 0.
+
                 case "y":      
                     ang = np.pi/2
+
                 case "xy":      
                     ang = misc.random_from_distribution(np.array([0, np.pi/2]), np.ones(2), N, kind="discrete")
-                case "Angle":   
+
+                case "Constant":   
                     ang = np.radians(self.pol_angle)
-                case "Random": # pragma: no branch 
+
+                case "Uniform":
                     ang = misc.uniform(0, 2*np.pi, N)
+
+                case "List":
+                    pc.check_type("RaySource.pol_angles", self.pol_angles, np.ndarray | list)
+                    if self.pol_probs is None:
+                        self.pol_probs = np.ones_like(self.pol_angles)
+                    ang = misc.random_from_distribution(self.pol_angles, self.pol_probs, N, kind="discrete")
+                    ang = np.radians(ang)
+
+                case "Function":  # pragma: no branch
+                    pc.check_callable("RaySource.pol_func", self.pol_func)
+                    x = np.linspace(0, 360, 5000)
+                    f = self.pol_func(x, **self.pol_kwargs)
+                    ang = misc.random_from_distribution(x, f, N, kind="continuous")
+                    ang = np.radians(ang)
 
             # pol is rotated by an axis perpendicular to the plane of base divergence s = [0, 0, 1]
             # and the current divergence s_
@@ -418,8 +426,14 @@ class RaySource(Element):
             case "spectrum":
                 pc.check_type(key, val, LightSpectrum)
 
-            case ("or_func" | "div_func"):
+            case ("or_func" | "div_func" | "pol_func"):
                 pc.check_none_or_callable(key, val)
+
+            case ("pol_angles" | "pol_probs") if val is not None:
+                pc.check_type(key, val, list | np.ndarray)
+                val2 = np.asarray_chkfinite(val, dtype=np.float64)
+                super().__setattr__(key, val2)
+                return
 
             case "image" if val is not None:
 

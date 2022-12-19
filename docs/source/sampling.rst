@@ -208,6 +208,8 @@ A reduction in noise is clearly visible.
           200k rays on a square area with two dimensional stratified sampling, image rendered with 189 x 189 pixel
 
 
+.. _disc_mapping:
+
 Disc/Annulus Sampling
 =======================
 
@@ -234,6 +236,7 @@ While this done uniformly in :numref:`circle_sampling`, there are some circular 
 These artefacts arise from the highly distorted initial rectangular cells, that in those regions become circular sectors. At the disc edge the rectangular cells are less distorted. In the inner region the area elements consist of small arc lengths and a large radial component, while going further outside the arc lengths increase and the radial lengths decrease. Near the center the area elements appear *zoomed in* to the human eye. You can see such a grid and its distortion in :footcite:`doi:10.1080/10867651.1997.10487479`, figure 5, as well as the alternative method that is showcased next.
 
 Although for many rays the mentioned artefacts become less and less visible, a different approach would be suitable to remove them altogether.
+This is especially important as the center of the disc typically lies at the optical axis or, when generating direction distributions, at the center of the distribution volume.
 
 **Square to Disc Mapping**
 
@@ -364,11 +367,16 @@ A Lambertian radiator follows the cosine law. With :math:`f(\theta) = \cos \thet
 3D Direction sampling
 ==========================
 
-Angle :math:`\alpha` is uniformly distributed inside the :math:`s_x, s_y` plane with :math:`\mathcal{A}`:
+For generating a direction cone two random variables are needed. To achieve an uniform, stratified and artefact free distribution, the disc mapping from :numref:`disc_mapping` is applied.
+The random variable :math:`\mathcal{A}` for values of :math:`\alpha` is made of values of :math:`\theta` from disc mapping.
+The second uniform variable :math:`\mathcal{U}` is then the radius squared :math:`r^2` and normalizing by the disc radius. 
 
 .. math::
-   \mathcal{A} = ~\mathcal{U}_{[0, ~2\pi]}
-   :label: eq_dir_3d_alpha
+   \mathcal{U}_{[0,~1]} = \frac{r^2}{r^2_\text{o}}
+   :label: eq_3d_direction_mapping_uniform
+
+Squaring is necessary as the values are uniformly distributed according to the area, but we need uniformly distributed values according to the radius. The inverse transformation for this is known from :numref:`circle_sampling`.
+Rescaling this uniform variable into the desired output range is a simple linear transformation.
 
 
 **Function**
@@ -435,7 +443,7 @@ The following angle distributions :math:`\mathcal{A}` with :math:`\alpha \in \ma
 
 
 .. list-table:: Polarization angle modes
-   :widths: 200 200
+   :widths: 150 400
    :header-rows: 1
    :align: center
    
@@ -443,12 +451,18 @@ The following angle distributions :math:`\mathcal{A}` with :math:`\alpha \in \ma
      - :math:`\alpha = 0^{\circ}`
    * - **y-Polarization**
      - :math:`\alpha = 90^{\circ}`
-   * - **Custom Angle**
+   * - **Constant Angle**
      - :math:`\alpha = \alpha_0`
    * - **xy-Polarization**
-     - :math:`\mathcal{A} ~\text{with}~ \Omega_\alpha = \{0^{\circ},~90^{\circ}\}`
+     - :math:`\alpha` randomly chosen from :math:`\{0^{\circ},~90^{\circ}\}`
    * - **Uniformly distributed**
      - :math:`\mathcal{A} = \mathcal{U}_{[0, ~2\pi]}`
+   * - **User Function**
+     - | function :math:`f(\alpha)`
+       | :math:`\mathcal{A} = F^{-1}\left(\mathcal{U}_{[F(\alpha_0), ~F(\alpha_1)]}\right)`
+   * - **List**
+     - | angles :math:`A=\left\{\alpha_0, ~\alpha_1,~\dots\right\}` with probabilities :math:`P=\left\{p_0, ~p_1,~\dots\right\}` 
+       | :math:`\alpha` gets then chosen randomly from :math:`A` according to :math:`P`
 
 ------------
 

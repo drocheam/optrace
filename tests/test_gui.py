@@ -35,7 +35,7 @@ def rt_example() -> ot.Raytracer:
 
     RSS2 = ot.CircularSurface(r=1)
     RS2 = ot.RaySource(RSS2, divergence="None", s=[0, 0, 1], spectrum=ot.presets.light_spectrum.d65,
-                       pos=[0, 1, -3], polarization="Angle", pol_angle=25, power=2)
+                       pos=[0, 1, -3], polarization="Constant", pol_angle=25, power=2)
     RT.add(RS2)
 
     front = ot.CircularSurface(r=3)

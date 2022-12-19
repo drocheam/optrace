@@ -450,7 +450,8 @@ class GeometryTests(unittest.TestCase):
         # use position other than default of [0, 0, 0]
         # use s other than [0, 0, 1]
         rargs = dict(spectrum=ot.presets.light_spectrum.d50, or_func=or_func, pos=[0.5, -2, 3], 
-                     power=2.5, s=[0, 0.5, 1], pol_angle=0.5, div_func=lambda e: np.cos(e))
+                     power=2.5, s=[0, 0.5, 1], pol_angle=0.5, div_func=lambda e: np.cos(e),
+                     pol_func=lambda x: x, pol_angles=[10, 30], pol_probs=[1, 2])
        
         # possible surface types
         Surfaces = [ot.Point(), ot.Line(), ot.CircularSurface(r=2), 
@@ -535,6 +536,9 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.RaySource, *rsargs, s=1)  # invalid s type
         self.assertRaises(TypeError, ot.RaySource, *rsargs, s=[1, 3])  # invalid s type
         self.assertRaises(TypeError, ot.RaySource, *rsargs, s_sph=5)  # invalid ss type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_func=5)  # invalid pol_func type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_angles=5)  # invalid pol_angles type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_probs=5)  # invalid pol_probs type
         
         # value errors
         self.assertRaises(ValueError, ot.RaySource, *rsargs, div_angle=0)  # pdiv_angle needs to be above 0
@@ -561,6 +565,43 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(RuntimeError, ot.RaySource, *rsargs, 
                           image=np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3)))  # image too large
 
+    def test_ray_source_polarization(self):
+            
+        N = 100000
+        sx = np.tile([1, 0, 0], (N, 1))
+       
+        # constant polarization angles
+        for pmode, pangle in zip(["x", "y", "Constant", "Constant", "Constant"], [0, np.pi/2, 0.2, -0.5, 3.5]):
+            RS = ot.RaySource(ot.CircularSurface(r=2), polarization=pmode, pol_angle=np.degrees(pangle))
+            _, _, pols, _, _ = RS.create_rays(N)
+            psx = misc.rdot(pols, sx)  # for light parallel to optical axis cos(pangle) is the scalar product between pol and x-axis
+            self.assertTrue(np.allclose(psx - np.cos(pangle), 0))  # check if near each other
+
+        # list polarization angles
+        for pmode, pangles, pprobs in zip(["xy", "List", "List"], [[0, np.pi/2], [0, 0.2], [0, 0.2]], [[1, 1], [1, 1], [1, 2]]):
+            RS = ot.RaySource(ot.CircularSurface(r=2), polarization=pmode, pol_angles=np.degrees(pangles), pol_probs=pprobs)
+            _, _, pols, _, _ = RS.create_rays(N)
+            psx = misc.rdot(pols, sx)  # for light parallel to optical axis cos(pangle) is the scalar product between pol and x-axis
+            self.assertTrue(np.all((np.abs(psx - np.cos(pangles[0])) < 1e-5) | (np.abs(psx - np.cos(pangles[1])) < 1e-5)))
+
+            # check if expectation value matches
+            mean = np.sum(np.array(pangles)*np.array(pprobs)) / np.sum(pprobs)
+            mean2 = np.mean(np.arccos(psx))
+            self.assertAlmostEqual(mean, mean2, delta=0.001)
+
+        # check if standard deviation for uniform polarization matches
+        RS = ot.RaySource(ot.CircularSurface(r=2), polarization="Uniform")
+        _, _, pols, _, _ = RS.create_rays(N)
+        psx = misc.rdot(pols, sx)  
+        self.assertAlmostEqual(np.degrees(np.std(np.arccos(psx))), 180/np.sqrt(12), delta=0.0001)
+       
+        # function mode
+        # check if standard deviation for uniform polarization matches
+        RS = ot.RaySource(ot.CircularSurface(r=2), polarization="Function", pol_func=lambda x: np.exp(-(x-120)**2/2))
+        _, _, pols, _, _ = RS.create_rays(N)
+        psx = misc.rdot(pols, sx)  
+        self.assertAlmostEqual(np.degrees(np.std(np.arccos(psx))), 1, delta=0.001)
+
     def test_ray_source_misc(self):
         RS = ot.RaySource(ot.RectangularSurface(dim=[2, 2]), [0, 0, 0])
 
@@ -579,7 +620,17 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0], 
                                                   spectrum=ot.presets.light_spectrum.d65,
                                                   divergence="Function").create_rays, 10000)  
-
+        
+        # no pol_func specified
+        self.assertRaises(TypeError, ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0], 
+                                                  spectrum=ot.presets.light_spectrum.d65,
+                                                  polarization="Function").create_rays, 10000)  
+        
+        # no pol_angles specified
+        self.assertRaises(TypeError, ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0], 
+                                                  spectrum=ot.presets.light_spectrum.d65,
+                                                  polarization="List").create_rays, 10000)  
+        
         # some rays with negative component in z direction
         self.assertRaises(RuntimeError, ot.RaySource(ot.CircularSurface(r=3), divergence="Isotropic", pos=[0, 0, 0],
                                                      spectrum=ot.presets.light_spectrum.d65,
@@ -588,6 +639,10 @@ class GeometryTests(unittest.TestCase):
         # additional coverage tests
         ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0], 
                      spectrum=ot.presets.light_spectrum.d65).create_rays(100000, no_pol=True)  # no_pol=True is tested
+        
+        # coverage: pol_angles specified, but pol_probs not
+        ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65,
+                    polarization="List", pol_angles=[0, 10]).create_rays(10000)  
 
         # s in spherical coordinates gets mapped correctly to s
         RS = ot.RaySource(ot.RectangularSurface(dim=[2, 2]), pos=[0, 0, 0], s_sph=[45, 90])

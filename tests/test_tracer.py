@@ -1127,7 +1127,7 @@ class TracerTests(unittest.TestCase):
         RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, -2.5, -2], s=s, 
                           polarization="y", desc="y-pol", power=1)
         RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[-2, -2.5, -2], s=s, 
-                          polarization="Random", desc="no pol", power=10)
+                          polarization="Uniform", desc="no pol", power=10)
         RT.add(RS0)
         RT.add(RS1)
         RT.add(RS2)
