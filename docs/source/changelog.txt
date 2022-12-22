@@ -1,6 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
-  1.1.0   |   2022-12-16   |   Simplified numeric tracing. Removed FunctionSurface hit_func. RImage export_png now can export in different resolutions and rescaling modes. New Raytracer.absorb_missing behavior: no restictions, but not-lens-hitting-rays at medium transition get absorbed. 
+  1.1.0   |   2022-12-16   |   Simplified numeric tracing. Removed FunctionSurface2D hit_func. RImage export_png now can export in different resolutions and rescaling modes. New Raytracer.absorb_missing behavior: no restictions, but not-lens-hitting-rays at medium transition get absorbed.
   1.0.7   |   2022-12-15   |   Improved documentation. Ring and Circle sampling now without artefacts at the center. 
   1.0.6   |   2022-12-02   |   Removed colorio dependency from tests. sRGB primaries are now strictly 0 beyond visible range. Improved testing and documentation. 
   1.0.5   |   2022-11-25   |   Fixed polarization calculation bug. Surface collisions are now plotted inside GUI. More tests. 

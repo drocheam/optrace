@@ -83,10 +83,10 @@ class TracerSpecialTests(unittest.TestCase):
             L0 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 0])
             RT.add(L0)
 
-            front = ot.FunctionSurface(r=3,
-                                       func=lambda x, y: (x**2 + y**2)/50 + (x**2 +y**2)**2/5000,
-                                       silent=True,
-                                       parax_roc=25)
+            front = ot.FunctionSurface1D(r=3,
+                                         func=lambda r: r**2/50 + r**2/5000,
+                                         silent=True,
+                                         parax_roc=25)
             back = ot.CircularSurface(r=2)
             L1 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 10])
             RT.add(L1)
@@ -194,8 +194,8 @@ class TracerSpecialTests(unittest.TestCase):
                 func = lambda x, y, R: 1/2/R*(x**2 + y**2)
                 func2 = lambda x, y: 0.78785 + 1/2/R_*(x**2 + y**2)  # some offset that needs to be removed
 
-                surff1 = ot.FunctionSurface(func=func2, r=r, silent=True)
-                surff2 = ot.FunctionSurface(func=func, r=r, z_min=0, z_max=func(0, r, R_), silent=True, func_args=dict(R=R_))
+                surff1 = ot.FunctionSurface2D(func=func2, r=r, silent=True)
+                surff2 = ot.FunctionSurface2D(func=func, r=r, z_min=0, z_max=func(0, r, R_), silent=True, func_args=dict(R=R_))
 
                 asph1 = ot.AsphericSurface(R=R_, r=r, k=-1, coeff=[0.], silent=True)  # same as conic
                 asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_], silent=True)  # conic can be neglected, only polynomial part
@@ -312,7 +312,7 @@ class TracerSpecialTests(unittest.TestCase):
         RT.add(RS2)
 
         surf_f = lambda x, y: np.tan(b_ang)*x
-        surf1 = ot.FunctionSurface(func=surf_f, r=0.7, silent=True)
+        surf1 = ot.FunctionSurface2D(func=surf_f, r=0.7, silent=True)
 
         surf2 = ot.TiltedSurface(r=0.7, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
 

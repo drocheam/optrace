@@ -3,4 +3,5 @@ Usage
 ################
 
 .. toctree::
-   basic_scripting
+   usage_geometry
+   usage_surfaces

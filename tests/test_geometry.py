@@ -819,7 +819,7 @@ class GeometryTests(unittest.TestCase):
     
     def test_rotate_element(self):
 
-        S0 = ot.FunctionSurface(r=3, func=lambda x, y: x**2 + y**2/0.95)
+        S0 = ot.FunctionSurface2D(r=3, func=lambda x, y: x ** 2 + y ** 2 / 0.95)
         S1 = ot.TiltedSurface(r=4, normal=[0, 0.5, 1])
 
         # rotate a lens, this is the same as rotate both its surfaces

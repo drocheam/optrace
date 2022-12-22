@@ -130,8 +130,6 @@ From there on, typical color model conversions can be applied.
 Random Wavelengths
 --------------------
 
-.. TODO different wavelength generations, mention inverse transform sampling
-
 
 **Monochromatic**
 

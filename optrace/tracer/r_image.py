@@ -296,6 +296,7 @@ class RImage(BaseClass):
         if self._sigma is not None:
             self.extent += np.array([-1, 1, -1, 1]) * 5*self._sigma
 
+    @misc.timer
     def rescale(self, N: int) -> None:
         """
 
@@ -324,6 +325,7 @@ class RImage(BaseClass):
               
                 # with this, with gaussian filtering the power sum in the image stays the same even after filtering
                 in_2 = scipy.ndimage.gaussian_filter(in_[:, :, ind], sigma=[fcy, fcx], mode="constant", cval=0)
+                
             else:
                 in_2 = in_[:, :, ind]
 
@@ -370,6 +372,7 @@ class RImage(BaseClass):
                 for i in range(Nz):
                     threaded(i, self._img, self.img)
 
+    # TODO test
     def refilter(self) -> None:
         """reapplies image filtering with the current limit setting"""
         self.rescale(self.N)

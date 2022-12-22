@@ -16,7 +16,7 @@ from optrace.tracer.geometry.surface import Surface
 class SurfaceTests(unittest.TestCase):
 
     def test_surface_init_type_errors(self):
-        self.assertRaises(TypeError, ot.FunctionSurface, 3, func=2)  # func is no function
+        self.assertRaises(TypeError, ot.FunctionSurface2D, 3, func=2)  # func is no function
         self.assertRaises(TypeError, ot.TiltedSurface, r=2, normal=True)  # invalid normal type
         self.assertRaises(TypeError, Surface, r=[])  # invalid r type
         self.assertRaises(TypeError, ot.RingSurface, r=2, ri=[])  # invalid ri type
@@ -26,8 +26,8 @@ class SurfaceTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.SphericalSurface, r=1, R=[])  # invalid R type
         self.assertRaises(TypeError, ot.ConicSurface, r=1, R=[], k=0)  # invalid R type
         self.assertRaises(TypeError, ot.RectangularSurface, dim=True)  # invalid dim type
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=lambda x, y: x, z_min=[], z_max=2)  # invalid z_min type
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=lambda x, y: x, z_min=0, z_max=[])  # invalid z_max type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, z_min=[], z_max=2)  # invalid z_min type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, z_min=0, z_max=[])  # invalid z_max type
         self.assertRaises(TypeError, ot.DataSurface2D, r=3, data=True)  # invalid data type
         self.assertRaises(TypeError, ot.DataSurface2D, r=3, data=np.ones((100, 100)), parax_roc=[])  # invalid curvature type
         self.assertRaises(TypeError, ot.DataSurface1D, r=3, data=True)  # invalid data type
@@ -67,17 +67,19 @@ class SurfaceTests(unittest.TestCase):
     def _test_surfaces(self):
 
         # SurfaceFunction with all funcs defined
-        sfunc =  ot.FunctionSurface(func = lambda x, y: np.ones_like(x),
-                                   deriv_func=lambda x, y: (np.zeros_like(x), np.zeros_like(x)), 
-                                   mask_func=lambda x, y: x+y < 2, r=3, silent=True)
+        sfunc =  ot.FunctionSurface2D(func = lambda x, y: np.ones_like(x),
+                                      deriv_func=lambda x, y: (np.zeros_like(x), np.zeros_like(x)),
+                                      mask_func=lambda x, y: x+y < 2, r=3, silent=True)
 
         S = [ot.CircularSurface(r=4),
              ot.SphericalSurface(r=5, R=10),
              ot.ConicSurface(r=3.2, R=-7, k=2),
              ot.AsphericSurface(r=3, R=-20, k=1, coeff=[0.02, 0.0034, 1e-5, 2e-5, 3e-5, 4e-5, 5e-5, 6e-5], silent=True),
              ot.RectangularSurface(dim=[5, 6]),
-             ot.FunctionSurface(func=lambda x, y: x, r=2, silent=True),  
-             ot.FunctionSurface(func=lambda x, y: -x, r=2, silent=True), 
+             ot.FunctionSurface2D(func=lambda x, y: x, r=2, silent=True),
+             ot.FunctionSurface2D(func=lambda x, y: -x, r=2, silent=True),
+             ot.FunctionSurface1D(func=lambda r: r**2, r=2, silent=True),
+             ot.FunctionSurface1D(func=lambda r: r**2 + 0.001*r**4, r=3, silent=True),
              sfunc,
              ot.TiltedSurface(r=4, normal=[0.5, 0, np.sqrt(1-0.5**2)]),
              ot.DataSurface2D(r=2, data=1+np.random.sample((50, 50)), silent=True),
@@ -92,7 +94,7 @@ class SurfaceTests(unittest.TestCase):
         for i, Si in enumerate(self._test_surfaces()):
             with self.subTest(i=i, Surface=type(Si).__name__):
                 # thickness expressions
-                self.assertAlmostEqual(Si.d, Si.dn + Si.dp, 8)
+                self.assertAlmostEqual(Si.ds, Si.dn + Si.dp, 8)
 
                 # check that surface center is at pos[2]
                 self.assertAlmostEqual(Si.get_values(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0], Si.pos[2])
@@ -146,15 +148,17 @@ class SurfaceTests(unittest.TestCase):
                      ot.AsphericSurface(r=5, R=12, k=3, coeff=[0, 1e-4, 1e-8]),
                      ot.TiltedSurface(r=2, normal_sph=[20, 50]),
                      ot.DataSurface1D(r=3, data=-1+np.linspace(0, 3, 200)**1.25),
-                     ot.FunctionSurface(r=4, func=lambda x, y: x**2 + y**2/2),
-                     ot.DataSurface2D(r=3, data=1+np.mgrid[-3:3:100j, -3:3:100j][1] + np.linspace(-3, 3, 100)**2)],
+                     ot.FunctionSurface2D(r=4, func=lambda x, y: x ** 2 + y ** 2 / 2),
+                     ot.DataSurface2D(r=3, data=1+np.mgrid[-3:3:100j, -3:3:100j][1] + np.linspace(-3, 3, 100)**2),
+                     ot.FunctionSurface1D(r=4, func=lambda r: r**2)],
                     [[0.1,        0.05,       0.99373035],
                      [-0.08444007, -0.04222003,  0.9955337],
                      [0.08444007, 0.04222003, 0.9955337],
                      [-0.08493345, -0.04246673,  0.99548123],
                      [0.21984631, 0.26200263, 0.93969262],
                      [-0.70594412, -0.35297206,  0.61404693],
-                     [-0.87287156, -0.21821789,  0.43643578]])
+                     [-0.87287156, -0.21821789,  0.43643578],
+                     [0, -0.894427191, 0.447213595]])
 
         # some offset
         x0, y0, z0 = 1.24, -5.8, 0.01
@@ -189,15 +193,17 @@ class SurfaceTests(unittest.TestCase):
                      ot.AsphericSurface(r=5, R=12, k=3, coeff=[0, 1e-4, 1e-8]),
                      ot.TiltedSurface(r=2, normal_sph=[20, 50]),
                      ot.DataSurface1D(r=3, data=-1+np.linspace(0, 3, 200)**1.25),
-                     ot.FunctionSurface(r=4, func=lambda x, y: x**2 + y**2/2),
-                     ot.DataSurface2D(r=3, data=1+np.mgrid[-3:3:100j, -3:3:100j][1] + np.linspace(-3, 3, 100)**2)],
+                     ot.FunctionSurface2D(r=4, func=lambda x, y: x ** 2 + y ** 2 / 2),
+                     ot.DataSurface2D(r=3, data=1+np.mgrid[-3:3:100j, -3:3:100j][1] + np.linspace(-3, 3, 100)**2),
+                     ot.FunctionSurface1D(r=4, func=lambda r: r + 0.1*r**2)],
                     [[-0.06269654, -0.01250782],
                     [0.05254347, 0.01043481],
                     [0.05269974, 0.01044106],
                     [-0.37336424,  0.13940869],
                     [1.14965824, 0.42044821],
                     [1.125, 0.125],
-                    [0.75, -0.25]])
+                    [0.75, -0.25],
+                    [1.24303399, 0.525]])
 
         # some offset
         x0, y0, z0 = 1.24, -5.8, 0.01
@@ -276,7 +282,7 @@ class SurfaceTests(unittest.TestCase):
                     self.assertTrue(Si.get_mask([Si.extent[1]], [Si.extent[3]])[0])
                     self.assertFalse(Si.get_mask([Si.extent[1]+1], [Si.pos[1]])[0])
                 else:
-                    if isinstance(Si, ot.FunctionSurface) and Si.mask_func is not None:
+                    if isinstance(Si, ot.FunctionSurface2D) and Si.mask_func is not None:
                         # special check for one of the SurfaceFunction Surfaces
                         self.assertTrue(Si.get_mask(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0])
                         self.assertFalse(Si.get_mask(np.array([Si.pos[0]+1.5]), np.array([Si.pos[1]+1.5]))[0])
@@ -371,8 +377,11 @@ class SurfaceTests(unittest.TestCase):
         self.assertAlmostEqual(ot.DataSurface2D(data=np.ones((50, 50)), r=3, parax_roc=5).parax_roc, 5)  # (factually wrong)
         self.assertAlmostEqual(ot.DataSurface1D(data=np.ones(50), r=3, parax_roc=5).parax_roc, 5)  # (factually wrong)
         func = lambda x, y: (x**2 + y**2)/1000
-        self.assertEqual(ot.FunctionSurface(func=func, r=2).parax_roc, None)
-        self.assertEqual(ot.FunctionSurface(func=func, r=2, parax_roc=5).parax_roc, 5)  # (factually wrong)
+        self.assertEqual(ot.FunctionSurface2D(func=func, r=2).parax_roc, None)
+        self.assertEqual(ot.FunctionSurface2D(func=func, r=2, parax_roc=5).parax_roc, 5)  # (factually wrong)
+        func = lambda r: r**2/1000
+        self.assertEqual(ot.FunctionSurface1D(func=func, r=2).parax_roc, None)
+        self.assertEqual(ot.FunctionSurface1D(func=func, r=2, parax_roc=5).parax_roc, 5)  # (factually wrong)
 
     def test_surface_sphere_projection_quadrants(self):
         
@@ -428,14 +437,17 @@ class SurfaceTests(unittest.TestCase):
             surf1 = DataSurface(r=3, data=-50+(1-np.exp(-np.abs(r)/0.01))*1000*np.exp(-(r-0.5)**2/0.1**2))
             self.assertAlmostEqual(surf1.z_min, 0)
             self.assertAlmostEqual(surf1.z_max, 1000, delta=3e-3)
-        
+       
+        # FunctionSurface 2D
+        #######################
+
         # smooth function with zero offset
-        surf1 = ot.FunctionSurface(r=3, func=lambda x, y: x**2 + y**2)
+        surf1 = ot.FunctionSurface2D(r=3, func=lambda x, y: x ** 2 + y ** 2)
         self.assertAlmostEqual(surf1.z_min, 0)
         self.assertAlmostEqual(surf1.z_max, 9)
         
         # smooth function with non zero offset
-        surf1 = ot.FunctionSurface(r=3, func=lambda x, y: 1000 + x**2 + y**2)
+        surf1 = ot.FunctionSurface2D(r=3, func=lambda x, y: 1000 + x ** 2 + y ** 2)
         self.assertAlmostEqual(surf1.z_min, 0)
         self.assertAlmostEqual(surf1.z_max, 9)
        
@@ -444,7 +456,28 @@ class SurfaceTests(unittest.TestCase):
             return -50+(1-np.exp(-np.abs(r)/0.01))*1000*np.exp(-(r-0.5)**2/0.1**2)
 
         # function with non central peak at r=0.5 with z = 1000
-        surf1 = ot.FunctionSurface(r=3, func=func)
+        surf1 = ot.FunctionSurface2D(r=3, func=func)
+        self.assertAlmostEqual(surf1.z_min, 0)
+        self.assertAlmostEqual(surf1.z_max, 1000, delta=3e-3)
+        
+        # FunctionSurface 1D
+        #######################
+
+        # smooth function with zero offset
+        surf1 = ot.FunctionSurface1D(r=3, func=lambda r: r**2)
+        self.assertAlmostEqual(surf1.z_min, 0)
+        self.assertAlmostEqual(surf1.z_max, 9)
+        
+        # smooth function with non zero offset
+        surf1 = ot.FunctionSurface1D(r=3, func=lambda r: 1000 + r**2)
+        self.assertAlmostEqual(surf1.z_min, 0)
+        self.assertAlmostEqual(surf1.z_max, 9)
+       
+        def func(r):
+            return -50+(1-np.exp(-np.abs(r)/0.01))*1000*np.exp(-(r-0.5)**2/0.1**2)
+
+        # function with non central peak at r=0.5 with z = 1000
+        surf1 = ot.FunctionSurface1D(r=3, func=func)
         self.assertAlmostEqual(surf1.z_min, 0)
         self.assertAlmostEqual(surf1.z_max, 1000, delta=3e-3)
 
@@ -453,33 +486,33 @@ class SurfaceTests(unittest.TestCase):
         sfunc = lambda x, y: x
         
         # test z_max, z_min, parax_roc parameter handling
-        self.assertRaises(ValueError, ot.FunctionSurface, r=2, func=sfunc, z_max=5)  
+        self.assertRaises(ValueError, ot.FunctionSurface2D, r=2, func=sfunc, z_max=5)
         # ^-- both z_min z_max need to be provided
-        self.assertRaises(ValueError, ot.FunctionSurface, r=2, func=sfunc, z_min=5)  
+        self.assertRaises(ValueError, ot.FunctionSurface2D, r=2, func=sfunc, z_min=5)
         # ^-- both z_min, z_max need to be provided
 
         # z_max, z_min info messages for "Function"
         sfunc = lambda x, y: x**2 + y**2/10
-        z_min, z_max = ot.FunctionSurface(func=sfunc, r=3).extent[4:]
-        surf = ot.FunctionSurface(func=sfunc, r=3, z_min=z_min, z_max=z_max)  # a valid call
+        z_min, z_max = ot.FunctionSurface2D(func=sfunc, r=3).extent[4:]
+        surf = ot.FunctionSurface2D(func=sfunc, r=3, z_min=z_min, z_max=z_max)  # a valid call
         self.assertAlmostEqual(z_min, surf.z_min)  # value has been assigned
         self.assertAlmostEqual(z_max, surf.z_max)
-        surf = ot.FunctionSurface(func=sfunc, r=3, z_min=z_min-1e-9, z_max=z_max+1e-9)  # also valid call
+        surf = ot.FunctionSurface2D(func=sfunc, r=3, z_min=z_min - 1e-9, z_max=z_max + 1e-9)  # also valid call
         self.assertAlmostEqual(z_min-1e-9, surf.z_min)  # value has been assigned
         self.assertAlmostEqual(z_max+1e-9, surf.z_max)
-        surf = ot.FunctionSurface(func=sfunc, r=3, z_min=z_min+1e-3, z_max=z_max-1e-3)  
+        surf = ot.FunctionSurface2D(func=sfunc, r=3, z_min=z_min + 1e-3, z_max=z_max - 1e-3)
         # ^-- range warning, values don't get set
         self.assertNotAlmostEqual(z_min+1e-3, surf.z_min)  # value has not been assigned
         self.assertNotAlmostEqual(z_max-1e-3, surf.z_max)
-        surf = ot.FunctionSurface(func=sfunc, r=3, z_min=z_min+1e-3, z_max=z_max+1e-3)  
+        surf = ot.FunctionSurface2D(func=sfunc, r=3, z_min=z_min + 1e-3, z_max=z_max + 1e-3)
         # ^-- range valid, +offset -> warning, don't set values
         self.assertNotAlmostEqual(z_min+1e-3, surf.z_min)  # value has not been assigned
         self.assertNotAlmostEqual(z_max+1e-3, surf.z_max)
-        surf = ot.FunctionSurface(func=sfunc, r=3, z_min=z_min-1e-3, z_max=z_max-1e-3)  
+        surf = ot.FunctionSurface2D(func=sfunc, r=3, z_min=z_min - 1e-3, z_max=z_max - 1e-3)
         # ^-- range valid, -offset -> warning, don't set values
         self.assertNotAlmostEqual(z_min-1e-3, surf.z_min)  # value has not been assigned
         self.assertNotAlmostEqual(z_max-1e-3, surf.z_max)
-        surf = ot.FunctionSurface(func=sfunc, r=3, z_min=z_min, z_max=z_max+5)
+        surf = ot.FunctionSurface2D(func=sfunc, r=3, z_min=z_min, z_max=z_max + 5)
         # ^-- range much larger than measured -> warning, set values
         self.assertAlmostEqual(z_min, surf.z_min)  # value has been assigned
         self.assertAlmostEqual(z_max+5, surf.z_max)
@@ -531,7 +564,7 @@ class SurfaceTests(unittest.TestCase):
         # __find_bounds with masked value at center
         sfunc = lambda x, y: np.ones_like(x)
         mask_func = lambda x, y: x**2 + y**2 > 0.5
-        ot.FunctionSurface(func=sfunc, r=3, mask_func=mask_func)
+        ot.FunctionSurface2D(func=sfunc, r=3, mask_func=mask_func)
 
         # coverage test: case rectangle, too few points for mesh and edge
         rect = ot.RectangularSurface(dim=[2, 3])
@@ -562,10 +595,10 @@ class SurfaceTests(unittest.TestCase):
         mask0 = lambda x, y: mask(x, y, 1000)
 
         # call with just the function
-        S0 = ot.FunctionSurface(r=1, func=func0)
+        S0 = ot.FunctionSurface2D(r=1, func=func0)
 
         # call with all function properties provided
-        S1 = ot.FunctionSurface(r=5, func=func0, deriv_func=deriv0, mask_func=mask0)
+        S1 = ot.FunctionSurface2D(r=5, func=func0, deriv_func=deriv0, mask_func=mask0)
 
         # check function pass-through
         a = 4
@@ -578,8 +611,8 @@ class SurfaceTests(unittest.TestCase):
         for pos in [[0, 0, 0], [-1, 2, 0.5]]:
 
             normal = [1/np.sqrt(2), 0 , 1/np.sqrt(2)]
-            S2 = ot.FunctionSurface(r=5, func=func, func_args=dict(normal=normal), deriv_func=deriv, deriv_args=dict(normal=normal), 
-                                    mask_func=mask, mask_args=dict(a=a+pos[2]))
+            S2 = ot.FunctionSurface2D(r=5, func=func, func_args=dict(normal=normal), deriv_func=deriv, deriv_args=dict(normal=normal),
+                                      mask_func=mask, mask_args=dict(a=a+pos[2]))
             S2.move_to(pos)
 
             # relative coordinates from center
@@ -596,25 +629,33 @@ class SurfaceTests(unittest.TestCase):
         func = lambda x, y: x
 
         # check type checks in init
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=np.array([1, 2]))  # invalid func type
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=None)  # func can't be none
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=func, mask_func=1)  # invalid type
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=func, deriv_func=1)  # invalid type
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=func, func_args=1)  # invalid type
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=func, deriv_args=1)  # invalid type
-        self.assertRaises(TypeError, ot.FunctionSurface, r=2, func=func, mask_args=1)  # invalid type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=np.array([1, 2]))  # invalid func type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=None)  # func can't be none
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=func, mask_func=1)  # invalid type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=func, deriv_func=1)  # invalid type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=func, func_args=1)  # invalid type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=func, deriv_args=1)  # invalid type
+        self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=func, mask_args=1)  # invalid type
 
         # check assertion errors when wrong types are returned from user provided functions
         x = np.linspace(-1, 1, 1000)
         y = np.linspace(-1, 1, 1000)
-        self.assertRaises(AssertionError, ot.FunctionSurface, r=2, func=lambda x, y: x>y)  # must return floats
-        self.assertRaises(AssertionError, ot.FunctionSurface, r=2, func=lambda x, y: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface, r=2, func=lambda x, y: x, mask_func=lambda x, y: x+y)  # must return bools
-        self.assertRaises(AssertionError, ot.FunctionSurface, r=2, func=lambda x, y: x, mask_func=lambda x, y: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x, 1)).get_normals, x, y)  # must return two np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (1, y)).get_normals, x, y)  # must return two np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x>y, y)).get_normals, x, y)  # must return two np.ndarray with float values
-        self.assertRaises(AssertionError, ot.FunctionSurface(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (y, x>y)).get_normals, x, y)  # must return two np.ndarray with float values
+        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x > y)  # must return floats
+        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: 1)  # must return np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: x + y)  # must return bools
+        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: 1)  # must return np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x, 1)).get_normals, x, y)  # must return two np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (1, y)).get_normals, x, y)  # must return two np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x > y, y)).get_normals, x, y)  # must return two np.ndarray with float values
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (y, x > y)).get_normals, x, y)  # must return two np.ndarray with float values
+
+        # FunctionSurface1D
+        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: x > y)  # must return floats
+        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: 1)  # must return np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: r)  # must return bools
+        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: 1)  # must return np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface1D(r=2, func=lambda r: r, deriv_func=lambda r: r > 0).get_normals, x, y)  # must return a np.ndarray with float values
+
 
     @pytest.mark.os
     @pytest.mark.slow
@@ -648,13 +689,19 @@ class SurfaceTests(unittest.TestCase):
 
                         r = fr*R
 
-                        # type "Function"
-                        surf1 = ot.FunctionSurface(func=surf_f, r=r, silent=True)
-                           
-                        # compare estimated normals with actual
+                        # compare estimated normals with actual, FunctionSurface2D
+                        surf1 = ot.FunctionSurface2D(func=surf_f, r=r, silent=True)
                         x = np.linspace(0, r, 100)
                         y = np.zeros_like(x)
                         n_is = surf1.get_normals(x, y)
+                        n_should = n_conic(x, y, 1/R, k)
+                        self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-7, rtol=0))
+                        
+                        # compare estimated normals with actual, FunctionSurface1D
+                        surf11 = ot.FunctionSurface1D(func=lambda r: surf_f(r, np.zeros_like(r)), r=r, silent=True)
+                        x = np.linspace(0, r, 100)
+                        y = np.zeros_like(x)
+                        n_is = surf11.get_normals(x, y)
                         n_should = n_conic(x, y, 1/R, k)
                         self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-7, rtol=0))
 
@@ -688,7 +735,7 @@ class SurfaceTests(unittest.TestCase):
               ot.RingSurface(r=3, ri=0.2),
               ot.RectangularSurface(dim=[2, 3]),
               ot.DataSurface2D(r=2, data=np.zeros((100, 100))),
-              ot.FunctionSurface(r=2, func=lambda x, y: np.zeros_like(x)),
+              ot.FunctionSurface2D(r=2, func=lambda x, y: np.zeros_like(x)),
               # in built analytical types
               ot.SphericalSurface(r=2, R=10),
               ot.SphericalSurface(r=2, R=-10),
@@ -698,15 +745,21 @@ class SurfaceTests(unittest.TestCase):
               ot.TiltedSurface(r=3, normal=[1/np.sqrt(3), 1/np.sqrt(3), 1/np.sqrt(3)]),
               ot.AsphericSurface(r=2, R=10, k=0.5, coeff=[0, 0.002, 0.00001]),
               ot.AsphericSurface(r=2, R=-10, k=0.5, coeff=[-0.02, 0.00001]),
-              # function surfaces
-              ot.FunctionSurface(r=5, func=lambda x, y: x**2 + y**2),
-              ot.FunctionSurface(r=5, func=lambda x, y: x+2*y, deriv_func=lambda x, y: (np.ones_like(x), np.full_like(y, 2))),
-              ot.FunctionSurface(r=5, func=lambda x, y: 1 -x**2 + y**2),
-              ot.FunctionSurface(r=5, func=lambda x, y: 1 -x**2 + 0.001*y**3),
-              ot.FunctionSurface(r=5, func=lambda x, y: x**2 + y**2, parax_roc=2),
-              ot.FunctionSurface(r=4, func=lambda x, y, a: a*x + y**2, func_args=dict(a=2)),
+              # function surfaces 2D
+              ot.FunctionSurface2D(r=5, func=lambda x, y: x ** 2 + y ** 2),
+              ot.FunctionSurface2D(r=5, func=lambda x, y: x + 2 * y, deriv_func=lambda x, y: (np.ones_like(x), np.full_like(y, 2))),
+              ot.FunctionSurface2D(r=5, func=lambda x, y: 1 - x ** 2 + y ** 2),
+              ot.FunctionSurface2D(r=5, func=lambda x, y: 1 - x ** 2 + 0.001 * y ** 3),
+              ot.FunctionSurface2D(r=5, func=lambda x, y: x ** 2 + y ** 2, parax_roc=2),
+              ot.FunctionSurface2D(r=4, func=lambda x, y, a: a * x + y ** 2, func_args=dict(a=2)),
+              # function surfaces 1D
+              ot.FunctionSurface1D(r=5, func=lambda r: r**2),
+              ot.FunctionSurface1D(r=5, func=lambda r: r, deriv_func=lambda r: np.ones_like(r)),
+              ot.FunctionSurface1D(r=5, func=lambda r: r**2, parax_roc=0.5),
+              ot.FunctionSurface1D(r=4, func=lambda r, a: a * r** 2, func_args=dict(a=2)),
               # Data Surfaces
               ot.DataSurface1D(r=3, data=0.5 + np.linspace(0, 1, 100)**2 - np.linspace(0, 1, 100)),
+              ot.DataSurface1D(r=3, data=0.5 + np.linspace(0, 1, 100)**2 - np.linspace(0, 1, 100), parax_roc=-1),
               ot.DataSurface2D(r=3, data=X**2 - Y),
               ot.DataSurface2D(r=3, data=1+0.001*Y/(X+10), parax_roc=0.3),
              ]
@@ -774,6 +827,7 @@ class SurfaceTests(unittest.TestCase):
               ot.ConicSurface(r=2, R=10, k=0.5),
               ot.ConicSurface(r=2, R=-10, k=-2),
               ot.DataSurface1D(r=2, data=np.linspace(0, 1, 100)),
+              ot.FunctionSurface1D(r=2, func=lambda r: r**2),
               ot.AsphericSurface(r=2, R=10, k=0.5, coeff=[0, 0.002, 0.00001]),
               ot.AsphericSurface(r=2, R=-10, k=0.5, coeff=[-0.02, 0.00001]),
              ]
@@ -799,10 +853,10 @@ class SurfaceTests(unittest.TestCase):
         angle = 27.1328
         
         Ss = [
-                ot.FunctionSurface(r=3, func=lambda x, y: (x**2 + y**2/3) / 10),
-                ot.FunctionSurface(r=3, func=lambda x, y: (x**2 + y**2/3) / 10, mask_func=lambda x, y: y < 0.5),
-                ot.FunctionSurface(r=3, func=func, func_args=dict(normal=normal),),
-                ot.FunctionSurface(r=3, func=func, func_args=dict(normal=normal), mask_func=lambda x, y: y < 0.5),
+                ot.FunctionSurface2D(r=3, func=lambda x, y: (x ** 2 + y ** 2 / 3) / 10),
+                ot.FunctionSurface2D(r=3, func=lambda x, y: (x ** 2 + y ** 2 / 3) / 10, mask_func=lambda x, y: y < 0.5),
+                ot.FunctionSurface2D(r=3, func=func, func_args=dict(normal=normal), ),
+                ot.FunctionSurface2D(r=3, func=func, func_args=dict(normal=normal), mask_func=lambda x, y: y < 0.5),
                 ot.TiltedSurface(r=3, normal=[0.5, 1, 0.9]),
                 ot.RectangularSurface(dim=[5, 4]),
                 ot.DataSurface2D(r=3, data=np.random.uniform(0, 1, (200, 200))),

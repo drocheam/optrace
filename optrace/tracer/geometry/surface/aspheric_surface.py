@@ -3,12 +3,12 @@ from typing import Any
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
-from .function_surface import FunctionSurface
+from .function_surface_1d import FunctionSurface1D
 from ...misc import PropertyChecker as pc
 
 
 
-class AsphericSurface(FunctionSurface):
+class AsphericSurface(FunctionSurface1D):
 
     rotational_symmetry: bool = True
 
@@ -49,9 +49,7 @@ class AsphericSurface(FunctionSurface):
         return super().info + f", R = {self.R:.5g} mm, k = {self.k:.5g}\n"\
             f"coeff = {self.coeff}"
 
-    def _asph(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
-
-        r = ne.evaluate("sqrt(x**2 + y**2)")
+    def _asph(self, r: np.ndarray) -> np.ndarray:
 
         # conic section function
         rho, k = 1/self.R, self.k
@@ -62,12 +60,7 @@ class AsphericSurface(FunctionSurface):
 
         return z
 
-    def _deriv(self, x: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-
-        # class FunctionSurface expects a function that takes x, y, relative to its center
-
-        r = ne.evaluate("sqrt(x**2 + y**2)")
-        phi = ne.evaluate("arctan2(y, x)")
+    def _deriv(self, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 
         # derivative of conic section in regards to r
         k, rho = self.k, 1/self.R
@@ -77,14 +70,11 @@ class AsphericSurface(FunctionSurface):
         der_coeff = np.polyder(self._np_coeff)
         fr += np.polyval(der_coeff, r)
 
-        # x and y components are just the radial component rotated by phi
-        return fr*np.cos(phi), fr*np.sin(phi)
+        return fr
 
     def flip(self) -> None:
 
-        # but now we have simply -1 as factor,
-        # instead we'd like a factor of 1 and to negate R and the coefficients
-        # so we reset the sign and negate those properties
+        # override super method, so we instead negate curvature radius and coefficients
 
         self._lock = False
         
@@ -97,10 +87,6 @@ class AsphericSurface(FunctionSurface):
         self.z_min, self.z_max = a, b
 
         self.lock()
-
-    # override rotate function of FunctionSurface parent class
-    def rotate(self, angle: float) -> None:
-        pass
 
     @property
     def _np_coeff(self) -> np.ndarray:

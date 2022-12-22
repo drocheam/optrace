@@ -24,9 +24,13 @@ tracer.geometry.surface.data_surface_2d
 ____________________________________________
 .. automodule:: optrace.tracer.geometry.surface.data_surface_2d
 
-tracer.geometry.surface.function_surface
+tracer.geometry.surface.function_surface_1d
 ____________________________________________
-.. automodule:: optrace.tracer.geometry.surface.function_surface
+.. automodule:: optrace.tracer.geometry.surface.function_surface_1d
+
+tracer.geometry.surface.function_surface_2d
+____________________________________________
+.. automodule:: optrace.tracer.geometry.surface.function_surface_2d
 
 tracer.geometry.surface.rectangular_surface
 ____________________________________________

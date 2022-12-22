@@ -13,9 +13,9 @@ RS = ot.RaySource(RSS, divergence="Isotropic", div_angle=8, s=[0, 0, 1], pos=[0,
                   spectrum=ot.presets.light_spectrum.led_b4)
 RT.add(RS)
 
-# custom surface with FunctionSurface
+# custom surface with FunctionSurface2D
 surf_func = lambda x, y: -np.tanh(3-2*np.sqrt(x**2 + y**2))/3
-front = ot.FunctionSurface(func=surf_func, r=3)
+front = ot.FunctionSurface2D(func=surf_func, r=3)
 back = ot.SphericalSurface(r=3, R=-8)
 nL1 = ot.RefractionIndex("Constant", n=1.5)
 L1 = ot.Lens(front, back, de=0, pos=[0, 0, 12], n=nL1)
@@ -27,7 +27,7 @@ def filter_func(wl):
     T = np.full_like(wl, 0.2)
     T[(wl < 450) | (wl > 630)] = 1
     return T
-f_surf = ot.FunctionSurface(func=lambda x, y:  np.zeros_like(x), mask_func=mask, r=3)
+f_surf = ot.FunctionSurface2D(func=lambda x, y:  np.zeros_like(x), mask_func=mask, r=3)
 t_spec = ot.TransmissionSpectrum("Function", func=filter_func)
 F = ot.Filter(f_surf, pos=[0, 0, 18], spectrum=t_spec)
 RT.add(F)
@@ -48,7 +48,7 @@ RT.add(L2)
 
 
 func3 = lambda x, y: np.abs(y)/3
-front = ot.FunctionSurface(func=func3, r=5, z_min=0, z_max=5/3)
+front = ot.FunctionSurface2D(func=func3, r=5, z_min=0, z_max=5 / 3)
 back = ot.CircularSurface(r=5)
 L3 = ot.Lens(front, back, n=nL1, pos=[1, 0, 29])
 RT.add(L3)

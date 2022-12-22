@@ -1,23 +1,20 @@
 
-"""
-Surface class:
-Provides the functionality for the creation of numerical or analytical surfaces.
-The class contains methods for interpolation, surface masking and normal calculation
-"""
 
 from typing import Any, Callable  # Any type
 import copy
 
 import numpy as np  # calculations
+import numexpr as ne
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface
 
 
-class FunctionSurface(Surface):
+class FunctionSurface2D(Surface):
     
     rotational_symmetry: bool = False
+    _1D: bool = False
 
     def __init__(self,
                  r:                 float,
@@ -70,8 +67,15 @@ class FunctionSurface(Surface):
         """
         Assign zmin, zmax depending on find bounds or user provided values.
         Check for plausibility and output messages.
-        """        
-        self.z_min, self.z_max = self._find_bounds()
+        """       
+        if self._1D:
+            rn = np.linspace(0, self.r, 10000)
+            zn = self._get_values(rn, np.zeros_like(rn))
+            mn = self.get_mask(rn, np.zeros_like(rn))
+            self.z_min, self.z_max = np.min(zn[mn]), np.max(zn[mn])
+
+        else:
+            self.z_min, self.z_max = self._find_bounds()
 
         if z_max is not None and z_min is not None:
             z_range_probed = self.z_max - self.z_min
@@ -118,11 +122,17 @@ class FunctionSurface(Surface):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        x_, y_ = self._rotate_rc(x, y, -self._angle)
-        vals = self.func(x_, self._sign*y_, **self._func_args)
+        if self._1D:
+            r = ne.evaluate("sqrt(x**2 + y**2)")
+            vals = self.func(r, **self._func_args)
+
+        else:
+            x_, y_ = self._rotate_rc(x, y, -self._angle)
+            vals = self.func(x_, self._sign*y_, **self._func_args)
 
         assert isinstance(vals, np.ndarray), "func must return a np.ndarray"
-        assert not vals.shape[0] or isinstance(vals[0], np.float64), "Elements of return value of func must be of type np.float64"
+        assert not vals.shape[0] or isinstance(vals[0], np.float64),\
+                "Elements of return value of func must be of type np.float64"
 
         return self._sign*(vals - self._offset)
 
@@ -136,20 +146,24 @@ class FunctionSurface(Surface):
         """
         mask = super().get_mask(x, y)
 
-        # additionally evaluate FunctionSurface mask if defined
+        # additionally evaluate FunctionSurface2D mask if defined
         if self.mask_func is not None:
             
             # relative coordinates
             xm = x - self.pos[0]
             ym = y - self.pos[1]
-        
-            # rotate surface
-            x_, y_ = self._rotate_rc(xm, ym, -self._angle)
+       
+            if self._1D:
+                rm = ne.evaluate("sqrt(xm**2 + ym**2)")
+                maskf = self.mask_func(rm, **self._mask_args)
 
-            maskf = self.mask_func(x_, self._sign*y_, **self._mask_args)
-            
+            else:
+                x_, y_ = self._rotate_rc(xm, ym, -self._angle)
+                maskf = self.mask_func(x_, self._sign*y_, **self._mask_args)
+                
             assert isinstance(maskf, np.ndarray), "mask_func must return a np.ndarray"
-            assert not maskf.shape[0] or isinstance(maskf[0], bool | np.bool_), f"Elements of return value of mask_func must be of type bool"
+            assert not maskf.shape[0] or isinstance(maskf[0], bool | np.bool_),\
+                    f"Elements of return value of mask_func must be of type bool"
 
             mask = mask & maskf
 
@@ -168,6 +182,7 @@ class FunctionSurface(Surface):
             return super().get_normals(x, y)
     
         else:
+
             n = np.tile([0., 0., 1.], (x.shape[0], 1))
 
             # coordinates actually on surface
@@ -177,22 +192,38 @@ class FunctionSurface(Surface):
             xm = x[m] - self.pos[0]
             ym = y[m] - self.pos[1]
         
-            # rotate surface
-            x_, y_ = self._rotate_rc(xm, ym, -self._angle)
+            if self._1D:
+                phi = ne.evaluate("arctan2(ym, xm)")
+                rm = ne.evaluate("sqrt(xm**2 + ym**2)")
+                nr = self._sign*self.deriv_func(rm, **self._deriv_args)
+                
+                assert isinstance(nr, np.ndarray), "deriv_func must return a np.ndarray"
+                assert not nr.shape[0] or isinstance(nr[0], np.float64), "values of deriv_func must be np.float64"
+                
+                nxn, nyn = ne.evaluate("nr*cos(phi)"), ne.evaluate("nr*sin(phi)")
 
-            # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
-            # we need to negate this, so the vector points in +z direction
-            # -> [-x, y, z]
-        
-            nxn, nyn = self.deriv_func(xm, self._sign*ym, **self._deriv_args)
-            # ^-- y is negative, since surface is flipped
+            else:
+                # rotate surface
+                x_, y_ = self._rotate_rc(xm, ym, -self._angle)
+
+                # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
+                # we need to negate this, so the vector points in +z direction
+                # -> [-x, y, z]
             
-            assert isinstance(nxn, np.ndarray), "deriv_func must return two np.ndarray"
-            assert isinstance(nyn, np.ndarray), "deriv_func must return two np.ndarray"
-            assert not nxn.shape[0] or isinstance(nxn[0], np.float64), "Elements of return value of deriv_func must be of type np.float64"
-            assert not nyn.shape[0] or isinstance(nyn[0], np.float64), "Elements of return value of deriv_func must be of type np.float64"
+                nxn, nyn = self.deriv_func(xm, self._sign*ym, **self._deriv_args)
+                # ^-- y is negative, since surface is flipped
+                
+                assert isinstance(nxn, np.ndarray), "deriv_func must return two np.ndarray"
+                assert isinstance(nyn, np.ndarray), "deriv_func must return two np.ndarray"
+                assert not nxn.shape[0] or isinstance(nxn[0], np.float64),\
+                        "Elements of return value of deriv_func must be of type np.float64"
+                assert not nyn.shape[0] or isinstance(nyn[0], np.float64),\
+                        "Elements of return value of deriv_func must be of type np.float64"
 
-            n[m, 0], n[m, 1] = self._rotate_rc(-nxn*self._sign, -nyn, self._angle)
+                nxn, nyn = self._rotate_rc(nxn*self._sign, nyn, self._angle)
+
+            n[m, 0] = -nxn
+            n[m, 1] = -nyn
             n[m] = misc.normalize(n[m])
 
             return n
@@ -217,10 +248,10 @@ class FunctionSurface(Surface):
         self.lock()
 
     def rotate(self, angle: float) -> None:
-
-        self._lock = False
-        self._angle += np.deg2rad(angle)
-        self.lock()
+        if not self._1D:
+            self._lock = False
+            self._angle += np.deg2rad(angle)
+            self.lock()
        
     def __setattr__(self, key: str, val: Any) -> None:
         """

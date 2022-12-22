@@ -225,13 +225,15 @@ While this done uniformly in :numref:`circle_sampling`, there are some circular 
           :align: center
           :width: 450
 
-          200k rays on a circular area with stratified sampling and a polar grid transformation as done in :numref:`circle_sampling`, image rendered with 189 x 189 pixel
+          200k rays with stratified sampling and a polar grid transformation as done in :numref:`circle_sampling`, image rendered with 189 x 189 pixel
 
      - .. figure:: ./images/circ_sampling_mapping.svg
           :align: center
           :width: 450
 
-          200k rays on a circular area with positions mapped from stratified grid, image rendered with 189 x 189 pixel
+          200k rays on a circular area with positions mapped from stratified grid, 
+          image rendered with 189 x 189 pixel
+           
 
 These artefacts arise from the highly distorted initial rectangular cells, that in those regions become circular sectors. At the disc edge the rectangular cells are less distorted. In the inner region the area elements consist of small arc lengths and a large radial component, while going further outside the arc lengths increase and the radial lengths decrease. Near the center the area elements appear *zoomed in* to the human eye. You can see such a grid and its distortion in :footcite:`doi:10.1080/10867651.1997.10487479`, figure 5, as well as the alternative method that is showcased next.
 

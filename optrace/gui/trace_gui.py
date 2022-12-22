@@ -17,7 +17,7 @@ from pyface.qt import QtGui  # closing UI elements
 from pyface.api import GUI as pyface_gui  # invoke_later() method
 
 # traits types and UI elements
-from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, CodeEditor
+from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeEditor
 from traitsui.api import Group as TGroup
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool
 
@@ -26,7 +26,7 @@ from mayavi.sources.parametric_surface import ParametricSurface  # provides outl
 
 # provides types and plotting functionality, most of these are also imported for the TCP protocol scope
 from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex,\
-                     SphericalSurface, DataSurface1D, DataSurface2D, FunctionSurface,\
+                     SphericalSurface, DataSurface1D, DataSurface2D, FunctionSurface2D, FunctionSurface1D,\
                      ConicSurface, RectangularSurface,\
                      RingSurface, CircularSurface, TiltedSurface, Spectrum, LightSpectrum, TransmissionSpectrum,\
                      Point, Line, TMA, Group, Marker, AsphericSurface, IdealLens
@@ -72,11 +72,11 @@ class TraceGUI(HasTraits):
                              auto_set=False, label="Rays", mode='text')
     """Number of rays for raytracing"""
     
-    filter_constant: Range = Range(0.5, 20., 1., desc='filter constant', enter_set=True,
+    filter_constant: Range = Range(0.3, 40., 1., desc='filter constant', enter_set=True,
                              auto_set=False, label="Limit (µm)", mode='text')
     """gaussian filter constant standard deviation"""
 
-    ray_amount_shown: Range = Range(1, 10000, 2000, desc='Percentage of N Which is Drawn', enter_set=False,
+    ray_amount_shown: Range = Range(1, 10000, 2000, desc='the number of rays which is drawn', enter_set=False,
                                     auto_set=False, label="Count", mode='logslider')
     """Number of rays shown in mayavi scenen"""
 
@@ -85,11 +85,13 @@ class TraceGUI(HasTraits):
     """z-Position of Detector. Lies inside z-range of :obj:`Backend.raytracer.outline`"""
 
     ray_opacity: Range = Range(1e-5, 1, 0.01, desc='Opacity of the rays/Points', enter_set=True,
-                             auto_set=True, label="Opacity", mode='logslider')
+                               auto_set=True, label="Opacity", editor=RangeEditor(format_str="%.4g", low=1e-5, 
+                                                                                  high=1, mode="logslider"))
     """opacity of shown ray"""
 
     ray_width: Range = Range(1.0, 20.0, 1, desc='Ray Linewidth or Point Size', enter_set=True,
-                             auto_set=True, label="Width")
+                             auto_set=True, label="Width", editor=RangeEditor(format_str="%.4g", low=1.0, 
+                                                                              high=20.0, mode="logslider"))
     """Width of rays shown."""
 
     cut_value: Float = Float(0, desc='value for specified cut dimension',
@@ -186,7 +188,8 @@ class TraceGUI(HasTraits):
     plotting_type: Enum = Enum(*plotting_types, desc="Ray Representation")
     """Ray Plotting Type"""
 
-    coloring_types: list = ['Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz', 'Polarization yz']  
+    coloring_types: list = ['Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz',\
+                            'Polarization yz', 'Refractive Index']  
     """available ray coloring modes"""
     coloring_type: Enum = Enum(*coloring_types, desc="Ray Property to color the Rays With")
     """Ray Coloring Mode"""
@@ -927,8 +930,8 @@ class TraceGUI(HasTraits):
     def _assign_ray_colors(self) -> None:
         """color the ray representation and the ray source"""
 
-        pol_, w_, wl_, snum_ = self._ray_property_dict["pol"], self._ray_property_dict["w"], \
-            self._ray_property_dict["wl"], self._ray_property_dict["snum"]
+        pol_, w_, wl_, snum_, n_ = self._ray_property_dict["pol"], self._ray_property_dict["w"], \
+            self._ray_property_dict["wl"], self._ray_property_dict["snum"], self._ray_property_dict["n"]
         N, nt, nc = pol_.shape
 
         # set plotting properties depending on plotting mode
@@ -948,6 +951,11 @@ class TraceGUI(HasTraits):
                 s = wl_.repeat(nt)
                 cm = "nipy_spectral"
                 title = "Wavelength\n in nm\n"
+
+            case 'Refractive Index':
+                s = n_.ravel()
+                cm = "gnuplot"
+                title = "Refractive\nIndex"
 
             case ('Polarization xz' | 'Polarization yz'):
                 if self.raytracer.no_pol:
@@ -1021,7 +1029,7 @@ class TraceGUI(HasTraits):
 
         match self.coloring_type:
 
-            case "Plain":
+            case ("Plain" | "Refractive Index"):
                 RSColor = [self.scene.foreground for RSp in self._ray_source_plots]
 
             case 'Wavelength':
@@ -1521,6 +1529,9 @@ class TraceGUI(HasTraits):
                 for el in obj[:3]:
                     if el is not None:
                         el.actor.property.color = color
+                        if self.high_contrast:
+                            el.actor.property.specular_color = (0.15, 0.15, 0.15)
+                            el.actor.property.diffuse_color = (0.12, 0.12, 0.12)
 
         # update axes color
         for ax in self._axis_plots:
@@ -1819,8 +1830,8 @@ class TraceGUI(HasTraits):
                         self._last_det_snap = snap
                     else:
                         DImg = self.last_det_image.copy()
+                        DImg.rescale(px)
 
-                DImg.rescale(px)
                 Imc = DImg.get_by_display_mode(mode, log=log)
 
                 def on_finish() -> None:
@@ -1947,8 +1958,8 @@ class TraceGUI(HasTraits):
                         self._last_source_snap = snap
                     else:
                         SImg = self.last_source_image.copy()
+                        SImg.rescale(px)
 
-                SImg.rescale(px)
                 Imc = SImg.get_by_display_mode(mode, log=log)
 
                 def on_finish() -> None:

@@ -81,8 +81,9 @@ class Surface(BaseClass):
         phi = 2*np.pi * (1 + 5**0.5)/2 * ind
 
         # get values and mask out invalid values
-        vals = self._get_values(r*np.cos(phi), r*np.sin(phi))
-        mask = self.get_mask(r * np.cos(phi) - self.pos[0], r * np.sin(phi) - self.pos[1])
+        rcos, rsin = ne.evaluate("r*cos(phi)"), ne.evaluate("r*sin(phi)")
+        vals = self._get_values(rcos, rsin)
+        mask = self.get_mask(rcos - self.pos[0], rsin - self.pos[1])
         vals[~mask] = np.nan
 
         # in many cases the minimum and maximum are at the  edge of the surface
@@ -123,7 +124,7 @@ class Surface(BaseClass):
                self.z_min, self.z_max
 
     @property
-    def d(self) -> float:
+    def ds(self) -> float:
         """surface thickness. Difference between highest and lowest point on surface"""
         return self.z_max - self.z_min
 
@@ -159,7 +160,8 @@ class Surface(BaseClass):
             # TODO test these
             if np.any(~inside):
                 if not self.rotational_symmetry:
-                    phi = np.arctan2(y[~inside] - self.pos[1], x[~inside] - self.pos[0])
+                    xni, x0, yni, y0 = x[~inside], self.pos[0], y[~inside], self.pos[1]
+                    phi = ne.evaluate("arctan2(yni - y0, xni - x0)")
                     z[~inside] = self.pos[2] + self._get_values(r*np.cos(phi), r*np.sin(phi))
                 else:
                     z[~inside] = self.pos[2] + self._get_values(np.array([r]), np.array([0.]))[0]
@@ -294,7 +296,9 @@ class Surface(BaseClass):
         yd = self.r * np.sin(theta)
         zd = self._get_values(xd, yd)
 
-        return xd+self.pos[0], yd+self.pos[1], zd+self.pos[2]
+        return xd + self.pos[0],\
+            yd + self.pos[1],\
+            zd + self.pos[2]
 
     def find_hit(self, p: np.ndarray, s: np.ndarray)\
             -> tuple[np.ndarray, np.ndarray]:
@@ -419,8 +423,8 @@ class Surface(BaseClass):
     def _rotate_rc(self, x, y, alpha) -> tuple[np.ndarray, np.ndarray]:
 
         if alpha:
-            return x*np.cos(alpha) - y*np.sin(alpha),\
-                x*np.sin(alpha) + y*np.cos(alpha)
+            return ne.evaluate("x*cos(alpha) - y*sin(alpha)"),\
+                ne.evaluate("x*sin(alpha) + y*cos(alpha)")
 
         return x, y
 

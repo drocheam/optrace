@@ -34,7 +34,8 @@ def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     a = 0.055
     below = np.abs(RGB) <= 0.04045
     RGB[below] *= 1 / 12.92
-    RGB[~below] = np.sign(RGB[~below])*((np.abs(RGB[~below]) + a) / (1 + a)) ** 2.4
+    RGBnb = RGB[~below]
+    RGB[~below] = np.sign(RGBnb)*ne.evaluate("((abs(RGBnb) + a) / (1 + a)) ** 2.4")
 
     return RGB
 
@@ -264,7 +265,8 @@ def srgb_linear_to_srgb(rgbl: np.ndarray) -> np.ndarray:
     a = 0.055
     below = np.abs(RGB) <= 0.0031308
     RGB[below] *= 12.92
-    RGB[~below] = np.sign(RGB[~below])*((1 + a) * np.abs(RGB[~below]) ** (1 / 2.4) - a)
+    RGBnb = RGB[~below]
+    RGB[~below] = np.sign(RGBnb)*ne.evaluate("((1 + a) * abs(RGBnb) ** (1 / 2.4) - a)")
 
     return RGB
 

@@ -111,7 +111,7 @@ class RefractionIndex(Spectrum):
                 B = 1/self.V * (nc - 1) / (1/(l[0]**2-d) - 1/(l[2]**2-d))
                 A = nc - B/(l[1]**2-d)
 
-                ns = A + B/(wl2-d)
+                ns = ne.evaluate("A + B/(wl2-d)")
 
             case "Conrady":
                 l = wl_*1e-3

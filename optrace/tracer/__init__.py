@@ -13,7 +13,8 @@ from .spectrum.transmission_spectrum import TransmissionSpectrum
 
 from .geometry.surface.data_surface_1d import DataSurface1D
 from .geometry.surface.data_surface_2d import DataSurface2D
-from .geometry.surface.function_surface import FunctionSurface
+from .geometry.surface.function_surface_2d import FunctionSurface2D
+from .geometry.surface.function_surface_1d import FunctionSurface1D
 from .geometry.surface.circular_surface import CircularSurface
 from .geometry.surface.rectangular_surface import RectangularSurface
 from .geometry.surface.ring_surface import RingSurface

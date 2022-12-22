@@ -61,12 +61,12 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     Luv[mask4, 0] = k * tn
 
     D = ne.evaluate("1/(X + 15*Y + 3*Z)")
-    u = ne.evaluate("4*X*D")
-    v = ne.evaluate("9*Y*D")
+    u = 4*X*D
+    v = 9*Y*D
 
     L13 = 13*Luv[mask, 0]
-    Luv[mask, 1] = ne.evaluate("L13*(u-un)")
-    Luv[mask, 2] = ne.evaluate("L13*(v-vn)")
+    Luv[mask, 1] = L13*(u-un)
+    Luv[mask, 2] = L13*(v-vn)
 
     return Luv
 

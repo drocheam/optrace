@@ -21,7 +21,7 @@ RT.add(RS)
 
 # sph = ot.SphericalSurface(r=5, R=5.1)
 # sph = ot.ConicSurface(r=12, R=0.1, k=-10000)
-sph = ot.FunctionSurface(r=5, func=lambda x, y: -np.sqrt(1 - (x**2 + y**2)/5.1**2)*5.1)
+sph = ot.FunctionSurface2D(r=5, func=lambda x, y: -np.sqrt(1 - (x ** 2 + y ** 2) / 5.1 ** 2) * 5.1)
 circ = ot.CircularSurface(r=5)
 L = ot.Lens(sph, circ, pos=[0, 0, 0], d1=0, d2=5, n=ot.presets.refraction_index.SF10)
 RT.add(L)

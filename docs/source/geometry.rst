@@ -27,6 +27,8 @@ The line is then defined for :math:`r \in [-R, ~R]`
 Surfaces
 ===============
 
+.. _conic_surface:
+
 Conic
 --------------------
 
@@ -53,6 +55,7 @@ Sphere
 
 Handled as conic with :math:`k=0`
 
+.. _aspheric_surface:
 
 Asphere
 ---------------------------

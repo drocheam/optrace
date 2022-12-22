@@ -115,9 +115,6 @@ def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.n
     """
     x, y = uniform2(-r, r, -r, r, N)
 
-    if ri:
-        x
-
     r_ = np.zeros_like(x)
     theta = np.zeros_like(x)
     x2, y2 = x**2, y**2  # store since used multiple times
@@ -141,7 +138,7 @@ def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.n
         r_ = ne.evaluate("(1 - ((r_ < 0) << 1)) * sqrt(ri**2 + r_**2*(1 - (ri/r)**2))")
 
     if not polar:
-        return r_*np.cos(theta), r_*np.sin(theta)
+        return ne.evaluate("r_*cos(theta)"), ne.evaluate("r_*sin(theta)")
 
     else:
         # r is signed, remove sign and convert it to an angle

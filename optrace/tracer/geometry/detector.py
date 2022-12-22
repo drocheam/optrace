@@ -9,7 +9,7 @@ import numexpr as ne  # faster calculations
 
 from .element import Element  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
-from .surface import Surface, DataSurface1D, DataSurface2D, FunctionSurface
+from .surface import Surface, DataSurface1D, DataSurface2D, FunctionSurface2D
 
 
 class Detector(Element):
@@ -33,8 +33,8 @@ class Detector(Element):
 
     def __setattr__(self, key, val):
 
-        if key == "front" and isinstance(val, DataSurface2D | DataSurface1D | FunctionSurface):
-            raise RuntimeError("Classes and subclasses of DataSurface1D, DataSurface2D, FunctionSurface"\
+        if key == "front" and isinstance(val, DataSurface2D | DataSurface1D | FunctionSurface2D):
+            raise RuntimeError("Classes and subclasses of DataSurface1D, DataSurface2D, FunctionSurface2D"\
                                " are not supported as Detector surfaces.")
 
         super().__setattr__(key, val)
