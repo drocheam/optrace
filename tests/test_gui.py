@@ -775,6 +775,7 @@ class GUITests(unittest.TestCase):
 
         def send(cmd):
             sim._do_in_main(sim.send_cmd, cmd)
+            time.sleep(1)
             sim._wait_for_idle()
 
         def interact(sim):
@@ -782,8 +783,6 @@ class GUITests(unittest.TestCase):
                 state = RT.rays.crepr()
                 send("GUI.replot()")
                 self.assertFalse(state == RT.rays.crepr())  # check if raytraced
-
-                sim._do_in_main(sim.open_command_window)
 
                 send("GUI.show_detector_image()")
                 self.assertTrue(sim.last_det_image is not None)  # check if raytraced
