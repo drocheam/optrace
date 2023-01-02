@@ -1,7 +1,8 @@
 ***********************
-Color Conversion
+Color Management
 ***********************
 
+.. TODO also explain: https://www5.in.tum.de/lehre/vorlesungen/graphik/info/csc/COL_3.htm#topic2
 
 .. _xyz_color_space:
 
@@ -236,6 +237,9 @@ The latter is not the case in the CIE 1931 chromaticity diagram in figure :numre
    u'v' chromaticity diagram with sRGB Gamut
 
 
+An also widespread CIE model is the CIELAB color space with the same lightness function but different color components. For color mixing and additive colour applications CIELUV should be preferred, as it has an associated chromaticity diagram (as mentioned above) and a defined expression for color saturation. :footcite:`ColorFord`
+
+
 **XYZ to CIELUV**
 
 Source for conversion: :footcite:`BloomXYZLUV`
@@ -331,13 +335,16 @@ sRGB Spectral Upsampling
 
 
 While doing the conversion of a physical light spectrum to coordinates in a human vision color model is a common task, going the opposite direction is rather unusual.
-In our application the conversion is used to load digital images into the raytracer and propagate spectral wavelengths troughout the tracing geometry.
+In our application the conversion is used to load digital images into the raytracer and propagate spectral wavelengths throughout the tracing geometry.
 Such an implementation would enable us a simple simulation of different light and lightning scenes.
 
-The conversion process is commonly referred to as *Spectral Upsampling*.  An implementation with real LED spectral curves is found in :footcite:`10.2312:sr.20221150`, while modelling sRGB reflectances is found in :footcite:`10.2312:sr.20191216`.
-It is important to note that not all chromacities inside the human vision and even the sRGB gamut can be modelled by valid reflectance spectra, since the reflectance range is bound to :math:`[0,~1]`. However, when choosing illuminant curves there is no such limitation.
+The conversion process is commonly referred to as *Spectral Upsampling*, *Spectral Rendering* or *Spectral Synthesis*.  An implementation with real LED spectral curves is found in :footcite:`10.2312:sr.20221150`, while modelling sRGB reflectances is found in :footcite:`10.2312:sr.20191216`.
+It is important to note that not all chromaticities inside the human vision and even the sRGB gamut can be modelled by valid reflectance spectra, since the reflectance range is bound to :math:`[0,~1]`. However, when choosing illuminant curves there is no such limitation.
 
-When choosing spectral primaries some requirements can be demanded:
+While the conversion of a spectral distribution to a color is well-defined, going backwards the conversion is not unique and simply reversible. Multiple spectral distributions can create the same color stimulus, an effect known as *metamerism*.
+In fact, there infinitely many distributions being perceived as the same color.
+With so many possibilities to choose from, we can demand some requirements for our sRGB primaries:
+
 
 .. topic:: Requirements
 

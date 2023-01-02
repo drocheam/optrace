@@ -1,0 +1,192 @@
+Refraction Index
+-----------------------
+
+.. role:: python(code)
+  :language: python
+  :class: highlight
+
+
+
+
+Defining the Index
+________________________
+
+**Constant**
+
+In the simplest case a constant (wavelength-independent) refactive index is defined as:
+
+.. code-block:: python
+
+   n = ot.RefractionIndex("Constant", n=1.54)
+
+**By Abbe Number**
+
+Many materials are simply characterized by the index at a center wavelength and the Abbe number.
+However, materials with these same quantities can still differ slightly.
+
+.. code-block:: python
+
+   n = ot.RefractionIndex("Abbe", n=1.5, V=32)
+
+Details on how the model is estimated are found in :numref:`index_from_abbe`.
+
+You can also specify the wavelength combination, for which ``n`` and ``V`` are specified:
+
+.. code-block:: python
+
+   n = ot.RefractionIndex("Abbe", n=1.5, V=32, lines=ot.presets.spectral_lines.FeC)
+
+
+**Common Index Models**
+   
+Defining a medium by a specific model is done by providing the model name and the correct number of coefficients in the ``coeff``.
+Note that all coefficients have units in µm or powers of µm. You can read more about the different supported models in :numref:`index_functions`.
+
+
+In the case of the Schott model the initialization could look as follows:
+
+.. code-block:: python
+
+   n = ot.RefractionIndex("Schott", coeff=[2.13e-06, 1.65e-08, -6.98e-11, 1.02e-06, 6.56e-10, 0.208])
+
+**User Data**
+
+.. code-block:: python
+
+   wls = np.linspace(380, 780, 10)
+   vals = np.array([1.6, 1.58, 1.55, 1.54, 1.535, 1.532, 1.531, 1.53, 1.529, 1.528])
+   n = ot.RefractionIndex("Data", wls=wls, vals=vals)
+
+**User Function**
+
+``optrace`` also supports user functions for the refractive index. The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
+
+.. code-block:: python
+
+   n = ot.RefractionIndex("Function", func=lambda wl: 1.6 - 1e-3*wl)
+
+When providing a function with multiple parameters you can use the ``func_args`` parameter.
+
+.. code-block:: python
+
+   n = ot.RefractionIndex("Function", func=lambda wl, n0: n0 - 1e-3*wl, func_args=dict(n0=1.6))
+
+
+Getting Index Values
+_______________________
+
+The refractive index values are calculated when calling the refractive index object with a wavelength vector.
+The call returns a vector of the same shape as the input.
+
+.. code-block:: python
+
+   n = ot.RefractionIndex("Abbe", n=1.543, V=62.1)
+   wl = np.linspace(380, 780, 100)
+   ns = n(wl)
+
+
+Abbe Number
+__________________
+
+Details on the calculation of the Abbe number can be found in :numref:``abbe_number``. 
+With a refractive index object at hand the Abbe number can be calculated with
+
+.. code-block:: python
+
+   n = ot.presets.refraction_index.SF10
+   V = n.get_abbe_number()
+
+Alternatively the function can be called with a different spectral line combination from :python:`ot.presets.spectral_lines`:
+
+.. code-block:: python
+
+   V = n.get_abbe_number(ot.presets.spectral_lines.FdC)
+
+Or specify a user defined list of three wavelengths:
+
+.. code-block:: python
+
+   V = n.get_abbe_number([350, 500, 700])
+
+
+You can also check if a medium is dispersive by calling
+
+.. code-block:: python
+
+   print(n.is_dispersive())
+
+
+A list of predefined lines can be found in :numref:`spectral_lines`.
+
+Loading material catalogues (.agf)
+_________________________________________
+
+
+``optrace``  can also load .agf catalogue files containing different materials.
+The function ``ot.load.agf`` takes a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
+
+For instance, loading the Schott catalogue and accessing the material ``N-LAF21`` can be done as follows:
+
+.. code-block:: python
+
+   n_schott = ot.load.agf("schott.agf")
+   n_laf21 = n_schott["N-LAF21"]
+
+
+Different ``.agf`` files are found in `this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`_.
+
+.. TODO Plotting n and V?
+
+
+
+.. _refraction_index_presets:
+
+Presets
+_________________
+
+``optrace`` comes with multiple material presets, which can be accessed using ``ot.presets.refractive_index.<name>``, where ``<name>`` is the material name.
+The materials are also grouped into multiple lists :python:`ot.presets.refractive_index.glasses, ot.presets.refractive_index.plastics, ot.presets.refractive_index.misc`. 
+
+These groups are plotted below in an index and an Abbe plot.
+
+**Glass**
+
+.. figure:: images/glass_presets_n.svg
+   :width: 600
+   :align: center
+
+   Refraction index curves for different glass presets.
+
+.. figure:: images/glass_presets_V.svg
+   :width: 600
+   :align: center
+   
+   Abbe diagram for different glass presets.
+
+**Plastics**
+
+.. figure:: images/plastics_presets_n.svg
+   :width: 600
+   :align: center
+   
+   Refraction index curves for different plastic presets.
+
+.. figure:: images/plastics_presets_V.svg
+   :width: 600
+   :align: center
+   
+   Abbe diagram for different plastic presets.
+
+**Misc**
+
+.. figure:: images/misc_presets_n.svg
+   :width: 600
+   :align: center
+
+   Refraction index curves for miscellaneous presets.
+
+.. figure:: images/misc_presets_V.svg
+   :width: 600
+   :align: center
+   
+   Abbe diagram for miscellaneous presets.

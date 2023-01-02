@@ -25,12 +25,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="4"
-     inkscape:cx="97.875"
-     inkscape:cy="77.125"
-     inkscape:window-width="2560"
-     inkscape:window-height="1366"
-     inkscape:window-x="1920"
+     inkscape:zoom="2.2898418"
+     inkscape:cx="-23.582415"
+     inkscape:cy="84.503653"
+     inkscape:window-width="1920"
+     inkscape:window-height="1006"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
@@ -99,25 +99,6 @@
        id="path-effect49296"
        is_visible="true"
        lpeversion="1" />
-    <marker
-       style="overflow:visible"
-       id="Arrow1L"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Arrow1L"
-       markerWidth="8.75"
-       markerHeight="5"
-       viewBox="0 0 8.75 5"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
-         d="M 0,0 5,-5 -12.5,0 5,5 Z"
-         id="arrow1L"
-         transform="scale(-0.5)" />
-    </marker>
     <marker
        style="overflow:visible"
        id="Arrow1L_Fnone_S-b91a1a"
@@ -326,10 +307,10 @@
        inkscape:collect="always"
        xlink:href="#linearGradient68491"
        id="linearGradient68493"
-       x1="89.057098"
-       y1="41.336868"
-       x2="125.22507"
-       y2="69.969849"
+       x1="97.667953"
+       y1="48.153797"
+       x2="118.87463"
+       y2="64.942413"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <g

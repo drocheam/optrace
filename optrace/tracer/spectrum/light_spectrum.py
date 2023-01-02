@@ -129,8 +129,8 @@ class LightSpectrum(Spectrum):
     def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
         """
 
-        :param wl:
-        :return:
+        :param wl: wavelength array
+        :return: values at provided wavelengths
         """
         if self.spectrum_type == "Blackbody":
             wl_ = np.asarray_chkfinite(wl, dtype=np.float64)

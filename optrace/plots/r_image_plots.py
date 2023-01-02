@@ -100,8 +100,8 @@ def r_image_plot(im:       RImage,
     plt.title(text)
 
     # show image
-    plt.show(block=block)
     plt.tight_layout()
+    plt.show(block=block)
     plt.pause(0.1)
 
 
@@ -196,8 +196,8 @@ def r_image_cut_plot(im:       RImage,
     plt.title(text)
 
     # show image
-    plt.show(block=block)
     plt.tight_layout()
+    plt.show(block=block)
     plt.pause(0.1)
 
 

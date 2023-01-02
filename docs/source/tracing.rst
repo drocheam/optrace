@@ -3,6 +3,8 @@
 Tracing
 *********************************
 
+.. TODO describe why sequential raytracing is sufficient and why non-sequential raytracing is hard.
+
 
 Pathtracing versus Raytracing
 ==================================
@@ -49,6 +51,7 @@ In case of total internal reflection (TIR) the root argument becomes negative. I
 Polarization
 ====================
 
+The following calculations are similar to :footcite:`Yun:11`.
 
 The polarization vector :math:`E` can be decomposed into a :math:`E_\text{p}` -component, lying in the surface normal - incidence vector plane, and a :math:`E_\text{s}` -component lying perpendicular to this plane. With refraction on an interface the component :math:`E_\text{s}` is equal for both ray vectors :math:`s, s'`, while :math:`E_\text{p}` is rotated around :math:`E_\text{s}` towards :math:`s'` creating the new component :math:`E_\text{p}'`.
 Note that for our calculations all vectors are unity vectors, while length information of the polarization components is contained in the scaling factors :math:`A_\text{tp}, A_\text{ts}`.
@@ -74,8 +77,8 @@ Additionally, both polarization components are perpendicular to each other. Assu
 .. math::
     \begin{align}
     E_\text{s} &= \frac{s' \times s}{|| s' \times s ||}\\
-    E_\text{p} &= E_\text{ts} \times s\\
-    E_\text{p}' &= E_\text{ts} \times s'\\
+    E_\text{p} &= E_\text{s} \times s\\
+    E_\text{p}' &= E_\text{s} \times s'\\
     \end{align}
     :label: pol_E
 

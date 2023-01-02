@@ -15,6 +15,9 @@ import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
 
+def random():
+    """less secure, but faster random number generator"""
+    return np.random.Generator(np.random.SFC64())
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function
@@ -40,6 +43,7 @@ def timer(func: Callable) -> Any:
             print(f"Timing: {time_:.3f} {unit} for {func}")
 
     return _time_it
+
 
 def uniform2(a, b, c, d, N):
     """
@@ -67,16 +71,16 @@ def uniform2(a, b, c, d, N):
 
     # create rectangular grid and add dither
     X, Y = np.mgrid[a:b-dba:N2*1j, c:d-ddc:N2*1j]
-    X += np.random.uniform(0, dba, X.shape)
-    Y += np.random.uniform(0, ddc, Y.shape)
+    X += random().uniform(0, dba, X.shape)
+    Y += random().uniform(0, ddc, Y.shape)
 
     # add remaining elements and shuffle everything
-    x = np.concatenate((X.ravel(), np.random.uniform(a, b, dN)))
-    y = np.concatenate((Y.ravel(), np.random.uniform(c, d, dN)))
+    x = np.concatenate((X.ravel(), random().uniform(a, b, dN)))
+    y = np.concatenate((Y.ravel(), random().uniform(c, d, dN)))
 
     # shuffle order
     ind = np.arange(N)
-    np.random.shuffle(ind)
+    random().shuffle(ind)
 
     return x[ind], y[ind]
 
@@ -95,9 +99,9 @@ def uniform(a, b, N):
         return np.array([], dtype=np.float64)
 
     dba = (b-a)/N  # grid spacing
-    x = np.linspace(a, b - dba, N) + np.random.uniform(0., dba, N)  # grid + dither
+    x = np.linspace(a, b - dba, N) + random().uniform(0., dba, N)  # grid + dither
 
-    np.random.shuffle(x)
+    random().shuffle(x)
     return x
 
 

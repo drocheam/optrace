@@ -296,7 +296,6 @@ class RImage(BaseClass):
         if self._sigma is not None:
             self.extent += np.array([-1, 1, -1, 1]) * 5*self._sigma
 
-    @misc.timer
     def rescale(self, N: int) -> None:
         """
 

@@ -1,5 +1,5 @@
-Defining Surfaces
------------------------
+Base Shapes (Surface, Point, Line)
+---------------------------------------
 
 Overview
 _________________
@@ -209,7 +209,7 @@ While we could add an offset to the axicon function, this is not needed, as a co
 
 **Providing partial derivatives**
 
-To speed up tracing and enhance numerical precision we can provide the partial derivatives of the surface in x- and y-direction.
+To speed up tracing and enhance numerical precision we can provide the partial derivatives of the surface in x and y-direction.
 For our axicon the special case :math:`r=0` needs to be handled separately.
 The derivative function is passed with the ``deriv_func``-parameter.
 
@@ -229,7 +229,7 @@ The derivative function is passed with the ``deriv_func``-parameter.
 
 In many cases one uses a already defined function with additional parameters, or in a different case we don't want to hard-code the values into any function.
 The user can provide a dictionary of parameters that will get passed down to the corresponding function.
-For the ``func`` argument the matching paramter would be ``func_args``.
+For the ``func`` argument the matching parameter would be ``func_args``.
 
 .. code-block:: python
 

@@ -80,8 +80,8 @@ class Spectrum(BaseClass):
     def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
         """
 
-        :param wl:
-        :return:
+        :param wl: wavelength array
+        :return: values at provided wavelengths
         """
         # don't enable evaluating a function with discontinuities or where only some discrete values amount to anything
         # float errors would ruin anything anyway

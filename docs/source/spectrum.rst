@@ -146,7 +146,7 @@ The sum power of all sources is
 
 .. math::
    P = \sum_{(P_i,~\lambda_i \in L)} P_i
-   :label: eq_lspectrum_lines_P
+   :label: eq_lspectrum_lines_power
 
 The probabilities are then 
 
@@ -219,6 +219,8 @@ Definition
 
 Color
 -----------
+
+.. _spectral_lines:
 
 Spectral Lines
 ======================
@@ -315,6 +317,8 @@ RefractionIndex
 
 Definition
 -------------
+
+.. _index_functions:
 
 Functions
 -------------
@@ -428,6 +432,8 @@ A material with :math:`V=0` is an ideal material with no dispersion.
 
 Selecting different glasses is often done with the help of a *Abbe diagram*, where the center refractive index as well as the :math:`V`-number of the material are plotted as a scatter diagram. Examples can be found in :numref:`refraction_index_presets`.
 
+.. _index_from_abbe:
+
 Curve from Abbe Number
 -----------------------
 
@@ -452,54 +458,6 @@ With :math:`n_\text{s}:=n(\lambda_\text{s}),~n_\text{c}:=n(\lambda_\text{c}),~n_
 
 Parameters :math:`V`, :math:`n_\text{c}` and the spectral lines :math:`\lambda_\text{s},~\lambda_\text{c},~\lambda_\text{l}` are provided by the user.
 
-
-
-.. _refraction_index_presets:
-
-Presets
---------------
-
-**Glass**
-
-.. figure:: images/glass_presets_n.svg
-   :width: 600
-   :align: center
-
-   Refraction index curves for different glass presets.
-
-.. figure:: images/glass_presets_V.svg
-   :width: 600
-   :align: center
-   
-   Abbe diagram for different glass presets.
-
-**Plastics**
-
-.. figure:: images/plastics_presets_n.svg
-   :width: 600
-   :align: center
-   
-   Refraction index curves for different plastic presets.
-
-.. figure:: images/plastics_presets_V.svg
-   :width: 600
-   :align: center
-   
-   Abbe diagram for different plastic presets.
-
-**Misc**
-
-.. figure:: images/misc_presets_n.svg
-   :width: 600
-   :align: center
-
-   Refraction index curves for miscellaneous presets.
-
-.. figure:: images/misc_presets_V.svg
-   :width: 600
-   :align: center
-   
-   Abbe diagram for miscellaneous presets.
 
 
 
