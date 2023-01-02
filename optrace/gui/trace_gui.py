@@ -1,4 +1,5 @@
 import gc  # garbage collector stats
+import copy # copy.deepcopy()
 import time  # provides sleeping
 import warnings  # show warnings
 import traceback  # traceback printing
@@ -416,7 +417,8 @@ class TraceGUI(HasTraits):
 
         # ray properties
         self._ray_selection = np.array([])  # indices for subset of all rays in raytracer
-        self._ray_property_dict = {}  # properties of shown rays
+        self.__ray_property_dict = {}  # properties of shown rays, set while tracing
+        self._ray_property_dict = {}  # properties of shown rays, set after tracing
         self._rays_plot_scatter = None  # plot for scalar ray values
         self._rays_plot = None  # plot for visualization of rays/points
         self._ray_text = None  # textbox for ray information
@@ -890,20 +892,21 @@ class TraceGUI(HasTraits):
 
     def _get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
-        Ray/Point Plotting with a specified scalar coloring
         :return:
         """
 
         p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=True)
-
-        # force copies
-        self._ray_property_dict.update(p=p_.copy(), s=s_.copy(), pol=pol_.copy(), w=w_.copy(), wl=wl_.copy(), snum=snum_.copy(), n=n_.copy(),
-                                       index=np.where(self._ray_selection)[0])
-
-        # get flattened list of the coordinates
+        l_ = self.raytracer.rays.ray_lengths(self._ray_selection)
+        ol_ = self.raytracer.rays.optical_lengths(self._ray_selection)
+        
         _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=False,
                                                                ret=[0, 1, 0, 0, 0, 0, 0])
-        
+
+        # force copies
+        self.__ray_property_dict.update(p=p_.copy(), s=s_.copy(), pol=pol_.copy(), w=w_.copy(), wl=wl_.copy(),
+                                        snum=snum_.copy(), n=n_.copy(), index=np.where(self._ray_selection)[0],
+                                        l=l_.copy(), ol=ol_.copy(), s_un=s_un.copy())
+       
         # use flatten instead of ravel so we have guaranteed copies
         x, y, z = p_[:, :, 0].flatten(), p_[:, :, 1].flatten(), p_[:, :, 2].flatten()
         u, v, w = s_un[:, :, 0].flatten(), s_un[:, :, 1].flatten(), s_un[:, :, 2].flatten()
@@ -1187,26 +1190,17 @@ class TraceGUI(HasTraits):
         if picker_obj is not None and len(picker_obj.actors) != 0 \
            and picker_obj.actors[0]._vtk_obj is self._rays_plot.actor.actor._vtk_obj:
 
-            # don't pick while plotted rays or rays in raytracer could change
-            # using the RayAccessLock wouldn't be wise, because it also used by Focussing
-            if self._status["Tracing"] or self._status["Drawing"]:
-                if not self.silent:
-                    print("Can't pick while tracing or drawing.")
-                return
-
-            a = self.raytracer.rays.Nt  # number of points per ray plotted
+            a = self._ray_property_dict["p"].shape[1]  # number of points per ray plotted
             b = picker_obj.point_id  # point id of the ray point
 
             n_, n2_ = np.divmod(b, 2*a)
             n2_ = min(1 + (n2_-1)//2, a - 1)
 
-            N_shown = np.count_nonzero(self._ray_selection)
-            RayMask = misc.part_mask(self._ray_selection, np.arange(N_shown) == n_)
-            pos = np.nonzero(RayMask)[0][0]
-
             # get properties of this ray section
-            p_, s_, pols_, pw_, wv, snum, n_ = self.raytracer.rays.rays_by_mask(RayMask)
-            p_, s_, pols_, pw_, wv, snum, n_ = p_[0], s_[0], pols_[0], pw_[0], wv[0], snum[0], n_[0]  # choose only ray
+            rp = self._ray_property_dict
+            p_, s_, pols_, pw_, wv, snum, n_, index, l, ol = rp["p"][n_], rp["s"][n_], rp["pol"][n_], rp["w"][n_],\
+                rp["wl"][n_], rp["snum"][n_], rp["n"][n_], rp["index"][n_], rp["l"][n_], rp["ol"][n_]
+
             p, s, pols, pw = p_[n2_], s_[n2_], pols_[n2_], pw_[n2_]
 
             pw0 = pw_[n2_-1] if n2_ else None
@@ -1215,8 +1209,7 @@ class TraceGUI(HasTraits):
             pl = ((pw0-pw)/pw0 if pw0 else 0) if n2_ else None  # power loss
 
             def to_sph_coords(s):
-                # theta, phi
-                return np.array([np.rad2deg(np.arccos(s[2])), np.rad2deg(np.arctan2(s[1], s[0]))])
+                return np.array([np.rad2deg(np.arccos(s[2])), np.rad2deg(np.arctan2(s[1], s[0]))])  # theta, phi
 
             s_sph = to_sph_coords(s)
             s0_sph = to_sph_coords(s0) if n2_ else None
@@ -1242,8 +1235,6 @@ class TraceGUI(HasTraits):
                 normal = surf.get_normals(np.array([p[0]]), np.array([p[1]]))[0]
                 normal_sph = to_sph_coords(normal)
 
-            l = self.raytracer.rays.ray_lengths(RayMask)[0]
-            ol = self.raytracer.rays.optical_lengths(RayMask)[0] 
             l0 = l[n2_ - 1] if n2_ > 0 else None
             l1 = l[n2_] if n2_ < l.shape[0] else None
             ol0 = ol[n2_ - 1] if n2_ > 0 else None
@@ -1251,7 +1242,7 @@ class TraceGUI(HasTraits):
 
             # differentiate between Click and Shift+Click
             if self.scene.interactor.shift_key:
-                text = f"Ray {pos}" +  \
+                text = f"Ray {index}" +  \
                     f" from RS{snum}" +  \
                     (f" at surface {n2_}\n\n" if n2_ else " at ray source\n\n") + \
                     f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n" + \
@@ -1284,7 +1275,7 @@ class TraceGUI(HasTraits):
                     ("\n\nSurface Information:\n" if is_surf and surf_hit else "") + \
                     (surf.info if is_surf and surf_hit else "")
             else:
-                text = f"Ray {pos}" +  \
+                text = f"Ray {index}" +  \
                     f" from Source {snum}" +  \
                     (f" at surface {n2_}\n" if n2_ else " at ray source\n") + \
                     f"Intersection Position: ({p[0]:>10.5g} mm, {p[1]:>10.5g} mm, {p[2]:>10.5g} mm)\n" + \
@@ -1448,8 +1439,8 @@ class TraceGUI(HasTraits):
         def raise_timeout(keys):
             raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
 
-        tsum = 0.3
-        time.sleep(0.3)  # wait for flags to be set, this could also be trait handlers, which could take longer
+        tsum = 1
+        time.sleep(1)  # wait for flags to be set, this could also be trait handlers, which could take longer
         while self.busy:
             time.sleep(0.05)
             tsum += 0.05
@@ -1493,7 +1484,7 @@ class TraceGUI(HasTraits):
         self.raytracer.silent = silent
         self.configure_traits()
 
-    @observe('scene:closing')  # needed so this gets also called when clicking x on main window
+    @observe('scene:closing', dispatch="ui")  # needed so this gets also called when clicking x on main window
     def close(self, event=None) -> None:
         """
         close the whole application, including plot windows
@@ -1505,7 +1496,7 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Trait handlers.
 
-    @observe('high_contrast')
+    @observe('high_contrast', dispatch="ui")
     def _change_contrast(self, event=None) -> None:
         """
         change high contrast mode
@@ -1558,7 +1549,7 @@ class TraceGUI(HasTraits):
         if self._ray_text is not None:
             self._ray_text.property.background_color = self._info_frame_color
 
-    @observe('ray_amount_shown')
+    @observe('ray_amount_shown', dispatch="ui")
     def replot_rays(self, event=None) -> None:
         """
         choose a subset of all raytracer rays and plot them with :obj:`TraceGUI._plot_rays`.
@@ -1586,6 +1577,10 @@ class TraceGUI(HasTraits):
 
                 def on_finish():
 
+                    # set _ray_property_dict, that is used by other methods
+                    # other methods can't use __ray_property_dict, since this would require locks in the main thread
+                    self._ray_property_dict = copy.deepcopy(self.__ray_property_dict)
+
                     with self._constant_camera():
                         self._plot_rays(*res)
                         self._change_ray_colors()
@@ -1605,7 +1600,7 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('ray_count, absorb_missing')
+    @observe('ray_count, absorb_missing', dispatch="ui")
     def retrace(self, event=None) -> None:
         """
         raytrace in separate thread, after that call :obj:`TraceGUI.replot_rays`.
@@ -1680,7 +1675,7 @@ class TraceGUI(HasTraits):
         else:
             pyface_gui.invoke_later(self._set_gui_loaded)
 
-    @observe('ray_opacity')
+    @observe('ray_opacity', dispatch="ui")
     def _change_ray_opacity(self, event=None) -> None:
         """
         change opacity of visible rays.
@@ -1689,7 +1684,7 @@ class TraceGUI(HasTraits):
         if self._rays_plot is not None:
             self._rays_plot.actor.property.trait_set(opacity=self.ray_opacity)
 
-    @observe("coloring_type")
+    @observe("coloring_type", dispatch="ui")
     def _change_ray_colors(self, event=None) -> None:
         """
         change ray coloring mode.
@@ -1699,7 +1694,7 @@ class TraceGUI(HasTraits):
             self._assign_ray_colors()
             self._assign_ray_source_colors()
 
-    @observe("plotting_type")
+    @observe("plotting_type", dispatch="ui")
     def _change_ray_representation(self, event=None) -> None:
         """
         change ray view to connected lines or points only.
@@ -1708,7 +1703,7 @@ class TraceGUI(HasTraits):
         if self._rays_plot is not None:
             self._rays_plot.actor.property.representation = 'points' if self.plotting_type == 'Points' else 'surface'
 
-    @observe('detector_selection')
+    @observe('detector_selection', dispatch="ui")
     def _change_detector(self, event=None) -> None:
         """
         change detector selection
@@ -1738,7 +1733,7 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('det_pos')
+    @observe('det_pos', dispatch="ui")
     def _move_detector(self, event=None) -> None:
         """
         move chosen Detector.
@@ -1783,7 +1778,7 @@ class TraceGUI(HasTraits):
         """
         self.show_detector_image(cut=True)
 
-    @observe('_detector_image_button, _detector_cut_button')
+    @observe('_detector_image_button, _detector_cut_button', dispatch="ui")
     def show_detector_image(self, event=None, cut=False) -> None:
         """
         render a DetectorImage at the chosen Detector, uses a separate thread.
@@ -1848,7 +1843,7 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('_detector_spectrum_button')
+    @observe('_detector_spectrum_button', dispatch="ui")
     def show_detector_spectrum(self, event=None) -> None:
         """
         render a Detector Spectrum for the chosen Source, uses a separate thread.
@@ -1888,7 +1883,7 @@ class TraceGUI(HasTraits):
         """
         self.show_source_image(cut=True)
 
-    @observe('_source_spectrum_button')
+    @observe('_source_spectrum_button', dispatch="ui")
     def show_source_spectrum(self, event=None) -> None:
         """
         render a Source Spectrum for the chosen Source, uses a separate thread.
@@ -1918,7 +1913,7 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('_source_image_button, _source_cut_button')
+    @observe('_source_image_button, _source_cut_button', dispatch="ui")
     def show_source_image(self, event=None, cut=False) -> None:
         """
         render a source image for the chosen Source, uses a separate thread
@@ -1976,7 +1971,7 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('_auto_focus_button')
+    @observe('_auto_focus_button', dispatch="ui")
     def move_to_focus(self, event=None) -> None:
         """
         Find a Focus.
@@ -2033,7 +2028,7 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('scene:activated')
+    @observe('scene:activated', dispatch="ui")
     def _plot_scene(self, event=None) -> None:
         """
         Initialize the GUI. Inits a variety of things.
@@ -2049,7 +2044,7 @@ class TraceGUI(HasTraits):
         self.default_camera_view()  # this needs to be called after replot, which defines the visual scope
         self._status["InitScene"] = 0
         
-    @observe('_status:items')
+    @observe('_status:items', dispatch="ui")
     def _change_status(self, event=None) -> None:
         """
         Update the status info text.
@@ -2072,7 +2067,7 @@ class TraceGUI(HasTraits):
                 if self._status[key]:
                     self._status_text.text += msgs[key] + "...\n"
 
-    @observe('minimalistic_view')
+    @observe('minimalistic_view', dispatch="ui")
     def _change_minimalistic_view(self, event=None) -> None:
         """
         change the minimalistic ui view option.
@@ -2105,7 +2100,7 @@ class TraceGUI(HasTraits):
             
             self._status["Drawing"] -= 1
 
-    @observe("maximize_scene")
+    @observe("maximize_scene", dispatch="ui")
     def _change_maximize_scene(self, event=None) -> None:
         """
         change "maximize scene, hide side menu and toolbar"
@@ -2114,7 +2109,7 @@ class TraceGUI(HasTraits):
         self._scene_not_maximized = not bool(self.maximize_scene)
         self.scene.scene_editor._tool_bar.setVisible(self._scene_not_maximized)
 
-    @observe('ray_width')
+    @observe('ray_width', dispatch="ui")
     def _change_ray_width(self, event=None) -> None:
         """
         set the ray width for the visible rays.
@@ -2123,7 +2118,7 @@ class TraceGUI(HasTraits):
         if self._rays_plot is not None:
             self._rays_plot.actor.property.trait_set(line_width=self.ray_width, point_size=self.ray_width)
 
-    @observe('source_selection')
+    @observe('source_selection', dispatch="ui")
     def _change_selected_ray_source(self, event=None) -> None:
         """
         Updates the Detector Selection and the corresponding properties.
@@ -2132,7 +2127,7 @@ class TraceGUI(HasTraits):
         if self.raytracer.ray_sources:
             self._source_ind = int(self.source_selection.split(":", 1)[0].split("RS")[1])
 
-    @observe('raytracer_single_thread')
+    @observe('raytracer_single_thread', dispatch="ui")
     def _change_raytracer_threading(self, event=None) -> None:
         """
         change the raytracer multithreading option. Useful for debugging.
@@ -2140,7 +2135,7 @@ class TraceGUI(HasTraits):
         """
         self.raytracer.threading = not bool(self.raytracer_single_thread)
 
-    @observe('garbage_collector_stats')
+    @observe('garbage_collector_stats', dispatch="ui")
     def _change_garbage_collector_stats(self, event=None) -> None:
         """
         show garbage collector stats
@@ -2148,7 +2143,7 @@ class TraceGUI(HasTraits):
         """
         gc.set_debug(gc.DEBUG_STATS if self.garbage_collector_stats else 0)
 
-    @observe('show_all_warnings')
+    @observe('show_all_warnings', dispatch="ui")
     def _change_warnings(self, event=None) -> None:
         """
         change warning visibility.
@@ -2159,7 +2154,7 @@ class TraceGUI(HasTraits):
         else:
             warnings.resetwarnings()
     
-    @observe('_command_window_button')
+    @observe('_command_window_button', dispatch="ui")
     def open_command_window(self, event=None) -> None:
         """
         :param event: optional event from traits observe decorator
@@ -2168,16 +2163,16 @@ class TraceGUI(HasTraits):
             self._cdb = CommandWindow(self)
         self._cdb.edit_traits()
 
-    @observe('_property_browser_button')
+    @observe('_property_browser_button', dispatch="ui")
     def open_property_browser(self, event=None) -> None:
         """
         Open a property browser for the gui, the scene, the raytracer and the shown rays.
         :param event: optional event from traits observe decorator
         """
-        gdb = PropertyBrowser(self, self.scene, self.raytracer, self._ray_property_dict)
+        gdb = PropertyBrowser(self, self.scene, self.raytracer)
         gdb.edit_traits()
 
-    @observe('wireframe_surfaces')
+    @observe('wireframe_surfaces', dispatch="ui")
     def _change_surface_mode(self, event=None) -> None:
         """
         change surface representation to normal or wireframe view.
@@ -2233,7 +2228,7 @@ class TraceGUI(HasTraits):
     # for some reasons these are the only ones having no text_scaling_mode = 'none' option
     # this is the only trait so far that does not work with @observe, like:
     # @observe("scene:scene_editor:interactor:size:items:value")
-    @observe("scene:scene_editor:busy")
+    @observe("scene:scene_editor:busy", dispatch="ui")
     def _resize_scene_elements(self, event) -> None:
         """
         Handles GUI window size changes. Fixes incorrect scaling by mayavi.

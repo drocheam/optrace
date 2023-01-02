@@ -1,5 +1,6 @@
 ./optrace
 ├── gui
+│   ├── command_window.py
 │   ├── __init__.py
 │   ├── property_browser.py
 │   └── trace_gui.py
@@ -50,7 +51,8 @@
     │       ├── conic_surface.py
     │       ├── data_surface_1d.py
     │       ├── data_surface_2d.py
-    │       ├── function_surface.py
+    │       ├── function_surface_1d.py
+    │       ├── function_surface_2d.py
     │       ├── __init__.py
     │       ├── rectangular_surface.py
     │       ├── ring_surface.py
@@ -79,4 +81,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-10 directories, 69 files
+11 directories, 71 files

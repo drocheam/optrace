@@ -36,7 +36,7 @@ class CommandWindow(HasTraits):
                     Item("_status", style="readonly", show_label=False),
                     ),
                 resizable=True,
-                width=650,
+                width=700,
                 height=800,
                 title="Command Window")
 
@@ -64,11 +64,7 @@ class CommandWindow(HasTraits):
         if self._cmd:
             ret = self.gui.send_cmd(self._cmd)
 
-            if ret:
+            # add to history if something happened and if the command differs from the last one
+            if ret and (not self._history or self._cmd != self._history[-1]):
                 self._history = self._history + [self._cmd]
-                # self._status = "Finished"
-            # else:
-                # self._status = "Command not executed"
-        # else:
-            # self._status = "Command empty"
 

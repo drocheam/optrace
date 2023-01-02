@@ -775,7 +775,6 @@ class GUITests(unittest.TestCase):
 
         def send(cmd):
             sim._do_in_main(sim.send_cmd, cmd)
-            time.sleep(1)
             sim._wait_for_idle()
 
         def interact(sim):
@@ -1280,19 +1279,6 @@ class GUITests(unittest.TestCase):
                 
                 # restore crosshair
                 sim._do_in_main(sim._init_crosshair)
-                sim._wait_for_idle()
-                
-                # check race condiction check (silent)
-                sim._status["Tracing"] = 1
-                time.sleep(0.2)
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
-                time.sleep(0.2)
-                # check same with non silent
-                sim.silent = False
-                time.sleep(0.2)
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
-                time.sleep(0.2)
-                sim._status["Tracing"] = 0  # remove, otherwise wait_for_idle waits endless
                 sim._wait_for_idle()
                 
                 # we have an extra picker sim._space_picker for right+clicking in the scene,

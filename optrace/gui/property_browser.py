@@ -12,55 +12,71 @@ from ..tracer.base_class import BaseClass  # BaseClass type
 class PropertyBrowser(HasTraits):
 
     update_button: Button = Button(label="Update", desc="updates the browser")
-    unit_label: Str = Str("Distances in mm, optical power in dpt")
-    
-    scene_dict: Dict = Dict()
+
+    unit_label:   Str = Str("Distances in mm, optical power in dpt")
+    legend_title: Str = Str("Legend")
+
+    ray_legend: Str = Str("p:      Position                      s:    unity direction vector           s_un:  direction vector\n"
+                          "l:      ray length to next point      ol:   optical length to next point     pol:   polarization unity vector\n"
+                          "w:      power                         wv:   wavelength                       snum:  source number\n"
+                          "index:  ray index                     n:    ambient refractive index")
+
+    tma_legend: Str = Str("abcd:  ABCD Matrix                bfl:  back focal length       d:  thickness\n"
+                          "efl:   effective focal length     ffl:  front focal length\n"
+                          "n1:    index before setup         n2:   index after setup")
+
+
+    scene_dict:     Dict = Dict()
     trace_gui_dict: Dict = Dict()
     raytracer_dict: Dict = Dict()
-    ray_dict: Dict = Dict()
-    card_dict: Dict = Dict()
+    ray_dict:       Dict = Dict()
+    card_dict:      Dict = Dict()
 
     view = View(
                 Item('update_button', label=" Update Dictionaries"),
                 Group(
                     Group(
-                        Item('raytracer_dict', editor=ValueEditor(), width=900, height=700, show_label=False),
-                        label="Raytracer",
-                    ),
-                    Group(
-                        Item('ray_dict', editor=ValueEditor(), width=900, height=700, show_label=False),
+                        Item('ray_dict', editor=ValueEditor(), show_label=False),
+                        Item("legend_title", show_label=False, style="readonly", emphasized=True),
+                        Item("ray_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
                         label="Shown Rays",
                     ),
                     Group(
                         Item("unit_label", show_label=False, style="readonly"),
-                        Item('card_dict', editor=ValueEditor(), width=900, height=700, show_label=False),
+                        Item('card_dict', editor=ValueEditor(), show_label=False),
+                        Item("legend_title", show_label=False, style="readonly", emphasized=True),
+                        Item("tma_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
                         label="Cardinal Points",
                     ),
                     Group(
-                        Item('trace_gui_dict', editor=ValueEditor(), width=900, height=700, show_label=False),
+                        Item('raytracer_dict', editor=ValueEditor(), show_label=False),
+                        label="Raytracer",
+                    ),
+                    Group(
+                        Item('trace_gui_dict', editor=ValueEditor(), show_label=False),
                         label="TraceGUI",
                     ),
                     Group(
-                        Item('scene_dict', editor=ValueEditor(), width=900, height=700, show_label=False),
+                        Item('scene_dict', editor=ValueEditor(), show_label=False),
                         label="TraceGUI.scene",
                     ),
                     layout="tabbed",
                 ),
                 resizable=True,
+                width=800,
+                height=800,
                 title="Property Browser")
 
-    def __init__(self, gui, scene, raytracer, rays: dict) -> None:
+    def __init__(self, gui, scene, raytracer) -> None:
         """
 
         :param gui:
         :param scene:
         :param raytracer:
-        :param rays:
         """
         self.gui = gui
         self.scene = scene
         self.raytracer = raytracer
-        self.rays = rays
 
         super().__init__()
         self.update_dict()
@@ -100,7 +116,7 @@ class PropertyBrowser(HasTraits):
                 return str(val)
 
         self.raytracer_dict = repr_(self.raytracer.__dict__)
-        self.ray_dict = repr_(self.rays)
+        self.ray_dict = repr_(self.gui._ray_property_dict)
         self.scene_dict = repr_(self.scene.trait_get())
         self.trace_gui_dict = repr_(self.gui.trait_get())
         self.card_dict = repr_(self.gen_cardinals())
