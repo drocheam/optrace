@@ -1,6 +1,11 @@
 Base Shapes (Surface, Point, Line)
 ---------------------------------------
 
+.. testsetup:: *
+
+   import optrace as ot
+   import numpy as np
+
 Overview
 _________________
 
@@ -35,7 +40,7 @@ Both types have no extent in z-direction, are therefore parallel to the xy-plane
 
 To create a point simply write:
 
-.. code-block:: python
+.. testcode::
 
    P = ot.Point()
 
@@ -43,7 +48,7 @@ To create a point simply write:
    
 A line with radius 2 and an angle of 40 degrees to the x-axis can be defined using:
 
-.. code-block:: python
+.. testcode::
 
    L = ot.Line(r=2, angle=40)
 
@@ -80,21 +85,21 @@ Ring surfaces typically can be found for Apertures, and rectangular surfaces for
 
 A circle/disc of radius 3.5 can be created with:
 
-.. code-block:: python
+.. testcode::
 
    Disc = ot.CircularSurface(r=3.5)
 
 
 When constructing a ring surface and additional inner radius :math:`r_\text{i}` is required:
 
-.. code-block:: python
+.. testcode::
 
    Ring = ot.RingSurface(ri=0.2, r=3.5)
 
 The rectangular surface has a list of two elements as parameter, that describe the extent in x and y direction.
 For a side length in x-direction of 4 mm and 5 mm in y-direction we write:
 
-.. code-block:: python
+.. testcode::
    
    Rect = ot.RectangularSurface(dim=[4.0, 5.0])
 
@@ -116,11 +121,11 @@ It can be used for creating prisms or tilted glass plates.
 As for most other surfaces it is defined by a radius :math:`r`. Additionally a normal vector must be provided. This can either be done in the cartesian form, with 3 elements and parameter ``normal=[x, y, z]`` or using spherical coordinates ``normal_sph=[theta, phi]`` with two elements. ``theta`` describes the angle between the normal and the optical axis (z-axis), while ``phi`` describes the angle in the xy-plane.
 The following examples both describe the same surface. Depending on the case, one of the methods for specifying the normal might be preffered.
 
-.. code-block:: python
+.. testcode::
 
    TS = ot.TiltedSurface(r=4, normal=[0.0, 1/np.sqrt(2), 1/np.sqrt(2)])
 
-.. code-block:: python
+.. testcode::
 
    TS = ot.TiltedSurface(r=4, normal_sph=[45.0, 90.0])
 
@@ -141,7 +146,7 @@ A spherical surface is the most common surface type for lenses. It is defined by
 
 Constructing such a surface is done with:
 
-.. code-block:: python
+.. testcode::
 
    sph = ot.SphericalSurface(r=2.5, R=-12.458)
 
@@ -157,7 +162,7 @@ Constructing such a surface is done with:
 
 A conical surface takes another parameter, the conical constant ``k``:
 
-.. code-block:: python
+.. testcode::
 
    conic = ot.ConicSurface(r=2.5, R=23.8, k=-1)
 
@@ -171,9 +176,13 @@ The fully mathematical formulation for an aspheric surface is found in :numref:`
 
 For :math:`a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}` the surface is created like this:
 
-.. code-block:: python
+.. testcode::
 
    asph = ot.AsphericSurface(r=2.5, R=12.37, k=2.03, coeff=[0, 1e-5, 3.2e-7])
+
+.. testoutput::
+
+   Class ...
 
 Generally there is no limit on the number of coefficients, however after a dozen one should ask oneself if they are worth the additional computational effort.
 
@@ -199,9 +208,13 @@ However, for functions with symmetry we can also use the FunctionSurface1D class
 
 As an example we want to create an axicon surface. In the simplest case the height values are just the radial distance from the center:
 
-.. code-block:: python
+.. testcode::
 
    func = ot.FunctionSurface1D(r=3, func=lambda r: r)
+
+.. testoutput::
+
+   Class ...
 
 We can use a FunctionSurface2D with rotational symmetry, which is called FunctionSurface1D.
 The user defined function must take r-values (as numpy array), return a numpy array and is provided as the ``func`` parameter.
@@ -213,9 +226,8 @@ To speed up tracing and enhance numerical precision we can provide the partial d
 For our axicon the special case :math:`r=0` needs to be handled separately.
 The derivative function is passed with the ``deriv_func``-parameter.
 
-.. TODO how to test all code blocks?
 
-.. code-block:: python
+.. testcode::
 
    def axicon_deriv(r):
        dr = np.ones_like(r)
@@ -224,6 +236,10 @@ The derivative function is passed with the ``deriv_func``-parameter.
 
    func = ot.FunctionSurface1D(r=3, func=lambda r: r, deriv_func=axicon_deriv)
 
+.. testoutput::
+
+   Class ...
+
 
 **Function parameters**
 
@@ -231,7 +247,7 @@ In many cases one uses a already defined function with additional parameters, or
 The user can provide a dictionary of parameters that will get passed down to the corresponding function.
 For the ``func`` argument the matching parameter would be ``func_args``.
 
-.. code-block:: python
+.. testcode::
 
    def axicon(r, a):
        return a*r
@@ -243,6 +259,10 @@ For the ``func`` argument the matching parameter would be ``func_args``.
 
    func = ot.FunctionSurface1D(r=3, func=axicon, func_args=dict(a=-0.3), deriv_func=axicon_deriv, deriv_args=dict(a=-0.3))
 
+.. testoutput::
+
+   Class ...
+
 
 **z-Range**
 
@@ -252,18 +272,20 @@ If these values should largely differ from the automatically estimated values a 
 
 For a ``a=-0.3`` and ``r=3`` the z-bounds are ``[-0.9, 0]``. This can be provided using:
 
-.. code-block::
+.. code-block:: python
 
    func = ot.FunctionSurface1D(..., z_min=-0.9, z_max=0)
+
 
 **Radius of Curvature**
 
 We can also provide a radius of curvature for the paraxial region. This will be used for ray transfer matrix analysis in section <>.
 Note that this only makes sense, if the surface has rotational symmetry near the center and is curved in this region.
 
-.. code-block::
+.. code-block:: python
 
    func = ot.FunctionSurface1D(..., parax_roc=3.465)
+
 
 Note that for our axicon example there can be no paraxial radius of curvature defined.
 
@@ -275,12 +297,16 @@ As well as for the other function parameters an optional ``mask_args`` can be pr
 
 To define a half circular aperture with radius :math:`r=0.1`, one can write:
 
-.. code-block:: python
+.. testcode::
 
    def mask(x, y, r):
        return (x > 0) | (x**2 + y**2 > r**2)
 
    func = ot.FunctionSurface2D(r=3, func=lambda x, y: np.zeros_like(x), mask_func=mask, mask_args=dict(r=0.1))
+
+.. testoutput::
+
+   Class ...
 
 In this case the ``func``-parameter is just a plane. Note that we need to use the FunctionSurface2D class, as there is not rotational symmetry anymore.
 
@@ -299,7 +325,7 @@ Values between data cells are interpolated with a polynomial of forth order, so 
 
 Here is and example of a lens with direction dependent curvature and a little noise/manufacturing errors added:
 
-.. code-block:: python
+.. testcode::
 
    r0 = 3
    X, Y = np.mgrid[-r0:r0:200j, -r0:r0:200j]
@@ -308,13 +334,17 @@ Here is and example of a lens with direction dependent curvature and a little no
 
    data2d = ot.DataSurface2D(r=r0, data=H)
 
+.. testoutput::
+
+   Class ...
+
 Note that we can also add the parameters ``z_min=...``, ``z_max=``, ``parax_roc`` as for the FunctionSurface class.
 
 **DataSurface1D**
 
 For a surface with rotational symmetry one radial vector is sufficient:
 
-.. code-block:: python
+.. testcode::
 
    r0 = 3
    r = np.linspace(0, r0, 1000)
@@ -323,6 +353,10 @@ For a surface with rotational symmetry one radial vector is sufficient:
    h += 0.005*np.random.sample(1000)
 
    data1d = ot.DataSurface1D(r=r0, data=h)
+
+.. testoutput::
+
+   Class ...
 
 
 Additional Geometrical Quantities

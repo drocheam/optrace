@@ -537,6 +537,9 @@ class GUITests(unittest.TestCase):
         self.assertTrue(not RT.ray_sources)
         test_features(RT)
 
+        RT.clear()
+        test_features(RT)
+
     @pytest.mark.slow
     @pytest.mark.skip(reason="there seems to be some issue with qt4, leads to segmentation faults.")
     def test_action_spam(self):
@@ -928,7 +931,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
-    def test_additional_coverage(self):
+    def test_additional_coverage_1(self):
         """additionial coverage tests"""
 
         RT = rt_example()
@@ -966,6 +969,32 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim._do_in_main(sim.retrace)
                 sim._wait_for_idle()
+
+                # skip on InitScene
+                sim._status["InitScene"] = 1
+                sim._do_in_main(sim._change_minimalistic_view)
+                time.sleep(2)  # make sure it gets executed, can't call wait_for_idle since we set InitScene
+                sim._status["InitScene"] = 0
+                sim._wait_for_idle()
+
+                # check if rays are removed correctly in replot()
+                assert len(RT.ray_sources) and RT.rays.N and sim._rays_plot is not None
+                sim._do_in_main(sim.send_cmd, "RT.clear()")
+                sim._wait_for_idle()
+                self.assertTrue(sim._rays_plot is None)
+                self.assertFalse(sim._ray_property_dict)
+
+        sim.debug(_func=interact, silent=True, _args=(sim,))
+        self.raise_thread_exceptions()
+    
+    def test_additional_coverage_2(self):
+        """additionial coverage tests"""
+
+        RT = rt_example()
+        sim = TraceGUI(RT)
+
+        def interact(sim):
+            with self._try(sim):
 
                 # delete one raysource plot but still try to color it
                 # do with silent = True and False
@@ -1074,13 +1103,6 @@ class GUITests(unittest.TestCase):
                 sim._ray_source_plots[0] = tn4
                 sim._axis_plots[0] = tn4
                 sim._do_in_main(sim._change_minimalistic_view)
-                sim._wait_for_idle()
-
-                # skip on InitScene
-                sim._status["InitScene"] = 1
-                sim._do_in_main(sim._change_minimalistic_view)
-                time.sleep(2)  # make sure it gets executed, can't call wait_for_idle since we set InitScene
-                sim._status["InitScene"] = 0
                 sim._wait_for_idle()
 
         sim.debug(_func=interact, silent=True, _args=(sim,))

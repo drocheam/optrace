@@ -1,6 +1,10 @@
 Base Geometries (Element, Group, Raytracer)
 ------------------------------------------------
 
+.. testsetup:: *
+
+   import optrace as ot
+
 .. role:: python(code)
   :language: python
   :class: highlight
@@ -84,9 +88,10 @@ When initializing the raytracer this is passed as ``outline`` parameter.
 This is also the only mandatory parameter of this class
 
 
-.. code-block:: python
+.. testcode::
 
    RT = ot.Raytracer(outline=[-2, 2, -3, 3, -5, 60])
+
 
 
 **Geometry**
@@ -132,7 +137,7 @@ _______________________
 
 
 
-Loading ZEMAX Geometries
-_____________________________
+Loading ZEMAX Geometries (.zmx)
+__________________________________
 
 

@@ -57,8 +57,6 @@ class RaySource(Element):
 
                  # Divergence Parameters
                  divergence:        str = "None",
-                 s:                 (list | np.ndarray) = None,
-                 s_sph:             (list | np.ndarray) = None,
                  div_angle:         float = 0.5,
                  div_2d:            bool = False,
                  div_axis_angle:    float = 0,
@@ -71,6 +69,8 @@ class RaySource(Element):
                  image:             (str | np.ndarray) = None,
 
                  # Ray Orientation Parameters
+                 s:                 (list | np.ndarray) = None,
+                 s_sph:             (list | np.ndarray) = None,
                  orientation:       str = "Constant",
                  or_func:           Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
                  or_kwargs:         dict = None,

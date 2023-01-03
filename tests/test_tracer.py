@@ -1188,6 +1188,8 @@ class TracerTests(unittest.TestCase):
         # hit_detector special cases are tested in test_tracer_special
         pass
 
+
+    # TODO test lens with negative power
     def test_ideal_lens_imaging(self):
 
         # an ideal lens creates an ideal image
@@ -1234,6 +1236,32 @@ class TracerTests(unittest.TestCase):
 
         # should be minimal, only numerical errors
         self.assertAlmostEqual(dev, 0, delta=1e-8)
+
+    def test_ideal_lens_negative(self):
+        """build a setup of a positive and negative lens, check if the focal point is at the correct position"""
+
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 100])
+       
+        RS = ot.RaySource(ot.CircularSurface(r=3))
+        RT.add(RS)
+
+        L1 = ot.IdealLens(r=5, D=-20, pos=[0, 0, 12])
+        RT.add(L1)
+        L2 = ot.IdealLens(r=5, D=50, pos=[0, 0, 15])
+        RT.add(L2)
+
+        # check optical power
+        self.assertAlmostEqual(RT.tma().power[1], 33)
+
+        # aperture so all rays get absorbed at their focal point
+        zf = RT.tma().focal_point[1]
+        AP = ot.Aperture(ot.CircularSurface(r=4), pos=[0, 0, zf])
+        RT.add(AP)
+
+        RT.trace(10000)
+
+        # check if rays are at optical axis
+        self.assertTrue(np.allclose(RT.rays.p_list[:, -1, :2], 0))
 
     def test_ideal_lens_polarization(self):
         """test polarization for ideal lenses. Case 1: perpendicular light, case 2: divergent/convergent light"""

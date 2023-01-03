@@ -700,7 +700,7 @@ class Raytracer(Group):
         s[hwh, 0] = s0[hwh, 0] * fsz - x
         s[hwh, 1] = s0[hwh, 1] * fsz - y
         s[hwh, 2] = f
-        s[hwh] = misc.normalize(s[hwh])
+        s[hwh] = misc.normalize(s[hwh]) * np.sign(f)  # sign so it points always in +z
 
         # calculate polarization
         n = np.tile([0., 0., 1.], (x.shape[0], 1))

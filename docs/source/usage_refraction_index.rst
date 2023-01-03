@@ -6,7 +6,10 @@ Refraction Index
   :class: highlight
 
 
+.. testsetup:: *
 
+   import optrace as ot
+   import numpy as np
 
 Defining the Index
 ________________________
@@ -15,7 +18,7 @@ ________________________
 
 In the simplest case a constant (wavelength-independent) refactive index is defined as:
 
-.. code-block:: python
+.. testcode::
 
    n = ot.RefractionIndex("Constant", n=1.54)
 
@@ -24,7 +27,7 @@ In the simplest case a constant (wavelength-independent) refactive index is defi
 Many materials are simply characterized by the index at a center wavelength and the Abbe number.
 However, materials with these same quantities can still differ slightly.
 
-.. code-block:: python
+.. testcode::
 
    n = ot.RefractionIndex("Abbe", n=1.5, V=32)
 
@@ -32,7 +35,7 @@ Details on how the model is estimated are found in :numref:`index_from_abbe`.
 
 You can also specify the wavelength combination, for which ``n`` and ``V`` are specified:
 
-.. code-block:: python
+.. testcode::
 
    n = ot.RefractionIndex("Abbe", n=1.5, V=32, lines=ot.presets.spectral_lines.FeC)
 
@@ -45,13 +48,13 @@ Note that all coefficients have units in µm or powers of µm. You can read more
 
 In the case of the Schott model the initialization could look as follows:
 
-.. code-block:: python
+.. testcode::
 
    n = ot.RefractionIndex("Schott", coeff=[2.13e-06, 1.65e-08, -6.98e-11, 1.02e-06, 6.56e-10, 0.208])
 
 **User Data**
 
-.. code-block:: python
+.. testcode::
 
    wls = np.linspace(380, 780, 10)
    vals = np.array([1.6, 1.58, 1.55, 1.54, 1.535, 1.532, 1.531, 1.53, 1.529, 1.528])
@@ -61,15 +64,15 @@ In the case of the Schott model the initialization could look as follows:
 
 ``optrace`` also supports user functions for the refractive index. The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
 
-.. code-block:: python
+.. testcode::
 
-   n = ot.RefractionIndex("Function", func=lambda wl: 1.6 - 1e-3*wl)
+   n = ot.RefractionIndex("Function", func=lambda wl: 1.6 - 1e-4*wl)
 
 When providing a function with multiple parameters you can use the ``func_args`` parameter.
 
-.. code-block:: python
+.. testcode::
 
-   n = ot.RefractionIndex("Function", func=lambda wl, n0: n0 - 1e-3*wl, func_args=dict(n0=1.6))
+   n = ot.RefractionIndex("Function", func=lambda wl, n0: n0 - 1e-4*wl, func_args=dict(n0=1.6))
 
 
 Getting Index Values
@@ -78,7 +81,7 @@ _______________________
 The refractive index values are calculated when calling the refractive index object with a wavelength vector.
 The call returns a vector of the same shape as the input.
 
-.. code-block:: python
+.. testcode::
 
    n = ot.RefractionIndex("Abbe", n=1.543, V=62.1)
    wl = np.linspace(380, 780, 100)
@@ -91,29 +94,30 @@ __________________
 Details on the calculation of the Abbe number can be found in :numref:``abbe_number``. 
 With a refractive index object at hand the Abbe number can be calculated with
 
-.. code-block:: python
+.. testcode::
 
    n = ot.presets.refraction_index.SF10
    V = n.get_abbe_number()
 
 Alternatively the function can be called with a different spectral line combination from :python:`ot.presets.spectral_lines`:
 
-.. code-block:: python
+.. testcode::
 
    V = n.get_abbe_number(ot.presets.spectral_lines.FdC)
 
 Or specify a user defined list of three wavelengths:
 
-.. code-block:: python
+.. testcode::
 
    V = n.get_abbe_number([350, 500, 700])
 
 
 You can also check if a medium is dispersive by calling
 
-.. code-block:: python
+.. doctest::
 
-   print(n.is_dispersive())
+   >>> print(n.is_dispersive())
+   True
 
 
 A list of predefined lines can be found in :numref:`spectral_lines`.

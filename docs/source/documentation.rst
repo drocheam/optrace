@@ -25,7 +25,7 @@ Documentation
 * documentation source files can be found under ``./docs/source`` and consist of ``.rst`` files
 * run ``make html`` from the ``doc`` folder to generate the html documentation (requires the `GNU make utility <https://www.gnu.org/software/make/>`_)
 * build files get created in ``./docs/build/html``, open the documentation by e.g. ``firefox ./docs/build/html/index.html``
-
+* check code snippets with ``sphinx.ext.doctest`` and ``make doctest``
 
 **Workflow**
 

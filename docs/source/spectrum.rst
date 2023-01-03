@@ -64,17 +64,6 @@ With Data/Function mode the spectrum is simply modelled by a user function/ data
    :label: eq_spectrum_user
 
 
-Presets
-------------
-
-**Tristimulus Curves**
-
-.. figure:: images/cie_cmf.svg
-   :width: 600
-   :align: center
-
-   CIE 1931 xy color matching functions.
-
 
 LightSpectrum
 =================
@@ -193,22 +182,6 @@ With these bounds the random wavelengths are then
 
 For these the inverse transform method in :numref:`inverse_transform` can be applied.
 
-
-Presets
---------------
-
-**Standard Illuminants**
-
-**Line Spectra**
-
-**sRGB illuminants**
-
-.. _rgb_curve2_:
-.. figure:: images/rgb_curves2.svg
-   :width: 600
-   :align: center
-
-   sRGB primary presets.
 
 
 TransmissionSpectrum

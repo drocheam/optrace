@@ -419,7 +419,6 @@ class TraceGUI(HasTraits):
         self._ray_selection = np.array([])  # indices for subset of all rays in raytracer
         self.__ray_property_dict = {}  # properties of shown rays, set while tracing
         self._ray_property_dict = {}  # properties of shown rays, set after tracing
-        self._rays_plot_scatter = None  # plot for scalar ray values
         self._rays_plot = None  # plot for visualization of rays/points
         self._ray_text = None  # textbox for ray information
         self._ray_text_parent = None
@@ -1380,15 +1379,14 @@ class TraceGUI(HasTraits):
                 if len(self.raytracer.ray_sources):
                     self.source_selection = self.source_names[self._source_ind]
 
-            rdh = False  # if GUILoaded Status should be reset in this function
-            if self.raytracer.ray_sources:
-                if all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
-                        or change["RaySources"] or change["TraceSettings"]:
-                    self.retrace()
-                elif change["Rays"]:
-                    self.replot_rays()
-            else:
-                rdh = True
+            # if GUILoaded Status should be reset in this function
+            rdh = not bool(self.raytracer.ray_sources)
+            
+            if (all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
+                    or change["RaySources"] or change["TraceSettings"]) and not rdh:
+                self.retrace()
+            elif all_ or change["Rays"]:
+                self.replot_rays()
 
             if all_ or change["Filters"]:
                 self._plot_filters()
@@ -1556,9 +1554,17 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
 
-        # don't do while init or tracing, since it will be done afterwards anyway
-        if self.raytracer.ray_sources and self.raytracer.rays.N and not self._no_trait_action_flag\
-             and not self._status["Tracing"]: # don't do while tracing, RayStorage rays are still being generated
+        if not self._no_trait_action_flag and not self._status["Tracing"]: 
+            # don't do while tracing, RayStorage rays are still being generated
+
+            if not self.raytracer.ray_sources or not self.raytracer.rays.N:
+                self._ray_property_dict = {}
+
+                if self._rays_plot is not None:
+                    self._rays_plot.parent.parent.remove()
+                    self._rays_plot = None
+
+                return
 
             self._status["Drawing"] += 1
             pyface_gui.process_events()
@@ -1596,7 +1602,7 @@ class TraceGUI(HasTraits):
                         pyface_gui.invoke_later(self._set_gui_loaded)
 
                 pyface_gui.invoke_later(on_finish)
-
+             
             action = Thread(target=background, daemon=True)
             action.start()
 

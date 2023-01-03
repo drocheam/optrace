@@ -363,6 +363,7 @@ class GeometryTests(unittest.TestCase):
         # exceptions
         self.assertRaises(TypeError, ot.IdealLens, r=2, pos=[0, 0, 0], D=[])  # invalid optical power type
         self.assertRaises(ValueError, ot.IdealLens, r=2, pos=[0, 0, 1], D=np.inf)  # invalid optical power value
+        self.assertRaises(ValueError, ot.IdealLens, r=2, pos=[0, 0, 1], D=0)  # invalid optical power value
 
         # check extent of IdealLens
         L = ot.IdealLens(r=4.2, D=15, pos=[0, 0, 1])
