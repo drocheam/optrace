@@ -1,24 +1,16 @@
 
-"""
-Surface class:
-Provides the functionality for the creation of numerical or analytical surfaces.
-The class contains methods for interpolation, surface masking and normal calculation
-"""
-
-from typing import Any  # Any type
+from typing import Any  # "Any" type
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
 from ...misc import PropertyChecker as pc  # check types and values
-from .surface import Surface
-
+from .surface import Surface  # parent class
 
 
 class ConicSurface(Surface):
     
-    rotational_symmetry: bool = True
-
+    rotational_symmetry: bool = True  #: has the surface rotational symmetry?
 
     def __init__(self,
                  r:            float,
@@ -27,13 +19,13 @@ class ConicSurface(Surface):
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Define a conic section surface, following the equation:
+        z(r) = 1/R * r**2 / (1 + sqrt(1 - (k+1) * r**2 / R**2))
 
         :param R: curvature circle for surface_type="Conic" or "Sphere" (float)
         :param r: radial size for surface_type="Conic", "Sphere", "Circle" or "Ring" (float)
         :param k: conic constant for surface_type="Conic" (float)
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -118,10 +110,11 @@ class ConicSurface(Surface):
 
     def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
+        Find hit/intersections of rays with this surface.
 
-        :param p:
-        :param s:
-        :return:
+        :param p: ray position array, shape (N, 3)
+        :param s: unity ray direction vectors, shape (N, 3)
+        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit
         """
 
         o = p - self.pos  # coordinates relative to surface center
@@ -197,6 +190,8 @@ class ConicSurface(Surface):
         return p_hit, is_hit
 
     def flip(self) -> None:
+        """flip the surface around the x-axis"""
+
         self._lock = False
         self.R *= -1
         self.parax_roc *= -1

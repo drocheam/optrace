@@ -1,10 +1,4 @@
 
-"""
-raytracer class:
-Provides the functionality for raytracing, autofocussing and rendering of source and detector images.
-"""
-
-
 from typing import Any  # Any type
 from threading import Thread  # threading
 import sys  # redirect progressbar to stdout
@@ -16,9 +10,8 @@ import scipy.optimize  # numerical optimization methods
 from progressbar import progressbar, ProgressBar  # fancy progressbars
 
 # needed for raytracing geometry and functionality
-from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface, Marker,\
-                      RectangularSurface, IdealLens, Line, Point, SphericalSurface
-from .geometry.element import Element
+from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface,\
+                      RectangularSurface, Line, Point, SphericalSurface
 from .geometry.group import Group
 
 from .spectrum import LightSpectrum
@@ -77,9 +70,9 @@ class Raytracer(Group):
         :param outline: outline of raytracer space [x1, x2, y1, y2, z1, z2] (numpy 1D array or list)
         :param n0: refraction index of the raytracer enviroment (RefractionIndex object)
         :param absorb_missing: if rays missing a lens are absorbed at the lens (bool)
-        :param no_pol:
-        :param silent:
-        :param threading:
+        :param no_pol: if polarization should be neglected to speed things up
+        :param silent: if all standard output should be muted
+        :param threading: if multithreading or creating threads at all is allowed
         """
 
         self.outline = outline  #: geometrical raytracer outline
@@ -146,17 +139,20 @@ class Raytracer(Group):
 
     def tma(self, wl: float = 555.) -> TMA:
         """
+        Create a ray transfer matrix analysis object
 
-        :param wl:
-        :return:
+        :param wl: wavelength for the analysis
+        :return: ray transfer matrix analysis object
         """
         # overwrites Group.tma since n0 is known
         return super().tma(wl, self.n0)
 
     def property_snapshot(self) -> dict:
         """
+        Creates a snapshot of properties of Elements and rays.
+        Needed to detect changes.
 
-        :return:
+        :return: dictionary of properties
         """
         return dict(Rays=self.rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()],
@@ -170,10 +166,11 @@ class Raytracer(Group):
 
     def compare_property_snapshot(self, h1: dict, h2: dict) -> dict:
         """
+        Compare two snapshots of property_snapshot and detect changes
 
-        :param h1:
-        :param h2:
-        :return:
+        :param h1: snapshot 1
+        :param h2: snapshot 2
+        :return: dictionary of changes
         """
 
         diff = {key: h1[key] != h2[key] for key in h1.keys()}
@@ -186,8 +183,9 @@ class Raytracer(Group):
 
     def _set_messages(self, msgs: list[np.ndarray]) -> None:
         """
+        Apply messages from threads
 
-        :param msgs:
+        :param msgs: list of message arrays
         """
         # join messages from all threads
         self._msgs = np.zeros_like(msgs[0], dtype=int)
@@ -196,8 +194,9 @@ class Raytracer(Group):
 
     def _show_messages(self, N) -> None:
         """
+        Show messages from tracing
 
-        :param N:
+        :param N: number of rays
         """
         # print messages
         for type_ in range(self._msgs.shape[0]):
@@ -237,7 +236,7 @@ class Raytracer(Group):
 
     def trace(self, N: int) -> None:
         """
-        Execute raytracing, saves all rays in the internal RaySource object
+        Execute raytracing for the current geometry
 
         :param N: number of rays (int)
         """
@@ -391,7 +390,7 @@ class Raytracer(Group):
 
     def __make_tracing_element_list(self) -> list[Lens | Filter | Aperture]:
         """
-        Creates a sorted element list from filters and lenses.
+        Creates a sorted element list from filters, apertures and lenses.
 
         :return: list of sorted elements
         """
@@ -473,15 +472,15 @@ class Raytracer(Group):
     def check_collision(front: Surface | Line | Point, back: Surface | Line | Point, res: int = 100)\
             -> tuple[bool, np.ndarray, np.ndarray, np.ndarray]:
         """
-        
-        Check for surface collisions.
+        Check for surface/point/line collisions.
         A collision is defined as the front surface havin a higher z-value than the back surface,
         at a point where both surfaces are defined
 
-        :param front:
-        :param back:
-        :param res:
-        :return:
+        :param front: first object (in regards to z-position)
+        :param back: second object
+        :param res: resolution measure, increase for better detection
+        :return: bool value if there is a collision, collision x-value array, 
+            collision y-value array, collision z-value array
         """
 
         # we only compare when at least one object is a surface
@@ -619,8 +618,8 @@ class Raytracer(Group):
         :param p: position array prior surface hit (numpy 2D array, shape (N, 3))
         :param s: direction array (numpy 2D array, shape (N, 3))
         :param w: ray weights (numpy 1D array)
-        :param hw:
-        :param i:
+        :param hw: bool array for rays still having a weight
+        :param i: surface/section number
         """
 
         if not np.any(hw):
@@ -725,12 +724,12 @@ class Raytracer(Group):
         :param surface: Surface object
         :param p: position array (numpy 2D array, shape (N, 3))
         :param s: direction array (numpy 2D array, shape (N, 3))
-        :param weights:
+        :param weights: ray weights
         :param n1: refraction indices prior surface (numpy 1D array)
         :param n2: refraction indices after surface (numpy 1D array)
-        :param pols:
-        :param hwh:
-        :param i: number of surface
+        :param pols: polarizations of the input ray
+        :param hwh: boolean array for rays having a weight and hitting the lens
+        :param i: number of the surface
         """
 
         if not np.any(hwh):
@@ -845,10 +844,10 @@ class Raytracer(Group):
         Get ray weights from positions on Filter and wavelengths.
 
         :param filter_: Filter object
-        :param weights:
+        :param weights: ray weights
         :param wl: wavelength array (numpy 1D array)
-        :param hwh:
-        :param i:
+        :param hwh: boolean array for rays having a weight and hitting the filter
+        :param i: surface number
         """
 
         if not np.any(hwh):
@@ -877,13 +876,15 @@ class Raytracer(Group):
                       projection_method: str = "Equidistant") \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, str, ProgressBar]:
         """
+        Internal function for calculating the detector intersection positions
 
-        :param info:
-        :param detector_index:
-        :param source_index:
-        :param extent:
-        :param projection_method:
-        :return:
+        :param info: information about the detector
+        :param detector_index: detector index
+        :param source_index: ray source index, optional. Defaults to None, meaning all sources
+        :param extent: extent to detect the intersections in as [x0, x1, y0, y1]. 
+                Defaults to None, meaning the whole detector are is used
+        :param projection_method: sphere projection method for a SphericalSurface detector
+        :return: hit, weights, wavelengths, actual extent, description, projection method, progressbar
         """
         if not self.detectors:
             raise RuntimeError("Detector Missing")
@@ -1055,14 +1056,17 @@ class Raytracer(Group):
                        projection_method: str = "Equidistant",
                        **kwargs) -> RImage:
         """
+        Render a detector image for a traced geometry
 
-        :param N:
-        :param detector_index:
-        :param source_index:
-        :param extent:
-        :param projection_method:
-        :param kwargs:
-        :return:
+        :param N: number of pixels for smaller image size
+        :param detector_index: index/number of the detector
+        :param source_index: index/number of the source. By default all sources are used.
+        :param extent: rectangular extent [x0, x1, y0, y1] to detect to intersections in. 
+                By default the whole detector are is used.
+        :param projection_method: sphere projection method for a SphericalSurface detector
+        :param kwargs: keyword arguments for creating the RImage
+        :param limit: resolution limit filter constant, see the documentation. Defaults to no filter.
+        :return: rendered RImage
         """
         N = int(N)
         if N <= 0:
@@ -1086,12 +1090,14 @@ class Raytracer(Group):
                           extent:           list | np.ndarray = None,
                           **kwargs) -> LightSpectrum:
         """
+        Render a detector spectrum for a traced geometry.
 
-        :param detector_index:
-        :param source_index:
-        :param extent:
-        :param kwargs:
-        :return:
+        :param detector_index: index/number of the detector
+        :param source_index: index/number of the source. By default all sources are used.
+        :param extent: rectangular extent [x0, x1, y0, y1] to detect to intersections in. 
+                By default the whole detector are is used.
+        :param kwargs: optional keyword arguments for the created LightSpectrum
+        :return: rendered LightSpectrum
         """
         p, w, wl, extent, desc, _, bar\
             = self._hit_detector("Detector Spectrum", detector_index, source_index, extent)
@@ -1134,17 +1140,17 @@ class Raytracer(Group):
 
         By default, source images are also rendered. Providing no_sources=True skips source rendering and simply returns an empty list.
 
-        :param N_rays:
-        :param N_px_D:
-        :param N_px_S:
-        :param detector_index:
-        :param pos:
-        :param projection_method:
-        :param limit: resolution limits for detector images
-        :param silent:
-        :param no_sources: don't render sources
-        :param extent:
-        :return:
+        :param N_rays: number of rays
+        :param N_px_D: number/list of detector image pixels for smaller image size
+        :param N_px_S: number/list of source image pixels for smaller image size
+        :param detector_index: number/list of detector indices
+        :param pos: position/list of the detector(s)
+        :param projection_method: type/list of projection methods for SphericalSurface
+        :param limit: list/resolution limits for detector images
+        :param silent: if all standard output should be muted
+        :param no_sources: don't render sources, speeds things up a little
+        :param extent: list/value for the extent of the detector images
+        :return: list of rendered source images, list of rendered detector images
         """
        
         if not self.ray_sources:
@@ -1285,11 +1291,12 @@ class Raytracer(Group):
     def _hit_source(self, info: str, source_index: int = 0)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
         """
-        Rendered Image of RaySource. rays were already traced.
+        Render a source image for a traced geometry.
+        Internal function.
 
-        :param N: number of image pixels in each dimension (int)
-        :param source_index:
-        :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
+        :param N: number of image pixels in the smaller dimension
+        :param source_index: source number, defaults to 0
+        :return: positions, weights, wavelengths, actual extent, description, progressbar
         """
         if not self.ray_sources:
             raise RuntimeError("Ray Sources Missing.")
@@ -1316,10 +1323,11 @@ class Raytracer(Group):
 
     def source_spectrum(self, source_index: int = 0, **kwargs) -> LightSpectrum:
         """
+        Render a LightSpectrum for a source in a traced geometry.
 
-        :param source_index:
-        :param kwargs:
-        :return:
+        :param source_index: source number, default to 0
+        :param kwargs: optional keyword arguments for the creation of the LightSpectrum
+        :return: rendered LightSpectrum
         """
         p, w, wl, extent, desc, bar = self._hit_source("Source Spectrum", source_index)
 
@@ -1329,13 +1337,15 @@ class Raytracer(Group):
 
         return spec
 
-    def source_image(self, N: int, source_index: int = 0, limit: float=None, **kwargs) -> RImage:
+    def source_image(self, N: int, source_index: int = 0, limit: float = None, **kwargs) -> RImage:
         """
-        Rendered Image of RaySource. rays were already traced.
+        Render a source image for a source in a traced geometry.
 
-        :param N: number of image pixels in each dimension (int)
-        :param source_index:
-        :return: XYZIL Image (XYZ channels + Irradiance + Illuminance in third dimension) (numpy 3D array)
+        :param N: number of image pixels in smaller dimension
+        :param source_index: source number, defaults to 0
+        :param limit: resolution filter limit constant, see the documentation. Defaults to not filter
+        :param kwargs: optional keyword arguments for creating the RImage
+        :return: rendered RImage
         """
 
         if (N := int(N)) <= 0:
@@ -1361,17 +1371,17 @@ class Raytracer(Group):
                               ret_pos: bool = False)\
             -> float | tuple[float, tuple[float, float, float]]:
         """
+        Calculate the cost function value at this z position.
+        There are no checks if rays are still inside the outline!
 
-        no checks if rays are still inside the outline!
-
-        :param z_pos:
-        :param mode:
-        :param pa:
-        :param sb:
-        :param w:
-        :param r0:
+        :param z_pos: search starting position
+        :param mode: focussing mode
+        :param pa: auxiliary ray position
+        :param sb: auxiliary ray direction
+        :param w: ray weights
+        :param r0: estimated airy radius
         :param ret_pos: if a second parameter contaning a 3D coordinate tuple should be returned
-        :return:
+        :return: cost value (ret_pos=False) or cost value and focus position (ret_pos=True)
         """
         # hit position at virtual xy-plane detector
         ph = pa + sb*z_pos
@@ -1443,14 +1453,14 @@ class Raytracer(Group):
         the search range is the region between lenses or the outline.
         The influence of filters and apertures is neglected. Outline intersections of rays are ignored.
 
-        :param method:
+        :param method: focussing method from "autofocus_methods"
         :param z_start: starting position z (float)
-        :param source_index:
+        :param source_index: source number, defaults to None, so rays from all sources are used
         :param N: maximum number of rays to evaluate for modes "Position Variance" and "Airy Disc Weighting"
         :param return_cost: False, if costly calculation of cost function array
                 can be skipped in mode "Position Variance".
                 In other modes it is generated on the way anyway
-        :return:
+        :return: scipy optimize result and property dictionary
         """
 
         if not (self.outline[4] <= z_start <= self.outline[5]):

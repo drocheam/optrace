@@ -598,10 +598,10 @@ class GeometryTests(unittest.TestCase):
        
         # function mode
         # check if standard deviation for uniform polarization matches
-        RS = ot.RaySource(ot.CircularSurface(r=2), polarization="Function", pol_func=lambda x: np.exp(-(x-120)**2/2))
+        RS = ot.RaySource(ot.CircularSurface(r=2), polarization="Function", pol_func=lambda x: np.exp(-(x-0.5)**2/2/0.03**2))
         _, _, pols, _, _ = RS.create_rays(N)
         psx = misc.rdot(pols, sx)  
-        self.assertAlmostEqual(np.degrees(np.std(np.arccos(psx))), 1, delta=0.001)
+        self.assertAlmostEqual(np.degrees(np.std(np.arccos(psx))), 0.03, delta=0.001)
 
     def test_ray_source_misc(self):
         RS = ot.RaySource(ot.RectangularSurface(dim=[2, 2]), [0, 0, 0])

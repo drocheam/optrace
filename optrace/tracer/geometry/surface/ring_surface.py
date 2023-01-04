@@ -1,25 +1,17 @@
 
-"""
-Surface class:
-Provides the functionality for the creation of numerical or analytical surfaces.
-The class contains methods for interpolation, surface masking and normal calculation
-"""
-
 from typing import Any  # Any type
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
-
 from ... import misc  # calculation
 from ...misc import PropertyChecker as pc  # check types and values
-from .surface import Surface
+from .surface import Surface  # parent class
 
 
 class RingSurface(Surface):
     
-    rotational_symmetry: bool = True
-
+    rotational_symmetry: bool = True  #: has the surface rotational symmetry?
 
     def __init__(self,
                  r:                 float,
@@ -27,12 +19,11 @@ class RingSurface(Surface):
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Create a ring surface, an area between two concentric circles (also known as annulus)
 
         :param r: radial size for surface_type="Conic", "Sphere", "Circle" or "Ring" (float)
         :param ri: radius of inner circle for surface_type="Ring" (float)
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
         
@@ -49,6 +40,7 @@ class RingSurface(Surface):
 
     @property
     def info(self) -> str:
+        """info message describing the surface"""
         return super().info + ", ri = {self.ri:.5g} mm"
 
     def get_plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -108,9 +100,10 @@ class RingSurface(Surface):
 
     def get_random_positions(self, N: int) -> np.ndarray:
         """
+        Get random 3D positions on the surface, uniformly distributed.
 
-        :param N:
-        :return:
+        :param N: number of positions
+        :return: position array, shape (N, 3)
         """
         x, y = misc.ring_uniform(self.ri, self.r, N)
         

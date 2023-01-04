@@ -8,8 +8,6 @@ from .lens import Lens  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 
 
-# TODO handle D = 0
-
 class IdealLens(Lens):
 
     is_ideal: bool = True
@@ -22,9 +20,14 @@ class IdealLens(Lens):
                  **kwargs)\
             -> None:
         """
+        Create an ideal lens, that refracts light without aberrations to the correct image distance.
+        An IdealLens has a disc geometry (CircularSurface) and zero thickness.
 
+        :param r: radial size of the lens
+        :param D: optical power of the lens, this is the inverse of the geometrical focal length
         :param n2: refraction index behind lens (positive z direction) (RefractionIndex object)
         :param pos: 3D position of lens center (list or numpy array)
+        :param kwargs: additional keyword arguments for parent classes
         """
 
         pc.check_type("D", D, int | float)

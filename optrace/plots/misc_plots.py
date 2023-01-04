@@ -18,11 +18,12 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
                         block:   bool = False)\
         -> None:
     """
+    Plot a cost function plot for the autofocus results.
 
-    :param res:
-    :param afdict:
-    :param title:
-    :param block:
+    :param res: optimize result from Raytracer.autofocus()
+    :param afdict: dictionary from Raytracer.autofocus()
+    :param title: title of the plot
+    :param block: if the plot should be blocking the execution of the program
     """
 
     # type checking
@@ -60,13 +61,13 @@ def abbe_plot(ri:     list[RefractionIndex],
               silent: bool = False)\
         -> None:
     """
+    Create an Abbe Plot for different refractive media.
 
-    :param ri:
-    :param title:
-    :param lines:
-    :param block:
-    :param silent:
-    :return:
+    :param ri: list of RefractionIndex
+    :param title: title of the plot
+    :param lines: spectral lines to use for the Abbe number calculation
+    :param block: if the plot should block the execution of the program
+    :param silent: if all standard output of this function should be muted
     """
 
     # type checking
@@ -115,19 +116,18 @@ def surface_profile_plot(surface:          Surface | list[Surface],
                          block:            bool = False)\
         -> None:
     """
-    plot surface profiles in x direction
+    Plot surface profiles in x direction
 
-    if x0 and xe are not provided it plots each surface over its extent
+    if x0 and xe are not provided, it plots each surface over its extent
     Note that it plots each surface at y=y0, its center position, even if it is different for each surface
 
-    :param surface:
-    :param x0:
-    :param xe:
-    :param remove_offset:
-    :param title:
-    :param silent:
-    :param block:
-    :return:
+    :param surface: Surface or List of Surface to plot
+    :param x0: x start value for the plot, defaults to the beginning of the surface
+    :param xe: x end value for the plot, defaults to the end of the surface
+    :param remove_offset: remove the height offset for each surface
+    :param title: title of the plot
+    :param silent: if all standard output of this function should be muted
+    :param block: if the plot should block the execution of the program
     """
 
     # type checking

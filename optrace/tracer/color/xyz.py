@@ -1,7 +1,7 @@
 
-import numpy as np
+import numpy as np  # matrix calculations
 
-from .observers import x_observer, y_observer, z_observer
+from .observers import x_observer, y_observer, z_observer  # spectrum to tristimulus
 
 
 WP_D65_XYZ: list[float, float, float] = [0.95047, 1.00000, 1.08883]
@@ -16,8 +16,8 @@ def xyz_to_xyY(xyz: np.ndarray) -> np.ndarray:
     Convert XYZ to xyY coordinates.
     Black gets mapped to the whitepoint and Y=0
 
-    :param xyz:
-    :return:
+    :param xyz: input values, 2D image with channels in third dimension
+    :return: converted values with same shape as input
     """
     s = np.sum(xyz, axis=2)
     mask = s > 0
@@ -31,11 +31,13 @@ def xyz_to_xyY(xyz: np.ndarray) -> np.ndarray:
 
     return xyY
 
+
 def xyY_to_xyz(xyy: np.ndarray) -> np.ndarray:
     """
+    Convert xyY to XYZ colorspace values.
 
-    :param xyy: xyY values
-    :return:
+    :param xyy: xyY values, 2D image with channels in third dimension
+    :return: converted values, same shape as input
     """
     xyz = xyy.copy()
 
@@ -51,11 +53,12 @@ def xyY_to_xyz(xyy: np.ndarray) -> np.ndarray:
 
 def xyz_from_spectrum(wl, spec, method="sum") -> np.ndarray:
     """
+    Calculate the tristimulus values XYZ from a spectral distribution.
 
-    :param wl:
-    :param spec:
-    :param method:
-    :return:
+    :param wl: 1D wavelength vector
+    :param spec: 1D spectral value vector, same shape as wl parameter
+    :param method: "sum" or "trapz", method for numerical integration
+    :return: numpy array of 3 elements
     """
     integrate = np.sum if method  == "sum" else np.trapz
 
@@ -63,3 +66,4 @@ def xyz_from_spectrum(wl, spec, method="sum") -> np.ndarray:
                     integrate(spec * y_observer(wl)),
                     integrate(spec * z_observer(wl))])
     return xyz
+

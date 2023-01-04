@@ -1,6 +1,4 @@
 
-from typing import Any  # Any type
-
 from traitsui.api import View, Item, ValueEditor, Group, CodeEditor, ListStrEditor
 from traits.api import HasTraits, observe, Button, Dict, Str, List
 

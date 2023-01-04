@@ -1,16 +1,11 @@
+from typing import Any  # Any type
 
 import numpy as np  # for ndarray type
 
-from ..misc import PropertyChecker as pc
-from .element import Element
-from .point import Point
+from ..misc import PropertyChecker as pc  # check types and values
+from .element import Element  # parent class
+from .point import Point  # front object of the Marker
 
-"""
-A Marker is an Element, where the front surface is a point
-Markers are used as point and/or text annotations in the tracing geometry
-text only: provide a text string and set the parameter label_only=True
-marker/point only: leave the text empty
-"""
 
 class Marker(Element):
 
@@ -24,6 +19,11 @@ class Marker(Element):
             -> None:
         """
         Create a new Marker.
+
+        A Marker is an Element, where the front surface is a point
+        Markers are used as point and/or text annotations in the tracing geometry
+        text only: provide a text string and set the parameter label_only=True
+        marker/point only: leave the text empty
 
         :param desc: text to display
         :param pos: position of marker
@@ -42,8 +42,14 @@ class Marker(Element):
         self._geometry_lock = True
         self._new_lock = True
 
-    def __setattr__(self, key, val):
-        """"""
+    def __setattr__(self, key: str, val: Any) -> None:
+        """
+        Assigns the value of an attribute.
+        Also performs type checking.
+
+        :param key: attribute name
+        :param val: value to assign
+        """
 
         match key:
 

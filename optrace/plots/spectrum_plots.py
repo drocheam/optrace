@@ -15,10 +15,15 @@ def refraction_index_plot(ri:         RefractionIndex | list[RefractionIndex],
                           **kwargs)\
         -> None:
     """
+    Plot a single or a list of RefractionIndex
 
-    :param ri:
-    :param title:
-    :param kwargs:
+    :param ri: RefractionIndex or list of RefractionIndex
+    :param title: title of the plot
+    :param kwargs: additional plotting arguments, including:
+        block: if the plot should be blocking
+        legend_off: if the legend should be turned off
+        label_off: if the labels should be turned off
+        color: a single or a list of colors
     """
     spectrum_plot(ri, title=title, **kwargs)
 
@@ -28,10 +33,15 @@ def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
                   **kwargs)\
         -> None:
     """
+    Plot a single or multiple spectra (LightSpectrum, Spectrum, TransmissionSpectrum)
 
-    :param spectrum:
-    :param title:
-    :param kwargs:
+    :param spectrum: spectrum or a list of spectra
+    :param title: title of the plot
+    :param kwargs: additional plotting arguments, including:
+        block: if the plot should be blocking
+        legend_off: if the legend should be turned off
+        label_off: if the labels should be turned off
+        color: a single or a list of colors
     """
     pc.check_type("title", title, str)
     pc.check_type("spectrum", spectrum, Spectrum | list)

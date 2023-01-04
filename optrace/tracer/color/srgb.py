@@ -1,6 +1,6 @@
 
-import numexpr as ne
-import numpy as np
+import numexpr as ne  # faster calculations
+import numpy as np  # matrix calculations
 
 from .. import misc
 from . import tools
@@ -20,7 +20,7 @@ SRGB_B_XY: list[float, float] = [0.15, 0.06]  #: sRGB blue primary in xy coordin
 
 def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     """
-    Conversion from sRGB to linear RGB values. srgb values should be inside [0, 1], however this is not checked or enforced.
+    Conversion from sRGB to linear RGB values. sRGB values should be inside [0, 1], however this is not checked or enforced.
     For negative values -a  srgb_to_srgb_linear(-a) is the same as -srgb_to_srgb_linear(a)
 
     :param rgb: RGB values (numpy 1D, 2D or 3D array)
@@ -42,7 +42,7 @@ def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
 
 def srgb_linear_to_xyz(rgbl: np.ndarray) -> np.ndarray:
     """
-    Conversion from linear RGB values to XYZ
+    Conversion from linear sRGB values to XYZ
 
     :param rgbl: linear RGB image (numpy 3D array, RGB channels in third dimension)
     :return: XYZ image (numpy 3D array)
@@ -63,7 +63,7 @@ def srgb_linear_to_xyz(rgbl: np.ndarray) -> np.ndarray:
 
 def srgb_to_xyz(rgb: np.ndarray) -> np.ndarray:
     """
-    Conversion from sRGB to XYZ
+    Conversion from sRGB to XYZ.
 
     :param rgb: sRGB image (numpy 3D array, RGB channels in third dimension)
     :return: XYZ image (numpy 3D array)
@@ -76,9 +76,10 @@ def srgb_to_xyz(rgb: np.ndarray) -> np.ndarray:
 
 def outside_srgb_gamut(xyz: np.ndarray) -> np.ndarray:
     """
+    Checks if the XYZ colors produce valid colors inside the sRGB gamut
 
-    :param xyz:
-    :return:
+    :param xyz: XYZ values, 2D image with channels in the third dimension
+    :return: boolean 2D image
     """
     return np.any(xyz_to_srgb_linear(xyz, rendering_intent="Ignore") < 0, axis=2)
 
@@ -251,7 +252,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
 
 def srgb_linear_to_srgb(rgbl: np.ndarray) -> np.ndarray:
     """
-    Conversion linear RGB to sRGB. Values should be inside range [0, 1], however with clip=False this is not enforced.
+    Conversion linear RGB to sRGB. Values should be inside range [0, 1], however this is not enforced.
     For negative values srgb(-a) is the same as -srgb(a)
 
     :param rgbl: linear RGB values (numpy 1D, 2D or 3D array)
@@ -277,12 +278,12 @@ def xyz_to_srgb(xyz:                np.ndarray,
                 rendering_intent:   str = "Absolute")\
         -> np.ndarray:
     """
-    Conversion XYZ to sRGB
+    Conversion of XYZ to sRGB.
 
     :param xyz: XYZ image (numpy 3D array, XYZ channels in third dimension)
     :param normalize: if values are normalized before conversion (bool)
-    :param rendering_intent:
-    :param clip:
+    :param rendering_intent: one of SRGB_RENDERING_INTENTS ("Ignore", "Absolute", "Perceptual")
+    :param clip: if sRGB values are clipped before gamma correction
     :return: sRGB image (numpy 3D array)
     """
     # XYZ -> sRGB is just XYZ -> RGBLinear -> sRGB
@@ -297,12 +298,12 @@ def xyz_to_srgb(xyz:                np.ndarray,
 
 def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     """
-    normalized Gauss Function
+    Normalized Gauss Function
 
-    :param x:
-    :param mu:
-    :param sig:
-    :return:
+    :param x: 1D value vector
+    :param mu: mean value
+    :param sig: standard deviation
+    :return: function values with same shape as x
 
     >>> gauss(np.array([0., 0.5, 1.5]), 0.75, 1)
     array([ 0.30113743, 0.38666812, 0.30113743])
@@ -421,12 +422,12 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     return wl_out
 
 
-def power_from_srgb(rgb: np.ndarray) -> np.ndarray:
+def _power_from_srgb(rgb: np.ndarray) -> np.ndarray:
     """
-    relative power for each pixel
+    Get a measure of pixel power/probability with the sRGB primaries above.
 
-    :param rgb:
-    :return:
+    :param rgb: sRGB image (2D, with channels in third dimension)
+    :return: power/probability image with two dimensions
     """
     RGBL = srgb_to_srgb_linear(rgb)  # physical brightness is proportional to RGBLinear signal
     P = _SRGB_R_PRIMARY_POWER_FACTOR * RGBL[:, :, 0] + _SRGB_G_PRIMARY_POWER_FACTOR * RGBL[:, :, 1] \
@@ -440,10 +441,11 @@ def spectral_colormap(N:    int,
                       wl1:  float = None) \
         -> np.ndarray:
     """
-    Get a spectral colormap with N steps in srgb
+    Get a spectral colormap with N steps in sRGB.
+    The Hue is rendered physically correct, however the lightness and saturation are set to be visually pleasing
 
-    :param wl0:
-    :param wl1:
+    :param wl0: lower wavelength
+    :param wl1: upper wavelength
     :param N: number of steps (int)
     :return: sRGBA array (numpy 2D array, shape (N, 4))
 

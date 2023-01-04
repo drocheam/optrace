@@ -28,15 +28,13 @@ Properties with FrontSurface + BackSurface:
 
 
 from typing import Any  # Any type
-import copy
 
 import numpy as np  # calculations
 
-from . import Surface, Point, Line
+from . import Surface, Point, Line  # base shapes for element
 
 from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
-
 
 
 
@@ -54,12 +52,13 @@ class Element(BaseClass):
                  **kwargs)\
             -> None:
         """
+        Parent class for Lens, RaySource, Detector, Aperture, Filter and Marker.
 
-        :param front:
-        :param pos:
-        :param back:
-        :param d1:
-        :param d2:
+        :param front: front surface/point/line
+        :param pos: 3D position of element
+        :param back: back surface
+        :param d1: z-distance between front and pos
+        :param d2: z-distance between pos and back
         :param kwargs: keyword arguments for :obj:`optrace.tracer.base_class.BaseClass`
         """
         self._geometry_lock = False
@@ -144,9 +143,10 @@ class Element(BaseClass):
 
     def get_desc(self, fallback: str = None) -> str:
         """
+        Get the description of the object.
 
         :param fallback: unused parameter
-        :return:
+        :return: the descriptions
         """
         stype1 = type(self.front).__name__
 
@@ -172,6 +172,7 @@ class Element(BaseClass):
         return np.column_stack((X1, X2)), np.column_stack((Y1, Y2)), np.column_stack((Z1, Z2))
 
     def flip(self) -> None:
+        """flip the element around the x-axis, absolute position stays the same"""
 
         if self.has_back():
             # flip and swap both surfaces, swap d1, d2
@@ -189,6 +190,10 @@ class Element(BaseClass):
             self.front.flip()
 
     def rotate(self, angle: float) -> None:
+        """
+        rotate the object around the z-axis
+        :param angle: rotation angle in degrees
+        """
         
         self.front.rotate(angle)
         

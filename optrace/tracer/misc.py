@@ -1,6 +1,3 @@
-"""
-helper
-"""
 
 from datetime import datetime  # date for fallback file naming
 from pathlib import Path  # path handling for image saving
@@ -16,7 +13,7 @@ import numexpr as ne  # faster calculations
 
 
 def random():
-    """less secure, but faster random number generator"""
+    """less secure (= lower quality of randomness), but faster random number generator"""
     return np.random.Generator(np.random.SFC64())
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
@@ -45,16 +42,16 @@ def timer(func: Callable) -> Any:
     return _time_it
 
 
-def uniform2(a, b, c, d, N):
+def uniform2(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray, np.ndarray]:
     """
     Stratified Sampling 2D.
     
-    :param a:
-    :param b:
-    :param c:
-    :param d:
-    :param N:
-    :return:
+    :param a: lower x-bound
+    :param b: upper x-bound
+    :param c: lower y-bound
+    :param d: upper y-bound
+    :param N: number of values
+    :return: tuple of random values inside [a, b] and [c, d]
     """
     # return np.random.uniform(a, b, N), np.random.uniform(c, d, N)
 
@@ -85,14 +82,14 @@ def uniform2(a, b, c, d, N):
     return x[ind], y[ind]
 
 
-def uniform(a, b, N):   
+def uniform(a: float, b: float, N: int) -> np.ndarray:   
     """
     Stratified Sampling 1D.
 
-    :param a:
-    :param b:
-    :param N:
-    :return:
+    :param a: lower bound
+    :param b: upper bound
+    :param N: number of values
+    :return: random values
     """
     # return np.random.uniform(a, b, N)
     if not N:
@@ -108,14 +105,14 @@ def uniform(a, b, N):
 def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.ndarray, np.ndarray]:
     """
     Generate uniform random positions inside a ring area (annulus) with stratified sampling.
-
     This is done by equi-areal mapping from grid to disc to annulus.
-    
-    :param ri: inner radius
-    :param r:  outer radius
-    :param N:  number of points
-    :param polar: if polar coordinates should be returned instead of cartesian
-    :return: random x and y positions
+    Set ri=0 so you get disc sampling.
+
+    :param ri: inner radius in mm
+    :param r: outer radius in mm
+    :param N: number of points
+    :param polar: if polar coordinates should be returned instead of cartesian ones
+    :return: random x and y positions (or r, phi)
     """
     x, y = uniform2(-r, r, -r, r, N)
 
@@ -292,8 +289,8 @@ def normalize(a: np.ndarray) -> np.ndarray:
     faster vector normalization for vectors in axis=1.
     Zero length vectors can normalized to np.nan.
 
-    :param a:
-    :return:
+    :param a: array to normalize, shape (N, 3)
+    :return: normalized values, shape (N, 3)
 
     >>> a = np.array([[1., 2., 3.], [4., 5., 6.]])
     >>> normalize(a)
@@ -310,9 +307,9 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     faster alternative to :func:`numpy.cross` for 3 element vectors and axis=1
 
-    :param a:
-    :param b:
-    :return:
+    :param a: first array, shape (N, 3)
+    :param b: second array, shape (N, 3)
+    :return: cross product, shape (N, 3)
 
     >>> cross(np.array([[1., 2., 3.], [4., 5., 6.]]), np.array([[-1., 2., -3.], [7., 8., 9.]]))
     array([[-12.,   0.,   4.],

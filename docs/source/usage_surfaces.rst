@@ -181,6 +181,7 @@ For :math:`a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}` the surface is cr
    asph = ot.AsphericSurface(r=2.5, R=12.37, k=2.03, coeff=[0, 1e-5, 3.2e-7])
 
 .. testoutput::
+   :hide:
 
    Class ...
 
@@ -213,6 +214,7 @@ As an example we want to create an axicon surface. In the simplest case the heig
    func = ot.FunctionSurface1D(r=3, func=lambda r: r)
 
 .. testoutput::
+   :hide:
 
    Class ...
 
@@ -237,6 +239,7 @@ The derivative function is passed with the ``deriv_func``-parameter.
    func = ot.FunctionSurface1D(r=3, func=lambda r: r, deriv_func=axicon_deriv)
 
 .. testoutput::
+   :hide:
 
    Class ...
 
@@ -260,6 +263,7 @@ For the ``func`` argument the matching parameter would be ``func_args``.
    func = ot.FunctionSurface1D(r=3, func=axicon, func_args=dict(a=-0.3), deriv_func=axicon_deriv, deriv_args=dict(a=-0.3))
 
 .. testoutput::
+   :hide:
 
    Class ...
 
@@ -305,6 +309,7 @@ To define a half circular aperture with radius :math:`r=0.1`, one can write:
    func = ot.FunctionSurface2D(r=3, func=lambda x, y: np.zeros_like(x), mask_func=mask, mask_args=dict(r=0.1))
 
 .. testoutput::
+   :hide:
 
    Class ...
 
@@ -335,6 +340,7 @@ Here is and example of a lens with direction dependent curvature and a little no
    data2d = ot.DataSurface2D(r=r0, data=H)
 
 .. testoutput::
+   :hide:
 
    Class ...
 
@@ -355,6 +361,7 @@ For a surface with rotational symmetry one radial vector is sufficient:
    data1d = ot.DataSurface1D(r=r0, data=h)
 
 .. testoutput::
+   :hide:
 
    Class ...
 

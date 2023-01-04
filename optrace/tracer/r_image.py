@@ -3,9 +3,9 @@ from threading import Thread  # multithreading
 
 import numpy as np  # calculations
 from PIL import Image  # saving as png
-import scipy.interpolate
+import scipy.interpolate  # interpolation
 import scipy.constants  # for luminous efficacy
-import scipy.ndimage
+import scipy.ndimage  # gaussian filtering
 
 from . import color  # xyz_observers curves and sRGB conversions
 from . import misc  # interpolation and calculation methods
@@ -61,6 +61,7 @@ class RImage(BaseClass):
         an image plotting type and an index for tagging.
 
         :param extent: image extent in the form [xs, xe, ys, ye]
+        :param projection: string containing information about the sphere projection method, if any
         :param limit: rayleigh limit, used to approximate wave optics using a gaussian blur filter
         """
         self._new_lock = False
@@ -88,6 +89,7 @@ class RImage(BaseClass):
 
     @property
     def _sigma(self) -> float:
+        """standard deviation for a gaussian approximating an airy disc with a specific resolution limit"""
         # an airy disc with roots at +-0.5*d can be approximated by a gauss with sigma = 0.175*d
         # limit (=d) needs to be converted from um to mm first
         return 0.175*self.limit/1000 if self.limit is not None else self.limit
@@ -134,13 +136,14 @@ class RImage(BaseClass):
             \
             -> tuple[np.ndarray, list[np.ndarray]]:
         """
-
+        Create an image cut/profile.
+        Only specify one of parameters x, y 
         
-        :param mode:
-        :param x:
-        :param y:
-        :param log:
-        :param imc:
+        :param mode: RImage mode
+        :param x: x-value to cut at
+        :param y: y-value to cut at
+        :param log: flag for sRGB modes, if the values should be logarithmic
+        :param imc: precomputed image (as np.ndarray) for speeding things up
         :return: bin edge array, list of image cuts
         """
         if (x is not None and not self.extent[0] - self.EPS <= x <= self.extent[1] + self.EPS)\
@@ -173,9 +176,9 @@ class RImage(BaseClass):
         """
         Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ
 
-        :param mode:
+        :param mode: one of "display_modes"
         :param log: logarithmic image (sRGB modes only)
-        :return:
+        :return: image as np.ndarray, shape depends on mode
         """
 
         self.__check_for_image()
@@ -245,7 +248,7 @@ class RImage(BaseClass):
         Get sRGB image
 
         :param log: if brightness should be logarithmically scaled
-        :param rendering_intent:
+        :param rendering_intent: rendering_intent for sRGB conversion
         :return: sRGB image (np.ndarray with shape (Ny, Nx, 3))
         """
         img = color.xyz_to_srgb_linear(self.get_xyz(), rendering_intent=rendering_intent)
@@ -298,9 +301,12 @@ class RImage(BaseClass):
 
     def rescale(self, N: int) -> None:
         """
+        Rescale the image to a new resolution without loosing or guessing information.
+        Only sizes from SIZES are supported, for other values the nearest from SIZES is applied.
 
-        :param N:
-        :return:
+        This function also applies the resolution filter.
+
+        :param N: pixel size of smaller image size
         """
         N = int(N)  # enforce int
         if N < 1:

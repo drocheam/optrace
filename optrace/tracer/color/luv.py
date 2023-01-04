@@ -20,10 +20,11 @@ SRGB_B_UV: list[float, float] = [0.1754385965, 0.1578947368]  #: sRGBgblue prima
 
 def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     """
+    Convert XYZ values to CIELUV colorspace.
 
-    :param xyz:
-    :param normalize:
-    :return:
+    :param xyz: XYZ image (2D with channels in third dimension)
+    :param normalize: if lightness is normalized
+    :return: CIELUV image, same shape as input
     """
 
     _, un, vn = WP_D65_LUV
@@ -73,9 +74,10 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
 
 def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
     """
+    Convert CIELUV back to XYZ.
 
-    :param luv:
-    :return:
+    :param luv: CIELUV image (2D, with channels in third dimension)
+    :return: XYZ image, same shape as input
     """
 
     # calculations are a rewritten from of
@@ -111,9 +113,10 @@ def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
 
 def luv_to_u_v_l(luv: np.ndarray) -> np.ndarray:
     """
+    Convert to CIELUV to chromacity color space u'v'L
 
-    :param luv:
-    :return:
+    :param luv: CIELUV image, 2D image with channels in third dimension
+    :return: u'v'L image, same shape as input
     """
     _, un, vn = WP_D65_LUV
     mi = luv[:, :, 0] > 0
@@ -132,7 +135,7 @@ def luv_to_u_v_l(luv: np.ndarray) -> np.ndarray:
 
 def luv_saturation(luv: np.ndarray) -> np.ndarray:
     """
-    Get Chroma from Luv. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Saturation
+    Get Chroma from CIELUV values. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Saturation
 
     :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
     :return: Saturation Image, np.ndarray with shape (Ny, Nx)
@@ -148,7 +151,7 @@ def luv_saturation(luv: np.ndarray) -> np.ndarray:
 
 def luv_chroma(luv: np.ndarray) -> np.ndarray:
     """
-    Get Chroma from Luv. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Chroma
+    Get Chroma from CIELUV values. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Chroma
 
     :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
     :return: Chroma Image, np.ndarray with shape (Ny, Nx)
@@ -159,7 +162,7 @@ def luv_chroma(luv: np.ndarray) -> np.ndarray:
 
 def luv_hue(luv: np.ndarray) -> np.ndarray:
     """
-    Get Hue from Luv. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Chroma
+    Get Hue from CIELUV values. Calculation using https://en.wikipedia.org/wiki/Colorfulness#Chroma
 
     :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
     :return: Hue Image, np.ndarray with shape (Ny, Nx)

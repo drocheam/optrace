@@ -1,15 +1,10 @@
-
-"""
-Detector class:
-rectangular plane perpendicular to optical axis for creation of Detector Images
-"""
+from typing import Any  # Any type
 
 import numpy as np  # for ndarray type
-import numexpr as ne  # faster calculations
 
 from .element import Element  # parent class
-from ..misc import PropertyChecker as pc  # check types and values
-from .surface import Surface, DataSurface1D, DataSurface2D, FunctionSurface2D
+from .surface import Surface, DataSurface1D, DataSurface2D,\
+        FunctionSurface1D, FunctionSurface2D  # supported surface types
 
 
 class Detector(Element):
@@ -27,13 +22,21 @@ class Detector(Element):
 
         :param surface: the Detector surface
         :param pos: position in 3D space
+        :param kwargs: additional keyword arguments for parent classes
         """
         super().__init__(surface, pos, **kwargs)
         self._new_lock = True  # no new properties after this
 
-    def __setattr__(self, key, val):
+    def __setattr__(self, key: str, val: Any) -> None:
+        """
+        Assigns the value of an attribute.
+        Also performs type checking.
 
-        if key == "front" and isinstance(val, DataSurface2D | DataSurface1D | FunctionSurface2D):
+        :param key: attribute name
+        :param val: value to assign
+        """
+
+        if key == "front" and isinstance(val, DataSurface2D | DataSurface1D | FunctionSurface1D | FunctionSurface2D):
             raise RuntimeError("Classes and subclasses of DataSurface1D, DataSurface2D, FunctionSurface2D"\
                                " are not supported as Detector surfaces.")
 

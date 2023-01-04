@@ -1,10 +1,4 @@
 
-"""
-Surface class:
-Provides the functionality for the creation of numerical or analytical surfaces.
-The class contains methods for interpolation, surface masking and normal calculation
-"""
-
 from typing import Any  # Any type
 
 import numpy as np  # calculations
@@ -18,7 +12,6 @@ from ...misc import PropertyChecker as pc  # check types and values
 # for higher classes like Element and Marker the objects itself maintains its position
 
 
-
 class Surface(BaseClass):
 
     C_EPS: float = 1e-6
@@ -28,6 +21,7 @@ class Surface(BaseClass):
     """numerical epsilon. Used for floating number comparisons. As well as adding small differences for plotting"""
 
     rotational_symmetry: bool = False
+    """has the surface rotational symmetry? Needs to be overwritten by child classes"""
 
 
     def __init__(self,
@@ -35,10 +29,10 @@ class Surface(BaseClass):
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Create a surface object, parent class of all other surface types.
 
+        :param r: surface radius
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -54,9 +48,6 @@ class Surface(BaseClass):
         """:return: if the surface has no extent in z-direction"""
         return self.z_max == self.z_min
 
-    def has_rotational_symmetry(self) -> bool:
-        return self.parax_roc is not None
-
     @property
     def info(self) -> str:
         """property string for UI information"""
@@ -65,7 +56,7 @@ class Surface(BaseClass):
 
     def _find_bounds(self) -> tuple[float, float]:
         """
-        Estimate min and max z-value on Surface by sampling dozen values.
+        Estimate min and max z-value on Surface by sampling many values.
 
         :return: min and max z-value on Surface
         """
@@ -120,6 +111,11 @@ class Surface(BaseClass):
 
     @property
     def extent(self) -> tuple[float, float, float, float, float, float]:
+        """
+        Surface extent, values for a smallest box encompassing all of the surface
+
+        :return: tuple of x0, x1, y0, y1, z0, z1
+        """
         return *(self.r*np.array([-1, 1, -1, 1]) + self.pos[:2].repeat(2)), \
                self.z_min, self.z_max
 
@@ -307,8 +303,6 @@ class Surface(BaseClass):
 
         :param p: position array (numpy 2D array, shape (N, 3))
         :param s: direction array (numpy 2D array, shape (N, 3))
-        :param i:
-        :param msg:
         :return: positions of hit (shape as p), bool numpy 1D array if ray hits lens
         """
 
@@ -415,12 +409,19 @@ class Surface(BaseClass):
         return p_hit, is_hit
 
     def flip(self) -> None:
+        """flip the surface around the x-axis"""
         assert self.is_flat()  # flip otherwise not implemented
 
     def rotate(self, angle: float) -> None:
+        """
+        rotate the surface around the z-axis
+        :param angle: rotation angle in degrees
+        """
         assert self.rotational_symmetry
 
-    def _rotate_rc(self, x, y, alpha) -> tuple[np.ndarray, np.ndarray]:
+    def _rotate_rc(self, x: np.ndarray, y: np.ndarray, alpha: float)\
+            -> tuple[np.ndarray, np.ndarray]:
+        """helper function rotating surface coordinates so the surface does not need to be rotated itself"""
 
         if alpha:
             return ne.evaluate("x*cos(alpha) - y*sin(alpha)"),\
@@ -428,7 +429,12 @@ class Surface(BaseClass):
 
         return x, y
 
-    def _find_hit_handle_abnormal(self, p, s, p_hit, is_hit):
+    def _find_hit_handle_abnormal(self, 
+                                  p:        np.ndarray, 
+                                  s:        np.ndarray, 
+                                  p_hit:    np.ndarray, 
+                                  is_hit:   np.ndarray)\
+            -> None:
         """
         this handles "abnormal" rays.
         Ray starts after z_max -> p_hit = p
@@ -438,6 +444,11 @@ class Surface(BaseClass):
         All these rays are set as non-hitting by updating is_hit
 
         All normal rays are kept intact.
+
+        :param p: ray position vectors
+        :param s: ray unity direction vectors
+        :param p_hit: intersection positions
+        :param is_hit: boolean hit array
         """
 
         zs = self.get_values(p_hit[:, 0], p_hit[:, 1])  # surface values

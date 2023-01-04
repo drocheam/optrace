@@ -1,13 +1,11 @@
 
-
 from typing import Any  # Any type
 
 import numpy as np  # calculations
 
 from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
-from .. import misc
-
+from .. import misc  # for misc.uniform
 
 
 class Line(BaseClass):
@@ -18,9 +16,11 @@ class Line(BaseClass):
                  **kwargs)\
             -> None:
         """
+        Create a Line object. A Line lies in a plane perpendicular to the z-axis.
 
         :param r: radial size
-        :param ang: in degrees
+        :param angle: axis angle in xy-plane, value in degrees
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -34,6 +34,7 @@ class Line(BaseClass):
 
     def move_to(self, pos: (list | np.ndarray)) -> None:
         """
+        Move the line in 3D space.
 
         :param pos: 3D position to move to (list or numpy 1D array)
         """
@@ -50,6 +51,9 @@ class Line(BaseClass):
     @property
     def extent(self) -> tuple[float, float, float, float, float, float]:
         """
+        Line extent, values for a smallest box encompassing all of the surface
+
+        :return: tuple of x0, x1, y0, y1, z0, z1
         """
         ang = np.deg2rad(self.angle)
         return self.pos[0] - self.r * np.cos(ang),\
@@ -60,20 +64,27 @@ class Line(BaseClass):
                self.z_max
 
     def flip(self) -> None:
+        """flip the line around the x-axis"""
         self._lock = False
         self.angle *= -1  
         self.lock()
 
     def rotate(self, angle: float) -> None:
+        """
+        rotate the line around the z-axis
+
+        :param angle: rotation angle in degrees
+        """
         self._lock = False
         self.angle += angle 
         self.lock()
 
     def get_random_positions(self, N: int) -> np.ndarray:
         """
+        Get random 3D positions on the line, uniformly distributed
 
-        :param N:
-        :return:
+        :param N: number of positions
+        :return: position array, shape (N, 3)
         """
         p = np.zeros((N, 3), dtype=np.float64, order='F')
 

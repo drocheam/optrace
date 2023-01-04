@@ -1,6 +1,6 @@
 import pathlib  # loading files in relative path
 import numpy as np  # np.ndarray type
-import scipy.misc  # for a racoon face
+import scipy.misc  # for a racoon face amd the "ascent" image
 
 
 # path of the image library folder

@@ -1,11 +1,8 @@
-"""
-Aperture class:
-"""
 
 import numpy as np  # for ndarray type
 
 from .element import Element  # parent class
-from .surface import Surface  # for Surface type
+from .surface import Surface  # for Surfaces
 
 
 class Aperture(Element):
@@ -19,11 +16,11 @@ class Aperture(Element):
                  **kwargs)\
             -> None:
         """
-        Create a Aperture object.
+        Create a Aperture object. Used for absorption of rays.
 
         :param surface: Surface object
         :param pos: 3D position of Aperture center (numpy array or list)
-        :param kwargs:
+        :param kwargs: keyword parameters for parent classes
         """
         super().__init__(surface, pos, **kwargs)
         self._new_lock = True  # no new properties after this

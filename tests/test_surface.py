@@ -792,7 +792,7 @@ class SurfaceTests(unittest.TestCase):
             # this negated (=pointing towards +z) is [-x, y, z]
 
             # check paraxial curvature circles
-            if not S.is_flat() and S.has_rotational_symmetry():
+            if not S.is_flat() and S.rotational_symmetry and S.parax_roc is not None:
                 self.assertEqual(S.parax_roc, -Sr.parax_roc)
                 self.assertEqual(S.parax_roc, Srr.parax_roc)
 

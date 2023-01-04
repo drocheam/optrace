@@ -1,20 +1,19 @@
 
-
-from typing import Any, Callable  # Any type
-import copy
+from typing import Any, Callable  # Any and Callable type
+import copy  # for
 
 import numpy as np  # calculations
-import numexpr as ne
+import numexpr as ne  # faster calculations
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
-from .surface import Surface
+from .surface import Surface  # parent class
 
 
 class FunctionSurface2D(Surface):
     
-    rotational_symmetry: bool = False
-    _1D: bool = False
+    rotational_symmetry: bool = False  #: has the surface rotational symmetry
+    _1D: bool = False  #: defined by a 1D vector?
 
     def __init__(self,
                  r:                 float,
@@ -30,10 +29,26 @@ class FunctionSurface2D(Surface):
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Create a surface object defined by a mathematical function.
 
+        Most of the time the automatic detection of the surface extent values z_min, z_max works correctly,
+        assign the values manually otherwise.
+
+        Providing parax_roc only makes sense, if the surface center can be locally described by a spherical surface.
+
+        :param r: surface radius
+        :param func: surface function, must take two 1D arrays (x and y positions) and return one 1D float array
+        :param mask_func: mask function (optional), must take two 1D arrays (x and y positions)
+                          and return one boolean 1D array, where the surface is defined
+        :param deriv_func: derivative function (optional), must take two 1D arrays (x and y positions)
+                          and return two float 1D arrays with partial derivatives in x and y direction
+        :param func_args: optional dict for keyword arguments for parameter func
+        :param mask_args: optional dict for keyword arguments for parameter mask_func
+        :param deriv_args: optional dict for keyword arguments for parameter deriv_func
+        :param parax_roc: optional paraxial radius of curvature
+        :param z_min: exact value for the maximum surface z-extent, optional
+        :param z_max: exact value for the minimum surface z-extent, optional
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -229,7 +244,8 @@ class FunctionSurface2D(Surface):
             return n
 
     def flip(self) -> None:
-       
+        """flip the surface around the x-axis"""
+
         # unlock
         self._lock = False
 
@@ -248,6 +264,11 @@ class FunctionSurface2D(Surface):
         self.lock()
 
     def rotate(self, angle: float) -> None:
+        """
+        rotate the surface around the z-axis
+
+        :param angle: rotation angle in degrees
+        """
         if not self._1D:
             self._lock = False
             self._angle += np.deg2rad(angle)

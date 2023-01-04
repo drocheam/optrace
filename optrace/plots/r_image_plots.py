@@ -1,11 +1,4 @@
-"""
-Functions for plotting of Source/Detector Images.
-Plotting Modes include Irradiance, Illuminance and RGB.
-All Modes can be shown in linear or logarithmic scaling
 
-"""
-
-# plotting library
 import matplotlib  # plotting library
 import matplotlib.pyplot as plt  # actual plotting
 
@@ -13,7 +6,6 @@ import numpy as np  # calculations
 
 from ..tracer.r_image import RImage  # RImage type and RImage displaying
 from ..tracer.misc import PropertyChecker as pc  # check types and values
-
 
 
 def r_image_plot(im:       RImage,
@@ -26,13 +18,13 @@ def r_image_plot(im:       RImage,
         -> None:
     """
 
-    :param im:
-    :param flip:
-    :param imc: precalculated Image (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
-    :param block: if plot is blocking (bool)
-    :param log: if logarithmic values are shown (only for images with 1 channel)
-    :param title:
-    :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
+    :param im: RImage to plot
+    :param mode: image plotting mode, one of RImage.display_modes
+    :param flip: if the image should be flipped
+    :param block: if the plot should block the execution of the program
+    :param log: if logarithmic values are shown
+    :param title: title of the plot
+    :param imc: precalculated RImage (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
     """
     _check_types(im, imc, block, log, flip, title, mode)
 
@@ -116,14 +108,14 @@ def r_image_cut_plot(im:       RImage,
         -> None:
     """
 
-    :param im:
-    :param imc:
-    :param kwargs:
-    :param block: if plot is blocking (bool)
-    :param log: if logarithmic values are shown (only for images with one channel)
-    :param flip:
-    :param title:
-    :param mode: "sRGB", "Illuminance" or "Irradiance" (string)
+    :param im: RImage to plot
+    :param imc: optional precalculated cut image
+    :param kwargs: arguments for RImage.cut
+    :param block: if the plot should be blocking the execution of the program
+    :param log: if logarithmic values are shown
+    :param flip: if the image should be flipped
+    :param title: title of the plot
+    :param mode: display_mode from RImage.display_modes
     """
     _check_types(im, imc, block, log, flip, title, mode)
 

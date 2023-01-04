@@ -1,23 +1,14 @@
 
-"""
-Surface class:
-Provides the functionality for the creation of numerical or analytical surfaces.
-The class contains methods for interpolation, surface masking and normal calculation
-"""
-
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from ... import misc  # calculations
-from .surface import Surface
-
+from .surface import Surface  # parent class
 
 
 class CircularSurface(Surface):
 
-    rotational_symmetry: bool = True
+    rotational_symmetry: bool = True  # has the surface rotational symmetry?
     
-
     def __init__(self,
                  r:        float,
                  **kwargs)\
@@ -28,6 +19,7 @@ class CircularSurface(Surface):
         adapted inside the lens class
 
         :param r: radial size for surface_type="Conic", "Sphere", "Circle" or "Ring" (float)
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -39,9 +31,10 @@ class CircularSurface(Surface):
 
     def get_random_positions(self, N: int) -> np.ndarray:
         """
+        Get 3D random positions on the surface, uniformly distributed.
 
-        :param N:
-        :return:
+        :param N: number of positions
+        :return: position array, shape (N, 3)
         """
         # x, y = misc.ring_uniform(0, self.r, N)
         x, y = misc.ring_uniform(0, self.r, N)

@@ -1,5 +1,4 @@
 
-
 import numpy as np  # calculations
 import scipy.special  # error function and inverse
 from typing import Any  # Any type
@@ -10,11 +9,10 @@ from .. import misc  # random_from_distribution
 from ..misc import PropertyChecker as pc  # check types and values
 
 
-
 class LightSpectrum(Spectrum):
 
-    quantity: str = "Spectral Power Density"
-    unit: str = "W/nm"
+    quantity: str = "Spectral Power Density"   #: physical quantity
+    unit: str = "W/nm"  #: physical unit
 
     spectrum_types: list[str] = [*Spectrum.spectrum_types, "Blackbody", "Histogram"]
     """possible spectrum types"""
@@ -24,9 +22,12 @@ class LightSpectrum(Spectrum):
                  T:             float = 5500, 
                  **sargs):
         """
-        
-        :param spectrum_type:
-        :param T:
+        Create a LightSpectrum, compared to the Spectrum parent class this provides
+        rendering of spectra and the generation of random wavelengths.
+        As well as two additional types (Blackbody and Histogram)
+
+        :param spectrum_type: spectrum type, one of "spectrum_types"
+        :param T: blackbody temperature in Kelvin
         :param sargs:
         """
         self.T = T
@@ -38,12 +39,13 @@ class LightSpectrum(Spectrum):
                **kwargs)\
             -> 'LightSpectrum':
         """
-         LightSpectrum has unit W/nm
+        Render a LightSpectrum from a list of wavelengths and powers.
+        The resulting LightSpectrum has type "Histogram" and unit W/nm
 
-        :param wl:
-        :param w:
-        :param kwargs:
-        :return:
+        :param wl: wavelength array
+        :param w: weight array
+        :param kwargs:  additional keyword arguments when creating the LightSpectrum
+        :return: the LightSpectrum object
         """
         # init light spectrum
         spec = LightSpectrum("Histogram", **kwargs)
@@ -73,9 +75,10 @@ class LightSpectrum(Spectrum):
 
     def random_wavelengths(self, N: int) -> np.ndarray:
         """
+        Generate random wavelengths following the spectral distribution.
 
-        :param N:
-        :return:
+        :param N: number of wavelengths
+        :return: wavelength array, shape (N,)
         """
 
         match self.spectrum_type:
@@ -128,6 +131,7 @@ class LightSpectrum(Spectrum):
 
     def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
         """
+        Get the spectrum values
 
         :param wl: wavelength array
         :return: values at provided wavelengths
@@ -157,8 +161,9 @@ class LightSpectrum(Spectrum):
 
     def get_xyz(self) -> np.ndarray:
         """
+        Get the XYZ color of the spectrum
 
-        :return:
+        :return: 3 element array of XYZ values
         """
         match self.spectrum_type:
 
@@ -182,10 +187,11 @@ class LightSpectrum(Spectrum):
 
     def get_color(self, rendering_intent="Ignore", clip=False) -> tuple[float, float, float]:
         """
+        Get the sRGB color of the spectrum
 
-        :param rendering_intent:
-        :param clip:
-        :return:
+        :param rendering_intent: rendering intent for the sRGB conversion
+        :param clip: if values are clipped to the [0, 1] data range
+        :return: tuple of 3 sRGB values
         """
         XYZ = np.array([[[*self.get_xyz()]]])
         RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip)[0, 0]

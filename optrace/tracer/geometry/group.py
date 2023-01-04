@@ -1,26 +1,17 @@
 
-from typing import Any
-
 import numpy as np  # calculations
 
-from . import Filter, Aperture, Detector, Lens, RaySource, Surface, Marker, IdealLens, Element
-from ..base_class import BaseClass
+from . import Filter, Aperture, Detector, Lens, RaySource, Surface,\
+        Marker, IdealLens, Element  # possible elements in group
+from ..base_class import BaseClass  # parent class
 
-from ..transfer_matrix_analysis import TMA
-from ..refraction_index import RefractionIndex
-from ..misc import PropertyChecker as pc
-
-
-"""
-A Group contains multiple elements of types Lens, Marker, RaySource, Filter, Aperture, Detector.
-This class provides the functionality for moving, rotating and flipping its whole geometry.
-A well as naturally including, removing elements and clearing is whole content.
-"""
+from ..transfer_matrix_analysis import TMA  # paraxial analysis
+from ..refraction_index import RefractionIndex  # ambient media
+from ..misc import PropertyChecker as pc  # check types and values
 
 
 class Group:
     pass
-
 
 class Group(BaseClass):
 
@@ -28,6 +19,10 @@ class Group(BaseClass):
         """
         Create a group by including elements from the 'elements' parameter.
         Without this parameter an empty group is created.
+
+        A Group contains multiple elements of types Lens, Marker, RaySource, Filter, Aperture, Detector.
+        This class provides the functionality for moving, rotating and flipping its whole geometry.
+        A well as including, removing elements and clearing is whole content.
 
         :param elements: list of elements to add. Can be empty
         :param kwargs: additional keyword arguments for the BaseClass class

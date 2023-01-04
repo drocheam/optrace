@@ -8,24 +8,25 @@ from . import misc  # calculations
 
 class RayStorage(BaseClass):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """
+        RayStorage is a class storing all rays and their properties
 
-        :param kwargs:
+        :param kwargs: additional keyword arguments for the parent class
         """
         self._lock = False
-        self.N_list = np.array([], dtype=int)
-        self.B_list = np.array([], dtype=int)
+        self.N_list = np.array([], dtype=int)  #: list of rays assigned to each source
+        self.B_list = np.array([], dtype=int)  #: list of boundary positions between sources
         
         self.no_pol = False
-        self.ray_source_list = []
+        self.ray_source_list = []  #: list of ray sources
 
-        self.p_list = np.array([])
-        self.s0_list = np.array([])
-        self.n_list = np.array([])
-        self.pol_list = np.array([])
-        self.w_list = np.array([])
-        self.wl_list = np.array([])
+        self.p_list = np.array([])  #: ray positions, shape (N, nt, 3)
+        self.s0_list = np.array([])  #: initial ray directions, shape (N, 3)
+        self.n_list = np.array([])  #: refractive index values, shape (N, nt)
+        self.pol_list = np.array([])  #: ray polarizations, shape (N, nt, 3)
+        self.w_list = np.array([])  #: ray weights, shape (N, nt)
+        self.wl_list = np.array([])  #: ray wavelengths, shape (N, )
 
         super().__init__(**kwargs)
 
@@ -36,12 +37,12 @@ class RayStorage(BaseClass):
              no_pol:            bool)\
             -> None:
         """
+        Initialize the Storage
 
-        :param ray_source_list:
-        :param N:
-        :param nt:
-        :param no_pol:
-        :return:
+        :param ray_source_list: list of ray sources
+        :param N: number of rays
+        :param nt: number of ray sections per ray
+        :param no_pol: if polarizations are generated
         """
         self._lock = False
         self.no_pol = no_pol
@@ -96,10 +97,11 @@ class RayStorage(BaseClass):
     def make_thread_rays(self, N_threads: int, Nt: int) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
+        Create the rays for the current thread
 
-        :param N_threads:
-        :param Nt:
-        :return:
+        :param N_threads: number of threads
+        :param Nt: current thread
+        :return: references to the ray properties (p, s, pol, w, wl, n)
         """
 
         assert self.N, "ray_source_list has no rays stored."
@@ -130,9 +132,10 @@ class RayStorage(BaseClass):
     def source_sections(self, index: int = None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
+        Return the source sections of each ray.
 
-        :param index:
-        :return:
+        :param index: source index, None if all rays should be returned
+        :return: tuple of ray properties (p, s, pol, w, wl)
         """
         assert self.N, "ray_source_list has no rays stored."
         assert index is None or 0 <= index < len(self.N_list)
@@ -142,22 +145,22 @@ class RayStorage(BaseClass):
         return self.p_list[Ns:Ne, 0], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne, 0],\
             self.w_list[Ns:Ne, 0], self.wl_list[Ns:Ne]
 
-    def ray_lengths(self, ch: np.ndarray = None, ch2: np.ndarray = None) -> np.ndarray:
+    def ray_lengths(self, ch: np.ndarray = None) -> np.ndarray:
         """
-        Euclidean lengths of ray sections.
+        Euclidean lengths of the ray sections.
 
-        :param ch:
-        :param ch2:
-        :return:
+        :param ch: boolean area selecting the desired rays, shape N
+        :return: length array with shape (N, nt)
         """
-        _, s, _, _, _, _, _ = self.rays_by_mask(ch, ch2, ret=[0, 1, 0, 0, 0, 0, 0], normalize=False)
+        _, s, _, _, _, _, _ = self.rays_by_mask(ch, ret=[0, 1, 0, 0, 0, 0, 0], normalize=False)
         return np.linalg.norm(s, axis=s.ndim-1)
     
     def optical_lengths(self, ch: np.ndarray = None) -> np.ndarray:
         """
-        
-        :param ch: boolean array for ray selection
-        :return: Optical path length for each ray section
+        Optical lengths of the ray sections
+
+        :param ch: boolean array for ray selection, shape N
+        :return: Optical path length for each ray section, shape (N, nt)
         """
 
         l = self.ray_lengths(ch)
@@ -172,12 +175,17 @@ class RayStorage(BaseClass):
             -> tuple[(np.ndarray | None), (np.ndarray | None), (np.ndarray | None),
                      (np.ndarray | None), (np.ndarray | None), (np.ndarray | None), (np.ndarray | None)]:
         """
+        Get ray properties for the selected rays and ray sections.
 
-        :param ch: bool array
-        :param ch2:
-        :param ret:
-        :param normalize:
-        :return:
+        :param ch: bool array selecting the desired rays, shape N. Default to None, meaning all rays are selected
+        :param ch2: int array selecting the desired ray sections. 
+                    Needs to be the same shape as the number of true values in ch.
+                    Defaults to None, meaning all sections per ray are selected
+        :param ret: a list of seven boolean elements, specifying if the corresponding 
+                    return value needs to be masked/calculated.
+                    Generally it is recommended to only set values to True, if they are needed
+        :param normalize: if ray directions should be normalized
+        :return: list of properties (p, s, pol, w, wl, snum, n) with shape resulting from choices of ch and ch2
         """
         assert self.N, "ray_source_list has no rays stored."
         

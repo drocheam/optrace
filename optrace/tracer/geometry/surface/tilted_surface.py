@@ -1,25 +1,16 @@
 
-"""
-Surface class:
-Provides the functionality for the creation of numerical or analytical surfaces.
-The class contains methods for interpolation, surface masking and normal calculation
-"""
-
 from typing import Any  # Any type
 
 import numpy as np  # calculations
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
-from .surface import Surface
-
-
+from .surface import Surface  # parent class
 
 
 class TiltedSurface(Surface):
     
-    rotational_symmetry: bool = False
-
+    rotational_symmetry: bool = False  #: has the surface rotational symmetry?
 
     def __init__(self,
                  r:                 float,
@@ -28,12 +19,12 @@ class TiltedSurface(Surface):
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Create a tilted surface.
 
-        :param r: radial size for surface_type="Conic", "Sphere", "Circle" or "Ring" (float)
-        :param normal:
+        :param r: radial size of the surface
+        :param normal: normal vector, list or array of 3 elements
+        :param normal_sph: spherical normal vector, list or array of 2 elements (theta, phi, both in degrees)
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -99,10 +90,11 @@ class TiltedSurface(Surface):
 
     def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
+        Find hit/intersections of rays with this surface.
 
-        :param p:
-        :param s:
-        :return:
+        :param p: ray position array, shape (N, 3)
+        :param s: unity ray direction vectors, shape (N, 3)
+        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit
         """
         # intersection ray with plane
         # see https://www.scratchapixel.com/lessons/3d-basic-rendering/
@@ -118,6 +110,7 @@ class TiltedSurface(Surface):
         return p_hit, is_hit
 
     def flip(self) -> None:
+        """flip the surface around the x-axis"""
 
         # rotating [x, y, z] around [1, 0, 0] by pi gives us [x, -y, -z]
         # we need to negate this, so the vector points in +z direction
@@ -128,7 +121,11 @@ class TiltedSurface(Surface):
         self.lock()
 
     def rotate(self, angle: float) -> None:
-        
+        """
+        rotate the surface around the z-axis
+
+        :param angle: rotation angle in degrees
+        """
         self._lock = False
         self.normal.flags.writeable = True
         self.normal[:2] = self._rotate_rc(self.normal[0], self.normal[1], np.deg2rad(angle))

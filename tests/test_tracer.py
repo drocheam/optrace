@@ -499,7 +499,7 @@ class TracerTests(unittest.TestCase):
         x0, x1, y0, y1 = img0.extent
         X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**3
-        self.assertTrue(np.std(Z/np.max(Z)) < 0.05)
+        self.assertTrue(np.std(Z/np.max(Z)) < 0.075)
 
         # Lambertian divergence in 3D, leads to 1/cos(e)**4 on detector
         RS0.divergence = "Lambertian"

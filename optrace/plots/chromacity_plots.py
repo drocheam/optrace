@@ -31,11 +31,14 @@ def chromacities_cie_1931(img:                  RImage | LightSpectrum | list[Li
                           **kwargs)\
         -> None:
     """
+    Draw a CIE 1931 xy chromaticity diagram and mark spectrum/image colors inside of it.
 
-    :param img:
-    :param rendering_intent:
-    :param title:
-    :param kwargs:
+    :param img: RImage, LightSpectrum or a list of LightSpectrum
+    :param rendering_intent: rendering_intent for the sRGB conversion
+    :param title: title of the plot
+    :param kwargs: additional plotting parameters, including:
+        block: if the plot should block the execution of the program
+        norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
     """
 
     # coordinates of whitepoint and sRGB primaries in Chromacity diagramm coordinates (xy)
@@ -63,11 +66,14 @@ def chromacities_cie_1976(img:                  RImage | LightSpectrum | list[Li
                           **kwargs)\
         -> None:
     """
+    Draw a CIE 1976 xy chromaticity diagram and mark spectrum/image colors inside of it.
 
-    :param img:
-    :param rendering_intent:
-    :param title:
-    :param kwargs:
+    :param img: RImage, LightSpectrum or a list of LightSpectrum
+    :param rendering_intent: rendering_intent for the sRGB conversion
+    :param title: title of the plot
+    :param kwargs: additional plotting parameters, including:
+        block: if the plot should block the execution of the program
+        norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
     """
 
     # coordinates of whitepoint and sRGB primaries in chromacity diagram coordinates (u'v')

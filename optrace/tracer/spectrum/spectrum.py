@@ -10,7 +10,6 @@ from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 
 
-
 class Spectrum(BaseClass):
 
     spectrum_types: list[str] = ["Monochromatic", "Constant", "Data", "Lines",
@@ -41,23 +40,25 @@ class Spectrum(BaseClass):
                  func_args:         dict = None,
                  **kwargs):
         """
+        Create a Spectrum object. 
+        Most of the time this class isn't used, as there are specific subclasses.
 
-        :param spectrum_type:
-        :param val:
-        :param lines:
-        :param line_vals:
-        :param wl:
-        :param wl0:
-        :param wl1:
-        :param wls:
-        :param vals:
-        :param func:
-        :param mu:
-        :param sig:
-        :param unit:
-        :param quantity:
-        :param func_args:
-        :param kwargs:
+        :param spectrum_type: one of "spectrum_types"
+        :param val: factor for types "Rectangle", "Constant", "Gaussian" etc.
+        :param lines: line wavelengths for "Lines" type
+        :param line_vals: line values for "Lines" type
+        :param wl: wavelength for "Monochromatic" type
+        :param wl0: lower wavelength for "Rectangle" type
+        :param wl1: upper wavelength for "Rectangle" type
+        :param wls: wavelength list for "List" type
+        :param vals: values for "List" type
+        :param mu: center wavelength for "Gaussian" type
+        :param sig: standard deviation for "Gaussian" type
+        :param unit: unit string 
+        :param quantity: quantity string
+        :param func: spectrum function, must take a wavelength vector and return float values
+        :param func_args: dict of optional keyword arguments for func
+        :param kwargs: additional keyword arguments for the parent class
         """
 
         self.spectrum_type = spectrum_type
@@ -79,6 +80,7 @@ class Spectrum(BaseClass):
 
     def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
         """
+        get spectrum values
 
         :param wl: wavelength array
         :return: values at provided wavelengths

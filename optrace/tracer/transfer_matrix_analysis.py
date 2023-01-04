@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np  # matrix calculations
 
 from .refraction_index import RefractionIndex  # media of and media between lenses
 from .base_class import BaseClass  # parent class
@@ -15,7 +15,6 @@ from .misc import PropertyChecker as pc  # type checking
 # https://www.montana.edu/ddickensheets/documents/abcdCardinal%202.pdf
 
 
-# transfer matrix analysis class
 class TMA(BaseClass):
 
     def __init__(self,
@@ -25,11 +24,13 @@ class TMA(BaseClass):
                  **kwargs)\
             -> None:
         """
-        
-        :param lenses:
-        :param wl:
-        :param n0:
-        :param kwargs:
+        Create an ray transfer matrix analysis object.
+        This is a snapshot of properties for when the object gets created, nothing is updated after that.
+
+        :param lenses: list of Lens
+        :param wl: wavelength to create the analysis for
+        :param n0: ambient medium before the lens setup
+        :param kwargs: additional keyword arguments for the parent class
         """
         # type checks
         pc.check_type("lenses", lenses, list)
@@ -119,6 +120,12 @@ class TMA(BaseClass):
         self._new_lock = True
 
     def _gen_abcd(self, L) -> np.ndarray:
+        """
+        generate the ABCD matrix
+
+        :param L: list of lenses
+        :return: 2x2 numpy array
+        """
         
         # calculate abcd matrix
         mat = np.eye(2)
@@ -166,9 +173,10 @@ class TMA(BaseClass):
 
     def image_position(self, z_g) -> float:
         """
-        get image position
+        get the image position for a object distance
+
         :param z_g: z-position of object
-        :return:
+        :return: absolute image z-position
         """
         # overall matrix:
         # mat = [[1, b], [0, 1]] * [[A, B], [C, D]] * [[1, g], [0, 1]]
@@ -193,9 +201,9 @@ class TMA(BaseClass):
 
     def object_position(self, z_b) -> float:
         """
-        get image position
+        get the object position for a given image position
         :param z_b: z-position of image
-        :return:
+        :return: z-position of object
         """
         # overall matrix:
         # mat = [[1, b], [0, 1]] * [[A, B], [C, D]] * [[1, g], [0, 1]]
@@ -220,11 +228,11 @@ class TMA(BaseClass):
 
     def matrix_at(self, z_g: float, z_b: float) -> np.ndarray:
         """
-        Calculate the abcd matrix for an object position z_g and image position z_b
+        Calculate the ABCD matrix for an object position z_g and image position z_b
 
-        :param z_g:
-        :param z_b:
-        :return:
+        :param z_g: object z-position
+        :param z_b: image z-position
+        :return: ABCD matrix, 2x2 numpy array
         """
         d_b_matrix = np.array([[1, z_b - self._2], [0, 1]])  # matrix for distance to first lens
         d_g_matrix = np.array([[1, self._1 - z_g], [0, 1]])  # matrix for distance from last lens

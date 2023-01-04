@@ -3,18 +3,18 @@ import numpy as np  # calculations
 import scipy.constants  # for c, h, k_B
 
 
-
 # default wavelength bounds
 _WL_MIN0 = 380.
 _WL_MAX0 = 780.
 
 WL_BOUNDS: list[float, float] = [_WL_MIN0, _WL_MAX0]
-"""wavelength range"""
+"""visible wavelength range"""
 
 
 def wavelengths(N: int) -> np.ndarray:
     """
-    Get wavelength range array with equal spacing and N points.
+    Get a wavelength range array with equal spacing and N points.
+    The first and last wavelength are specified by WL_BOUNDS
 
     :param N: number of values
     :return: wavelength vector in nm, 1D numpy array
@@ -27,7 +27,7 @@ def wavelengths(N: int) -> np.ndarray:
 
 def blackbody(wl: np.ndarray, T: float = 6504.) -> np.ndarray:
     """
-    Get spectral radiance of a planck blackbody curve. Unit is W/(sr m³).
+    Get the spectral radiance of a planck blackbody curve. Unit is W/(sr m³).
 
     :param wl: wavelength vector in nm (numpy 1D array)
     :param T: blackbody temperature in Kelvin (float)

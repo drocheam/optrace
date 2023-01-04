@@ -1,29 +1,26 @@
 
 from typing import Any  # Any type
 
-import numpy as np  # calculations
+import numpy as np  # matrix calculations
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
-from .surface import Surface
-
+from .surface import Surface  # parent class
 
 
 class RectangularSurface(Surface):
     
-    rotational_symmetry: bool = False
-
+    rotational_symmetry: bool = False  #: has the surface rotational symmetry?
 
     def __init__(self,
                  dim:               (list | np.ndarray),
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Create a rectangular surface, perpendicular to the z-axis.
 
-        :param dim:
+        :param dim: x and y side length as two element array/list
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
       
@@ -47,6 +44,9 @@ class RectangularSurface(Surface):
     @property
     def extent(self) -> tuple[float, float, float, float, float, float]:
         """
+        Surface extent, values for a smallest box encompassing all of the surface
+
+        :return: tuple of x0, x1, y0, y1, z0, z1
         """
         # side lengths get rotated       
         sx = np.abs(self.dim[0] * np.cos(self._angle)) + np.abs(self.dim[1] * np.sin(self._angle))
@@ -62,13 +62,18 @@ class RectangularSurface(Surface):
         return -self.dim[0]/2, self.dim[0]/2, -self.dim[1]/2, self.dim[1]/2, 0., 0.
    
     def rotate(self, angle: float) -> None:
+        """
+        rotate the surface around the z-axis
 
+        :param angle: rotation angle in degrees
+        """
         # create an copy with an incremented angle
         self._lock = False
         self._angle += np.deg2rad(angle)
         self.lock()
 
     def flip(self) -> None:
+        """flip the surface around the x-axis"""
         self._lock = False
         self._angle *= -1
         self.lock()
@@ -141,9 +146,10 @@ class RectangularSurface(Surface):
 
     def get_random_positions(self, N: int) -> np.ndarray:
         """
+        Get random 3D positions on the surface, uniformly distributed
 
-        :param N:
-        :return:
+        :param N: number of positions
+        :return: position array, shape (N, 3)
         """
         p = np.zeros((N, 3), dtype=np.float64, order='F')
         # grid for unrotated rectangle at (0, 0, 0)

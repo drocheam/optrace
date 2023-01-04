@@ -1,4 +1,3 @@
-
 import copy  # deepcopy
 from typing import Any  # Any type
 import numpy as np  # calculations

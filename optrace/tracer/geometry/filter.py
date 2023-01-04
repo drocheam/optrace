@@ -1,10 +1,4 @@
 
-"""
-Filter class:
-A filter is a surface with wavelength dependent or constant transmittance.
-Useful for color filters or apertures.
-"""
-
 import numpy as np  # ndarray type
 from typing import Any  # Any type
 
@@ -26,11 +20,14 @@ class Filter(Element):
                  **kwargs)\
             -> None:
         """
-        Create a Filter object.
+        Create a Filter object. A filter is a surface with wavelength dependent or constant transmittance.
+        Useful for color filters or apertures.
+
 
         :param Surface: Surface object
         :param pos: 3D position of Filter center
         :param spectrum: transmission spectrum. Output range needs be inside [0, 1].
+        :param kwargs: additional keyword arguments for parent classes
         """
         super().__init__(surface, pos, **kwargs)
 

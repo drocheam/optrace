@@ -400,11 +400,10 @@ class TraceGUI(HasTraits):
 
     def __init__(self, raytracer: Raytracer, **kwargs) -> None:
         """
-        The extra bool parameters are needed to assign the List-Checklisteditor to bool values in the GUI.__init__.
-        Otherwise the user would assign bool values to a string list.
+        Create a new TraceGUI with the assigned Raytracer.
 
-        :param RT:
-        :param kwargs:
+        :param RT: raytracer
+        :param kwargs: additional arguments, options, traits and parameters
         """
         # lock object for multithreading
         self.__detector_lock = Lock()  # when detector is changed, moved or used for rendering
@@ -585,8 +584,8 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Plotting functions
 
-    # remove visual objects from raytracer geometry
     def __remove_objects(self, objs) -> None:
+        """remove visual objects from raytracer geometry"""
         for obj in objs:
             for obji in obj[:4]:
                 if obji is not None:
@@ -823,17 +822,7 @@ class TraceGUI(HasTraits):
                       spec:     bool = True,
                       light:    bool = True)\
             -> tuple:
-        """plotting of a Element. Gets called from plotting for Lens, Filter, Detector, RaySource.
-
-        :param obj:
-        :param num:
-        :param color:
-        :param alpha:
-        :param d:
-        :param spec:
-        :param light:
-        :return:
-        """
+        """plotting of a Element. Gets called from plotting for Lens, Filter, Detector, RaySource. """
 
         def plot(C, surf_type):
             # plot surface
@@ -890,10 +879,8 @@ class TraceGUI(HasTraits):
         return a, b, c, text, obj
 
     def _get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """
-        :return:
-        """
-
+        """assign traced and selected rays into a ray dictionary"""
+        
         p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=True)
         l_ = self.raytracer.rays.ray_lengths(self._ray_selection)
         ol_ = self.raytracer.rays.optical_lengths(self._ray_selection)
@@ -916,6 +903,7 @@ class TraceGUI(HasTraits):
     def _plot_rays(self, x: np.ndarray, y: np.ndarray, z: np.ndarray,
                    u: np.ndarray, v: np.ndarray, w: np.ndarray, s: np.ndarray)\
             -> None:
+        """plot a subset of traced rays"""
 
         if self._rays_plot is not None:
             self._rays_plot.parent.parent.remove()
@@ -1112,7 +1100,7 @@ class TraceGUI(HasTraits):
         # because issues with trait updates with type "List"
     
     def _plot_markers(self) -> None:
-        
+        """plot markers inside the scene"""
         self.__remove_objects(self._marker_plots)
 
         for num, mark in enumerate(self.raytracer.markers):
@@ -1150,8 +1138,8 @@ class TraceGUI(HasTraits):
 
     def _on_space_pick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker') -> None:
         """
-        3D Space Clicking Handler.
-        Shows Click Coordinates or moves Detector to this position when Shift is pressed.
+        3D Space Clicking Handler. Shows Click Coordinates or moves Detector to this position when Shift is pressed.
+
         :param picker_obj:
         """
 
@@ -1176,8 +1164,8 @@ class TraceGUI(HasTraits):
 
     def _on_ray_pick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker' = None) -> None:
         """
-        Ray Picking Handler.
-        Shows ray properties on screen.
+        Ray Picking Handler. Shows ray properties in the scene.
+
         :param picker_obj:
         """
         if self._ray_text is None:
@@ -1296,7 +1284,7 @@ class TraceGUI(HasTraits):
                 self._crosshair.visible = False
 
     def _init_keyboard_shortcuts(self) -> None:
-        """Init shift key press detection"""
+        """init keyboard shortcut detection inside the scene"""
 
         # also see already available shortcuts
         # https://docs.enthought.com/mayavi/mayavi/application.html#keyboard-interaction
@@ -1354,6 +1342,7 @@ class TraceGUI(HasTraits):
         """
         replot all or part of the geometry and scene.
         If the change dictionary is not provided, everything is replotted according to the raytracer geometry
+
         :param change: optional change dict from raytracer.compare_property_snapshot
         """
 
@@ -1458,10 +1447,11 @@ class TraceGUI(HasTraits):
     def debug(self, silent: bool = False, _exit: bool = False, _func: Callable = None, _args: tuple = None) -> None:
         """
         Run in debugging mode
-        :param silent:
-        :param _exit:
-        :param _func:
-        :param _args:
+
+        :param silent: if all standard output should be muted
+        :param _exit: if exit directly after initializing and plotting the GUI
+        :param _func: thread function to execute while the GUI is active
+        :param _args: arguments for _func
         """
         self._exit = _exit
         self.silent = silent
@@ -1476,7 +1466,8 @@ class TraceGUI(HasTraits):
     def run(self, silent: bool = False) -> None:
         """
         Run the TraceGUI
-        :param silent:
+
+        :param silent: if all standard output should be muted
         """
         self.silent = silent
         self.raytracer.silent = silent
@@ -1486,6 +1477,7 @@ class TraceGUI(HasTraits):
     def close(self, event=None) -> None:
         """
         close the whole application, including plot windows
+
         :param event: optional event from traits observe decorator
         """
         pyface_gui.invoke_later(plt.close, "all")  # close plots
@@ -1497,7 +1489,8 @@ class TraceGUI(HasTraits):
     @observe('high_contrast', dispatch="ui")
     def _change_contrast(self, event=None) -> None:
         """
-        change high contrast mode
+        change the high contrast mode
+
         :param event: optional event from traits observe decorator
         """
 
@@ -1551,6 +1544,7 @@ class TraceGUI(HasTraits):
     def replot_rays(self, event=None) -> None:
         """
         choose a subset of all raytracer rays and plot them with :obj:`TraceGUI._plot_rays`.
+
         :param event: optional event from traits observe decorator
         """
 
@@ -1610,6 +1604,7 @@ class TraceGUI(HasTraits):
     def retrace(self, event=None) -> None:
         """
         raytrace in separate thread, after that call :obj:`TraceGUI.replot_rays`.
+
         :param event: optional event from traits observe decorator
         """
 
@@ -1685,6 +1680,7 @@ class TraceGUI(HasTraits):
     def _change_ray_opacity(self, event=None) -> None:
         """
         change opacity of visible rays.
+
         :param event: optional event from traits observe decorator
         """
         if self._rays_plot is not None:
@@ -1694,6 +1690,7 @@ class TraceGUI(HasTraits):
     def _change_ray_colors(self, event=None) -> None:
         """
         change ray coloring mode.
+
         :param event: optional event from traits observe decorator
         """
         if self._rays_plot is not None:
@@ -1704,6 +1701,7 @@ class TraceGUI(HasTraits):
     def _change_ray_representation(self, event=None) -> None:
         """
         change ray view to connected lines or points only.
+
         :param event: optional event from traits observe decorator
         """
         if self._rays_plot is not None:
@@ -1713,6 +1711,7 @@ class TraceGUI(HasTraits):
     def _change_detector(self, event=None) -> None:
         """
         change detector selection
+
         :param event: optional event from traits observe decorator
         """
 
@@ -1742,7 +1741,8 @@ class TraceGUI(HasTraits):
     @observe('det_pos', dispatch="ui")
     def _move_detector(self, event=None) -> None:
         """
-        move chosen Detector.
+        move chosen detector.
+
         :param event: optional event from traits observe decorator
         """
 
@@ -1779,7 +1779,8 @@ class TraceGUI(HasTraits):
 
     def show_detector_cut(self) -> None:
         """
-        detector image cut.
+        Plot a detector image cut.
+
         :param event: optional event from traits observe decorator
         """
         self.show_detector_image(cut=True)
@@ -1787,8 +1788,10 @@ class TraceGUI(HasTraits):
     @observe('_detector_image_button, _detector_cut_button', dispatch="ui")
     def show_detector_image(self, event=None, cut=False) -> None:
         """
-        render a DetectorImage at the chosen Detector, uses a separate thread.
+        render a detector image at the chosen Detector, uses a separate thread.
+
         :param event: optional event from traits observe decorator
+        :param cut: if a RImage cut image is plotted
         """
 
         if self.raytracer.detectors and self.raytracer.rays.N:
@@ -1883,10 +1886,7 @@ class TraceGUI(HasTraits):
             action.start()
 
     def show_source_cut(self) -> None:
-        """
-        source image cut.
-        :param event: optional event from traits observe decorator
-        """
+        """show a source image cut plot"""
         self.show_source_image(cut=True)
 
     @observe('_source_spectrum_button', dispatch="ui")
@@ -1924,7 +1924,7 @@ class TraceGUI(HasTraits):
         """
         render a source image for the chosen Source, uses a separate thread
         :param event: optional event from traits observe decorator
-        :param cut:
+        :param cut: if an RImage cut plot is plotted
         """
 
         if self.raytracer.ray_sources and self.raytracer.rays.N:
@@ -1984,6 +1984,7 @@ class TraceGUI(HasTraits):
         The chosen Detector defines the search range for focus finding.
         Searches are always between lenses or the next outline.
         Search takes place in a separate thread, after that the Detector is moved to the focus
+
         :param event: optional event from traits observe decorator
         """
 
@@ -2038,6 +2039,7 @@ class TraceGUI(HasTraits):
     def _plot_scene(self, event=None) -> None:
         """
         Initialize the GUI. Inits a variety of things.
+
         :param event: optional event from traits observe decorator
         """
         self._init_crosshair()
@@ -2054,6 +2056,7 @@ class TraceGUI(HasTraits):
     def _change_status(self, event=None) -> None:
         """
         Update the status info text.
+
         :param event: optional event from traits observe decorator
         """
         msgs = {"RunningCommand": "Running Command",
@@ -2077,6 +2080,7 @@ class TraceGUI(HasTraits):
     def _change_minimalistic_view(self, event=None) -> None:
         """
         change the minimalistic ui view option.
+
         :param event: optional event from traits observe decorator
         """
         if not self._status["InitScene"]:
@@ -2110,6 +2114,7 @@ class TraceGUI(HasTraits):
     def _change_maximize_scene(self, event=None) -> None:
         """
         change "maximize scene, hide side menu and toolbar"
+
         :param event: optional event from traits observe decorator
         """
         self._scene_not_maximized = not bool(self.maximize_scene)
@@ -2119,6 +2124,7 @@ class TraceGUI(HasTraits):
     def _change_ray_width(self, event=None) -> None:
         """
         set the ray width for the visible rays.
+
         :param event: optional event from traits observe decorator
         """
         if self._rays_plot is not None:
@@ -2128,6 +2134,7 @@ class TraceGUI(HasTraits):
     def _change_selected_ray_source(self, event=None) -> None:
         """
         Updates the Detector Selection and the corresponding properties.
+
         :param event: optional event from traits observe decorator
         """
         if self.raytracer.ray_sources:
@@ -2137,6 +2144,7 @@ class TraceGUI(HasTraits):
     def _change_raytracer_threading(self, event=None) -> None:
         """
         change the raytracer multithreading option. Useful for debugging.
+
         :param event: optional event from traits observe decorator
         """
         self.raytracer.threading = not bool(self.raytracer_single_thread)
@@ -2145,6 +2153,7 @@ class TraceGUI(HasTraits):
     def _change_garbage_collector_stats(self, event=None) -> None:
         """
         show garbage collector stats
+
         :param event: optional event from traits observe decorator
         """
         gc.set_debug(gc.DEBUG_STATS if self.garbage_collector_stats else 0)
@@ -2153,6 +2162,7 @@ class TraceGUI(HasTraits):
     def _change_warnings(self, event=None) -> None:
         """
         change warning visibility.
+
         :param event: optional event from traits observe decorator
         """
         if bool(self.show_all_warnings):
@@ -2163,6 +2173,8 @@ class TraceGUI(HasTraits):
     @observe('_command_window_button', dispatch="ui")
     def open_command_window(self, event=None) -> None:
         """
+        Open the command window for executing code.
+        
         :param event: optional event from traits observe decorator
         """
         if self._cdb is None:
@@ -2172,7 +2184,8 @@ class TraceGUI(HasTraits):
     @observe('_property_browser_button', dispatch="ui")
     def open_property_browser(self, event=None) -> None:
         """
-        Open a property browser for the gui, the scene, the raytracer and the shown rays.
+        Open a property browser for the gui, the scene, the raytracer, shown rays and cardinal points.
+
         :param event: optional event from traits observe decorator
         """
         gdb = PropertyBrowser(self, self.scene, self.raytracer)
@@ -2182,6 +2195,7 @@ class TraceGUI(HasTraits):
     def _change_surface_mode(self, event=None) -> None:
         """
         change surface representation to normal or wireframe view.
+
         :param event: optional event from traits observe decorator
         """
         repr_ = "wireframe" if bool(self.wireframe_surfaces) else "surface"
@@ -2194,6 +2208,7 @@ class TraceGUI(HasTraits):
 
     def send_cmd(self, cmd) -> None:
         """
+        send/execute a command
         """
         dict_ = dict(  # GUI and scene
                      mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
@@ -2238,6 +2253,7 @@ class TraceGUI(HasTraits):
     def _resize_scene_elements(self, event) -> None:
         """
         Handles GUI window size changes. Fixes incorrect scaling by mayavi.
+
         :param event: event from traits observe decorator
         """
 

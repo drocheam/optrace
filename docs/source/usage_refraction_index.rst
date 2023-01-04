@@ -81,12 +81,12 @@ _______________________
 The refractive index values are calculated when calling the refractive index object with a wavelength vector.
 The call returns a vector of the same shape as the input.
 
-.. testcode::
+.. doctest::
 
-   n = ot.RefractionIndex("Abbe", n=1.543, V=62.1)
-   wl = np.linspace(380, 780, 100)
-   ns = n(wl)
-
+   >>> n = ot.RefractionIndex("Abbe", n=1.543, V=62.1)
+   >>> wl = np.linspace(380, 780, 5)
+   >>> n(wl)
+   array([1.56237798, 1.54967658, 1.54334457, 1.53971213, 1.53742918])
 
 Abbe Number
 __________________
@@ -94,22 +94,25 @@ __________________
 Details on the calculation of the Abbe number can be found in :numref:``abbe_number``. 
 With a refractive index object at hand the Abbe number can be calculated with
 
-.. testcode::
+.. doctest::
 
-   n = ot.presets.refraction_index.SF10
-   V = n.get_abbe_number()
+   >>> n = ot.presets.refraction_index.LAF2
+   >>> n.get_abbe_number()
+   44.850483919254984
 
 Alternatively the function can be called with a different spectral line combination from :python:`ot.presets.spectral_lines`:
 
-.. testcode::
+.. doctest::
 
-   V = n.get_abbe_number(ot.presets.spectral_lines.FdC)
+   >>> n.get_abbe_number(ot.presets.spectral_lines.F_eC_)
+   44.57150709341499
 
 Or specify a user defined list of three wavelengths:
 
-.. testcode::
+.. doctest::
 
-   V = n.get_abbe_number([350, 500, 700])
+   >>> n.get_abbe_number([450, 580, 680])
+   30.59379412865849
 
 
 You can also check if a medium is dispersive by calling
@@ -121,6 +124,9 @@ You can also check if a medium is dispersive by calling
 
 
 A list of predefined lines can be found in :numref:`spectral_lines`.
+
+
+.. _agf_load:
 
 Loading material catalogues (.agf)
 _________________________________________
@@ -141,6 +147,9 @@ Different ``.agf`` files are found in `this repository <https://github.com/nzhag
 
 .. TODO Plotting n and V?
 
+
+Information on the file format can be found `here <https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf>`__ and
+and `here <https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf>`__.
 
 
 .. _refraction_index_presets:

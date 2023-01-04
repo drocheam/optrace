@@ -7,13 +7,7 @@ from ..refraction_index import RefractionIndex  # material refraction index
 from .surface import Surface  # Surface type
 from .element import Element  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
-from ..transfer_matrix_analysis import TMA
-
-"""
-Lens class:
-A lens is an geometrical object with two refractive surfaces.
-A refractive index is specified for the material and one for the area behind the lens (optional)
-"""
+from ..transfer_matrix_analysis import TMA  # paraxial analysis
 
 
 class Lens(Element):
@@ -37,7 +31,10 @@ class Lens(Element):
             -> None:
         """
         Creates a lens object using 2 surfaces and additional properties.
-        Of the thickness parameters only one of de or (d1, d2) needs to be specified.
+        Of the thickness parameters only one of d, de or (d1, d2) needs to be specified.
+
+        A lens is an geometrical object with two refractive surfaces.
+        A refractive index is specified for the material and one for the area behind the lens (optional)
 
         :param front: front surface (smaller z-position) (Surface object)
         :param back: back surface (higher z-position) (Surface object)
@@ -49,6 +46,7 @@ class Lens(Element):
         :param n: material refraction index (RefractionIndex object)
         :param n2: refraction index behind lens (positive z direction) (RefractionIndex object)
         :param pos: 3D position of lens center (list or numpy array)
+        :param kwargs: additional keyword arguments for parent classes
         """
 
         self.n = n

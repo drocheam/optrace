@@ -1,17 +1,15 @@
-from typing import Any
+from typing import Any  # "Any" type
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
-from .function_surface_1d import FunctionSurface1D
-from ...misc import PropertyChecker as pc
-
+from .function_surface_1d import FunctionSurface1D  # parent class
+from ...misc import PropertyChecker as pc  # check values and types
 
 
 class AsphericSurface(FunctionSurface1D):
 
-    rotational_symmetry: bool = True
-
+    rotational_symmetry: bool = True  #: has the surface rotation symmetry?
 
     def __init__(self,
                  r:                 float,
@@ -21,14 +19,14 @@ class AsphericSurface(FunctionSurface1D):
                  **kwargs)\
             -> None:
         """
+        Define an aspheric surface, which is a ConicSurface with an additional polynomial component a_0*r^2 + a_1*r^4 + ...
+        There is no upper bound on number of coefficients
 
-        no upper bound on number of coefficients
-
-        :param r:
-        :param R:
-        :param k:
+        :param r: surface radius
+        :param R: curvature circle
+        :param k: conic constant
         :param coeff: coefficients for orders r^2, r^4, r^6, ... as list, where units are mm^-1, mm^-3, ...
-        :return:
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -46,11 +44,17 @@ class AsphericSurface(FunctionSurface1D):
 
     @property
     def info(self) -> str:
+        """info string, characterizing the surface"""
         return super().info + f", R = {self.R:.5g} mm, k = {self.k:.5g}\n"\
             f"coeff = {self.coeff}"
 
     def _asph(self, r: np.ndarray) -> np.ndarray:
+        """
+        asphere function
 
+        :param r: radial values, 1D array
+        :return: surface values
+        """
         # conic section function
         rho, k = 1/self.R, self.k
         z = ne.evaluate("rho * r**2 /(1 + sqrt(1 - (k+1) * rho**2 * r**2))")
@@ -60,8 +64,13 @@ class AsphericSurface(FunctionSurface1D):
 
         return z
 
-    def _deriv(self, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def _deriv(self, r: np.ndarray) -> np.ndarray:
+        """
+        derivative of the aspheric function
 
+        :param r: radial values, 1D array
+        :return: derivative values
+        """
         # derivative of conic section in regards to r
         k, rho = self.k, 1/self.R
         fr = ne.evaluate("r*rho / sqrt(1 - (k+1) * rho**2 *r**2)")
@@ -73,8 +82,9 @@ class AsphericSurface(FunctionSurface1D):
         return fr
 
     def flip(self) -> None:
+        """flip the surface around the x-axis"""
 
-        # override super method, so we instead negate curvature radius and coefficients
+        # override super() method, so we instead negate curvature radius and coefficients
 
         self._lock = False
         

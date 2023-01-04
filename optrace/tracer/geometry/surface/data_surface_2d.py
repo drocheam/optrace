@@ -1,17 +1,16 @@
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
-import scipy.interpolate  # biquadratic interpolation
+import scipy.interpolate  # interpolation
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
-from .surface import Surface
-
+from .surface import Surface  # parent class
 
 
 class DataSurface2D(Surface):
     
-    rotational_symmetry: bool = False
+    rotational_symmetry: bool = False  #: has the surface rotational symmetry?
 
     _1D: bool = False
     """1D or 2D data surface, basically if we use an 1D profile as whole surface description"""
@@ -23,13 +22,12 @@ class DataSurface2D(Surface):
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Create a surface object, defined by a two dimensional data set.
 
-        :param r: radial size for surface_type="Conic", "Sphere", "Circle" or "Ring" (float)
-        :param parax_roc:
+        :param r: radial size of surface
+        :param parax_roc: paraxial radius of curvature, optional
         :param data: uses copy of this array, grid z-coordinate array for surface_type="Data" (numpy 2D array)
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
 
@@ -126,10 +124,10 @@ class DataSurface2D(Surface):
         # lock properties
         self.lock()
 
-    def _call(self, x, y, **kwargs):
+    def _call(self, x: np.ndarray, y: np.ndarray, **kwargs):
         """internal function.
-        get surface values relative to center, directly works on interpolation object without rotation or flipping"""
-
+        get surface values relative to center, directly works on interpolation object without rotation or flipping
+        """
         if self._1D:
             r = np.hypot(x, y)
             return self._interp(r, **kwargs)
@@ -195,6 +193,7 @@ class DataSurface2D(Surface):
         return n
 
     def flip(self) -> None:
+        """flip the surface around the x-axis"""
         
         # unlock
         self._lock = False
@@ -214,6 +213,11 @@ class DataSurface2D(Surface):
         self.lock()
     
     def rotate(self, angle: float) -> None:
+        """
+        rotate the surface around the z-axis
+
+        :param angle: rotation angle in degrees
+        """
         if not self.rotational_symmetry:
             self._lock = False
             self._angle += np.deg2rad(angle)  # add relative rotation

@@ -13,13 +13,14 @@ class TransmissionSpectrum(Spectrum):
     # don't allow all types of class Spectrum, especially not types "Lines" and "Monochromatic"
     spectrum_types: list[str] = ["Constant", "Data", "Rectangle", "Gaussian", "Function"]
 
-    quantity: str = "Transmission T"
-    unit: str = ""
+    quantity: str = "Transmission T"  #: physical quantity
+    unit: str = ""  #: physical unit
 
     def get_xyz(self) -> np.ndarray:
         """
+        Get the Spectrum XYZ Color under daylight D65
 
-        :return:
+        :return: 3 element XYZ color array
         """
         # illuminate the filter with daylight, get color of resulting spectrum
         wl = color.wavelengths(5000)
@@ -28,10 +29,11 @@ class TransmissionSpectrum(Spectrum):
 
     def get_color(self, rendering_intent="Absolute", clip=True) -> tuple[float, float, float, float]:
         """
+        Get the Spectrum sRGB color and the opacity.
 
-        :param rendering_intent:
-        :param clip:
-        :return:
+        :param rendering_intent: rendering_intent for sRGB conversion
+        :param clip: if values are clipped towards the sRGB data range
+        :return: tuple of R, G, B, and the opacity, all with data range  [0, 1]
         """
         XYZ = self.get_xyz()
        

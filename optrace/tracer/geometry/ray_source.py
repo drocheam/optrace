@@ -1,16 +1,4 @@
 
-"""
-RaySource class:
-This class generates the rays depending
-on the specified positional, divergenceal, wavelength and brightness distributions.
-The RaySource object also holds all rays and ray sections generated in raytracing from the raytracer class
-"""
-
-# Why random sampling? Sampling the source,
-# "sampling" the lens areas or aperture by the rays can lead to Nyquist Theorem violation.
-# Also, this ensures that when you run it repeatedly, you get a different version of the image,
-# and not the same one. E.g. with image compositions by several raytraces.
-
 # standard libs
 from typing import Callable, Any  # Callable and Any type
 
@@ -26,7 +14,7 @@ from .surface.rectangular_surface import RectangularSurface
 
 # spectrum and color
 from ..spectrum.light_spectrum import LightSpectrum  # spectrum of source
-from .. import color  # for random_wavelengths_from_srgb() and power_from_srgb()
+from .. import color  # for random_wavelengths_from_srgb() and _power_from_srgb()
 from ..presets.light_spectrum import d65 as d65_spectrum  # default light spectrum
 
 # misc
@@ -61,7 +49,7 @@ class RaySource(Element):
                  div_2d:            bool = False,
                  div_axis_angle:    float = 0,
                  div_func:          Callable[[np.ndarray], np.ndarray] = None,
-                 div_kwargs:        dict = None,
+                 div_args:        dict = None,
 
                  # Light Parameters
                  spectrum:          LightSpectrum = None,
@@ -73,7 +61,7 @@ class RaySource(Element):
                  s_sph:             (list | np.ndarray) = None,
                  orientation:       str = "Constant",
                  or_func:           Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
-                 or_kwargs:         dict = None,
+                 or_args:         dict = None,
 
                  # Polarization Parameters
                  polarization:      str = "Uniform",
@@ -81,27 +69,41 @@ class RaySource(Element):
                  pol_angles:        list[float] = None,
                  pol_probs:         list[float] = None,
                  pol_func:          Callable[[np.ndarray], np.ndarray] = None,
-                 pol_kwargs:        dict = None,
+                 pol_args:        dict = None,
 
                  **kwargs)\
             -> None:
         """
-        Create a RaySource with a specific source_type, divergence_type and light_type.
+        Create a RaySource with a specific area, orientation, divergence, polarization, power and spectrum
 
-        :param surface:
-        :param divergence: "Diverging" or "Parallel"
-        :param orientation: "Constant" or "Function"
-        :param s: 3D divergence vector
-        :param div_angle: cone opening angle in degree in mode divergence_type="Diverging"
+        :param surface: emitting Surface object
+        :param divergence: divergence type, see "divergences" list
+        :param orientation: orientation type, see "orientations" list
+        :param polarization: polarization type, see "polarizations" list
+        :param spectrum: LightSpectrum of the RaySource
         :param pos: 3D position of RaySource center
-        :param power: total power of RaySource in W
-        :param pol_angle: polarisation angle as float. Specify 'x' or 'y' for x- or y-polarisation, 'xy' for both
-                    and leave empty for unpolarized light
-        :param or_func: orientation function for orientation_type="Function",
+        :param power: total power of the RaySource in W
+        :param div_angle: cone opening angle in degrees
+        :param div_2d: if divergence is inside of a circular arc instead a cone
+        :param div_axis_angle: axis angle for 2D divergence with div_2d=True
+        :param div_func: divergence function, must take angles in radians in range [0, div_angle]
+                and return a probability
+        :param div_args: additional keywords arguments for div_func in a dictionary
+        :param pol_angle: polarization angle as float, value in degrees 
+        :param pol_angles: polarization angle list, values in degrees
+        :param pol_probs: probabilities for the pol_angles
+        :param pol_func: polarization function, must take an numpy array in range [0, 2*pi] and return a probability
+        :param pol_args: dictionary of additional keyword arguments for pol_func
+        :param s: 3D direction vector
+        :param s_sph: 3D direction vector in spherical coordinates, specified as theta, phi, both in degrees
+        :param or_func: orientation function,
             takes 1D array of x and y coordinates as input, returns (N, 3) numpy 2D array with orientations
+        :param or_args: dictionary of additional keyword arguments for or_func
         :param image: image for modes source_type="BW_Image" or "RGB_Image",
                 specified as path (string) or RGB array (numpy 3D array)
+        :param kwargs: additional keyword arguments for parent classes
         """
+
         self._new_lock = False
 
         # geometry
@@ -121,14 +123,14 @@ class RaySource(Element):
         self.pol_func = pol_func
         self.pol_angles = pol_angles
         self.pol_probs = pol_probs
-        self.pol_kwargs = pol_kwargs if pol_kwargs is not None else {}
+        self.pol_args = pol_args if pol_args is not None else {}
 
         # orientation and divergence
         self.divergence = divergence
         self.div_angle = div_angle
         self.orientation = orientation
         self.or_func = or_func
-        self.or_kwargs = or_kwargs if or_kwargs is not None else {}
+        self.or_args = or_args if or_args is not None else {}
 
         if s_sph is None:
             self.s = s if s is not None else [0, 0, 1]
@@ -140,17 +142,18 @@ class RaySource(Element):
         self.div_axis_angle = div_axis_angle
         self.div_func = div_func
         self.div_2d = div_2d
-        self.div_kwargs = div_kwargs if div_kwargs is not None else {}
+        self.div_args = div_args if div_args is not None else {}
 
         # lock assignment of new properties. New properties throw an error.
         self._new_lock = True
 
     def get_color(self, rendering_intent: str = "Ignore", clip=False) -> tuple[float, float, float]:
         """
+        Get the mean color of the RaySource
 
-        :param rendering_intent:
-        :param clip:
-        :return:
+        :param rendering_intent: rendering_intent for color calculation
+        :param clip: if sRGB values are clipped
+        :return: tuple of sRGB values with data range [0, 1]
         """
         if self.image is not None:
             return self._mean_img_color
@@ -161,13 +164,14 @@ class RaySource(Element):
     def create_rays(self, N: int, no_pol: bool = False, power: float = None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
-        Generate N rays and save them internally.
+        Generate N rays according to the property of the RaySource
 
-        :param N: number of rays (int)
-        :param no_pol:
-        :param power:
-        :return: position array (numpy 2D array), divergence array (numpy 2D array), weight array (numpy 1D array),
-            first dimension: ray number, second dimension: values
+        :param N: number of rays
+        :param no_pol: if polarization needs to be calculated
+        :param power: power to use, when not specified internal object value is used
+        :return: position array (numpy 2D array), direction array (numpy 2D array), polarization array (numpy 2D array)
+                 weight array (numpy 1D array), wavelength array (numpy 1D array)
+                 first dimension: ray number, second dimension: values
         """
 
         ## Generate ray weights
@@ -223,7 +227,7 @@ class RaySource(Element):
 
             case "Function":  # pragma: no branch
                 pc.check_callable("RaySource.or_func", self.or_func)
-                s_or = self.or_func(p[:, 0], p[:, 1], **self.or_kwargs)
+                s_or = self.or_func(p[:, 0], p[:, 1], **self.or_args)
 
         ## Generate ray divergences relative to orientation
         ################################################################################################################
@@ -269,13 +273,13 @@ class RaySource(Element):
                 r, alpha = misc.ring_uniform(0, div_sin, N, polar=True)
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 # related https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
-                f = self.div_func(x, **self.div_kwargs) * np.sin(x)
+                f = self.div_func(x, **self.div_args) * np.sin(x)
                 X0 = r**2 / div_sin**2
                 theta = misc.random_from_distribution(x, f, X0, kind="continuous")
 
             case "Function" if self.div_2d:  # pragma: no branch
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
-                f = self.div_func(x, **self.div_kwargs)
+                f = self.div_func(x, **self.div_args)
                 theta = misc.random_from_distribution(x, f, N, kind="continuous")
 
         if self.divergence != "None":
@@ -328,8 +332,8 @@ class RaySource(Element):
 
                 case "Function":  # pragma: no branch
                     pc.check_callable("RaySource.pol_func", self.pol_func)
-                    x = np.linspace(0, 360, 5000)
-                    f = self.pol_func(x, **self.pol_kwargs)
+                    x = np.linspace(0, 2*np.pi, 5000)
+                    f = self.pol_func(x, **self.pol_args)
                     ang = misc.random_from_distribution(x, f, N, kind="continuous")
                     ang = np.radians(ang)
 
@@ -457,7 +461,7 @@ class RaySource(Element):
                 img = np.flipud(img)
 
                 # calculate pixel probability from relative power for each pixel
-                If = color.power_from_srgb(img).ravel()
+                If = color._power_from_srgb(img).ravel()
                 Ifs = np.sum(If)
 
                 if Ifs == 0:

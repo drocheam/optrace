@@ -1,15 +1,8 @@
 
-"""
-Surface class:
-Provides the functionality for the creation of numerical or analytical surfaces.
-The class contains methods for interpolation, surface masking and normal calculation
-"""
-
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 
-from .conic_surface import ConicSurface
-
+from .conic_surface import ConicSurface  # parent class
 
 
 class SphericalSurface(ConicSurface):
@@ -17,7 +10,7 @@ class SphericalSurface(ConicSurface):
     sphere_projection_methods: list[str] = ["Equidistant", "Orthographic", "Equal-Area", "Stereographic"]
     """projection methods for mapping a sphere surface onto a plane"""
     
-    rotational_symmetry: bool = True
+    rotational_symmetry: bool = True  #: has the surface rotational symmetry?
 
     def __init__(self,
                  r:                 float,
@@ -25,12 +18,11 @@ class SphericalSurface(ConicSurface):
                  **kwargs)\
             -> None:
         """
-        Create a surface object.
-        The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
-        adapted inside the lens class
+        Create a spherical surface object.
 
         :param R: curvature circle for surface_type="Conic" or "Sphere" (float)
         :param r: radial size for surface_type="Conic", "Sphere", "Circle" or "Ring" (float)
+        :param kwargs: additional keyword arguments for parent classes
         """
         self._lock = False
         
@@ -50,9 +42,9 @@ class SphericalSurface(ConicSurface):
         E.g: cartesian coordinates x = +5, y = -2 relative to sphere center 
         would have some projection coordinate px > 0, py < 0
 
-        :param p:
-        :param projection_method:
-        :return:
+        :param p: cartesian positions in 3D space
+        :param projection_method: one of sphere_projection_methods defined in this class
+        :return: projected coordinates, same shape as input
         """
         if projection_method == "Orthographic":
             return p.copy()

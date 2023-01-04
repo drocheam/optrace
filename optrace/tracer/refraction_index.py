@@ -1,8 +1,4 @@
 
-"""
-RefractionIndex class:
-Provides the creation and computation of constant or wavelength depended refraction indices
-"""
 from typing import Any  # Any type
 
 import numpy as np  # calculations
@@ -14,7 +10,6 @@ from . import color  # for visible wavelength range
 from .misc import PropertyChecker as pc  # check types and values
 
 
-
 class RefractionIndex(Spectrum):
 
     # Refraction Index Models:
@@ -23,16 +18,18 @@ class RefractionIndex(Spectrum):
     coeff_count = {"Cauchy": 4, "Conrady": 3, "Sellmeier1": 6, "Sellmeier2": 5, "Sellmeier3": 8, 
                     "Sellmeier4": 5, "Sellmeier5": 10, "Herzberger": 6, "Extended": 8, "Extended2": 8, 
                     "Handbook of Optics 1": 4, "Handbook of Optics 2": 4, "Schott": 6, "Extended3": 9}
+    """number of coefficients for the different refractive index models"""
     
     n_types: list[str] = ["Abbe", "Cauchy", "Conrady", "Constant", "Data", "Extended", "Extended2", 
                           "Extended3", "Function", "Handbook of Optics 1", "Handbook of Optics 2", 
                           "Sellmeier1", "Sellmeier2", "Sellmeier3", "Sellmeier4", 
                           "Sellmeier5", "Herzberger", "Schott"]
+    """possible refractive index types"""
 
     spectrum_types: list[str] = n_types  # alias
 
-    quantity: str = "Refraction Index n"
-    unit: str = ""
+    quantity: str = "Refraction Index n"  #: physical quantity
+    unit: str = ""  #: physical unit
 
     def __init__(self,
                  n_type:    str = "Constant",
@@ -44,21 +41,12 @@ class RefractionIndex(Spectrum):
             -> None:
         """
         Create a RefractionIndex object of type "n_type".
+        See the documentation on information on how to provide all parameters correctly.
 
-        See https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
-        for the model equations.
-
-        Cauchy coefficients are specified in order [A, B, C, D] with units µm^n with n = 0, 2, 4, 6
-        Sellmeier are specified in order [A1, B1, A2, B2, A3, B3, A4, B4], Cs are specified in µm^2
-        Conrady coefficients are specified as [A, B, C] with units 1, µm, µm**3.5
-
-        In Abbe mode a curve is estimated using Abbe number V, center refractive index n and 3 spectral lines 'lines'.
-        n at center wavelength lines[1].
-
-        :param n_type: "Constant", "Cauchy", "Sellmeier", "Function" or presets RefractionIndex.materials
-        :param n: refraction index for ntype="Constant" (float)
-        :param func: function for n_type="Function", input needs to be in nm
+        :param n_type: one of "n_types"
+        :param n: refraction index for n_type="Constant"
         :param V: Abbe number for n_type="Abbe"
+        :param coeff: list of coefficients for the model, see the documentation
         :param lines: spectral lines to use for n_type="Abbe",
                       list of 3 wavelengths [short wavelength, center wavelength, long wavelength]
         """
@@ -189,8 +177,9 @@ class RefractionIndex(Spectrum):
     def __eq__(self, other: Any) -> bool:
         """
         Equal operator. Compares self to 'other'.
-        :param other:
-        :return:
+
+        :param other: object to compare to
+        :return: if both are equal
         """
 
         if type(self) is not type(other):
@@ -207,9 +196,11 @@ class RefractionIndex(Spectrum):
         return False
 
     def __ne__(self, other: Any) -> bool:
-        """Not equal operator. Compares self to 'other'.
-        :param other:
-        :return:
+        """
+        Not-equal operator. Compares self to 'other'.
+
+        :param other: object to compare to
+        :return: if both are not equal
         """
         return not self.__eq__(other)
 
@@ -276,5 +267,5 @@ class RefractionIndex(Spectrum):
         return (nc - 1) / (ns - nl) if ns != nl else np.inf
 
     def is_dispersive(self) -> bool:
-        """:return: if the refractive index is dispersive using the Abbe Number"""
+        """:return: if the refractive index is dispersive, determined by the Abbe Number"""
         return self.get_abbe_number() != np.inf

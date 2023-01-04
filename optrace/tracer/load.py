@@ -1,15 +1,18 @@
-import os.path
-import numpy as np
-import chardet
+import os.path  # working with paths
+import numpy as np  # np.ndarray type
+import chardet  # detection of text file encoding
 
+# media
 from .refraction_index import RefractionIndex
+
+# needed geometrise
 from .geometry.group import Group
 from .geometry import Lens, Marker, Detector, Aperture
 from .geometry.surface import CircularSurface, ConicSurface, SphericalSurface,\
                               RingSurface, AsphericSurface, Surface, RectangularSurface
-from .presets import spectral_lines
-from .color.tools import WL_BOUNDS
 
+from .presets import spectral_lines  # lines for Abbe number checking
+from .color.tools import WL_BOUNDS  # wavelength bounds
 
 
 _agf_modes = ["Schott", "Sellmeier1", "Herzberger", "Sellmeier2", "Conrady", "Sellmeier3", "Handbook of Optics 1",
@@ -19,6 +22,13 @@ don't mess with the order of this list!!"""
 
 
 def _read_lines(path: str) -> list[str]:
+    """
+    reads lines of a file into a list of strings.
+    File encoding is detected automatically.
+
+    :param path: filepath to load
+    :return: list of strings
+    """
 
     # check if file exists
     if not os.path.isfile(path):
@@ -39,10 +49,11 @@ def _read_lines(path: str) -> list[str]:
 
 def agf(path: str, silent: bool = True) -> dict:
     """
+    Load an .agf material catalogue
 
-    :param path:
+    :param path: filepath
     :param silent: mute all messages from this function
-    :return:
+    :return: dictionary of refractive media, keys are names, values are RefractionIndex objects
     """
 
     lines = _read_lines(path)  # load text lines from file
@@ -132,9 +143,18 @@ def agf(path: str, silent: bool = True) -> dict:
 
 
 def zmx(filename: str, n_dict: dict = None, no_marker: bool = False, silent: bool = False) -> Group:
+    """
+    Load a ZEMAX geometry from a .zmx into a Group.
+    See the documentation on the limitations of the import.
+
+    :param filename: filepath
+    :param n_dict: dictionary of RefractiveIndex in the geometry
+    :param no_marker: if there should be no marker created for the .zmx description
+    :param silent: if all standard output from this function should be muted
+    :return: Group including the geometry from the .zmx
+    """
 
     # see https://documents.pub/document/zemaxmanual.html?page=461
-
 
     lines = _read_lines(filename)
     n_dict = n_dict or {}
@@ -148,6 +168,12 @@ def zmx(filename: str, n_dict: dict = None, no_marker: bool = False, silent: boo
 
 # make surface from surface dict
 def _make_surface(surf: dict) -> AsphericSurface | ConicSurface | CircularSurface | SphericalSurface:
+    """
+    Create a Surface from a surface property dictionary
+
+    :param surf: surface property dictionary from _zmx_to_surface_dicts
+    :return: Surface object with correct class and properties
+    """
 
     # STANDARD mode can be circle, sphere or conic
     if surf["stype"] == "STANDARD":
@@ -166,8 +192,18 @@ def _make_surface(surf: dict) -> AsphericSurface | ConicSurface | CircularSurfac
         raise RuntimeError(f"Surface mode " + str(surf["stype"]) + " not supported yet.")
 
 
-def _zmx_to_surface_dicts(lines, n_dict, silent) -> tuple[list, list, str]:
+def _zmx_to_surface_dicts(lines:  list[str], 
+                          n_dict: dict[RefractionIndex], 
+                          silent: bool)\
+        -> tuple[list, list, str]:
+    """
+    Process the file lines into a list of Surfaces and distances.
 
+    :param lines: list of lines from the loaded file
+    :param n_dict: dictionary of RefractionIndex
+    :param silent: if all standard output from this function should be muted
+    :return: Surface dictionary list, distance list, zmx file description
+    """
     Surfaces = []
     dds = []
     long_desc = ""
@@ -267,7 +303,15 @@ def _zmx_to_surface_dicts(lines, n_dict, silent) -> tuple[list, list, str]:
     return Surfaces, dds, long_desc
 
 def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_marker: bool) -> Group:
-
+    """
+    Convert the list of Surfaces dictionary and distances into a Group
+    
+    :param Surfaces: list of Surface dictionaries from _zmx_to_surface_dicts
+    :param dds: list of distances in mm
+    :param long_desc: description of geometry from zmx files
+    :param no_marker: if no description marker should be set
+    :return: Group containing the geometry
+    """
     G = Group(long_desc=long_desc)
 
     # find first surface with refraction index, all surfaces before that are irrelevant

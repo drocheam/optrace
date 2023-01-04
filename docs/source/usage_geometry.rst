@@ -135,9 +135,45 @@ Geometry Presets
 _______________________
 
 
+**Arizona Eye Model**
+
+
+**LeGrand Paraxial Eye Model**
 
 
 Loading ZEMAX Geometries (.zmx)
 __________________________________
 
 
+It is possible to load ``.zmx`` geometries into ``optrace``. For instance, the following example load some geometry from file ``setup.zmx`` into the raytracer.
+
+.. code-block:: python
+
+   RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 200])
+
+   RS = ot.RaySource(ot.CircularSurface(r=0.05), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
+   RT.add(RS)
+
+   n_schott = ot.load.agf("schott.agf")
+   G = ot.load.zmx("setup.zmx", n_dict=n_schott)
+   RT.add(G)
+
+   RT.trace(10000)
+
+
+For the materials to be loaded correctly all mentioned names in the ``.zmx`` file need to be included in the ``n_dict`` dictionary.
+You can either load them from a ``.agf`` catalogue like in :numref:`agf_load` or create the dictionary manually.
+
+A list of exemplary ``.zmx`` files can be found in the following `repository <https://github.com/nzhagen/LensLibrary/tree/main/zemax_files>`_.
+
+
+Unfortunately, the support is only experimental, as there is no actual documentation on the file format. Additionally, only a subset of all ZEMAX functionality is supported, including:
+
+* ``SEQ``-mode only
+* ``UNIT`` must be ``MM``
+* only ``STANDARD`` or ``EVENASPH`` surfaces, this is equivalent to ``RingSurface, CircularSurface, SphericalSurface, ConicSurface, AspheriSurface`` in ``optrace``
+* no support for coatings
+* temperature or absorption behavior of the material is neglected
+* only loads lens and aperture geometries, no support for additional objects
+
+Information on the file format can be found `here <https://documents.pub/document/zemaxmanual.html?page=461>`__, `here <https://github.com/mjhoptics/ray-optics/blob/master/src/rayoptics/zemax/zmxread.py>`__ and `here <https://github.com/quartiq/rayopt/blob/master/rayopt/zemax.py>`__.

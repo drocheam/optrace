@@ -1,8 +1,10 @@
 
-import numpy as np
+import numpy as np  # np.ndarray type
 
-from ..geometry import Aperture, Detector, Lens, SphericalSurface, ConicSurface, RingSurface, Group
-from ..refraction_index import RefractionIndex
+from ..geometry import Aperture, Detector, Lens, SphericalSurface,\
+        ConicSurface, RingSurface, Group  # Elements and Surfaces in the preset geometries
+from ..refraction_index import RefractionIndex  # media in the geometries
+
 
 # Eye models
 #######################################################################################################################
@@ -17,6 +19,12 @@ def arizona_eye(adaptation:  float = 0.,
     Schwiegerling J. Field Guide to Visual and Ophthalmic Optics. SPIE Publications: 2004.
     Includes Eye adaption and chromatic behaviour. Matches different on- and off-axis aberrations of the eye.
     See the source above for more info.
+
+    :param adaptation: adaptation value (optical power), defaults to 0dpt
+    :param pupil: pupil diameter in mm, default tos 5.7mm
+    :param r_det: radial size of detector (retina), defaults to 8mm
+    :param pos: position of the Group
+    :return: Group containing all the elements
     """
 
     # absolute position
@@ -72,6 +80,11 @@ def legrand_eye(pupil: float = 5.7,
 
     Properties: Infinity adapted eye. Eye approximation by spherical surfaces.
     Only useful for first order optical properties of the eye.
+
+    :param pupil: pupil diameter in mm, defaults to 5.7mm
+    :param r_det: radial detector (=retina) size, defaults to 8mm
+    :param pos: position of the Group
+    :return: Group containing all elements
     """
 
     pos0 = np.array(pos if pos is not None else [0, 0, 0])
