@@ -863,7 +863,5 @@ class GeometryTests(unittest.TestCase):
         # coverage: rotate empty group
         ot.Group().rotate(5)
 
-    # TODO test rotate and flip combined for group?
-
 if __name__ == '__main__':
     unittest.main()

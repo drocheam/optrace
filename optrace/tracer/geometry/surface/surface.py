@@ -153,7 +153,6 @@ class Surface(BaseClass):
             r = self.r - self.N_EPS
 
             # continue the edge value in radial direction
-            # TODO test these
             if np.any(~inside):
                 if not self.rotational_symmetry:
                     xni, x0, yni, y0 = x[~inside], self.pos[0], y[~inside], self.pos[1]

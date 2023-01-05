@@ -770,7 +770,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
     
-    def test_send_cmd(self):
+    def test_0send_cmd(self):
         """test command setting and sending as well as automatic replotting"""
 
         RT = rt_example()
@@ -816,6 +816,24 @@ class GUITests(unittest.TestCase):
                 # this time with output
                 sim.silent = False
                 send("throw RuntimeError()")  # check if exceptions are handled
+
+                # send empty command using command window
+                sim._cdb._cmd = ""
+                sim._do_in_main(sim._cdb.send_cmd)
+                sim._wait_for_idle()
+
+                # send actual command using command window
+                sim._cdb._cmd = "self.replot()"
+                sim._do_in_main(sim._cdb.send_cmd)
+                sim._wait_for_idle()
+
+                # resend command, history does not get updated with same command
+                sim._do_in_main(sim._cdb.send_cmd)
+                sim._wait_for_idle()
+                
+                # clear history
+                sim._do_in_main(sim._cdb.clear_history)
+                sim._wait_for_idle()
 
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()

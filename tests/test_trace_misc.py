@@ -125,7 +125,7 @@ class TracerMiscTests(unittest.TestCase):
         
         # create some image
         img, P, L = self.gen_r_image()
-        
+       
         # now has an image
         self.assertTrue(img.has_image())
         
@@ -148,6 +148,10 @@ class TracerMiscTests(unittest.TestCase):
                 im = img.get_rgb(log=log, rendering_intent=ri)
                 self.assertTrue(np.min(im) > 0-1e-9)
                 self.assertTrue(np.max(im) < 1+1e-9)
+
+        # test refilter
+        img.limit = 5
+        img.refilter()
 
         # check if empty image throws
         RIm = ot.RImage(extent=[-1, 1, -1, 1])
@@ -268,6 +272,11 @@ class TracerMiscTests(unittest.TestCase):
         RIm.render(keep_extent=True)
         self.assertTrue(np.all(RIm.extent == Im_hasp_ext))
 
+        # coverage: _dont_rescale = True
+        ext = [0, 1, 0, 1]
+        RIm = ot.RImage(extent=ext)
+        RIm.render(_dont_rescale=True)
+
     def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1, limit=None, threading=True):
         # create some image
         img = ot.RImage([-1, 1, -1*ratio, 1*ratio], silent=True, limit=limit, threading=threading)
@@ -335,6 +344,9 @@ class TracerMiscTests(unittest.TestCase):
                 path3 = img.export_png(path, imm, log=False, overwrite=True, flip=True)
                 im3 = np.asarray(PILImage.open(path3), dtype=np.float64)  # load from disc
                 self.assertTrue(im3.ndim == (2 if not imm.startswith("sRGB") else 3))  # check number of channels
+
+        # coverage: non-default resample parameter
+        path3 = img.export_png(path, imm, log=True, overwrite=True, flip=False, resample=0)
 
         # check shapes
         for ratio in [0.746, 1, 2.45]:

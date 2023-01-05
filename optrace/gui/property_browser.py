@@ -8,6 +8,8 @@ from traits.api import HasTraits, observe, Button, Dict, Str
 from ..tracer.presets import spectral_lines as spec_lines
 from ..tracer.base_class import BaseClass  # BaseClass type
 
+from ..tracer import presets as otp
+
 
 class PropertyBrowser(HasTraits):
 
@@ -31,6 +33,7 @@ class PropertyBrowser(HasTraits):
     raytracer_dict: Dict = Dict()
     ray_dict:       Dict = Dict()
     card_dict:      Dict = Dict()
+    preset_dict:    Dict = Dict()
 
     view = View(
                 Item('update_button', label=" Update Dictionaries"),
@@ -53,6 +56,10 @@ class PropertyBrowser(HasTraits):
                         label="Raytracer",
                     ),
                     Group(
+                        Item('preset_dict', editor=ValueEditor(), show_label=False),
+                        label="Presets",
+                    ),
+                    Group(
                         Item('trace_gui_dict', editor=ValueEditor(), show_label=False),
                         label="TraceGUI",
                     ),
@@ -67,16 +74,15 @@ class PropertyBrowser(HasTraits):
                 height=800,
                 title="Property Browser")
 
-    def __init__(self, gui, scene, raytracer) -> None:
+    def __init__(self, gui) -> None:
         """
+        Initialize a PropertyBrowser
 
-        :param gui:
-        :param scene:
-        :param raytracer:
+        :param gui: reference to the TraceGUI
         """
         self.gui = gui
-        self.scene = scene
-        self.raytracer = raytracer
+        self.scene = gui.scene
+        self.raytracer = gui.raytracer
 
         super().__init__()
         self.update_dict()
@@ -84,48 +90,62 @@ class PropertyBrowser(HasTraits):
     @observe('update_button')
     def update_dict(self, event=None) -> None:
         """
+        Update the dictionaries in all ValueEditor()
 
-        :param event:
+        :param event: optional event from traits observe decorator
         """
+        self.raytracer_dict = self._gen_dict_repr(self.raytracer.__dict__)
+        self.ray_dict = self._gen_dict_repr(self.gui._ray_property_dict)
+        self.scene_dict = self._gen_dict_repr(self.scene.trait_get())
+        self.trace_gui_dict = self._gen_dict_repr(self.gui.trait_get())
+        self.card_dict = self._gen_dict_repr(self._gen_cardinals())
+        self.preset_dict = self._gen_dict_repr(self._gen_pdict())
+
+    def _gen_dict_repr(self, val: Any) -> dict:
+        """generate a dictionary containing representable elements for ValueEditor()"""
+
         # some elements are not copyable or should not be copied or the application will hang
         # int64 and float32 are shown as hexadecimal values in the ValueEditor,
         # convert to float64 to show them correctly
-        def repr_(val: Any) -> Any:
 
-            if isinstance(val, None | bool | int | float | str | BaseClass):
-                return val
+        if isinstance(val, None | bool | int | float | str | BaseClass):
+            return val
 
-            elif isinstance(val, np.ndarray):
-                # unpack arrays with only one element
-                if val.size == 1:
-                    return repr_(val[()])
+        elif isinstance(val, np.ndarray):
+            # unpack arrays with only one element
+            if val.size == 1:
+                return self._gen_dict_repr(val[()])
 
-                # force convert to float, but only if size is not gigantic
-                return np.array(val, dtype=np.float64) if val.size < 1e5 else val
+            # force convert to float, but only if size is not gigantic
+            return np.array(val, dtype=np.float64) if val.size < 1e5 else val
 
-            elif isinstance(val, list):
-                return [repr_(el) for el in val]
+        elif isinstance(val, list):
+            return [self._gen_dict_repr(el) for el in val]
 
-            elif isinstance(val, tuple):
-                return tuple([repr_(el) for el in val])
+        elif isinstance(val, tuple):
+            return tuple([self._gen_dict_repr(el) for el in val])
 
-            elif isinstance(val, dict):
-                return {key: repr_(val_) for key, val_ in val.items()}
+        elif isinstance(val, dict):
+            return {key: self._gen_dict_repr(val_) for key, val_ in val.items()}
 
-            else:
-                return str(val)
+        else:
+            return str(val)
 
-        self.raytracer_dict = repr_(self.raytracer.__dict__)
-        self.ray_dict = repr_(self.gui._ray_property_dict)
-        self.scene_dict = repr_(self.scene.trait_get())
-        self.trace_gui_dict = repr_(self.gui.trait_get())
-        self.card_dict = repr_(self.gen_cardinals())
+    def _gen_pdict(self) -> dict:
+        """generate a dictionary of optrace presets"""
 
-    def gen_cardinals(self) -> dict:
-        """
+        pdict = {"presets.image": otp.image.__dict__,
+                 "presets.light_spectrum": otp.light_spectrum.__dict__,
+                 "presets.refraction_index": otp.refraction_index.__dict__,
+                 "presets.spectrum": otp.spectrum.__dict__,
+                 "presets.spectral_lines": otp.spectral_lines.__dict__,}
 
-        :return:
-        """
+        return {key0:  {key: val for key, val in val0.items() if not key.startswith("__")}\
+                for key0, val0 in pdict.items()}
+
+    def _gen_cardinals(self) -> dict:
+        """generate a dictionary of cardinal points / ray transfer matrix analysis"""
+
         # get properties for lens
         def set_cdict(w, cdict, name):
             cdict[name] = dict()

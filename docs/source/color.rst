@@ -2,7 +2,6 @@
 Color Management
 ***********************
 
-.. TODO also explain: https://www5.in.tum.de/lehre/vorlesungen/graphik/info/csc/COL_3.htm#topic2
 
 .. _xyz_color_space:
 
@@ -39,7 +38,7 @@ With a light power spectrum :math:`P(\lambda)` and the three  curves from the fi
    Z &=\int_{\lambda} P(\lambda) \cdot z(\lambda) ~d \lambda
    :label: XYZ_Calc
 
-The Y component is reponsible for the brightness stimulus. Converting to the so-called lumininous flux :math:`\Phi_v`, which is mainly used in photometry, is simply done by rescaling by the lumininous efficacy constant:
+The Y component is reponsible for the brightness stimulus. Converting to the so-called luminous flux :math:`\Phi_v`, which is mainly used in photometry, is simply done by rescaling by the luminous efficacy constant:
 
 .. math::
    \Phi_v = 683 \frac{\text{lm}}{\text{W}} ~Y

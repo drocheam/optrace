@@ -1189,7 +1189,6 @@ class TracerTests(unittest.TestCase):
         pass
 
 
-    # TODO test lens with negative power
     def test_ideal_lens_imaging(self):
 
         # an ideal lens creates an ideal image

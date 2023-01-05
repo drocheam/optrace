@@ -2188,7 +2188,7 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
-        gdb = PropertyBrowser(self, self.scene, self.raytracer)
+        gdb = PropertyBrowser(self)
         gdb.edit_traits()
 
     @observe('wireframe_surfaces', dispatch="ui")
