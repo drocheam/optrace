@@ -107,9 +107,9 @@ Below you can find preset images that can be used for a ray source.
 
 Additional presets include:
 
-* ``ot.presets.image.checkerboard``: 8x8 black and white chess-like board
-* ``ot.presets.image.ascent``: ascent image from `scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.ascent.html>`__
-* ``ot.presets.image.racoon``: racoon image from `scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.face.html>`__
+* ``ot.presets.image.checkerboard``: 8x8 black and white chess-like board image
+* ``ot.presets.image.ascent``: ascent image from `scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.datasets.ascent.html>`__
+* ``ot.presets.image.racoon``: racoon image from `scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.datasets.face.html>`__
 
 
 ------------

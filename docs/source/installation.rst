@@ -25,6 +25,7 @@ After this, ``optrace`` should be installed on your system.
 * `Pillow <https://pillow.readthedocs.io/en/stable/>`_
 * `progressbar2 <https://pypi.org/project/progressbar2/>`_
 * `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
+* `pooch <https://pypi.org/project/pooch/>`_, needed for ``scipy.datasets`` to work
 * `PyQt5 <https://pypi.org/project/PyQt5/>`_
 * `traitsui <https://docs.enthought.com/traitsui/>`_
 

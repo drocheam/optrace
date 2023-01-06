@@ -1,15 +1,15 @@
 import pathlib  # loading files in relative path
 import numpy as np  # np.ndarray type
-import scipy.misc  # for a racoon face amd the "ascent" image
+import scipy.datasets  # for a racoon face and the "ascent" image
 
 
 # path of the image library folder
 image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "images"
 
 
-ascent: np.ndarray = np.repeat(np.array(scipy.misc.ascent(), dtype=np.float64)[:, :, np.newaxis] / 255, 3, axis=2)
+ascent: np.ndarray = np.repeat(np.array(scipy.datasets.ascent(), dtype=np.float64)[:, :, np.newaxis] / 255, 3, axis=2)
 """Ascent Image from scipy.misc, 
-see https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.face.html#scipy.misc.ascent"""
+see https://docs.scipy.org/doc/scipy/reference/generated/scipy.datasets.ascent.html"""
 
 
 bacteria: str = str(image_dir / "bacteria.png")
@@ -38,9 +38,9 @@ ETDRS_chart_inverted: str = str(image_dir / "ETDRS_Chart_inverted.png")
 edited version of Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
 
 
-racoon: np.ndarray = np.array(scipy.misc.face(), dtype=np.float64) / 255
+racoon: np.ndarray = np.array(scipy.datasets.face(), dtype=np.float64) / 255
 """Racoon Image from scipy.misc, 
-see https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.face.html#scipy.misc.face"""
+see https://docs.scipy.org/doc/scipy/reference/generated/scipy.datasets.face.html"""
 
 
 resolution_chart: str = str(image_dir / "EIA_Resolution_Chart_1956.png")
