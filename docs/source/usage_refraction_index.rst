@@ -75,8 +75,8 @@ When providing a function with multiple parameters you can use the ``func_args``
    n = ot.RefractionIndex("Function", func=lambda wl, n0: n0 - 1e-4*wl, func_args=dict(n0=1.6))
 
 
-Getting Index Values
-_______________________
+Getting the Index Values
+___________________________
 
 The refractive index values are calculated when calling the refractive index object with a wavelength vector.
 The call returns a vector of the same shape as the input.
@@ -202,4 +202,4 @@ These groups are plotted below in an index and an Abbe plot.
    :width: 600
    :align: center
    
-   Abbe diagram for miscellaneous presets.
+   Abbe diagram for miscellaneous presets. *Air* and *Vacuum* are missing here, because they are modelled without dispersion.

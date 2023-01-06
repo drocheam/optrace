@@ -164,14 +164,16 @@ class SpectrumTests(unittest.TestCase):
         sargs = dict(func=lambda x: 0.5, wls=np.array([380, 580, 780]), vals=np.array([1, 0.5, 0]))
 
         for type_ in ot.TransmissionSpectrum.spectrum_types:
-            spec = ot.TransmissionSpectrum(type_, **sargs)  # init
-            spec(wl)
-            spec.get_xyz()
-            spec.get_color()
+            for inv in [False, True]:
+                spec = ot.TransmissionSpectrum(type_, inverse=inv, **sargs)  # init
+                spec(wl)
+                spec.get_xyz()
+                spec.get_color()
            
         # call without parameters works
         ot.TransmissionSpectrum()
-        
+       
+        self.assertRaises(TypeError, ot.TransmissionSpectrum, "Constant", inverse=[])  # invalid "inverse" type
         self.assertRaises(ValueError, ot.TransmissionSpectrum, "Lines")  # invalid discrete type
         self.assertRaises(ValueError, ot.TransmissionSpectrum, "Monochromatic")  # invalid discrete type
         self.assertRaises(ValueError, ot.TransmissionSpectrum, "Gaussian", val=2)  # fact above 1 

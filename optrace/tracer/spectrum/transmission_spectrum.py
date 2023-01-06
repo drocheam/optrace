@@ -16,6 +16,23 @@ class TransmissionSpectrum(Spectrum):
     quantity: str = "Transmission T"  #: physical quantity
     unit: str = ""  #: physical unit
 
+
+    def __init__(self,
+                 spectrum_type:     str = "Gaussian",
+                 inverse:           bool = False,
+                 **sargs):
+        """
+        Define a TransmissionSpectrum object.
+
+        :param spectrum_type: spectrum type, one of spectrum_types
+        :param inverse: if the function is inversed, meaning subtracted from 1. 
+            A transmittance function becomes an absorptance function.
+        :param sargs: additional parameters (See the Spectrum() constuctor)
+        """
+
+        self.inverse = inverse
+        super().__init__(spectrum_type, **sargs)
+
     def get_xyz(self) -> np.ndarray:
         """
         Get the Spectrum XYZ Color under daylight D65
@@ -51,6 +68,19 @@ class TransmissionSpectrum(Spectrum):
 
         return RGB[0], RGB[1], RGB[2], alpha
 
+    def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
+        """
+        Get the spectrum values
+
+        :param wl: wavelength array
+        :return: values at provided wavelengths
+        """
+
+        if not self.inverse:
+            return super().__call__(wl)
+        else:
+            return 1.0 - super().__call__(wl)
+
     def __setattr__(self, key: str, val: Any) -> None:
         """
         assigns the value of an attribute
@@ -64,6 +94,9 @@ class TransmissionSpectrum(Spectrum):
         if key == "_vals" and isinstance(val, list | np.ndarray):
             if np.max(val) > 1:
                 raise ValueError("all elements in vals need to be in range [0, 1].")
+
+        if key == "inverse":
+            pc.check_type(key, val, bool)
 
         if key == "func" and callable(val):
             wls = color.wavelengths(1000)
