@@ -754,10 +754,10 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 
                 # replot rays
-                id0 = id(sim._ray_selection)
+                id0 = id(sim._ray_property_dict["p"])
                 send_key(sim, "n")
                 sim._wait_for_idle()
-                self.assertNotEqual(id0, id(sim._ray_selection))  # array changed, therefore the id too
+                self.assertNotEqual(id0, id(sim._ray_property_dict["p"]))  # array changed, therefore the id too
               
                 # do this one last, since it raises another window
                 # and I don't know how to focus the scene after this

@@ -415,7 +415,6 @@ class TraceGUI(HasTraits):
         """reference to the raytracer"""
 
         # ray properties
-        self._ray_selection = np.array([])  # indices for subset of all rays in raytracer
         self.__ray_property_dict = {}  # properties of shown rays, set while tracing
         self._ray_property_dict = {}  # properties of shown rays, set after tracing
         self._rays_plot = None  # plot for visualization of rays/points
@@ -858,7 +857,7 @@ class TraceGUI(HasTraits):
         b = plot(obj.get_cylinder_surface(nc=2*self.SURFACE_RES), "cylinder") if plotCyl else None
 
         # use wireframe mode, so edge is always visible, even if it is infinitesimal small
-        if plotCyl and (not obj.has_back() or (obj.extent[5] - obj.extent[4] < 0.1)):
+        if plotCyl and (not obj.has_back() or (obj.extent[5] - obj.extent[4] < 0.05)):
             b.actor.property.trait_set(representation="wireframe", lighting=False, line_width=1.5, opacity=alpha/2)
 
         # calculate middle center z-position
@@ -885,16 +884,24 @@ class TraceGUI(HasTraits):
     def _get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """assign traced and selected rays into a ray dictionary"""
         
-        p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=True)
-        l_ = self.raytracer.rays.ray_lengths(self._ray_selection)
-        ol_ = self.raytracer.rays.optical_lengths(self._ray_selection)
+        N = self.raytracer.rays.N
+        set_size = min(N, self.ray_amount_shown)
+        rindex = np.random.choice(N, size=set_size, replace=False)  # random choice
+
+        # make bool array with chosen rays set to true
+        ray_selection = np.zeros(N, dtype=bool)
+        ray_selection[rindex] = True
+
+        p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(ray_selection, normalize=True)
+        l_ = self.raytracer.rays.ray_lengths(ray_selection)
+        ol_ = self.raytracer.rays.optical_lengths(ray_selection)
         
-        _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(self._ray_selection, normalize=False,
+        _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(ray_selection, normalize=False,
                                                                ret=[0, 1, 0, 0, 0, 0, 0])
 
         # force copies
         self.__ray_property_dict.update(p=p_.copy(), s=s_.copy(), pol=pol_.copy(), w=w_.copy(), wl=wl_.copy(),
-                                        snum=snum_.copy(), n=n_.copy(), index=np.where(self._ray_selection)[0],
+                                        snum=snum_.copy(), n=n_.copy(), index=np.where(ray_selection)[0],
                                         l=l_.copy(), ol=ol_.copy(), s_un=s_un.copy())
        
         # use flatten instead of ravel so we have guaranteed copies
@@ -1571,14 +1578,6 @@ class TraceGUI(HasTraits):
 
             def background():
                 with self.__ray_access_lock:
-                    N = self.raytracer.rays.N
-                    set_size = min(N, self.ray_amount_shown)
-                    source_index = np.random.choice(N, size=set_size, replace=False)  # random choice
-
-                    # make bool array with chosen rays set to true
-                    self._ray_selection = np.zeros(N, dtype=bool)
-                    self._ray_selection[source_index] = True
-
                     res = self._get_rays()
 
                 def on_finish():
@@ -1729,8 +1728,8 @@ class TraceGUI(HasTraits):
 
                 def on_finish():
 
-                    self._det_ind = int(self.detector_selection.split(":", 1)[0].split("DET")[1])
                     with self._no_trait_action():
+                        self._det_ind = int(self.detector_selection.split(":", 1)[0].split("DET")[1])
                         self.det_pos = self.raytracer.detectors[self._det_ind].pos[2]
 
                     self.__detector_lock.release()
@@ -1765,9 +1764,10 @@ class TraceGUI(HasTraits):
                     self.raytracer.detectors[self._det_ind].move_to([xp, yp, self.det_pos])
 
                     # move surface, cylinder and label
-                    self._detector_plots[self._det_ind][0].mlab_source.z += event.new - event.old
-                    self._detector_plots[self._det_ind][1].mlab_source.z += event.new - event.old
-                    self._detector_plots[self._det_ind][3].z_position += event.new - event.old
+                    dp, diff = self._detector_plots[self._det_ind], event.new - event.old
+                    dp[0].mlab_source.z += diff
+                    dp[1].mlab_source.z += diff
+                    dp[3].z_position += diff
 
                     # reinit detectors and Selection to update z_pos in detector name
                     self._init_detector_list()
@@ -1823,16 +1823,13 @@ class TraceGUI(HasTraits):
                                                               int(self.image_pixels), self._det_ind, \
                                                               bool(self.flip_det_image), self.projection_method
                             limit = None if not self.activate_filter else self.filter_constant
-
-                            cut_args = dict(x=self.cut_value) if self.cut_dimension == "x"\
-                                else dict(y=self.cut_value)
+                            cut_args = dict(x=self.cut_value) if self.cut_dimension == "x" else dict(y=self.cut_value)
 
                             if rerender:
                                 with self._try() as error:
                                     DImg = self.raytracer.detector_image(N=px, detector_index=dindex,
                                                                          source_index=source_index, 
-                                                                         projection_method=pm,
-                                                                         limit=limit)
+                                                                         projection_method=pm, limit=limit)
                     if not error:
 
                         if rerender:
@@ -1954,8 +1951,7 @@ class TraceGUI(HasTraits):
                         log, mode, px, source_index = bool(self.log_image), self.image_type, int(self.image_pixels), \
                             self._source_ind
                         limit = None if not self.activate_filter else self.filter_constant
-                        cut_args = dict(x=self.cut_value) if self.cut_dimension == "x"\
-                            else dict(y=self.cut_value)
+                        cut_args = dict(x=self.cut_value) if self.cut_dimension == "x" else dict(y=self.cut_value)
 
                         if rerender:
                             with self._try() as error:
@@ -2014,7 +2010,7 @@ class TraceGUI(HasTraits):
                 with self.__ray_access_lock:
                     with self._try() as error:
                         res, afdict = self.raytracer.autofocus(mode, det_pos, return_cost=ret_cost,
-                                                                        source_index=source_index)
+                                                               source_index=source_index)
 
                 if not error:
                     with self.__detector_lock:
@@ -2216,7 +2212,8 @@ class TraceGUI(HasTraits):
         for obj in [*self._ray_source_plots, *self._lens_plots,
                     *self._filter_plots, *self._aperture_plots, *self._detector_plots]:
             for obji in obj[:3]:
-                if obji is not None:
+                # don't change mode of object side if it has no back (in this case wireframe only)
+                if obji is not None and not (obji is obj[1] and obj[2] is None):
                     obji.actor.property.representation = repr_
 
     def send_cmd(self, cmd) -> None:
