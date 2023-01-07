@@ -3,6 +3,7 @@ Usage
 ################
 
 .. toctree::
+   usage_overview
    usage_geometry
    usage_surfaces
    usage_elements

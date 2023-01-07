@@ -387,6 +387,7 @@ Calling the filter with wavelengths returns the transmittance at these wavelengt
    >>> F(wl)
    array([0. , 0.5, 0. ])
 
+.. TODO note on t threshold
 
 Aperture
 ________________

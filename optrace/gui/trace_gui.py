@@ -564,12 +564,16 @@ class TraceGUI(HasTraits):
     @contextmanager
     def _constant_camera(self, *args, **kwargs) -> None:
         """context manager the saves and restores the camera view"""
-        cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
-                                                    "clipping_range", "parallel_scale")
+
+        has_cam = self.scene is not None and self.scene.camera is not None
+        if has_cam:
+            cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
+                                                        "clipping_range", "parallel_scale")
         try:
             yield
         finally:
-            self.scene.camera.trait_set(**cc_traits_org)
+            if has_cam:
+                self.scene.camera.trait_set(**cc_traits_org)
 
     def _do_in_main(self, f: Callable, *args, **kw) -> None:
         """execute a function in the GUI main thread"""
@@ -1426,8 +1430,8 @@ class TraceGUI(HasTraits):
         def raise_timeout(keys):
             raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
 
-        tsum = 1
-        time.sleep(1)  # wait for flags to be set, this could also be trait handlers, which could take longer
+        tsum = 0.8
+        time.sleep(0.8)  # wait for flags to be set, this could also be trait handlers, which could take longer
         while self.busy:
             time.sleep(0.05)
             tsum += 0.05
@@ -1551,17 +1555,19 @@ class TraceGUI(HasTraits):
         if not self._no_trait_action_flag and not self._status["Tracing"]: 
             # don't do while tracing, RayStorage rays are still being generated
 
+            self._status["Drawing"] += 1
+            pyface_gui.process_events()
+
             if not self.raytracer.ray_sources or not self.raytracer.rays.N:
                 self._ray_property_dict = {}
 
                 if self._rays_plot is not None:
-                    self._rays_plot.parent.parent.remove()
-                    self._rays_plot = None
-
+                    with self._constant_camera():
+                        self._rays_plot.parent.parent.remove()
+                        self._rays_plot = None
+                    
+                self._status["Drawing"] -= 1
                 return
-
-            self._status["Drawing"] += 1
-            pyface_gui.process_events()
 
             def background():
                 with self.__ray_access_lock:
@@ -1799,6 +1805,8 @@ class TraceGUI(HasTraits):
             self._status["DetectorImage"] += 1
 
             def background() -> None:
+            
+                error = False
 
                 with self.__det_image_lock:
                     with self.__detector_lock:
@@ -1825,25 +1833,25 @@ class TraceGUI(HasTraits):
                                                                          source_index=source_index, 
                                                                          projection_method=pm,
                                                                          limit=limit)
-                                if error:
-                                    self._status["DetectorImage"] -= 1
-                                    return
+                    if not error:
 
-                    if rerender:
-                        self.last_det_image = DImg
-                        self._last_det_snap = snap
-                    else:
-                        DImg = self.last_det_image.copy()
-                        DImg.rescale(px)
+                        if rerender:
+                            self.last_det_image = DImg
+                            self._last_det_snap = snap
+                        else:
+                            DImg = self.last_det_image.copy()
+                            DImg.rescale(px)
 
-                Imc = DImg.get_by_display_mode(mode, log=log)
+                        Imc = DImg.get_by_display_mode(mode, log=log)
 
                 def on_finish() -> None:
-                    with self._try():
-                        if (event is None and not cut) or (event is not None and event.name == "_detector_image_button"):
-                            r_image_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc)
-                        else:
-                            r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **cut_args)
+                    if not error:
+                        with self._try():
+                            if (event is None and not cut) or (event is not None\
+                                    and event.name == "_detector_image_button"):
+                                r_image_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc)
+                            else:
+                                r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **cut_args)
 
                     self._status["DetectorImage"] -= 1
 
@@ -1865,19 +1873,19 @@ class TraceGUI(HasTraits):
 
             def background() -> None:
 
+                error = False
+
                 with self.__detector_lock:
                     with self.__ray_access_lock:
                         source_index = None if not self.det_spectrum_one_source else self._source_ind
                         with self._try() as error:
                             Det_Spec = self.raytracer.detector_spectrum(detector_index=self._det_ind,
                                                                         source_index=source_index)
-                        if error:
-                            self._status["DetectorSpectrum"] -= 1
-                            return
 
                 def on_finish() -> None:
-                    with self._try():
-                        spectrum_plot(Det_Spec)
+                    if not error:
+                        with self._try():
+                            spectrum_plot(Det_Spec)
                     self._status["DetectorSpectrum"] -= 1
 
                 pyface_gui.invoke_later(on_finish)
@@ -1902,16 +1910,16 @@ class TraceGUI(HasTraits):
 
             def background() -> None:
 
+                error = False
+
                 with self.__ray_access_lock:
                     with self._try() as error:
                         RS_Spec = self.raytracer.source_spectrum(source_index=self._source_ind)
-                    if error:
-                        self._status["SourceSpectrum"] -= 1
-                        return
 
                 def on_finish() -> None:
-                    with self._try():
-                        spectrum_plot(RS_Spec)
+                    if not error:
+                        with self._try():
+                            spectrum_plot(RS_Spec)
                     self._status["SourceSpectrum"] -= 1
 
                 pyface_gui.invoke_later(on_finish)
@@ -1933,6 +1941,8 @@ class TraceGUI(HasTraits):
 
             def background() -> None:
 
+                error = False
+
                 with self.__source_image_lock:
                     with self.__ray_access_lock:
                         # only calculate Image if raytracer Snapshot, selected Source or image_pixels changed
@@ -1950,25 +1960,25 @@ class TraceGUI(HasTraits):
                         if rerender:
                             with self._try() as error:
                                 SImg = self.raytracer.source_image(N=px, source_index=source_index, limit=limit)
-                            if error:
-                                self._status["SourceImage"] -= 1
-                                return
 
-                    if rerender:
-                        self.last_source_image = SImg
-                        self._last_source_snap = snap
-                    else:
-                        SImg = self.last_source_image.copy()
-                        SImg.rescale(px)
+                    if not error:
 
-                Imc = SImg.get_by_display_mode(mode, log=log)
+                        if rerender:
+                            self.last_source_image = SImg
+                            self._last_source_snap = snap
+                        else:
+                            SImg = self.last_source_image.copy()
+                            SImg.rescale(px)
+
+                        Imc = SImg.get_by_display_mode(mode, log=log)
 
                 def on_finish() -> None:
-                    with self._try():
-                        if (event is None and not cut) or (event is not None and event.name == "_source_image_button"):
-                            r_image_plot(SImg, log=log, mode=mode, imc=Imc)
-                        else:
-                            r_image_cut_plot(SImg, log=log, mode=mode, imc=Imc, **cut_args)
+                    if not error:
+                        with self._try():
+                            if (event is None and not cut) or (event is not None and event.name == "_source_image_button"):
+                                r_image_plot(SImg, log=log, mode=mode, imc=Imc)
+                            else:
+                                r_image_cut_plot(SImg, log=log, mode=mode, imc=Imc, **cut_args)
 
                     self._status["SourceImage"] -= 1
 
@@ -1994,6 +2004,9 @@ class TraceGUI(HasTraits):
             self._autofocus_information = ""
 
             def background() -> None:
+
+                error = False
+
                 source_index = None if not self.af_one_source else self._source_ind
                 mode, det_pos, ret_cost, det_ind = self.focus_type, self.det_pos, bool(self.focus_cost_plot), \
                     self._det_ind
@@ -2002,31 +2015,31 @@ class TraceGUI(HasTraits):
                     with self._try() as error:
                         res, afdict = self.raytracer.autofocus(mode, det_pos, return_cost=ret_cost,
                                                                         source_index=source_index)
-                    if error:
-                        self._status["Focussing"] -= 1
-                        return
 
-                with self.__detector_lock:
-                    if det_ind < len(self.raytracer.detectors):  # pragma: no branch
-                        self.raytracer.detectors[det_ind].move_to([*self.raytracer.detectors[det_ind].pos[:2], res.x])
+                if not error:
+                    with self.__detector_lock:
+                        if det_ind < len(self.raytracer.detectors):  # pragma: no branch
+                            self.raytracer.detectors[det_ind].move_to([*self.raytracer.detectors[det_ind].pos[:2], 
+                                                                       res.x])
 
                 # execute this function after thread has finished
                 def on_finish() -> None:
 
-                    bounds, pos, N = afdict["bounds"], afdict["pos"], afdict["N"]
-                    
-                    if det_ind < len(self.raytracer.detectors):  # pragma: no branch
-                        self.det_pos = self.raytracer.detectors[det_ind].pos[2]
+                    if not error:
+                        bounds, pos, N = afdict["bounds"], afdict["pos"], afdict["N"]
+                        
+                        if det_ind < len(self.raytracer.detectors):  # pragma: no branch
+                            self.det_pos = self.raytracer.detectors[det_ind].pos[2]
 
-                    if self.focus_cost_plot:
-                        with self._try():
-                            autofocus_cost_plot(res, afdict, f"{mode} Cost Function\nMinimum at z={res.x:.5g}mm")
+                        if self.focus_cost_plot:
+                            with self._try():
+                                autofocus_cost_plot(res, afdict, f"{mode} Cost Function\nMinimum at z={res.x:.5g}mm")
 
-                    self._autofocus_information = \
-                        f"Found 3D position: [{pos[0]:.7g}mm, {pos[1]:.7g}mm, {pos[2]:.7g}mm]\n"\
-                        f"Search Region: z = [{bounds[0]:.7g}mm, {bounds[1]:.7g}mm]\n"\
-                        f"Used {N} Rays for Autofocus\n"\
-                        f"Ignoring Filters and Apertures\n\nOptimizeResult:\n{res}"
+                        self._autofocus_information = \
+                            f"Found 3D position: [{pos[0]:.7g}mm, {pos[1]:.7g}mm, {pos[2]:.7g}mm]\n"\
+                            f"Search Region: z = [{bounds[0]:.7g}mm, {bounds[1]:.7g}mm]\n"\
+                            f"Used {N} Rays for Autofocus\n"\
+                            f"Ignoring Filters and Apertures\n\nOptimizeResult:\n{res}"
 
                     self._status["Focussing"] -= 1
 
@@ -2210,25 +2223,26 @@ class TraceGUI(HasTraits):
         """
         send/execute a command
         """
-        dict_ = dict(  # GUI and scene
-                     mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
-                     camera=self.scene.camera, GUI=self,
-
-                     # abbreviations for raytracer and object lists
-                     RT=self.raytracer, LL=self.raytracer.lenses, FL=self.raytracer.filters,
-                     APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
-                     DL=self.raytracer.detectors, ML=self.raytracer.markers)
 
         if cmd != "":
-
-            pyface_gui.process_events()
-
+            
             if self.busy and not self.command_dont_skip:
                 if not self.silent:
                     print("Other actions running, try again when the program is idle.")
                 return False
 
             self._status["RunningCommand"] += 1
+        
+            dict_ = dict(  # GUI and scene
+                         mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
+                         camera=self.scene.camera, GUI=self,
+
+                         # abbreviations for raytracer and object lists
+                         RT=self.raytracer, LL=self.raytracer.lenses, FL=self.raytracer.filters,
+                         APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
+                         DL=self.raytracer.detectors, ML=self.raytracer.markers)
+            
+            pyface_gui.process_events()
 
             with self._try():
                 hs = self.raytracer.property_snapshot()

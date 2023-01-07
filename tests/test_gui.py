@@ -770,7 +770,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
     
-    def test_0send_cmd(self):
+    def test_send_cmd(self):
         """test command setting and sending as well as automatic replotting"""
 
         RT = rt_example()
