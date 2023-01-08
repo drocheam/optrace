@@ -1343,7 +1343,7 @@ class TraceGUI(HasTraits):
         self._status["DisplayingGUI"] = 0
 
         if self._exit:  # wait 200ms so the user has time to see the scene
-            pyface_gui.invoke_after(200, self.close)
+            pyface_gui.invoke_after(400, self.close)
 
     ####################################################################################################################
     # Interface functions
@@ -1505,6 +1505,7 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
 
+        self._status["Drawing"] += 1
         self._set_colors()
 
         # update filter color
@@ -1550,6 +1551,8 @@ class TraceGUI(HasTraits):
 
         if self._ray_text is not None:
             self._ray_text.property.background_color = self._info_frame_color
+            
+        self._status["Drawing"] -= 1
 
     @observe('ray_amount_shown', dispatch="ui")
     def replot_rays(self, event=None) -> None:
@@ -2070,13 +2073,13 @@ class TraceGUI(HasTraits):
         """
         msgs = {"RunningCommand": "Running Command",
                 "Tracing": "Raytracing",
-                "Focussing": "Focussing",
+                "Focussing": "Finding Focus",
                 "ChangingDetector": "Changing Detector",
-                "DetectorImage": "Generating Detector Image",
-                "SourceImage": "Generating Source Image",
-                "SourceSpectrum": "Generating Source Spectrum",
-                "DetectorSpectrum": "Generating Detector Spectrum",
-                "Drawing": "Drawing"}
+                "DetectorImage": "Rendering Detector Image",
+                "SourceImage": "Rendering Source Image",
+                "SourceSpectrum": "Rendering Source Spectrum",
+                "DetectorSpectrum": "Rendering Detector Spectrum",
+                "Drawing": "Updating Scene"}
        
         # print messages to scene
         if not self._status["InitScene"] and self._status_text is not None:
@@ -2207,6 +2210,7 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
+        self._status["Drawing"] += 1
         repr_ = "wireframe" if bool(self.wireframe_surfaces) else "surface"
 
         for obj in [*self._ray_source_plots, *self._lens_plots,
@@ -2215,6 +2219,8 @@ class TraceGUI(HasTraits):
                 # don't change mode of object side if it has no back (in this case wireframe only)
                 if obji is not None and not (obji is obj[1] and obj[2] is None):
                     obji.actor.property.representation = repr_
+
+        self._status["Drawing"] -= 1
 
     def send_cmd(self, cmd) -> None:
         """
