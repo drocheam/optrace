@@ -24,6 +24,7 @@ from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, L
 
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from mayavi.sources.parametric_surface import ParametricSurface  # provides outline and axes
+import mayavi.modules.text  # Text type
 
 # provides types and plotting functionality, most of these are also imported for the TCP protocol scope
 from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex,\
@@ -142,6 +143,10 @@ class TraceGUI(HasTraits):
     show_all_warnings: List = List(editor=CheckListEditor(values=['Show All Warnings'], format_func=lambda x: x),
                                    desc="if all warnings are shown")
     """show debugging messages"""
+
+    vertical_labels: List = List(editor=CheckListEditor(values=['Vertical Labels'], format_func=lambda x: x),
+                                   desc="if element labels are displayed vertically in scene")
+    """in geometries with tight geometry and long descriptions one could want to display the labels vertically"""
 
     activate_filter: List = List(editor=CheckListEditor(values=['Activate Filter'], format_func=lambda x: x),
                                    desc="if gaussian filter is applied")
@@ -263,6 +268,8 @@ class TraceGUI(HasTraits):
     # with the window bar this should still fit on a 900p screen
     _scene_size = _scene_size0.copy()  # will hold current size
 
+    _bool_list_elements = []
+
     ####################################################################################################################
     # UI view creation
 
@@ -298,6 +305,7 @@ class TraceGUI(HasTraits):
                             Item('minimalistic_view', style="custom", show_label=False),
                             Item('maximize_scene', style="custom", show_label=False),
                             Item('high_contrast', style="custom", show_label=False),
+                            Item('vertical_labels', style="custom", show_label=False),
                             _separator,
                             _separator,
                             Item("_property_label", style='readonly', show_label=False, emphasized=True),
@@ -473,6 +481,11 @@ class TraceGUI(HasTraits):
         if any(key in kwargs for key in forbidden):
             raise RuntimeError(f"Assigning an initial value for properties '{forbidden}' is not supported")
 
+        # one element list traits that are treated as bool values
+        self._bool_list_elements = [el for el in self.trait_get() if (self.trait(el).default_kind == "list")\
+                                    and self._trait(el, 0).editor is not None and\
+                                    (len(self._trait(el, 0).editor.values) == 1)]
+
         with self._no_trait_action():
 
             # add true default parameters
@@ -481,11 +494,7 @@ class TraceGUI(HasTraits):
 
             # convert bool values to list entries for List()
             for key, val in kwargs.items():
-                if key in ["absorb_missing", "minimalistic_view", "log_image", "flip_det_image", "wireframe_surfaces",
-                           "focus_cost_plot", "af_one_source", "det_image_one_source", "det_spectrum_one_source",
-                           "raytracer_single_thread", "show_all_warnings", "garbage_collector_stats", "high_contrast",
-                           "command_dont_skip", "command_dont_replot", "maximize_scene", "activate_filter"]\
-                                   and isinstance(val, bool):
+                if key in self._bool_list_elements and isinstance(val, bool):
                     kwargs[key] = [self._trait(key, 0).editor.values[0]] if val else []
 
             # define Status dict
@@ -504,11 +513,7 @@ class TraceGUI(HasTraits):
         :param val: value to assign
         """
         # workaround so we can set bool values to some List settings
-        if isinstance(val, bool) and\
-            key in ["absorb_missing", "minimalistic_view", "log_image", "flip_det_image", "focus_cost_plot",
-                    "det_spectrum_one_source", "af_one_source", "det_image_one_source", "raytracer_single_thread",
-                    "show_all_warnings", "wireframe_surfaces", "garbage_collector_stats", "high_contrast",
-                    "command_dont_skip", "command_dont_replot", "maximize_scene", "activate_filter"]:
+        if isinstance(val, bool) and key in self._bool_list_elements:
             val = [self._trait(key, 0).editor.values[0]] if val else []
 
         # the detector can only be changed, if it isn't locked (__detector_lock)
@@ -790,9 +795,14 @@ class TraceGUI(HasTraits):
             text_ = f"ambient\nn={label}" if not self.minimalistic_view else f"n={label}"
             text = self.scene.mlab.text(x_pos, y_pos, z=z_pos, text=text_, name="Label")
             text.actor.text_scale_mode = 'none'
-            text.property.trait_set(**self.TEXT_STYLE, justification="center", frame=True,
-                                    frame_color=self._subtle_color, color=self._axis_color, opacity=self._axis_alpha)
-            text.property.bold = False
+            text.property.trait_set(**self.TEXT_STYLE, frame=True, frame_color=self._subtle_color, 
+                                    color=self._axis_color, opacity=self._axis_alpha)
+            if not self.vertical_labels:
+                text.property.trait_set(justification="center", bold=True)
+            else:
+                text.property.trait_set(justification="left", orientation=90, bold=True, 
+                                        vertical_justification="center")
+
             # append plot objects
             self._index_box_plots.append((outline, text, None))
 
@@ -873,8 +883,11 @@ class TraceGUI(HasTraits):
         # add description if any exists. But only if we are not in "minimalistic_view" displaying mode
         label = label if obj.desc == "" or bool(self.minimalistic_view) else label + ": " + obj.desc
         text = self.scene.mlab.text(x=obj.extent[1], y=obj.pos[1], z=zl, text=label, name="Label")
-        text.property.trait_set(**self.LABEL_STYLE, justification="center")
         text.actor.text_scale_mode = 'none'
+        if not self.vertical_labels:
+            text.property.trait_set(**self.LABEL_STYLE, justification="center", vertical_justification="bottom", orientation=0)
+        else:
+            text.property.trait_set(**self.LABEL_STYLE, justification="left", orientation=90, vertical_justification="center")
 
         # plot BackSurface if one exists
         c = plot(obj.back.get_plotting_mesh(N=self.SURFACE_RES), "back") if plotBack else None
@@ -1335,6 +1348,9 @@ class TraceGUI(HasTraits):
                     self.replot_rays()
                     self.scene.disable_render = False
 
+                case _ if vtk_obj.GetKeySym() == "F11":
+                    self.scene.scene_editor._full_screen_fired()
+
         self.scene.interactor.add_observer('KeyReleaseEvent', keyrelease)  # calls keyrelease() in main thread
 
     def _set_gui_loaded(self) -> None:
@@ -1342,7 +1358,7 @@ class TraceGUI(HasTraits):
 
         self._status["DisplayingGUI"] = 0
 
-        if self._exit:  # wait 200ms so the user has time to see the scene
+        if self._exit:  # wait 400ms so the user has time to see the scene
             pyface_gui.invoke_after(400, self.close)
 
     ####################################################################################################################
@@ -1437,8 +1453,8 @@ class TraceGUI(HasTraits):
         def raise_timeout(keys):
             raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
 
-        tsum = 0.8
-        time.sleep(0.8)  # wait for flags to be set, this could also be trait handlers, which could take longer
+        tsum = 1
+        time.sleep(1)  # wait for flags to be set, this could also be trait handlers, which could take longer
         while self.busy:
             time.sleep(0.05)
             tsum += 0.05
@@ -2121,11 +2137,32 @@ class TraceGUI(HasTraits):
                     ax[0].visible = show
             
             self._status["Drawing"] -= 1
+    
+    @observe('vertical_labels')
+    def change_label_orientation(self, event=None):
+        """
+        Make element labels horizontal or vertical
+
+        :param event: optional event from traits observe decorator
+        """
+        self._status["Drawing"] += 1
+       
+        opts = dict(justification="center", vertical_justification="bottom", orientation=0) if not self.vertical_labels\
+            else dict(justification="left", orientation=90, vertical_justification="center")
+
+        for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
+                     self._marker_plots, self._index_box_plots, self._ray_source_plots]:
+            for obj in objs:
+                for obji in obj:
+                    if isinstance(obji, mayavi.modules.text.Text):
+                        obji.property.trait_set(**opts)
+
+        self._status["Drawing"] -= 1
 
     @observe("maximize_scene", dispatch="ui")
     def _change_maximize_scene(self, event=None) -> None:
         """
-        change "maximize scene, hide side menu and toolbar"
+        change maximize scene, hide side menu and toolbar"
 
         :param event: optional event from traits observe decorator
         """

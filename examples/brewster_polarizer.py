@@ -24,9 +24,9 @@ s = [0, np.sin(b_ang), np.cos(b_ang)]
 
 # create sources
 RS0 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0.5, 0, -4], 
-                  polarization="x", desc="x-pol")
+                  polarization="x", desc=" x-pol")
 RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, 0, -4], 
-                  polarization="y", desc="y-pol")
+                  polarization="y", desc=" y-pol")
 RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[-0.5, 0, -4],
                   polarization="Uniform", desc="no pol")
 RT.add(RS0)

@@ -182,11 +182,12 @@ class GUITests(unittest.TestCase):
         trace_gui_run(raytracer_single_thread=True)
         trace_gui_run(ray_opacity=0.15)
         trace_gui_run(ray_width=5)
+        trace_gui_run(vertical_labels=True)
 
         # many parameters
         trace_gui_run(ray_count=100000, ray_amount_shown=1500, absorb_missing=False, ray_opacity=0.1, ray_width=5,
                       coloring_type="Wavelength", plotting_type="Points", minimalistic_view=True, 
-                      raytracer_single_thread=True)
+                      raytracer_single_thread=True, vertical_labels=True)
 
         # this attributes can't bet set initially
         self.assertRaises(RuntimeError, TraceGUI, RT, detector_selection="DET1")
@@ -353,6 +354,12 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("det_image_one_source", True)
                 sim._wait_for_idle()
                 sim._do_in_main(sim.show_detector_image)
+                sim._wait_for_idle()
+
+                # make labels vertical
+                sim._set_in_main("vertical_labels", True)
+                sim._wait_for_idle()
+                sim._set_in_main("vertical_labels", False)
                 sim._wait_for_idle()
 
                 # high contrast mode
@@ -641,15 +648,18 @@ class GUITests(unittest.TestCase):
                          sim.replot_rays, sim.open_property_browser, sim.open_command_window,
                          sim.show_detector_spectrum, sim.show_detector_cut, sim.show_source_cut, sim.replot]
 
-                props = [('ray_amount_shown', 500), ('ray_amount_shown', 2000), ('minimalistic_view', True), ('minimalistic_view', False), 
-                        ('plotting_type', "Rays"), ('plotting_type', "Points"), ('absorb_missing', True), ('absorb_missing', False), 
-                        ('ray_opacity', 0.06), ('ray_width', 12), ('af_one_source', False), ('af_one_source', True), ('det_image_one_source', False),
-                        ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), ('flip_det_image', False),
-                        ('det_spectrum_one_source', True), ('det_image_one_source', False), ('log_image', False), ('log_image', True),
-                        ('raytracer_single_thread', False), ('raytracer_single_thread', True), ('wireframe_surfaces', True), 
-                        ('wireframe_surfaces', False), ('focus_cost_plot', True), ('focus_cost_plot', False), 
-                        ('maximize_scene', False), ('maximize_scene', True),
-                        ('activate_filter', False), ('activate_filter', True), ('high_contrast', False), ('high_contrast', True)]
+                props = [('ray_amount_shown', 500), ('ray_amount_shown', 2000), ('minimalistic_view', True),
+                         ('minimalistic_view', False), ('plotting_type', "Rays"), ('plotting_type', "Points"),
+                         ('absorb_missing', True), ('absorb_missing', False), ('ray_opacity', 0.06), ('ray_width', 12),
+                         ('af_one_source', False), ('af_one_source', True), ('det_image_one_source', False),
+                         ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), 
+                         ('flip_det_image', False), ('det_spectrum_one_source', True), ('det_image_one_source', False),
+                         ('log_image', False), ('log_image', True), ('raytracer_single_thread', False),
+                         ('raytracer_single_thread', True), ('wireframe_surfaces', True), 
+                         ('wireframe_surfaces', False), ('focus_cost_plot', True), ('focus_cost_plot', False), 
+                         ('maximize_scene', False), ('maximize_scene', True), ('vertical_labels', False), 
+                         ('vertical_labels', True), ('activate_filter', False), ('activate_filter', True), 
+                         ('high_contrast', False), ('high_contrast', True)]
 
                 for i in np.arange(200):
                     # the expected value (mean time for a large number) is integral n*10^n from n0 to n1
@@ -747,6 +757,12 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim.silent = True
                 send_key(sim, "m")
+                sim._wait_for_idle()
+               
+                # make fullscreen
+                send_key(sim, "F11")
+                sim._wait_for_idle()
+                send_key(sim, "F11")
                 sim._wait_for_idle()
                 
                 # key without shortcut
@@ -1200,7 +1216,7 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
                 self.assertTrue(RT.rays.N > 0)  # rays traced
-                self.assertEqual(len(sim._fault_markers), 0)  # no faul_marker in GUI
+                self.assertEqual(len(sim._fault_markers), 0)  # no fault_marker in GUI
                 self.assertEqual(len(RT.markers), 0)  # no fault markers in RT
 
         sim = TraceGUI(RT)

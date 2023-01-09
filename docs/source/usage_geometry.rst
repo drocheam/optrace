@@ -131,15 +131,6 @@ However, for setups where the angles of the beams to surface normals are small, 
 
 
 
-Geometry Presets
-_______________________
-
-
-**Arizona Eye Model**
-
-
-**LeGrand Paraxial Eye Model**
-
 
 Loading ZEMAX Geometries (.zmx)
 __________________________________
@@ -177,3 +168,159 @@ Unfortunately, the support is only experimental, as there is no actual documenta
 * only loads lens and aperture geometries, no support for additional objects
 
 Information on the file format can be found `here <https://documents.pub/document/zemaxmanual.html?page=461>`__, `here <https://github.com/mjhoptics/ray-optics/blob/master/src/rayoptics/zemax/zmxread.py>`__ and `here <https://github.com/quartiq/rayopt/blob/master/rayopt/zemax.py>`__.
+
+
+Geometry Presets
+_______________________
+
+
+**LeGrand Paraxial Eye Model**
+
+The LeGrand full theoretical eye model is a simple model consisting of only spherical surfaces and wavelength-independent refractive indices. It models the paraxial behavior of a far-adapted eye.
+
+.. list-table:: LeGrand Full Theoretical Eye Model :footcite:`SchwiegerlingOptics`
+   :widths: 110 75 75 75 75
+   :header-rows: 1
+   :align: center
+
+   * - Surface
+     - Radius in mm
+     - Conic Constant
+     - Refraction Index to next surface
+     - Thickness (mm) (to next surface)
+
+   * - Cornea Anterior
+     - 7.80
+     - 0
+     - 1.3771
+     - 0.5500
+		
+   * - Cornea Posterior 
+     - 6.50
+     - 0 
+     - 1.3374
+     - 3.0500
+
+   * - Lens Anterior 
+     - 10.20
+     - 0
+     - 1.4200
+     - 4.0000
+
+   * - Lens Posterior 
+     - -6.00
+     - 0 
+     - 1.3360
+     - 16.5966
+
+   * - Retina 
+     - -13.40
+     - 0 
+     - `-` 
+     - `-`
+
+
+The preset is located in ``ot.presets.geometry`` and is called as function. It returns a ``Group`` object that can be added to a raytracer. Provide a ``pos`` parameter to position it at an other position than ``[0, 0, 0]``.
+
+.. testcode::
+
+   eye_model = ot.presets.geometry.legrand_eye(pos=[0.3, 0.7, 1.2])
+   RT.add(eye_model)
+
+Optional parameters include a pupil diameter and a detector (retina) radius, both provided in millimeters.
+
+.. testcode::
+
+   eye_model = ot.presets.geometry.legrand_eye(pupil=3, r_det=10, pos=[0.3, 0.7, 1.2])
+
+
+**Arizona Eye Model**
+
+A more advanced model is the Arizona Eye Model, which tries to match clinical levels of aberration and for different adaption levels. It consists of conic surfaces, dispersive media and adaptation dependent parameters.
+
+.. list-table:: Arizona Eye Model :footcite:`SchwiegerlingOptics`
+   :widths: 75 75 75 75 75 75
+   :header-rows: 1
+   :align: center
+
+   * - Surface
+     - Radius in mm
+     - Conic Constant
+     - Refraction Index to next surface
+     - Abbe Number
+     - Thickness (mm) (to next surface)
+
+   * - Cornea Anterior
+     - 7.80
+     - -0.25
+     - 1.377
+     - 57.1
+     - 0.55
+		
+   * - Cornea Posterior 
+     - 6.50
+     - -0.25
+     - 1.337
+     - 61.3
+     - :math:`t_\text{aq}`
+
+   * - Lens Anterior 
+     - :math:`R_\text{ant}`
+     - :math:`K_\text{ant}`
+     - :math:`n_\text{lens}`
+     - 51.9
+     - :math:`t_\text{lens}`
+
+   * - Lens Posterior 
+     - :math:`R_\text{post}`
+     - :math:`K_\text{post}`
+     - 1.336
+     - 61.1
+     - 16.713
+
+   * - Retina 
+     - -13.40
+     - 0 
+     - `-` 
+     - `-` 
+
+     - `-` 
+
+With an accommodation level :math:`A` in dpt the missing parameters are calculated using: :footcite:`SchwiegerlingOptics`
+
+.. math::
+   \begin{array}{ll}
+       R_{\text {ant }}=12.0-0.4 \mathrm{~A} & K_{\text {ant }}=-7.518749+1.285720 \mathrm{~A} \\
+       R_{\text {post }}=-5.224557+0.2 \mathrm{~A} & K_{\text {post }}=-1.353971-0.431762 \mathrm{~A} \\
+       t_{\text {aq }}=2.97-0.04 \mathrm{~A} & t_{\text {lens }}=3.767+0.04 \mathrm{~A} \\
+       n_{\text {lens }}=1.42+0.00256 \mathrm{~A}-0.00022 \mathrm{~A}^2
+   \end{array}
+
+
+Accessing and adding works like for the ``legrand_eye`` preset.
+
+.. testcode::
+
+   eye_model = ot.presets.geometry.arizona_eye(pos=[0.3, 0.7, 1.2])
+   RT.add(eye_model)
+
+As for the legrand eye we have the parameters ``pupil`` and ``r_det``. Additionally there is a ``accommodation`` parameter specified in diopters, which defaults to 0 dpt.
+
+.. testcode::
+
+   eye_model = ot.presets.geometry.arizona_eye(adaptation=1, pupil=3, r_det=10, pos=[0.3, 0.7, 1.2])
+
+
+.. figure:: ./images/arizona_eye_scene.png
+   :align: center
+   :width: 600
+
+   Eye model in the ``arizona_eye_model.py`` example script.
+
+------------
+
+**Sources**
+
+.. footbibliography::
+
+
