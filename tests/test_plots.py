@@ -204,6 +204,12 @@ class PlotTests(unittest.TestCase):
         otp.autofocus_cost_plot(sci, afdict, block=self.manual)
         otp.autofocus_cost_plot(sci, afdict, title="Test title", block=self.manual)
 
+        # missing z, cost in afdict, possible with "Position Variance" but without return_cost = True
+        otp.autofocus_cost_plot(sci, afdict | dict(z=None), silent=False)
+        otp.autofocus_cost_plot(sci, afdict | dict(cost=None), silent=False)
+        otp.autofocus_cost_plot(sci, afdict | dict(z=None), silent=True)
+        otp.autofocus_cost_plot(sci, afdict | dict(cost=None), silent=True)
+
     @pytest.mark.os
     def test_abbe_plot(self):
 

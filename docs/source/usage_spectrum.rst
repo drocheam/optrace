@@ -178,7 +178,7 @@ As for the LightSpectrum object we can get the spectral values with:
 
    >>> wl = np.linspace(400, 550, 5)
    >>> spec(wl)
-   array([0. , 0. , 0. , 1., 1.])
+   array([0., 0., 0., 1., 1.])
 
 Spectrum
 ______________________

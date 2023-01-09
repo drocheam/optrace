@@ -1,6 +1,18 @@
 Autofocus
 -----------------------
 
+
+.. testsetup:: *
+
+   import optrace as ot
+   RT = ot.Raytracer(outline=[-1, 1, -1, 1, 0, 60], silent=True)
+   RS = ot.RaySource(ot.Point(), pos=[0, 0, 1])
+   RT.add(RS)
+   RS = ot.RaySource(ot.Point(), pos=[0, 0, 1])
+   RT.add(RS)
+   RT.trace(1000)
+
+
 Goal
 ____________________
 
@@ -22,6 +34,54 @@ The following focus methods are available:
 * **Image Sharpness**: finds the position with the sharpest edges
 
 More details as well as the mathematical formulations can be found in :numref:`autofocus`.
+
+
+Usage
+______________
+
+
+
+To use the focus finding you will need a traced raytracer ``ŔT`` geometry with one or multiple ray sources.
+The ``autofocus`` function is then called by passing the focus mode and a starting position.
+Focussing then tries to find the focus in a search region between the last lens (or the outline) and the next lens (or the outline).
+
+.. testcode::
+
+   res, afdict = RT.autofocus("Position Variance", 12.09)
+
+``autofocus`` returns two results, where the first one is a ``scipy.optimize.OptimizeResult`` object with information on the root finding. 
+The found z-position is accessed with ``res.x``.
+The second return value includes some additional information, while these are mostly only useful for the ``TraceGUI`` information or the cost plot.
+
+By default, rays of all different sources are used to autofocus. Optionally a ``source_index`` parameter can be provided to use only a specific ray source.
+
+.. testcode::
+
+   res, afdict = RT.autofocus("Position Variance", 12.09, source_index=1)
+
+
+With many rays the focus finding can get very slow. However, for modes ``"Position Variance", "Airy Disc Weighting"`` after some large number of rays the cost function does not change anymore. That's why it is sufficient to limit the number of rays for those cases.
+You can higher or lower the number ``N`` for this with a parameter. Note that this rarely needs to be done.
+
+Mode ``"Position Variance"`` uses a slightly different approach for root finding, which leads to some parameters missing in ``afdict``.
+When plotting a cost plot, as described later, these parameters need to be calculated and included. This is done by setting ``return_cost=True``, but don't set it if not necessary, as it unfortunately slows down the focus mode.
+
+.. testcode::
+
+   res, afdict = RT.autofocus("Position Variance", 12.09, N=10000, return_cost=True)
+
+
+Limitations
+__________________
+
+
+Below you can find some limitations of ``autofocus`` in ``optrace``
+
+* search only between lenses or a lens and the outline
+* the behavior of filters and apertures is ignored. If a ray exists at the start of a search region, it also exists at the end.
+* the same way rays are not absorbed by the outline in the search region
+* in more complex cases only a local minimum is found
+* see the limitations for each method in :numref:`autofocus`. 
 
 Application Cases
 ____________________
@@ -53,7 +113,66 @@ Below you can find multiple application cases an preferred autofocus methods.
    The TraceGUI has an option for plotting the cost function.
 
 
-Debug Plots
+Cost Plots
 ___________________________
 
+Cost plots are especially useful to debug the focus finding and check how pronounced a focus or focus region is.
+Plotting the cost function and result is done by calling the ``autofocus_cost_plot`` method from ``optrace.plots``.
+It requires the ``res, afdict`` parameters from before.
+
+.. code-block:: python
+
+   from optrace.plots import autofocus_cost_plot
+
+   autofocus_cost_plot(res, afdict)
+
+
+Optionally one can overwrite the ``title`` and make the plot window blocking by setting ``block=True``.
+
+.. code-block:: python
+
+   autofocus_cost_plot(res, afdict, title="abcd", block=True)
+
+
+Below you can find examples for cost plots.
+
+.. list-table::
+
+   * - .. figure:: ./images/af_debug_position_variance.svg
+          :align: center
+          :width: 450
+
+          Focus finding for mode "Position Variance" in the ``spherical_aberration.py`` example.
+
+     - .. figure:: ./images/af_debug_image_sharpness.svg
+          :align: center
+          :width: 450
+
+          Focus finding for mode "Image Sharpness" in the ``spherical_aberration.py`` example.
+
+.. highlight:: none
+
+
+When working with the ``TraceGUI`` it also outputs focus information, like the following:
+
+::
+
+   Found 3D position: [2.170283e-07mm, -4.748909e-06mm, 15.42216mm]
+   Search Region: z = [0.9578644mm, 40mm]
+   Used 200000 Rays for Autofocus
+   Ignoring Filters and Apertures
+
+   OptimizeResult:
+     message: CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL
+     success: True
+      status: 0
+         fun: 1.455146088174102
+           x: 15.422155091215522
+         nit: 0
+         jac: [ 0.000e+00]
+        nfev: 2
+        njev: 1
+    hess_inv: <1x1 LbfgsInvHessProduct with dtype=float64> 
+    
+.. highlight:: default
 

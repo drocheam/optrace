@@ -15,7 +15,8 @@ from ..tracer.misc import PropertyChecker as pc
 def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
                         afdict:  dict,
                         title:   str = "Autofocus Cost Function",
-                        block:   bool = False)\
+                        block:   bool = False,
+                        silent:  bool = False)\
         -> None:
     """
     Plot a cost function plot for the autofocus results.
@@ -24,6 +25,7 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     :param afdict: dictionary from Raytracer.autofocus()
     :param title: title of the plot
     :param block: if the plot should be blocking the execution of the program
+    :param silent: if all standard output should be muted
     """
 
     # type checking
@@ -31,6 +33,13 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     pc.check_type("afdict", afdict, dict)
     pc.check_type("title", title, str)
     pc.check_type("block", block, bool)
+
+    if afdict["z"] is None or afdict["cost"] is None:
+        if not silent:
+            print('Parameters missing in focus dict. For mode "Position Variance" set '
+                  'autofocus("Position Variance", ..., return_cost=True) when'
+                  ' wanting to plot the debug plot.')
+        return
 
     r, vals = afdict["z"], afdict["cost"]
 
