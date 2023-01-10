@@ -2053,6 +2053,7 @@ class TraceGUI(HasTraits):
                         self._autofocus_information = \
                             f"Found 3D position: [{pos[0]:.7g}mm, {pos[1]:.7g}mm, {pos[2]:.7g}mm]\n"\
                             f"Search Region: z = [{bounds[0]:.7g}mm, {bounds[1]:.7g}mm]\n"\
+                            f"Method: {mode}\n"\
                             f"Used {N} Rays for Autofocus\n"\
                             f"Ignoring Filters and Apertures\n\nOptimizeResult:\n{res}"
 

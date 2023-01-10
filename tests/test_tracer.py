@@ -116,7 +116,7 @@ class TracerTests(unittest.TestCase):
 
         # check if tma works correctly
         abcd0 = RT.tma(489).abcd
-        abcd1 = ot.Group(RT.lenses).tma(489, n0=RT.n0).abcd
+        abcd1 = ot.Group(RT.lenses, n0=RT.n0).tma(489).abcd
         self.assertTrue(np.allclose(abcd0 - abcd1, 0))
 
         # clear also deletes rays

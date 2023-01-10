@@ -157,22 +157,23 @@ When working with the ``TraceGUI`` it also outputs focus information, like the f
 
 ::
 
-   Found 3D position: [2.170283e-07mm, -4.748909e-06mm, 15.42216mm]
-   Search Region: z = [0.9578644mm, 40mm]
-   Used 200000 Rays for Autofocus
-   Ignoring Filters and Apertures
+    Found 3D position: [5.684185e-06mm, 2.022295e-06mm, 15.39223mm]
+    Search Region: z = [0.9578644mm, 40mm]
+    Method: Irradiance Maximum
+    Used 200000 Rays for Autofocus
+    Ignoring Filters and Apertures
 
-   OptimizeResult:
-     message: CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL
-     success: True
-      status: 0
-         fun: 1.455146088174102
-           x: 15.422155091215522
-         nit: 0
-         jac: [ 0.000e+00]
-        nfev: 2
-        njev: 1
-    hess_inv: <1x1 LbfgsInvHessProduct with dtype=float64> 
-    
+    OptimizeResult:
+      message: CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH
+      success: True
+       status: 0
+          fun: 0.019262979304881897
+            x: 15.3922327445026
+          nit: 4
+          jac: [ 9.024e-03]
+         nfev: 102
+         njev: 51
+     hess_inv: <1x1 LbfgsInvHessProduct with dtype=float64>
+
 .. highlight:: default
 

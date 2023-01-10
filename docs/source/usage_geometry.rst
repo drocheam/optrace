@@ -127,10 +127,37 @@ However, for setups where the angles of the beams to surface normals are small, 
 
 **Example**
 
-.. TODO
+Below you can find an example. A eye preset is loaded and flipped around the x-axis.
+A point source is added at the retina and the geometry is traced.
 
+.. testcode::
 
+   import optrace as ot
 
+   # init raytracer 
+   RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
+
+   # load eye preset
+   eye = ot.presets.geometry.arizona_eye(pupil=3)
+
+   # flip, move and add it to the tracer
+   eye.flip()
+   eye.move_to([0, 0, 0])
+   RT.add(eye)
+
+   # create and add divergent point source
+   point = ot.Point()
+   RS = ot.RaySource(point, spectrum=ot.presets.light_spectrum.d50, divergence="Isotropic", div_angle=5,
+                     pos=[0, 0, 0])
+   RT.add(RS)
+
+   # trace
+   RT.trace(100000)
+
+.. testoutput::
+   :hide:
+
+   Class ...
 
 Loading ZEMAX Geometries (.zmx)
 __________________________________
@@ -224,6 +251,7 @@ The preset is located in ``ot.presets.geometry`` and is called as function. It r
 
 .. testcode::
 
+   RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
    eye_model = ot.presets.geometry.legrand_eye(pos=[0.3, 0.7, 1.2])
    RT.add(eye_model)
 
@@ -290,10 +318,10 @@ With an accommodation level :math:`A` in dpt the missing parameters are calculat
 
 .. math::
    \begin{array}{ll}
-       R_{\text {ant }}=12.0-0.4 \mathrm{~A} & K_{\text {ant }}=-7.518749+1.285720 \mathrm{~A} \\
-       R_{\text {post }}=-5.224557+0.2 \mathrm{~A} & K_{\text {post }}=-1.353971-0.431762 \mathrm{~A} \\
-       t_{\text {aq }}=2.97-0.04 \mathrm{~A} & t_{\text {lens }}=3.767+0.04 \mathrm{~A} \\
-       n_{\text {lens }}=1.42+0.00256 \mathrm{~A}-0.00022 \mathrm{~A}^2
+       R_{\text {ant }}=12.0-0.4 A & K_{\text {ant }}=-7.518749+1.285720 A \\
+       R_{\text {post }}=-5.224557+0.2 A & K_{\text {post }}=-1.353971-0.431762 A \\
+       t_{\text {aq }}=2.97-0.04 A & t_{\text {lens }}=3.767+0.04 A \\
+       n_{\text {lens }}=1.42+0.00256 A-0.00022 A^2
    \end{array}
 
 
@@ -301,6 +329,7 @@ Accessing and adding works like for the ``legrand_eye`` preset.
 
 .. testcode::
 
+   RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
    eye_model = ot.presets.geometry.arizona_eye(pos=[0.3, 0.7, 1.2])
    RT.add(eye_model)
 

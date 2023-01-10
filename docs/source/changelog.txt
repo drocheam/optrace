@@ -1,5 +1,7 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.2.1   |   2023-01-09   |   New TraceGUI keyboard shortcut "F11" toggling fullscreen. vertical_labels option changing Element label orientation. 
+  1.2.0   |   2023-01-06   |   scipy.misc has been moved to scipy.datasets. optrace now requires pooch dependency for this work. Added scipy>=1.10 requirement. 
   1.1.5   |   2023-01-06   |   Improved documentation. TransmissionSpectrum now has a "inverse" parameter, that turns the transmission into absorption. 
   1.1.4   |   2023-01-02   |   Improved TraceGUI picking multithreading. Better CommandWindow, PropertyBrowser UI (fonts, legends). 
   1.1.3   |   2022-12-22   |   FunctionSurface renamed to FunctionSurface2D. New FunctionSurface1D class. New ray coloring mode "Refractive Index" in TraceGUI. 

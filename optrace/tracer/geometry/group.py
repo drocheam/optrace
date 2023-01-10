@@ -1,3 +1,4 @@
+from typing import Any  # Any type
 
 import numpy as np  # calculations
 
@@ -15,7 +16,10 @@ class Group:
 
 class Group(BaseClass):
 
-    def __init__(self, elements: list[Element] = None, **kwargs) -> None:
+    def __init__(self, 
+                 elements: list[Element] = None, 
+                 n0: RefractionIndex = None,
+                 **kwargs) -> None:
         """
         Create a group by including elements from the 'elements' parameter.
         Without this parameter an empty group is created.
@@ -25,20 +29,35 @@ class Group(BaseClass):
         A well as including, removing elements and clearing is whole content.
 
         :param elements: list of elements to add. Can be empty
+        :param n0: ambient refraction index
         :param kwargs: additional keyword arguments for the BaseClass class
         """
-
         self.lenses = []  #: lenses in raytracing geometry
         self.apertures = []  #: apertures in raytracing geometry
         self.filters = []  #: filters in raytracing geometry
         self.detectors = []  #: detectors in raytracing geometry
         self.ray_sources = []  #: ray sources in raytracing geometry
         self.markers = []  #: markers in raytracing geometry
+        self.n0 = n0  #: ambient refraction index
 
         super().__init__(**kwargs)
 
         if elements is not None:
             self.add(elements)
+    
+    def __setattr__(self, key: str, val: Any) -> None:
+        """
+        assigns the value of an attribute
+        :param key: attribute name
+        :param val: value to assign
+        """
+        if key == "n0":
+            if val is None:
+                val = RefractionIndex("Constant", n=1)
+
+            pc.check_type(key, val, RefractionIndex)
+
+        super().__setattr__(key, val)
 
     @property
     def elements(self) -> list[Element]:
@@ -116,21 +135,22 @@ class Group(BaseClass):
         for el in self._elements:
             el.move_to(el.pos - (pos0 - pos))
 
-    def tma(self, wl: float = 555., n0: RefractionIndex = None) -> TMA:
+    def tma(self, wl: float = 555.) -> TMA:
         """
         Creates an ray transfer matrix analysis object from the group geometry.
         Note that this is a snapshot and does not get updated.
 
         :param wl: wavelength for matrix analysis
-        :param n0: ambient refraction index before first lens
         :return: ray transfer matrix analysis object
         """
-        return TMA(self.lenses, wl=wl, n0=n0)
+        return TMA(self.lenses, wl=wl, n0=self.n0)
 
     def flip(self, y0: float = 0, z0: float = None) -> None:
         """
         Flip the group (= rotate by 180 deg) around an axis parallel to the x-axis and through the point (y0, z0).
-        By default y0 = 0 and z0 is the center of the z-extent of the group
+        By default y0 = 0 and z0 is the center of the z-extent of the group.
+
+        This also sets and reassigns ambient and lens refraction indices.
 
         :param y0: y-position of axis
         :param z0: z-position of axis
@@ -140,27 +160,31 @@ class Group(BaseClass):
 
         # elements, z-positions and media
         els = self.elements
-        ns = [L.n2 for L in els if isinstance(L, Lens)]
+        ns = [self.n0] + [L.n2 for L in els if isinstance(L, Lens)]
         z0 = np.mean(self.extent[4:]) if z0 is None else z0
+        
+        # reverse element order
+        self.clear()
+        els.reverse()
+        self.add(els)
 
+        # flip elements and element positions
         for i, el in enumerate(els):
             el.flip()
             el.move_to([el.pos[0], y0 - (el.pos[1] - y0), z0 - (el.pos[2] - z0)])
 
-        if len(ns):
-            # with the lenses the order of ambient materials n2 is also reversed
-            # n2 last element is lost, because it would be the medium before the group
+        # reverse medium order, last medium is undefined
+        ns.reverse()
 
-            if ns[-1] is not None:
-                self.print("WARNING: ambient index n2 of last lens is lost.")
-            
-            # reverse medium order, last medium is undefined
-            ns.reverse()
-            ns += [None]
+        # replace "None" media with old ambient one
+        ns = [nsi if nsi is not None else self.n0 for nsi in ns]
 
-            # assign
-            for n2, L in zip(ns[1:], self.lenses):
-                L.n2 = n2
+        # assign new ambient
+        self.n0 = ns[0] 
+
+        # assign all lens media
+        for n2, L in zip(ns[1:], self.lenses):
+            L.n2 = n2
 
     def rotate(self, angle: float, x0: float = 0, y0: float = 0) -> None:
         """
@@ -205,6 +229,11 @@ class Group(BaseClass):
             case Lens() | IdealLens():        self.lenses.append(el)
 
             case Group():
+
+                if self.n0 != el.n0:
+                    self.print("Overwriting ambient index with index from new Group.")
+                    self.n0 = el.n0
+
                 for eli in el.elements:
                     self.add(eli)
 

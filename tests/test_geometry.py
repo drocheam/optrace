@@ -17,7 +17,6 @@ from optrace.tracer.base_class import BaseClass as BaseClass
 
 from optrace.tracer.geometry.surface import Surface
 
-# TODO example with ideal lenses
 
 
 class GeometryTests(unittest.TestCase):
@@ -230,6 +229,12 @@ class GeometryTests(unittest.TestCase):
         tma1 = eye.tma()
         self.assertTrue(np.allclose(tma0.abcd - tma1.abcd, 0))
 
+        # change ambient index, abcd should now differ
+        eye2 = eye.copy()
+        eye2.n0 = ot.RefractionIndex("Constant", n=1.2)
+        tma2 = eye2.tma()
+        self.assertFalse(np.allclose(tma0.abcd - tma2.abcd, 0))
+
         # position of Group is just position of first element
         self.assertTrue(np.allclose(eye.lenses[0].pos - eye.pos, 0))
 
@@ -248,6 +253,9 @@ class GeometryTests(unittest.TestCase):
         tma2 = eye.tma()
         self.assertTrue(np.allclose(eye.pos - pos, 0))
         self.assertTrue(np.allclose(tma1.abcd - tma2.abcd, 0))
+
+        # check types
+        self.assertRaises(TypeError, ot.Group, [], 1)  # invalid refraction index type
 
     def test_group_geometry_actions(self):
 
@@ -358,6 +366,15 @@ class GeometryTests(unittest.TestCase):
                 self.assertTrue(surf[i].pos[2] <= surf[i+1].pos[2])
             self.assertEqual(el.desc, "a")
 
+        # check ambient index overwrite when adding two groups together
+        G1 = ot.Group(None, n0=ot.RefractionIndex("Constant", n=2))
+        G2 = ot.Group(None, n0=ot.RefractionIndex("Constant", n=1))
+        G3 = G1.copy()
+        G1.add(G2)
+        self.assertEqual(G1.n0(500)[()], 1)
+        G2.add(G3)
+        self.assertEqual(G2.n0(500)[()], 2)
+        
     def test_ideal_lens(self):
 
         # exceptions
@@ -718,14 +735,15 @@ class GeometryTests(unittest.TestCase):
 
         n = ot.presets.refraction_index.SF10
         n2 = ot.presets.refraction_index.F2
-
+        n3 = ot.presets.refraction_index.K5
+        
         # group with ascending order of desc strings according to z position
         G = ot.Group([
             ot.RaySource(ot.CircularSurface(r=3), pos=[0, 1, -1], desc="0"),
             ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Constant", val=0.5), pos=[0, 0, 2], desc="1"),
             ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 5], d=1, n2=n, desc="2"),
             ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 7], d=1, n2=n2, desc="3"),
-            ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 9], d=1, desc="4"),
+            ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 9], n2=n3, d=1, desc="4"),
             ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 11], desc="5"),
             ot.Aperture(ot.RingSurface(r=3, ri=1), pos=[0, 0, 13], desc="6"),
             ot.Marker("7", pos=[0, 0, 15]),
@@ -755,6 +773,8 @@ class GeometryTests(unittest.TestCase):
         # check assignment of ambient n
         self.assertEqual(Gr.lenses[0].n2, n2)
         self.assertEqual(Gr.lenses[1].n2, n)
+        self.assertEqual(Gr.lenses[2].n2, G.n0)
+        self.assertEqual(Gr.n0, n3)
 
         # xy extent stayed the same
         self.assertTrue(np.allclose(np.array(G.extent[:4]) - Gr.extent[:4], 0))
@@ -770,10 +790,6 @@ class GeometryTests(unittest.TestCase):
         G3.flip(y0=1, z0=2)
         self.assertTrue(np.allclose(G3.markers[0].pos - [2, -1, -1], 0))
         self.assertTrue(np.allclose(G3.markers[1].pos - [-1, 2, 2], 0))
-
-        # coverage test: ambient lens n2 gets unset
-        G3 = ot.Group([G.lenses[0]])
-        G3.flip()
 
         # coverage test: flip empty group
         ot.Group().flip()

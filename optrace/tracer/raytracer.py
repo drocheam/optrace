@@ -78,7 +78,6 @@ class Raytracer(Group):
         self.outline = outline  #: geometrical raytracer outline
         self.absorb_missing = absorb_missing  #: absorb rays missing lenses
         self.no_pol = no_pol  #: polarization calculation flag
-        self.n0 = n0  #: ambient refraction index
 
         self.rays = RayStorage()  #: traced rays
         self._msgs = np.array([])
@@ -87,7 +86,7 @@ class Raytracer(Group):
         self._force_threads = None
         self.fault_pos = np.array([])
 
-        super().__init__(**kwargs)
+        super().__init__(None, n0, **kwargs)
         self._new_lock = True
 
     def __setattr__(self, key: str, val: Any) -> None:
@@ -112,11 +111,6 @@ class Raytracer(Group):
             case ("no_pol" | "absorb_missing"):
                 pc.check_type(key, val, bool)
 
-            case "n0":
-                pc.check_type(key, val, RefractionIndex | None)
-                if val is None:
-                    val = RefractionIndex("Constant", n=1.)
-
         super().__setattr__(key, val)
 
     @property
@@ -136,16 +130,6 @@ class Raytracer(Group):
         # overwrites Group.clear, since we also clear the ray storage here
         super().clear()
         self.rays.__init__()
-
-    def tma(self, wl: float = 555.) -> TMA:
-        """
-        Create a ray transfer matrix analysis object
-
-        :param wl: wavelength for the analysis
-        :return: ray transfer matrix analysis object
-        """
-        # overwrites Group.tma since n0 is known
-        return super().tma(wl, self.n0)
 
     def property_snapshot(self) -> dict:
         """
