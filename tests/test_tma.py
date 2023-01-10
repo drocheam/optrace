@@ -314,14 +314,10 @@ class TMATests(unittest.TestCase):
 
     def test_tma_misc(self):
 
-        # test tma.trace
+        # some lens
         L = ot.Lens(ot.SphericalSurface(r=1, R=100), ot.SphericalSurface(r=1, R=-200), de=0, pos=[0, 0, 2],
                     n=ot.RefractionIndex("Constant", n=1.5))
         Ltma = L.tma()
-        Ltma.trace([1.2, -0.7])  # list input
-        res = Ltma.trace(np.array([1.2, -0.7]))  # 1D array input
-        res2 = Ltma.trace(np.array([[1.2, -0.7], [5, 3]]))  # 2D array input
-        self.assertTrue(np.allclose(res2[0], res))  # rows in input lead to rows in output
 
         # test tma.matrix_at
         ######

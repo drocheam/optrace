@@ -1,4 +1,6 @@
 
+.. _ray_matrix_analysis:
+
 *****************************
 Ray Transfer Matrix Analysis
 *****************************
@@ -215,6 +217,9 @@ With the surface optical powers :math:`D_\text{s1} = \frac{n-n_1}{R_1}` and :mat
 
 Which is known as Gullstrand's equation. :footcite:`GullstrandHyper,EdmundFocal`
 
+
+.. _ray_cardinal_points:
+
 Cardinal Points 
 =================================================
 
@@ -266,6 +271,7 @@ Effective focal length (EFL), back focal length (BFL) and front focal length (FF
    \text{EFL} =&~ f_2
    :label: TMA_ffk_bfl_efl
 
+.. _ray_power_def:
 
 Optical Power 
 =================================================
@@ -299,6 +305,8 @@ To evaluate setups of :math:`N` lenses the lens matrices :math:`\text{M}_\text{L
    \text{M} = \text{M}_\text{L,N} \cdot \text{M}_\text{s,N-1} \dots \text{M}_\text{s,0} \cdot \text{M}_\text{L,0}
    :label: TMA_setup
 
+
+.. _ray_image_object_distances:
 
 Image and Object Distance 
 =================================================

@@ -635,6 +635,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
+    @pytest.mark.skip(reason="there seems to be some issue with qt4, leads to segmentation faults.")
     def test_action_spam_random(self):
         """do random actions with random delays and check if there are race conditions or other special issues"""
 

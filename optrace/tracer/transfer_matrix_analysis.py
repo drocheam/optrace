@@ -6,13 +6,12 @@ from . import color  # for wavelength bounds
 from .misc import PropertyChecker as pc  # type checking
 
 
-# sources for sign conventions:
+# Some Sources
 # https://www.edmundoptics.de/knowledge-center/application-notes/optics/understanding-optical-lens-geometries/
 # https://www.montana.edu/jshaw/documents/1%20EELE_481_582_S15_GeoSignConventions.pdf
-
-# resources TMA
 # https://indico.cern.ch/event/266133/attachments/474621/656940/Gillespie_Aachen_CP_vs_P_optics.pdf
 # https://www.montana.edu/ddickensheets/documents/abcdCardinal%202.pdf
+# https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/
 
 
 class TMA(BaseClass):
@@ -26,6 +25,8 @@ class TMA(BaseClass):
         """
         Create an ray transfer matrix analysis object.
         This is a snapshot of properties for when the object gets created, nothing is updated after that.
+        
+        With no lenses the abcd matrix is a unity matrix and all other properties are set to nan
 
         :param lenses: list of Lens
         :param wl: wavelength to create the analysis for
@@ -34,20 +35,15 @@ class TMA(BaseClass):
         """
         # type checks
         pc.check_type("lenses", lenses, list)
+        pc.check_type("n0", n0, RefractionIndex | None)
         pc.check_type("wl", wl, float | int)
         pc.check_not_below("wl", wl, color.WL_BOUNDS[0])
         pc.check_not_above("wl", wl, color.WL_BOUNDS[1])
-        pc.check_type("n0", n0, RefractionIndex | None)
 
         self.wl = wl
+        """wavelength for the analysis"""
+
         L = sorted(lenses, key=lambda el: el.front.pos[2])
-
-        # cardinal points from ABCD matrix:
-        # https://www.montana.edu/ddickensheets/documents/abcdCardinal%202.pdf
-        # bfl and ffl from
-        # https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/
-
-        # with no lenses the abcd matrix is a unity matrix and all other properties are set to nan
 
         self.vertex_point: tuple[float, float] = (L[0].front.pos[2], L[-1].back.pos[2]) if len(lenses)\
                                                  else (np.nan, np.nan)
@@ -101,7 +97,7 @@ class TMA(BaseClass):
         """effective focal length"""
     
         self.focal_length_n: tuple[float, float] = f1/self.n1, f2/self.n2
-        """"""
+        """focal lengths with different definition, see the documentation"""
    
         self.power: tuple[float, float] = 1000/f1, 1000/f2
         """optical powers of the lens, inverse of focal length"""
@@ -115,7 +111,7 @@ class TMA(BaseClass):
 
         super().__init__(**kwargs)
 
-        # lock object
+        # lock object (no changes from here)
         self.lock()
         self._new_lock = True
 
@@ -127,7 +123,7 @@ class TMA(BaseClass):
         :return: 2x2 numpy array
         """
         
-        # calculate abcd matrix
+        # calculate ABCD matrix
         mat = np.eye(2)
         for i in np.arange(len(L)-1, -1, -1):
             
@@ -167,7 +163,7 @@ class TMA(BaseClass):
                 mat = mat @ d_matrix
             
                 if dz < 0:
-                    raise RuntimeError("Negative distance between lenses. Maybe there are object collisions?")
+                    raise RuntimeError("Negative distance between lenses. Are there object collisions?")
 
         return mat
 
@@ -234,23 +230,10 @@ class TMA(BaseClass):
         :param z_b: image z-position
         :return: ABCD matrix, 2x2 numpy array
         """
+
         d_b_matrix = np.array([[1, z_b - self._2], [0, 1]])  # matrix for distance to first lens
         d_g_matrix = np.array([[1, self._1 - z_g], [0, 1]])  # matrix for distance from last lens
         mat = d_b_matrix @ self.abcd @ d_g_matrix
 
         return mat
 
-    def trace(self, pos: list[float, float] | np.ndarray):
-        """
-        Paraxial tracing. Calculates r and theta values.
-
-        :param pos: either two element list or array with [r, theta] 
-                or two-dimensional array with r and theta in columns
-        :return: resulting r and theta in same shape as pos
-        """
-        in_arr = np.array(pos, dtype=float)
-
-        if in_arr.ndim == 1:
-            return self.abcd @ in_arr
-        else:
-            return (self.abcd @ in_arr.T).T
