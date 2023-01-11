@@ -217,23 +217,35 @@ class TMATests(unittest.TestCase):
         self.assertAlmostEqual(Ltma.efl, Lf, places=1)
         
         def check_image_pos(g_z): 
+            tma = L.tma()
             g = L.pos[2] - g_z
-            f = L.tma().efl
+            f = tma.efl
             image_pos_approx = L.pos[2] + f*g/(g-f)
-            image_pos = L.tma().image_position(g_z)
+            image_pos = tma.image_position(g_z)
 
             self.assertAlmostEqual(image_pos, image_pos_approx, delta=0.5)
+
+            # check if magnification nearly matches b/g
+            b = image_pos - tma.principal_point[1]
+            m = tma.image_magnification(g_z)
+            self.assertAlmostEqual(-b/g, m, delta=0.005)  # minus because image is inverted
 
         for g_z in [-2*Lf, -Lf/2, 0, Lf/2, 2*Lf]:
             check_image_pos(g_z)
         
         def check_object_pos(b_z): 
+            tma = L.tma()
             b = b_z - L.pos[2]
-            f = L.tma().efl
+            f = tma.efl
             object_pos_approx = L.pos[2] - f*b/(b-f)
-            object_pos = L.tma().object_position(b_z)
+            object_pos = tma.object_position(b_z)
 
             self.assertAlmostEqual(object_pos, object_pos_approx, delta=0.5)
+            
+            # check if magnification nearly matches b/g
+            g = tma.principal_point[0] - object_pos
+            m = tma.object_magnification(b_z)
+            self.assertAlmostEqual(-b/g, m, delta=0.005)  # minus because image is inverted
 
         for b_z in [-2*Lf, -Lf/2, 0, Lf/2, 2*Lf]:
             check_object_pos(b_z)
@@ -246,15 +258,26 @@ class TMATests(unittest.TestCase):
         # object at -inf
         self.assertAlmostEqual(tma.image_position(-np.inf), tma.focal_point[1])
         self.assertAlmostEqual(tma.image_position(-100000), tma.focal_point[1], delta=0.005)
+        self.assertAlmostEqual(tma.image_magnification(-np.inf), 0, delta=1e-9)
+        self.assertAlmostEqual(tma.image_magnification(-10000000), 0, delta=1e-5)
+
         # image at inf
         self.assertAlmostEqual(tma.object_position(np.inf), tma.focal_point[0])
         self.assertAlmostEqual(tma.object_position(100000), tma.focal_point[0], delta=0.005)
+        self.assertTrue(np.isnan(tma.object_magnification(np.inf)))
+        self.assertTrue(np.abs(tma.object_magnification(10000000)) > 10000)
+
         # object at focal point 0
         self.assertAlmostEqual(1 / tma.image_position(tma.focal_point[0] - 1e-12), 0) # 1/b approaches zero
         self.assertTrue(1 / tma.image_position(tma.focal_point[0] - 1e-12) > 0)  # positive infinity
+        mz = tma.image_magnification(tma.focal_point[0])
+        self.assertTrue(np.isnan(mz) or mz > 10000)  # large magnification
+
         # image at focal point 1
         self.assertAlmostEqual(1 / tma.object_position(tma.focal_point[1] + 1e-12), 0)
         self.assertTrue(1 / tma.object_position(tma.focal_point[1] + 1e-12) < 0)  # negative infinity
+        mz = tma.object_magnification(tma.focal_point[1]+1e-12)
+        self.assertAlmostEqual(mz, 0, delta=1e-9)
 
     def test_tma_error_cases(self):
 

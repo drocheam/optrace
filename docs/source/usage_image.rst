@@ -43,8 +43,16 @@ ___________________________
 * **Equidistant**: Projection keeping the radial direction from the center equal, see :footcite:`EquidistantProjWiki`.
 * **Equal-Area**: Projection keeping local areas equal, see :footcite:`EqualAreaProjWiki`.
 
+.. _image_plots:
+
 Plotting Image and Spectra
 _____________________________________
+
+
+.. _chromaticity_plots:
+
+Chromaticity Plots
+________________________
 
 
 Rescaling and Filtering an Image

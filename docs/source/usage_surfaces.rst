@@ -380,6 +380,43 @@ Bewlo you can see some additional geometrical quantities that are useful when mo
 
 There is a smallest three-dimensional box encompassing all of the surface. It can be described by four values, the ``extent``. It consists of two values per dimension, where each describes one of the bounds in this dimension.
 
+
+.. _surface_plotting:
+
+Plotting
+__________________________
+
+Visualizing surfaces is done with the function ``surface_profile_plot`` from ``optrace.plots``.
+The surface profiles are plotted with absolute coordinates, if you want to display them relative to each other provide ``remove_offset=True``.
+``surface_profile_plot`` takes a Surface or a list of Surfaces as argument as well as some other display options.
+
+In the following examples both cornea surfaces of the arizona eye model are plotted:
+
+.. testcode::
+
+   import optrace.plots as otp
+
+   G = ot.presets.geometry.arizona_eye()
+   L0 = G.lenses[0]
+
+   otp.surface_profile_plot([L0.front, L0.back], remove_offset=True)
+   
+
+Optionally a ``title`` parameter can be provided. You can plot only part of the profiles by providing values for ``x0`` and ``xe``.
+
+.. testcode::
+
+   otp.surface_profile_plot([L0.front, L0.back], block=True, remove_offset=True, x0=-0.5, xe=1.2, title="Cornea Surfaces")
+
+This produces the following plot:
+
+.. figure:: ./images/surface_profile_plot.svg
+   :align: center
+   :width: 550
+
+   Surface profile plot for the two cornea surfaces of the arizona eye model.
+
+
 ------------
 
 **Sources**

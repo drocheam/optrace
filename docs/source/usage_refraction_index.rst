@@ -125,6 +125,49 @@ You can also check if a medium is dispersive by calling
 
 A list of predefined lines can be found in :numref:`spectral_lines`.
 
+.. _index_plots:
+
+Plotting
+_______________________
+
+
+**Index Plot**
+
+A RefractionIndex or a list of RefractionIndex objects can be plotted with the function ``refraction_index_plot`` from ``optrace.plots``.
+The example below plots the glass presets in one figure.
+
+.. testcode::
+
+   import optrace.plots as otp
+
+   otp.refraction_index_plot(ot.presets.refraction_index.glasses)
+
+The methods support a user defined ``title`` and a blocking parameter ``block``, that stops the rest of the program for plotting.
+You can also enable or disable the legend and labels with ``legend_off`` and ``labels_off``
+
+.. testcode::
+
+   otp.refraction_index_plot(ot.presets.refraction_index.glasses, block=False, title="Test abc",
+                             legend_off=False, labels_off=True)
+
+Examples for an index plot are found below.
+
+**Abbe Plot**
+
+An Abbe plot is generated with ``abbe_plot``.
+
+.. testcode::
+
+   otp.abbe_plot(ot.presets.refraction_index.glasses)
+
+It also supports the parameters ``title`` and ``block``. Additionally one can provide user defined ``lines`` to calculate the index and V-number with:
+
+.. testcode::
+
+   otp.abbe_plot(ot.presets.refraction_index.glasses, title="abc", lines=ot.presets.spectral_lines.FeC, block=False)
+
+
+Exemplary Abbe plots are shown below in the presets section.
 
 .. _agf_load:
 

@@ -29,7 +29,7 @@ def arizona_eye(adaptation:  float = 0.,
 
     # absolute position
     pos0 = np.array(pos if pos is not None else [0, 0, 0])
-    geom = Group(long_desc="Arizona Eye Model")
+    geom = Group(long_desc="Arizona Eye Model", desc="Eye")
     
     # rename
     A = adaptation
@@ -45,25 +45,25 @@ def arizona_eye(adaptation:  float = 0.,
     n_Vitreous = RefractionIndex("Abbe", n=1.336, V=61.1, desc="n_Vitreous")
 
     # add Cornea
-    front = ConicSurface(r=5.25, R=7.8, k=-0.25)
-    back = ConicSurface(r=5.25, R=6.5, k=-0.25)
+    front = ConicSurface(r=5.25, R=7.8, k=-0.25, long_desc="Cornea Anterior")
+    back = ConicSurface(r=5.25, R=6.5, k=-0.25, long_desc="Cornea Posterior")
     L0 = Lens(front, back, d1=0, d2=0.55, pos=pos0+[0, 0, 0], n=n_Cornea, n2=n_Aqueous, desc="Cornea")
     geom.add(L0)
 
     # add Pupil
-    ap = RingSurface(r=5.25, ri=pupil/2)
+    ap = RingSurface(r=5.25, ri=pupil/2, desc="Pupil")
     AP = Aperture(ap, pos=pos0+[0, 0, 3.1], desc="Pupil")
     geom.add(AP)
 
     # add Lens
-    front = ConicSurface(r=5.25, R=12-0.4*A, k=-7.518749+1.285720*A)
-    back = ConicSurface(r=5.25, R=-5.224557+0.2*A, k=-1.353971-0.431762*A)
+    front = ConicSurface(r=5.25, R=12-0.4*A, k=-7.518749+1.285720*A, long_desc="Lens Anterior")
+    back = ConicSurface(r=5.25, R=-5.224557+0.2*A, k=-1.353971-0.431762*A, long_desc="Lens Posterior")
     L1 = Lens(front, back, d1=0, d2=d_Lens, pos=pos0+[0, 0, d_Aq+0.55],
               n=n_Lens, n2=n_Vitreous, desc="Lens")
     geom.add(L1)
 
     # add Detector
-    DetS = SphericalSurface(r=r_det, R=-13.4)
+    DetS = SphericalSurface(r=r_det, R=-13.4, desc="Retina")
     Det = Detector(DetS, pos=pos0+[0, 0, 24], desc="Retina")
     geom.add(Det)
 
@@ -88,7 +88,7 @@ def legrand_eye(pupil: float = 5.7,
     """
 
     pos0 = np.array(pos if pos is not None else [0, 0, 0])
-    geom = Group(long_desc="LeGrand Full Theoretical Eye")
+    geom = Group(long_desc="LeGrand Full Theoretical Eye", desc="Eye")
 
     n_Cornea = RefractionIndex("Constant", n=1.3771, desc="n_Cornea")
     n_Aqueous = RefractionIndex("Constant", n=1.3374, desc="n_Aqueous")
@@ -96,25 +96,25 @@ def legrand_eye(pupil: float = 5.7,
     n_Vitreous = RefractionIndex("Constant", n=1.3360, desc="n_Vitreous")
 
     # add Cornea
-    front = SphericalSurface(r=5, R=7.8)
-    back = SphericalSurface(r=5, R=6.5)
+    front = SphericalSurface(r=5, R=7.8, long_desc="Cornea Anterior")
+    back = SphericalSurface(r=5, R=6.5, long_desc="Cornea Posterior")
     L0 = Lens(front, back, d1=0.25, d2=0.30, pos=pos0+[0, 0, 0.25], n=n_Cornea, n2=n_Aqueous, desc="Cornea")
     geom.add(L0)
 
     # add Aperture
-    ap = RingSurface(r=5, ri=pupil/2)
+    ap = RingSurface(r=5, ri=pupil/2, desc="Pupil")
     AP = Aperture(ap, pos=pos0+[0, 0, 3.3], desc="Pupil")
     geom.add(AP)
 
     # add Lens
-    front = SphericalSurface(r=4.5, R=10.2)
-    back = SphericalSurface(r=4.5, R=-6)
+    front = SphericalSurface(r=4.5, R=10.2, long_desc="Lens Anterior")
+    back = SphericalSurface(r=4.5, R=-6, long_desc="Lens Posterior")
     L1 = Lens(front, back, d1=1.5, d2=2.5, pos=pos0+[0, 0, 5.10],
               n=n_Lens, n2=n_Vitreous, desc="Lens")
     geom.add(L1)
 
     # add Detector
-    DetS = SphericalSurface(r=r_det, R=-13.4)
+    DetS = SphericalSurface(r=r_det, R=-13.4, desc="Retina")
     Det = Detector(DetS, pos=pos0+[0, 0, 24.197], desc="Retina")
     geom.add(Det)
 

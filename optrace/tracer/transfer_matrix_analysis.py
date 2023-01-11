@@ -166,7 +166,7 @@ class TMA(BaseClass):
                     raise RuntimeError("Negative distance between lenses. Are there object collisions?")
 
         return mat
-
+ 
     def image_position(self, z_g) -> float:
         """
         get the image position for a object distance
@@ -194,10 +194,22 @@ class TMA(BaseClass):
             b = -A/C if C else np.nan
 
         return b + self._2
+    
+    def image_magnification(self, z_g) -> float:
+        """
+        get the image magnification at the image plane for a given object distance
+
+        :param z_g: z-position of object
+        :return: magnification factor (image size divided by object size)
+        """
+        z_b = self.image_position(z_g)
+        mat = self.matrix_at(z_g, z_b)
+        return mat[0, 0]
 
     def object_position(self, z_b) -> float:
         """
         get the object position for a given image position
+
         :param z_b: z-position of image
         :return: z-position of object
         """
@@ -221,6 +233,17 @@ class TMA(BaseClass):
             g = -D/C if C else np.nan
 
         return self._1 - g
+
+    def object_magnification(self, z_b) -> float:
+        """
+        get the object magnification at the object plane for a given image distance
+
+        :param z_g: z-position of object
+        :return: magnification factor (image size divided by object size)
+        """
+        z_g = self.object_position(z_b)
+        mat = self.matrix_at(z_g, z_b)
+        return mat[0, 0]
 
     def matrix_at(self, z_g: float, z_b: float) -> np.ndarray:
         """

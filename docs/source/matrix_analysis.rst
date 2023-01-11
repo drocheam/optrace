@@ -311,6 +311,8 @@ To evaluate setups of :math:`N` lenses the lens matrices :math:`\text{M}_\text{L
 Image and Object Distance 
 =================================================
 
+**Positions**
+
 The matrix for additional object distance :math:`g` and image distance :math:`b` is:
 
 .. math::
@@ -402,7 +404,16 @@ And most commonly found for :math:`n_i = 1, ~~n_o = 1`: :footcite:`LinsenGleichu
    \frac{1}{f} = \frac{1}{g} + \frac{1}{b}
    :label: TMA_imaging_eq_base
 
+Where :math:`f,~b,~g` are positive when measured in positive z-direction.
 
+**Magnifications**
+
+With a given object and image position the combined ABCD matrix in :math:numref:`TMA_image_distance_mat` can be calculated.
+Element :math:`A` of the matrix corresponds to the magnification factor :math:`m`, as :math:`B=0` applies for this matrix.
+
+For a thin, ideal lens :math:`m` would be equal to :math:`b/g`.
+
+Referring to the value of this factor, :math:`A < 0` signifies an inverted image, :math:`A > 0` an upright image, :math:`\lvert A \rvert > 1` a size increase, :math:`\lvert A \rvert < 1` a size decrease.
 
 ------------
 

@@ -232,6 +232,21 @@ Which should be exactly the same position as the first focal point:
    >>> tma.focal_point[0]
    -16.931238099315884
 
+
+Analogously not only the positions but also the magnification factors at the image/object plane can be calculated:
+
+.. doctest::
+
+   >>> tma.image_magnification(-57.3)
+   -0.7591396036811361
+
+.. doctest::
+
+   >>> tma.object_magnification(18)
+   0.8640542105175426
+
+A positive factor corresponds to an upright image, a negative to an inverted one. A number of magnitude larger than one means magnification, a number smaller than this a size decrease.
+
 Details on the math are listed in :numref:`ray_image_object_distances`.
 
 Another feature is the calculation of the ABCD matrix for a specific object and image distance.

@@ -187,6 +187,29 @@ This is the parent class of both ``LightSpectrum, TransmissionSpectrum``. It def
 Generally the ``Spectrum`` class is not used by the user. But for instance the color matching functions ``ot.presets.spectrum.x, ot.presets.spectrum.y, ot.presets.spectrum.z`` are objects of this class.
 
 
+.. _spectrum_plots:
+
+Plotting
+_____________________
+
+A ``Spectrum`` is plotted with the function ``spectrum_plot`` from ``optrace.plots``.
+It takes a ``Spectrum``, subclasses or a list of them.
+
+.. testcode::
+
+   import optrace.plots as otp
+
+   otp.spectrum_plot(ot.presets.light_spectrum.standard_natural)
+
+The user can provide a user-defined ``title``, turn off/on labels and the legend with ``legend_off. labels_off`` and make the plot blocking with ``block=True``.
+
+.. testcode::
+
+   ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_natural, labels_off=False, title="CIE Standard Illuminants",
+                          legend_off=False, block=False)
+
+Examples for a spectrum plot are found below.
+
 Presets
 ______________________
 

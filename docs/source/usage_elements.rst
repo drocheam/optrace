@@ -1,4 +1,4 @@
-Defining Elements (Lens, RaySource, Detector, Filter, Aperture, Maker)
+Defining Elements (Lens, RaySource, Detector, Filter, Aperture, Marker)
 ------------------------------------------------------------------------
 
 
@@ -27,7 +27,7 @@ A RaySource defines the properties for rays that it creates, including
 
 **Surface/Point/Line Parameter**
 
-A RaySource supports the following bsae shapes ``Point, Line, CircularSurface, RectangularSurface, RingSurface``, which are provided as first parameter to the ``RaySource()`` function.
+A RaySource supports the following base shapes ``Point, Line, CircularSurface, RectangularSurface, RingSurface``, which are provided as first parameter to the ``RaySource()`` function.
 
 .. testcode::
 

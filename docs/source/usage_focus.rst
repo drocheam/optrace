@@ -113,6 +113,8 @@ Below you can find multiple application cases an preferred autofocus methods.
    The TraceGUI has an option for plotting the cost function.
 
 
+.. _focus_cost_plot:
+
 Cost Plots
 ___________________________
 
