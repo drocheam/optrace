@@ -203,7 +203,10 @@ class TMA(BaseClass):
         :return: magnification factor (image size divided by object size)
         """
         z_b = self.image_position(z_g)
-        mat = self.matrix_at(z_g, z_b)
+        
+        with np.errstate(invalid='ignore'):  # suppresses nan warnings
+            mat = self.matrix_at(z_g, z_b)
+       
         return mat[0, 0]
 
     def object_position(self, z_b) -> float:
@@ -242,7 +245,10 @@ class TMA(BaseClass):
         :return: magnification factor (image size divided by object size)
         """
         z_g = self.object_position(z_b)
-        mat = self.matrix_at(z_g, z_b)
+
+        with np.errstate(invalid='ignore'):  # suppresses nan warnings
+            mat = self.matrix_at(z_g, z_b)
+
         return mat[0, 0]
 
     def matrix_at(self, z_g: float, z_b: float) -> np.ndarray:

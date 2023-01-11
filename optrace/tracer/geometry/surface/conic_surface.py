@@ -122,65 +122,60 @@ class ConicSurface(Surface):
         sx, sy, sz = s[:, 0], s[:, 1], s[:, 2]
         k, rho = self.k, 1/self.R
 
-        # we want to ignore numpy errors, since we divide by zero in some cases (e.g for A == 0)
-        # these errors are handled afterwards, but checking and masking
-        # all arrays beforehand would decrease performance
-        old_err = np.seterr("ignore")
+        with np.errstate(invalid='ignore'):  # suppresses nan warnings for now
 
-        A = ne.evaluate("1 + k*sz**2")
-        B = ne.evaluate("sx*ox + sy*oy + sz*(oz*(k+1) - 1/rho)")
-        C = ne.evaluate("oy**2 + ox**2 + oz*(oz*(k+1) - 2/rho)")
+            A = ne.evaluate("1 + k*sz**2")
+            B = ne.evaluate("sx*ox + sy*oy + sz*(oz*(k+1) - 1/rho)")
+            C = ne.evaluate("oy**2 + ox**2 + oz*(oz*(k+1) - 2/rho)")
 
-        # if there are not hits, this term gets imaginary
-        # we'll handle this case afterwards
-        D = ne.evaluate("sqrt(B**2 - C*A)")
+            # if there are not hits, this term gets imaginary
+            # we'll handle this case afterwards
+            D = ne.evaluate("sqrt(B**2 - C*A)")
 
-        # we get two possible ray parameters
-        # nan values for A == 0, we'll handle them later
-        t1 = ne.evaluate("(-B - D) / A")
-        t2 = ne.evaluate("(-B + D) / A")
+            # we get two possible ray parameters
+            # nan values for A == 0, we'll handle them later
+            t1 = ne.evaluate("(-B - D) / A")
+            t2 = ne.evaluate("(-B + D) / A")
 
-        # choose t that leads to z-position inside z-range of surface and 
-        # to a larger z-position than starting point (since for us rays only propagate in +z direction)
-        z1 = p[:, 2] + sz*t1
-        z2 = p[:, 2] + sz*t2
-        z = p[:, 2]
-        z_min, z_max = self.z_min - self.N_EPS, self.z_max + self.N_EPS
-        t = ne.evaluate("where((z_min <= z1) & (z1 <= z_max) & (z1 >= z) &"\
-                        " ~((z_min <= z2) & (z2 <= z_max) & (z2 >= z) & (t2 < t1)), t1, t2)")
-        # chose the smaller one of t1, t2 that produces a z-value inside the surface extent
-        # and a hit point behind the starting point
+            # choose t that leads to z-position inside z-range of surface and 
+            # to a larger z-position than starting point (since for us rays only propagate in +z direction)
+            z1 = p[:, 2] + sz*t1
+            z2 = p[:, 2] + sz*t2
+            z = p[:, 2]
+            z_min, z_max = self.z_min - self.N_EPS, self.z_max + self.N_EPS
+            t = ne.evaluate("where((z_min <= z1) & (z1 <= z_max) & (z1 >= z) &"\
+                            " ~((z_min <= z2) & (z2 <= z_max) & (z2 >= z) & (t2 < t1)), t1, t2)")
+            # chose the smaller one of t1, t2 that produces a z-value inside the surface extent
+            # and a hit point behind the starting point
 
-        # calculate hit points and hit mask
-        p_hit = p + s*t[:, np.newaxis]
-        is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
+            # calculate hit points and hit mask
+            p_hit = p + s*t[:, np.newaxis]
+            is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
 
-        # case A == 0 and B != 0 => one intersection
-        mask = (A == 0) & (B != 0)
-        if np.any(mask):
-            t = -C[mask]/(2*B[mask])
-            p_hit[mask] = p[mask] + s[mask]*t[:, np.newaxis]
-            is_hit[mask] = self.get_mask(p_hit[mask, 0], p_hit[mask, 1])
+            # case A == 0 and B != 0 => one intersection
+            mask = (A == 0) & (B != 0)
+            if np.any(mask):
+                t = -C[mask]/(2*B[mask])
+                p_hit[mask] = p[mask] + s[mask]*t[:, np.newaxis]
+                is_hit[mask] = self.get_mask(p_hit[mask, 0], p_hit[mask, 1])
 
-        # cases with no hit:
-        # D imaginary, means no hit with whole surface function
-        # (p_hit[:, 2] < z_min) | (p_hit[:, 2] > z_max): Hit with surface function,
-        #               but for the wrong side or outside our surfaces definition region
-        # (A == 0) | (B == 0) : Surface is a Line => not hit (
-        # technically infinite hits for C == 0, but we'll ignore this)
-        # in the simplest case: ray shooting straight at center of a parabola with R = inf,
-        # which is so steep, it's a line
-        # the ray follows the parabola line exactly => infinite solutions
-        #   s = (0, 0, 1), o = (0, 0, oz), k = -1, R=0  => A = 0, B = 0, C = 0 => infinite solutions
-        nh = ~is_hit | ~np.isfinite(D) | ((A == 0) & (B == 0)) | (p_hit[:, 2] < z_min) | (p_hit[:, 2] > z_max)
+            # cases with no hit:
+            # D imaginary, means no hit with whole surface function
+            # (p_hit[:, 2] < z_min) | (p_hit[:, 2] > z_max): Hit with surface function,
+            #               but for the wrong side or outside our surfaces definition region
+            # (A == 0) | (B == 0) : Surface is a Line => not hit (
+            # technically infinite hits for C == 0, but we'll ignore this)
+            # in the simplest case: ray shooting straight at center of a parabola with R = inf,
+            # which is so steep, it's a line
+            # the ray follows the parabola line exactly => infinite solutions
+            #   s = (0, 0, 1), o = (0, 0, oz), k = -1, R=0  => A = 0, B = 0, C = 0 => infinite solutions
+            nh = ~is_hit | ~np.isfinite(D) | ((A == 0) & (B == 0)) | (p_hit[:, 2] < z_min) | (p_hit[:, 2] > z_max)
 
-        if np.any(nh):
-            # set intersection to plane z = z_max
-            tnh = (self.z_max - p[nh, 2]) / s[nh, 2]
-            p_hit[nh] = p[nh] + s[nh]*tnh[:, np.newaxis]
-            is_hit[nh] = False
-
-        np.seterr(**old_err)  # restore numpy error settings
+            if np.any(nh):
+                # set intersection to plane z = z_max
+                tnh = (self.z_max - p[nh, 2]) / s[nh, 2]
+                p_hit[nh] = p[nh] + s[nh]*tnh[:, np.newaxis]
+                is_hit[nh] = False
 
         # set hit to current position when ray starts after surface
         m = p[:, 2] > self.z_max
