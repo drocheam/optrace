@@ -1348,8 +1348,10 @@ class TraceGUI(HasTraits):
                     self.replot_rays()
                     self.scene.disable_render = False
 
-                case _ if vtk_obj.GetKeySym() == "F11":
-                    self.scene.scene_editor._full_screen_fired()
+                # Unfortunately this does not work as special keys don't seem to be correctly checked
+                # after pressing F11 then Esc also triggers this
+                # case "" if vtk_obj.GetKeySym() == "F11":
+                    # self.scene.scene_editor._full_screen_fired()
 
         self.scene.interactor.add_observer('KeyReleaseEvent', keyrelease)  # calls keyrelease() in main thread
 

@@ -760,12 +760,6 @@ class GUITests(unittest.TestCase):
                 send_key(sim, "m")
                 sim._wait_for_idle()
                
-                # make fullscreen
-                send_key(sim, "F11")
-                sim._wait_for_idle()
-                send_key(sim, "F11")
-                sim._wait_for_idle()
-                
                 # key without shortcut
                 send_key(sim, "i")
                 sim._wait_for_idle()
