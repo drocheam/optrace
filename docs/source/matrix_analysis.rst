@@ -120,7 +120,8 @@ Thick Lens
 Thick Lens with refraction index :math:`n`, front surface curvature :math:`R_1`, thickness :math:`d`, back surface curvature :math:`R_2`, medium with :math:`n_1` in front and medium with :math:`n_2` behind the lens.
 Using ray transfer matrix analysis this is the product of the matrix of the front surface matrix :math:`\text{M}_\text{c1}`, free space propagation matrix :math:`\text{M}_\text{s}` and back surface matrix :math:`\text{M}_\text{c2}`.
 Note that matrices are multiplied from right to left.
-The resulting matrix is then:
+The resulting matrix is then: :footcite:`Kaschke2014`
+
 
 .. math::
    \text{M}_\text{thick} =&~~ \text{M}_\text{c2} \cdot \text{M}_\text{s} \cdot \text{M}_\text{c1}\\
@@ -414,6 +415,74 @@ Element :math:`A` of the matrix corresponds to the magnification factor :math:`m
 For a thin, ideal lens :math:`m` would be equal to :math:`b/g`.
 
 Referring to the value of this factor, :math:`A < 0` signifies an inverted image, :math:`A > 0` an upright image, :math:`\lvert A \rvert > 1` a size increase, :math:`\lvert A \rvert < 1` a size decrease.
+
+
+Entrance and Exit Pupils
+=================================================
+
+
+To calculate the entrance and exit pupil for a given system and aperture stop the lens setup is separated into a front and rear group. The pupils are then the image of the aperture for the corresponding group. :footcite:`GreivenStop`
+
+**Aperture inside setup**
+
+
+In the case of the aperture stop being inside the lens setup, the setup and its matrix :math:`\text{M}` can be separated into three parts:
+
+.. math::
+
+   \text{M} = \text{M}_\text{rear} \cdot \text{M}_\text{gap} \cdot \text{M}_\text{front}
+
+:math:`\text{M}_\text{front}` is the matrix for all surfaces in front of the aperture stop, :math:`\text{M}_\text{back}` for everything behind the stop. :math:`\text{M}_\text{gap}` is the distance matrix for the gap region between surfaces where the stop is positioned in and does not belong to either front or back group.
+
+The entrance pupil is the result of the stop being imaged into the front group, whereas the exit pupil is the image of the aperture stop into the rear group.
+
+The exit pupil position is simply calculated with an object distance :math:`g_\text{ex}` between the stop position :math:`z_\text{s}` and the front vertex of the rear group and the matrix :math:`\text{M}_\text{rear}` with the procedure in <>.
+The resulting :math:`z_\text{ex}` is the exit pupil's absolute position.
+
+For the entrance pupil, we need to image the stop in backwards direction through :math:`\text{M}_\text{front}`. This is done by inverting the matrix:
+
+.. math::
+   \text{M}^{-1}_\text{front} &= \left[\begin{array}{cc}
+       A & B \\
+       C & D
+       \end{array}\right]^{-1}\\
+    &= \frac{1}{AD - BC}  \left[\begin{array}{cc}
+       D & -B \\
+       -C & A
+       \end{array}\right]\\
+
+The object distance is negative and calculated with the back vertex of the front group: 
+
+.. math::
+   
+   g_\text{en} = V_{2,\text{front}} - z_\text{s}
+
+The procedure in <> with :math:`g_\text{en}` and :math:`\text{M}^{-1}_\text{front}` gives us the image distance :math:`b_\text{en}`, that needs to be added to the front vertex of the front group to get the entrance pupil position.:
+
+.. math::
+
+   z_\text{en} = V_{1,\text{front}} + b_\text{en}
+
+
+**Aperture in front of setup**
+
+With the stop being in front of all lenses, it itself is the entrance pupil (:math:`z_\text{en} = z_\text{s}`).
+
+The exit pupil then is the result of imaging through all elements with the matrix:
+
+.. math::
+
+   \text{M}_\text{rear} = \text{M} 
+
+**Aperture behind of setup**
+
+With the stop being behind all lenses, it itself is equal to the exit pupil (:math:`z_\text{ex} = z_\text{s}`).
+
+The entrance pupil then is the result of imaging backwards through all elements with the procedure above and the matrix:
+
+.. math::
+
+   \text{M}_\text{front} = \text{M} 
 
 ------------
 

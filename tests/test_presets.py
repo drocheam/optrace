@@ -193,6 +193,7 @@ class PresetTests(unittest.TestCase):
 
             RT.trace(50000)
 
+            self.assertFalse(RT.geometry_error)
             self.assertEqual(RT.detectors[-1].surface.r, r_det)
             self.assertEqual(RT.apertures[-1].surface.ri, P / 2)
             self.assertTrue(np.allclose(RT.lenses[0].pos - pos, 0))
@@ -205,6 +206,7 @@ class PresetTests(unittest.TestCase):
             RT.add(geom)
             RT.trace(50000)
 
+            self.assertFalse(RT.geometry_error)
             self.assertEqual(RT.detectors[-1].surface.r, r_det)
             self.assertEqual(RT.apertures[-1].surface.ri, P / 2)
             self.assertTrue(np.allclose(RT.lenses[0].pos - pos - [0, 0, 0.25], 0))

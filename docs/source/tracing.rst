@@ -118,7 +118,7 @@ The subsequent equations describe this behavior :footcite:`FresnelWiki`.
 :math:`A_\text{ts}` and :math:`A_\text{tp}` are the polarization components from equations :math:numref:`pol_A`. Occurring cosine terms are calculated as :math:`\cos \varepsilon = n \cdot s` and :math:`\cos \varepsilon' = n \cdot s'`.
 
 
-For light hitting the surface perpendicular this yields an expression independent of the polarization:
+For light hitting the surface perpendicular this yields an expression independent of the polarization: :footcite:`Kaschke2014`
 
 .. math::
    T_{\varepsilon=0} = \frac{4 n_1 n_2 }{(n_1 + n_2)^2}

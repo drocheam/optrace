@@ -300,7 +300,7 @@ The following equations are valid for :math:`L > 0`, for :math:`L = 0` we set :m
 
 **CIELUV Chroma**
 
-Calculation of chroma :footcite:`ColorfulnessWiki`:
+Calculation of chroma :footcite:`SchwiegerlingOptics`:
 
 .. math::
    C = \sqrt{u^2 + v^2}
@@ -308,7 +308,7 @@ Calculation of chroma :footcite:`ColorfulnessWiki`:
 
 **CIELUV Hue**
 
-Calculation of hue :footcite:`ColorfulnessWiki`:
+Calculation of hue :footcite:`SchwiegerlingOptics`:
 
 .. math::
    H = \text{arctan2}(v, u)

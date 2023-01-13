@@ -279,6 +279,17 @@ class TMATests(unittest.TestCase):
         mz = tma.object_magnification(tma.focal_point[1]+1e-12)
         self.assertAlmostEqual(mz, 0, delta=1e-9)
 
+        # check object/image distance reversal for different front and back medium 
+        G = ot.presets.geometry.legrand_eye()
+        for i in range(2):
+            tma = G.tma()
+            zg = -600
+            zi = tma.image_position(zg)
+            zg2 = tma.object_position(zi)
+            
+            self.assertAlmostEqual(zg, zg2)
+            G.flip()
+
     def test_tma_error_cases(self):
 
         L = ot.Lens(ot.CircularSurface(r=1), ot.CircularSurface(r=1), pos=[0, 0, 0], n=ot.presets.refraction_index.SF10)
@@ -334,6 +345,129 @@ class TMATests(unittest.TestCase):
                 self.assertTrue(np.allclose(abcd1-abcd, 0))
                 self.assertAlmostEqual(tma.power[1], D)
                 self.assertAlmostEqual(np.linalg.det(tma.abcd), tma.n1/tma.n2)  # check determinant
+
+    def test_tma_pupils(self):
+
+        for z0 in [0, -10, 12.56]:
+
+            # empty group
+            # entrance and exit pupil are the stop itself
+            tma = ot.Group().tma()
+            zs = z0 + 7.89
+            zp = tma.pupil_position(zs)
+            mp = tma.pupil_magnification(zs)
+            self.assertEqual(zp[0], zs)
+            self.assertEqual(zp[1], zs)
+            self.assertEqual(mp[0], 1)
+            self.assertEqual(mp[1], 1)
+
+            # single lens checks with different optical powers
+            for D in [12, -12, 100]:
+
+                # stop before the lens
+                # -> stop is just imaged normally by the lens for the exit pupil
+                # entrance pupil = aperture stop
+                IL = ot.IdealLens(r=2, D=D, pos=[0, 0, z0])
+                tma = IL.tma()
+                zs = z0-5
+                zi = tma.image_position(zs)
+                mi = tma.image_magnification(zs)
+                zp = tma.pupil_position(zs)
+                mp = tma.pupil_magnification(zs)
+                self.assertAlmostEqual(zp[1], zi)
+                self.assertAlmostEqual(mp[1], mi)
+                self.assertAlmostEqual(zp[0], zs)
+                self.assertAlmostEqual(mp[0], 1)
+                self.assertTrue(((zp[1] < zs) and D > 0) or ((zp[1] > zs) and D < 0))
+                self.assertTrue(((mp[1] > 1) and D > 0) or ((mp[1] < 1) and D < 0))
+            
+                # stop after the lens
+                # -> stop is just imaged normally by the lens for the entrace pupil
+                # exit pupil = aperture stop
+                IL = ot.IdealLens(r=2, D=D, pos=[0, 0, z0])
+                tma = IL.tma()
+                zs = z0+5
+                zi = z0 - (tma.image_position(z0 - (zs - z0))-z0)
+                mi = tma.image_magnification(z0 - (zs - z0))  # inverse since we want g/b
+                zp = tma.pupil_position(zs)
+                mp = tma.pupil_magnification(zs)
+                self.assertAlmostEqual(zp[0], zi)
+                self.assertAlmostEqual(mp[0], mi)
+                self.assertAlmostEqual(zp[1], zs)
+                self.assertAlmostEqual(mp[1], 1)
+                self.assertTrue(((zp[0] > zs) and D > 0) or ((zp[0] < zs) and D < 0))
+                self.assertTrue(((mp[0] > 1) and D > 0) or ((mp[0] < 1) and D < 0))
+
+            # example from https://wp.optics.arizona.edu/jgreivenkamp/wp-content/uploads/sites/11/2019/08/502-09-Stops-and-Pupils.pdf
+            # slide 9-23 - 9-25
+            IL = ot.IdealLens(r=2, D=10, pos=[0, 0, z0])
+            IL2 = ot.IdealLens(r=2, D=1/0.075, pos=[0, 0, z0+50])
+            G = ot.Group([IL, IL2])
+
+            for zil in [-5, 2, 8, 150]:
+                tma = G.tma()
+                zp = z0+25
+                zp1, zp2 = tma.pupil_position(zp)
+                m1, m2 = tma.pupil_magnification(zp)
+                self.assertAlmostEqual(zp1, z0+100/3, delta=1e-5)
+                self.assertAlmostEqual(zp2, z0+12.5, delta=1e-5)
+                self.assertAlmostEqual(m1, 4/3, delta=1e-5)
+                self.assertAlmostEqual(m2, 1.5, delta=1e-5)
+
+                # add some lenses that do nearly nothing but change the mat and ds list
+                # zp and mp should stay the same
+                G.add(ot.IdealLens(r=2, D=1e-6, pos=[0, 0, z0+zil]))
+
+
+            # Example from Pedrotti Introduction to Optics, page58
+            IL = ot.IdealLens(r=3, D=1/0.06, pos=[0, 0, z0])
+            IL2 = ot.IdealLens(r=3, D=-1/0.1, pos=[0, 0, z0+40])
+            tma = ot.Group([IL, IL2]).tma()
+            zs = z0-30
+            zp = tma.pupil_position(zs)
+            mp = tma.pupil_magnification(zs)
+            self.assertAlmostEqual(zp[0], zs)
+            self.assertAlmostEqual(zp[1], z0-10)
+            self.assertAlmostEqual(mp[0], 1)
+            self.assertAlmostEqual(mp[1], 1)
+            
+            # example from above but stop is 30mm behind last lens
+            IL = ot.IdealLens(r=3, D=1/0.06, pos=[0, 0, z0])
+            IL2 = ot.IdealLens(r=3, D=-1/0.1, pos=[0, 0, z0+40])
+            tma = ot.Group([IL, IL2]).tma()
+            zs = z0+70
+            zp = tma.pupil_position(zs)
+            mp = tma.pupil_magnification(zs)
+            zi = tma.object_position(zs)
+            mi = 1/tma.object_magnification(zs)  # inverse since object and image are swapped
+            self.assertAlmostEqual(zp[0], zi)
+            self.assertAlmostEqual(zp[1], zs)
+            self.assertAlmostEqual(mp[0], mi)
+            self.assertAlmostEqual(mp[1], 1)
+
+            # Example 1 of Schröder, Technische Optik, page 64
+            IL = ot.IdealLens(r=3.5, D=30, pos=[0, 0, z0 + 100])
+            tma = IL.tma()
+            zs = z0 + 90
+            zp = tma.pupil_position(zs)
+            mp = tma.pupil_magnification(zs)
+            self.assertAlmostEqual(zp[1], IL.pos[2]-14.2857142857)
+            self.assertAlmostEqual(mp[1], 1.42857142857)
+
+        # pupil positions of LeGrandEye, see
+        # Schwiegerling J. Field Guide to Visual and Ophthalmic Optics. SPIE Publications: 2004.
+        eye = ot.presets.geometry.legrand_eye()
+        zs0 = eye.apertures[0].pos[2]
+        ze = eye.tma().pupil_position(eye.apertures[0].pos[2])
+        self.assertAlmostEqual(ze[0], 3.038, delta=0.0005)
+        self.assertAlmostEqual(ze[1], 3.682, delta=0.0005)
+
+        # flip the eye and check again
+        eye.flip()
+        zs = eye.apertures[0].pos[2]
+        ze = eye.tma().pupil_position(zs)
+        self.assertAlmostEqual(zs0+zs-ze[1], 3.038, delta=0.0005)
+        self.assertAlmostEqual(zs0+zs-ze[0], 3.682, delta=0.0005)
 
     def test_tma_misc(self):
 
