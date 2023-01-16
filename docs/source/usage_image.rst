@@ -69,36 +69,55 @@ ____________________
 
 Below you can find preset images that can be used for a ray source.
 
-.. list-table::
+.. list-table:: Photos of natural scenes or objects
 
-   * - .. figure:: ../../optrace/ressources/images/bacteria.png
+   * - .. figure:: ../../optrace/ressources/images/cell.webp
           :align: center
-          :width: 300
+          :width: 350
 
-          Colored rings on white background. Own creation. Usable as ``ot.presets.image.bacteria``
+          Cell image for microscope examples. Usable as ``ot.presets.image.cell``.
+          Image created with `Stable Diffusion <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__.
    
-     - .. figure:: ../../optrace/ressources/images/ColorChecker.jpg
+     - .. figure:: ../../optrace/ressources/images/group_photo.jpg
+          :align: center
+          :width: 250
+
+          Group photo of managers. Usable as ``ot.presets.image.group_photo``
+          Image created with `Stable Diffusion <https://lexica.art/prompt/06ba5ac6-7bfd-4ce6-8002-9d0e487b36b2>`__.
+   
+   * - .. figure:: ../../optrace/ressources/images/interior.jpg
+          :align: center
+          :width: 400
+
+          Photo of an interior living room. Usable as ``ot.presets.image.interior``
+          Image created with `Stable Diffusion <https://lexica.art/prompt/44d7e1fe-ba3b-4e73-972c-a30b95897434>`__.
+   
+     - .. figure:: ../../optrace/ressources/images/landscape.jpg
+          :align: center
+          :width: 400
+
+          Photo of an european landscape. Usable as ``ot.presets.image.landscape``
+          Image created with `Stable Diffusion <https://lexica.art/prompt/0da3a592-465e-46d6-8ee6-dfe17ddea386>`__.
+   
+
+
+.. list-table:: Test images for color, resolution or distortion
+
+   * - .. figure:: ../../optrace/ressources/images/ColorChecker.jpg
           :align: center
           :width: 300
 
           Color checker chart. Public domain image from `here <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__.
           Usage with ``ot.presets.image.color_checker``
 
-     - .. figure:: ../../optrace/ressources/images/EIA_Resolution_Chart_1956.png
-          :align: center
-          :width: 300
-
-          EIA 1956 resolution chart. Public Domain image from `here <https://commons.wikimedia.org/wiki/File:EIA_Resolution_Chart_1956.svg>`__.
-          Usage with ``ot.presets.image.resolution_chart``
-   
-   * - .. figure:: ../../optrace/ressources/images/ETDRS_Chart.png
+     - .. figure:: ../../optrace/ressources/images/ETDRS_Chart.png
           :align: center
           :width: 300
 
           ETDRS Chart standard. Public Domain Image from `here <https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg>`__.
           Usage with ``ot.presets.image.ETDRS_chart``
    
-     - .. figure:: ../../optrace/ressources/images/ETDRS_Chart_inverted.png
+   * - .. figure:: ../../optrace/ressources/images/ETDRS_Chart_inverted.png
           :align: center
           :width: 300
           
@@ -116,8 +135,6 @@ Below you can find preset images that can be used for a ray source.
 Additional presets include:
 
 * ``ot.presets.image.checkerboard``: 8x8 black and white chess-like board image
-* ``ot.presets.image.ascent``: ascent image from `scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.datasets.ascent.html>`__
-* ``ot.presets.image.racoon``: racoon image from `scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.datasets.face.html>`__
 
 
 ------------

@@ -15,11 +15,13 @@
 ├── ressources
 │   ├── illuminants.csv
 │   ├── images
-│   │   ├── bacteria.png
+│   │   ├── cell.webp
 │   │   ├── ColorChecker.jpg
-│   │   ├── EIA_Resolution_Chart_1956.png
 │   │   ├── ETDRS_Chart_inverted.png
 │   │   ├── ETDRS_Chart.png
+│   │   ├── group_photo.jpg
+│   │   ├── interior.jpg
+│   │   ├── landscape.jpg
 │   │   └── TestScreen_square.png
 │   └── observers.csv
 └── tracer
@@ -81,4 +83,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-11 directories, 71 files
+11 directories, 73 files

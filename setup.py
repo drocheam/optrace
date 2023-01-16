@@ -44,9 +44,9 @@ if __name__ == '__main__':
             python_requires='>=3.10, <3.11',
             packages=["optrace", "optrace.tracer", "optrace.tracer.color", "optrace.tracer.geometry", "optrace.tracer.geometry.surface",
                       "optrace.tracer.spectrum", "optrace.tracer.presets", "optrace.ressources", "optrace.ressources.images", "optrace.gui", "optrace.plots"],
-            install_requires=['numpy>1.21', 'numexpr', 'chardet', 'scipy>=1.10', 'Pillow', 'vtk', 'pooch', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi'],
+            install_requires=['numpy>1.21', 'numexpr', 'chardet', 'scipy>=1.10', 'Pillow', 'vtk', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi'],
             tests_require=['pyautogui', 'pytest', 'colour-science', 'requests'],
-            package_data={"": ["*.png", "*.jpg", "*.csv"]},   # includes tables and images
+            package_data={"": ["*.png", "*.jpg", "*.webp", "*.csv"]},   # includes tables and images
             include_package_data=True,
         )
 

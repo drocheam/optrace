@@ -40,8 +40,6 @@ After this, ``optrace`` should be installed on your system.
      - animated progressbar in standard output (terminal)
    * - `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
      - specialized methods for interpolation and math. Some image presets
-   * - `pooch <https://pypi.org/project/pooch/>`_
-     - only needed for ``scipy.datasets`` to work
    * - `PyQt5 <https://pypi.org/project/PyQt5/>`_
      - GUI backend for mayavi
    * - `traitsui <https://docs.enthought.com/traitsui/>`_

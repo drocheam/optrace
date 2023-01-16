@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.2.4   |   2023-01-13   |   New functions pupil_position and pupil_magnification in TMA for calculating entrance and exit pupil. 
   1.2.3   |   2023-01-11   |   New functions "image_magnification" and "object_magnification" in ray transfer matrix analysis. 
   1.2.2   |   2023-01-10   |   A Group now has an ambient refraction index. 
   1.2.1   |   2023-01-09   |   New TraceGUI keyboard shortcut "F11" toggling fullscreen. vertical_labels option changing Element label orientation. 

@@ -18,17 +18,11 @@ front = ot.SphericalSurface(r=3, R=8)
 back = ot.SphericalSurface(r=3, R=-8)
 nL1 = ot.RefractionIndex("Constant", n=1.5)
 L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
-# RT.add(L1)
-
-
-# D = L1.tma().power[1]
-# L1 = ot.IdealLens(r=5, D=D, pos=[0, 0, 12])
-
 RT.add(L1)
 
 # add Detector
 DetS = ot.RectangularSurface(dim=[10, 10])
-Det = ot.Detector(DetS, pos=[0, 0, 36])
+Det = ot.Detector(DetS, pos=[0, 0, 36.95])
 RT.add(Det)
 
 # Instantiate the class and configure its traits.

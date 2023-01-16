@@ -264,12 +264,12 @@ Both focal points are there corresponding focal lengths away from their principl
 
 **EFL, BFL, FFL**
 
-Effective focal length (EFL), back focal length (BFL) and front focal length (FFL) are defined as follows: :footcite:`EdmundFocal`
+Effective focal length (EFL), back focal length (BFL) and front focal length (FFL) are defined as follows: 
 
 .. math::
-   \text{FFL} =&~ V_2 - F_2\\
-   \text{BFL} =&~ F_1 - V_1\\
-   \text{EFL} =&~ f_2
+   \text{FFL} =&~ F_1 - V_1 &=~& &\frac{D}{C}\\
+   \text{BFL} =&~ F_2 - V_2 &=~& -&\frac{A}{C}\\
+   \text{EFL} =&~ f_2 &=~& -&\frac{1}{C}
    :label: TMA_ffk_bfl_efl
 
 .. _ray_power_def:
@@ -422,6 +422,13 @@ Entrance and Exit Pupils
 
 
 To calculate the entrance and exit pupil for a given system and aperture stop the lens setup is separated into a front and rear group. The pupils are then the image of the aperture for the corresponding group. :footcite:`GreivenStop`
+
+
+.. figure:: ./images/pupil_calculation.svg
+   :align: center
+   :width: 750
+
+   Visualization of the matrix separation and different distances.
 
 **Aperture inside setup**
 

@@ -8,6 +8,7 @@ import unittest
 import numpy as np
 import pytest
 import colour
+from PIL import Image as PILImage  # image loading
 
 import optrace as ot
 import optrace.tracer.color as color
@@ -398,7 +399,8 @@ class ColorTests(unittest.TestCase):
         # check if random_wavelengths_from_srgb correctly handles wavelength range changes
 
         # some rgb image from presets
-        rgb = ot.presets.image.racoon
+        im = ot.presets.image.landscape
+        rgb = np.asarray_chkfinite(PILImage.open(im).convert("RGB"), dtype=np.float64) / 255
         rgb = rgb.reshape((rgb.shape[0]*rgb.shape[1], 3))
 
         # initial bounds

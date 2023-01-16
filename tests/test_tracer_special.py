@@ -433,8 +433,8 @@ class TracerSpecialTests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 300])
 
         RSS = ot.RectangularSurface(dim=[200e-3, 200e-3])
-        RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.bacteria,
-                          pos=[0, 0, 0], s=[0, 0, 1], div_angle=27, desc="Bacteria")
+        RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.cell,
+                          pos=[0, 0, 0], s=[0, 0, 1], div_angle=27, desc="Cell")
         RT.add(RS)
 
         # objective doublet properties
