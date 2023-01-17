@@ -1,5 +1,7 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.2.6   |   2023-01-17   |   Clearer TMA names. New "optical_center" property in TMA. 
+  1.2.5   |   2023-01-16   |   Removed pooch dependency. Now there are multiple scene image presets available (cell, group photo, interior, landscape). 
   1.2.4   |   2023-01-13   |   New functions pupil_position and pupil_magnification in TMA for calculating entrance and exit pupil. 
   1.2.3   |   2023-01-11   |   New functions "image_magnification" and "object_magnification" in ray transfer matrix analysis. 
   1.2.2   |   2023-01-10   |   A Group now has an ambient refraction index. 

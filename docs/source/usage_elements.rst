@@ -163,7 +163,7 @@ For this the emitting surface needs to be a ``RectangularSurface``. The image it
 
    RS = ot.RaySource(rect, image="test_image.png")
 
-Every image color generates a specific physical spectrum matching its color. This spectrum is a linear comination of the sRGB primaries in <>.
+Every image color generates a specific physical spectrum matching its color. This spectrum is a linear combination of the sRGB primaries in <>.
 
 With ``image`` specified the ``spectrum`` is unused.
 
