@@ -634,7 +634,7 @@ class TracerTests(unittest.TestCase):
         RT = rt_example()
         RT.add(ot.RaySource(ot.Point(), spectrum=ot.LightSpectrum("Monochromatic", wl=550), pos=[0, 0, 0]))
         
-        # we want the ray sources to be two and have different power
+        # we want the ray sources to be two and have different powers
         assert len(RT.ray_sources) == 3
         
         RS0, RS1, RS2 = tuple(RT.ray_sources)
@@ -655,15 +655,15 @@ class TracerTests(unittest.TestCase):
                         # check number of rays
                         self.assertEqual(N, RT.rays.N)
 
-                        # check power
+                        # check powers
                         P_s = np.sum([RS.power for RS in RT.ray_sources])
                         self.assertAlmostEqual(P_s, np.sum(RT.rays.w_list[:, 0]), delta=10/N)
 
-                        # check power and number for each source
+                        # check powers and number for each source
                         for Ni, RSi in enumerate(RT.ray_sources):
                             tup = RT.rays.source_sections(Ni)
                             self.assertEqual(tup[0].shape[0], RT.rays.N_list[Ni])
-                            self.assertAlmostEqual(RT.rays.N_list[Ni]/RT.rays.N, RSi.power/P_s, delta=10/N)
+                            self.assertAlmostEqual(RT.rays.N_list[Ni] / RT.rays.N, RSi.power / P_s, delta=10 / N)
 
                         # check source section call for all rays, call for each source has been tested above
                         tup = RT.rays.source_sections()
@@ -1249,11 +1249,11 @@ class TracerTests(unittest.TestCase):
         L2 = ot.IdealLens(r=5, D=50, pos=[0, 0, 15])
         RT.add(L2)
 
-        # check optical power
-        self.assertAlmostEqual(RT.tma().power[1], 33)
+        # check optical powers
+        self.assertAlmostEqual(RT.tma().powers[1], 33)
 
         # aperture so all rays get absorbed at their focal point
-        zf = RT.tma().focal_point[1]
+        zf = RT.tma().focal_points[1]
         AP = ot.Aperture(ot.CircularSurface(r=4), pos=[0, 0, zf])
         RT.add(AP)
 

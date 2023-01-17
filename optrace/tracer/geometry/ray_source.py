@@ -176,7 +176,7 @@ class RaySource(Element):
 
         ## Generate ray weights
         ################################################################################################################
-        power = power or self.power  # favour power parameter self.power 
+        power = power or self.power  # favour power parameter self.power
         weights = np.full(N, power/N, dtype=np.float32)
 
         ## Generate ray wavelengths

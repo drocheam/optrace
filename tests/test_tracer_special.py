@@ -457,7 +457,7 @@ class TracerSpecialTests(unittest.TestCase):
         objective.add(L02)
 
         # move objective lens so that its focal point is 0.6mm behind object
-        L0f0 = objective.tma().focal_point[0]
+        L0f0 = objective.tma().focal_points[0]
         objective.move_to([0, 0, L01.pos[2] - (L0f0 - RS.pos[2] - 0.6)])
 
         # add group to raytracer

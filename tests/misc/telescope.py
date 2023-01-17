@@ -54,7 +54,7 @@ L2 = ot.Lens(front, back, n=n_, pos=[0, 0, 50], de=0.5)
 RT.add(L2)
 
 # move so focal points overlap
-L2.move_to([0, 0, L2.pos[2] - (L2.tma().focal_point[0] - L1.tma().focal_point[1])])
+L2.move_to([0, 0, L2.pos[2] - (L2.tma().focal_points[0] - L1.tma().focal_points[1])])
 
 
 

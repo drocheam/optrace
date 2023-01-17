@@ -309,6 +309,16 @@ To evaluate setups of :math:`N` lenses the lens matrices :math:`\text{M}_\text{L
 
 .. _ray_image_object_distances:
 
+
+Optical Center
+=====================
+
+.. TODO
+.. Herleitung optical center, Literatur:
+.. Correctly making panoramic imagery and the meaning of optical centeri
+.. Francis A. Jenkins, Harvey E. White - Fundamentals of Optics, Fourth Edition -McGraw-Hill Science_Engineering_Math (2001), p110
+.. Rückführung auf Form V1 + (V2 - V1) / (1 - R1/R2)
+
 Image and Object Distance 
 =================================================
 

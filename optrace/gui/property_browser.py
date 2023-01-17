@@ -15,10 +15,10 @@ class PropertyBrowser(HasTraits):
 
     update_button: Button = Button(label="Update", desc="updates the browser")
 
-    unit_label:   Str = Str("Distances in mm, optical power in dpt")
+    unit_label:   Str = Str("Distances in mm, optical powers in dpt")
     legend_title: Str = Str("Legend")
 
-    ray_legend: Str = Str("p:      Position                      s:    unity direction vector           s_un:  direction vector\n"
+    ray_legend: Str = Str("p:      position                      s:    unity direction vector           s_un:  direction vector\n"
                           "l:      ray length to next point      ol:   optical length to next point     pol:   polarization unity vector\n"
                           "w:      power                         wv:   wavelength                       snum:  source number\n"
                           "index:  ray index                     n:    ambient refractive index")
@@ -154,11 +154,12 @@ class PropertyBrowser(HasTraits):
             for wl in spec_lines.FdC:
                 tma = w.tma(wl=wl)
                 cdict[name][f"{wl:.4g}nm"] = \
-                    dict(nodal_points=tma.nodal_point, d=tma.d, n1=tma.n1, n2=tma.n2,
-                         focal_points=tma.focal_point, focal_lengths=tma.focal_length,
-                         focal_lengths_n=tma.focal_length_n, principal_points=tma.principal_point,
+                    dict(nodal_points=tma.nodal_points, d=tma.d, n1=tma.n1, n2=tma.n2,
+                         focal_points=tma.focal_points, focal_lengths=tma.focal_lengths,
+                         focal_lengths_n=tma.focal_lengths_n, principal_points=tma.principal_points,
                          vertex_points=tma.vertex_point, abcd=tma.abcd, efl=tma.efl, efl_n=tma.efl_n,
-                         power=tma.power, power_n=tma.power_n, bfl=tma.bfl, ffl=tma.ffl)
+                         powers=tma.powers, powers_n=tma.powers_n, bfl=tma.bfl, ffl=tma.ffl,
+                         optical_center=tma.optical_center)
 
         try:
             cdict = dict()

@@ -36,7 +36,7 @@ L02 = ot.Lens(front, back, d1=0, d2=5.3, pos=[0, 0, 0.0001], n=n1)
 objective.add(L02)
 
 # move objective lens so that its focal point is 0.6mm behind object
-L0f0 = objective.tma().focal_point[0]
+L0f0 = objective.tma().focal_points[0]
 objective.move_to([0, 0, L01.pos[2] - (L0f0 - RS.pos[2] - 0.6)])
 
 # add group to raytracer
@@ -72,9 +72,9 @@ L12 = ot.Lens(front, back, d1=0, d2=0.5, pos=[0, 0, L11.extent[5]+0.0001], n=n2)
 eyepiece.add(L12)
 
 # move eyepiece so first image is in front focal point
-L1f0 = eyepiece.tma().focal_point[0]
+L1f0 = eyepiece.tma().focal_points[0]
 eyepiece.move_to([0, 0, L11.pos[2]-(L1f0-z_img0)])
-L1f1 = eyepiece.tma().focal_point[1]
+L1f1 = eyepiece.tma().focal_points[1]
 
 # add group to raytracer
 RT.add(eyepiece)
@@ -86,17 +86,17 @@ RT.add(geom)
 # calculate magnification
 tma_ok = eyepiece.tma()
 tma_obj = objective.tma()
-L = tma_ok.focal_point[0] - tma_obj.focal_point[1]
-f_ok = tma_ok.focal_length[1]
-f_obj = tma_ok.focal_length[1]
+L = tma_ok.focal_points[0] - tma_obj.focal_points[1]
+f_ok = tma_ok.focal_lengths[1]
+f_obj = tma_ok.focal_lengths[1]
 mu = L/f_ok * 254/f_obj
 print(f"Approximate Magnification: {mu:.1f}x")
 
 # add markers focal points
-RT.add(ot.Marker("F_obj", [0, 0, tma_obj.focal_point[0]]))
-RT.add(ot.Marker("F_obj", [0, 0, tma_obj.focal_point[1]]))
-RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_point[0]]))
-RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_point[1]]))
+RT.add(ot.Marker("F_obj", [0, 0, tma_obj.focal_points[0]]))
+RT.add(ot.Marker("F_obj", [0, 0, tma_obj.focal_points[1]]))
+RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_points[0]]))
+RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_points[1]]))
 
 # add misc markers
 RT.add(ot.Marker("Objective", [-14, 0, L01.pos[2]+2], label_only=True, text_factor=1.2))

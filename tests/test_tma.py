@@ -21,8 +21,8 @@ class TMATests(unittest.TestCase):
         self.assertTrue(np.allclose(tma.abcd - np.eye(2), 0))
 
         # all other properties are set to nan
-        for val in [tma.ffl, tma.bfl, tma.efl, tma.efl_n, tma.power, tma.power_n, tma.focal_length, tma.vertex_point,
-                    tma.focal_point, tma.nodal_point, tma.principal_point, tma.d, tma.focal_length_n]:
+        for val in [tma.ffl, tma.bfl, tma.efl, tma.efl_n, tma.powers, tma.powers_n, tma.focal_lengths, tma.vertex_point,
+                    tma.focal_points, tma.nodal_points, tma.principal_points, tma.d, tma.focal_lengths_n]:
             self.assertTrue(np.all(np.isnan(val)))
 
     def test_tma_single_lens_efl(self):
@@ -94,9 +94,9 @@ class TMATests(unittest.TestCase):
             tma = L.tma(n0=n0)
             # edmund optics defines the nodal point shift NPS as sum of focal lengths
             list1 = [tma.efl_n, tma.bfl, tma.ffl,
-                     tma.principal_point[0] - tma.vertex_point[0],
-                     tma.principal_point[1] - tma.vertex_point[1],
-                     tma.focal_length[0] + tma.focal_length[1]]
+                     tma.principal_points[0] - tma.vertex_point[0],
+                     tma.principal_points[1] - tma.vertex_point[1],
+                     tma.focal_lengths[0] + tma.focal_lengths[1]]
 
             for el1, el2 in zip(list1, list2):
                 self.assertAlmostEqual(el1, el2, delta=0.0002)
@@ -157,9 +157,9 @@ class TMATests(unittest.TestCase):
         # both surfaces disc
         tma = ot.Lens(circ, circ, pos=[0, 0, 0], d=0.2, n=n, n2=n2).tma()
         list1 = [tma.efl_n, tma.bfl, tma.ffl,
-                 tma.principal_point[0] - tma.vertex_point[0],
-                 tma.principal_point[1] - tma.vertex_point[1],
-                 tma.focal_length[0] + tma.focal_length[1]]
+                 tma.principal_points[0] - tma.vertex_point[0],
+                 tma.principal_points[1] - tma.vertex_point[1],
+                 tma.focal_lengths[0] + tma.focal_lengths[1]]
         self.assertTrue(np.all(np.isnan(list1)))
 
     def test_raytracer_tma_cardinal_values(self):
@@ -180,32 +180,32 @@ class TMATests(unittest.TestCase):
         RT.add(ot.presets.geometry.legrand_eye())
         
         tma = RT.tma()
-        self.assertAlmostEqual(tma.focal_point[0], -15.089, delta=0.001)
-        self.assertAlmostEqual(tma.focal_point[1], 24.197, delta=0.001)
-        self.assertAlmostEqual(tma.nodal_point[0], 7.200, delta=0.001)
-        self.assertAlmostEqual(tma.nodal_point[1], 7.513, delta=0.001)
-        self.assertAlmostEqual(tma.principal_point[0], 1.595, delta=0.001)
-        self.assertAlmostEqual(tma.principal_point[1], 1.908, delta=0.001)
-        self.assertAlmostEqual(tma.power_n[1], 59.940, delta=0.001)
+        self.assertAlmostEqual(tma.focal_points[0], -15.089, delta=0.001)
+        self.assertAlmostEqual(tma.focal_points[1], 24.197, delta=0.001)
+        self.assertAlmostEqual(tma.nodal_points[0], 7.200, delta=0.001)
+        self.assertAlmostEqual(tma.nodal_points[1], 7.513, delta=0.001)
+        self.assertAlmostEqual(tma.principal_points[0], 1.595, delta=0.001)
+        self.assertAlmostEqual(tma.principal_points[1], 1.908, delta=0.001)
+        self.assertAlmostEqual(tma.powers_n[1], 59.940, delta=0.001)
         self.assertAlmostEqual(tma.d, 7.600, delta=0.001)
-        self.assertAlmostEqual(RT.lenses[0].tma().power_n[1], 42.356, delta=0.001)
-        self.assertAlmostEqual(RT.lenses[1].tma(n0=RT.lenses[0].n2).power_n[1], 21.779, delta=0.001)
+        self.assertAlmostEqual(RT.lenses[0].tma().powers_n[1], 42.356, delta=0.001)
+        self.assertAlmostEqual(RT.lenses[1].tma(n0=RT.lenses[0].n2).powers_n[1], 21.779, delta=0.001)
 
         # additional checks for derived properties
         self.assertAlmostEqual(tma.vertex_point[0], RT.lenses[0].front.pos[2])
         self.assertAlmostEqual(tma.vertex_point[1], RT.lenses[-1].back.pos[2])
         self.assertAlmostEqual(tma.n1, RT.n0(550))  # wavelength independent, so value unimportant
         self.assertAlmostEqual(tma.n2, RT.lenses[-1].n2(550))
-        self.assertAlmostEqual(tma.power[0], -59.940/tma.n1, delta=0.001)
-        self.assertAlmostEqual(tma.power[1], 59.940/tma.n2, delta=0.001)
+        self.assertAlmostEqual(tma.powers[0], -59.940 / tma.n1, delta=0.001)
+        self.assertAlmostEqual(tma.powers[1], 59.940 / tma.n2, delta=0.001)
         self.assertAlmostEqual(tma.efl_n, 1000/59.940, delta=0.001)
         self.assertAlmostEqual(tma.efl, 1000/59.940*tma.n2, delta=0.001)
-        self.assertAlmostEqual(tma.focal_length_n[0], -1000 / 59.940, delta=0.001)
-        self.assertAlmostEqual(tma.focal_length_n[1], 1000 / 59.940, delta=0.001)
-        self.assertAlmostEqual(tma.focal_length[0], -1000 / 59.940 * tma.n1, delta=0.001)
-        self.assertAlmostEqual(tma.focal_length[1], 1000 / 59.940 * tma.n2, delta=0.001)
-        self.assertAlmostEqual(tma.ffl, tma.focal_point[0] - tma.vertex_point[0])
-        self.assertAlmostEqual(tma.bfl, tma.focal_point[1] - tma.vertex_point[1])
+        self.assertAlmostEqual(tma.focal_lengths_n[0], -1000 / 59.940, delta=0.001)
+        self.assertAlmostEqual(tma.focal_lengths_n[1], 1000 / 59.940, delta=0.001)
+        self.assertAlmostEqual(tma.focal_lengths[0], -1000 / 59.940 * tma.n1, delta=0.001)
+        self.assertAlmostEqual(tma.focal_lengths[1], 1000 / 59.940 * tma.n2, delta=0.001)
+        self.assertAlmostEqual(tma.ffl, tma.focal_points[0] - tma.vertex_point[0])
+        self.assertAlmostEqual(tma.bfl, tma.focal_points[1] - tma.vertex_point[1])
         self.assertAlmostEqual(np.linalg.det(tma.abcd), tma.n1/tma.n2)
 
     def test_tma_image_object_distances(self):
@@ -226,7 +226,7 @@ class TMATests(unittest.TestCase):
             self.assertAlmostEqual(image_pos, image_pos_approx, delta=0.5)
 
             # check if magnification nearly matches b/g
-            b = image_pos - tma.principal_point[1]
+            b = image_pos - tma.principal_points[1]
             m = tma.image_magnification(g_z)
             self.assertAlmostEqual(-b/g, m, delta=0.005)  # minus because image is inverted
 
@@ -243,7 +243,7 @@ class TMATests(unittest.TestCase):
             self.assertAlmostEqual(object_pos, object_pos_approx, delta=0.5)
             
             # check if magnification nearly matches b/g
-            g = tma.principal_point[0] - object_pos
+            g = tma.principal_points[0] - object_pos
             m = tma.object_magnification(b_z)
             self.assertAlmostEqual(-b/g, m, delta=0.005)  # minus because image is inverted
 
@@ -256,27 +256,27 @@ class TMATests(unittest.TestCase):
 
         # image/object distances special cases
         # object at -inf
-        self.assertAlmostEqual(tma.image_position(-np.inf), tma.focal_point[1])
-        self.assertAlmostEqual(tma.image_position(-100000), tma.focal_point[1], delta=0.005)
+        self.assertAlmostEqual(tma.image_position(-np.inf), tma.focal_points[1])
+        self.assertAlmostEqual(tma.image_position(-100000), tma.focal_points[1], delta=0.005)
         self.assertAlmostEqual(tma.image_magnification(-np.inf), 0, delta=1e-9)
         self.assertAlmostEqual(tma.image_magnification(-10000000), 0, delta=1e-5)
 
         # image at inf
-        self.assertAlmostEqual(tma.object_position(np.inf), tma.focal_point[0])
-        self.assertAlmostEqual(tma.object_position(100000), tma.focal_point[0], delta=0.005)
+        self.assertAlmostEqual(tma.object_position(np.inf), tma.focal_points[0])
+        self.assertAlmostEqual(tma.object_position(100000), tma.focal_points[0], delta=0.005)
         self.assertTrue(np.isnan(tma.object_magnification(np.inf)))
         self.assertTrue(np.abs(tma.object_magnification(10000000)) > 10000)
 
         # object at focal point 0
-        self.assertAlmostEqual(1 / tma.image_position(tma.focal_point[0] - 1e-12), 0) # 1/b approaches zero
-        self.assertTrue(1 / tma.image_position(tma.focal_point[0] - 1e-12) > 0)  # positive infinity
-        mz = tma.image_magnification(tma.focal_point[0])
+        self.assertAlmostEqual(1 / tma.image_position(tma.focal_points[0] - 1e-12), 0) # 1/b approaches zero
+        self.assertTrue(1 / tma.image_position(tma.focal_points[0] - 1e-12) > 0)  # positive infinity
+        mz = tma.image_magnification(tma.focal_points[0])
         self.assertTrue(np.isnan(mz) or mz > 10000)  # large magnification
 
         # image at focal point 1
-        self.assertAlmostEqual(1 / tma.object_position(tma.focal_point[1] + 1e-12), 0)
-        self.assertTrue(1 / tma.object_position(tma.focal_point[1] + 1e-12) < 0)  # negative infinity
-        mz = tma.object_magnification(tma.focal_point[1]+1e-12)
+        self.assertAlmostEqual(1 / tma.object_position(tma.focal_points[1] + 1e-12), 0)
+        self.assertTrue(1 / tma.object_position(tma.focal_points[1] + 1e-12) < 0)  # negative infinity
+        mz = tma.object_magnification(tma.focal_points[1] + 1e-12)
         self.assertAlmostEqual(mz, 0, delta=1e-9)
 
         # check object/image distance reversal for different front and back medium 
@@ -343,7 +343,7 @@ class TMATests(unittest.TestCase):
                 abcd1 = tma.abcd
                 abcd = np.array([[1, 0], [-D/1000, tma.n1/tma.n2]])  # 30dpt (1/m) ->  0.03 (1/mm)
                 self.assertTrue(np.allclose(abcd1-abcd, 0))
-                self.assertAlmostEqual(tma.power[1], D)
+                self.assertAlmostEqual(tma.powers[1], D)
                 self.assertAlmostEqual(np.linalg.det(tma.abcd), tma.n1/tma.n2)  # check determinant
 
     def test_tma_pupils(self):
@@ -479,12 +479,72 @@ class TMATests(unittest.TestCase):
         # test tma.matrix_at
         ######
         # image object positions for imaging
-        z_g = Ltma.focal_point[0] - 5
+        z_g = Ltma.focal_points[0] - 5
         z_b = Ltma.image_position(z_g)
         # calculate matrix for this image-object distance combination
         abcd = Ltma.matrix_at(z_g, z_b)
         # for imaging element B of the ABCD matrix must be zero, check if this is the case
         self.assertAlmostEqual(abcd[0, 1], 0)
+
+    def test_tma_optical_center(self):
+
+        # glass block -> undefined optical center
+        L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3), pos=[0, 0, 0], n=ot.presets.refraction_index.SF10)
+        tma = L.tma()
+        self.assertTrue(np.isnan(tma.optical_center))
+        
+        # ideal lens -> optical center at its position
+        L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3), pos=[0, 0, 0], n=ot.presets.refraction_index.SF10)
+        IL = ot.IdealLens(r=3, D=15, pos=[0, 0, 1])
+        tma = IL.tma()
+        self.assertEqual(tma.optical_center, 1)
+
+        # symmetrically biconvex lens -> optical center at center
+        front = ot.SphericalSurface(r=3, R=8)
+        back = ot.SphericalSurface(r=3, R=-8)
+        nL1 = ot.RefractionIndex("Constant", n=1.5)
+        L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
+        oc = L1.tma().optical_center
+        self.assertAlmostEqual(oc, L1.pos[2])
+        
+        # asymmetrically biconvex lens -> optical center at V1 + (V2 - V1)/(1 - R2/R1)
+        front2 = ot.SphericalSurface(r=3, R=8)
+        back2 = ot.SphericalSurface(r=3, R=-12)
+        nL1 = ot.RefractionIndex("Constant", n=1.5)
+        L1 = ot.Lens(front2, back2, de=0.1, pos=[0, 0, 12], n=nL1)
+        tma = L1.tma()
+        oc = tma.optical_center
+        V1, V2 = tma.vertex_point
+        self.assertAlmostEqual(oc, V1 + (V2-V1)/(1 - back2.R/front2.R))
+
+        # meniscus lens
+        L2 = ot.Lens(back2, back, d=0.5, pos=[0, 0, 12], n=nL1)
+        tma = L2.tma()
+        oc = tma.optical_center
+        V1, V2 = tma.vertex_point
+        self.assertAlmostEqual(oc, V1 + (V2-V1)/(1 - back.R/back2.R))
+        
+        # concave lens
+        L3 = ot.Lens(back2, front, d=0.3, pos=[0, 0, 12], n=nL1)
+        tma = L3.tma()
+        oc = tma.optical_center
+        V1, V2 = tma.vertex_point
+        self.assertAlmostEqual(oc, V1 + (V2-V1)/(1 - front.R/back2.R))
+      
+        # for a setup with the same n1 and n2 the optical center is wavelength independent 
+        for wl in [380, 550, 780]:
+            self.assertAlmostEqual(L3.tma(wl).optical_center, oc)
+
+        # Example from "Correctly making panoramic imagery and the meaning of optical center", DOI:10.1117/12.805489
+        front4 = ot.SphericalSurface(r=3, R=20)
+        back4 = ot.SphericalSurface(r=3, R=5)
+        nL2 = ot.RefractionIndex("Constant", n=1.5)
+        L4 = ot.Lens(front4, back4, d=8, pos=[0, 0, 0], n=nL2)
+        tma = L4.tma()
+        V2 = tma.vertex_point[1]
+        OC = tma.optical_center
+        N1, N2 = tma.nodal_points
+        self.assertTrue(OC > N2 > N1 > V2)
 
 if __name__ == '__main__':
     unittest.main()

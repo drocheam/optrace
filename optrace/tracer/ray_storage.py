@@ -53,7 +53,7 @@ class RayStorage(BaseClass):
 
         # all rays have the same starting power.
         # The rays are distributed between the sources according to the ray source power
-        # get source powers and overall power
+        # get source power and overall power
         P_list = np.array([RS.power for RS in ray_source_list])
         P_all = np.sum(P_list)
 

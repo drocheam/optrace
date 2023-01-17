@@ -66,27 +66,27 @@ class TMA(BaseClass):
         n1_, n2_ = self.n1, self.n2
         A, B, C, D = tuple(self.abcd.ravel())
 
-        self.principal_point: tuple[float, float] = (_1-(n1_-n2_*D)/(n2_*C), _2+(1-A)/C) if C else (np.nan, np.nan)
+        self.principal_points: tuple[float, float] = (_1 - (n1_ - n2_ * D) / (n2_ * C), _2 + (1 - A) / C) if C else (np.nan, np.nan)
         """z-position of principal points"""
 
-        p1, p2 = self.principal_point
+        p1, p2 = self.principal_points
 
-        self.nodal_point: tuple[float, float] = (_1-(1-D)/C, _2+(n1_-n2_*A)/(n2_*C)) if C else (np.nan, np.nan)
+        self.nodal_points: tuple[float, float] = (_1 - (1 - D) / C, _2 + (n1_ - n2_ * A) / (n2_ * C)) if C else (np.nan, np.nan)
         """z-position of nodal points"""
         
-        self.focal_point: tuple[float, float] = (p1+n1_/n2_/C, p2-1/C) if C else (np.nan, np.nan)
+        self.focal_points: tuple[float, float] = (p1 + n1_ / n2_ / C, p2 - 1 / C) if C else (np.nan, np.nan)
         """z-position of focal points"""
 
-        f1p, f2p = self.focal_point
+        f1p, f2p = self.focal_points
 
-        self.focal_length: tuple[float, float] = (f1p-p1, f2p-p2) if C else (np.nan, np.nan)
+        self.focal_lengths: tuple[float, float] = (f1p - p1, f2p - p2) if C else (np.nan, np.nan)
         """focal lengths of the lens """
         
-        f1, f2 = self.focal_length
+        f1, f2 = self.focal_lengths
 
         self.ffl: float = f1p - _1 if C else np.nan
         """back focal length, Distance between back focal point and back surface vertex point """
-        
+       
         self.bfl: float = f2p - _2 if C else np.nan
         """front focal length, Distance between front focal point and front surface vertex"""
 
@@ -99,19 +99,23 @@ class TMA(BaseClass):
         self.efl_n: float = f2 / self.n2
         """effective focal length"""
     
-        self.focal_length_n: tuple[float, float] = f1/self.n1, f2/self.n2
+        self.focal_lengths_n: tuple[float, float] = f1 / self.n1, f2 / self.n2
         """focal lengths with different definition, see the documentation"""
    
-        self.power: tuple[float, float] = 1000/f1, 1000/f2
+        self.powers: tuple[float, float] = 1000 / f1, 1000 / f2
         """optical powers of the lens, inverse of focal length"""
         
-        self.power_n: tuple[float, float] = 1000*self.n1/f1, 1000*self.n2/f2
+        self.powers_n: tuple[float, float] = 1000 * self.n1 / f1, 1000 * self.n2 / f2
         """
-        different definition for the optical power. The optical power is scaled with the ambient index for each side.
+        different definition for the optical powers. The optical powers is scaled with the ambient index for each side.
         Mainly used in ophthalmic optics.
         This definition has the advantage, that both powers always have the same magnitude, but only different signs.
         """
 
+        _oc = 1 - A + B*C / (D - 1) if D - 1 else np.inf
+        self.optical_center = _1 + self.d / _oc if _oc else np.nan
+        """optical center of the setup"""
+        
         super().__init__(**kwargs)
 
         # lock object (no changes from here)

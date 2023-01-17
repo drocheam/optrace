@@ -152,7 +152,7 @@ For this the emitting surface needs to be a ``RectangularSurface``. The image it
 .. testcode::
 
    rect = ot.RectangularSurface(dim=[2, 3])
-   RS = ot.RaySource(rect, image=ot.presets.image.racoon)
+   RS = ot.RaySource(rect, image=ot.presets.image.landscape)
 
 .. testcode::
 

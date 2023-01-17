@@ -107,7 +107,7 @@ Below a tabular overview of the supported properties is found. Details on their 
      - ``-``
      - refractive index value after the lens setup
    
-   * - ``vertex_point``
+   * - ``vertex_points``
      - float, float (tuple)
      - mm
      - front and back position of vertices of the system 
@@ -122,37 +122,42 @@ Below a tabular overview of the supported properties is found. Details on their 
      - ``-``
      - ABCD matrix
 
-   * - ``principal_point``
+   * - ``principal_points``
      - float, float (tuple)
      - mm
      - principal points (z-positions)
 
-   * - ``nodal_point``
+   * - ``nodal_points``
      - float, float (tuple)
      - mm
      - nodal points (z-positions)
    
-   * - ``focal_point``
+   * - ``optical_center``
+     - float
+     - mm
+     - optical center (z-position)
+   
+   * - ``focal_points``
      - float, float (tuple)
      - mm
      - focal points (z-positions)
    
-   * - ``focal_length``
+   * - ``focal_lengths``
      - float, float (tuple)
      - mm
      - focal lengths
    
-   * - ``focal_length_n``
+   * - ``focal_lengths_n``
      - float, float (tuple)
      - mm
      - focal lengths, scaled with refractive index
 
-   * - ``power``
+   * - ``powers``
      - float, float (tuple)
      - dpt
      - optical powers of the system
    
-   * - ``power_n``
+   * - ``powers_n``
      - float, float (tuple)
      - dpt
      - optical powers, scaled with the refractive index
@@ -206,7 +211,7 @@ The member function ``image_position`` enables us to calculate a image position 
 .. doctest::
 
    >>> tma.image_position(-50)
-   72.87925720752207
+   72.87925720752206
 
 Both input and output value are absolute positions at the optical axis in millimeters.
 
@@ -215,7 +220,7 @@ On the contrary we can calculate an object position from a known image position:
 .. doctest::
 
    >>> tma.object_position(100)
-   -33.84654855214077
+   -33.84654855214075
 
 For both function infinite values (``-np.inf, np.inf``) are supported as function parameters.
 For the image position at infinity we get:
@@ -223,14 +228,15 @@ For the image position at infinity we get:
 .. doctest::
 
    >>> tma.object_position(np.inf)
-   -16.931238099315884
+   -16.931238099315877
 
 Which should be exactly the same position as the first focal point:
 
 .. doctest::
    
-   >>> tma.focal_point[0]
-   -16.931238099315884
+   >>> tma.focal_points[0]
+   -16.93123809931588
+
 
 
 Analogously not only the positions but also the magnification factors at the image/object plane can be calculated:

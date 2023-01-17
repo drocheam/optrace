@@ -464,7 +464,7 @@ class GeometryTests(unittest.TestCase):
             s /= ab[:, np.newaxis]
             return s
 
-        # use power other than default of 1
+        # use powers other than default of 1
         # use position other than default of [0, 0, 0]
         # use s other than [0, 0, 1]
         rargs = dict(spectrum=ot.presets.light_spectrum.d50, or_func=or_func, pos=[0.5, -2, 3], 

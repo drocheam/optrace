@@ -78,9 +78,9 @@ RT.add(DET)
 
 print("\nDoublet Powers:")
 F_, e, C_ = ot.presets.spectral_lines.F_eC_
-print(f"{RT.tma(F_).power[1]:.2f} dpt ({F_:.2f} nm)")
-print(f"{RT.tma(e).power[1]:.2f} dpt ({e:.2f} nm)")
-print(f"{RT.tma(C_).power[1]:.2f} dpt ({C_:.2f} nm)\n")
+print(f"{RT.tma(F_).powers[1]:.2f} dpt ({F_:.2f} nm)")
+print(f"{RT.tma(e).powers[1]:.2f} dpt ({e:.2f} nm)")
+print(f"{RT.tma(C_).powers[1]:.2f} dpt ({C_:.2f} nm)\n")
 
 # run the simulator
 sim = TraceGUI(RT, coloring_type="Wavelength", ray_opacity=0.8)
