@@ -259,7 +259,7 @@ class Raytracer(Group):
 
         def sub_trace(N_threads: int, N_t: int) -> None:
 
-            p, s, pols, weights, wavelengths, ns = self.rays.make_thread_rays(N_threads, N_t)
+            p, s, pols, weights, wavelengths, ns = self.rays.thread_rays(N_threads, N_t)
             if not self.silent and N_t == 0:
                 bar.update(1)
 
@@ -477,11 +477,11 @@ class Raytracer(Group):
 
             # check value at surface
             x, y = np.array([pt.pos[0]]), np.array([pt.pos[1]])
-            z = surf.get_values(x, y)
+            z = surf.values(x, y)
 
             # check if hitting, surface needs to be defined at this point
             hit = (z < pt.pos[2]) if not rev else (z > pt.pos[2])
-            hit = hit & surf.get_mask(x, y)
+            hit = hit & surf.mask(x, y)
             where = np.where(hit)[0]
             return np.any(hit), x[where], y[where], z[where]
 
@@ -493,11 +493,11 @@ class Raytracer(Group):
             t = np.linspace(-line.r, line.r, 10*res)
             x = line.pos[0] + np.cos(line.angle)*t
             y = line.pos[1] + np.sin(line.angle)*t
-            z = surf.get_values(x, y)
+            z = surf.values(x, y)
 
             # check if hitting and order correct
             hit = (z < line.pos[2]) if not rev else (z > line.pos[2])
-            hit = hit & surf.get_mask(x, y)
+            hit = hit & surf.mask(x, y)
             where = np.where(hit)[0]
             return np.any(hit), x[where], y[where], z[where]
 
@@ -524,12 +524,12 @@ class Raytracer(Group):
 
         # sample surface mask
         x2, y2 = X.flatten(), Y.flatten()
-        valid = front.get_mask(x2, y2) & back.get_mask(x2, y2)
+        valid = front.mask(x2, y2) & back.mask(x2, y2)
 
         # sample valid surface values
         x2v, y2v = x2[valid], y2[valid]
-        zfv = front.get_values(x2v, y2v)
-        zbv = back.get_values(x2v, y2v)
+        zfv = front.values(x2v, y2v)
+        zbv = back.values(x2v, y2v)
 
         # check for collisions
         coll = zfv > zbv
@@ -719,7 +719,7 @@ class Raytracer(Group):
         if not np.any(hwh):
             return
 
-        n = surface.get_normals(p[hwh, i + 1, 0], p[hwh, i + 1, 1])
+        n = surface.normals(p[hwh, i + 1, 0], p[hwh, i + 1, 1])
 
         n1_h = n1[hwh]
         n2_h = n2[hwh]
@@ -1060,7 +1060,7 @@ class Raytracer(Group):
             = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
 
         # init image and extent, these are the default values when no rays hit the detector
-        img = RImage(desc=desc, extent=extent_out, projection=projection,
+        img = RImage(long_desc=desc, extent=extent_out, projection=projection,
                      threading=self.threading, silent=self.silent, limit=limit)
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:
@@ -1086,7 +1086,7 @@ class Raytracer(Group):
         p, w, wl, extent, desc, _, bar\
             = self._hit_detector("Detector Spectrum", detector_index, source_index, extent)
 
-        spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        spec = LightSpectrum.render(wl, w, long_desc=f"Spectrum of {desc}", **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1315,7 +1315,7 @@ class Raytracer(Group):
         """
         p, w, wl, extent, desc, bar = self._hit_source("Source Spectrum", source_index)
 
-        spec = LightSpectrum.render(wl, w, desc=f"Spectrum of {desc}", **kwargs)
+        spec = LightSpectrum.render(wl, w, long_desc=f"Spectrum of {desc}", **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1337,7 +1337,7 @@ class Raytracer(Group):
 
         p, w, wl, extent, desc, bar = self._hit_source("Source Image", source_index)
 
-        img = RImage(desc=desc, extent=extent, projection=None, limit=limit,
+        img = RImage(long_desc=desc, extent=extent, projection=None, limit=limit,
                     threading=self.threading, silent=self.silent)
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:

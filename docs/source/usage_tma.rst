@@ -264,3 +264,33 @@ The ``matrix_at`` method takes the object and image position as arguments and re
    array([[ -1.16560585, -19.55567495],
           [ -0.03263119,  -1.40538498]])
 
+
+Calculation of Entrance and Exit Pupil
+__________________________________________
+
+Entrance and exit pupil position and magnifications are also available for calculation.
+Details on the math are found in :numref:`pupil_calculation`.
+
+First, let's load the paraxial eye model, get the pupil position and create the matrix analysis object:
+
+.. testcode::
+
+   eye = ot.presets.geometry.legrand_eye()
+   aps = eye.apertures[0].pos[2]
+   tma = eye.tma()
+
+The function ``pupil_position`` takes the aperture stop position and returns a tuple of entrance and exit pupil position along the optical axis.
+Regarding the position of the stop, the aperture can lie inside, behind or in front of the lens setup. Therefore there are no limitations.
+
+.. doctest::
+   
+   >>> tma.pupil_position(aps)
+   (3.0375652165508553, 3.6821114369501466)
+
+Magnifications are returned with the member function ``pupil_magnification``.
+
+.. doctest::
+   
+   >>> tma.pupil_magnification(aps)
+   (1.1310996628960361, 1.0410557184750733)
+

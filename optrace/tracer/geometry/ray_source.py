@@ -147,7 +147,7 @@ class RaySource(Element):
         # lock assignment of new properties. New properties throw an error.
         self._new_lock = True
 
-    def get_color(self, rendering_intent: str = "Ignore", clip=False) -> tuple[float, float, float]:
+    def color(self, rendering_intent: str = "Ignore", clip=False) -> tuple[float, float, float]:
         """
         Get the mean color of the RaySource
 
@@ -159,7 +159,7 @@ class RaySource(Element):
             return self._mean_img_color
 
         else:
-            return self.spectrum.get_color(rendering_intent, clip)
+            return self.spectrum.color(rendering_intent, clip)
 
     def create_rays(self, N: int, no_pol: bool = False, power: float = None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -190,7 +190,7 @@ class RaySource(Element):
         ################################################################################################################
 
         if self.image is None:
-            p = self.surface.get_random_positions(N)
+            p = self.surface.random_positions(N)
 
         else:
             if not isinstance(self.surface, RectangularSurface):
@@ -469,7 +469,7 @@ class RaySource(Element):
 
                 self.pIf = 1/Ifs*If
 
-                # calculate mean image color, needed for self.get_color
+                # calculate mean image color, needed for self.color
                 # mean color needs to calculated in a linear colorspace, hence sRGBLinear
                 sRGBL = color.srgb_to_srgb_linear(img)
                 sRGBL_mean = np.mean(sRGBL, axis=(0, 1))

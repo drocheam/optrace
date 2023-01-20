@@ -123,15 +123,15 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     
     # RImage -> plot Pixel colors (RI != "Ignore" means sRGB conversion with said rendering intent)
     if isinstance(img, RImage):
-        XYZ = img.get_xyz() if rendering_intent == "Ignore" \
-            else color.srgb_to_xyz(img.get_rgb(rendering_intent=rendering_intent))
+        XYZ = img.xyz() if rendering_intent == "Ignore" \
+            else color.srgb_to_xyz(img.rgb(rendering_intent=rendering_intent))
         labels = []  # no labels, otherwise many labels would cover the whole diagram
         legend3 = "Image Colors"
         point_alpha = 0.1  # low alpha since we have a lot of pixels
 
     # LightSpectrum -> single point in diagram
     elif isinstance(img, LightSpectrum):
-        XYZ = np.array([[[*img.get_xyz()]]])
+        XYZ = np.array([[[*img.xyz()]]])
         labels = [img.get_desc()]
         legend3 = "Spectrum Colors"
         point_alpha = 1
@@ -150,7 +150,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
         # fill legend and color array
         for i, Imi in enumerate(img):
             labels.append(Imi.get_desc())
-            XYZ = np.vstack((XYZ, np.array([[[*Imi.get_xyz()]]])))
+            XYZ = np.vstack((XYZ, np.array([[[*Imi.xyz()]]])))
 
         legend3 = "Spectrum Colors"
         point_alpha = 1

@@ -376,7 +376,7 @@ With a filter at hand we can calculate its approximate sRGB color. The fourth re
 
 .. doctest::
 
-   >>> F.get_color()
+   >>> F.color()
    (2.359115924484492e-07, 0.2705811859857049, 0.9999999999999999, 0.9838657805329205)
 
 Calling the filter with wavelengths returns the transmittance at these wavelengths.

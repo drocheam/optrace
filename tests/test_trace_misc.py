@@ -28,7 +28,7 @@ class TracerMiscTests(unittest.TestCase):
     def test_ray_storage(self):
 
         RS = RayStorage()
-        self.assertRaises(AssertionError, RS.make_thread_rays, 0, 0)  # no rays
+        self.assertRaises(AssertionError, RS.thread_rays, 0, 0)  # no rays
         self.assertRaises(AssertionError, RS.source_sections, 0)  # no rays
         self.assertRaises(AssertionError, RS.rays_by_mask, np.array([]))  # no rays
 
@@ -131,7 +131,7 @@ class TracerMiscTests(unittest.TestCase):
         
         # check display_modes
         for dm in ot.RImage.display_modes:
-            img_ = img.get_by_display_mode(dm)
+            img_ = img.get(dm)
             
             # all values should be positive
             self.assertTrue(np.min(img_) > -1e-9)
@@ -140,12 +140,12 @@ class TracerMiscTests(unittest.TestCase):
             if dm.find("sRGB") != -1:
                 self.assertTrue(np.max(img_) < 1+1e-9)
 
-        self.assertRaises(ValueError, img.get_by_display_mode, "hjkhjkhjk")  # invalid mode
+        self.assertRaises(ValueError, img.get, "hjkhjkhjk")  # invalid mode
 
-        # get_rgb with log and rendering intent options
+        # rgb with log and rendering intent options
         for ri in color.SRGB_RENDERING_INTENTS:
             for log in [True, False]:
-                im = img.get_rgb(log=log, rendering_intent=ri)
+                im = img.rgb(log=log, rendering_intent=ri)
                 self.assertTrue(np.min(im) > 0-1e-9)
                 self.assertTrue(np.max(im) < 1+1e-9)
 
@@ -156,7 +156,7 @@ class TracerMiscTests(unittest.TestCase):
         # check if empty image throws
         RIm = ot.RImage(extent=[-1, 1, -1, 1])
         for mode in ot.RImage.display_modes:
-            self.assertRaises(RuntimeError, RIm.get_by_display_mode, mode)
+            self.assertRaises(RuntimeError, RIm.get, mode)
     
     @pytest.mark.slow
     def test_r_image_cut(self):
@@ -192,9 +192,9 @@ class TracerMiscTests(unittest.TestCase):
 
                                 # make cut through image, multiply with 1-1e-12 so p = 1 gets mapped into last bin
                                 if cut_ == "x":
-                                    img_ = img.get_by_display_mode(dm)[:, int(p*(1-1e-12)*img.Nx)]
+                                    img_ = img.get(dm)[:, int(p * (1 - 1e-12) * img.Nx)]
                                 else:
-                                    img_ = img.get_by_display_mode(dm)[int(p*(1-1e-12)*img.Ny), :]
+                                    img_ = img.get(dm)[int(p * (1 - 1e-12) * img.Ny), :]
 
                                 # compare with cut from before
                                 self.assertTrue(np.allclose(img_ - vals, 0))
@@ -209,8 +209,8 @@ class TracerMiscTests(unittest.TestCase):
                 img, P, L = self.gen_r_image(ratio=ratio, limit=limit, threading=bool(i % 2))  # toggle threading
 
                 # check power sum
-                P0 = img.get_power()
-                L0 = img.get_luminous_power()
+                P0 = img.power()
+                L0 = img.luminous_power()
                 self.assertAlmostEqual(P0, P)
                 self.assertAlmostEqual(L0, L)
 
@@ -227,7 +227,7 @@ class TracerMiscTests(unittest.TestCase):
                     cmp_siz1 = img.Nx if ratio_act < 1 else img.Ny
                     self.assertEqual(near_siz, cmp_siz1)
 
-                    self.assertAlmostEqual(P0, img.get_power())  # overall power stays the same even after rescaling
+                    self.assertAlmostEqual(P0, img.power())  # overall power stays the same even after rescaling
                     self.assertAlmostEqual(ratio_act, img.Nx/img.Ny)  # ratio stayed the same
                     self.assertEqual(sx0, img.sx)  # side length stayed the same
                     self.assertEqual(sy0, img.sy)  # side length stayed the same
@@ -447,7 +447,7 @@ class TracerMiscTests(unittest.TestCase):
 
             self.assertEqual(n.is_dispersive(), n.spectrum_type != "Constant")
             self.assertAlmostEqual(n(np.array(ot.presets.spectral_lines.d)), nc, delta=5e-5)
-            self.assertAlmostEqual(n.get_abbe_number(), V, delta=0.3)
+            self.assertAlmostEqual(n.abbe_number(), V, delta=0.3)
 
         # check if equal operator is working
         self.assertEqual(ot.presets.refraction_index.SF10, ot.presets.refraction_index.SF10)
@@ -464,8 +464,8 @@ class TracerMiscTests(unittest.TestCase):
                 for V in [15, 37.56, 78, 156]:
                   n = ot.RefractionIndex("Abbe", n=nc, V=V, lines=lines)
                   self.assertAlmostEqual(nc, n(n.lines[1]), delta=1e-4)
-                  self.assertAlmostEqual(V, n.get_abbe_number(lines), delta=1e-2)  # enforce lines...
-                  self.assertAlmostEqual(V, n.get_abbe_number(), delta=1e-2)  # ...but should correct one anyway
+                  self.assertAlmostEqual(V, n.abbe_number(lines), delta=1e-2)  # enforce lines...
+                  self.assertAlmostEqual(V, n.abbe_number(), delta=1e-2)  # ...but should correct one anyway
 
     def test_refraction_index_exceptions(self):
 

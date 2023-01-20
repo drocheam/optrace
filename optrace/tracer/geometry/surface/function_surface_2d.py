@@ -71,7 +71,7 @@ class FunctionSurface2D(Surface):
         self._deriv_args = deriv_args or {}
         
         self._offset = 0  # provisional offset
-        self._offset = self._get_values(np.array([0.]), np.array([0.]))[0]
+        self._offset = self._values(np.array([0.]), np.array([0.]))[0]
         self.parax_roc = parax_roc
 
         self.__set_zmin_zmax(z_min, z_max)
@@ -85,8 +85,8 @@ class FunctionSurface2D(Surface):
         """       
         if self._1D:
             rn = np.linspace(0, self.r, 10000)
-            zn = self._get_values(rn, np.zeros_like(rn))
-            mn = self.get_mask(rn, np.zeros_like(rn))
+            zn = self._values(rn, np.zeros_like(rn))
+            mn = self.mask(rn, np.zeros_like(rn))
             self.z_min, self.z_max = np.min(zn[mn]), np.max(zn[mn])
 
         else:
@@ -128,7 +128,7 @@ class FunctionSurface2D(Surface):
         else:
             raise ValueError(f"z_max and z_min need to be both None or both need a value")
 
-    def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
         And without masking out values beyond the surface extent or own additional mask
@@ -151,7 +151,7 @@ class FunctionSurface2D(Surface):
 
         return self._sign*(vals - self._offset)
 
-    def get_mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface mask values. A value of 1 means the surface is defined here.
 
@@ -159,7 +159,7 @@ class FunctionSurface2D(Surface):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        mask = super().get_mask(x, y)
+        mask = super().mask(x, y)
 
         # additionally evaluate FunctionSurface2D mask if defined
         if self.mask_func is not None:
@@ -184,7 +184,7 @@ class FunctionSurface2D(Surface):
 
         return mask
 
-    def get_normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get normal vectors of the surface.
 
@@ -194,14 +194,14 @@ class FunctionSurface2D(Surface):
         """
 
         if self.deriv_func is None:
-            return super().get_normals(x, y)
+            return super().normals(x, y)
     
         else:
 
             n = np.tile([0., 0., 1.], (x.shape[0], 1))
 
             # coordinates actually on surface
-            m = self.get_mask(x, y)
+            m = self.mask(x, y)
             
             # relative coordinates
             xm = x[m] - self.pos[0]

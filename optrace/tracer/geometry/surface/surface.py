@@ -73,17 +73,17 @@ class Surface(BaseClass):
 
         # get values and mask out invalid values
         rcos, rsin = ne.evaluate("r*cos(phi)"), ne.evaluate("r*sin(phi)")
-        vals = self._get_values(rcos, rsin)
-        mask = self.get_mask(rcos - self.pos[0], rsin - self.pos[1])
+        vals = self._values(rcos, rsin)
+        mask = self.mask(rcos - self.pos[0], rsin - self.pos[1])
         vals[~mask] = np.nan
 
         # in many cases the minimum and maximum are at the  edge of the surface
         # => sample it additionally
 
         # values at surface edge
-        xv, yv, vals2 = self.get_edge(3001)
+        xv, yv, vals2 = self.edge(3001)
         vals2 -= self.pos[2]
-        mask = self.get_mask(xv, yv)
+        mask = self.mask(xv, yv)
         vals2[~mask] = np.nan
 
         # find minimum and maximum value
@@ -134,7 +134,7 @@ class Surface(BaseClass):
         """thickness between highest point on surface and center z-position"""
         return self.z_max - self.pos[2]
 
-    def get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values. Absolute coordinates. Points outside the surface are set to z_max.
 
@@ -148,8 +148,8 @@ class Surface(BaseClass):
             return z
     
         else:
-            inside = self.get_mask(x, y)
-            z[inside] = self.pos[2] + self._get_values(x[inside] - self.pos[0], y[inside] - self.pos[1])
+            inside = self.mask(x, y)
+            z[inside] = self.pos[2] + self._values(x[inside] - self.pos[0], y[inside] - self.pos[1])
             r = self.r - self.N_EPS
 
             # continue the edge value in radial direction
@@ -157,13 +157,13 @@ class Surface(BaseClass):
                 if not self.rotational_symmetry:
                     xni, x0, yni, y0 = x[~inside], self.pos[0], y[~inside], self.pos[1]
                     phi = ne.evaluate("arctan2(yni - y0, xni - x0)")
-                    z[~inside] = self.pos[2] + self._get_values(r*np.cos(phi), r*np.sin(phi))
+                    z[~inside] = self.pos[2] + self._values(r * np.cos(phi), r * np.sin(phi))
                 else:
-                    z[~inside] = self.pos[2] + self._get_values(np.array([r]), np.array([0.]))[0]
+                    z[~inside] = self.pos[2] + self._values(np.array([r]), np.array([0.]))[0]
 
             return z
 
-    def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
         And without masking out values beyond the surface extent
@@ -175,7 +175,7 @@ class Surface(BaseClass):
         assert self.is_flat(), "function not implemented for sub-class"
         return np.zeros_like(x, dtype=np.float64)
 
-    def get_plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
         The only guarantee is that neighbouring array values are neighbouring values in 3D space.
@@ -201,16 +201,16 @@ class Surface(BaseClass):
         
         # values inside circular area
         z = np.zeros(mask.shape, dtype=np.float64)
-        z[~mask] = self._get_values(X[~mask2].ravel(), Y[~mask2].ravel())
+        z[~mask] = self._values(X[~mask2].ravel(), Y[~mask2].ravel())
 
         # move values outside surface to the surface edge
         # this defines the edge with more points, making it more circular instead of step-like
-        z[mask] = self._get_values(r * np.cos(Phi.ravel()[mask]), r * np.sin(Phi.ravel()[mask]))
+        z[mask] = self._values(r * np.cos(Phi.ravel()[mask]), r * np.sin(Phi.ravel()[mask]))
         X[mask2] = r*np.cos(Phi[mask2])
         Y[mask2] = r*np.sin(Phi[mask2])
 
         # plot nan values inside
-        mask3 = self.get_mask(X.ravel()+self.pos[0], Y.ravel()+self.pos[1])  # get_mask has absolute coordinates
+        mask3 = self.mask(X.ravel() + self.pos[0], Y.ravel() + self.pos[1])  # mask has absolute coordinates
         z[~mask3] = np.nan
 
         # make 2D
@@ -219,7 +219,7 @@ class Surface(BaseClass):
         # return offset values
         return X+self.pos[0], Y+self.pos[1], Z+self.pos[2]
 
-    def get_mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface mask values. A value of 1 means the surface is defined here.
 
@@ -233,7 +233,7 @@ class Surface(BaseClass):
 
         return r2 <= (self.r + self.N_EPS)**2
 
-    def get_normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get normal vectors of the surface.
 
@@ -248,7 +248,7 @@ class Surface(BaseClass):
             return n
 
         # coordinates actually on surface
-        m = self.get_mask(x, y)
+        m = self.mask(x, y)
         xm, ym = x[m], y[m]
 
         # approximate optimal step width for differentiation  for a second derivative
@@ -266,8 +266,8 @@ class Surface(BaseClass):
         # of derivative vectors u = (2*ds, 0, uz) and v = (0, 2*ds, vz) is n = (-2*uz*ds, -2*ds*vz, 4*ds*ds)
         # this can be rescaled to n = (-uz, -vz, 2*ds)
         x_, y_ = xm - self.pos[0], ym - self.pos[1]  # use coordinates relative to center
-        n[m, 0] = self._get_values(x_ - eps, y_) - self._get_values(x_ + eps, y_)  # -uz
-        n[m, 1] = self._get_values(x_, y_ - eps) - self._get_values(x_, y_ + eps)  # -vz
+        n[m, 0] = self._values(x_ - eps, y_) - self._values(x_ + eps, y_)  # -uz
+        n[m, 1] = self._values(x_, y_ - eps) - self._values(x_, y_ + eps)  # -vz
         n[m, 2] = 2*eps
 
         # normalize vectors
@@ -275,7 +275,7 @@ class Surface(BaseClass):
 
         return n
 
-    def get_edge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def edge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get surface values of the surface edge, assumes a circular edge.
 
@@ -289,7 +289,7 @@ class Surface(BaseClass):
         theta = np.linspace(0, 2 * np.pi, nc)
         xd = self.r * np.cos(theta)
         yd = self.r * np.sin(theta)
-        zd = self._get_values(xd, yd)
+        zd = self._values(xd, yd)
 
         return xd + self.pos[0],\
             yd + self.pos[1],\
@@ -309,7 +309,7 @@ class Surface(BaseClass):
             # intersection with xy plane
             t = (self.pos[2] - p[:, 2])/s[:, 2]
             p_hit = p + s*t[:, np.newaxis]
-            is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
+            is_hit = self.mask(p_hit[:, 0], p_hit[:, 1])
 
             self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
@@ -328,8 +328,8 @@ class Surface(BaseClass):
             p2 = p + s*t2[:, np.newaxis]
 
             # cost function values
-            f1 = p1[:, 2] - self.get_values(p1[:, 0], p1[:, 1])
-            f2 = p2[:, 2] - self.get_values(p2[:, 0], p2[:, 1])
+            f1 = p1[:, 2] - self.values(p1[:, 0], p1[:, 1])
+            f2 = p2[:, 2] - self.values(p2[:, 0], p2[:, 1])
 
             # contraction factor (m = 0.5 : Illinois Algorithm)
             m = 0.5
@@ -364,7 +364,7 @@ class Surface(BaseClass):
                 pl = p[w] + s[w]*ts[:, np.newaxis]
 
                 # difference between ray and surface at root
-                fts = pl[:, 2] - self.get_values(pl[:, 0], pl[:, 1])
+                fts = pl[:, 2] - self.values(pl[:, 0], pl[:, 1])
 
                 # sign of fts*f2 decides which case is handled for each ray
                 prod = fts*f2[w]
@@ -400,7 +400,7 @@ class Surface(BaseClass):
 
             # check if hit is an actual hit. For this the surface needs to be defined at this x and y
             # as well as the actual surface value being near
-            is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
+            is_hit = self.mask(p_hit[:, 0], p_hit[:, 1])
 
             # handle rays that start behind surface or inside its extent 
             self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
@@ -450,7 +450,7 @@ class Surface(BaseClass):
         :param is_hit: boolean hit array
         """
 
-        zs = self.get_values(p_hit[:, 0], p_hit[:, 1])  # surface values
+        zs = self.values(p_hit[:, 0], p_hit[:, 1])  # surface values
         dev = np.abs(p_hit[:, 2] - zs) > self.C_EPS  # z-value deviates
         beh = p[:, 2] > self.z_max + self.N_EPS  # rays start after surface
         neg = p_hit[:, 2] < p[:, 2] - self.C_EPS  # hit is behind ray start

@@ -242,6 +242,7 @@ class TraceGUI(HasTraits):
     # Strings and Labels
 
     _autofocus_information:      Str = Str()
+    _spectrum_information:       Str = Str()
     _debug_options_label:        Str = Str('Debugging Options:')
     _debug_command_label:        Str = Str('Command Running Options:')
     _spectrum_label:             Str = Str('Generate Spectrum:')
@@ -254,6 +255,7 @@ class TraceGUI(HasTraits):
     _ray_visual_label:           Str = Str('Ray Visual Settings:')
     _ui_visual_label:            Str = Str('Scene and UI Settings:')
     _autofocus_output_label:     Str = Str('Optimization Output:')
+    _spectrum_output_label:      Str = Str('Spectrum Properties:')
     _filter_label:               Str = Str('Resolution Filter (Gaussian):')
     _whitespace_label:           Str = Str('')
 
@@ -353,6 +355,10 @@ class TraceGUI(HasTraits):
                             Item('_source_spectrum_button', show_label=False),
                             Item('det_spectrum_one_source', style="custom", show_label=False),
                             Item('_detector_spectrum_button', show_label=False),
+                            _separator,
+                            _separator,
+                            Item("_spectrum_output_label", style='readonly', show_label=False, emphasized=True),
+                            Item("_spectrum_information", show_label=False, style="custom"),
                             label="Spectrum",
                             ),
                         TGroup(
@@ -625,7 +631,7 @@ class TraceGUI(HasTraits):
         self.__remove_objects(self._filter_plots)
 
         for num, F in enumerate(self.raytracer.filters):
-            fcolor = F.get_color()
+            fcolor = F.color()
             alpha = 0.1 + 0.899*fcolor[3]  # offset in both directions, ensures visibility and see-through
             t = self._plot_element(F, num, fcolor[:3] if not self.high_contrast else self.scene.foreground, alpha)
             self._filter_plots.append(t)
@@ -861,10 +867,10 @@ class TraceGUI(HasTraits):
             self.scene.engine.add_source(ParametricSurface(name=f"{type(obj).__name__} {num}"), self.scene)
 
         # plot front
-        a = plot(obj.front.get_plotting_mesh(N=self.SURFACE_RES), "front") if plotFront else None
+        a = plot(obj.front.plotting_mesh(N=self.SURFACE_RES), "front") if plotFront else None
 
         # cylinder between surfaces
-        b = plot(obj.get_cylinder_surface(nc=2*self.SURFACE_RES), "cylinder") if plotCyl else None
+        b = plot(obj.cylinder_surface(nc=2 * self.SURFACE_RES), "cylinder") if plotCyl else None
 
         # use wireframe mode, so edge is always visible, even if it is infinitesimal small
         if plotCyl and (not obj.has_back() or (obj.extent[5] - obj.extent[4] < 0.05)):
@@ -872,11 +878,11 @@ class TraceGUI(HasTraits):
 
         # calculate middle center z-position
         if obj.has_back():
-            zl = (obj.front.get_values(np.array([obj.front.extent[1]]), np.array([obj.front.pos[1]]))[0] \
-                  + obj.back.get_values(np.array([obj.back.extent[1]]), np.array([obj.back.pos[1]]))[0]) / 2
+            zl = (obj.front.values(np.array([obj.front.extent[1]]), np.array([obj.front.pos[1]]))[0] \
+                  + obj.back.values(np.array([obj.back.extent[1]]), np.array([obj.back.pos[1]]))[0]) / 2
         else:
             # 10/40 values in [0, 2pi] -> z - value at 90 deg relative to x axis in xy plane
-            zl = obj.front.get_edge(40)[2][10] if isinstance(obj.front, Surface) else obj.pos[2]
+            zl = obj.front.edge(40)[2][10] if isinstance(obj.front, Surface) else obj.pos[2]
 
         # object label
         label = f"{obj.abbr}{num}"
@@ -890,7 +896,7 @@ class TraceGUI(HasTraits):
             text.property.trait_set(**self.LABEL_STYLE, justification="left", orientation=90, vertical_justification="center")
 
         # plot BackSurface if one exists
-        c = plot(obj.back.get_plotting_mesh(N=self.SURFACE_RES), "back") if plotBack else None
+        c = plot(obj.back.plotting_mesh(N=self.SURFACE_RES), "back") if plotBack else None
 
         return a, b, c, text, obj
 
@@ -1047,7 +1053,7 @@ class TraceGUI(HasTraits):
                 RSColor = [self.scene.foreground for RSp in self._ray_source_plots]
 
             case 'Wavelength':
-                RSColor = [RS.get_color(rendering_intent="Absolute") for RS in self.raytracer.ray_sources]
+                RSColor = [RS.color(rendering_intent="Absolute") for RS in self.raytracer.ray_sources]
 
             case ('Polarization xz' | "Polarization yz"):
                 # color from polarization projection on yz-plane
@@ -1240,10 +1246,10 @@ class TraceGUI(HasTraits):
                 surf = None
 
             is_surf = isinstance(surf, Surface)
-            surf_hit = is_surf and surf.get_mask(np.array([p[0]]), np.array([p[1]]))[0]
+            surf_hit = is_surf and surf.mask(np.array([p[0]]), np.array([p[1]]))[0]
             
             if is_surf and surf_hit:
-                normal = surf.get_normals(np.array([p[0]]), np.array([p[1]]))[0]
+                normal = surf.normals(np.array([p[0]]), np.array([p[1]]))[0]
                 normal_sph = to_sph_coords(normal)
 
             l0 = l[n2_ - 1] if n2_ > 0 else None
@@ -1530,7 +1536,7 @@ class TraceGUI(HasTraits):
         for F in self._filter_plots:
             for Fi in F[:2]:
                 if Fi is not None and F[4] is not None:
-                    Fi.actor.property.color = F[4].get_color()[:3] if not self.high_contrast else self.scene.foreground
+                    Fi.actor.property.color = F[4].color()[:3] if not self.high_contrast else self.scene.foreground
 
         # update misc color
         for color, objs in zip([self._lens_color, self._detector_color, self._aperture_color, self._marker_color,
@@ -1860,7 +1866,7 @@ class TraceGUI(HasTraits):
                             DImg = self.last_det_image.copy()
                             DImg.rescale(px)
 
-                        Imc = DImg.get_by_display_mode(mode, log=log)
+                        Imc = DImg.get(mode, log=log)
 
                 def on_finish() -> None:
                     if not error:
@@ -1888,6 +1894,7 @@ class TraceGUI(HasTraits):
         if self.raytracer.detectors and self.raytracer.rays.N:
 
             self._status["DetectorSpectrum"] += 1
+            self._spectrum_information = ""
 
             def background() -> None:
 
@@ -1904,6 +1911,8 @@ class TraceGUI(HasTraits):
                     if not error:
                         with self._try():
                             spectrum_plot(Det_Spec)
+                        self._spectrum_information = self._get_spectrum_information(Det_Spec)
+
                     self._status["DetectorSpectrum"] -= 1
 
                 pyface_gui.invoke_later(on_finish)
@@ -1914,6 +1923,18 @@ class TraceGUI(HasTraits):
     def show_source_cut(self) -> None:
         """show a source image cut plot"""
         self.show_source_image(cut=True)
+    
+    def _get_spectrum_information(self, spec) -> str:
+        return\
+            f"{spec.get_long_desc()}\n\n"\
+            f"Power: {spec.power():.6g} W\n"\
+            f"Luminous Power: {spec.luminous_power():.6g} lm\n\n"\
+            f"Peak: {spec.peak():.6g} {spec.unit}\n"\
+            f"Peak Wavelength: {spec.peak_wavelength():.3f} nm\n"\
+            f"Centroid Wavelength: {spec.centroid_wavelength():.3f} nm\n"\
+            f"FWHM: {spec.fwhm():.3f} nm\n\n"\
+            f"Dominant Wavelength: {spec.dominant_wavelength():.3f} nm\n"\
+            f"Complementary Wavelength: {spec.complementary_wavelength():.3f} nm\n"\
 
     @observe('_source_spectrum_button', dispatch="ui")
     def show_source_spectrum(self, event=None) -> None:
@@ -1925,6 +1946,7 @@ class TraceGUI(HasTraits):
         if self.raytracer.ray_sources and self.raytracer.rays.N:
 
             self._status["SourceSpectrum"] += 1
+            self._spectrum_information = ""
 
             def background() -> None:
 
@@ -1938,6 +1960,8 @@ class TraceGUI(HasTraits):
                     if not error:
                         with self._try():
                             spectrum_plot(RS_Spec)
+                        self._spectrum_information = self._get_spectrum_information(RS_Spec)
+
                     self._status["SourceSpectrum"] -= 1
 
                 pyface_gui.invoke_later(on_finish)
@@ -1987,7 +2011,7 @@ class TraceGUI(HasTraits):
                             SImg = self.last_source_image.copy()
                             SImg.rescale(px)
 
-                        Imc = SImg.get_by_display_mode(mode, log=log)
+                        Imc = SImg.get(mode, log=log)
 
                 def on_finish() -> None:
                     if not error:

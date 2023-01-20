@@ -159,7 +159,7 @@ class RImage(BaseClass):
         yp = bins_y[:-1] + (bins_y[1]-bins_y[0])/2
         
         # get image
-        img = self.get_by_display_mode(mode, log) if imc is None else imc
+        img = self.get(mode, log) if imc is None else imc
 
         # assign bins and sampling positions
         sp, xs, ys = (bins_y, np.full(self.Ny, x), yp) if x is not None else (bins_x, xp, np.full(self.Nx, y))
@@ -172,7 +172,7 @@ class RImage(BaseClass):
 
         return sp, ims
 
-    def get_by_display_mode(self, mode: str, log: bool = False) -> np.ndarray:
+    def get(self, mode: str, log: bool = False) -> np.ndarray:
         """
         Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ
 
@@ -194,56 +194,56 @@ class RImage(BaseClass):
 
             case "sRGB (Absolute RI)":
                 # return
-                rgb = self.get_rgb(log=log, rendering_intent="Absolute")
+                rgb = self.rgb(log=log, rendering_intent="Absolute")
 
                 return rgb
 
             case "sRGB (Perceptual RI)":
-                return self.get_rgb(log=log, rendering_intent="Perceptual")
+                return self.rgb(log=log, rendering_intent="Perceptual")
 
             case "Outside sRGB Gamut":
                 # force conversion from bool to int so further algorithms work correctly
-                return np.array(color.outside_srgb_gamut(self.get_xyz()), dtype=int)
+                return np.array(color.outside_srgb_gamut(self.xyz()), dtype=int)
 
             case "Lightness (CIELUV)":
-                return self.get_luv()[:, :, 0]
+                return self.luv()[:, :, 0]
 
             case "Hue (CIELUV)":
-                Luv = self.get_luv()
+                Luv = self.luv()
                 return color.luv_hue(Luv)
 
             case "Chroma (CIELUV)":
-                Luv = self.get_luv()
+                Luv = self.luv()
                 return color.luv_chroma(Luv)
 
             case "Saturation (CIELUV)":
-                Luv = self.get_luv()
+                Luv = self.luv()
                 return color.luv_saturation(Luv)
 
             case _:
                 raise ValueError(f"Invalid display_mode {mode}, should be one of {self.display_modes}.")
 
-    def get_power(self) -> float:
+    def power(self) -> float:
         """:return: calculated total image power"""
         self.__check_for_image()
         return np.sum(self.img[:, :, 3])
 
-    def get_luminous_power(self) -> float:
+    def luminous_power(self) -> float:
         """:return: calculated total image luminous power"""
         self.__check_for_image()
         return self.K * np.sum(self.img[:, :, 1])
 
-    def get_xyz(self) -> np.ndarray:
+    def xyz(self) -> np.ndarray:
         """:return: XYZ image (np.ndarray with shape (Ny, Nx, 3))"""
         self.__check_for_image()
         return self.img[:, :, :3]
 
-    def get_luv(self) -> np.ndarray:
+    def luv(self) -> np.ndarray:
         """:return: CIELUV image"""
-        xyz = self.get_xyz()
+        xyz = self.xyz()
         return color.xyz_to_luv(xyz)
 
-    def get_rgb(self, log: bool = False, rendering_intent: str = "Absolute") -> np.ndarray:
+    def rgb(self, log: bool = False, rendering_intent: str = "Absolute") -> np.ndarray:
         """
         Get sRGB image
 
@@ -251,7 +251,7 @@ class RImage(BaseClass):
         :param rendering_intent: rendering_intent for sRGB conversion
         :return: sRGB image (np.ndarray with shape (Ny, Nx, 3))
         """
-        img = color.xyz_to_srgb_linear(self.get_xyz(), rendering_intent=rendering_intent)
+        img = color.xyz_to_srgb_linear(self.xyz(), rendering_intent=rendering_intent)
 
         # addition, multiplication etc. only work correctly in the linear color space
         # otherwise we would change the color ratios, but we only want the brightness to change
@@ -436,7 +436,7 @@ class RImage(BaseClass):
         :param overwrite: file if it exists, otherwise saved in a fallback path
         :return: path of saved file
         """
-        im = self.get_by_display_mode(mode, log)
+        im = self.get(mode, log)
         if flip:
             im = np.fliplr(np.flipud(im))
 

@@ -155,6 +155,9 @@ class Spectrum(BaseClass):
                 if key == "line_vals" and (lmin := np.min(val2)) < 0:
                     raise ValueError(f"line_vals must be all positive, but one value is {lmin}.")
 
+                if key == "lines" and len(np.unique(val)) != len(val):
+                    raise ValueError("All elements inside of 'lines' must be unique.")
+
                 super().__setattr__(key, val2)
                 return
 

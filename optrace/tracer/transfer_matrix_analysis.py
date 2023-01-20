@@ -113,7 +113,7 @@ class TMA(BaseClass):
         """
 
         _oc = 1 - A + B*C / (D - 1) if D - 1 else np.inf
-        self.optical_center = _1 + self.d / _oc if _oc else np.nan
+        self.optical_center = _1 + self.d / _oc if _oc and not np.isnan(_oc) and C != 0 else np.nan
         """optical center of the setup"""
         
         super().__init__(**kwargs)

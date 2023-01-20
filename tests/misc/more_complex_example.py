@@ -60,7 +60,6 @@ Det2 = ot.Detector(ot.SphericalSurface(R=-1.1, r=1), pos=[0, 0, 40])
 RT.add(Det2)
 
 # TODO document that this is possible
-# TODO why are the rays not cleared, when func2() is called from the GUI?
 
 # Instantiate the GUI and start it.
 sim = TraceGUI(RT, minimalistic_view=True, func2=lambda: RT.clear())

@@ -42,9 +42,9 @@ class ConicSurface(Surface):
 
         # depending on the sign of R, z_max or z_min can be on the edge or center
         z0 = self.pos[2]
-        self.z_max = 0  # set to some value so get_values() can be called
-        z1 = z0 + self._get_values(np.array([r]), np.array([0]))[0]  
-        # note _get_values uses x, y coordinates relative to the surface center
+        self.z_max = 0  # set to some value so values() can be called
+        z1 = z0 + self._values(np.array([r]), np.array([0]))[0]
+        # note _values uses x, y coordinates relative to the surface center
         
         self.z_min, self.z_max = min(z0, z1), max(z0, z1)
 
@@ -55,7 +55,7 @@ class ConicSurface(Surface):
         """property string for UI information"""
         return super().info + f", R = {self.R:.5g} mm, k = {self.k:.5g}"
 
-    def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
         And without masking out values beyond the surface extent
@@ -69,7 +69,7 @@ class ConicSurface(Surface):
         r2 = ne.evaluate("x**2 + y**2")
         return ne.evaluate("rho * r2 /(1 + sqrt(1 - (k+1) * rho**2 *r2))")
 
-    def get_normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get normal vectors of the surface.
 
@@ -80,7 +80,7 @@ class ConicSurface(Surface):
         n = np.tile(np.array([0., 0., 1.], dtype=np.float64), (x.shape[0], 1))
 
         # coordinates actually on surface
-        m = self.get_mask(x, y)
+        m = self.mask(x, y)
         xm, ym = x[m], y[m]
 
         x0, y0, z0 = self.pos
@@ -150,14 +150,14 @@ class ConicSurface(Surface):
 
             # calculate hit points and hit mask
             p_hit = p + s*t[:, np.newaxis]
-            is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])
+            is_hit = self.mask(p_hit[:, 0], p_hit[:, 1])
 
             # case A == 0 and B != 0 => one intersection
             mask = (A == 0) & (B != 0)
             if np.any(mask):
                 t = -C[mask]/(2*B[mask])
                 p_hit[mask] = p[mask] + s[mask]*t[:, np.newaxis]
-                is_hit[mask] = self.get_mask(p_hit[mask, 0], p_hit[mask, 1])
+                is_hit[mask] = self.mask(p_hit[mask, 0], p_hit[mask, 1])
 
             # cases with no hit:
             # D imaginary, means no hit with whole surface function

@@ -95,7 +95,7 @@ def abbe_plot(ri:     list[RefractionIndex],
 
         # get refraction index and abbe number
         nd = RIi(lines[1])
-        Vd = RIi.get_abbe_number(lines)
+        Vd = RIi.abbe_number(lines)
 
         # check if dispersive
         if not np.isfinite(Vd):
@@ -162,8 +162,8 @@ def surface_profile_plot(surface:          Surface | list[Surface],
         x0 = Surfi.extent[0] if x0 is None else x0
         x = np.linspace(x0, xe, 2000)  # 2000 values should be enough
 
-        vals = Surfi.get_values(x, np.full_like(x, Surfi.pos[1]))  # from center in x direction
-        vals[~Surfi.get_mask(x, np.full_like(x, Surfi.pos[1]))] = np.nan  # mask invalid values
+        vals = Surfi.values(x, np.full_like(x, Surfi.pos[1]))  # from center in x direction
+        vals[~Surfi.mask(x, np.full_like(x, Surfi.pos[1]))] = np.nan  # mask invalid values
 
         # remove position offset
         if remove_offset:

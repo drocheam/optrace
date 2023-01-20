@@ -12,11 +12,11 @@ from optrace.gui import TraceGUI
 # 3. check the documentation for the difference between image modes "sRGB (Absolute RI)" and "sRGB (Perceptual RI)"
 #    and compare the image modes by rendering both images
 
-RS_spectrum = ot.presets.light_spectrum.fl11
+RS_spectrum = ot.presets.light_spectrum.d50
 n = ot.presets.refraction_index.SF10
 
 # print the abbe number
-print(f"Abbe Number: {n.get_abbe_number():.4g}")
+print(f"Abbe Number: {n.abbe_number():.4g}")
 
 
 # make raytracer

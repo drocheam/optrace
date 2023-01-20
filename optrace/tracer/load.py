@@ -115,7 +115,7 @@ def agf(path: str, silent: bool = True) -> dict:
                 
                 else:
                     nc1 = n(spectral_lines.d)
-                    V1 = n.get_abbe_number(spectral_lines.FdC)
+                    V1 = n.abbe_number(spectral_lines.FdC)
 
                     # index deviation
                     if np.abs(nc1 - nc) > 1e-4:

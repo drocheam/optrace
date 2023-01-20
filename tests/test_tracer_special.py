@@ -15,6 +15,7 @@ from test_gui import rt_example
 # Tests for special cases in Raytracing
 
 
+
 class TracerSpecialTests(unittest.TestCase):
 
     @pytest.mark.slow
@@ -52,10 +53,10 @@ class TracerSpecialTests(unittest.TestCase):
                 img = RT.detector_image(16, projection_method="Equidistant")
                 
                 if RT.outline[5] > z > RS.surface.pos[2]:
-                    self.assertAlmostEqual(img.get_power(), RS.power)  # correctly lit
+                    self.assertAlmostEqual(img.power(), RS.power)  # correctly lit
                     self.assertTrue(np.allclose(img.extent-ext, 0, atol=1e-2, rtol=0))  # extent correct
                 else:
-                    self.assertAlmostEqual(img.get_power(), 0)
+                    self.assertAlmostEqual(img.power(), 0)
 
     def test_offset_system_equality(self):
         """
@@ -119,7 +120,7 @@ class TracerSpecialTests(unittest.TestCase):
                 self.assertTrue(np.allclose(im.extent-im2.extent+pos0[:2].repeat(2), 0, atol=0.001, rtol=0))
                 self.assertAlmostEqual(im.extent[1]-im.extent[0], im2.extent[1]-im2.extent[0], delta=0.001)
                 self.assertAlmostEqual(im.extent[3]-im.extent[2], im2.extent[3]-im2.extent[2], delta=0.001)
-                self.assertAlmostEqual(im.get_power(), im2.get_power(), places=4)
+                self.assertAlmostEqual(im.power(), im2.power(), places=4)
                 self.assertTrue(np.allclose(abcd-abcd2, 0, atol=0.0001, rtol=0))
 
     @pytest.mark.os
@@ -165,7 +166,7 @@ class TracerSpecialTests(unittest.TestCase):
             assert w == 0
 
         # check rays hitting
-        mask = L1.front.get_mask(RT.rays.p_list[[0, 2, 5, 7], 1, 0], RT.rays.p_list[[0, 2, 5, 7], 1, 1])
+        mask = L1.front.mask(RT.rays.p_list[[0, 2, 5, 7], 1, 0], RT.rays.p_list[[0, 2, 5, 7], 1, 1])
         assert np.all(mask)
 
     @pytest.mark.slow
@@ -475,12 +476,12 @@ class TracerSpecialTests(unittest.TestCase):
 
         # tilted surface intersects with 4 surfaces, check if correctly renders image
         img = RT.detector_image(500)
-        self.assertTrue(img.get_power() > 0.55)
+        self.assertTrue(img.power() > 0.55)
 
         # check ring detector
         RT.add(ot.Detector(ot.RingSurface(r=3.5, ri=0.3), pos=[0, 0, 12]))
         img = RT.detector_image(500, detector_index=1)
-        self.assertTrue(img.get_power() > 0.4)
+        self.assertTrue(img.power() > 0.4)
         ny, nx = img._img.shape[:2]
         self.assertEqual(img._img[ny//2, nx//2, 3], 0)  
         # ^-- due to hole in detector there is no light detected in its center
@@ -488,12 +489,12 @@ class TracerSpecialTests(unittest.TestCase):
         # check circle detector
         RT.add(ot.Detector(ot.CircularSurface(r=3.5), pos=[0, 0, 12]))
         img = RT.detector_image(500, detector_index=2)
-        self.assertTrue(img.get_power() > 0.4)
+        self.assertTrue(img.power() > 0.4)
         
         # check conic surface detector
         RT.add(ot.Detector(ot.ConicSurface(r=3.5, R=-10, k=2), pos=[0, 0, 12]))
         img = RT.detector_image(500, detector_index=3)
-        self.assertTrue(img.get_power() > 0.4)
+        self.assertTrue(img.power() > 0.4)
 
 if __name__ == '__main__':
     unittest.main()

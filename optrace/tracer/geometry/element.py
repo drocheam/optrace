@@ -158,7 +158,7 @@ class Element(BaseClass):
 
         return super().get_desc(fallback)
 
-    def get_cylinder_surface(self, nc: int = 100) \
+    def cylinder_surface(self, nc: int = 100) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get a 3D surface representation of the Element cylinder for plotting.
@@ -166,8 +166,8 @@ class Element(BaseClass):
         :param nc: number of surface edge points (int)
         :return: tuple of coordinate arrays X, Y, Z (2D numpy arrays)
         """
-        X1, Y1, Z1 = self.front.get_edge(nc)
-        X2, Y2, Z2 = self.back.get_edge(nc) if self.has_back() else (X1, Y1, Z1)
+        X1, Y1, Z1 = self.front.edge(nc)
+        X2, Y2, Z2 = self.back.edge(nc) if self.has_back() else (X1, Y1, Z1)
 
         return np.column_stack((X1, X2)), np.column_stack((Y1, Y2)), np.column_stack((Z1, Z2))
 

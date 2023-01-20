@@ -29,7 +29,7 @@ class CircularSurface(Surface):
         self.z_min = self.z_max = self.pos[2]
         self.lock()
 
-    def get_random_positions(self, N: int) -> np.ndarray:
+    def random_positions(self, N: int) -> np.ndarray:
         """
         Get 3D random positions on the surface, uniformly distributed.
 

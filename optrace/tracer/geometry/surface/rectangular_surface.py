@@ -78,7 +78,7 @@ class RectangularSurface(Surface):
         self._angle *= -1
         self.lock()
 
-    def get_plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
         The only guarantee is that neighbouring array values are neighbouring values in 3D space.
@@ -99,7 +99,7 @@ class RectangularSurface(Surface):
 
         return X, Y, Z
 
-    def get_mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface mask values. A value of 1 means the surface is defined here.
 
@@ -114,7 +114,7 @@ class RectangularSurface(Surface):
         inside = (xs-self.N_EPS <= xr) & (xr <= xe+self.N_EPS) & (ys-self.N_EPS <= yr) & (yr <= ye+self.N_EPS)
         return inside
 
-    def get_edge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def edge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get surface values of the surface edge, assumes a circular edge.
 
@@ -144,7 +144,7 @@ class RectangularSurface(Surface):
 
         return self.pos[0]+x, self.pos[1]+y, np.full_like(y, self.pos[2])
 
-    def get_random_positions(self, N: int) -> np.ndarray:
+    def random_positions(self, N: int) -> np.ndarray:
         """
         Get random 3D positions on the surface, uniformly distributed
 

@@ -546,5 +546,19 @@ class TMATests(unittest.TestCase):
         N1, N2 = tma.nodal_points
         self.assertTrue(OC > N2 > N1 > V2)
 
+        # two ideal lenses separated by d, OC is at V1 + (V2-V1)/(1 + f2/f1)
+        f1, f2, d = 0.05, 0.03, 10
+        IL1 = ot.IdealLens(r=3, D=1/f1, pos=[0, 0, 0])
+        IL2 = ot.IdealLens(r=3, D=1/f2, pos=[0, 0, d])
+        tma = ot.TMA([IL1, IL2])
+        OC = tma.optical_center
+        self.assertAlmostEqual(OC, IL1.pos[2] + d/(1 + f2/f1))
+
+        # for this setup an aperture at the OC leads to pupils at the nodal points
+        en, ex = tma.pupil_position(OC)
+        N1, N2 = tma.nodal_points 
+        self.assertAlmostEqual(en, N1)
+        self.assertAlmostEqual(ex, N2)
+
 if __name__ == '__main__':
     unittest.main()

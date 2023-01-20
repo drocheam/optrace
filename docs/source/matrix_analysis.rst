@@ -72,6 +72,7 @@ An important relation is that the determinant of such a ABCD-matrix, here called
 
 .. math::
    \det (M) = AD - BC = \frac{n_i}{n_o}
+   :label: eq_TMA_det
 
 
 Propagation through Free Space 
@@ -144,6 +145,17 @@ The resulting matrix is then: :footcite:`Kaschke2014`
     \frac{n_1 - n}{n_2 R_1}  + \frac{n-n_2}{n_2 R_2} + \frac{n_1 - n}{n R_1}\frac{n-n_2}{n_2 R_2}d & \frac{n_1}{n_2} + \frac{n_1}{n}\frac{n - n_2}{n_2 R_2}d
    \end{array}\right]
    :label: TMA_thick_lens_complete
+
+
+With same ambient media, therefore :math:`n_0 := n_1 = n_2`, this simplifies to:
+
+.. math::
+   \text{M}_{\text{thick},n_0}   =&~ 
+   \left[\begin{array}{cc}
+   1 + \frac{n_0-n}{n R_1}d & \frac{n_0}{n}d \\
+   \frac{n_0 - n}{n_0} \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{n-n_0}{n R_1 R_2}d \right) & 1 + \frac{n - n_0}{n R_2}d
+   \end{array}\right]
+   :label: TMA_thick_lens_same_media
 
 
 Thin Lens
@@ -313,13 +325,149 @@ To evaluate setups of :math:`N` lenses the lens matrices :math:`\text{M}_\text{L
 Optical Center
 =====================
 
-.. TODO
-.. Herleitung optical center, Literatur:
-.. Correctly making panoramic imagery and the meaning of optical centeri
-.. Francis A. Jenkins, Harvey E. White - Fundamentals of Optics, Fourth Edition -McGraw-Hill Science_Engineering_Math (2001), p110
-.. Rückführung auf Form V1 + (V2 - V1) / (1 - R1/R2)
 
-Image and Object Distance 
+**General Case**
+
+.. TODO OC erklären oder auf Literatur verweisen
+
+
+.. figure:: ./images/optical_center.svg
+   :align: center
+   :width: 550
+
+
+From the red triangle follows that:
+
+.. math::
+   \tan \phi = \frac{x_2 - x_1}{V_2 - V_1}
+   :label: eq_oc_tan_phi1
+
+While from the green triangle follows that:
+
+.. math::
+   \tan \phi = -\frac{x_1}{o}
+   :label: eq_oc_tan_phi2
+
+Note that the minus wass added so both equations have the same sign.
+Inserting :math:numref:`eq_oc_tan_phi1` into :math:numref:`eq_oc_tan_phi2` gives us:
+
+.. math::
+   o = - \frac{x_1}{x_2 - x_1} \left(V_2 - V_1\right)
+   :label: eq_oc_o1
+
+The blue triangle leads to:
+
+.. math::
+   \tan \theta_1 = -\frac{x_1}{N_1 - V_1}
+   :label: eq_oc_theta1
+
+With paraxial rays :math:`\theta_1 \approx \tan \theta_1` holds. :math:`x_2` can therefore be calculated using the ABCD matrix of the setup:
+
+.. math::
+   x_2 = A x_1 - \frac{B}{N_1 - V_1} x_1
+   :label: eq_oc_x2
+
+
+Inserting into :math:numref:`eq_oc_o1` gives us:
+
+.. math::
+   o = -\frac{x_1}{A x_1 - \frac{B}{N_1 - V_1} x_1 -x_1} \left(V_2 - V_1\right)
+  :label: eq_oc_o2
+
+
+From :math:numref:`TMA_nodal` follows that:
+
+.. math::
+   N_1 - V_1 = - \frac{1 - D}{C}
+   :label: eq_oc_dNV
+
+Which can also be inserted into the equation :math:numref:`eq_oc_o2`.
+After some rearranging one gets:
+
+.. math::
+   o = \frac{V_2 - V_1}{1 - A + \frac{BC}{D-1}}
+   :label: eq_oc_o3
+
+
+Which needs to be added to the front vertex to get the absolute position of the optical center:
+
+.. math::
+   \text{OC} = V_1 + \frac{V_2 - V_1}{1 - A + \frac{BC}{D-1}}
+   :label: eq_oc_final
+
+
+The requirements that were silently assumed are that the nodal point exist (:math:`C \neq 0`) and input and output positions differ :math:`x_2 \neq x_1`.
+The only case where it makes sense to also define an optical center is for an ideal lens, where we set :math:`\text{OC} = V_1`, although a nodal ray does not cross the optical axis at that point.
+For all other cases, especially :math:`1 - A  + \frac{BC}{D - 1} = 0` or :math:`D = 1` the optical center is undefined. As mentioned before, an ideal lens (:math:`A = 1, ~B=0, ~C\neq 0, ~D=1`) is an exception.
+
+
+**Thick Lens/Lens Combination with Same Front and Back Medium**
+
+With :math:`m := \frac{n - n_0}{n}d` matrix :math:numref:`TMA_thick_lens_same_media` becomes:
+
+.. math::
+   \text{M}_{\text{thick},n_0}   =&~ 
+   \left[\begin{array}{cc}
+   1 - \frac{m}{R_1} & \frac{n_0}{n}d \\
+   \frac{n_0 - n}{n_0} \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{m}{R_1 R_2} \right) & 1 + \frac{m}{R_2}
+   \end{array}\right]
+   :label: TMA_thick_lens_same_media_m
+
+The denominator of equation :math:numref:`eq_oc_final` is then:
+
+.. math::
+   1 - A + \frac{BC}{D - 1} &= 1 - \left(1 - \frac{m}{R_1}\right) + \frac{\frac{n_0-n}{n_0}\frac{n_0}{n}d \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{m}{R_1 R_2} \right)}{1 + \frac{m}{R_2} - 1}\\
+   &= \frac{m}{R_1} - m \frac{\left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{m}{R_1 R_2} \right)}{\frac{m}{R_2}}\\
+   &= \frac{m}{R_1} - \left( \frac{R_2}{R_1}  - 1 + \frac{m}{R_1} \right)\\
+   &= 1 - \frac{R_2}{R_1}
+   :label: eq_oc_thick_lens_denom
+
+Leading to the final form of :math:numref:`eq_oc_final`:
+
+.. math::
+   \text{OC} = V_1 + \frac{V_2 - V_1}{1 - \frac{R_2}{R_1}}
+   :label: eq_oc_radii
+
+.. Simplifying this expression towards this form is quite labor-intensive but goes without any conditions or tricks.
+.. A interested reader is free to do it by themselves or trust Wolfram Alpha with the query: `Link <https://www.wolframalpha.com/input?i=1+-+A+%2B+B*C%2F%28D+-+1%29+with+A+%3D+%281+%2B+%28n_0-n%29%2F%28n+R_1%29*d%29%2C+B+%3D+%28%28n_0%29%2F%28n%29*d%29%2C+C+%3D+%28%28n_0+-+n%29%2F%28n_0+R_1%29%2B%28n-n_0%29%2F%28n_0+R_2%29%2B%28n_0+-+n%29%2F%28n+R_1%29*%28n-n_0%29%2F%28n_0+R_2%29*d%29%2C+D+%3D+%281+%2B+%28n+-+n_0%29%2F%28n+R_2%29*d%29>`__.
+
+Equation :math:numref:`eq_oc_radii` is consistent with the results in :footcite:`10.1117/12.805489`.
+As mentioned in :footcite:`jenkins2001fundamentals` for this case the optical center is completely independent of the wavelength and the material dispersion.
+
+
+In fact, doing this with two ideal lenses with focal lengths :math:`f_1` and :math:`f_2` with separation distance :math:`d` and the same ambient media, produces a similar form:
+
+.. math::
+   M_\text{2L} &= \left[\begin{array}{cc}
+   1 & 0 \\
+   \frac{1}{f_2} & 1
+   \end{array}\right] \cdot\left[\begin{array}{ll}
+   1 & d \\
+   0 & 1
+   \end{array}\right] \cdot\left[\begin{array}{cc}
+   1 & 0 \\
+   \frac{1}{f_1} & 1
+   \end{array}\right]\\
+   &= \left[\begin{array}{cc}
+   1+\frac{d}{f_1} & d \\
+   \frac{1}{f_1}+\frac{1}{f_2}+\frac{d}{f_1 f_2} & 1+\frac{d}{f_2}
+   \end{array}\right]
+   :label: eq_oc_two_lens_matrix
+
+.. math::
+   1 - A + \frac{BC}{D - 1} &= 1 - \left(1 + \frac{d}{f_1}\right) + \frac{ \frac{1}{f_1}  + \frac{1}{f_2} + \frac{d}{f_1 f_2} }{1 + \frac{d}{f_2} - 1} d\\
+   &= -\frac{d}{f_1} + \frac{f_2}{f_1} + 1 + \frac{d}{f_1}\\
+   &= 1 + \frac{f_2}{f_1}
+   :label: eq_oc_two_lenses_denom
+
+
+.. math::
+   \text{OC} = V_1 + \frac{V_2 - V_1}{1 + \frac{f_2}{f_1}}
+   :label: eq_oc_two_lenses
+
+For :math:`R_2 = -R_1` in :math:numref:`eq_oc_radii` or :math:`f_2 = f_1` in :math:numref:`eq_oc_focals` the optical center lies at exactly the center of the lens/lens combination.
+
+Image and Object Distances 
 =================================================
 
 **Positions**
@@ -427,6 +575,8 @@ For a thin, ideal lens :math:`m` would be equal to :math:`b/g`.
 Referring to the value of this factor, :math:`A < 0` signifies an inverted image, :math:`A > 0` an upright image, :math:`\lvert A \rvert > 1` a size increase, :math:`\lvert A \rvert < 1` a size decrease.
 
 
+.. _pupil_calculation:
+
 Entrance and Exit Pupils
 =================================================
 
@@ -446,8 +596,8 @@ To calculate the entrance and exit pupil for a given system and aperture stop th
 In the case of the aperture stop being inside the lens setup, the setup and its matrix :math:`\text{M}` can be separated into three parts:
 
 .. math::
-
    \text{M} = \text{M}_\text{rear} \cdot \text{M}_\text{gap} \cdot \text{M}_\text{front}
+   :label: eq_pupils_separation
 
 :math:`\text{M}_\text{front}` is the matrix for all surfaces in front of the aperture stop, :math:`\text{M}_\text{back}` for everything behind the stop. :math:`\text{M}_\text{gap}` is the distance matrix for the gap region between surfaces where the stop is positioned in and does not belong to either front or back group.
 
@@ -467,18 +617,19 @@ For the entrance pupil, we need to image the stop in backwards direction through
        D & -B \\
        -C & A
        \end{array}\right]\\
+   :label: eq_pupils_front_inverse
 
 The object distance is negative and calculated with the back vertex of the front group: 
 
 .. math::
-   
    g_\text{en} = V_{2,\text{front}} - z_\text{s}
+   :label: eq_pupils_gen
 
 The procedure in <> with :math:`g_\text{en}` and :math:`\text{M}^{-1}_\text{front}` gives us the image distance :math:`b_\text{en}`, that needs to be added to the front vertex of the front group to get the entrance pupil position.:
 
 .. math::
-
    z_\text{en} = V_{1,\text{front}} + b_\text{en}
+   :label: eq_pupils_zen
 
 
 **Aperture in front of setup**
@@ -488,8 +639,8 @@ With the stop being in front of all lenses, it itself is the entrance pupil (:ma
 The exit pupil then is the result of imaging through all elements with the matrix:
 
 .. math::
-
    \text{M}_\text{rear} = \text{M} 
+   :label: eq_pupils_rear_only
 
 **Aperture behind of setup**
 
@@ -498,8 +649,8 @@ With the stop being behind all lenses, it itself is equal to the exit pupil (:ma
 The entrance pupil then is the result of imaging backwards through all elements with the procedure above and the matrix:
 
 .. math::
-
    \text{M}_\text{front} = \text{M} 
+   :label: eq_pupils_front_only
 
 ------------
 

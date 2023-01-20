@@ -37,7 +37,7 @@ class GeometryTests(unittest.TestCase):
             
             # check random positions
             for N in [1, 10, 107]:
-                rpos = p.get_random_positions(N)
+                rpos = p.random_positions(N)
                 self.assertEqual(rpos.shape[0], N)
                 self.assertTrue(np.allclose(rpos - p.pos, 0))
         
@@ -73,7 +73,7 @@ class GeometryTests(unittest.TestCase):
                 
                 # check random positions
                 for N in [1, 10, 107]:
-                    rpos = l.get_random_positions(N)
+                    rpos = l.random_positions(N)
                     self.assertEqual(rpos.shape[0], N)
 
                     # radial position correct
@@ -134,7 +134,7 @@ class GeometryTests(unittest.TestCase):
         F = ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Gaussian"), pos=[0, 0, 0])
 
         # test color
-        self.assertEqual(F.get_color(), F.spectrum.get_color())  # filter color is just spectrum color
+        self.assertEqual(F.color(), F.spectrum.color())  # filter color is just spectrum color
 
         # test call
         wl = np.random.uniform(*color.WL_BOUNDS, 1000)
@@ -439,9 +439,9 @@ class GeometryTests(unittest.TestCase):
         # check cylinder surface
         for Li in L:
             N = int(np.random.uniform(40, 200))
-            X, Y, Z = Li.get_cylinder_surface(N)
+            X, Y, Z = Li.cylinder_surface(N)
             self.assertTrue(X.shape[0] == Y.shape[0] == Z.shape[0] == N)
-            de = np.abs(Li.front.get_edge(20)[2][0] - Li.back.get_edge(20)[2][0])
+            de = np.abs(Li.front.edge(20)[2][0] - Li.back.edge(20)[2][0])
             self.assertTrue(np.allclose(np.abs(Z[:, 0] - Z[:, 1]), de))
 
         # coverage: test tma. actual values will be checked in test_tma.py
@@ -493,7 +493,7 @@ class GeometryTests(unittest.TestCase):
 
                                 RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, div_2d=div_2d,
                                                   polarization=pol_type, image=Im, **rargs)
-                                RS.get_color()
+                                RS.color()
                                 p, s, pols, weights, wavelengths = RS.create_rays(8000)
 
                                 self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
@@ -699,9 +699,9 @@ class GeometryTests(unittest.TestCase):
         F3 = F2.copy()
         F3.flip()
         self.assertTrue(np.allclose(F1.pos - F2.pos, 0, atol=1e-10))  # same position
-        z1 = F1.surface.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
-        z2 = F2.surface.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
-        z3 = F3.surface.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z1 = F1.surface.values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z2 = F2.surface.values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z3 = F3.surface.values(np.array([7, 8]), np.array([8.5, 9.2]))
         self.assertTrue(np.allclose(z1 - 2*pos[2] + z2, 0, atol=1e-10))  # surface flipped
         self.assertTrue(np.allclose(z1 - z3, 0, atol=1e-10))  # double reversion leads to initial values
 
@@ -718,16 +718,16 @@ class GeometryTests(unittest.TestCase):
         self.assertTrue(np.all(L3.pos == L2.pos))  # same position
 
         # front flipped
-        z1 = L1.front.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
-        z2 = L2.back.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
-        z3 = L3.front.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z1 = L1.front.values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z2 = L2.back.values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z3 = L3.front.values(np.array([7, 8]), np.array([8.5, 9.2]))
         self.assertTrue(np.allclose(z1 - 2*pos[2] + z2, 0, atol=1e-10))  # surface flipped
         self.assertTrue(np.allclose(z1 - z3, 0, atol=1e-8))  # double reversion leads to initial element
 
         # back flipped
-        z1 = L1.back.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
-        z2 = L2.front.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
-        z3 = L3.back.get_values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z1 = L1.back.values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z2 = L2.front.values(np.array([7, 8]), np.array([8.5, 9.2]))
+        z3 = L3.back.values(np.array([7, 8]), np.array([8.5, 9.2]))
         self.assertTrue(np.allclose(z1 - 2*pos[2] + z2, 0, atol=1e-10))  # surface flipped
         self.assertTrue(np.allclose(z1 - z3, 0, atol=1e-8))  # double reversion leads to initial element
 

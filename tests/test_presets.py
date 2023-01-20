@@ -22,7 +22,7 @@ class PresetTests(unittest.TestCase):
         # check presets
         for material in ot.presets.refraction_index.all_presets:
             n = material(wl)
-            A0 = material.get_abbe_number()
+            A0 = material.abbe_number()
 
             self.assertTrue(np.all((1 <= n) & (n <= 2.5)))  # sane refraction index everywhere
             self.assertTrue(A0 == np.inf or A0 < 150)  # sane Abbe Number
@@ -44,8 +44,8 @@ class PresetTests(unittest.TestCase):
             if spec.is_continuous():
                 spec(wl)
 
-            spec.get_xyz()
-            spec.get_color()
+            spec.xyz()
+            spec.color()
             spec.random_wavelengths(1000)
 
             # should have descriptions
@@ -95,7 +95,7 @@ class PresetTests(unittest.TestCase):
         }
 
         for ill in ot.presets.light_spectrum.standard:
-            xyz = np.array([[[*ill.get_xyz()]]])
+            xyz = np.array([[[*ill.xyz()]]])
             coord = color.xyz_to_xyY(xyz)[0, 0]
 
             # higher delta, because we get different results depending on interpolation method of the illuminant
@@ -112,7 +112,7 @@ class PresetTests(unittest.TestCase):
         prec = 2e-5
 
         for ch, coord_xy, coord_uv in zip(ot.presets.light_spectrum.srgb, xy_coords, uv_coords):
-            xyz = np.array([[[*ch.get_xyz()]]])
+            xyz = np.array([[[*ch.xyz()]]])
             xy = color.xyz_to_xyY(xyz)[0, 0]
             self.assertAlmostEqual(xy[0], coord_xy[0], delta=prec)
             self.assertAlmostEqual(xy[1], coord_xy[1], delta=prec)

@@ -46,8 +46,8 @@ class TiltedSurface(Surface):
 
         phi = np.arctan2(self.normal[1], self.normal[0])
         R = self.r
-        val1 = self.pos[2] + self._get_values(np.array([R*np.cos(phi)]), np.array([R*np.sin(phi)]))[0]
-        val2 = self.pos[2] + self._get_values(np.array([-R*np.cos(phi)]), np.array([-R*np.sin(phi)]))[0]
+        val1 = self.pos[2] + self._values(np.array([R * np.cos(phi)]), np.array([R * np.sin(phi)]))[0]
+        val2 = self.pos[2] + self._values(np.array([-R * np.cos(phi)]), np.array([-R * np.sin(phi)]))[0]
         self.z_min, self.z_max = min(val1, val2), max(val1, val2)
 
         self.lock()
@@ -58,7 +58,7 @@ class TiltedSurface(Surface):
         return super().info + f", normal = [{self.normal[0]:.4f}, {self.normal[1]:.4f},"\
             f" {self.normal[2]:.4f}]"
 
-    def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
         And without masking out values beyond the surface extent
@@ -73,7 +73,7 @@ class TiltedSurface(Surface):
         # no division by zero because we enforce normal[:, 2] > 0,
         return x*mx + y*my
 
-    def get_normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get normal vectors of the surface.
 
@@ -82,7 +82,7 @@ class TiltedSurface(Surface):
         :return: normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)
         """
         # coordinates actually on surface
-        m = self.get_mask(x, y)
+        m = self.mask(x, y)
         n = np.tile([0., 0., 1.], (x.shape[0], 1))
         n[m] = self.normal
 
@@ -102,7 +102,7 @@ class TiltedSurface(Surface):
         normal = np.broadcast_to(self.normal, (p.shape[0], 3))
         t = misc.rdot(self.pos - p, normal) / misc.rdot(s, normal)
         p_hit = p + s*t[:, np.newaxis]
-        is_hit = self.get_mask(p_hit[:, 0], p_hit[:, 1])  # rays not hitting
+        is_hit = self.mask(p_hit[:, 0], p_hit[:, 1])  # rays not hitting
 
         # handle rays that start behind surface or inside its extent 
         self._find_hit_handle_abnormal(p, s, p_hit, is_hit)

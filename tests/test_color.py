@@ -40,22 +40,22 @@ class ColorTests(unittest.TestCase):
         RT.add(RS)
 
         # check white color of spectrum in sRGB
-        for RSci, WPi in zip(RS.get_color(), np.array([1, 1, 1])):
+        for RSci, WPi in zip(RS.color(), np.array([1, 1, 1])):
             self.assertAlmostEqual(RSci, WPi, delta=0.0005)
 
         # check white color of spectrum in XYZ
-        spec_XYZ = RS.spectrum.get_xyz()
+        spec_XYZ = RS.spectrum.xyz()
         for RSci, WPi in zip(spec_XYZ/spec_XYZ[1], color.WP_D65_XYZ):
             self.assertAlmostEqual(RSci, WPi, delta=0.0005) 
 
         # check color of all rendered rays on RaySource in sRGB
         RT.trace(N=500000)
         spec_RS = RT.source_spectrum()
-        for RSci, WPi in zip(spec_RS.get_color(), np.array([1, 1, 1])):
+        for RSci, WPi in zip(spec_RS.color(), np.array([1, 1, 1])):
             self.assertAlmostEqual(RSci, WPi, delta=0.001)
 
         # check color of all rendered rays on RaySource in XYZ
-        RS_XYZ = spec_RS.get_xyz()
+        RS_XYZ = spec_RS.xyz()
         for RSci, WPi in zip(RS_XYZ/RS_XYZ[1], color.WP_D65_XYZ):
             self.assertAlmostEqual(RSci, WPi, delta=0.001) 
 
@@ -368,7 +368,7 @@ class ColorTests(unittest.TestCase):
         SIm, _ = RT.iterative_render(100000000, N_px_S=5, silent=True)
 
         # get Source Image
-        RS_XYZ = np.flipud(SIm[0].get_xyz())  # flip so element [0, 0] is in lower left
+        RS_XYZ = np.flipud(SIm[0].xyz())  # flip so element [0, 0] is in lower left
         Im_px = color.srgb_to_xyz(Image).reshape((25, 3))
         RS_px = RS_XYZ.reshape((25, 3))
         Im_px /= np.max(Im_px)
@@ -434,6 +434,18 @@ class ColorTests(unittest.TestCase):
             val = prim(arr)
             self.assertEqual(val[0], 0)
             self.assertEqual(val[1], 0)
+
+    def test_dominant_complementary_wavelengths(self):
+        # gets tested in test_spectrum()
+        pass
+
+    def test_blackbody_normalized(self):
+
+        # peak in visible range should be =1 for all temperatures, even if the peak is outside the visible region
+        wl = color.wavelengths(100000)
+        for T in [100, 1000, 3000, 500, 7800, 10000]:
+            spec = color.normalized_blackbody(wl, T)
+            self.assertAlmostEqual(np.max(spec), 1)
 
 if __name__ == '__main__':
     unittest.main()

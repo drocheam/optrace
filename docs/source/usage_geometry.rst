@@ -15,26 +15,47 @@ __________________
 In ``optrace`` the class *Element* denotes an object which has no, one or two surfaces and belongs to the tracing geometry.
 
 This includes the classes
- * **RaySource**: An element with a light emitting surface
- * **Lens**: An element with two surfaces on which light is refracted.
- * **IdealLens**: Like a Lens, except that it has a planar surface and refracts light without aberration
- * **Detector**: Element with one surface on which images can be rendered
- * **Filter**: Element with a surface on which wavelength-dependent or wavelength-independent filtering takes place.
- * **Aperture**: Like a filter, except that incident light is completely absorbed.
- * **Marker**: element consisting of a point and a label, useful for annotating things.
+
+.. list-table::
+   :widths: 100 400
+   :header-rows: 0
+   :align: left
+
+   * - **RaySource**
+     - An element with a light emitting surface
+   * - **Lens**
+     - An element with two surfaces on which light is refracted.
+   * - **IdealLens**
+     - Like a Lens, except that it has a planar surface and refracts light without aberration
+   * - **Detector**
+     - Element with one surface on which images can be rendered
+   * - **Filter** 
+     - Element with a surface on which wavelength-dependent or wavelength-independent filtering takes place.
+   * - **Aperture** 
+     - Like a filter, except that incident light is completely absorbed.
+   * - **Marker** 
+     - element consisting of a point and a label, useful for annotating things.
 
 These subclasses have the same methods as the Element superclass, these include:
- * move the element: 
-    * :python:`El.move_to([-2.1, 0.2, 5.3])`
- * rotate: 
-    * :python:`El.rotate(25)`
- * flip around the x-axis: 
-    * :python:`El.flip()`
- * getting the extent (bounding box): 
-    * :python:`ext = El.extent`
- * determine the position: 
-    * :python:`pos = El.pos`
- * plot the geometry
+
+.. list-table::
+   :header-rows: 1
+   :align: left
+
+   * - Functionality
+     - Example
+   * - move the element: 
+     - :python:`El.move_to([-2.1, 0.2, 5.3])`
+   * - rotate 
+     - :python:`El.rotate(25)`
+   * - flip around the x-axis: 
+     - :python:`El.flip()`
+   * - getting the extent (bounding box): 
+     - :python:`ext = El.extent`
+   * - determine the position: 
+     - :python:`pos = El.pos`
+   * - plot the geometry
+     - (internal functions)
 
 
 Group
@@ -43,21 +64,28 @@ ________________
 A *Group* can be seen as a list or container of several elements.
 
 It contains the following functionality:
- * Adding and removing one or more elements:
-    * :python:`G.add(obj)`
-    * :python:`G.remove(obj)`
- * Emptying all elements: 
-    * :python:`G.clear()`
- * check if an element is included: 
-    * :python:`G.has(obj)`
- * move all elements at once: 
-    * :python:`G.move_to([5.3, 0.0, 12.3])`
- * rotate or flip all elements: 
-    * :python:`G.rotate(-12)`
-    * :python:`G.flip()`
- * create ray transfer matrix of the whole lens system: 
-    * :python:`G.tma()`
 
+.. list-table::
+   :widths: 300 250
+   :header-rows: 1
+   :align: left
+
+   * - Functionality
+     - Example
+   * - Adding and removing one or more elements:
+     - | :python:`G.add(obj)`
+       | :python:`G.remove(obj)`
+   * - Emptying all elements: 
+     - :python:`G.clear()`
+   * - check if an element is included: 
+     - :python:`G.has(obj)`
+   * - move all elements at once: 
+     - :python:`G.move_to([5.3, 0.0, 12.3])`
+   * - rotate or flip all elements: 
+     - | :python:`G.rotate(-12)`
+       | :python:`G.flip()`
+   * - create ray transfer matrix of the whole lens system: 
+     - :python:`G.tma()`
 
 A Group object stores all elements in their own class lists:
 ``lenses, ray_sources, detectors, markers, filters, apertures``.

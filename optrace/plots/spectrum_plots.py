@@ -107,8 +107,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
 
         # assign title. add total power if it is a LightSpectrum
         if isinstance(obj, LightSpectrum):
-            total = np.sum(val)*(wlp[1]-wlp[0])
-            fig.suptitle("\n" + obj.get_long_desc(fallback=title) + f"\nTotal Power: {total:.5g}W")
+            fig.suptitle("\n" + obj.get_long_desc(fallback=title) + f"\nTotal Power: {obj.power():.5g}W")
         else:
             fig.suptitle("\n" + obj.get_long_desc(fallback=title))
 
@@ -125,7 +124,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
                 tcolor = axp._original_edgecolor
             else:
                 axp = ax1.plot(wlp, val, color=cl)
-                tcolor = axp[0].get_color()
+                tcolor = axp[0]._color
 
             lg.append(obji.get_long_desc())
 

@@ -960,6 +960,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.slow
     def test_additional_coverage_1(self):
         """additionial coverage tests"""
 

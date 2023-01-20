@@ -11,9 +11,6 @@ from ..misc import PropertyChecker as pc  # check types and values
 
 class LightSpectrum(Spectrum):
 
-    quantity: str = "Spectral Power Density"   #: physical quantity
-    unit: str = "W/nm"  #: physical unit
-
     spectrum_types: list[str] = [*Spectrum.spectrum_types, "Blackbody", "Histogram"]
     """possible spectrum types"""
 
@@ -31,7 +28,12 @@ class LightSpectrum(Spectrum):
         :param sargs:
         """
         self.T = T
-        super().__init__(spectrum_type, **sargs)
+
+        line_spec = spectrum_type in ["Monochromatic", "Lines"]
+        unit = "W" if line_spec else "W/nm"
+        quantity = "Spectral Power" if line_spec else "Spectral Power Density"
+
+        super().__init__(spectrum_type, unit=unit, quantity=quantity, **sargs)
 
     @staticmethod
     def render(wl:        np.ndarray,
@@ -138,7 +140,7 @@ class LightSpectrum(Spectrum):
         """
         if self.spectrum_type == "Blackbody":
             wl_ = np.asarray_chkfinite(wl, dtype=np.float64)
-            return color.blackbody(wl_, T=self.T)
+            return self.val * color.normalized_blackbody(wl_, T=self.T)
 
         elif self.spectrum_type == "Histogram":
             pc.check_type("wls", self._wls, np.ndarray)
@@ -159,7 +161,7 @@ class LightSpectrum(Spectrum):
         else:
             return super().__call__(wl)
 
-    def get_xyz(self) -> np.ndarray:
+    def xyz(self) -> np.ndarray:
         """
         Get the XYZ color of the spectrum
 
@@ -185,7 +187,7 @@ class LightSpectrum(Spectrum):
 
         return color.xyz_from_spectrum(wl, spec)
 
-    def get_color(self, rendering_intent="Ignore", clip=False) -> tuple[float, float, float]:
+    def color(self, rendering_intent="Ignore", clip=False) -> tuple[float, float, float]:
         """
         Get the sRGB color of the spectrum
 
@@ -193,13 +195,191 @@ class LightSpectrum(Spectrum):
         :param clip: if values are clipped to the [0, 1] data range
         :return: tuple of 3 sRGB values
         """
-        XYZ = np.array([[[*self.get_xyz()]]])
+        XYZ = np.array([[[*self.xyz()]]])
         RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip)[0, 0]
         return RGB[0], RGB[1], RGB[2]
+
+    def dominant_wavelength(self) -> float:
+        """
+        Dominant wavelength of the spectrum, that is the wavelength with the same hue.
+
+        :return: dominant wavelength in nm if any exists, else np.nan
+        """
+        return color.dominant_wavelength(self.xyz())
+
+    def complementary_wavelength(self) -> float:
+        """
+        Complementary wavelength of the spectrum, that is the wavelength with the opposite hue.
+
+        :return: complementary wavelength in nm if any exists, else np.nan
+        """
+        return color.complementary_wavelength(self.xyz())
+
+    def centroid_wavelength(self) -> float:
+        """
+        The centroid wavelength. This is the center of mass wavelength according to its spectral power.
+        Another name would be "power-weighted average wavelength".
+
+        :return: centroid wavelength in nm
+        """
+        # Calculation: see https://de.wikipedia.org/wiki/Schwerpunktwellenl%C3%A4nge
+        match self.spectrum_type:
+
+            case "Monochromatic":
+                return self.wl
+
+            case "Lines":
+                lamb = np.array(self.lines)
+                s = np.array(self.line_vals)
+                return np.sum(s*lamb) / np.sum(s)
+     
+            case "Rectangle":
+                return np.mean([self.wl0, self.wl1])
+            
+            case "Constant":
+                return np.mean(color.WL_BOUNDS)
+
+            # Blackbody, Function, Data, Gaussian
+            case _ :
+                wl = color.wavelengths(100000)
+                s = self(wl)
+                return np.trapz(wl*s) / np.trapz(s) if np.any(s > 0) else np.mean(color.WL_BOUNDS)
+
+    def peak(self) -> float:
+        """
+        Peak value of the spectrum. 
+
+        :return: peak value in self.unit
+        """
+       
+        match self.spectrum_type:
+
+            case ("Monochromatic" | "Gaussian" | "Rectangle" | "Constant"| "Blackbody"):
+                return self.val
+
+            case "Lines":
+                return np.max(self.line_vals)
+
+            case ("Histogram" | "Data"):
+                return np.max(self._vals)
+
+            case _:
+                wl = color.wavelengths(100000)
+                return np.max(self(wl))
+
+    def peak_wavelength(self) -> float:
+        """
+        Peak wavelength of the spectrum. 
+        For a spectrum with a constant maximum region (Constant, Rectangle) or multiple maxima the first one is returned.
+
+        :return: peak wavelength in nm
+        """
+       
+        match self.spectrum_type:
+
+            case "Monochromatic":
+                return self.wl
+
+            case "Lines":
+                return self.lines[np.argmax(self.line_vals)]
+
+            case "Rectangle":
+                return self.wl0
+
+            case "Constant":
+                return color.WL_BOUNDS[0]
+
+            case "Gaussian":
+                return self.mu  # True because it is enforced that mu is inside the visible range
+
+            # also includes "Blackbody", as the peak might not lie inside the visible range
+            case _:
+                wl = color.wavelengths(100000)
+                return wl[np.argmax(self(wl))]
+
+    def fwhm(self) -> float:
+        """
+        Return the full width half maximum (FWHM).
+        The smallest distance to the half height is calculated on both sides of the highest peak in the spectrum.
+
+        :return: FWHM
+        """
+        match self.spectrum_type:
+
+            case ("Monochromatic" | "Lines"):
+                return 0
+
+            case "Rectangle":
+                return self.wl1 - self.wl0
+
+            case "Constant":
+                return color.WL_BOUNDS[1] - color.WL_BOUNDS[0]
+
+            # default case (Function, Data, Histogram, Gaussian)
+            # Gaussian is included here because it could be truncated
+            case _:
+                # find the peak
+                wl = color.wavelengths(100000)
+                spec = self(wl)
+                ind = np.argmax(spec)
+                specp = spec[ind]
+
+                # right half crossing
+                specr = spec[ind:]
+                br = specr < 0.5*specp
+                indr = ind + np.argmax(br) if np.any(br) else spec.shape[0] - 1
+                
+                # left half crossing
+                specl = np.flip(spec[:ind])
+                bl = specl < 0.5*specp
+                indl = ind - np.argmax(bl) if np.any(bl) else 0
+
+                # FWHM is the difference between crossings
+                return wl[indr] - wl[indl]
+
+    def _power(self, sensitivity) -> float:
+        """
+        Function for calculating the power of a spectrum with a wavelength dependent sensitivity function.
+
+        :return: power
+        """
+        match self.spectrum_type:
+
+            case "Monochromatic":
+                return sensitivity(self.wl)*self.val
+
+            case "Lines":
+                return np.sum(sensitivity(self.lines)*self.line_vals)
+
+            case "Histogram":
+                dl = self._wls[1] - self._wls[0]
+                wl2 = self._wls[:-1] + dl/2
+                return np.sum(sensitivity(wl2)*self._vals)*dl
+            
+            case _:
+                wl = color.wavelengths(100000)
+                return np.trapz(sensitivity(wl)*self(wl)) * (wl[1] - wl[0])
+
+    def power(self) -> float:
+        """
+        Power in W of the spectrum
+        
+        :return: power
+        """
+        return self._power(lambda x: np.ones_like(x))
+    
+    def luminous_power(self) -> float:
+        """
+        Luminous power in lm of the spectrum
+
+        :return: luminous power
+        """
+        return self._power(lambda x: 683.0*color.y_observer(x))
 
     def __setattr__(self, key: str, val: Any) -> None:
         """
         assigns the value of an attribute
+
         :param key: attribute name
         :param val: value to assign
         """
@@ -211,5 +391,14 @@ class LightSpectrum(Spectrum):
             pc.check_type(key, val, int | float)
             val = float(val)
             pc.check_above(key, val, 0)
+
+        # a user defined data spectrum can't be constantly zero
+        if key == "_vals" and val is not None and self.spectrum_type != "Histogram":
+            vals = np.asarray_chkfinite(val)
+            if np.any(vals < 0):
+                raise ValueError("Values below zero in LightSpectrum.")
+
+            if not np.any(vals > 0):
+                raise ValueError("LightSpectrum can't be constantly zero.")
 
         super().__setattr__(key, val)

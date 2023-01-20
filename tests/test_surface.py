@@ -97,7 +97,7 @@ class SurfaceTests(unittest.TestCase):
                 self.assertAlmostEqual(Si.ds, Si.dn + Si.dp, 8)
 
                 # check that surface center is at pos[2]
-                self.assertAlmostEqual(Si.get_values(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0], Si.pos[2])
+                self.assertAlmostEqual(Si.values(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0], Si.pos[2])
 
                 # moving working correctly
                 pos_new = np.array([2.3, -5, 10])
@@ -108,7 +108,7 @@ class SurfaceTests(unittest.TestCase):
                 Si.info
 
                 # check if moving actually moved the origin of the function
-                self.assertEqual(Si.get_values(np.array([pos_new[0]]), np.array([pos_new[1]]))[0], pos_new[2])
+                self.assertEqual(Si.values(np.array([pos_new[0]]), np.array([pos_new[1]]))[0], pos_new[2])
 
     def test_surface_normals(self):
        
@@ -120,7 +120,7 @@ class SurfaceTests(unittest.TestCase):
                 x = np.linspace(Si.extent[0]-1, Si.extent[1]+2, 1000)
                 y = np.linspace(Si.extent[2]-1, Si.extent[3]+2, 1000)
                 
-                n = Si.get_normals(x, y)
+                n = Si.normals(x, y)
 
                 # z component needs to be positive
                 self.assertTrue(np.all(n[:, 2] > 0))
@@ -129,7 +129,7 @@ class SurfaceTests(unittest.TestCase):
                 self.assertTrue(np.allclose(n[:, 0]**2 + n[:, 1]**2 + n[:, 2]**2 - 1, 0))
 
                 # points outside the surface have a normal of [0, 0, 1]
-                m = Si.get_mask(x, y)
+                m = Si.mask(x, y)
                 self.assertTrue(np.all(n[~m] == [0, 0, 1]))
                 
                 # flat surfaces have n = [0, 0, 1] everywhere
@@ -170,7 +170,7 @@ class SurfaceTests(unittest.TestCase):
             x = np.array([x0+1])
             y = np.array([y0+0.5])
 
-            na = surf.get_normals(x, y)
+            na = surf.normals(x, y)
             self.assertTrue(np.allclose(n - na, 0))
 
     def test_surface_values(self):
@@ -183,7 +183,7 @@ class SurfaceTests(unittest.TestCase):
             if Si.is_flat():
                 pos_new = np.array([2.3, -5, 10])
                 Si.move_to(pos_new)
-                z = Si.get_values(x, y)
+                z = Si.values(x, y)
 
                 self.assertTrue(np.all(z == Si.pos[2]))
 
@@ -215,7 +215,7 @@ class SurfaceTests(unittest.TestCase):
             x = np.array([x0+1, x0])
             y = np.array([y0+0.5, y0-0.5])
 
-            za = surf.get_values(x, y) - z0
+            za = surf.values(x, y) - z0
             
             for zi1, zi2 in zip(z, za):
                 self.assertAlmostEqual(zi1, zi2)
@@ -233,12 +233,12 @@ class SurfaceTests(unittest.TestCase):
                 p_hit, is_hit = Si.find_hit(p, s)
 
                 # check that all hitting rays have the correct z-value at the surface
-                z_hit = Si.get_values(p_hit[is_hit, 0], p_hit[is_hit, 1])
+                z_hit = Si.values(p_hit[is_hit, 0], p_hit[is_hit, 1])
                 self.assertTrue(np.allclose(p_hit[is_hit, 2] - z_hit, 0, rtol=0, atol=Surface.C_EPS))
               
                 # rays missing, but with valid x,y coordinates inside extent must always be behind the surface
-                zs = Si.get_values(p_hit[~is_hit, 0], p_hit[~is_hit, 1])
-                ms = Si.get_mask(p_hit[~is_hit, 0], p_hit[~is_hit, 1])
+                zs = Si.values(p_hit[~is_hit, 0], p_hit[~is_hit, 1])
+                ms = Si.mask(p_hit[~is_hit, 0], p_hit[~is_hit, 1])
                 self.assertTrue(np.all(p_hit[~is_hit, 2][ms] > zs[ms]))
 
                 # check if p_hit is actually a valid position on the ray
@@ -262,9 +262,9 @@ class SurfaceTests(unittest.TestCase):
                 # random positions only for planar types
                 if isinstance(Si, ot.RectangularSurface | ot.CircularSurface | ot.RingSurface):
                     # check that generated positions are all inside surface and have correct values
-                    p_ = Si.get_random_positions(N=10000)
-                    m_ = Si.get_mask(p_[:, 0], p_[:, 1])
-                    z_ = Si.get_values(p_[:, 0], p_[:, 1])
+                    p_ = Si.random_positions(N=10000)
+                    m_ = Si.mask(p_[:, 0], p_[:, 1])
+                    z_ = Si.values(p_[:, 0], p_[:, 1])
                     self.assertTrue(np.all(m_))
                     self.assertTrue(np.allclose(z_-p_[:, 2], 0))
 
@@ -275,31 +275,31 @@ class SurfaceTests(unittest.TestCase):
                 
                 # check mask values. Especially surface edge, which by definition is valid
                 if isinstance(Si, ot.RectangularSurface):
-                    self.assertTrue(Si.get_mask([Si.pos[0]], [Si.pos[1]])[0])
-                    self.assertTrue(Si.get_mask([Si.extent[0]], [Si.extent[2]])[0])
-                    self.assertTrue(Si.get_mask([Si.extent[0]], [Si.extent[3]])[0])
-                    self.assertTrue(Si.get_mask([Si.extent[1]], [Si.extent[3]])[0])
-                    self.assertTrue(Si.get_mask([Si.extent[1]], [Si.extent[3]])[0])
-                    self.assertFalse(Si.get_mask([Si.extent[1]+1], [Si.pos[1]])[0])
+                    self.assertTrue(Si.mask([Si.pos[0]], [Si.pos[1]])[0])
+                    self.assertTrue(Si.mask([Si.extent[0]], [Si.extent[2]])[0])
+                    self.assertTrue(Si.mask([Si.extent[0]], [Si.extent[3]])[0])
+                    self.assertTrue(Si.mask([Si.extent[1]], [Si.extent[3]])[0])
+                    self.assertTrue(Si.mask([Si.extent[1]], [Si.extent[3]])[0])
+                    self.assertFalse(Si.mask([Si.extent[1] + 1], [Si.pos[1]])[0])
                 else:
                     if isinstance(Si, ot.FunctionSurface2D) and Si.mask_func is not None:
                         # special check for one of the SurfaceFunction Surfaces
-                        self.assertTrue(Si.get_mask(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0])
-                        self.assertFalse(Si.get_mask(np.array([Si.pos[0]+1.5]), np.array([Si.pos[1]+1.5]))[0])
+                        self.assertTrue(Si.mask(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0])
+                        self.assertFalse(Si.mask(np.array([Si.pos[0] + 1.5]), np.array([Si.pos[1] + 1.5]))[0])
                     else:
-                        self.assertTrue(Si.get_mask(np.array([Si.extent[1]]), np.array([Si.pos[1]]))[0])
-                        self.assertFalse(Si.get_mask(np.array([Si.extent[1]+1]), np.array([Si.pos[1]]))[0])
+                        self.assertTrue(Si.mask(np.array([Si.extent[1]]), np.array([Si.pos[1]]))[0])
+                        self.assertFalse(Si.mask(np.array([Si.extent[1] + 1]), np.array([Si.pos[1]]))[0])
 
                     if isinstance(Si, ot.RingSurface):
-                        self.assertFalse(Si.get_mask(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0])
-                        self.assertTrue(Si.get_mask(np.array([Si.pos[0]+Si.ri]), np.array([Si.pos[1]]))[0])
+                        self.assertFalse(Si.mask(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0])
+                        self.assertTrue(Si.mask(np.array([Si.pos[0] + Si.ri]), np.array([Si.pos[1]]))[0])
 
     def test_surface_get_edge(self):
 
         for i, Si in enumerate(self._test_surfaces()):
             with self.subTest(i=i, Surface=type(Si).__name__):
                 for nc in [22, 23, 51, 100, 10001]:
-                    x_, y_, z_ = Si.get_edge(nc)
+                    x_, y_, z_ = Si.edge(nc)
                     
                     # check shapes
                     self.assertEqual(x_.shape[0], nc)
@@ -307,7 +307,7 @@ class SurfaceTests(unittest.TestCase):
                     self.assertEqual(z_.shape[0], nc)
 
                     # check values
-                    z2 = Si.get_values(x_, y_)
+                    z2 = Si.values(x_, y_)
                     self.assertTrue(np.allclose(z_-z2, 0))
 
     def test_surface_plotting_mesh(self):
@@ -315,7 +315,7 @@ class SurfaceTests(unittest.TestCase):
         for i, Si in enumerate(self._test_surfaces()):
             with self.subTest(i=i, Surface=type(Si).__name__):
                 for N in [10, 11, 25, 200]:
-                    X, Y, Z = Si.get_plotting_mesh(N)
+                    X, Y, Z = Si.plotting_mesh(N)
                     
                     # check shapes
                     self.assertEqual(X.shape, (N, N))
@@ -323,11 +323,11 @@ class SurfaceTests(unittest.TestCase):
                     self.assertEqual(Z.shape, (N, N))
                     
                     # check if values are masked correctly
-                    m2 = Si.get_mask(X.flatten(), Y.flatten())
+                    m2 = Si.mask(X.flatten(), Y.flatten())
                     self.assertTrue(np.all(m2 == np.isfinite(Z.flatten())))
 
                     # check if values are calculated correctly
-                    z2 = Si.get_values(X.flatten(), Y.flatten())
+                    z2 = Si.values(X.flatten(), Y.flatten())
                     valid = np.isfinite(Z.flatten())
                     self.assertTrue(np.allclose(Z.flatten()[valid]-z2[valid], 0))
                    
@@ -355,8 +355,8 @@ class SurfaceTests(unittest.TestCase):
             ot.CircularSurface(r=3).pos[0] = 1.
         self.assertRaises(ValueError, setArrayElement)  # array elements read-only
 
-        self.assertRaises(ValueError, ot.ConicSurface(r=3, R=-10, k=1).get_plotting_mesh, 5)  # N < 10
-        self.assertRaises(ValueError, ot.ConicSurface(r=3, R=-10, k=1).get_edge, 5)  # nc < 20
+        self.assertRaises(ValueError, ot.ConicSurface(r=3, R=-10, k=1).plotting_mesh, 5)  # N < 10
+        self.assertRaises(ValueError, ot.ConicSurface(r=3, R=-10, k=1).edge, 5)  # nc < 20
 
     def test_surface_paraxial_radius_of_curvature(self):
 
@@ -405,7 +405,7 @@ class SurfaceTests(unittest.TestCase):
                     p = p0 + p1
 
                     # get correct z values
-                    p[:, 2] = surf.get_values(p[:, 0], p[:, 1])
+                    p[:, 2] = surf.values(p[:, 0], p[:, 1])
 
                     # test all projection methods
                     for projm in ot.SphericalSurface.sphere_projection_methods:
@@ -559,7 +559,7 @@ class SurfaceTests(unittest.TestCase):
         # get values of surface, but no points are actually on the surface
         surf = ot.SphericalSurface(r=0.5, R=10)
         x, y = np.ones(1000), np.ones(1000)
-        surf.get_values(x, y)  # no points are on the surface
+        surf.values(x, y)  # no points are on the surface
 
         # __find_bounds with masked value at center
         sfunc = lambda x, y: np.ones_like(x)
@@ -568,8 +568,8 @@ class SurfaceTests(unittest.TestCase):
 
         # coverage test: case rectangle, too few points for mesh and edge
         rect = ot.RectangularSurface(dim=[2, 3])
-        self.assertRaises(ValueError, rect.get_plotting_mesh, N=1)
-        self.assertRaises(ValueError, rect.get_edge, nc=1)
+        self.assertRaises(ValueError, rect.plotting_mesh, N=1)
+        self.assertRaises(ValueError, rect.edge, nc=1)
 
     def test_surface_function_values(self):
 
@@ -604,9 +604,9 @@ class SurfaceTests(unittest.TestCase):
         a = 4
         pars = (np.array([1, 0, 0.5]), np.array([0, -1., 0]))
         pars2 = (np.array([[0, -1, -0.5]]), np.array([[0, 0, 1]]))
-        self.assertTrue(np.allclose(S1.get_values(*pars) - func0(*pars), 0))
-        self.assertTrue(np.all(S1.get_mask(*pars) == mask0(*pars)))
-        self.assertTrue(np.allclose(S1.get_normals(*pars) - normal0, 0))
+        self.assertTrue(np.allclose(S1.values(*pars) - func0(*pars), 0))
+        self.assertTrue(np.all(S1.mask(*pars) == mask0(*pars)))
+        self.assertTrue(np.allclose(S1.normals(*pars) - normal0, 0))
 
         for pos in [[0, 0, 0], [-1, 2, 0.5]]:
 
@@ -620,9 +620,9 @@ class SurfaceTests(unittest.TestCase):
             pars20 = (pars2[0]-pos, pars2[1])
 
             # check function pass-through
-            self.assertTrue(np.allclose(S2.get_values(*pars) - func(*pars0, normal) - pos[2], 0))
-            self.assertTrue(np.all(S2.get_mask(*pars) == mask(*pars0, a)))
-            self.assertTrue(np.allclose(S2.get_normals(*pars) - normal, 0))
+            self.assertTrue(np.allclose(S2.values(*pars) - func(*pars0, normal) - pos[2], 0))
+            self.assertTrue(np.all(S2.mask(*pars) == mask(*pars0, a)))
+            self.assertTrue(np.allclose(S2.normals(*pars) - normal, 0))
 
     def test_surface_function_exceptions(self):
        
@@ -644,17 +644,17 @@ class SurfaceTests(unittest.TestCase):
         self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: 1)  # must return np.ndarray
         self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: x + y)  # must return bools
         self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x, 1)).get_normals, x, y)  # must return two np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (1, y)).get_normals, x, y)  # must return two np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x > y, y)).get_normals, x, y)  # must return two np.ndarray with float values
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (y, x > y)).get_normals, x, y)  # must return two np.ndarray with float values
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x, 1)).normals, x, y)  # must return two np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (1, y)).normals, x, y)  # must return two np.ndarray
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x > y, y)).normals, x, y)  # must return two np.ndarray with float values
+        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (y, x > y)).normals, x, y)  # must return two np.ndarray with float values
 
         # FunctionSurface1D
         self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: x > y)  # must return floats
         self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: 1)  # must return np.ndarray
         self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: r)  # must return bools
         self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface1D(r=2, func=lambda r: r, deriv_func=lambda r: r > 0).get_normals, x, y)  # must return a np.ndarray with float values
+        self.assertRaises(AssertionError, ot.FunctionSurface1D(r=2, func=lambda r: r, deriv_func=lambda r: r > 0).normals, x, y)  # must return a np.ndarray with float values
 
 
     @pytest.mark.os
@@ -693,7 +693,7 @@ class SurfaceTests(unittest.TestCase):
                         surf1 = ot.FunctionSurface2D(func=surf_f, r=r, silent=True)
                         x = np.linspace(0, r, 100)
                         y = np.zeros_like(x)
-                        n_is = surf1.get_normals(x, y)
+                        n_is = surf1.normals(x, y)
                         n_should = n_conic(x, y, 1/R, k)
                         self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-7, rtol=0))
                         
@@ -701,7 +701,7 @@ class SurfaceTests(unittest.TestCase):
                         surf11 = ot.FunctionSurface1D(func=lambda r: surf_f(r, np.zeros_like(r)), r=r, silent=True)
                         x = np.linspace(0, r, 100)
                         y = np.zeros_like(x)
-                        n_is = surf11.get_normals(x, y)
+                        n_is = surf11.normals(x, y)
                         n_should = n_conic(x, y, 1/R, k)
                         self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-7, rtol=0))
 
@@ -720,7 +720,7 @@ class SurfaceTests(unittest.TestCase):
                            
                                 # compare numeric normals to actual ones
                                 # data normals are more unprecise, since enough samples are needed to define the shape
-                                n_is = surf2.get_normals(x, y)
+                                n_is = surf2.normals(x, y)
                                 n_should = n_conic(x, y, 1/R, k)
                                 self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-4, rtol=0))
 
@@ -779,11 +779,11 @@ class SurfaceTests(unittest.TestCase):
             self.assertTrue(np.allclose(Sr.pos - S.pos, 0, atol=1e-10))
             self.assertTrue(np.allclose(Srr.pos - S.pos, 0, atol=1e-10))
 
-            val0 = S.get_values(x+pos[0], y+pos[1]) - pos[2]
-            norm0 = S.get_normals(x+pos[0], y+pos[1])
-            val1 = Sr.get_values(x+pos[0], pos[1]-y) - pos[2] # the y minus is important
-            norm1 = Sr.get_normals(x+pos[0], pos[1]-y)  # the minus sign is important
-            val2 = Srr.get_values(x+pos[0], y+pos[1]) - pos[2] # double flipped
+            val0 = S.values(x + pos[0], y + pos[1]) - pos[2]
+            norm0 = S.normals(x + pos[0], y + pos[1])
+            val1 = Sr.values(x+pos[0], pos[1]-y) - pos[2] # the y minus is important
+            norm1 = Sr.normals(x+pos[0], pos[1]-y)  # the minus sign is important
+            val2 = Srr.values(x+pos[0], y+pos[1]) - pos[2] # double flipped
             self.assertTrue(np.allclose(val0 + val1, 0))  # check flipped values
             self.assertTrue(np.allclose(val0 - val2, 0))  # double reversion leads to initial values
             self.assertTrue(np.allclose(norm0 - norm1 * np.array([-1, 1, 1])[None, None, :], 0)) 
@@ -797,7 +797,7 @@ class SurfaceTests(unittest.TestCase):
                 self.assertEqual(S.parax_roc, Srr.parax_roc)
 
             # check that z_min, z_max were assigned correctly
-            _, _, Z = Sr.get_plotting_mesh(100)
+            _, _, Z = Sr.plotting_mesh(100)
             self.assertTrue(np.nanmin(Z) >= Sr.z_min - 10*Sr.C_EPS)
             self.assertTrue(np.nanmax(Z) <= Sr.z_max + 10*Sr.C_EPS)
 
@@ -873,19 +873,19 @@ class SurfaceTests(unittest.TestCase):
         for S in Ss:
             for i in range(3):  # rotate three times and flip two times
                 S.move_to(pos0)
-                z0 = S.get_values(x, y)
-                n0 = S.get_normals(x, y)
-                m0 = S.get_mask(x, y)
+                z0 = S.values(x, y)
+                n0 = S.normals(x, y)
+                m0 = S.mask(x, y)
                 ph0, ish0 = S.find_hit(p, s)
 
                 S.rotate(angle)
                 xr, yr = self.relative_rotate(x-pos0[0], y-pos0[1], np.deg2rad(angle))  # rotate coordinates
                 x2, y2 = xr+pos0[0], yr+pos0[1]
-                z1 = S.get_values(x2, y2)
-                n1 = S.get_normals(x2, y2)
+                z1 = S.values(x2, y2)
+                n1 = S.normals(x2, y2)
                 n0r = n0.copy()
                 n0r[:, 0], n0r[:, 1] = self.relative_rotate(n0[:, 0], n0[:, 1], np.deg2rad(angle))
-                m1 = S.get_mask(x2, y2)
+                m1 = S.mask(x2, y2)
                 self.assertTrue(np.allclose(z0 - z1, 0))
                 self.assertTrue(np.allclose(n0r - n1, 0))
                 self.assertTrue(np.all(m0 == m1))
@@ -918,26 +918,26 @@ class SurfaceTests(unittest.TestCase):
         y = np.random.uniform(-2, 2, 100)
 
         # edge, mesh and mask or an unrotated rectangle
-        X0, Y0, Z0 = rect.get_plotting_mesh(100)
-        x0, y0, z0 = rect.get_edge(100)
-        m0 = rect.get_mask(x, y)
+        X0, Y0, Z0 = rect.plotting_mesh(100)
+        x0, y0, z0 = rect.edge(100)
+        m0 = rect.mask(x, y)
 
         angle = -82.46
         rect.rotate(angle)
 
         # get mesh, rotate mesh back
-        X1, Y1, Z1 = rect.get_plotting_mesh(100)
+        X1, Y1, Z1 = rect.plotting_mesh(100)
         X1r, Y1r = self.relative_rotate(X1 - pos0[0], Y1 - pos0[1], -np.deg2rad(angle))
         X1r, Y1r = X1r + pos0[0], Y1r + pos0[1]
 
         # get edge, rotate edge back
-        x1, y1, z1 = rect.get_edge(100)
+        x1, y1, z1 = rect.edge(100)
         x1r, y1r = self.relative_rotate(x1 - pos0[0], y1 - pos0[1], -np.deg2rad(angle))
         x1r, y1r = x1r + pos0[0], y1r + pos0[1]
 
         # rotate coordinates to math rotation, get mask
         xr, yr = self.relative_rotate(x - pos0[0], y - pos0[1], -np.deg2rad(angle))
-        m1 = rect.get_mask(xr + pos0[0], yr + pos0[1])
+        m1 = rect.mask(xr + pos0[0], yr + pos0[1])
 
         # compare values
         self.assertTrue(np.allclose(x1r - x0 + y1r - y0, 0)) 

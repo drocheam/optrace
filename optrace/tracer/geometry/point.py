@@ -59,7 +59,7 @@ class Point(BaseClass):
         """
         return tuple(self.pos.repeat(2))
 
-    def get_random_positions(self, N: int) -> np.ndarray:
+    def random_positions(self, N: int) -> np.ndarray:
         """
         Get random positions, for a point that is just the list of its position.
 

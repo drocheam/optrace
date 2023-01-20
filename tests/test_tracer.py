@@ -228,7 +228,7 @@ class TracerTests(unittest.TestCase):
         geome[1].move_to(geome[0].front.pos + [0, 0, 0.01])  # cornea is now inside empty area of pupil
         coll, x, y, _ = ot.Raytracer.check_collision(geome[0].front, geome[1].front)
         self.assertTrue(coll)
-        self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[1].front.get_values(x, y)))
+        self.assertTrue(np.all(geome[0].front.values(x, y) >= geome[1].front.values(x, y)))
 
         # another collision
         geom = ot.presets.geometry.arizona_eye()
@@ -236,7 +236,7 @@ class TracerTests(unittest.TestCase):
         geome[2].move_to(geome[0].front.pos + [0, 0, 0.2])
         coll, x, y, _ = ot.Raytracer.check_collision(geome[0].front, geome[2].front)
         self.assertTrue(coll)
-        self.assertTrue(np.all(geome[0].front.get_values(x, y) >= geome[2].front.get_values(x, y)))
+        self.assertTrue(np.all(geome[0].front.values(x, y) >= geome[2].front.values(x, y)))
 
         # collision point - surface
 
@@ -389,7 +389,7 @@ class TracerTests(unittest.TestCase):
             RT.trace(200000)
 
             im = RT.source_image(35)
-            L = im.get_by_display_mode("Irradiance")
+            L = im.get("Irradiance")
             L /= np.max(L)
 
             if isinstance(surf, Surface):
@@ -488,14 +488,14 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "None"
         RT.trace(2000000)
         img = RT.detector_image(63)
-        img = img.get_by_display_mode("Irradiance")
+        img = img.get("Irradiance")
         self.assertTrue(np.std(img/np.max(img)) < 0.025)
 
         # Equal divergence in 3D, leads to 1/cos(e)**3 on detector
         RS0.divergence = "Isotropic"
         RT.trace(2000000)
         img0 = RT.detector_image(63)
-        img = img0.get_by_display_mode("Irradiance")
+        img = img0.get("Irradiance")
         x0, x1, y0, y1 = img0.extent
         X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**3
@@ -505,7 +505,7 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Lambertian"
         RT.trace(4000000)
         img0 = RT.detector_image(63)
-        img = img0.get_by_display_mode("Irradiance")
+        img = img0.get("Irradiance")
         x0, x1, y0, y1 = img0.extent
         X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**4
@@ -516,7 +516,7 @@ class TracerTests(unittest.TestCase):
         RS0.div_func = lambda e: 1/np.cos(e)**3
         RT.trace(2000000)
         img0 = RT.detector_image(63)
-        Z = img0.get_by_display_mode("Irradiance")
+        Z = img0.get("Irradiance")
         self.assertTrue(np.std(Z/np.max(Z)) < 0.075)
 
         # Function mode, needs to be rescaled by 1/function and 1/cos(e)**3 for uniform curve on detector
@@ -524,7 +524,7 @@ class TracerTests(unittest.TestCase):
         RS0.div_func = lambda e: 1+np.sqrt(e)
         RT.trace(2000000)
         img0 = RT.detector_image(63)
-        img = img0.get_by_display_mode("Irradiance")
+        img = img0.get("Irradiance")
         x0, x1, y0, y1 = img0.extent
         X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
         r = np.sqrt(X**2 + Y**2)
@@ -553,7 +553,7 @@ class TracerTests(unittest.TestCase):
         RT.add(RS0)
         RT.trace(2000000)
         img0 = RT.detector_image(63, projection_method="Equal-Area")
-        Z = img0.get_by_display_mode("Irradiance")
+        Z = img0.get("Irradiance")
         # mask out area outside disc, leave 3 pixels margin
         X, Y = np.mgrid[-32:32:63j, -32:32:63j]
         mask = np.sqrt(X**2 + Y**2) < 29

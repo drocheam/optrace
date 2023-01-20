@@ -75,7 +75,7 @@ class DataSurface2D(Surface):
         
             # get max and min z values
             rn = np.linspace(0, self.r, 10000)
-            zn = self._get_values(rn, np.zeros_like(rn))
+            zn = self._values(rn, np.zeros_like(rn))
             self.z_min, self.z_max = np.min(zn), np.max(zn)
 
             # range of input data, not to be confused with height of interpolated data
@@ -106,7 +106,7 @@ class DataSurface2D(Surface):
        
             # get range of input data, but only inside circular area (= enforced by masking)
             X, Y = np.meshgrid(xy, xy)
-            M = self.get_mask(X.ravel(), Y.ravel()).reshape(X.shape)
+            M = self.mask(X.ravel(), Y.ravel()).reshape(X.shape)
             z_range0 = np.max(Z[M]) - np.min(Z[M])
       
         # interpolation can lead to an increased z-value range
@@ -134,7 +134,7 @@ class DataSurface2D(Surface):
         else:
             return self._interp(x, y, grid=False, **kwargs)
 
-    def _get_values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface values but in relative coordinate system to surface center.
         And without masking out values beyond the surface extent
@@ -149,7 +149,7 @@ class DataSurface2D(Surface):
         # uses quadratic interpolation for smooth surfaces and a constantly changing slope
         return self._sign*(self._call(x_, self._sign*y_) - self._offset)
 
-    def get_normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get normal vectors of the surface.
 
@@ -161,7 +161,7 @@ class DataSurface2D(Surface):
         n = np.tile([0., 0., 1.], (x.shape[0], 1))
 
         # coordinates actually on surface
-        m = self.get_mask(x, y)
+        m = self.mask(x, y)
        
         # relative coordinates
         xm = x[m] - self.pos[0]

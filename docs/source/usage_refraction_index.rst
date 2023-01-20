@@ -91,27 +91,28 @@ The call returns a vector of the same shape as the input.
 Abbe Number
 __________________
 
-Details on the calculation of the Abbe number can be found in :numref:``abbe_number``. 
+Details on the calculation of the Abbe number can be found in :numref:`abbe_number`. 
 With a refractive index object at hand the Abbe number can be calculated with
 
 .. doctest::
 
    >>> n = ot.presets.refraction_index.LAF2
-   >>> n.get_abbe_number()
+   >>> n.abbe_number()
    44.850483919254984
+
 
 Alternatively the function can be called with a different spectral line combination from :python:`ot.presets.spectral_lines`:
 
 .. doctest::
 
-   >>> n.get_abbe_number(ot.presets.spectral_lines.F_eC_)
+   >>> n.abbe_number(ot.presets.spectral_lines.F_eC_)
    44.57150709341499
 
 Or specify a user defined list of three wavelengths:
 
 .. doctest::
 
-   >>> n.get_abbe_number([450, 580, 680])
+   >>> n.abbe_number([450, 580, 680])
    30.59379412865849
 
 

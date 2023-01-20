@@ -94,7 +94,7 @@ class RayStorage(BaseClass):
         """number of ray sections per ray"""
         return self.p_list.shape[1] if self.N_list.shape[0] else 0
 
-    def make_thread_rays(self, N_threads: int, Nt: int) \
+    def thread_rays(self, N_threads: int, Nt: int) \
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Create the rays for the current thread
@@ -127,7 +127,8 @@ class RayStorage(BaseClass):
 
             i += 1
 
-        return self.p_list[Ns:Ne], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne],  self.w_list[Ns:Ne], self.wl_list[Ns:Ne], self.n_list[Ns:Ne]
+        return self.p_list[Ns:Ne], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne],  self.w_list[Ns:Ne], self.wl_list[Ns:Ne],\
+            self.n_list[Ns:Ne]
 
     def source_sections(self, index: int = None)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:

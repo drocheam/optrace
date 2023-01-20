@@ -79,7 +79,7 @@ class Line(BaseClass):
         self.angle += angle 
         self.lock()
 
-    def get_random_positions(self, N: int) -> np.ndarray:
+    def random_positions(self, N: int) -> np.ndarray:
         """
         Get random 3D positions on the line, uniformly distributed
 

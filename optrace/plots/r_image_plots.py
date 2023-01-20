@@ -28,7 +28,7 @@ def r_image_plot(im:       RImage,
     """
     _check_types(im, imc, block, log, flip, title, mode)
 
-    Imd = imc.copy() if imc is not None else im.get_by_display_mode(mode, log=log)
+    Imd = imc.copy() if imc is not None else im.get(mode, log=log)
 
     _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, mode, log)
 
@@ -224,8 +224,8 @@ def _get_labels(im: RImage, mode: str, log: bool) -> tuple[str, str, str, str, s
 
     # z-label
     if mode in ["Irradiance", "Illuminance"]:
-        punit, aname, srname, p = ("W", "Irradiance", "Radiant", im.get_power()) if mode == "Irradiance"\
-                                  else ("lm", "Illuminance", "Luminous", im.get_luminous_power())
+        punit, aname, srname, p = ("W", "Irradiance", "Radiant", im.power()) if mode == "Irradiance"\
+                                  else ("lm", "Illuminance", "Luminous", im.luminous_power())
     
         match im.projection:
             case "Equal-Area":

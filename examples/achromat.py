@@ -14,8 +14,8 @@ if achromat:
     n1_ = n1(ot.presets.spectral_lines.e)
     n2_ = n2(ot.presets.spectral_lines.e)
     
-    V1 = n1.get_abbe_number(lines=ot.presets.spectral_lines.F_eC_)
-    V2 = n2.get_abbe_number(lines=ot.presets.spectral_lines.F_eC_)
+    V1 = n1.abbe_number(lines=ot.presets.spectral_lines.F_eC_)
+    V2 = n2.abbe_number(lines=ot.presets.spectral_lines.F_eC_)
 
     # calculate powers for chromatic dispersion compensation
     # https://en.wikipedia.org/wiki/Achromatic_lens#Design
@@ -26,7 +26,7 @@ else:
     # same medium for both lenses
     n1 = n2 = ot.presets.refraction_index.SF10
     n1_ = n2_ = n1(ot.presets.spectral_lines.e)
-    V1 = V2 = n1.get_abbe_number(lines=ot.presets.spectral_lines.F_eC_)
+    V1 = V2 = n1.abbe_number(lines=ot.presets.spectral_lines.F_eC_)
     # this choice of D1, D2 leads to a similar R ratio as the achromatic case
     D1 = 2*D
     D2 = -1*D

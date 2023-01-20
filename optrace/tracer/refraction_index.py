@@ -254,7 +254,7 @@ class RefractionIndex(Spectrum):
 
         super().__setattr__(key, val)
 
-    def get_abbe_number(self, lines: list = None) -> float:
+    def abbe_number(self, lines: list = None) -> float:
         """
         Calculates the Abbe Number. The spectral lines can be overwritten with the parameter.
         Otherwise the RefractionIndex.lines parameter is used from its initialization, which defaults to FDC lines.
@@ -268,4 +268,4 @@ class RefractionIndex(Spectrum):
 
     def is_dispersive(self) -> bool:
         """:return: if the refractive index is dispersive, determined by the Abbe Number"""
-        return self.get_abbe_number() != np.inf
+        return self.abbe_number() != np.inf

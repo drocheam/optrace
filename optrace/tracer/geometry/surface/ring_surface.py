@@ -43,7 +43,7 @@ class RingSurface(Surface):
         """info message describing the surface"""
         return super().info + ", ri = {self.ri:.5g} mm"
 
-    def get_plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
         The only guarantee is that neighbouring array values are neighbouring values in 3D space.
@@ -51,7 +51,7 @@ class RingSurface(Surface):
         :param N: number of grid values in each dimension (int)
         :return: X, Y, Z coordinate array (all numpy 2D array)
         """
-        X0, Y0, Z = super().get_plotting_mesh(N)
+        X0, Y0, Z = super().plotting_mesh(N)
         X, Y = X0 - self.pos[0], Y0 - self.pos[1]
 
         # convert to polar coordinates
@@ -86,7 +86,7 @@ class RingSurface(Surface):
 
         return X+self.pos[0], Y+self.pos[1], Z
 
-    def get_mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Get surface mask values. A value of 1 means the surface is defined here.
 
@@ -98,7 +98,7 @@ class RingSurface(Surface):
         r2 = ne.evaluate("(x - x0) ** 2 + (y - y0) ** 2")
         return ((self.ri - self.N_EPS)**2 <= r2) & (r2 <= (self.r + self.N_EPS)**2)
 
-    def get_random_positions(self, N: int) -> np.ndarray:
+    def random_positions(self, N: int) -> np.ndarray:
         """
         Get random 3D positions on the surface, uniformly distributed.
 
