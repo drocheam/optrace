@@ -25,7 +25,7 @@ class LoadTests(unittest.TestCase):
 
             return True
 
-        except ConnectionResetError:
+        except (ConnectionResetError, TimeoutError):
             return False
 
     # normally we would download the file in __init__ and delete in __del__
