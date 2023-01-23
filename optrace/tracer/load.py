@@ -7,7 +7,7 @@ from .refraction_index import RefractionIndex
 
 # needed geometrise
 from .geometry.group import Group
-from .geometry import Lens, Marker, Detector, Aperture
+from .geometry import Lens, PointMarker, Detector, Aperture
 from .geometry.surface import CircularSurface, ConicSurface, SphericalSurface,\
                               RingSurface, AsphericSurface, Surface, RectangularSurface
 
@@ -374,7 +374,7 @@ def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_mar
         zm = np.mean(ext[4:6])
         xm = ext[0] - 1.5
 
-        G.add(Marker(G.long_desc, [xm, ym, zm], label_only=True))
+        G.add(PointMarker(G.long_desc, [xm, ym, zm], label_only=True))
 
     return G
 

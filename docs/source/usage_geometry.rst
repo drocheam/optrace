@@ -33,8 +33,10 @@ This includes the classes
      - Element with a surface on which wavelength-dependent or wavelength-independent filtering takes place.
    * - **Aperture** 
      - Like a filter, except that incident light is completely absorbed.
-   * - **Marker** 
+   * - **PointMarker** 
      - element consisting of a point and a label, useful for annotating things.
+   * - **LineMarker** 
+     - element consisting of a line and a label, useful for annotating things.
 
 These subclasses have the same methods as the Element superclass, these include:
 
@@ -106,7 +108,11 @@ The raytracer class provides the functionality for tracing, geometry checking, r
 Since the raytracer is a subclass of a group, elements can be changed or added in the same way.
 
 
-.. TODO Screenshot einer Raytracer Geometry in der GUI
+.. figure:: ./images/raytracer_geometry_example.png
+   :width: 100%
+   :align: center
+
+   Example of a raytracer geometry in the TraceGUI in side view
 
 
 **Outline**
@@ -125,7 +131,7 @@ This is also the only mandatory parameter of this class
 **Geometry**
 
 Since ``optrace`` implements sequential raytracing, the surfaces and objects must be in a well-defined and unique sequence. This applies to all elements with interactions of light: ``Lens, IdealLens, Filter, Aperture, RaySource``.
-The elements ``Detector, Marker`` are excluded from this.
+The elements ``Detector, LineMarker, PointMarker`` are excluded from this.
 All RaySource elements must lie before all lenses, filters and apertures. And all subsequent lenses, filters, apertures must not collide and be inside the outline.
 
 
@@ -134,7 +140,12 @@ All RaySource elements must lie before all lenses, filters and apertures. And al
 Earlier we learned that when creating a lens, you can use the ``n2`` parameter to define the subsequent media. In the case of multiple lenses, the ``n2`` of the previous lens is the medium before the next lens.
 In the case of the raytracer, we can define an ``n0`` which defines the refractive index for all undefined ``n2=None`` as well as for the region to the first lens.
 
-.. TODO Prinzipbild mit mehreren Linsen und Medienübergängen
+.. figure:: ./images/rt_setup_different_ambient_media.svg
+   :width: 700
+   :align: center
+
+   Schematic figure of a setup with a ray source, three different lenses and three different ambient media
+
 
 **absorb_missing**
 

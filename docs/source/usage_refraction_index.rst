@@ -187,9 +187,7 @@ For instance, loading the Schott catalogue and accessing the material ``N-LAF21`
    n_laf21 = n_schott["N-LAF21"]
 
 
-Different ``.agf`` files are found in `this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`_.
-
-.. TODO Plotting n and V?
+Different ``.agf`` files are found in `this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`__ or `this one <https://github.com/edeforas/Astree/tree/master/glass>`__.
 
 
 Information on the file format can be found `here <https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf>`__ and

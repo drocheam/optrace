@@ -63,7 +63,8 @@ def rt_example() -> ot.Raytracer:
     RT.add(ot.Aperture(ap, pos=[0, 0, 20.3]))
 
     # add marker
-    RT.add(ot.Marker("sdghj", [0, 1, 5]))
+    RT.add(ot.PointMarker("sdghj", [0, 1, 5]))
+    RT.add(ot.LineMarker(r=2, angle=5, desc="sdghj", pos=[0, 1, 5]))
     
     # add Lens 3
     front = ot.SphericalSurface(r=1, R=2.2)
@@ -1219,7 +1220,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
-    def test_marker(self):
+    def test_point_marker(self):
         """test marker plotting, replotting, removal and properties in scene"""
 
         RT = rt_example()
@@ -1229,14 +1230,14 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
 
                 # marker 1, default size
-                RT.add(ot.Marker("Test1", [0., 0., 0]))
+                RT.add(ot.PointMarker("Test1", [0., 0., 0]))
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
                 self.assertEqual(len(sim._marker_plots), 1)  # element was added
                 self.assertTrue(np.allclose(sim._marker_plots[0][0].actor.actor.center, 0))  # check position
 
                 # marker 2, enlarged
-                RT.add(ot.Marker("Test2", [0., 1., 5.2], text_factor=2, marker_factor=2))
+                RT.add(ot.PointMarker("Test2", [0., 1., 5.2], text_factor=2, marker_factor=2))
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
                 self.assertEqual(len(sim._marker_plots), 2)  # element was added
@@ -1267,6 +1268,49 @@ class GUITests(unittest.TestCase):
                 # first marker now should have no crosshair shown
                 a = sim._marker_plots[0]
                 self.assertFalse(a[0].visible)
+
+        sim = TraceGUI(RT)
+        sim.debug(_func=interact, silent=True, _args=(sim,))
+        self.raise_thread_exceptions()
+    
+    def test_line_marker(self):
+        """test marker plotting, replotting, removal and properties in scene"""
+
+        RT = rt_example()
+        RT.remove(RT.markers)
+        
+        def interact(sim):
+            with self._try(sim):
+
+                # marker 1, default size
+                RT.add(ot.LineMarker(r=5, desc="Test1", pos=[0., 0., 0]))
+                sim._do_in_main(sim.replot)
+                sim._wait_for_idle()
+                self.assertEqual(len(sim._line_marker_plots), 1)  # element was added
+                self.assertTrue(np.allclose(sim._line_marker_plots[0][0].actor.actor.center, 0))  # check position
+
+                # marker 2, enlarged
+                RT.add(ot.LineMarker(r=5, angle=-20, desc="Test2", pos=[0., 1., 5.2], text_factor=2, line_factor=2))
+                sim._do_in_main(sim.replot)
+                sim._wait_for_idle()
+                self.assertEqual(len(sim._line_marker_plots), 2)  # element was added
+                self.assertTrue(np.allclose(sim._line_marker_plots[1][0].actor.actor.center\
+                                            - np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
+
+                # check size change
+                a, b = tuple(sim._line_marker_plots)
+                self.assertAlmostEqual(b[0].actor.actor.property.line_width/a[0].actor.actor.property.line_width, 2)
+                self.assertAlmostEqual(b[3].property.font_size/a[3].property.font_size, 2)
+
+                # check if text was assigned correctly
+                self.assertEqual(a[3].text, "Test1")
+                self.assertEqual(b[3].text, "Test2")
+
+                # check replotting of markers
+                sim._do_in_main(sim.send_cmd, "RT.remove(ML[-1])") # also checks that alias ML exists
+                sim._wait_for_idle()
+                self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
+                self.assertEqual(len(sim._line_marker_plots), 1)  # element was removed in scene
 
         sim = TraceGUI(RT)
         sim.debug(_func=interact, silent=True, _args=(sim,))

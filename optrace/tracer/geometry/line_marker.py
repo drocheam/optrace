@@ -4,39 +4,38 @@ import numpy as np  # for ndarray type
 
 from ..misc import PropertyChecker as pc  # check types and values
 from .element import Element  # parent class
-from .point import Point  # front object of the Marker
+from .line import Line  # front object of the Marker
 
 
-class Marker(Element):
+class LineMarker(Element):
 
     def __init__(self,
-                 desc:          str,
+                 r:             float,
                  pos:           (list | np.ndarray),
+                 desc:          str = "",
+                 angle:         float = 0,
                  text_factor:   float = 1.,
-                 marker_factor: float = 1.,
-                 label_only:    bool = False,
+                 line_factor:   float = 1.,
                  **kwargs)\
             -> None:
         """
-        Create a new Marker.
+        Create a new LineMarker.
 
-        A Marker is an Element, where the front surface is a point
-        Markers are used as point and/or text annotations in the tracing geometry
-        text only: provide a text string and set the parameter label_only=True
-        marker/point only: leave the text empty
+        A LineMarker is an Element, where the front surface is a Line
+        LineMarkers are used as line and text annotations in the tracing geometry
 
+        :param r: radius of the line
         :param desc: text to display
+        :param angle: angle of the line in xy-plane
         :param pos: position of marker
         :param text_factor: text scaling factor
-        :param marker_factor: marker scaling factor
-        :param label_only: don't plot marker, only text
+        :param line_factor: marker scaling factor
         :param kwargs: additional keyword args for class Element and BaseClass
         """
-        self.marker_factor = marker_factor
         self.text_factor = text_factor
-        self.label_only = label_only
+        self.line_factor = line_factor
         
-        super().__init__(Point(), pos, desc=desc, **kwargs)
+        super().__init__(Line(r=r, angle=angle), pos, desc=desc, **kwargs)
 
         # lock object
         self._geometry_lock = True
@@ -51,13 +50,8 @@ class Marker(Element):
         :param val: value to assign
         """
 
-        match key:
-
-            case ("text_factor" | "marker_factor"):
+        if key in ["text_factor", "line_factor"]:
                 pc.check_type(key, val, float | int)
             
-            case "label_only":
-                pc.check_type(key, val, bool)
-
         super().__setattr__(key, val)
 

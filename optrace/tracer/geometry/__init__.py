@@ -21,7 +21,8 @@ from .aperture import Aperture
 from .detector import Detector
 from .lens import Lens
 from .ideal_lens import IdealLens
-from .marker import Marker
+from .point_marker import PointMarker
+from .line_marker import LineMarker
 from .ray_source import RaySource
 
 from .group import Group

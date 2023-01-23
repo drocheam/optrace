@@ -3,7 +3,7 @@ from typing import Any  # Any type
 import numpy as np  # calculations
 
 from . import Filter, Aperture, Detector, Lens, RaySource, Surface,\
-        Marker, IdealLens, Element  # possible elements in group
+        PointMarker, LineMarker, IdealLens, Element  # possible elements in group
 from ..base_class import BaseClass  # parent class
 
 from ..transfer_matrix_analysis import TMA  # paraxial analysis
@@ -24,7 +24,8 @@ class Group(BaseClass):
         Create a group by including elements from the 'elements' parameter.
         Without this parameter an empty group is created.
 
-        A Group contains multiple elements of types Lens, Marker, RaySource, Filter, Aperture, Detector.
+        A Group contains multiple elements of types Lens, PointMarker, 
+        LineMarker, RaySource, Filter, Aperture, Detector.
         This class provides the functionality for moving, rotating and flipping its whole geometry.
         A well as including, removing elements and clearing is whole content.
 
@@ -221,12 +222,12 @@ class Group(BaseClass):
             return
 
         match el:
-            case Aperture():                  self.apertures.append(el)
-            case Filter():                    self.filters.append(el)
-            case RaySource():                 self.ray_sources.append(el)
-            case Detector():                  self.detectors.append(el)
-            case Marker():                    self.markers.append(el)
-            case Lens() | IdealLens():        self.lenses.append(el)
+            case Aperture():                       self.apertures.append(el)
+            case Filter():                         self.filters.append(el)
+            case RaySource():                      self.ray_sources.append(el)
+            case Detector():                       self.detectors.append(el)
+            case PointMarker() | LineMarker():     self.markers.append(el)
+            case Lens() | IdealLens():             self.lenses.append(el)
 
             case Group():
 

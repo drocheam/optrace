@@ -411,31 +411,58 @@ It takes a surface parameter and the position parameter as arguments.
    rect = ot.RectangularSurface(dim=[1.5, 2.3])
    Det = ot.Detector(rect, pos=[0, 0, 15.2])
 
-Marker
+PointMarker
 _________________
 
-A Marker is used to annotate positions or elements inside the tracing geometry. While itself having no influence on the tracing process.
+A PointMarker is used to annotate positions or elements inside the tracing geometry. While itself having no influence on the tracing process.
 
-In the simplest case a Marker is defined with a text string and a position.
+In the simplest case a PointMarker is defined with a text string and a position.
 
 .. testcode::
 
-   M = ot.Marker("Text132", pos=[0.5, 9.1, 0.5])
+   M = ot.PointMarker("Text132", pos=[0.5, 9.1, 0.5])
 
 One can scale the text and marker with ``text_factor`` or ``marker_factor``. The actual size change is handled by the plotting GUI.
 
 .. testcode::
 
-   M = ot.Marker("Text132", pos=[0.5, 9.1, 0.5], text_factor=2.3, marker_factor=0.5)
+   M = ot.PointMarker("Text132", pos=[0.5, 9.1, 0.5], text_factor=2.3, marker_factor=0.5)
 
 We can also hide the marker point and only display the text with the parameter ``label_only=True``.
 
 .. testcode::
 
-   M = ot.Marker("Text132", pos=[0.5, 9.1, 0.5], label_only=True)
+   M = ot.PointMarker("Text132", pos=[0.5, 9.1, 0.5], label_only=True)
 
 In contrast, we can hide the text and only plot the marker point by leaving the text empty:
 
 .. testcode::
 
-   M = ot.Marker("", pos=[0.5, 9.1, 0.5])
+   M = ot.PointMarker("", pos=[0.5, 9.1, 0.5])
+
+
+LineMarker
+_________________
+
+
+Similarly, a LineMarker is a Line in the xy-plane with a text annotation.
+
+In the simplest case a LineMarker is defined with a text string, radius, angle and a position.
+
+.. testcode::
+
+   M = ot.LineMarker(r=3, desc="Text132", angle=45, pos=[0.5, 9.1, 0.5])
+
+One can scale the text and marker with ``text_factor`` or ``line_factor``. The actual size change is handled by the plotting GUI.
+
+.. testcode::
+
+   M = ot.LineMarker(r=3, desc="Text132", pos=[0.5, 9.1, 0.5], text_factor=2.3, line_factor=0.5)
+
+
+We can hide the text and only plot the marker line by leaving the text empty:
+
+.. testcode::
+
+   M = ot.LineMarker(r=3, desc="", pos=[0.5, 9.1, 0.5])
+

@@ -328,8 +328,6 @@ Optical Center
 
 **General Case**
 
-.. TODO OC erklären oder auf Literatur verweisen
-
 
 .. figure:: ./images/optical_center.svg
    :align: center

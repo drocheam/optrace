@@ -93,19 +93,19 @@ class GeometryTests(unittest.TestCase):
             ot.Line().pos[0] = 1.
         self.assertRaises(ValueError, setArrayElement)  # array elements read-only
 
-    def test_marker(self):
+    def test_point_marker(self):
         
         # init exceptions
-        self.assertRaises(TypeError, ot.Marker, 1, [0, 0, 0])  # invalid desc
-        self.assertRaises(TypeError, ot.Marker, "Test", 1)  # invalid pos type
-        self.assertRaises(ValueError, ot.Marker, "Test", [np.inf, 0, 0])  # inf in pos
-        self.assertRaises(TypeError, ot.Marker, "Test", [0, 0, 0], marker_factor="yes")  # invalid factor type
-        self.assertRaises(TypeError, ot.Marker, "Test", [0, 0, 0], text_factor="yes")  # invalid factor type
-        self.assertRaises(TypeError, ot.Marker, "Test", [0, 0, 0], label_only="yes")  # invalid label_only type
+        self.assertRaises(TypeError, ot.PointMarker, 1, [0, 0, 0])  # invalid desc
+        self.assertRaises(TypeError, ot.PointMarker, "Test", 1)  # invalid pos type
+        self.assertRaises(ValueError, ot.PointMarker, "Test", [np.inf, 0, 0])  # inf in pos
+        self.assertRaises(TypeError, ot.PointMarker, "Test", [0, 0, 0], marker_factor="yes")  # invalid factor type
+        self.assertRaises(TypeError, ot.PointMarker, "Test", [0, 0, 0], text_factor="yes")  # invalid factor type
+        self.assertRaises(TypeError, ot.PointMarker, "Test", [0, 0, 0], label_only="yes")  # invalid label_only type
 
         # check init assignments and extent
         for desc, pos in zip(["a", "", "afhajk"], [[0, 1, 0], [5, 0, 0], [7, 8, 9]]):
-            M = ot.Marker(desc, pos)
+            M = ot.PointMarker(desc, pos)
             self.assertEqual(M.desc, desc)
             self.assertTrue(np.all(M.pos == pos))
             self.assertTrue(np.all(M.pos.repeat(2) == M.extent))
@@ -119,6 +119,26 @@ class GeometryTests(unittest.TestCase):
 
         # test lock
         self.assertRaises(AttributeError, M.__setattr__, "r46546", 4)  # _new_lock active
+    
+    def test_line_marker(self):
+        
+        # init exceptions
+        self.assertRaises(TypeError, ot.LineMarker, r=3, desc="Test", pos=[0, 0, 0], line_factor="yes")  # invalid factor type
+        self.assertRaises(TypeError, ot.LineMarker, r=3, desc="Test", pos=[0, 0, 0], text_factor="yes")  # invalid factor type
+
+        LM = ot.LineMarker(r=5, angle=12, desc="hjkhkJ", pos=[5, 6, 7])
+        self.assertTrue(np.allclose(LM.pos - [5, 6, 7], 0))
+
+        # flip and rotate
+        lmx0 = LM.front.angle
+        LM.flip()
+        lmx1 = LM.front.angle
+        self.assertNotAlmostEqual(lmx0, lmx1)
+        LM.rotate(45)
+        self.assertNotAlmostEqual(lmx1, LM.front.angle)
+        
+        # test lock
+        self.assertRaises(AttributeError, LM.__setattr__, "r46546", 4)  # _new_lock active
 
     def test_filter(self):
 
@@ -265,7 +285,7 @@ class GeometryTests(unittest.TestCase):
         F = ot.Filter(ot.CircularSurface(r=3, desc="a"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
         DET = ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 10])
         AP = ot.Aperture(ot.RingSurface(r=3, ri=0.2, desc="a"), pos=[0, 0, 10])
-        M = ot.Marker("Test", pos=[0, 0, 10])
+        M = ot.PointMarker("Test", pos=[0, 0, 10])
         IL = ot.IdealLens(r=3, D=20, pos=[0, 0, 10])
         L = ot.Lens(ot.CircularSurface(r=2, desc="a"), ot.CircularSurface(r=3, desc="a"),
                        n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10])
@@ -686,7 +706,7 @@ class GeometryTests(unittest.TestCase):
     def test_flip_elements(self):
 
         # marker flip
-        M1 = ot.Marker("bla", [12, -3, 5])
+        M1 = ot.PointMarker("bla", [12, -3, 5])
         M2 = M1.copy()
         M2.flip()
         self.assertTrue(np.allclose(M1.pos - M2.pos, 0, atol=1e-10))
@@ -746,7 +766,7 @@ class GeometryTests(unittest.TestCase):
             ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 9], n2=n3, d=1, desc="4"),
             ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 11], desc="5"),
             ot.Aperture(ot.RingSurface(r=3, ri=1), pos=[0, 0, 13], desc="6"),
-            ot.Marker("7", pos=[0, 0, 15]),
+            ot.PointMarker("7", pos=[0, 0, 15]),
         ])
 
         # check that after reversing the desc are in reversed order
@@ -783,8 +803,8 @@ class GeometryTests(unittest.TestCase):
         self.assertAlmostEqual(G.extent[5]-G.extent[4], Gr.extent[5]-Gr.extent[4])
 
         # flip group around a user specified axis
-        M1 = ot.Marker("", pos=[2, 3, 5])
-        M2 = ot.Marker("", pos=[-1, 0, 2])
+        M1 = ot.PointMarker("", pos=[2, 3, 5])
+        M2 = ot.PointMarker("", pos=[-1, 0, 2])
         G3 = ot.Group([M1, M2])
         G4 = G.copy()
         G3.flip(y0=1, z0=2)
@@ -804,7 +824,7 @@ class GeometryTests(unittest.TestCase):
               # detector and lens with rotational symmetry
               ot.presets.geometry.arizona_eye().lenses[-2],
               ot.presets.geometry.arizona_eye().detectors[-1],
-              ot.Marker("defg", [0, 0, 0]),
+              ot.PointMarker("defg", [0, 0, 0]),
              ]
 
         for SSi in Ss:
@@ -862,7 +882,7 @@ class GeometryTests(unittest.TestCase):
 
         surf =  ot.RectangularSurface(dim=[3., 2])
         det = ot.Detector(surf, pos=[0, 0, 0])
-        mark = ot.Marker("abc", pos=[0, 0, 5])
+        mark = ot.PointMarker("abc", pos=[0, 0, 5])
 
         G = ot.Group([det, mark])
 

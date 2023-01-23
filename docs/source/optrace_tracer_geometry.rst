@@ -36,7 +36,11 @@ tracer.geometry.element
 _________________________________
 .. automodule:: optrace.tracer.geometry.element
 
-tracer.geometry.marker
+tracer.geometry.point_marker
 _________________________________
-.. automodule:: optrace.tracer.geometry.marker
+.. automodule:: optrace.tracer.geometry.point_marker
+
+tracer.geometry.line_marker
+_________________________________
+.. automodule:: optrace.tracer.geometry.line_marker
 

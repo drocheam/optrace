@@ -15,11 +15,18 @@ import optrace as ot
 class LoadTests(unittest.TestCase):
 
     def save_file(self, source, path):
-        r = requests.get(source)
 
-        # save to file
-        with open(path,'wb') as f:
-            f.write(r.content)
+        try:
+            r = requests.get(source)
+
+            # save to file
+            with open(path,'wb') as f:
+                f.write(r.content)
+
+            return True
+
+        except ConnectionResetError:
+            return False
 
     # normally we would download the file in __init__ and delete in __del__
     # but using unittest multiple objects of this class are created
@@ -85,7 +92,10 @@ class LoadTests(unittest.TestCase):
             # load web ressource
             print(file)
             temp_file = "temp.agf"
-            self.save_file(file, temp_file)
+            success = self.save_file(file, temp_file)
+
+            if not success:
+                continue
   
             # count lines with NM, which is the number of different media
             lin = ot.load._read_lines(temp_file)

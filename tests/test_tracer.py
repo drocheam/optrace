@@ -49,7 +49,7 @@ class TracerTests(unittest.TestCase):
         F = ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
         DET = ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 10])
         AP = ot.Aperture(ot.RingSurface(r=3, ri=0.2), pos=[0, 0, 10])
-        M = ot.Marker("Test", pos=[0, 0, 10])
+        M = ot.PointMarker("Test", pos=[0, 0, 10])
         L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3),
                        n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10])
 

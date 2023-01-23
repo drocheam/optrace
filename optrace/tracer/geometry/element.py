@@ -52,7 +52,7 @@ class Element(BaseClass):
                  **kwargs)\
             -> None:
         """
-        Parent class for Lens, RaySource, Detector, Aperture, Filter and Marker.
+        Parent class for Lens, RaySource, Detector, Aperture, Filter, PointMarker and LineMarker.
 
         :param front: front surface/point/line
         :param pos: 3D position of element

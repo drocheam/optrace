@@ -31,7 +31,7 @@ from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RIm
                      SphericalSurface, DataSurface1D, DataSurface2D, FunctionSurface2D, FunctionSurface1D,\
                      ConicSurface, RectangularSurface,\
                      RingSurface, CircularSurface, TiltedSurface, Spectrum, LightSpectrum, TransmissionSpectrum,\
-                     Point, Line, TMA, Group, Marker, AsphericSurface, IdealLens
+                     Point, Line, LineMarker, TMA, Group, PointMarker, AsphericSurface, IdealLens
 from ..tracer.geometry import Surface, Element
 from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
 
@@ -446,6 +446,7 @@ class TraceGUI(HasTraits):
         self._detector_plots = []
         self._ray_source_plots = []
         self._marker_plots = []
+        self._line_marker_plots = []
         self._index_box_plots = []
         self._crosshair = None
         self._orientation_axes = None
@@ -600,13 +601,18 @@ class TraceGUI(HasTraits):
 
     def __remove_objects(self, objs) -> None:
         """remove visual objects from raytracer geometry"""
+
+        # try to delete objects in pipeline while iterating over its parents and grandparents
         for obj in objs:
             for obji in obj[:4]:
                 if obji is not None:
-                    if obji.parent.parent.parent in self.scene.mayavi_scene.children:
-                        obji.parent.parent.parent.remove()
-                    if obji.parent.parent in self.scene.mayavi_scene.children:
-                        obji.parent.parent.remove()
+                    try:
+                        for i in range(4):
+                            if obji.parent in self.scene.mayavi_scene.children:
+                                obji.parent.remove()
+                            obji = obji.parent
+                    except:
+                        pass
 
         objs[:] = []
     
@@ -826,6 +832,7 @@ class TraceGUI(HasTraits):
         self._subtle_color = (0.3, 0.3, 0.3) if not self.high_contrast else (0.7, 0.7, 0.7)
         self._crosshair_color = (1, 0, 0)
         self._marker_color = (0, 1, 0) if not self.high_contrast else self.scene.foreground
+        self._line_marker_color = (0.8, 0, 0.8) if not self.high_contrast else self.scene.foreground
         self._outline_color = (0, 0, 0)
         self._raysource_alpha = 0.55
         self._axis_color = (1, 1, 1) if not self.high_contrast else (0, 0, 0)
@@ -1129,25 +1136,51 @@ class TraceGUI(HasTraits):
         # don't append and delete directly on elements of self.detector_names,
         # because issues with trait updates with type "List"
     
-    def _plot_markers(self) -> None:
-        """plot markers inside the scene"""
+    def _plot_point_markers(self) -> None:
+        """plot point markers inside the scene"""
         self.__remove_objects(self._marker_plots)
 
         for num, mark in enumerate(self.raytracer.markers):
-            m = self.scene.mlab.points3d(*mark.pos, mode="axes", color=self._marker_color)
-            m.parent.parent.name = f"Marker {num}"
-            m.actor.actor.property.trait_set(lighting=False, line_width=5)
-            m.actor.actor.trait_set(pickable=False, force_translucent=True)
-            radius  = 0.2 * mark.marker_factor
-            m.glyph.glyph.scale_factor = radius
-            m.visible = not mark.label_only
-        
-            text = self.scene.mlab.text(x=mark.pos[0]+radius, y=mark.pos[1], z=mark.pos[2], text=mark.desc, name="Label")
-            text.property.trait_set(**self.LABEL_STYLE, justification="center")
-            text.actor.text_scale_mode = 'none'
-            text.property.font_size = int(8 * mark.text_factor)
+            if isinstance(mark, PointMarker):
+                dx, dy = 0.2 * mark.marker_factor, 0
+                m = self.scene.mlab.points3d(*mark.pos, mode="axes", color=self._marker_color)
+                m.visible = not mark.label_only
+                m.glyph.glyph.scale_factor = dx
+                m.actor.actor.property.trait_set(lighting=False, line_width=5, representation="wireframe")
 
-            self._marker_plots.append((m, None, None, text, mark))
+                m.parent.parent.name = f"Marker {num}"
+                m.actor.actor.trait_set(pickable=False, force_translucent=True)
+            
+                text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
+                                            text=mark.desc, name="Label")
+                text.property.trait_set(**self.LABEL_STYLE, justification="center")
+                text.actor.text_scale_mode = 'none'
+                text.property.font_size = int(8 * mark.text_factor)
+
+                self._marker_plots.append((m, None, None, text, mark))
+    
+    def _plot_line_markers(self) -> None:
+        """plot line markers inside the scene"""
+        self.__remove_objects(self._line_marker_plots)
+
+        for num, mark in enumerate(self.raytracer.markers):
+            if isinstance(mark, LineMarker):
+                drx = mark.front.r*np.cos(np.radians(mark.front.angle))
+                dry = mark.front.r*np.sin(np.radians(mark.front.angle))
+                dx, dy = mark.pos[0]+drx, mark.pos[1]+dry
+                m = self.scene.mlab.plot3d([mark.pos[0]-drx, mark.pos[0]+drx], [mark.pos[1]-dry, mark.pos[1]+dry],
+                                           [mark.pos[2], mark.pos[2]], tube_radius=0, color=self._line_marker_color)
+
+                m.actor.actor.property.trait_set(lighting=False, line_width=mark.line_factor, representation="wireframe")
+                m.parent.parent.parent.parent.name = f"Marker {num}"
+                m.actor.actor.trait_set(pickable=False, force_translucent=True)
+            
+                text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], text=mark.desc, name="Label")
+                text.property.trait_set(**self.LABEL_STYLE, justification="center")
+                text.actor.text_scale_mode = 'none'
+                text.property.font_size = int(8 * mark.text_factor)
+
+                self._line_marker_plots.append((m, None, None, text, mark))
 
     def _init_crosshair(self) -> None:
         """init a crosshair for the picker"""
@@ -1422,7 +1455,8 @@ class TraceGUI(HasTraits):
                 self._plot_apertures()
 
             if all_ or change["Markers"]:
-                self._plot_markers()
+                self._plot_point_markers()
+                self._plot_line_markers()
             
             if all_ or change["Detectors"]:
                 # no threading and __detector_lock here, since we're only updating the list
@@ -1540,9 +1574,9 @@ class TraceGUI(HasTraits):
 
         # update misc color
         for color, objs in zip([self._lens_color, self._detector_color, self._aperture_color, self._marker_color,
-                                self._crosshair_color, self._outline_color],
+                                self._line_marker_color, self._crosshair_color, self._outline_color],
                                [self._lens_plots, self._detector_plots, self._aperture_plots,
-                                self._marker_plots, [[self._crosshair]], self._outline_plots]):
+                                self._marker_plots, self._line_marker_plots, [[self._crosshair]], self._outline_plots]):
             for obj in objs:
                 for el in obj[:3]:
                     if el is not None:
@@ -1680,10 +1714,11 @@ class TraceGUI(HasTraits):
 
                             # remove old markers, generate and plot new ones
                             self.raytracer.remove(self._fault_markers)
-                            self._fault_markers = [Marker("COLLISION", pos=pfault[ind], text_factor=1.5, marker_factor=1.5)\
+                            self._fault_markers = [PointMarker("COLLISION", pos=pfault[ind], text_factor=1.5, 
+                                                               marker_factor=1.5)\
                                                   for ind in f_ind]
                             self.raytracer.add(self._fault_markers)
-                            self._plot_markers()
+                            self._plot_point_markers()
 
                         self._status["Tracing"] -= 1
 
@@ -1696,7 +1731,7 @@ class TraceGUI(HasTraits):
                         if self._fault_markers:
                             self.raytracer.remove(self._fault_markers)
                             self._fault_markers = []
-                            self._plot_markers()
+                            self._plot_point_markers()
 
                         self._status["Tracing"] -= 1
                         self.replot_rays()
@@ -2178,7 +2213,7 @@ class TraceGUI(HasTraits):
             else dict(justification="left", orientation=90, vertical_justification="center")
 
         for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
-                     self._marker_plots, self._index_box_plots, self._ray_source_plots]:
+                     self._marker_plots, self._line_marker_plots, self._index_box_plots, self._ray_source_plots]:
             for obj in objs:
                 for obji in obj:
                     if isinstance(obji, mayavi.modules.text.Text):

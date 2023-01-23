@@ -93,16 +93,21 @@ mu = L/f_ok * 254/f_obj
 print(f"Approximate Magnification: {mu:.1f}x")
 
 # add markers focal points
-RT.add(ot.Marker("F_obj", [0, 0, tma_obj.focal_points[0]]))
-RT.add(ot.Marker("F_obj", [0, 0, tma_obj.focal_points[1]]))
-RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_points[0]]))
-RT.add(ot.Marker("F_ok", [0, 0, tma_ok.focal_points[1]]))
+RT.add(ot.PointMarker("F_obj", [0, 0, tma_obj.focal_points[0]]))
+RT.add(ot.PointMarker("F_obj", [0, 0, tma_obj.focal_points[1]]))
+RT.add(ot.PointMarker("F_ok", [0, 0, tma_ok.focal_points[0]]))
+RT.add(ot.PointMarker("F_ok", [0, 0, tma_ok.focal_points[1]]))
 
 # add misc markers
-RT.add(ot.Marker("Objective", [-14, 0, L01.pos[2]+2], label_only=True, text_factor=1.2))
-RT.add(ot.Marker("Body Tube", [-14, 0, (L02.pos[2] + L12.pos[2])/2], label_only=True, text_factor=1.2))
-RT.add(ot.Marker("Eyepiece", [-14, 0, L11.pos[2]], label_only=True, text_factor=1.2))
-RT.add(ot.Marker("Eye", [-14, 0, RT.lenses[-1].pos[2] + 10], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Objective", [-14, 0, L01.pos[2]+2], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Body Tube", [-14, 0, (L02.pos[2] + L12.pos[2])/2], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Eyepiece", [-14, 0, L11.pos[2]], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Eye", [-14, 0, RT.lenses[-1].pos[2] + 10], label_only=True, text_factor=1.2))
+
+# add line markers
+RT.add(ot.LineMarker(r=5, pos=[0, 0, RS.pos[2]], desc="Object\nPlane"))
+RT.add(ot.LineMarker(r=5, pos=[0, 0, tma_ok.focal_points[0]], desc="Intermed.\nImage"))
+RT.add(ot.LineMarker(r=7, pos=[0, 0, RT.detectors[-1].pos[2]], desc="Image\nPlane"))
 
 # start GUI.
 sim = TraceGUI(RT, minimalistic_view=True, ray_count=2000000)

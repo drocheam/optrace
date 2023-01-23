@@ -31,7 +31,8 @@ from .geometry.ideal_lens import IdealLens
 from .geometry.aperture import Aperture
 from .geometry.filter import Filter
 from .geometry.detector import Detector
-from .geometry.marker import Marker
+from .geometry.line_marker import LineMarker
+from .geometry.point_marker import PointMarker
 from .geometry.group import Group
 
 from . import load
