@@ -168,7 +168,7 @@ class PresetTests(unittest.TestCase):
         plt.close('all')
     
     @pytest.mark.slow
-    def test_geometry_presets(self):
+    def test_geometry_eye_presets(self):
 
         def base_RT():
             RT = ot.Raytracer(outline=[-30, 30, -30, 30, -50, 200], silent=True)
@@ -178,7 +178,7 @@ class PresetTests(unittest.TestCase):
             return RT
 
         # test example geometries without parameters
-        for geom_func in ot.presets.geometry.geometries:
+        for geom_func in ot.presets.geometry.eye_models:
             RT = base_RT()
             geom = geom_func()
             RT.add(geom)
@@ -211,6 +211,47 @@ class PresetTests(unittest.TestCase):
             self.assertEqual(RT.apertures[-1].surface.ri, P / 2)
             self.assertTrue(np.allclose(RT.lenses[0].pos - pos - [0, 0, 0.25], 0))
 
+
+    def test_0geometry_camera_preset(self):
+        """check that ideal camera preset gets calculated correctly"""
+
+        RT = ot.Raytracer(outline=[-20, 20, -20, 20, -2000, 2000], silent=True)
+
+        for z_g in [-1000, -52, -3.59]:  # different object distances
+            for b in [2, 125, 369]:  # different image distances
+                for cam_pos in [[0, 0, 0], [-3, 2, 50]]:  # different camera positions
+
+                    # create a point source
+                    r_det = 10
+                    div_angle = np.degrees(np.arctan(r_det/(cam_pos[2] - z_g))/2)
+                    RS = ot.RaySource(ot.Point(), pos=[cam_pos[0], cam_pos[1], z_g],
+                                      div_angle=div_angle, divergence="Isotropic")
+                    RT.add(RS)
+
+                    # add camera and aperture at image plane
+                    RT.add(ot.presets.geometry.ideal_camera(z_g=z_g, cam_pos=cam_pos, b=b, r_det=r_det, r=r_det))
+                    RT.add(ot.Aperture(ot.CircularSurface(r=8), pos=RT.detectors[0].pos))
+
+                    RT.trace(10000)
+
+                    # check that image distance is correct and that the image is a point
+                    self.assertAlmostEqual(np.std(RT.rays.p_list[:, -1, :2] - cam_pos[:2]), 0, delta=1e-10)
+                    self.assertAlmostEqual(RT.detectors[0].pos[2] - RT.lenses[0].pos[2], b)
+                    
+                    RT.clear()
+
+        # check assignment of r_det and r
+        G = ot.presets.geometry.ideal_camera(z_g=-1000, cam_pos=[0, 0, 5], b=10, r=6.3, r_det=5.4)
+        self.assertEqual(G.lenses[0].front.r, 6.3)
+        self.assertEqual(G.detectors[0].front.dim[0], 2*5.4)
+
+        # for g = -inf, D of the lens is just 1/b (because of 1/f = 1/b + 1/g)
+        G = ot.presets.geometry.ideal_camera(z_g=-np.inf, b=5, cam_pos=[0, 0, 0])
+        self.assertAlmostEqual(G.lenses[0].D, 1000/5)
+
+        # check if negative b and g are handled correctly
+        self.assertRaises(ValueError, ot.presets.geometry.ideal_camera, z_g=5, b=5, cam_pos=[0, 0, 0])
+        self.assertRaises(ValueError, ot.presets.geometry.ideal_camera, z_g=-5, b=-5, cam_pos=[0, 0, 0])
 
 if __name__ == '__main__':
     unittest.main()

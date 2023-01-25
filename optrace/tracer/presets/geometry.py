@@ -1,9 +1,44 @@
 
 import numpy as np  # np.ndarray type
 
-from ..geometry import Aperture, Detector, Lens, SphericalSurface,\
-        ConicSurface, RingSurface, Group  # Elements and Surfaces in the preset geometries
+from ..geometry import Aperture, Detector, Lens, IdealLens, SphericalSurface,\
+        RectangularSurface, ConicSurface, RingSurface, Group  # Elements and Surfaces in the preset geometries
 from ..refraction_index import RefractionIndex  # media in the geometries
+
+from ..misc import PropertyChecker as pc
+
+
+# helper tools
+#######################################################################################################################
+
+def ideal_camera(cam_pos:   np.ndarray, 
+                 z_g:       float, 
+                 b:         float = 10, 
+                 r:         float = 6, 
+                 r_det:     float = 6)\
+        -> Group:
+    """
+    Create an ideally imaging camera, consisting of a lens and a detector area.
+    Returns a Group of both elements.
+
+    :param cam_pos: position of camera
+    :param z_g: position of object
+    :param b: image distance (distance between lens and detector)
+    :param r: radius of the camera lens
+    :param r_det: radius of the detector area
+    :return: Group object with Lens and Detector
+    """
+    pc.check_above("b", b, 0)
+    pc.check_above("g = cam_pos[2] - z_g", cam_pos[2] - z_g, 0)
+
+    g = cam_pos[2] - z_g
+    D = (1/b + 1/g)*1000   # from imaging equation D = 1/f = 1/b + 1/g
+
+    IL = IdealLens(pos=cam_pos, r=r, D=D, long_desc="Camera Objective", desc="Obj")
+    DET = Detector(RectangularSurface([2*r_det, 2*r_det]), pos=np.array(cam_pos)+[0, 0, b],
+                   long_desc="Camera Sensor", desc="Sensor")
+
+    return Group([IL, DET], long_desc="Ideal Camera", desc="Camera")
 
 
 # Eye models
@@ -130,4 +165,4 @@ eye_models: list = [legrand_eye, arizona_eye]
 # list with all geometries
 #######################################################################################################################
 
-geometries: list = [*eye_models]
+geometries: list = [ideal_camera, *eye_models]

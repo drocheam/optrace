@@ -497,13 +497,13 @@ class SpectrumTests(unittest.TestCase):
         spec = ot.LightSpectrum("Data", wls=wl, vals=vals)
         self.assertAlmostEqual(spec.fwhm(), wl[1]-wl[0], delta=0.01) 
         
-    def test_light_spectrum_peak(self):
+    def test_light_spectrum_peak_wavelength(self):
         """test peak wavelength"""
 
         # monochromatic
         spec = ot.LightSpectrum("Monochromatic", wl=381)
         self.assertEqual(spec.peak_wavelength(), spec.wl)
-        
+       
         # lines
         spec = ot.LightSpectrum("Lines", lines=[420, 510, 680], line_vals=[2, 3, 1])
         self.assertEqual(spec.peak_wavelength(), 510)
@@ -665,11 +665,20 @@ class SpectrumTests(unittest.TestCase):
         # constant function
         spec = ot.LightSpectrum("Function", func=lambda x: 1/(color.WL_BOUNDS[1] - color.WL_BOUNDS[0]))
         self.assertAlmostEqual(spec.power(), 1, delta=1e-5)
+        
+        # histogram
+        wl = color.wavelengths(1001)
+        w = np.ones_like(wl)*0.5
+        spec = ot.LightSpectrum.render(wl, w)
+        self.assertAlmostEqual(spec.power(), wl.shape[0]*0.5)
 
     def test_light_spectrum_peak(self):
 
         spec = ot.LightSpectrum("Monochromatic", wl=555, val=2)
         self.assertAlmostEqual(spec.peak(), 2)
+        
+        spec = ot.LightSpectrum("Lines", lines=[420, 531.2, 587.6], line_vals=[1., 2.3, 0.5])
+        self.assertAlmostEqual(spec.peak(), 2.3)
 
         spec = ot.LightSpectrum("Function", func=lambda x: np.exp(-(x-550)**2/50))
         self.assertAlmostEqual(spec.peak(), 1, delta=1e-5)

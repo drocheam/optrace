@@ -97,7 +97,40 @@ When adding objects, the order of objects remains the same.
 Thus ``lenses[2]`` denotes the lens that was added third (since counting starts at 0).
 In principle it is recommended to add objects in the order in which the light passes through them.
 
-.. TODO example
+**Example**
+
+The following example creates a Group consisting of an IdealLens and an Aperture.
+
+.. testcode::
+
+   IL = ot.IdealLens(r=6, D=-20, pos=[0, 0, 10])
+   F = ot.Aperture(ot.RingSurface(ri=0.5, r=10), pos=[0, 0, 30])
+
+   G = ot.Group([IL, F])
+
+Next, we flip the group, reversing the z-order of the elements and flipping each element around its x-axis through the center.
+Since all elements are rotationally symmetric, this has only a effect on the order of them.
+After flipping we move the group to a new position. This position is the new position for the first element (which after flipping is the Filter), whereas all relative distances to all other elements are kept equal.
+
+.. testcode::
+
+   G.flip()
+   G.move_to([0, 1, 0])
+
+The filter is the first element and has the same position as we moved the group to.
+
+.. doctest::
+
+   >>> G.apertures[0].pos
+   array([0., 1., 0.])
+
+The lens has the same relative distance of :math:`\Delta z = 20` mm relative to the Filter, but in a different absolute position and now behind the filter.
+
+.. doctest::
+
+   >>> G.lenses[0].pos
+   array([ 0.,  1., 20.])
+
 
 Raytracer
 ________________
@@ -239,6 +272,40 @@ Information on the file format can be found `here <https://documents.pub/documen
 Geometry Presets
 _______________________
 
+
+**Ideal Camera**
+
+.. TODO add figure describing the parameters
+
+In cases of a virtual image, an additional lens or lens system is needed to create a real image.
+Real lens systems come with aberrations and falsify the virtual image by adding additional errors.
+
+For this application an ideal camera preset is included, that provides aberration-free imaging towards a detector.
+
+The preset is loaded with ``ot.presets.geometry.ideal_camera`` and returns a Group object consisting of a lens and a detector.
+Required parameters are the object position ``z_g`` as well as the camera position (the position of the lens) ``cam_pos``, as well as the image distance ``b``, which in this case is just the difference distance between lens and detector.
+
+.. testcode::
+
+   G = ot.presets.geometry.ideal_camera(cam_pos=[1, -2.5, 12.3], z_g=-56.06, b=10)
+
+In many cases the additional lens diameter parameter ``r`` and detector radius ``r_det`` need to be provided:
+
+.. testcode::
+
+   G = ot.presets.geometry.ideal_camera(cam_pos=[1, -2.5, 12.3], z_g=-56.06, b=10, r=5, r_det=8)
+
+The function also supports an infinite position of ``z_g = -np.inf``.
+
+When given a desired object magnification :math:`m`, the image distance parameter :math:`b` can be calculated with:
+
+.. math::
+
+   m = \frac{b}{g} \Rightarrow b = m \cdot g
+
+Which should be known from the fundamentals of optics.
+Where :math:`g` is the object distance, in our example ``z_g - cam_pos[2]``.
+Note that :math:`b, g`  both need to be positive for this preset.
 
 **LeGrand Paraxial Eye Model**
 

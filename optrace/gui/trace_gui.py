@@ -29,13 +29,11 @@ import mayavi.modules.text  # Text type
 # provides types and plotting functionality, most of these are also imported for the TCP protocol scope
 from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex,\
                      SphericalSurface, DataSurface1D, DataSurface2D, FunctionSurface2D, FunctionSurface1D,\
-                     ConicSurface, RectangularSurface,\
+                     ConicSurface, RectangularSurface, presets, color, misc,\
                      RingSurface, CircularSurface, TiltedSurface, Spectrum, LightSpectrum, TransmissionSpectrum,\
                      Point, Line, LineMarker, TMA, Group, PointMarker, AsphericSurface, IdealLens
 from ..tracer.geometry import Surface, Element
 from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
-
-from ..tracer import presets, color, misc
 
 from .property_browser import PropertyBrowser  # dictionary browser
 from .command_window import CommandWindow
@@ -606,13 +604,13 @@ class TraceGUI(HasTraits):
         for obj in objs:
             for obji in obj[:4]:
                 if obji is not None:
-                    try:
-                        for i in range(4):
-                            if obji.parent in self.scene.mayavi_scene.children:
-                                obji.parent.remove()
-                            obji = obji.parent
-                    except:
-                        pass
+                    # try:
+                    for i in range(4):
+                        if obji.parent in self.scene.mayavi_scene.children:
+                            obji.parent.remove()
+                        obji = obji.parent
+                    # except:
+                        # pass
 
         objs[:] = []
     

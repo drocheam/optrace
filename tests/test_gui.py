@@ -984,10 +984,16 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.show_detector_cut)
                 sim._wait_for_idle()
 
+                # refraction index box replotting with vertical labels
+                sim._set_in_main("vertical_labels", True)
+                sim._do_in_main(sim.replot)
+                sim._wait_for_idle()
+
                 # mock no_pol mode, check if coloring type handles this
                 RT.no_pol = True
                 sim._set_in_main("coloring_type", "Polarization yz")
                 sim._wait_for_idle()
+
                 # same but without messages
                 sim.silent = True
                 sim._set_in_main("coloring_type", "Polarization yz")
