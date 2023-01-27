@@ -387,7 +387,16 @@ Calling the filter with wavelengths returns the transmittance at these wavelengt
    >>> F(wl)
    array([0. , 0.5, 0. ])
 
-.. TODO note on t threshold
+
+When tracing the Raytracer sets all transmission values below a specific threshold ``T_TH`` to zero. This is done to avoid ghost rays, that are rays that merely contribute to the light distribution or image but are nonetheless calculated and reduce performance. An example could be rays far away from the mean value in normal distribution/ gaussian function.
+
+By default the threshold value is
+
+.. doctest::
+
+   >>> ot.Raytracer.T_TH
+   1e-05
+
 
 Aperture
 ________________

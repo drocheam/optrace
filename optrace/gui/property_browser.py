@@ -157,7 +157,7 @@ class PropertyBrowser(HasTraits):
                     dict(nodal_points=tma.nodal_points, d=tma.d, n1=tma.n1, n2=tma.n2,
                          focal_points=tma.focal_points, focal_lengths=tma.focal_lengths,
                          focal_lengths_n=tma.focal_lengths_n, principal_points=tma.principal_points,
-                         vertex_points=tma.vertex_point, abcd=tma.abcd, efl=tma.efl, efl_n=tma.efl_n,
+                         vertex_points=tma.vertex_points, abcd=tma.abcd, efl=tma.efl, efl_n=tma.efl_n,
                          powers=tma.powers, powers_n=tma.powers_n, bfl=tma.bfl, ffl=tma.ffl,
                          optical_center=tma.optical_center)
 

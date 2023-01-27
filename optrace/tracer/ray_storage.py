@@ -215,7 +215,7 @@ class RayStorage(BaseClass):
                     s = misc.normalize(s)
             else:
                 s = self.p_list[ch, 1:] - self.p_list[ch, :-1]
-                s = np.hstack((s, np.zeros((s.shape[0], 1, 3), order='F')))
+                s = np.hstack((s, np.zeros((s.shape[0], 1, 3), order='F', dtype=np.float64)))
                 if normalize:
                     s_ = s.reshape((s.shape[0]*s.shape[1], 3))
                     s = misc.normalize(s_).reshape(s.shape)

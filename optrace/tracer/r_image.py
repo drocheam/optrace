@@ -377,7 +377,6 @@ class RImage(BaseClass):
                 for i in range(Nz):
                     threaded(i, self._img, self.img)
 
-    # TODO test
     def refilter(self) -> None:
         """reapplies image filtering with the current limit setting"""
         self.rescale(self.N)

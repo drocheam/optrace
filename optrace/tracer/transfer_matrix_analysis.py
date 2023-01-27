@@ -45,7 +45,7 @@ class TMA(BaseClass):
 
         L = sorted(lenses, key=lambda el: el.front.pos[2])
 
-        self.vertex_point: tuple[float, float] = (L[0].front.pos[2], L[-1].back.pos[2]) if len(lenses)\
+        self.vertex_points: tuple[float, float] = (L[0].front.pos[2], L[-1].back.pos[2]) if len(lenses)\
                                                  else (np.nan, np.nan)
         """z-position of vertex points"""
 
@@ -55,7 +55,7 @@ class TMA(BaseClass):
         self.n2: float = L[-1].n2(self.wl) if len(lenses) and L[-1].n2 is not None else self.n1
         """refraction index value after the lens setup"""
 
-        _1, _2 = self._1, self._2 = self.vertex_point
+        _1, _2 = self._1, self._2 = self.vertex_points
         
         self._ds = []  # position list
         self._mats = []  # ABCD matrix list
@@ -292,7 +292,7 @@ class TMA(BaseClass):
         :return: absolute image z-position
         """
         if self._1 < z_g < self._2:
-            raise ValueError(f"Object inside lens with z-extent at optical axis of {self.vertex_point}")
+            raise ValueError(f"Object inside lens with z-extent at optical axis of {self.vertex_points}")
 
         g = self._1 - z_g
         b = self._obj_dist(self.abcd, g, rev=False)
@@ -319,7 +319,7 @@ class TMA(BaseClass):
         :return: z-position of object
         """
         if self._1 < z_b < self._2:
-            raise ValueError(f"Image inside lens with z-extent at optical axis of {self.vertex_point}")
+            raise ValueError(f"Image inside lens with z-extent at optical axis of {self.vertex_points}")
         
         b = z_b - self._2
         g = self._obj_dist(self.abcd, b, rev=True)

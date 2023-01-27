@@ -1151,9 +1151,11 @@ class TraceGUI(HasTraits):
             
                 text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
                                             text=mark.desc, name="Label")
-                text.property.trait_set(**self.LABEL_STYLE, justification="center")
                 text.actor.text_scale_mode = 'none'
                 text.property.font_size = int(8 * mark.text_factor)
+                tprop = dict(justification="center") if not self.vertical_labels\
+                        else dict(justification="left", orientation=90, vertical_justification="center")
+                text.property.trait_set(**self.LABEL_STYLE, **tprop)
 
                 self._marker_plots.append((m, None, None, text, mark))
     
@@ -1174,9 +1176,11 @@ class TraceGUI(HasTraits):
                 m.actor.actor.trait_set(pickable=False, force_translucent=True)
             
                 text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], text=mark.desc, name="Label")
-                text.property.trait_set(**self.LABEL_STYLE, justification="center")
                 text.actor.text_scale_mode = 'none'
                 text.property.font_size = int(8 * mark.text_factor)
+                tprop = dict(justification="center") if not self.vertical_labels\
+                        else dict(justification="left", orientation=90, vertical_justification="center")
+                text.property.trait_set(**self.LABEL_STYLE, **tprop)
 
                 self._line_marker_plots.append((m, None, None, text, mark))
 

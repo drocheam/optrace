@@ -32,7 +32,7 @@ class Raytracer(Group):
     N_EPS: float = 1e-11
     """ numerical epsilon. Used for floating number comparisions in some places or adding small differences """
 
-    T_TH: float = 1e-4
+    T_TH: float = 1e-5
     """ threshold for the transmission Filter
     values below this are handled as absorbed
     needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power"""

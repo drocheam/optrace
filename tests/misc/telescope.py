@@ -45,7 +45,7 @@ front = ot.SphericalSurface(r=r1, R=R1/2)
 back = ot.CircularSurface(r=r1)
 L1 = ot.Lens(front, back, n=n_, pos=[0, 0, 0], de=0.5)
 RT.add(L1)
-L1.move_to([0, 0, L1.pos[2] - L1.tma().vertex_point[0]])
+L1.move_to([0, 0, L1.pos[2] - L1.tma().vertex_points[0]])
 
 # Objective
 front = ot.CircularSurface(r=r2)

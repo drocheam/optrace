@@ -44,6 +44,10 @@ class ExampleTests(unittest.TestCase):
         self.execute("custom_surfaces.py")
     
     @pytest.mark.slow
+    def test_legrand_eye(self):
+        self.execute("legrand_eye_model.py")
+    
+    @pytest.mark.slow
     def test_sphere_projections(self):
         self.execute("sphere_projections.py")
     
