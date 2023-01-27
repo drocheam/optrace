@@ -84,8 +84,7 @@ class LoadTests(unittest.TestCase):
         webfiles += ["https://lweb.cfa.harvard.edu/~aas/pisco/model330/zemax_files/MY_I_LINE.AGF",
                      "https://lweb.cfa.harvard.edu/~aas/pisco/model330/zemax_files/SAFE.AGF",
                      "https://lweb.cfa.harvard.edu/~aas/pisco/model330/zemax_files/SCHOTT.AGF",
-                     "https://usn.figshare.com/ndownloader/files/9478777",
-                     "https://web.archive.org/web/20060516122137/http://www.zemax.com/file_exchange/user/Eye_best.agf"]
+                     "https://usn.figshare.com/ndownloader/files/9478777"]
 
         for file in webfiles:
 

@@ -1,38 +1,38 @@
-import gc  # garbage collector stats
 import copy # copy.deepcopy()
 import time  # provides sleeping
 import warnings  # show warnings
 import traceback  # traceback printing
+import gc  # garbage collector stats
 from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context manager for _no_trait_action()
-
-import numpy as np  # calculations
-import matplotlib.pyplot as plt  # closing plot windows
 
 # enforce qt backend
 from traits.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt'
 
-from pyface.qt import QtGui  # closing UI elements
 from pyface.api import GUI as pyface_gui  # invoke_later() method
+from pyface.qt import QtGui  # closing UI elements
 
 # traits types and UI elements
-from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeEditor
 from traitsui.api import Group as TGroup
+from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeEditor
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool
 
+import mayavi.modules.text  # Text type
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from mayavi.sources.parametric_surface import ParametricSurface  # provides outline and axes
-import mayavi.modules.text  # Text type
+
+import matplotlib.pyplot as plt  # closing plot windows
+import numpy as np  # calculations
 
 # provides types and plotting functionality, most of these are also imported for the TCP protocol scope
+from ..tracer.geometry import Surface, Element
 from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex,\
                      SphericalSurface, DataSurface1D, DataSurface2D, FunctionSurface2D, FunctionSurface1D,\
                      ConicSurface, RectangularSurface, presets, color, misc,\
                      RingSurface, CircularSurface, TiltedSurface, Spectrum, LightSpectrum, TransmissionSpectrum,\
                      Point, Line, LineMarker, TMA, Group, PointMarker, AsphericSurface, IdealLens
-from ..tracer.geometry import Surface, Element
 from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
 
 from .property_browser import PropertyBrowser  # dictionary browser

@@ -1,5 +1,8 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.3.2   |   2023-01-25   |   Added ideal_camera geometry preset. 
+  1.3.1   |   2023-01-23   |   Renamed Marker to PointMarker. New LineMarker element class. 
+  1.3.0   |   2023-01-20   |   New wavelength (peak_wavelength, fwhm, ...) and spectrum characteristics (peak, power, ...) for LightSpectrum. Units are now enforced. New property view for rendered spectra in TraceGUI. Renamed some functions. 
   1.2.6   |   2023-01-17   |   Clearer TMA names. New "optical_center" property in TMA. 
   1.2.5   |   2023-01-16   |   Removed pooch dependency. Now there are multiple scene image presets available (cell, group photo, interior, landscape). 
   1.2.4   |   2023-01-13   |   New functions pupil_position and pupil_magnification in TMA for calculating entrance and exit pupil. 

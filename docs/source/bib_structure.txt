@@ -43,8 +43,9 @@
     │   ├── ideal_lens.py
     │   ├── __init__.py
     │   ├── lens.py
+    │   ├── line_marker.py
     │   ├── line.py
-    │   ├── marker.py
+    │   ├── point_marker.py
     │   ├── point.py
     │   ├── ray_source.py
     │   └── surface
@@ -83,4 +84,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-11 directories, 73 files
+11 directories, 74 files
