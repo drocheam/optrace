@@ -113,7 +113,7 @@ def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
 
 def luv_to_u_v_l(luv: np.ndarray) -> np.ndarray:
     """
-    Convert to CIELUV to chromacity color space u'v'L
+    Convert to CIELUV to chromaticity color space u'v'L
 
     :param luv: CIELUV image, 2D image with channels in third dimension
     :return: u'v'L image, same shape as input

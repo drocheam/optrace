@@ -2,7 +2,7 @@
 import numpy as np  # calculations
 import matplotlib.pyplot as plt  # actual plotting
 
-from ..tracer import color as mcolor  # color conversions for chromacity plots
+from ..tracer import color as mcolor  # color conversions for chromaticity plots
 from ..tracer.spectrum import Spectrum, LightSpectrum
 from ..tracer.refraction_index import RefractionIndex
 from .misc_plots import _set_font, _show_grid

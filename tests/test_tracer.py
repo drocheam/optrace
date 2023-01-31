@@ -412,7 +412,7 @@ class TracerTests(unittest.TestCase):
             RT.remove(RS)
 
     @pytest.mark.slow
-    def test_0ray_source_divergence(self):
+    def test_ray_source_divergence(self):
         """
         tests the behaviour of different ray source divergence modes in 2D and 3D mode
         to check the function f we multiply the irradiance curve on the detector with 1/f
@@ -420,11 +420,11 @@ class TracerTests(unittest.TestCase):
         we check the standard deviation on this curve
         """
 
-        # we can't use spherical detectorsf for testing, 
+        # we can't use spherical detectors for testing, 
         # since the projection is not equidistant and equal-area at the same time
 
         # make raytracer
-        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True)
+        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True, no_pol=True)
 
         RSS0 = ot.RectangularSurface(dim=[0.02, 0.02])
         RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=True,
@@ -1004,7 +1004,7 @@ class TracerTests(unittest.TestCase):
         self.assertEqual(len(sim), 0)
 
         # call with explicit position
-        sim, dim = RT.iterative_render(N_rays, pos=13.3, silent=True)
+        sim, dim = RT.iterative_render(N_rays, pos=[0, 0, 13.3], silent=True)
         
         # call with explicit extent = [...]
         ext2 = [0, *RT.detectors[0].extent[1:4]]
@@ -1033,29 +1033,29 @@ class TracerTests(unittest.TestCase):
         self.assertEqual(dim[0].limit, 5)
         
         # call with multiple positions
-        sim, dim = RT.iterative_render(N_rays, pos=[0, 5], silent=True)
+        sim, dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]], silent=True)
         self.assertEqual(len(dim), 2)
         
         # call with multiple positions and detector_indices
-        sim, dim = RT.iterative_render(N_rays, pos=[0, 5], 
+        sim, dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]], 
                                        detector_index=[0, 1], silent=True)
         self.assertEqual(len(dim), 2)
         self.assertNotEqual(dim[0].projection, dim[1].projection) 
         # the detectors have different coordinate types
 
         # call with multiple positions and detector pixel numbers
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[0, 5], 
+        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
                                        N_px_D=[5, 500], silent=True)
         self.assertNotEqual(dim[0].Nx, dim[1].Nx) 
         
         # call with multiple positions and projection_methods
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[0, 5], 
+        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
                                        N_px_D=500, silent=True, detector_index=1,
                                        projection_method=["Equidistant", "Equal-Area"])
         self.assertNotEqual(dim[0].projection, dim[1].projection) 
         
         # call with multiple positions and limits
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[0, 5], 
+        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
                                        N_px_D=500, silent=True, detector_index=1,
                                        limit=[10, 12])
         self.assertNotEqual(dim[0].limit, dim[1].limit) 
@@ -1066,7 +1066,7 @@ class TracerTests(unittest.TestCase):
         self.assertNotEqual(sim[0].Nx, sim[1].Nx) 
         
         # call with multiple positions and detector pixel numbers
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[0, 5],
+        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]],
                                        extent=[None, [-1, 1, 2, 3]], silent=True)
         self.assertFalse(np.all(dim[0].extent == dim[1].extent)) 
         
@@ -1085,9 +1085,9 @@ class TracerTests(unittest.TestCase):
         # ^--  len(projection_method) != len(pos)
         self.assertRaises(ValueError, RT.iterative_render, 10000, detector_index=[0, 1])  
         # len(detector_index) != len(pos)
-        self.assertRaises(ValueError, RT.iterative_render, 10000, detector_index=[0, 1], pos=[0])  
+        self.assertRaises(ValueError, RT.iterative_render, 10000, detector_index=[0, 1], pos=[0, 0, 0])  
         # len(detector_index) != len(pos)
-        self.assertRaises(ValueError, RT.iterative_render, 10000, limit=[4, 1], pos=[0])  
+        self.assertRaises(ValueError, RT.iterative_render, 10000, limit=[4, 1], pos=[0, 0, 0])  
         # len(limit) != len(pos)
         
         # coverage tests:
@@ -1102,7 +1102,7 @@ class TracerTests(unittest.TestCase):
         RT.detectors = []
         sim, dim = RT.iterative_render(N_rays, silent=True)
 
-        self.assertRaises(RuntimeError, RT.iterative_render, 10000, pos=0)  # no detectors to move
+        self.assertRaises(RuntimeError, RT.iterative_render, 10000, pos=[0, 0, 0])  # no detectors to move
 
         RT.ray_sources = []
         self.assertRaises(RuntimeError, RT.iterative_render, 10000)  # no ray_sources

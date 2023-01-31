@@ -9,12 +9,12 @@ from ..tracer.misc import PropertyChecker as pc  # check types and values
 
 
 def r_image_plot(im:       RImage,
+                 mode:     str = RImage.display_modes[0],
                  imc:      np.ndarray = None,
                  block:    bool = False,
                  log:      bool = False,
                  flip:     bool = False,
-                 title:    str = None,
-                 mode:     str = RImage.display_modes[0])\
+                 title:    str = None)\
         -> None:
     """
 
@@ -98,12 +98,12 @@ def r_image_plot(im:       RImage,
 
 
 def r_image_cut_plot(im:       RImage,
+                     mode:     str = RImage.display_modes[0],
                      imc:      np.ndarray = None,
                      block:    bool = False,
                      log:      bool = False,
                      flip:     bool = False,
                      title:    str = None,
-                     mode:     str = RImage.display_modes[0],
                      **kwargs)\
         -> None:
     """

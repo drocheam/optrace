@@ -1,3 +1,3 @@
 #!/bin/bash
 
-tree -I "__pycache__" ./optrace > ./docs/source/bib_structure.txt
+tree -I "__pycache__" ./optrace > ./docs/source/library/structure.txt

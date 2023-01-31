@@ -53,9 +53,9 @@ class PlotTests(unittest.TestCase):
 
                 # image cut plots
                 for modei in ot.RImage.display_modes:
-                    otp.r_image_cut_plot(img, mode=modei, log=False, block=self.manual, x=0.1)
-                    otp.r_image_cut_plot(img, mode=modei, log=True, y=-0.156, block=self.manual)
-                otp.r_image_cut_plot(img, mode=ot.RImage.display_modes[0], flip=True, block=self.manual, x=0.3)
+                    otp.r_image_cut_plot(img, modei, log=False, block=self.manual, x=0.1)
+                    otp.r_image_cut_plot(img, modei, log=True, y=-0.156, block=self.manual)
+                otp.r_image_cut_plot(img, ot.RImage.display_modes[0], flip=True, block=self.manual, x=0.3)
                 plt.close('all')
 
                 # make image empty and check if plots can handle this
@@ -101,7 +101,7 @@ class PlotTests(unittest.TestCase):
         otp.r_image_plot(RIm, log=True, block=self.manual)  # log mode but zero image
 
     @pytest.mark.slow
-    def test_chromacity_plots(self) -> None:
+    def test_chromaticity_plots(self) -> None:
 
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
         RSS = ot.RectangularSurface(dim=[6, 6])
@@ -110,11 +110,11 @@ class PlotTests(unittest.TestCase):
         RT.trace(200000)
         img = RT.source_image(200)
         
-        # ChromacityPlots
+        # ChromaticityPlots
         # different paramter combinations
         for el in [ot.presets.light_spectrum.d65, ot.presets.light_spectrum.standard, img, []]:
-            for i, cie in enumerate([otp.chromacities_cie_1931, otp.chromacities_cie_1976]):
-                for normi in otp.chromacity_norms: 
+            for i, cie in enumerate([otp.chromaticities_cie_1931, otp.chromaticities_cie_1976]):
+                for normi in otp.chromaticity_norms:
                     title = None if not i else "Test title"  # sometimes set a different title
                     cie(el, norm=normi, block=self.manual)
                     if isinstance(el, ot.RImage):
@@ -123,17 +123,23 @@ class PlotTests(unittest.TestCase):
                             cie(el, norm=normi, rendering_intent=RIi, block=self.manual, **args)
                 plt.close("all")
 
+
+        # test empty calls
+        otp.chromaticities_cie_1931(block=self.manual)
+        otp.chromaticities_cie_1976(block=self.manual)
+
         # exception tests
-        self.assertRaises(TypeError, otp.chromacities_cie_1931, ot.Point())  # invalid type
-        self.assertRaises(TypeError, otp.chromacities_cie_1931, [ot.presets.light_spectrum.d65, 
-                                                               ot.Point()])  # invalid type in list
-        self.assertRaises(TypeError, otp.chromacities_cie_1976, ot.Point())  # invalid type
-        self.assertRaises(TypeError, otp.chromacities_cie_1976, [ot.presets.light_spectrum.d65, 
-                                                               ot.Point()])  # invalid type in list
-        self.assertRaises(TypeError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, block=[])  # invalid block type
-        self.assertRaises(TypeError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, title=[])  # invalid title type
-        self.assertRaises(ValueError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, norm="abc")  # invalid norm
-        self.assertRaises(ValueError, otp.chromacities_cie_1931, ot.presets.light_spectrum.d65, rendering_intent="abc")  # invalid rendering_intent
+        self.assertRaises(TypeError, otp.chromaticities_cie_1931, ot.Point())  # invalid type
+        self.assertRaises(TypeError, otp.chromaticities_cie_1931, [ot.presets.light_spectrum.d65,
+                                                                   ot.Point()])  # invalid type in list
+        self.assertRaises(TypeError, otp.chromaticities_cie_1976, ot.Point())  # invalid type
+        self.assertRaises(TypeError, otp.chromaticities_cie_1976, [ot.presets.light_spectrum.d65,
+                                                                   ot.Point()])  # invalid type in list
+        self.assertRaises(TypeError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, block=[])  # invalid block type
+        self.assertRaises(TypeError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, title=[])  # invalid title type
+        self.assertRaises(ValueError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, norm="abc")  # invalid norm
+        self.assertRaises(ValueError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, rendering_intent="abc")  # invalid rendering_intent
+        self.assertRaises(ValueError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, norm="abc")  # invalid norm
         
     @pytest.mark.slow
     def test_spectrum_plots(self):

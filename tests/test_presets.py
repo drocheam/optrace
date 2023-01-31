@@ -125,7 +125,7 @@ class PresetTests(unittest.TestCase):
     def test_srgb_lines(self):
 
         # rgb lines have same dominant wavelength as rgb primaries
-        # so with srgb conversion with mode "Absolute" we should get the same chromacities as the primaries
+        # so with srgb conversion with mode "Absolute" we should get the same chromaticities as the primaries
         BGR = np.array(ot.presets.spectral_lines.rgb)
         XYZ = np.array([np.vstack((color.x_observer(BGR),
                                    color.y_observer(BGR),
@@ -163,7 +163,7 @@ class PresetTests(unittest.TestCase):
             RT.trace(500000)
             img = RT.source_image(256)
             
-            otp.r_image_plot(img)
+            otp.r_image_plot(img, "sRGB (Absolute RI)")
 
         plt.close('all')
     

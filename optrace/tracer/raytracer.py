@@ -1128,7 +1128,7 @@ class Raytracer(Group):
         :param N_px_D: number/list of detector image pixels for smaller image size
         :param N_px_S: number/list of source image pixels for smaller image size
         :param detector_index: number/list of detector indices
-        :param pos: position/list of the detector(s)
+        :param pos: 3D position(s) of the detector(s)
         :param projection_method: type/list of projection methods for SphericalSurface
         :param limit: list/resolution limits for detector images
         :param silent: if all standard output should be muted
@@ -1153,9 +1153,9 @@ class Raytracer(Group):
             if pos is None:
                 if isinstance(detector_index, list):
                     raise ValueError("detector_index list needs to have the same length as pos list")
-                pos = [self.detectors[detector_index].pos[2]]
+                pos = [self.detectors[detector_index].pos]
 
-            elif not isinstance(pos, list):
+            elif isinstance(pos, list) and not isinstance(pos[0], list):
                 pos = [pos]
 
             if not isinstance(N_px_D, list):
@@ -1231,8 +1231,7 @@ class Raytracer(Group):
             if self.detectors:
                 # for all detector positions
                 for j in np.arange(len(pos)):
-                    pos_new = np.concatenate((self.detectors[detector_index[j]].pos[:2], [pos[j]]))
-                    self.detectors[detector_index[j]].move_to(pos_new)
+                    self.detectors[detector_index[j]].move_to(pos[j])
                     Imi = self.detector_image(N=N_px_D[j], detector_index=detector_index[j], 
                                               extent=extentc[j], _dont_rescale=True, 
                                               projection_method=projection_method[j])

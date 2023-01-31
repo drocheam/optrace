@@ -27,6 +27,7 @@ def filter_func(wl):
     T = np.full_like(wl, 0.2)
     T[(wl < 450) | (wl > 630)] = 1
     return T
+
 f_surf = ot.FunctionSurface2D(func=lambda x, y:  np.zeros_like(x), mask_func=mask, r=3)
 t_spec = ot.TransmissionSpectrum("Function", func=filter_func)
 F = ot.Filter(f_surf, pos=[0, 0, 18], spectrum=t_spec)

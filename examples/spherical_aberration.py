@@ -89,7 +89,7 @@ sim = TraceGUI(RT, coloring_type="Source", ray_opacity=0.2)
 # the frontend is created, but we need to start it explicitly for it to run
 sim.run()
 
-# now is is running you can experiment with different features, e.g.
+# You can now experiment with different features, e.g.
 # 1. navigate in the three dimensional geometry
 # 2. click on intersections of rays with a surface to see ray properties
 # 3. play around with ray visual settings in the main tab

@@ -27,10 +27,10 @@ Det = ot.Detector(ot.RectangularSurface(dim=[10, 10]), pos=[0, 0, 36])
 RT.add(Det)
 
 # render and show detector image
-pos = [27., 30., 33., 36.]
+pos = [[0, 0, 27.], [0, 0, 30.], [0, 0, 33.], [0, 0, 36.]]
 _, Ims = RT.iterative_render(N_rays=15e6, N_px_D=200, pos=pos, no_sources=True)
 
 # show rendered images
 for i in np.arange(len(Ims)-1):
-    r_image_plot(Ims[i], block=False, mode="sRGB (Absolute RI)")
-r_image_plot(Ims[-1], block=True, mode="sRGB (Absolute RI)")
+    r_image_plot(Ims[i], "sRGB (Absolute RI)", block=False)
+r_image_plot(Ims[-1], "sRGB (Absolute RI)", block=True)

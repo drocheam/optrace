@@ -14,11 +14,11 @@ Optrace Documentation
    overview
    installation
    quickstart
-   usage
+   ./usage/usage
    examples
-   math
-   API
-   Development
+   ./math/math
+   ./library/library
+   ./development/development
 
 Indices and tables
 ==================

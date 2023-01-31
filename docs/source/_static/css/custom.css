@@ -14,6 +14,14 @@ div.related, div.footer, div.sphinxsidebar {
 }
 
 
+/* make sidebar sticky */
+/* and make sidebar scrollable if larger than rest of the page */
+div.sphinxsidebar {
+    position: fixed;
+    margin-left: 0;
+    max-height: 92%;
+    overflow-y: auto;
+}
 
 /** fix for equation numbers being display on top instead of on the right side
  * see https://github.com/readthedocs/sphinx_rtd_theme/pull/383#issuecomment-348803509

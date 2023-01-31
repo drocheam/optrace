@@ -27,7 +27,7 @@ def xyz_to_xyY(xyz: np.ndarray) -> np.ndarray:
     xyY = xyz.copy()
 
     xyY[mask, :2] /= s[mask, np.newaxis]
-    xyY[~mask, :2] = WP_D65_XY  # set blacks to whitepoint chromacity
+    xyY[~mask, :2] = WP_D65_XY  # set blacks to whitepoint chromaticity
 
     xyY[:, :, 2] = xyz[:, :, 1]  # copy Y
 
@@ -46,7 +46,7 @@ def xyY_to_xyz(xyy: np.ndarray) -> np.ndarray:
     # calculate z from x and y
     xyz[:, :, 2] = 1 - xyy[:, :, 0] - xyy[:, :, 1]
     
-    # scale chromacity coordinates by ratio Y/y
+    # scale chromaticity coordinates by ratio Y/y
     m = xyy[:, :, 1] != 0
     xyz[m] *= (xyy[m, 2] / xyy[m, 1]) [:, np.newaxis]
 

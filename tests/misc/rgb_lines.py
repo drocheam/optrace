@@ -20,7 +20,7 @@ def cost_func0(wl, ref):
 
 def cost_func(args, lines):
     # rgb lines have same dominant wavelength as rgb primaries
-    # so with srgb conversion with mode "Absolute" we should get the same chromacities as the primaries
+    # so with srgb conversion with mode "Absolute" we should get the same chromaticities as the primaries
     BGR = np.array(lines)
     XYZ = np.array([np.vstack((color.x_observer(BGR) * args,
                                color.y_observer(BGR) * args,
