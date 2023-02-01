@@ -241,7 +241,7 @@ TODO
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 

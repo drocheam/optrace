@@ -468,7 +468,7 @@ The following angle distributions :math:`\mathcal{A}` with :math:`\alpha \in \ma
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 

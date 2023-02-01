@@ -535,7 +535,7 @@ By doing so, each pixel gets an intensity weight that needs to be rescaled so th
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 

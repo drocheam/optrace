@@ -16,7 +16,7 @@ ________________________
 
 **Constant**
 
-In the simplest case a constant (wavelength-independent) refactive index is defined as:
+In the simplest case a constant (wavelength-independent) :class:`refractive index <optrace.tracer.refraction_index.RefractionIndex>` is defined as:
 
 .. testcode::
 
@@ -33,7 +33,7 @@ However, materials with these same quantities can still differ slightly.
 
 Details on how the model is estimated are found in :numref:`index_from_abbe`.
 
-You can also specify the wavelength combination, for which ``n`` and ``V`` are specified:
+You can also specify the wavelength combination, for which :python:`n` and :python:`V` are specified:
 
 .. testcode::
 
@@ -42,7 +42,7 @@ You can also specify the wavelength combination, for which ``n`` and ``V`` are s
 
 **Common Index Models**
    
-Defining a medium by a specific model is done by providing the model name and the correct number of coefficients in the ``coeff``.
+Defining a medium by a specific model is done by providing the model name and the correct number of coefficients in the :python:`coeff`.
 Note that all coefficients have units in µm or powers of µm. You can read more about the different supported models in :numref:`index_functions`.
 
 
@@ -68,7 +68,7 @@ In the case of the Schott model the initialization could look as follows:
 
    n = ot.RefractionIndex("Function", func=lambda wl: 1.6 - 1e-4*wl)
 
-When providing a function with multiple parameters you can use the ``func_args`` parameter.
+When providing a function with multiple parameters you can use the :python:`func_args` parameter.
 
 .. testcode::
 
@@ -101,7 +101,7 @@ With a refractive index object at hand the Abbe number can be calculated with
    44.850483919254984
 
 
-Alternatively the function can be called with a different spectral line combination from :python:`ot.presets.spectral_lines`:
+Alternatively the function can be called with a different spectral line combination from :mod:`ot.presets.spectral_lines <optrace.tracer.presets.spectral_lines>`:
 
 .. doctest::
 
@@ -134,7 +134,7 @@ _______________________
 
 **Index Plot**
 
-A RefractionIndex or a list of RefractionIndex objects can be plotted with the function ``refraction_index_plot`` from ``optrace.plots``.
+A RefractionIndex or a list of RefractionIndex objects can be plotted with the function :func:`refraction_index_plot <optrace.plots.spectrum_plots.refraction_index_plot>` from :mod:`optrace.plots`.
 The example below plots the glass presets in one figure.
 
 .. testcode::
@@ -143,8 +143,8 @@ The example below plots the glass presets in one figure.
 
    otp.refraction_index_plot(ot.presets.refraction_index.glasses)
 
-The methods support a user defined ``title`` and a blocking parameter ``block``, that stops the rest of the program for plotting.
-You can also enable or disable the legend and labels with ``legend_off`` and ``labels_off``
+The methods support a user defined :python:`title` and a blocking parameter :python:`block`, that stops the rest of the program for plotting.
+You can also enable or disable the legend and labels with :python:`legend_off` and :python:`labels_off`
 
 .. testcode::
 
@@ -155,13 +155,13 @@ Examples for an index plot are found below.
 
 **Abbe Plot**
 
-An Abbe plot is generated with ``abbe_plot``.
+An Abbe plot is generated with :func:`abbe_plot <optrace.plots.misc_plots.abbe_plot>`.
 
 .. testcode::
 
    otp.abbe_plot(ot.presets.refraction_index.glasses)
 
-It also supports the parameters ``title`` and ``block``. Additionally one can provide user defined ``lines`` to calculate the index and V-number with:
+It also supports the parameters :python:`title` and :python:`block`. Additionally one can provide user defined :python:`lines` to calculate the index and V-number with:
 
 .. testcode::
 
@@ -177,7 +177,7 @@ _________________________________________
 
 
 ``optrace``  can also load .agf catalogue files containing different materials.
-The function ``ot.load.agf`` takes a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
+The function :func:`ot.load.agf <optrace.tracer.load.agf>` takes a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
 
 For instance, loading the Schott catalogue and accessing the material ``N-LAF21`` can be done as follows:
 

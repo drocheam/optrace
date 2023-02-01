@@ -59,19 +59,30 @@ bibtex_default_style = 'unsrt'
 # a list of builtin themes.
 #
 # needs sphinx-rtd-theme installed
-html_theme = 'pyramid'
+# html_theme = 'pyramid'
+html_theme = "pydata_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-
-def setup(app):
-    app.add_css_file(os.path.join('css', 'custom.css'))
+html_css_files = ['css/custom.css']
 
 html_theme_options = {
-    "sidebarwidth": 380,
-    "body_max_width" : 1080
+    "secondary_sidebar_items": ["page-toc", "sidebar-nav-bs-auto"],  # add navigation to secondary sidebar
+    "icon_links": [{"name": "GitHub",
+                    "url": "https://github.com/drocheam/optrace",
+                    "icon": "fa-brands fa-square-github",
+                    "type": "fontawesome",},],
+}
+
+html_context = {
+   "default_mode": "light"  # force light mode
+}
+
+# turn off primary side bar
+html_sidebars = {
+  "**": []
 }
 
 numfig = True
@@ -79,9 +90,10 @@ math_numfig = True
 
 # links to libraries
 intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy', None),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.org/stable', None)}
+                       'numpy': ('http://numpy.org/doc/stable', None),
+                       'scipy': ('http://docs.scipy.org/doc/scipy/', None),
+                       'matplotlib': ('http://matplotlib.org/stable', None),
+                       'pillow': ('https://pillow.readthedocs.io/en/stable/', None)}
 
 autodoc_default_options = {
 	'members': True,

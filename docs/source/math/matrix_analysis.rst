@@ -26,7 +26,7 @@ In paraxial optics the relationships between angles :math:`\theta` and distances
 .. _TMA_elements:
 
 .. list-table:: Meaning of matrix elements :footcite:`IvanOptics`
-   :widths: 50 200
+   :widths: 80 300
    :header-rows: 1
    :align: center
    
@@ -652,6 +652,6 @@ The entrance pupil then is the result of imaging backwards through all elements 
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::

@@ -614,7 +614,7 @@ Related: :footcite:`WolframDiskPicking`.
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 

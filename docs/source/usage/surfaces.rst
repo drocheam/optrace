@@ -419,7 +419,7 @@ This produces the following plot:
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 

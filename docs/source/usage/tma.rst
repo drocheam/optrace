@@ -1,6 +1,12 @@
 Paraxial Analysis
 -------------------------------
 
+.. role:: python(code)
+  :language: python
+  :class: highlight
+
+.. |TMA_link| replace:: :class:`TMA <optrace.tracer.transfer_matrix_analysis.TMA>` 
+
 .. testsetup:: *
 
    import numpy as np
@@ -11,7 +17,7 @@ Paraxial Analysis
 Overview
 ______________
 
-A ray transfer matrix analysis object (class name ``TMA``) allows for the analysis of the paraxial properties of a lens or lens setups. After being computed once and for a specific wavelength it stores a snapshot of different quantities.
+A ray transfer matrix analysis object |TMA_link| allows for the analysis of the paraxial properties of a lens or lens setups. After being computed once and for a specific wavelength it stores a snapshot of different quantities.
 These for instance include focal lengths, nodal points, optical powers and more.
 
 You can read about the calculation and meaning of the matrix analysis in :numref:`ray_matrix_analysis`.
@@ -21,7 +27,7 @@ __________________________________________
 
 **Group/Raytracer**
 
-From a raytracer ``RT`` with a specific geometry the ``TMA`` objected can be created with the member function ``tma()``.
+From a :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` with a specific geometry the |TMA_link| objected can be created with the member function :meth:`tma() <optrace.tracer.geometry.group.Group.tma>`.
 
 .. testcode::
 
@@ -54,7 +60,7 @@ We can also create the analysis object for a single lens:
 
    tma = L.tma()
 
-But since a single Lens does not know about the ambient medium before it, we can provide it as parameter ``n0`` to calculate the properties correctly for a non-default (different than vacuum) prior medium.
+But since a single Lens does not know about the ambient medium before it, we can provide it as parameter :python:`n0` to calculate the properties correctly for a non-default (different than vacuum) prior medium.
 
 .. testcode::
 
@@ -63,7 +69,7 @@ But since a single Lens does not know about the ambient medium before it, we can
 
 **Multiple Lenses**
 
-Without a specific geometry we can also create the ``TMA`` object by simply providing a list of lenses.
+Without a specific geometry we can also create the |TMA_link| object by simply providing a list of lenses.
 
 .. testcode::
 
@@ -75,7 +81,7 @@ Without a specific geometry we can also create the ``TMA`` object by simply prov
    Ls = [L, L2]
    tma = ot.TMA(Ls)
 
-As for the lens the ambient medium before the first lens is not known but can be provided with the ``n0`` parameter.
+As for the lens the ambient medium before the first lens is not known but can be provided with the :python:`n0` parameter.
 
 .. testcode::
 
@@ -87,7 +93,7 @@ __________________________________________
 
 Below a tabular overview of the supported properties is found. Details on their meaning and calculation are documented in :numref:`ray_cardinal_points` and more information on the different definitions for focal lengths and powers in :numref:`ray_power_def`.
 
-.. list-table:: Properties of a ``TMA`` object
+.. list-table:: Properties of a |TMA_link| object
    :widths: 75 60 40 200
    :header-rows: 1
    :align: center
@@ -97,92 +103,92 @@ Below a tabular overview of the supported properties is found. Details on their 
      - Unit
      - Meaning
 
-   * - ``n1``
+   * - :attr:`n1 <optrace.tracer.transfer_matrix_analysis.TMA.n1>`
      - float
      - ``-``
      - refractive index value before the lens setup
    
-   * - ``n2``
+   * - :attr:`n2 <optrace.tracer.transfer_matrix_analysis.TMA.n2>`
      - float
      - ``-``
      - refractive index value after the lens setup
    
-   * - ``vertex_points``
+   * - :attr:`vertex_points <optrace.tracer.transfer_matrix_analysis.TMA.vertex_points>`
      - float, float (tuple)
      - mm
      - front and back position of vertices of the system 
    
-   * - ``d``
+   * - :attr:`d <optrace.tracer.transfer_matrix_analysis.TMA.d>`
      - float
      - mm
      - thickness, distance between vertex points
    
-   * - ``abcd``
+   * - :attr:`abcd <optrace.tracer.transfer_matrix_analysis.TMA.abcd>`
      - numpy array, shape (2, 2)
      - ``-``
      - ABCD matrix
 
-   * - ``principal_points``
+   * - :attr:`principal_points <optrace.tracer.transfer_matrix_analysis.TMA.principal_points>`
      - float, float (tuple)
      - mm
      - principal points (z-positions)
 
-   * - ``nodal_points``
+   * - :attr:`nodal_points <optrace.tracer.transfer_matrix_analysis.TMA.nodal_points>`
      - float, float (tuple)
      - mm
      - nodal points (z-positions)
    
-   * - ``optical_center``
+   * - :attr:`optical_center <optrace.tracer.transfer_matrix_analysis.TMA.optical_center>`
      - float
      - mm
      - optical center (z-position)
    
-   * - ``focal_points``
+   * - :attr:`focal_points <optrace.tracer.transfer_matrix_analysis.TMA.focal_points>`
      - float, float (tuple)
      - mm
      - focal points (z-positions)
    
-   * - ``focal_lengths``
+   * - :attr:`focal_lengths <optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths>`
      - float, float (tuple)
      - mm
      - focal lengths
    
-   * - ``focal_lengths_n``
+   * - :attr:`focal_lengths_n <optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n>`
      - float, float (tuple)
      - mm
      - focal lengths, scaled with refractive index
 
-   * - ``powers``
+   * - :attr:`powers <optrace.tracer.transfer_matrix_analysis.TMA.powers>`
      - float, float (tuple)
      - dpt
      - optical powers of the system
    
-   * - ``powers_n``
+   * - :attr:`powers_n <optrace.tracer.transfer_matrix_analysis.TMA.powers_n>`
      - float, float (tuple)
      - dpt
      - optical powers, scaled with the refractive index
    
-   * - ``efl``
+   * - :attr:`efl <optrace.tracer.transfer_matrix_analysis.TMA.efl>`
      - float
      - mm
      - effective focal length of the system
 
-   * - ``efl_n``
+   * - :attr:`efl_n <optrace.tracer.transfer_matrix_analysis.TMA.efl_n>`
      - float
      - mm
      - effective focal length, scaled by the refractive index
    
-   * - ``bfl``
+   * - :attr:`bfl <optrace.tracer.transfer_matrix_analysis.TMA.bfl>`
      - float
      - mm
      - back focal length
 
-   * - ``ffl``
+   * - :attr:`ffl <optrace.tracer.transfer_matrix_analysis.TMA.ffl>`
      - float
      - mm
      - front focal length
 
-   * - ``wl``
+   * - :attr:`wl <optrace.tracer.transfer_matrix_analysis.TMA.wl>`
      - float
      - nm
      - wavelength for the analysis
@@ -206,7 +212,7 @@ Calculating Image and Object Distance
 __________________________________________
 
 
-The member function ``image_position`` enables us to calculate a image position from an object position.
+The member function :meth:`image_position <optrace.tracer.transfer_matrix_analysis.TMA.image_position>` enables us to calculate a image position from an object position.
 
 .. doctest::
 
@@ -215,14 +221,15 @@ The member function ``image_position`` enables us to calculate a image position 
 
 Both input and output value are absolute positions at the optical axis in millimeters.
 
-On the contrary we can calculate an object position from a known image position:
+On the contrary we can calculate an object position from a known image position with
+:meth:`object_position <optrace.tracer.transfer_matrix_analysis.TMA.object_position>`:
 
 .. doctest::
 
    >>> tma.object_position(100)
    -33.84654855214075
 
-For both function infinite values (``-np.inf, np.inf``) are supported as function parameters.
+For both function infinite values (:python:`-np.inf, np.inf`) are supported as function parameters.
 For the image position at infinity we get:
 
 .. doctest::
@@ -256,7 +263,7 @@ A positive factor corresponds to an upright image, a negative to an inverted one
 Details on the math are listed in :numref:`ray_image_object_distances`.
 
 Another feature is the calculation of the ABCD matrix for a specific object and image distance.
-The ``matrix_at`` method takes the object and image position as arguments and returns the matrix.
+The :meth:`matrix_at <optrace.tracer.transfer_matrix_analysis.TMA.matrix_at>` method takes the object and image position as arguments and returns the matrix.
 
 .. doctest::
 
@@ -279,7 +286,7 @@ First, let's load the paraxial eye model, get the pupil position and create the 
    aps = eye.apertures[0].pos[2]
    tma = eye.tma()
 
-The function ``pupil_position`` takes the aperture stop position and returns a tuple of entrance and exit pupil position along the optical axis.
+The function :meth:`pupil_position <optrace.tracer.transfer_matrix_analysis.TMA.pupil_position>` takes the aperture stop position and returns a tuple of entrance and exit pupil position along the optical axis.
 Regarding the position of the stop, the aperture can lie inside, behind or in front of the lens setup. Therefore there are no limitations.
 
 .. doctest::
@@ -287,7 +294,7 @@ Regarding the position of the stop, the aperture can lie inside, behind or in fr
    >>> tma.pupil_position(aps)
    (3.0375652165508553, 3.6821114369501466)
 
-Magnifications are returned with the member function ``pupil_magnification``.
+Magnifications are returned with the member function :meth:`pupil_magnification <optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification>`.
 
 .. doctest::
    

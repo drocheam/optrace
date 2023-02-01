@@ -333,7 +333,7 @@ Parameters :math:`V`, :math:`n_\text{c}` and the spectral lines :math:`\lambda_\
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 

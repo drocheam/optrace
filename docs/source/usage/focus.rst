@@ -2,6 +2,10 @@ Focus Finding
 -----------------------
 
 
+.. role:: python(code)
+  :language: python
+  :class: highlight
+
 .. testsetup:: *
 
    import optrace as ot
@@ -27,11 +31,20 @@ ____________________
 
 The following focus methods are available:
 
-* **Position Variance**: minimizes the variance of the lateral ray position
-* **Airy Disc Weighting**: weights the ray positions with a spatial sensitivity of the zeroth order of an airy disc
-* **Irradiance Maximum**: finds the position with the highest irradiance
-* **Irradiance Variance**: finds the positions with the highest irradiance variance
-* **Image Sharpness**: finds the position with the sharpest edges
+.. list-table::
+   :widths: 200 400
+   :align: left
+
+   * - **Position Variance**
+     - minimizes the variance of the lateral ray position
+   * - **Airy Disc Weighting**
+     - weights the ray positions with a spatial sensitivity of the zeroth order of an airy disc
+   * - **Irradiance Maximum**
+     - finds the position with the highest irradiance
+   * - **Irradiance Variance**
+     - finds the positions with the highest irradiance variance
+   * - **Image Sharpness**
+     - finds the position with the sharpest edges
 
 More details as well as the mathematical formulations can be found in :numref:`autofocus`.
 
@@ -41,30 +54,30 @@ ______________
 
 
 
-To use the focus finding you will need a traced raytracer ``ŔT`` geometry with one or multiple ray sources.
-The ``autofocus`` function is then called by passing the focus mode and a starting position.
+To use the focus finding you will need a traced :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` geometry with one or multiple ray sources.
+The :meth:`autofocus <optrace.tracer.raytracer.Raytracer.autofocus>` function is then called by passing the focus mode and a starting position.
 Focussing then tries to find the focus in a search region between the last lens (or the outline) and the next lens (or the outline).
 
 .. testcode::
 
    res, afdict = RT.autofocus("Position Variance", 12.09)
 
-``autofocus`` returns two results, where the first one is a ``scipy.optimize.OptimizeResult`` object with information on the root finding. 
-The found z-position is accessed with ``res.x``.
-The second return value includes some additional information, while these are mostly only useful for the ``TraceGUI`` information or the cost plot.
+:python:`autofocus` returns two results, where the first one is a :class:`scipy.optimize.OptimizeResult` object with information on the root finding. 
+The found z-position is accessed with :python:`res.x`.
+The second return value includes some additional information, while these are mostly only useful for the :class:`TraceGUI <optrace.gui.trace_gui.TraceGUI>` information or the cost plot.
 
-By default, rays of all different sources are used to autofocus. Optionally a ``source_index`` parameter can be provided to use only a specific ray source.
+By default, rays of all different sources are used to autofocus. Optionally a :python:`source_index` parameter can be provided to use only a specific ray source.
 
 .. testcode::
 
    res, afdict = RT.autofocus("Position Variance", 12.09, source_index=1)
 
 
-With many rays the focus finding can get very slow. However, for modes ``"Position Variance", "Airy Disc Weighting"`` after some large number of rays the cost function does not change anymore. That's why it is sufficient to limit the number of rays for those cases.
-You can higher or lower the number ``N`` for this with a parameter. Note that this rarely needs to be done.
+With many rays the focus finding can get very slow. However, for modes :python:`"Position Variance", "Airy Disc Weighting"` after some large number of rays the cost function does not change anymore. That's why it is sufficient to limit the number of rays for those cases.
+You can higher or lower the number :python:`N` for this with a parameter. Note that this rarely needs to be done.
 
-Mode ``"Position Variance"`` uses a slightly different approach for root finding, which leads to some parameters missing in ``afdict``.
-When plotting a cost plot, as described later, these parameters need to be calculated and included. This is done by setting ``return_cost=True``, but don't set it if not necessary, as it unfortunately slows down the focus mode.
+Mode :python:`"Position Variance"` uses a slightly different approach for root finding, which leads to some parameters missing in :python:`afdict`.
+When plotting a cost plot, as described later, these parameters need to be calculated and included. This is done by setting :python:`return_cost=True`, but don't set it if not necessary, as it unfortunately slows down the focus mode.
 
 .. testcode::
 
@@ -75,7 +88,7 @@ Limitations
 __________________
 
 
-Below you can find some limitations of ``autofocus`` in ``optrace``
+Below you can find some limitations of :python:`autofocus` in ``optrace``
 
 * search only between lenses or a lens and the outline
 * the behavior of filters and apertures is ignored. If a ray exists at the start of a search region, it also exists at the end.
@@ -119,8 +132,8 @@ Cost Plots
 ___________________________
 
 Cost plots are especially useful to debug the focus finding and check how pronounced a focus or focus region is.
-Plotting the cost function and result is done by calling the ``autofocus_cost_plot`` method from ``optrace.plots``.
-It requires the ``res, afdict`` parameters from before.
+Plotting the cost function and result is done by calling the :func:`autofocus_cost_plot <optrace.plots.misc_plots.autofocus_cost_plot>` method from :mod:`optrace.plots`.
+It requires the :python:`res, afdict` parameters from before.
 
 .. code-block:: python
 
@@ -129,7 +142,7 @@ It requires the ``res, afdict`` parameters from before.
    autofocus_cost_plot(res, afdict)
 
 
-Optionally one can overwrite the ``title`` and make the plot window blocking by setting ``block=True``.
+Optionally one can overwrite the :python:`title` and make the plot window blocking by setting :python:`block=True`.
 
 .. code-block:: python
 
@@ -155,7 +168,7 @@ Below you can find examples for cost plots.
 .. highlight:: none
 
 
-When working with the ``TraceGUI`` it also outputs focus information, like the following:
+When working with the :class:`TraceGUI <optrace.gui.trace_gui.TraceGUI>` it also outputs focus information, like the following:
 
 ::
 

@@ -1,6 +1,13 @@
 Image and Spectrum Rendering
 ---------------------------------
 
+.. TODO alle code zeilen oder verweise sollen in die python role kommen
+.. TODO Verweise 
+
+
+.. role:: python(code)
+  :language: python
+  :class: highlight
 
 .. testsetup:: *
 
@@ -43,14 +50,14 @@ The pixel sizes for the smaller side are limited to:
    >>> ot.RImage.SIZES
    [1, 3, 5, 7, 9, 15, 21, 27, 35, 45, 63, 105, 135, 189, 315, 945]
 
-Whereas the larger side is larger by a factor with elements of ``ot.RImage.SIZES`` up to:
+Whereas the larger side is larger by a factor with elements of :attr:`ot.RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>` up to:
 
 .. doctest::
 
    >>> ot.RImage.MAX_IMAGE_RATIO
    5
 
-And therefore values of ``[1, 3, 5]``. For arbitrary side ratios this leads to non-square pixels, but which pose no problem in plotting and processing.
+And therefore values of :python:`[1, 3, 5]`. For arbitrary side ratios this leads to non-square pixels, but which pose no problem in plotting and processing.
 
 So if the user wants an image with 500 pixels for the smaller side and the exposed area on the detector has a side ratio of 2.63, the internal image is rendered in the resolution 945x2835. This is the case because the nearest side factor to 2.63 is 3 and because 945 is the size for all internally rendered images.
 From this resolution the image can be scaled to 315x945 189x567 135x405 105x315 63x189 45x135 35x105 27x81 21x63 15x45 9x27 7x21 5x15 3x9 1x3. The user image is then scaled into size 315x945, as it is the nearest to a size of 500.
@@ -63,21 +70,35 @@ _____________________________________
 
 Internally the RImage objects saves a power and XYZ color space image, from which the following image modes can be generated:
 
-* **Irradiance**: Image of power per area, equivalent to an intensity image
-* **Illuminance**: Image of luminous power per area
-* **sRGB (Absolute RI)**: A human vision approximation of the image. Colors outside the gamut are saturation-clipped. Preferred sRGB-Mode for "natural"/"everyday" scenes.
-* **sRGB (Perceptual RI)**: Similar to sRGB (Absolute RI), but instead saturation scaling for all pixels. Preferred mode for scenes with monochromatic sources or highly dispersive optics.
-* **Lightness**: Human vision approximation in greyscale colors. Similar to Illuminance, but with non-linear brightness function.
-* **Outside sRGB Gamut**: Boolean image showing pixels outside the sRGB gamut
-* **Hue**: Measure of the type of color tint (red, orange, yellow, ...) 
-* **Chroma**: How colorful an area seems compared to a similar illuminated area.
-* **Saturation**: How colorful an area seems compared to its brightness. Quotient of Chroma and Lightness. 
+
+.. list-table::
+   :widths: 150 500 
+   :align: left
+   :stub-columns: 1
+
+   * - :python:`"Irradiance"`
+     - Image of power per area, equivalent to an intensity image
+   * - :python:`"Illuminance"`
+     - Image of luminous power per area
+   * - :python:`"sRGB (Absolute RI)"`
+     - A human vision approximation of the image. Colors outside the gamut are saturation-clipped. Preferred sRGB-Mode for "natural"/"everyday" scenes.
+   * - :python:`"sRGB (Perceptual RI)"`
+     - Similar to sRGB (Absolute RI), but instead saturation scaling for all pixels. Preferred mode for scenes with monochromatic sources or highly dispersive optics.
+   * - :python:`"Outside sRGB Gamut"`
+     - Boolean image showing pixels outside the sRGB gamut
+   * - :python:`"Lightness"`
+     - Human vision approximation in greyscale colors. Similar to Illuminance, but with non-linear brightness function.
+   * - :python:`"Hue"`
+     - Measure of the type of color tint (red, orange, yellow, ...) 
+   * - :python:`"Chroma"`
+     - How colorful an area seems compared to a similar illuminated area.
+   * - :python:`"Saturation"`
+     - How colorful an area seems compared to its brightness. Quotient of Chroma and Lightness. 
 
 The difference between chroma and saturation is elaborately explained in :footcite:`BriggsChroma`. Due to subtle differences saturation is often put to use as light property and chroma as property for an illuminated object.
 
 An example for the difference of both sRGB modes is seen in :numref:`color_dispersive1`. 
 
-.. TODO add example images (from image_rgb?)
 
 .. list-table:: Renderes images from the ``image_rgb.py`` example. From left to right, top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.
 
@@ -127,12 +148,24 @@ With a spherical detector surface, there are multiple ways to project it down to
 Below you can find the projection methods implemented in ``optrace`` and Wikipedia links for their detailed explanation.
 Details on the math applied internally are found in the math section in :numref:`sphere_projections`.
 
-* **Orthographic**: *Far-Away-Perspective-Projection*, sphere surface seen from far away, see :footcite:`OrthographicProjWiki`.
-* **Stereographic**: Projection keeping local angles equal, see :footcite:`SteographicProjWiki`.
-* **Equidistant**: Projection keeping the radial direction from the center equal, see :footcite:`EquidistantProjWiki`.
-* **Equal-Area**: Projection keeping local areas equal, see :footcite:`EqualAreaProjWiki`.
+Available methods are:
 
-.. TODO add example images from sphere_projections.py
+.. list-table::
+   :widths: 150 300 
+   :align: left
+   :stub-columns: 1
+
+   * - :python:`"Orthographic"`
+     - Perspective projection, sphere surface seen from far away :footcite:`OrthographicProjWiki`
+
+   * - :python:`"Stereographic"`
+     - Conformal projection (preserving local angles and shapes) :footcite:`SteographicProjWiki`
+
+   * - :python:`"Equidistant"`
+     - Projection keeping the radial direction from a center point equal :footcite:`EquidistantProjWiki`
+
+   * - :python:`"Equal-Area"`
+     - Area preserving projection :footcite:`EqualAreaProjWiki`
 
 .. list-table::
     `Tissot's indicatrices <https://en.wikipedia.org/wiki/Tissot%27s_indicatrix>`__ for different projection methods. All circles should have the same size, shape and brightness. Taken from the ``sphere_projections.py`` example.
@@ -159,7 +192,7 @@ Details on the math applied internally are found in the math section in :numref:
 Resolution Limit Filter
 ___________________________
 
-Unfortunately, ``optrace`` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the RImage class provides a limit parameter. This parameter describes the width of an airy disc and blurs the image with a gaussian filter that is approximately the size of the zeroth order of an airy disc with the same resolution limit.
+Unfortunately, ``optrace`` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RImage <optrace.tracer.r_image.RImage>` class provides a limit parameter. This parameter describes the width of an airy disc and blurs the image with a gaussian filter that is approximately the size of the zeroth order of an airy disc with the same resolution limit.
 
 .. note::
 
@@ -171,8 +204,7 @@ Unfortunately, ``optrace`` does not take wave optics into account when simulatin
 To some degree this parameter is also suitable to estimate the effect of different resolution limits.
 
 
-
-.. list-table:: Images of the focus in the ``achromat.py`` example. From left to right: No filter, filter with 2 µm size, filter with 10 µm size. For a setup with a resolution limit of 10 µm we are clearly inside the limit, but even for 2 µm we are diffraction limited.
+.. list-table:: Images of the focus in the ``achromat.py`` example. From left to right: No filter, filter with 2 µm size, filter with 10 µm size. For a setup with a resolution limit of 10 µm we are clearly inside the limit, but even for 2 µm we are diffraction limited.   
 
    * - .. figure:: ../images/rimage_limit_off.svg
           :align: center
@@ -186,7 +218,6 @@ To some degree this parameter is also suitable to estimate the effect of differe
           :align: center
           :width: 300
 
-.. TODO add example imagee (from achromat.py?)
 
 Rendering an Image
 _____________________________________
@@ -231,10 +262,10 @@ The below snippet generates a geometry with multiple sources and detectors. The 
 
 **Source Image**
 
-Rendering a source image is done with the ``source_image`` method of the ``Raytracer`` class. Note that it expects, that scene has already been traced and rays were calculated.
+Rendering a source image is done with the :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` method of the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` class. Note that it expects, that scene has already been traced and rays were calculated.
 
 The function takes a pixel size parameter, that determines the pixel count for the smaller image size.
-Note that only image sizes of ``RImage.SIZES`` are valid, when different values are specified the nearest values is chosen.
+Note that only image sizes of :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>` are valid, when different values are specified the nearest values is chosen.
 
 Example for the function call:
 
@@ -244,7 +275,7 @@ Example for the function call:
 
 This renders an RImage for the first source and returns an RImage.
 
-The following code renders it for the second source (since index counting starts at zero) and additionally provides the resolution limit ``limit`` parameter of 3 µm.
+The following code renders it for the second source (since index counting starts at zero) and additionally provides the resolution limit :python:`limit` parameter of 3 µm.
 
 .. testcode::
 
@@ -253,20 +284,20 @@ The following code renders it for the second source (since index counting starts
 
 **Detector Image**
 
-Calculating a detector image is done in a similar fashion:
+Calculating a :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>` is done in a similar fashion:
 
 .. testcode::
 
    img = RT.detector_image(389)
 
-Compared to ``source_image`` you can not only provide a ``detector_index``, but also a ``source_index``, which limit the rendering to the light from this source. By default all sources are used.
+Compared to :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` you can not only provide a :python:`detector_index`, but also a :python:`source_index`, which limit the rendering to the light from this source. By default all sources are used.
 
 .. testcode::
 
    img = RT.detector_image(389, detector_index=0, source_index=1)
 
-For spherical surface detectors a ``projection_method`` can be chosen. Moreover, the extent of the detector can be limited with the ``extent`` parameter, that is provided as ``[x0, x1, y0, y1]`` with :math:`x_0 < x_1, ~ y_0 < y_1`. By default the extent gets adjusted automatically to contain all rays hitting the detector.
-As for ``source_image`` the ``limit`` parameter can also be provided.
+For spherical surface detectors a :python:`projection_method` can be chosen. Moreover, the extent of the detector can be limited with the :python:`extent` parameter, that is provided as :python:`[x0, x1, y0, y1]` with :math:`x_0 < x_1, ~ y_0 < y_1`. By default the extent gets adjusted automatically to contain all rays hitting the detector.
+As for :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` the :python:`limit` parameter can also be provided.
 
 .. testcode::
 
@@ -277,25 +308,25 @@ Iterative Render
 _______________________
 
 When tracing, the amount of rays is limited by the system's available RAM. Many million rays would not fit in the finite working memory. However, some more complicated scenes need a huge amount of rays, especially for low image noise. 
-For this the function ``iterative_render`` exists. It does multiple traces and iteratively adds up the image components to a summed image. In this way there is no upper bound on the ray count. With enough available user time, images can be rendered with many billion rays.
+For this the function :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` exists. It does multiple traces and iteratively adds up the image components to a summed image. In this way there is no upper bound on the ray count. With enough available user time, images can be rendered with many billion rays.
 
-Parameter ``N_rays`` provides the overall number of rays for raytracing.
-The first returned value of ``iterative_render`` is a list of rendered sources, the second a list of rendered detector images.
+Parameter :python:`N_rays` provides the overall number of rays for raytracing.
+The first returned value of :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` is a list of rendered sources, the second a list of rendered detector images.
 
-If the detector position parameter ``pos`` is not provided, a single detector image is rendered at the position of the detector specified by ``detector_index``.
+If the detector position parameter :python:`pos` is not provided, a single detector image is rendered at the position of the detector specified by :python:`detector_index`.
 
 .. testcode::
 
    RT.iterative_render(N_rays=10000, detector_index=1) 
 
-If ``pos`` is provided as coordinate, the detector is moved beforehand.
+If :python:`pos` is provided as coordinate, the detector is moved beforehand.
 
 .. testcode::
 
    RT.iterative_render(N_rays=10000, pos=[0, 1, 0], detector_index=1) 
 
-If ``pos`` is a list, ``len(pos)`` detector images are rendered. All other parameters are either automatically
-repeated ``len(pos)`` times or can be specified as list with the same length as ``pos``.
+If :python:`pos` is a list, :python:`len(pos)` detector images are rendered. All other parameters are either automatically
+repeated :python:`len(pos)` times or can be specified as list with the same length as :python:`pos`.
 
 Exemplary calls:
 
@@ -304,22 +335,22 @@ Exemplary calls:
    RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256]) 
    RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
 
-``N_px_S`` can also be provided as list, note however, that when provided as list, it needs to have the same length as the number of sources.
+:python:`N_px_S` can also be provided as list, note however, that when provided as list, it needs to have the same length as the number of sources.
 
-By default, source images are also rendered. Providing ``no_sources=True`` skips source rendering and simply returns an empty list.
+By default, source images are also rendered. Providing :python:`no_sources=True` skips source rendering and simply returns an empty list.
 
 
 **Tips for Faster Rendering**
 
 With large rendering times, even small speed-up amounts add up significantly:
 
-* As mentioned above, source rendering can be skipped with ``no_sources=True`` when not needed. Depending on the complexity of the setup this option can increase performance by 5%.
-* Setting the raytracer option ``RT.no_pol`` skips the calculation of the light polarization, note that depending on the geometry the polarization direction can have an influence of the amount of light transmission at different surfaces. It is advised to experiment beforehand, if the parameter seems to have any effect on the image.
-  Depending on the geometry ``no_pol=True`` can lead to a speed-up of 10-30%.
+* As mentioned above, source rendering can be skipped with :python:`no_sources=True` when not needed. Depending on the complexity of the setup this option can increase performance by 5%.
+* Setting the raytracer option :python:`RT.no_pol` skips the calculation of the light polarization, note that depending on the geometry the polarization direction can have an influence of the amount of light transmission at different surfaces. It is advised to experiment beforehand, if the parameter seems to have any effect on the image.
+  Depending on the geometry :python:`no_pol=True` can lead to a speed-up of 10-30%.
 * Prefer inbuilt surface types to data or function surfaces
 * try to limit the light through the geometry to rays hitting all lenses. For instance:
-    * Moving the color filters to the front of the system avoids the calculation of ray refractions that get absorbed in a later stage.
-    * Orienting the ray direction cone of the source towards the setup, therfore maximizing rays hitting all lenses. See the ``arizona_eye_model.py`` example on how this could be done. 
+    - Moving the color filters to the front of the system avoids the calculation of ray refractions that get absorbed in a later stage.
+    - Orienting the ray direction cone of the source towards the setup, therfore maximizing rays hitting all lenses. See the ``arizona_eye_model.py`` example on how this could be done. 
 
 
 Getting an Image by Mode
@@ -328,13 +359,13 @@ _____________________________________
 
 **Image**
 
-As described above, multiple different image modes can be generated. This is done by utilizing the ``get`` function of the image and a selected image mode name:
+As described above, multiple different image modes can be generated. This is done by utilizing the :python:`get` function of the image and a selected image mode name:
 
 .. testcode::
 
    img_array = img.get("Illuminance")
 
-For the sRGB modes there is an additional ``log`` parameter, that scales the color brightness logarithmically. However this is done in a different color space.
+For the sRGB modes there is an additional :python:`log` parameter, that scales the color brightness logarithmically. However this is done in a different color space.
 While the other modes also can be scaled logarithmically, this can be done by the user or the plotting function.
 
 .. testcode::
@@ -345,9 +376,9 @@ The returned value is a three-dimensional numpy array for sRGB color modes and a
 
 **Image Cut**
 
-An image cut is the profile of a generated image in x- or y-direction. It has the same parameter as the ``get`` function, but includes the additional parameters ``x`` and ``y``. 
+An image cut is the profile of a generated image in x- or y-direction. It has the same parameter as the :python:`get` function, but includes the additional parameters :python:`x` and :python:`y`. 
 
-If one wants to generate an image cut in y-direction for a fixed ``x`` of 0, one can write:
+If one wants to generate an image cut in y-direction for a fixed :python:`x` of 0, one can write:
 
 .. testcode::
 
@@ -359,7 +390,7 @@ For a cut in x-direction the following can be used:
 
    bins, vals = img.cut("Illuminance", y=0.25)
 
-As for ``get`` there is a ``log`` parameter:
+As for :python:`get` there is a :python:`log` parameter:
 
 .. testcode::
 
@@ -375,13 +406,13 @@ _____________________________________
 As discussed before, internally the RImage data is saved in a higher resolution. After generating such an RImage you can rescale it afterwards.
 Note that no interpolation takes place, the histogram bins just get joined together without distorting or guessing any information.
 
-Rescaling is done with the ``rescale`` function and a size parameter:
+Rescaling is done with the :meth:`rescale <optrace.tracer.r_image.RImage.rescale>` function and a size parameter:
 
 .. testcode::
 
    img.rescale(400)
 
-The size doesn't need to be one of ``RImage.SIZES``, but the nearest one of these values gets chosen automatically.
+The size doesn't need to be one of :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>`, but the nearest one of these values gets chosen automatically.
 
 The size should now be:
 
@@ -390,10 +421,10 @@ The size should now be:
    >>> img.N
    315
 
-Which is the nearest value in ``RImage.SIZES``.
+Which is the nearest value in :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>`.
 
-The ``limit`` parameter can also be changed afterwards, as internally the RImage holds the unfiltered version.
-However, after changing the member variable the image needs to be refiltered by the ``refilter`` function:
+The :python:`limit` parameter can also be changed afterwards, as internally the RImage holds the unfiltered version.
+However, after changing the member variable the image needs to be refiltered by the :meth:`refilter <optrace.tracer.r_image.RImage.refilter>` function:
 
 .. testcode::
 
@@ -413,8 +444,8 @@ An RImage can be saved on the disk for later use in ``optrace``. In the simplest
 
    img.save("RImage_12345")
 
-If the path is invalid, the object is saved under a fallback name in the current directory. If the file already exists, this is also the case. Otherwise you can specify ``overwrite=True`` to force an overwrite.
-There is an additional parameter ``save_32bit`` that lowers the bit depth, loosing some information but saving disk space.
+If the path is invalid, the object is saved under a fallback name in the current directory. If the file already exists, this is also the case. Otherwise you can specify :python:`overwrite=True` to force an overwrite.
+There is an additional parameter :python:`save_32bit` that lowers the bit depth, loosing some information but saving disk space.
 
 .. code-block:: python
 
@@ -423,7 +454,7 @@ There is an additional parameter ``save_32bit`` that lowers the bit depth, loosi
 
 **Loading**
 
-For loading the object the static method ``load`` of the RImage class is used. It takes a path and returns the RImage object.
+For loading the object the static method :meth:`load <optrace.tracer.r_image.RImage.load>` of the RImage class is used. It takes a path and returns the RImage object.
 
 .. code-block:: python
 
@@ -432,13 +463,11 @@ For loading the object the static method ``load`` of the RImage class is used. I
 
 **Export as PNG**
 
-You can also export an image mode as .png file. The function ``export_png`` takes a file path, an image mode and a side length as arguments. The size is specified to the smaller side length.
+You can also export an image mode as .png file. The function :meth:`export_png <optrace.tracer.r_image.RImage.export_png>` takes a file path, an image mode and a side length as arguments. The size is specified to the smaller side length.
 
-Note that the export resolution (=export image size) and the RImage pixel count (=histogram resolution) differ.
-So saving an RImage with pixel side length 5 (``RImage.N``) with a resolution of ``size=500`` creates a larger image, but not a finer one. 
+Note that the export resolution (= export image size) and the RImage pixel count (= histogram resolution) differ.
+So saving an RImage with pixel side length 5 (:attr:`RImage.N <optrace.tracer.r_image.RImage.N>`) with a resolution of :python:`size=500` creates a larger image, but not a finer one. 
 You can therefore parametrize the histogram resolution of the RImage and the export size independently by rescaling the image beforehand.
-
-.. TODO example
 
 
 An exemplary function call could be:
@@ -447,14 +476,17 @@ An exemplary function call could be:
 
    img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=400)
 
-As for the image modes, one can specify the parameters ``log`` and ``flip``. And as for the RImage export the parameter ``overwrite`` to force an overwrite.
+As for the image modes, one can specify the parameters :python:`log` and :python:`flip`. And as for the RImage export the parameter :python:`overwrite` to force an overwrite.
 
 .. code-block:: python
 
    img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=389, log=True, flip=True, overwrite=True)
 
 The image rescaling is done with methods from the `Pillow <https://pillow.readthedocs.io/en/stable/>`__ python library. By default, nearest neighbor interpolation is applied if the export resolution is higher than the RImage resolution and bilinear interpolation otherwise.
-You can overwrite this behavior with the ``resample`` parameter and the method flag from `PIL.Image.Resampling <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Resampling>`__.
+
+You can overwrite this behavior with the :python:`resample` parameter and the method flag from :class:`PIL.Image.Resampling`
+
+.. `PIL.Image.Resampling <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Resampling>`__.
 
 .. code-block:: python
 
@@ -483,10 +515,10 @@ Power in W and luminous power in lm are calculated from the following functions:
 
 Additionally, there are multiple size related properties available.
 
-The extent provides the corner points of the rectangle encompassing the image with values ``[x0, x1, y0, y1]``.
-``Nx`` describes the pixel count in x-direction and ``Ny`` the count in y-direction. ``N`` is the smaller of those two.
-Properties ``sx`` and ``sy`` specify the side lengths of the image in millimeters in its dimensions.
-``Apx`` is the pixel area in mm².
+The extent provides the corner points of the rectangle encompassing the image with values :python:`[x0, x1, y0, y1]`.
+:python:`Nx` describes the pixel count in x-direction and :python:`Ny` the count in y-direction. :python:`N` is the smaller of those two.
+Properties :python:`sx` and :python:`sy` specify the side lengths of the image in millimeters in its dimensions.
+:python:`Apx` is the pixel area in mm².
 
 
 .. doctest::
@@ -516,25 +548,25 @@ _____________________________________
 
 Rendering a light spectrum is also done on the source or detector surface.
 
-Analogously to rendering a source image, we can render a spectrum with ``source_spectrum`` and by providing a ``source_index`` parameter (default to zero).
+Analogously to rendering a source image, we can render a spectrum with :meth:`source_spectrum <optrace.tracer.raytracer.Raytracer.source_spectrum>` and by providing a :python:`source_index` parameter (default to zero).
 
 .. testcode::
 
    spec = RT.source_spectrum(source_index=1)
 
-For a detector spectrum the ``detector_spectrum`` function is applied. It takes a ``detector_index`` argument, that also defaults to zero.
+For a detector spectrum the :meth:`detector_spectrum <optrace.tracer.raytracer.Raytracer.detector_spectrum>` function is applied. It takes a :python:`detector_index` argument, that also defaults to zero.
 
 .. testcode::
 
    spec = RT.detector_spectrum(detector_index=0)
 
-Additionally we can limit the rendering to a source by providing a ``source_index`` or limit the detector area by providing the ``extent`` parameter, as we did for the ``detector_image``.
+Additionally we can limit the rendering to a source by providing a :python:`source_index` or limit the detector area by providing the :python:`extent` parameter, as we did for the :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>`.
 
 .. testcode::
 
    spec = RT.detector_spectrum(detector_index=0, source_index=1, extent=[0, 1, 0, 1])
 
-The above methods return an object of type ``LightSpectrum`` with ``spectrum_type="Histogram"``.
+The above methods return an object of type :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` with :python:`spectrum_type="Histogram"`.
 
 
 
@@ -545,13 +577,13 @@ _____________________________________
 
 **Spectrum**
 
-A rendered spectrum can be plotted with the ``spectrum_plot`` function from ``optrace.plots``.
+A rendered spectrum can be plotted with the :func:`spectrum_plot <optrace.plots.spectrum_plots.spectrum_plot>` function from :mod:`optrace.plots`.
 More on plotting spectra is found in :numref:`spectrum_plots`.
 
 
 **Image**
 
-With a RImage object an image plot is created with the function ``r_image_plot``. But first, the plotting namespace needs to be imported:
+With a RImage object an image plot is created with the function :func:`r_image_plot <optrace.plots.r_image_plots.r_image_plot>`. But first, the plotting namespace needs to be imported:
 
 .. testcode::
    
@@ -564,7 +596,7 @@ The plotting function takes the RImage as parameter. Next, we need to specify th
 
    otp.r_image_plot(img, "Lightness (CIELUV)")
 
-We can use the additional parameter ``log`` to scale the image values logarithmically or provide ``flip=True`` to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the ``title`` parameter and we can make the plotting window blocking with ``block=True``.
+We can use the additional parameter :python:`log` to scale the image values logarithmically or provide :python:`flip=True` to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the :python:`title` parameter and we can make the plotting window blocking with :python:`block=True`.
 
 .. testcode::
 
@@ -572,13 +604,13 @@ We can use the additional parameter ``log`` to scale the image values logarithmi
 
 **Image Cut**
 
-For plotting an image cut the analogous function ``r_image_cut_plot`` is applied. It takes the same arguments, but needs a cut parameter ``x`` or ``y``. These are the same parameters as for the function ``RImage.cut``, so setting a value for ``x`` creates a profile in y-direction for the given x value and vice versa.
+For plotting an image cut the analogous function :func:`r_image_cut_plot <optrace.plots.r_image_plots.r_image_cut_plot>` is applied. It takes the same arguments, but needs a cut parameter :python:`x` or :python:`y`. These are the same parameters as for the function :meth:`RImage.cut <optrace.tracer.r_image.RImage.cut>`, so setting a value for :python:`x` creates a profile in y-direction for the given x value and vice versa.
 
 .. testcode::
 
    otp.r_image_cut_plot(img, "Lightness (CIELUV)", x=0)
 
-Supporting all the same parameters as for ``r_image_plot``, the following call is also valid:
+Supporting all the same parameters as for :func:`r_image_plot <optrace.plots.r_image_plots.r_image_plot>`, the following call is also valid:
 
 .. testcode::
 
@@ -587,7 +619,7 @@ Supporting all the same parameters as for ``r_image_plot``, the following call i
 
 
 .. list-table::
-    Exemplary image plot and image cut plot from the ``double_prism.py`` example.
+   Exemplary image plot and image cut plot from the ``double_prism.py`` example.
 
    * - .. figure:: ../images/color_dispersive3.svg
           :align: center
@@ -616,13 +648,13 @@ ________________________
 In some use cases it is helpful to display the spectrum color or image values inside a chromaticity diagram to see the color distribution.
 When doing so, the choice between the CIE 1931 xy chromaticity diagram and the CIE 1976 UCS chromaticity diagram must be undertaken. Differences are described in <>.
 
-Depending on your choice the ``chromaticities_cie_1931`` or ``chromaticities_cie_1976`` function is called. In the simplest case it takes an RImage as parameter:
+Depending on your choice the :func:`chromaticities_cie_1931 <optrace.plots.chromaticity_plots.chromaticities_cie_1931>` or :func:`chromaticities_cie_1976 <optrace.plots.chromaticity_plots.chromaticities_cie_1976>` function is called. In the simplest case it takes an RImage as parameter:
 
 .. testcode::
 
    otp.chromaticities_cie_1931(img)
 
-A LightSpectrum can also be provided:
+A :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` can also be provided:
 
 .. testcode::
 
@@ -634,7 +666,7 @@ Or a list of multiple spectra:
 
    otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard)
 
-A user defined ``title`` can also be set. The parameter ``rendering_intent`` is specified for the conversion of the colors into the sRGB color space, but generally the default value of "Absolute" is suited. ``block=True`` interrupts the rest of the program and ``norm`` specifies the brightness normalization, explained a few paragraphs below.
+A user defined :python:`title` can also be set. The parameter :python:`rendering_intent` is specified for the conversion of the colors into the sRGB color space, but generally the default value of "Absolute" is suited. :python:`block=True` interrupts the rest of the program and :python:`norm` specifies the brightness normalization, explained a few paragraphs below.
 
 A full function call could look like this:
 
@@ -658,8 +690,8 @@ A full function call could look like this:
 
 Chromaticity norms describe the brightness normalization for the colored diagram background. There are multiple norms available:
 
- *  **Largest**: Maximum brightness for this sRGB color. Leads to colors with maximum brightness and saturation.
- *  **Sum**: Normalize the sRGB such that the sum of all channels equals one. Leads to a diagram with smooth color changes and approximately equal brightness.
+*  **Largest**: Maximum brightness for this sRGB color. Leads to colors with maximum brightness and saturation.
+*  **Sum**: Normalize the sRGB such that the sum of all channels equals one. Leads to a diagram with smooth color changes and approximately equal brightness.
 
 .. list-table:: 
    Example of a chromaticity plots showing the color coordinates of fluorescent lamp presets. Norms are "Sum", "Largest" and "Ignore" (from left to right, top to bottom).
@@ -745,12 +777,12 @@ Below you can find preset images that can be used for a ray source.
 
 Additional presets include:
 
-* ``ot.presets.image.checkerboard``: 8x8 black and white chess-like board image
+* :attr:`ot.presets.image.checkerboard <optrace.tracer.presets.image.checkerboard>`: 8x8 black and white chess-like board image
 
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 

@@ -16,13 +16,13 @@ _______________________
 
 A RaySource defines the properties for rays that it creates, including
 
- * Emitting area/point/line
- * light distribution on this area (=image)
- * Emitted spectrum and power
- * Ray Polarization
- * Ray orientation
- * Ray divergence
- * Source position
+* Emitting area/point/line
+* light distribution on this area (=image)
+* Emitted spectrum and power
+* Ray Polarization
+* Ray orientation
+* Ray divergence
+* Source position
 
 
 **Surface/Point/Line Parameter**
@@ -108,7 +108,7 @@ Or a user defined one:
 
 Divergence defines how rays are distributed relative to their base orientation (``orientation`` parameter).
 
-With ``divergence="Non"`` all rays follow their orientation:
+With ``divergence="None"`` all rays follow their orientation:
 
 .. testcode::
 

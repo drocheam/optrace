@@ -143,7 +143,7 @@ Additional Notes
 
 ------------
 
-**Sources**
+**References**
 
 .. footbibliography::
 
