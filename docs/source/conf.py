@@ -76,9 +76,9 @@ html_theme_options = {
                     "type": "fontawesome",},],
 }
 
-html_context = {
-   "default_mode": "light"  # force light mode
-}
+# html_context = {
+   # "default_mode": "light"  # force light mode
+# }
 
 # turn off primary side bar
 html_sidebars = {
@@ -93,6 +93,7 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'numpy': ('http://numpy.org/doc/stable', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/', None),
                        'matplotlib': ('http://matplotlib.org/stable', None),
+                       'mayavi': ('https://docs.enthought.com/mayavi/mayavi', None),
                        'pillow': ('https://pillow.readthedocs.io/en/stable/', None)}
 
 autodoc_default_options = {

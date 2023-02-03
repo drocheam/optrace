@@ -5,8 +5,8 @@
    version="1.1"
    id="svg26974"
    width="488.172"
-   height="484.70627"
-   viewBox="0 0 488.17199 484.70627"
+   height="496.04486"
+   viewBox="0 0 488.17199 496.04486"
    sodipodi:docname="rendering_intents.svg"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -231,11 +231,11 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="1"
-     inkscape:cx="32.5"
-     inkscape:cy="189.5"
-     inkscape:window-width="1920"
-     inkscape:window-height="1048"
-     inkscape:window-x="0"
+     inkscape:cx="189.5"
+     inkscape:cy="50.5"
+     inkscape:window-width="2560"
+     inkscape:window-height="1366"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="g26984">
@@ -244,21 +244,30 @@
        y="0"
        id="page26980"
        width="488.172"
-       height="484.70627" />
+       height="496.04486" />
     <inkscape:grid
        type="xygrid"
        id="grid41457"
        originx="0"
-       originy="-5.8750489e-07" />
+       originy="11.338583" />
   </sodipodi:namedview>
   <g
      id="g26982"
      inkscape:groupmode="layer"
      inkscape:label="Page 1"
-     transform="matrix(1.3333333,0,0,-1.3333333,0,502.66685)">
+     transform="matrix(1.3333333,0,0,-1.3333333,0,514.00544)">
     <g
        id="g26984"
        transform="scale(0.1)">
+      <rect
+         style="opacity:0.996714;fill:#ffffff;stroke-width:7.08662;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+         id="rect14488"
+         width="3661.29"
+         height="3720.3367"
+         x="0"
+         y="-3855.041"
+         transform="scale(1,-1)"
+         ry="1.0070685e-13" />
       <path
          d="M 0,134.70438 H 3661.2901 V 3770.0014 H 0 Z"
          style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.982258"

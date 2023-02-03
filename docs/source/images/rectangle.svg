@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="2.9501042"
-     inkscape:cx="6.1014795"
-     inkscape:cy="75.760037"
+     inkscape:cx="6.2709649"
+     inkscape:cy="76.099007"
      inkscape:window-width="2560"
      inkscape:window-height="1366"
      inkscape:window-x="1920"
@@ -41,24 +41,6 @@
   </sodipodi:namedview>
   <defs
      id="defs628">
-    <marker
-       style="overflow:visible"
-       id="marker3155"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Stop"
-       markerWidth="1"
-       markerHeight="8"
-       viewBox="0 0 1 8"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:none;stroke:context-stroke;stroke-width:1"
-         d="M 0,4 V -4"
-         id="path3153" />
-    </marker>
     <marker
        style="overflow:visible"
        id="marker3155_Fnone_S-b91a1a"
@@ -76,24 +58,6 @@
          style="fill:none;stroke:#b91a1a;stroke-width:1"
          d="M 0,4 V -4"
          id="path95028" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="Stop"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Stop"
-       markerWidth="1"
-       markerHeight="8"
-       viewBox="0 0 1 8"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:none;stroke:context-stroke;stroke-width:1"
-         d="M 0,4 V -4"
-         id="path171" />
     </marker>
     <marker
        style="overflow:visible"
@@ -272,6 +236,14 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-50.7888, -24.8426)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect11951"
+       width="50"
+       height="50"
+       x="50.788803"
+       y="24.8426"
+       ry="3.5527137e-15" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1556_Fnone_S-000000)"
        d="M 55.788787,69.842641 H 65.842474"

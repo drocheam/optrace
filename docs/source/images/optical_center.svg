@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="100mm"
+   width="99mm"
    height="55mm"
-   viewBox="0 0 100 55"
+   viewBox="0 0 99 55"
    version="1.1"
    id="svg5"
    sodipodi:docname="optical_center.svg"
@@ -13,7 +13,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:ns14="http://www.iki.fi/pav/software/textext/">
+   xmlns:ns1="http://www.iki.fi/pav/software/textext/">
   <sodipodi:namedview
      id="namedview7"
      pagecolor="#ffffff"
@@ -26,8 +26,8 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="2.8284271"
-     inkscape:cx="214.60691"
-     inkscape:cy="98.46462"
+     inkscape:cx="52.856232"
+     inkscape:cy="19.975767"
      inkscape:window-width="2560"
      inkscape:window-height="1366"
      inkscape:window-x="1920"
@@ -37,8 +37,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid132"
-       originx="-4.9999999"
-       originy="-5.0000004" />
+       originx="-6.0000002"
+       originy="-4.9999998" />
   </sodipodi:namedview>
   <defs
      id="defs2">
@@ -234,7 +234,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-5, -5)">
+     transform="translate(-6.0000001,-4.9999996)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect9694"
+       width="98.999992"
+       height="54.999996"
+       x="6"
+       y="5"
+       ry="3.5527137e-15" />
     <path
        style="fill:none;stroke:#4535be;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:0.25, 0.75;stroke-dashoffset:0.725;stroke-opacity:1"
        d="M 50,35 30,25"
@@ -714,15 +722,15 @@
        sodipodi:open="true" />
     <g
        transform="matrix(0.352778,0,0,0.352778,42.850171,35.877908)"
-       ns14:version="1.8.1"
-       ns14:texconverter="pdflatex"
-       ns14:pdfconverter="inkscape"
-       ns14:text="$o$"
-       ns14:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns14:scale="1.0"
-       ns14:alignment="middle center"
-       ns14:stroke-to-path="0"
-       ns14:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$o$"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:jacobian_sqrt="0.352778"
        id="g4341"
        style="fill:#008c14;fill-opacity:1">
       <defs
@@ -809,16 +817,16 @@
        d="m 59.468663,35.00174 a 1.9686633,2.0771878 0 0 1 -0.263751,1.036854" />
     <g
        transform="matrix(0.352778,0,0,0.352778,98.50625,35.878088)"
-       ns14:version="1.8.1"
-       ns14:texconverter="pdflatex"
-       ns14:pdfconverter="inkscape"
-       ns14:text="$z$"
-       ns14:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns14:scale="1.0"
-       ns14:alignment="middle center"
-       ns14:stroke-to-path="0"
-       ns14:inkscapeversion="1.2.2"
-       ns14:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$z$"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:inkscapeversion="1.2.2"
+       ns1:jacobian_sqrt="0.352778"
        id="g13907">
       <defs
          id="id-070270dd-28f3-49d0-a78f-389024c509e1">

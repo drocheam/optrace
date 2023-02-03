@@ -25,9 +25,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="6.7277216"
-     inkscape:cx="92.081694"
-     inkscape:cy="68.299497"
+     inkscape:zoom="4.7572176"
+     inkscape:cx="83.97766"
+     inkscape:cy="87.130764"
      inkscape:window-width="2560"
      inkscape:window-height="1366"
      inkscape:window-x="1920"
@@ -141,6 +141,14 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-50.788787,-24.842641)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke:none;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect394"
+       width="50"
+       height="50"
+       x="50.788788"
+       y="24.842642"
+       ry="3.5527137e-15" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1556_Fnone_S-000000)"
        d="M 55.788787,69.842641 H 65.842474"

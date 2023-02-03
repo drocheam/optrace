@@ -14,6 +14,7 @@ import pytest
 
 import matplotlib.pyplot as plt
 import pyautogui
+from pyface.qt import QtGui
 
 import optrace as ot
 from optrace.gui import TraceGUI
@@ -791,7 +792,9 @@ class GUITests(unittest.TestCase):
 
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
-    
+   
+    # os test because clipboard is system dependent
+    @pytest.mark.os
     def test_send_cmd(self):
         """test command setting and sending as well as automatic replotting"""
 
@@ -852,10 +855,31 @@ class GUITests(unittest.TestCase):
                 # resend command, history does not get updated with same command
                 sim._do_in_main(sim._cdb.send_cmd)
                 sim._wait_for_idle()
-                
+               
                 # clear history
                 sim._do_in_main(sim._cdb.clear_history)
                 sim._wait_for_idle()
+
+                # check if setting and getting clipboard works globally
+                clipboard = QtGui.QApplication.clipboard()
+                clipboard.setText("a", mode=clipboard.Clipboard)
+                self.assertTrue(clipboard.text(), "a")
+
+                # check that empty strings are copied correctly in the command window
+                sim._do_in_main(sim._cdb.copy_history)
+                sim._wait_for_idle()
+                self.assertEqual(clipboard.text(), "")
+               
+                # check if full history is copied
+                sim._cdb._cmd = "self.replot()"
+                sim._do_in_main(sim._cdb.send_cmd)
+                sim._wait_for_idle()
+                sim._cdb._cmd = "a=5"
+                sim._do_in_main(sim._cdb.send_cmd)
+                sim._wait_for_idle()
+                sim._do_in_main(sim._cdb.copy_history)
+                sim._wait_for_idle()
+                self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
 
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()

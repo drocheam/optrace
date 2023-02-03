@@ -44,6 +44,7 @@ div.math mjx-container {
 	width: unset;
 	margin-top: 1rem;
 	margin-bottom: 2rem;
+	color: unset;
 }
 
 /*lower row padding in tables*/

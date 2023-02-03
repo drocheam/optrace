@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="61.007133mm"
-   height="44.549999mm"
-   viewBox="0 0 61.007132 44.55"
+   width="65mm"
+   height="48mm"
+   viewBox="0 0 64.999999 48"
    version="1.1"
    id="svg5"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
@@ -24,21 +24,21 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     showgrid="false"
+     showgrid="true"
      inkscape:zoom="2.2898418"
-     inkscape:cx="-23.582415"
-     inkscape:cy="84.503653"
-     inkscape:window-width="1920"
-     inkscape:window-height="1006"
-     inkscape:window-x="0"
+     inkscape:cx="-15.939966"
+     inkscape:cy="51.313589"
+     inkscape:window-width="2560"
+     inkscape:window-height="1366"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
     <inkscape:grid
        type="xygrid"
        id="grid132"
-       originx="-69.873605"
-       originy="-30.725001" />
+       originx="-67.999995"
+       originy="-28.999999" />
   </sodipodi:namedview>
   <defs
      id="defs2">
@@ -132,7 +132,7 @@
        inkscape:collect="always"
        preserveAspectRatio="xMidYMid">
       <g
-         transform="rotate(180,0,0)"
+         transform="scale(-1)"
          id="g122870">
         <path
            style="fill:#b91a1a;fill-rule:evenodd;stroke:none"
@@ -317,7 +317,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-69.873625,-30.725)">
+     transform="translate(-68.00002,-28.999999)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect12415"
+       width="65"
+       height="48"
+       x="68.000023"
+       y="29"
+       ry="3.5527137e-15" />
     <path
        style="fill:url(#linearGradient68493);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
        d="m 100,50 c 8.00736,-9.287548 18.88803,-16.062371 30.75576,-19.15 v 0 44.299999 H 87.011813 C 89.292876,65.90473 93.781993,57.212117 100,50 Z"

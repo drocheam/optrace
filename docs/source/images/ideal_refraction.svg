@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="100.8756mm"
-   height="56.449913mm"
-   viewBox="0 0 100.8756 56.449913"
+   width="104mm"
+   height="60mm"
+   viewBox="0 0 104 60"
    version="1.1"
    id="svg14901"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
@@ -13,7 +13,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:ns4="http://www.iki.fi/pav/software/textext/">
+   xmlns:ns1="http://www.iki.fi/pav/software/textext/">
   <sodipodi:namedview
      id="namedview14903"
      pagecolor="#ffffff"
@@ -24,10 +24,10 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     showgrid="false"
-     inkscape:zoom="2"
-     inkscape:cx="22.25"
-     inkscape:cy="2.75"
+     showgrid="true"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="125.33468"
+     inkscape:cy="161.39712"
      inkscape:window-width="2560"
      inkscape:window-height="1366"
      inkscape:window-x="1920"
@@ -37,31 +37,11 @@
     <inkscape:grid
        type="xygrid"
        id="grid15397"
-       originx="-50.686917"
-       originy="-28.437509" />
+       originx="-49"
+       originy="-27.000001" />
   </sodipodi:namedview>
   <defs
      id="defs14898">
-    <marker
-       markerWidth="0.52499998"
-       markerHeight="0.99999994"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       id="CapTriangle"
-       viewBox="0 0 0.525 1"
-       inkscape:stockid="pin"
-       style="overflow:visible"
-       preserveAspectRatio="xMidYMid"
-       inkscape:isstock="true"
-       inkscape:collect="always">
-      <path
-         id="path7813"
-         style="fill:context-stroke;stroke-linecap:butt"
-         d="M 0,-1 1,0 0,1 -0.05,0 Z"
-         sodipodi:nodetypes="sssssscsss"
-         transform="scale(0.5)" />
-    </marker>
     <marker
        markerWidth="0.52499998"
        markerHeight="0.99999994"
@@ -137,26 +117,6 @@
        id="path-effect98169"
        is_visible="true"
        lpeversion="1" />
-    <marker
-       style="overflow:visible"
-       id="Arrow1L"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Arrow1L"
-       markerWidth="8.75"
-       markerHeight="5"
-       viewBox="0 0 8.75 5"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid"
-       markerUnits="strokeWidth">
-      <path
-         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
-         d="M 0,0 5,-5 -12.5,0 5,5 Z"
-         id="arrow1L"
-         transform="scale(-0.5)" />
-    </marker>
     <marker
        style="overflow:visible"
        id="Arrow1L_Fnone_S-4535be"
@@ -551,7 +511,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-50.6869,-28.4375)">
+     transform="translate(-48.999983,-26.999991)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect6463"
+       width="104"
+       height="60"
+       x="48.999985"
+       y="26.99999"
+       ry="3.5527137e-15" />
     <path
        style="fill:#000000;stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:bevel;stroke-dasharray:none;stroke-dashoffset:0;paint-order:fill markers stroke"
        id="path15926"
@@ -756,16 +724,16 @@
        inkscape:original-d="M 95.000605,64.999396 C 109.5224,58.546555 124.04394,52.093458 138.56522,45.640106" />
     <g
        transform="matrix(0.35277801,0,0,0.35277801,94.804,33.7636)"
-       ns4:version="1.8.1"
-       ns4:texconverter="pdflatex"
-       ns4:pdfconverter="inkscape"
-       ns4:text="$s_0$\n\n$s'_0$\n\n$x$\n\n$x_0$\n\n$0$\n\n$f$\n\n$z$\n\n$x_f$\n\n$s_z$\n\n$s_x$\n\n$\\varepsilon_x$\n\n$\\varepsilon'_x$\n\nLens Axis\n\nOptical Axis"
-       ns4:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns4:scale="1.0"
-       ns4:alignment="middle center"
-       ns4:stroke-to-path="0"
-       ns4:inkscapeversion="1.2.2"
-       ns4:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$s_0$\n\n$s'_0$\n\n$x$\n\n$x_0$\n\n$0$\n\n$f$\n\n$z$\n\n$x_f$\n\n$s_z$\n\n$s_x$\n\n$\\varepsilon_x$\n\n$\\varepsilon'_x$\n\nLens Axis\n\nOptical Axis"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:inkscapeversion="1.2.2"
+       ns1:jacobian_sqrt="0.352778"
        id="g10981">
       <defs
          id="id-8ac41d7b-df64-4167-ae75-ca2b12957e6e">

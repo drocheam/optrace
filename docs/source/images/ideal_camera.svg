@@ -13,7 +13,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:ns17="http://www.iki.fi/pav/software/textext/">
+   xmlns:ns1="http://www.iki.fi/pav/software/textext/">
   <sodipodi:namedview
      id="namedview7"
      pagecolor="#ffffff"
@@ -25,12 +25,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.1893044"
-     inkscape:cx="588.15893"
-     inkscape:cy="111.40966"
-     inkscape:window-width="1920"
-     inkscape:window-height="1006"
-     inkscape:window-x="0"
+     inkscape:zoom="1.6819304"
+     inkscape:cx="302.33118"
+     inkscape:cy="204.22961"
+     inkscape:window-width="2560"
+     inkscape:window-height="1366"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
@@ -429,6 +429,14 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-5, -10)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect5585"
+       width="165"
+       height="100"
+       x="5.0000005"
+       y="10"
+       ry="3.5527137e-15" />
     <path
        id="path274"
        style="fill:#fcffb5;fill-opacity:1;stroke:none;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-dasharray:none"
@@ -744,15 +752,15 @@
        ry="3.5527137e-15" />
     <g
        transform="matrix(0.352778,0,0,0.352778,114.79991,16.361591)"
-       ns17:version="1.8.1"
-       ns17:texconverter="pdflatex"
-       ns17:pdfconverter="inkscape"
-       ns17:text="Ideal Camera"
-       ns17:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns17:scale="1.0"
-       ns17:alignment="middle center"
-       ns17:stroke-to-path="0"
-       ns17:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="Ideal Camera"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:jacobian_sqrt="0.352778"
        id="g4292">
       <defs
          id="id-045fcf5c-7751-4537-bb16-9e605f22f5a4">
@@ -1121,15 +1129,15 @@
     </g>
     <g
        transform="matrix(0.352778,0,0,0.352778,145.20018,20.970587)"
-       ns17:version="1.8.1"
-       ns17:texconverter="pdflatex"
-       ns17:pdfconverter="inkscape"
-       ns17:text="Sensor"
-       ns17:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns17:scale="1.0"
-       ns17:alignment="middle center"
-       ns17:stroke-to-path="0"
-       ns17:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="Sensor"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:jacobian_sqrt="0.352778"
        id="g13611">
       <defs
          id="id-26e6dcbd-b175-41d2-ab34-6674c100a5d1">

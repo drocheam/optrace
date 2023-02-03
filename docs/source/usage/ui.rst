@@ -17,41 +17,61 @@ ____________________
 
 **Example**
 
+As always, import the main optrace namespace:
+
 .. testcode::
 
    import optrace as ot
 
+To import the TraceGUI into the current namespace write:
+
 .. testcode::
 
-   from optrace.gui.trace_gui.import TraceGUI
+   from optrace.gui.trace_gui import TraceGUI
+
+Let's create some exemplary geometry:
 
 .. testcode::
 
    RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
 
    disc = ot.CircularSurface(r=3)
-   RS = ot.RaySource(disc, pos=[0, 0, 0])
+   RS = ot.RaySource(disc, pos=[0, 0, -5])
    RT.add(RS)
 
    eye = ot.presets.geometry.legrand_eye()
    RT.add(eye)
 
+A TraceGUI takes the raytracer as argument:
+
 .. testcode::
 
    sim = TraceGUI(RT)
+
+The GUI is now assigned to the :python:`sim` variable, but has not started yet.
+For running the GUI you need to write:
+
+.. testcode::
+
    sim.run()
 
+This loads the main window and also raytraces the geometry.
 
 **Parameters**
+
+When creating the GUI, additional properties can be assigned.
+For instance, setting the scene to high contrast mode and increasing the amount of rays traced, we can write instead:
 
 .. testcode::
 
    sim = TraceGUI(RT, high_contrast=True, ray_count=2000000)
 
+Available properties are discussed in :numref:`gui_tabs`.
+
 
 **UI Theme**
 
-The TraceGUI uses Qt5 as UI backend. Qt5 supports different styles that can be controlled with the :python:`ui_theme` parameter on the TraceGUI initialization.
+The TraceGUI uses Qt5 as UI backend. Qt5 supports different themes that can be controlled with the :python:`ui_theme` parameter on the TraceGUI initialization.
 
 .. testcode::
 
@@ -59,15 +79,57 @@ The TraceGUI uses Qt5 as UI backend. Qt5 supports different styles that can be c
 
 Details on styles can be found in the `Qt documentation <https://doc.qt.io/qt-5/qstyle.html#details>`__.
 Available themes depend on your system and Qt installation, but can be extended using plugins.
-At least styles :python:`"Windows"` and :python:`"Fusion"` should be available on all systems.
+Normally, at least styles :python:`"Windows"` and :python:`"Fusion"` should be available on all systems.
+Most notably, dark themes like in :numref:`ui_dark_theme` prove especially useful in low light environments.
 
-UI Elements
+UI Overview
 _________________
 
+
+Full UI
+######################
 
 .. figure:: ../images/ui_full.png
    :align: center
    :width: 800
+
+
+Scene
+######################
+
+
+Details on the scene navigation are found in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>` under "Mouse Interaction".
+There are also keyboard shortcuts available that are discussed in :numref:`gui_keyboard_shortcuts`.
+
+
+Toolbar
+######################
+
+The mayavi scene toolbar is positioned above the scene. It includes buttons for the pipeline view window, different perspectives, fullscreen, screenshot saving and scene settings. Details are found in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>`.
+
+Sidebar
+######################
+
+The sidebar is positioned at the right hand side of the scene and consists of multiple tabs:
+
+.. list-table::
+   :align: left
+   :stub-columns: 1
+   :widths: 150 350
+
+   * - Main Tab
+     - Includes settings for raytracing, scene visualization and buttons for opening additional windows
+   * - Image Tab
+     - Features options for rendering source and detector images
+   * - Spectrum Tab
+     - Settings for the rendering of source or detector light spectrum histograms
+   * - Focus Tab
+     - Option View and result output for finding the focus in the optical setup
+   * - Debug Tab
+     - Advanced options, especially for development of optrace
+
+The following figure shows all tabs except the debug tab. 
+The UI elements will be discussed in the following sections.
 
 .. list-table::
    :align: center
@@ -89,11 +151,46 @@ _________________
           :width: 200
 
 
+Additional Windows
+#######################
+
+
+Beside the main window there are additional windows in the interface. These will be discussed in :numref:`gui_windows`, but a quick overview is given here:
+
+.. list-table::
+   :align: left
+   :header-rows: 1
+   :stub-columns: 0
+   :widths: 100 250 350
+
+   * - Window
+     - Access
+     - Function
+   * - Pipeline View
+     - Leftmost button in the toolbar
+     - Access to viewing and editing the mayavi graphical elements
+   * - Scene Settings
+     - Rightmost button in the toolbar
+     - mayavi settings, including lighting and scene properties
+   * - Command Window
+     - button at the bottom of the main tab in the sidebar
+     - command execution and history for controlling the GUI and raytracer
+   * - Property Browser
+     - button at the bottom of the main tab in the sidebar
+     - overview of raytracer, scene and ray properties as well as cardinal points
+
 The Scene
 ____________________
 
-Main Tab
+
+.. _gui_tabs:
+
+Sidebar Tabs
 ____________________
+
+
+Main Tab
+#######################
 
 
 .. list-table::
@@ -158,7 +255,8 @@ ____________________
      -
 
 Image Tab
-____________________
+#######################
+
 
 .. list-table::
    :header-rows: 1
@@ -238,7 +336,7 @@ ____________________
      -
 
 Spectrum Tab
-____________________
+#######################
 
 .. list-table::
    :header-rows: 1
@@ -278,7 +376,7 @@ ____________________
      -
 
 Focus Tab
-____________________
+#######################
 
 .. list-table::
    :header-rows: 1
@@ -321,10 +419,19 @@ ____________________
      - string
      -
 
+.. _gui_windows:
 
+Additional Windows
+____________________
 
 Pipeline View
-____________________
+#######################
+
+
+`<https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__
+
+`<https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__
+
 
 .. figure:: ../images/ui_pipeline.png
    :align: center
@@ -332,15 +439,17 @@ ____________________
 
 
 Property Viewer
-____________________
+#######################
 
 .. figure:: ../images/ui_property_browser.png
    :align: center
    :width: 600
 
 Command Window
-____________________
+#######################
 
+
+.. TODO single elements from the history can be copied by selecting them and pressing ctrl+c
 
 .. figure:: ../images/ui_command_window.png
    :align: center
@@ -354,7 +463,9 @@ ____________________
 
 The following keyboard shortcuts are available inside the scene:
 
-.. list-table::
+.. _gui_keyboard_shortcuts:
+
+.. list-table:: Available keyboards shortcuts
    :header-rows: 1
    :align: center
    :widths: 100 300
@@ -403,6 +514,7 @@ From outside the theme can either be provided by setting an environment variable
 
 Note that the mentioned style needs to be supported by your Qt installation. The above syntax is that for an Unix system and can differ for other systems.
 
+.. _ui_dark_theme:
 
 .. figure:: ../images/ui_kvantum_theme.png
    :align: center
@@ -411,4 +523,21 @@ Note that the mentioned style needs to be supported by your Qt installation. The
    UI with the dark theme.
 
 **Passing Properties to the GUI object**
+
+Under some circumstances it is useful to provide additional parameters like properties or functions to the GUI so they can be accessed in the control window.
+For instance, we implemented a function that changes the geometry in some specific way or steps through different source or lens constellations.
+
+As example, the user can define some function :python:`func` inside his script and pass it to the TraceGUI:
+
+.. testcode::
+
+   def func(a, b, c):
+        # do some complicated things inside here
+        ...
+
+   sim = TraceGUI(RT, important_function=func)
+
+:python:`func` get assigned to the TraceGUI under the name :python:`important_function`. Therefore it can be used inside the command window as :python:`self.important_function`.
+
+This is not limited to functions but works for arbitrary objects, however note that the assigned name must not collide with any variable or method name already implemented in the TraceGUI class.
 

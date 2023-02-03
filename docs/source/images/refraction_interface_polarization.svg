@@ -6,15 +6,15 @@
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    id="svg5"
    version="1.1"
-   viewBox="0 0 124.82089 48.415661"
-   height="48.415661mm"
-   width="124.82088mm"
+   viewBox="0 0 130.00001 54"
+   height="54mm"
+   width="130mm"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:ns4="http://www.iki.fi/pav/software/textext/">
+   xmlns:ns1="http://www.iki.fi/pav/software/textext/">
   <sodipodi:namedview
      id="namedview7"
      pagecolor="#ffffff"
@@ -25,21 +25,21 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     showgrid="false"
-     inkscape:zoom="1.9653042"
-     inkscape:cx="363.55694"
-     inkscape:cy="92.860941"
+     showgrid="true"
+     inkscape:zoom="2.7793599"
+     inkscape:cx="196.62801"
+     inkscape:cy="90.488463"
      inkscape:window-width="2560"
      inkscape:window-height="1366"
      inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1">
+     inkscape:current-layer="svg5">
     <inkscape:grid
        type="xygrid"
        id="grid132"
-       originx="-80.860001"
-       originy="-23.584312" />
+       originx="-78.000004"
+       originy="-21.000001" />
   </sodipodi:namedview>
   <defs
      id="defs2">
@@ -449,18 +449,27 @@
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(2.9132106,0,0,1.0037023,-137.85644,-0.26599367)" />
   </defs>
+  <rect
+     style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+     id="rect13398"
+     width="130"
+     height="53.999996"
+     x="77.999947"
+     y="21.000029"
+     ry="3.5527137e-15"
+     transform="translate(-77.999947,-21.000029)" />
   <g
-     transform="matrix(0.35277801,0,0,0.35277801,60.351651,-4.4097251e-5)"
-     ns4:version="1.8.1"
-     ns4:texconverter="pdflatex"
-     ns4:pdfconverter="inkscape"
-     ns4:text="p-Plane View at Intersection"
-     ns4:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-     ns4:scale="1.0"
-     ns4:alignment="middle center"
-     ns4:stroke-to-path="0"
-     ns4:inkscapeversion="1.2.2"
-     ns4:jacobian_sqrt="0.352778"
+     transform="matrix(0.35277801,0,0,0.35277801,63.211673,2.5842679)"
+     ns1:version="1.8.1"
+     ns1:texconverter="pdflatex"
+     ns1:pdfconverter="inkscape"
+     ns1:text="p-Plane View at Intersection"
+     ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+     ns1:scale="1.0"
+     ns1:alignment="middle center"
+     ns1:stroke-to-path="0"
+     ns1:inkscapeversion="1.2.2"
+     ns1:jacobian_sqrt="0.352778"
      id="g93508">
     <defs
        id="id-ebb888a1-02e1-473c-b708-a49bf9da5d6f">
@@ -776,7 +785,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-80.85997,-23.584341)">
+     transform="translate(-77.999948,-21.000029)">
     <path
        style="fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:0.25, 0.75;stroke-dashoffset:0.3;stroke-opacity:1"
        d="M 98.2542,35.328881 H 88.25419"
@@ -1677,16 +1686,16 @@
     </g>
     <g
        transform="matrix(0.352778,0,0,0.352778,80.860058,23.623102)"
-       ns4:version="1.8.1"
-       ns4:texconverter="pdflatex"
-       ns4:pdfconverter="inkscape"
-       ns4:text="Propagation Direction"
-       ns4:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns4:scale="1.0"
-       ns4:alignment="middle center"
-       ns4:stroke-to-path="0"
-       ns4:inkscapeversion="1.2.2"
-       ns4:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="Propagation Direction"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:inkscapeversion="1.2.2"
+       ns1:jacobian_sqrt="0.352778"
        id="g2460">
       <defs
          id="id-566c2d20-278c-414f-97d2-f4bf16f7ddfd">
@@ -1943,16 +1952,16 @@
     </g>
     <g
        transform="matrix(0.352778,0,0,0.352778,164.9528,31.616153)"
-       ns4:version="1.8.1"
-       ns4:texconverter="pdflatex"
-       ns4:pdfconverter="inkscape"
-       ns4:text="Orthogonality:\n\n$s \\perp E_\\text{p}, ~s \\perp E_\\text{s},  ~E_\\text{s} \\perp E_\\text{p}$\n\n$s' \\perp E'_\\text{p}, ~s' \\perp E_\\text{s},  ~E_\\text{s} \\perp E'_\\text{p}$"
-       ns4:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns4:scale="1.0"
-       ns4:alignment="middle center"
-       ns4:stroke-to-path="0"
-       ns4:inkscapeversion="1.2.2"
-       ns4:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="Orthogonality:\n\n$s \\perp E_\\text{p}, ~s \\perp E_\\text{s},  ~E_\\text{s} \\perp E_\\text{p}$\n\n$s' \\perp E'_\\text{p}, ~s' \\perp E_\\text{s},  ~E_\\text{s} \\perp E'_\\text{p}$"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:inkscapeversion="1.2.2"
+       ns1:jacobian_sqrt="0.352778"
        id="g6166"
        style="display:inline;fill:#727272;fill-opacity:1">
       <defs

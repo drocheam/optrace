@@ -24,10 +24,10 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     showgrid="false"
+     showgrid="true"
      inkscape:zoom="2.9800553"
-     inkscape:cx="288.24969"
-     inkscape:cy="85.736664"
+     inkscape:cx="222.31131"
+     inkscape:cy="128.01776"
      inkscape:window-width="2560"
      inkscape:window-height="1366"
      inkscape:window-x="1920"
@@ -1442,6 +1442,14 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-42.7888, -8.8426)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect8435"
+       width="106"
+       height="75.999992"
+       x="42.788799"
+       y="8.8425989"
+       ry="3.5527137e-15" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1556_Fnone_S-000000-9)"
        d="m 50.788794,79.842594 h 10.02684"

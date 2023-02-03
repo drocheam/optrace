@@ -1,6 +1,7 @@
 
 from traitsui.api import View, Item, ValueEditor, Group, CodeEditor, ListStrEditor
 from traits.api import HasTraits, observe, Button, Dict, Str, List
+from pyface.qt import QtGui  # copying to clipboard 
 
 
 class CommandWindow(HasTraits):
@@ -15,6 +16,7 @@ class CommandWindow(HasTraits):
     
     _run_button:          Button = Button(label="Run", desc="runs the specified command")
     _clear_button:        Button = Button(label="Clear", desc="clear command history")
+    _clipboard_button:    Button = Button(label="Copy History to Clipboard", desc="copies the full history to the clipboard")
     
 
     view = View(
@@ -33,6 +35,7 @@ class CommandWindow(HasTraits):
                         Item("_history", editor=ListStrEditor(horizontal_lines=True), show_label=False,
                              height=220, style_sheet="*{font-family: monospace}"),
                         Item("_clear_button", show_label=False),
+                        Item("_clipboard_button", show_label=False),
                     ),
                     Item("_status", style="readonly", show_label=False),
                     ),
@@ -56,6 +59,19 @@ class CommandWindow(HasTraits):
         :param event: optional event from traits observe decorator
         """
         self._history = []
+    
+    @observe('_clipboard_button')
+    def copy_history(self, event=None) -> None:
+        """
+        copy the full history to the clipboard
+        :param event: optional event from traits observe decorator
+        """
+        output = ""
+        for el in self._history:
+            output += el + "\n"
+
+        clipboard = QtGui.QApplication.clipboard()
+        clipboard.setText(output, mode=clipboard.Clipboard)
     
     @observe('_run_button')
     def send_cmd(self, event=None) -> None:

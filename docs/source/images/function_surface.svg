@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="105mm"
-   height="55mm"
-   viewBox="0 0 105 55"
+   width="104mm"
+   height="56mm"
+   viewBox="0 0 104 56"
    version="1.1"
    id="svg631"
    sodipodi:docname="function_surface.svg"
@@ -26,9 +26,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="3.3638608"
-     inkscape:cx="140.01768"
-     inkscape:cy="63.468738"
+     inkscape:zoom="2.3786088"
+     inkscape:cx="96.064557"
+     inkscape:cy="196.54346"
      inkscape:window-width="2560"
      inkscape:window-height="1366"
      inkscape:window-x="1920"
@@ -38,8 +38,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid972"
-       originx="-55.000001"
-       originy="-25.000001" />
+       originx="-54.000001"
+       originy="-25" />
   </sodipodi:namedview>
   <defs
      id="defs628">
@@ -581,7 +581,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-50.7888,-19.842601)">
+     transform="translate(-49.7888,-19.842601)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect4933"
+       width="104"
+       height="56"
+       x="49.788799"
+       y="19.842602"
+       ry="3.5527137e-15" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1556_Fnone_S-000000)"
        d="M 55.788787,69.842641 H 65.842474"

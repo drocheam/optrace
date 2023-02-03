@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="161mm"
+   width="155mm"
    height="67mm"
-   viewBox="0 0 161 67"
+   viewBox="0 0 155 67"
    version="1.1"
    id="svg5"
    sodipodi:docname="pupil_calculation.svg"
@@ -13,7 +13,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:ns4="http://www.iki.fi/pav/software/textext/">
+   xmlns:ns1="http://www.iki.fi/pav/software/textext/">
   <sodipodi:namedview
      id="namedview7"
      pagecolor="#ffffff"
@@ -25,12 +25,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="11.313709"
-     inkscape:cx="549.55455"
-     inkscape:cy="119.98718"
-     inkscape:window-width="1920"
-     inkscape:window-height="1006"
-     inkscape:window-x="0"
+     inkscape:zoom="2.8284273"
+     inkscape:cx="303.87913"
+     inkscape:cy="121.79914"
+     inkscape:window-width="2560"
+     inkscape:window-height="1366"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
@@ -38,30 +38,11 @@
     <inkscape:grid
        type="xygrid"
        id="grid132"
-       originx="-5.0000003"
+       originx="-9.9999998"
        originy="-9.9999999" />
   </sodipodi:namedview>
   <defs
      id="defs2">
-    <marker
-       style="overflow:visible"
-       id="Arrow1L"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Arrow1L"
-       markerWidth="8.75"
-       markerHeight="5"
-       viewBox="0 0 8.75 5"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
-         d="M 0,0 5,-5 -12.5,0 5,5 Z"
-         id="arrow1L"
-         transform="scale(-0.5)" />
-    </marker>
     <marker
        style="overflow:visible"
        id="Arrow1L_Fnone_S-e9c300"
@@ -703,7 +684,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-5.0000008,-10)">
+     transform="translate(-10.000001,-10)">
+    <rect
+       style="opacity:0.996714;fill:#ffffff;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dashoffset:1.70079;paint-order:fill markers stroke"
+       id="rect11148"
+       width="155"
+       height="67"
+       x="10.000001"
+       y="10"
+       ry="3.5527137e-15" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
        d="M 39.999999,39.999999 41,38.999998"
@@ -712,10 +701,10 @@
        inkscape:original-d="M 39.999999,39.999999 C 40.333596,39.666931 40.666931,39.333598 41,38.999998" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1L_Fnone_S-000000)"
-       d="m 10,40 150,-10e-7"
+       d="M 14.000001,40 160,39.999999"
        id="path7063"
        inkscape:path-effect="#path-effect7065"
-       inkscape:original-d="m 10,40 c 50.000263,2.64e-4 100.00026,2.63e-4 150,-10e-7"
+       inkscape:original-d="M 14.000001,40 C 64.000264,40.000264 110.00026,40.000263 160,39.999999"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#008c14;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
@@ -758,7 +747,7 @@
        inkscape:original-d="m 134.88377,48 c 5.00026,2.64e-4 8.39853,3.49e-4 13.39827,4.9e-5"
        sodipodi:nodetypes="cc" />
     <rect
-       style="opacity:0.996714;fill:none;stroke:#000000;stroke-width:0.504046;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dasharray:1.00809205, 1.00809205;stroke-dashoffset:0"
+       style="opacity:0.996714;fill:none;stroke:#000000;stroke-width:0.504046;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.1;stroke-dasharray:1.00809, 1.00809;stroke-dashoffset:0"
        id="rect956"
        width="95.495956"
        height="40.995953"
@@ -965,15 +954,15 @@
     </g>
     <g
        transform="matrix(0.352778,0,0,0.352778,81.044572,15.500176)"
-       ns4:version="1.8.1"
-       ns4:texconverter="pdflatex"
-       ns4:pdfconverter="inkscape"
-       ns4:text="$\\text{M}$"
-       ns4:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns4:scale="1.0"
-       ns4:alignment="middle center"
-       ns4:stroke-to-path="0"
-       ns4:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$\\text{M}$"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:jacobian_sqrt="0.352778"
        id="g9579">
       <defs
          id="id-5d873a84-6d35-45c7-a352-272101ddc6f7">
@@ -1004,22 +993,22 @@
       </g>
     </g>
     <path
-       style="fill:none;stroke:#b81a1a;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.25,0.25;stroke-dashoffset:0.25;stroke-opacity:1"
+       style="fill:none;stroke:#b81a1a;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.25, 0.25;stroke-dashoffset:0.25;stroke-opacity:1"
        d="M 150,65 V 20"
        id="path10706"
        inkscape:path-effect="#path-effect10708"
        inkscape:original-d="m 150,65 c 2.6e-4,-15.105194 2.6e-4,-29.894275 0,-45"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:none;stroke:#9f9f9f;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.25,0.25;stroke-dashoffset:0.25;stroke-opacity:1"
-       d="m 88,20 0,45"
+       style="fill:none;stroke:#9f9f9f;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.25, 0.25;stroke-dashoffset:0.25;stroke-opacity:1"
+       d="M 88,20 V 65"
        id="path10716"
        inkscape:path-effect="#path-effect10718"
        inkscape:original-d="m 88,20 c 2.66e-4,15.105725 2.66e-4,29.894806 0,45"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:none;stroke:#008c14;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.25,0.25;stroke-dashoffset:0.25;stroke-opacity:1"
-       d="m 75,20 0,45"
+       style="fill:none;stroke:#008c14;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.25, 0.25;stroke-dashoffset:0.25;stroke-opacity:1"
+       d="M 75,20 V 65"
        id="path10726"
        inkscape:path-effect="#path-effect10728"
        inkscape:original-d="m 75,20 c 2.66e-4,15.105725 2.66e-4,29.894806 0,45"
@@ -2144,15 +2133,15 @@
     </g>
     <g
        transform="matrix(0.352778,0,0,0.352778,156.54483,37.000088)"
-       ns4:version="1.8.1"
-       ns4:texconverter="pdflatex"
-       ns4:pdfconverter="inkscape"
-       ns4:text="$z$"
-       ns4:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns4:scale="1.0"
-       ns4:alignment="middle center"
-       ns4:stroke-to-path="0"
-       ns4:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$z$"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:jacobian_sqrt="0.352778"
        id="g40499">
       <defs
          id="id-600831ee-6088-46be-b2fc-76aa73c021a3">
@@ -2202,15 +2191,15 @@
        inkscape:original-d="m 18,30.000002 c 4.000264,2.64e-4 8.000264,2.64e-4 12,0" />
     <g
        transform="matrix(0.352778,0,0,0.352778,13.049956,24.756965)"
-       ns4:version="1.8.1"
-       ns4:texconverter="pdflatex"
-       ns4:pdfconverter="inkscape"
-       ns4:text="Light Direction"
-       ns4:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
-       ns4:scale="1.0"
-       ns4:alignment="middle center"
-       ns4:stroke-to-path="0"
-       ns4:jacobian_sqrt="0.352778"
+       ns1:version="1.8.1"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="Light Direction"
+       ns1:preamble="/usr/share/inkscape/extensions/textext/default_packages.tex"
+       ns1:scale="1.0"
+       ns1:alignment="middle center"
+       ns1:stroke-to-path="0"
+       ns1:jacobian_sqrt="0.352778"
        id="g42616"
        style="display:none;fill:#e9c300;fill-opacity:1">
       <defs
