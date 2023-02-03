@@ -37,7 +37,7 @@ class Raytracer(Group):
     values below this are handled as absorbed
     needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power"""
 
-    MAX_RAYS: int = 10000000
+    MAX_RAYS: int = 6000000
     """ maximum number of rays. Limited by RAM usage """
 
     ITER_RAYS_STEP: int = 1000000

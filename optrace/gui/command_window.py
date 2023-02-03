@@ -21,7 +21,10 @@ class CommandWindow(HasTraits):
                 Group(
                     Group(
                         Item("_execute_label", style='readonly', show_label=False, emphasized=True),
-                        Item('_cmd', editor=CodeEditor(), show_label=False, style="custom"), 
+                        # custom stylesheet because colored or dark themes mess up the syntax highlighting
+                        # of the code editor
+                        Item('_cmd', editor=CodeEditor(), show_label=False, style="custom", 
+                             style_sheet="*{background-color: white; color: black}"), 
                         Item("_run_button", show_label=False),
                     ),
                     Item("_whitespace_label", style='readonly', show_label=False, width=210),

@@ -11,6 +11,7 @@ from contextlib import contextmanager  # context manager for _no_trait_action()
 from traits.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt'
 
+from PyQt5.QtCore import QCoreApplication
 from pyface.api import GUI as pyface_gui  # invoke_later() method
 from pyface.qt import QtGui  # closing UI elements
 
@@ -78,7 +79,7 @@ class TraceGUI(HasTraits):
 
     ray_amount_shown: Range = Range(1, 10000, 2000, desc='the number of rays which is drawn', enter_set=False,
                                     auto_set=False, label="Count", mode='logslider')
-    """Number of rays shown in mayavi scenen"""
+    """Number of rays shown in mayavi scene"""
 
     det_pos: Range = Range(low='_det_pos_min', high='_det_pos_max', value='_det_pos_max', mode='text',
                            desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_det")
@@ -410,13 +411,19 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Class constructor
 
-    def __init__(self, raytracer: Raytracer, **kwargs) -> None:
+    def __init__(self, raytracer: Raytracer, ui_style=None, **kwargs) -> None:
         """
         Create a new TraceGUI with the assigned Raytracer.
 
         :param RT: raytracer
+        :param ui_style: UI style string for Qt
         :param kwargs: additional arguments, options, traits and parameters
         """
+        # TODO documentation
+        # set UI theme. Unfortunately this does not work dynamically (yet)
+        if ui_style is not None:
+            QtGui.QApplication.setStyle(ui_style)
+        
         # lock object for multithreading
         self.__detector_lock = Lock()  # when detector is changed, moved or used for rendering
         self.__det_image_lock = Lock()  # when last detector image changed
@@ -1152,10 +1159,10 @@ class TraceGUI(HasTraits):
                 text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
                                             text=mark.desc, name="Label")
                 text.actor.text_scale_mode = 'none'
-                text.property.font_size = int(8 * mark.text_factor)
                 tprop = dict(justification="center") if not self.vertical_labels\
                         else dict(justification="left", orientation=90, vertical_justification="center")
                 text.property.trait_set(**self.LABEL_STYLE, **tprop)
+                text.property.font_size = int(8 * mark.text_factor)
 
                 self._marker_plots.append((m, None, None, text, mark))
     
@@ -1177,10 +1184,10 @@ class TraceGUI(HasTraits):
             
                 text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], text=mark.desc, name="Label")
                 text.actor.text_scale_mode = 'none'
-                text.property.font_size = int(8 * mark.text_factor)
                 tprop = dict(justification="center") if not self.vertical_labels\
                         else dict(justification="left", orientation=90, vertical_justification="center")
                 text.property.trait_set(**self.LABEL_STYLE, **tprop)
+                text.property.font_size = int(8 * mark.text_factor)
 
                 self._line_marker_plots.append((m, None, None, text, mark))
 
@@ -1364,6 +1371,10 @@ class TraceGUI(HasTraits):
                 case "m":
                     if not self.silent:
                         print("Avoid pressing 'm' in the scene because it interferes with mouse picking handlers.")
+                
+                case "a":
+                    if not self.silent:
+                        print("Avoid pressing 'a' as it is a mayavi shortcut for actor mode, where rays can be moved.")
 
                 case "y":  # reset view
                     self.default_camera_view()

@@ -71,7 +71,7 @@ Masking
 ################
 
 
-Passing Objects to the GUI
+Controlling Threading and Standard Output
 ______________________________________________
 
 

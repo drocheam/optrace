@@ -184,11 +184,13 @@ class GUITests(unittest.TestCase):
         trace_gui_run(ray_opacity=0.15)
         trace_gui_run(ray_width=5)
         trace_gui_run(vertical_labels=True)
+        trace_gui_run(ui_style="Windows")
+        trace_gui_run(ui_style="Fusion")
 
         # many parameters
         trace_gui_run(ray_count=100000, ray_amount_shown=1500, absorb_missing=False, ray_opacity=0.1, ray_width=5,
                       coloring_type="Wavelength", plotting_type="Points", minimalistic_view=True, 
-                      raytracer_single_thread=True, vertical_labels=True)
+                      raytracer_single_thread=True, vertical_labels=True, ui_style="Windows")
 
         # this attributes can't bet set initially
         self.assertRaises(RuntimeError, TraceGUI, RT, detector_selection="DET1")
@@ -759,6 +761,14 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim.silent = True
                 send_key(sim, "m")
+                sim._wait_for_idle()
+                
+                # don't press a warning
+                sim.silent = False
+                send_key(sim, "a")
+                sim._wait_for_idle()
+                sim.silent = True
+                send_key(sim, "a")
                 sim._wait_for_idle()
                
                 # key without shortcut

@@ -62,5 +62,5 @@ RT.add(Det2)
 # TODO document that this is possible
 
 # Instantiate the GUI and start it.
-sim = TraceGUI(RT, minimalistic_view=True, func2=lambda: RT.clear())
+sim = TraceGUI(RT, minimalistic_view=True, func2=lambda: RT.clear(), ui_style="kvantum-dark")
 sim.run()
