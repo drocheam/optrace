@@ -1113,7 +1113,8 @@ class TraceGUI(HasTraits):
         self._ray_text_parent = self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
         self._ray_text = self.scene.mlab.text(0.02, 0.97, "")
         self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
-                                          opacity=1, color=self.scene.foreground, vertical_justification="top")
+                                          opacity=1, color=self.scene.foreground, vertical_justification="top",
+                                          background_color=self._info_frame_color)
         self._ray_text.actor.text_scale_mode = 'none'
         self._ray_text.text = ""
 
@@ -1229,7 +1230,9 @@ class TraceGUI(HasTraits):
                 if self._crosshair is not None:
                     self._crosshair.visible = False  # hide crosshair
         else:
-            self._ray_text.text = f"Pick Position: ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, {pos[2]:>9.6g} mm)"
+            r, ang = np.hypot(pos[0], pos[1]), np.rad2deg(np.arctan2(pos[1], pos[0]))
+            self._ray_text.text = f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, {pos[2]:>9.6g} mm)\n"\
+                                  f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)"
             if self._crosshair is not None:
                 self._crosshair.mlab_source.trait_set(x=[pos[0]], y=[pos[1]], z=[pos[2]])
                 self._crosshair.visible = True
@@ -1593,10 +1596,10 @@ class TraceGUI(HasTraits):
             for obj in objs:
                 for el in obj[:3]:
                     if el is not None:
-                        el.actor.property.color = color
                         if self.high_contrast:
                             el.actor.property.specular_color = (0.15, 0.15, 0.15)
                             el.actor.property.diffuse_color = (0.12, 0.12, 0.12)
+                        el.actor.property.color = color
 
         # update axes color
         for ax in self._axis_plots:

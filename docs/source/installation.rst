@@ -24,7 +24,7 @@ After this, ``optrace`` should be installed on your system.
 .. list-table:: 
    :widths: 200 350
    :header-rows: 1
-   :align: left
+   :align: center
 
    * - Dependency
      - Needed for/as
@@ -50,4 +50,15 @@ After this, ``optrace`` should be installed on your system.
      - trait framework for mayavi
    * - `vtk <https://pypi.org/project/vtk/>`_
      - 3D toolkit needed for mayavi
+
+
+**Troubleshooting**
+
+* When mayavi fails installing vtk, try to install vtk first
+
+* When the installation of vtk fails, try to install older wheels from `this repository <https://github.com/pyvista/pyvista-wheels>`__.
+
+* Consult the `mayavi issues <https://github.com/enthought/mayavi/issues>`__, `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ or `PyQt5 issues <https://github.com/pyqt/python-qt5/issues>`__ for current problems and solutions
+
+* In many cases forcing the installation of a specific library version circumvents issues of newer releases. The syntax is shown `here <https://stackoverflow.com/a/5226504>`__. Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
 

@@ -11,7 +11,8 @@ Defining Elements (Lens, RaySource, Detector, Filter, Aperture, Marker)
 RaySource
 _______________________
 
-**Overview**
+Overview
+#############################
 
 
 A RaySource defines the properties for rays that it creates, including
@@ -25,7 +26,8 @@ A RaySource defines the properties for rays that it creates, including
 * Source position
 
 
-**Surface/Point/Line Parameter**
+Surface/Point/Line Parameter
+##################################
 
 A RaySource supports the following base shapes ``Point, Line, CircularSurface, RectangularSurface, RingSurface``, which are provided as first parameter to the ``RaySource()`` function.
 
@@ -35,7 +37,8 @@ A RaySource supports the following base shapes ``Point, Line, CircularSurface, R
    RS = ot.RaySource(circ)
 
 
-**Position Parameter**
+Position Parameter
+##################################
 
 The position in three-dimensional space is provided by the ``pos``-parameter.
 
@@ -43,7 +46,8 @@ The position in three-dimensional space is provided by the ``pos``-parameter.
 
    RS = ot.RaySource(circ, pos=[0, 1.2, -3.5])
 
-**Power Parameter**
+Power Parameter
+##################################
 
 Providing the ``power`` you can define the cumulative power of all rays. This proves especially useful when working with multiple sources and different power ratios.
 
@@ -51,7 +55,8 @@ Providing the ``power`` you can define the cumulative power of all rays. This pr
 
    RS = ot.RaySource(circ, power=0.5)
 
-**Orientation Parameter**
+Orientation Parameter
+##################################
 
 The base orientation type of the rays is defined by the ``orientation``-parameter.
 
@@ -87,7 +92,8 @@ As with other functions we can also provide a keyword argument dictionary for th
    ... 
    RS = ot.RaySource(circ, orientation="Function", or_func=or_func, or_args=dict(g=10))
 
-**Spectrum Parameter**
+Spectrum Parameter
+##################################
 
 A ``LightSpectrum`` object is provided with the ``spectrum`` parameter.
 For instance, this can be a predefined spectrum:
@@ -104,7 +110,8 @@ Or a user defined one:
    RS = ot.RaySource(circ, spectrum=spec)
 
 
-**Divergence Parameter**
+Divergence Parameter
+##################################
 
 Divergence defines how rays are distributed relative to their base orientation (``orientation`` parameter).
 
@@ -143,7 +150,8 @@ For all the combinations above we can also generate a direction distribution ins
    RS = ot.RaySource(circ, divergence="Function", div_func=lambda e: np.cos(e)**2, div_2d=True, div_axis_angle=20, div_angle=10)
 
 
-**Image Parameter**
+Image Parameter
+##################################
 
 Alternatively to a uniformly emitting area there is the possiblity to provide light distributions (=images).
 
@@ -167,7 +175,8 @@ Every image color generates a specific physical spectrum matching its color. Thi
 
 With ``image`` specified the ``spectrum`` is unused.
 
-**Polarization Parameter**
+Polarization Parameter
+##################################
 
 The polarization parameter describes the distribution of the direction of linear light polarizations.
 
@@ -222,10 +231,16 @@ Above we talked how for instance for ``polarization="x"`` the rays are parallel 
 Lens
 ________
 
+Overview
+##################################
+
+
 A Lens consists of two surfaces and a medium with a RefractionIndex between them.
 Additionally we need to provide the position and some thickness parameter, that will be explained later.
 
-**Example**
+Example
+##################################
+
 
 .. testcode:: 
 
@@ -243,7 +258,9 @@ To define a non-standard medium (not the one defined by the raytracing geometry)
    L = ot.Lens(sph1, sph2, n=n, pos=[0, 2, 10], de=0.5, n2=n2)
 
 
-**Lens Thickness**
+Lens Thickness
+##################################
+
 
 To allow for simple definitions of lens thickness and positions, there are multiple ways to define the thickness:
 
@@ -316,7 +333,9 @@ Or the parameters of its surfaces, like:
    0.4511539144368477
 
 
-**Paraxial Properties**
+Paraxial Properties
+##################################
+
 
 As for a setup of many lenses, we can also do paraxial analysis on a simple lens.
 
@@ -473,5 +492,4 @@ We can hide the text and only plot the marker line by leaving the text empty:
 
 .. testcode::
 
-   M = ot.LineMarker(r=3, desc="", pos=[0.5, 9.1, 0.5])
-
+   M = ot.LineMarker(r=3, desc="", pos=[0.5, 9.1, 0.5]
