@@ -867,7 +867,7 @@ class GUITests(unittest.TestCase):
                 clipboard = QtGui.QApplication.clipboard()
                 clipboard.clear(mode=clipboard.Clipboard)
                 clipboard.setText("a", mode=clipboard.Clipboard)
-                self.assertTrue(clipboard.text(), "a")
+                self.assertTrue(clipboard.text(mode=clipboard.Clipboard), "a")
 
                 # check that empty strings are copied correctly in the command window
                 sim._do_in_main(sim._cdb.copy_history)
