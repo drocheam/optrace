@@ -71,6 +71,7 @@ class CommandWindow(HasTraits):
             output += el + "\n"
 
         clipboard = QtGui.QApplication.clipboard()
+        clipboard.clear()  # needed to work on Windows?
         clipboard.setText(output, mode=clipboard.Clipboard)
     
     @observe('_run_button')
