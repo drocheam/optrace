@@ -3,7 +3,8 @@ from typing import Any  # Any type
 import numpy as np  # calculations
 
 from . import Filter, Aperture, Detector, Lens, RaySource, Surface,\
-        PointMarker, LineMarker, IdealLens, Element  # possible elements in group
+        PointMarker, LineMarker, IdealLens, Element, SphereVolume, BoxVolume, CylinderVolume, Volume
+        # possible elements in group
 from ..base_class import BaseClass  # parent class
 
 from ..transfer_matrix_analysis import TMA  # paraxial analysis
@@ -39,6 +40,7 @@ class Group(BaseClass):
         self.detectors = []  #: detectors in raytracing geometry
         self.ray_sources = []  #: ray sources in raytracing geometry
         self.markers = []  #: markers in raytracing geometry
+        self.volumes = []  #: volumes in raytracing geometry
         self.n0 = n0  #: ambient refraction index
 
         super().__init__(**kwargs)
@@ -64,13 +66,13 @@ class Group(BaseClass):
     def elements(self) -> list[Element]:
         """all included elements sorted in z-order"""
         return sorted([*self.lenses, *self.apertures, *self.filters, *self.ray_sources,
-                      *self.detectors, *self.markers], key=lambda el: el.pos[2])
+                      *self.detectors, *self.markers, *self.volumes], key=lambda el: el.pos[2])
     
     @property
     def _elements(self) -> list[Element]:
         """all included elements unsorted"""
         return [*self.lenses, *self.apertures, *self.filters, *self.ray_sources,
-                *self.detectors, *self.markers]
+                *self.detectors, *self.markers, *self.volumes]
 
     @property
     def pos(self) -> np.ndarray:
@@ -222,12 +224,26 @@ class Group(BaseClass):
             return
 
         match el:
-            case Aperture():                       self.apertures.append(el)
-            case Filter():                         self.filters.append(el)
-            case RaySource():                      self.ray_sources.append(el)
-            case Detector():                       self.detectors.append(el)
-            case PointMarker() | LineMarker():     self.markers.append(el)
-            case Lens() | IdealLens():             self.lenses.append(el)
+            case Aperture():                       
+                self.apertures.append(el)
+
+            case Filter():                         
+                self.filters.append(el)
+
+            case RaySource():                      
+                self.ray_sources.append(el)
+
+            case Detector():                       
+                self.detectors.append(el)
+
+            case PointMarker() | LineMarker():     
+                self.markers.append(el)
+
+            case SphereVolume() | BoxVolume() | CylinderVolume() | Volume():     
+                self.volumes.append(el)
+
+            case Lens() | IdealLens():             
+                self.lenses.append(el)
 
             case Group():
 
@@ -242,7 +258,7 @@ class Group(BaseClass):
                 for eli in el:
                     self.add(eli)
             case _:
-                raise TypeError("Unsupported element type {type(el).__name__}.")
+                raise TypeError(f"Unsupported element type {type(el).__name__}.")
 
     def remove(self, el: Element | list[Element] | Group) -> bool:
         """
@@ -263,7 +279,7 @@ class Group(BaseClass):
                 success = self.remove(eli) or success
 
         else:
-            for list_ in [self.lenses, self.apertures, self.detectors,
+            for list_ in [self.lenses, self.apertures, self.detectors, self.volumes,
                           self.filters, self.ray_sources, self.markers]:
                 for lel in list_.copy():
                     if lel is el:
@@ -285,6 +301,6 @@ class Group(BaseClass):
     def clear(self) -> None:
         """clear geometry, remove all objects from group"""
         for list_ in [self.lenses, self.apertures, self.filters, self.detectors,\
-                      self.ray_sources, self.markers]:
+                      self.ray_sources, self.markers, self.volumes]:
             list_[:] = []
 

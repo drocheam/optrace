@@ -36,11 +36,36 @@ tracer.geometry.element
 _________________________________
 .. automodule:: optrace.tracer.geometry.element
 
-tracer.geometry.point_marker
-_________________________________
-.. automodule:: optrace.tracer.geometry.point_marker
+tracer.geometry.point
+____________________________________
+.. automodule:: optrace.tracer.geometry.point
 
-tracer.geometry.line_marker
-_________________________________
-.. automodule:: optrace.tracer.geometry.line_marker
+tracer.geometry.line
+_____________________________________
+.. automodule:: optrace.tracer.geometry.line
+
+tracer.geometry.marker.point_marker
+____________________________________
+.. automodule:: optrace.tracer.geometry.marker.point_marker
+
+tracer.geometry.marker.line_marker
+_____________________________________
+.. automodule:: optrace.tracer.geometry.marker.line_marker
+
+tracer.geometry.volume.sphere_volume
+____________________________________________
+.. automodule:: optrace.tracer.geometry.volume.sphere_volume
+
+tracer.geometry.volume.box_volume
+____________________________________________
+.. automodule:: optrace.tracer.geometry.volume.box_volume
+
+tracer.geometry.volume.cylinder_volume
+____________________________________________
+.. automodule:: optrace.tracer.geometry.volume.cylinder_volume
+
+tracer.geometry.volume.volume
+____________________________________________
+.. automodule:: optrace.tracer.geometry.volume.volume
+
 

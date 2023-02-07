@@ -258,9 +258,9 @@ class GeometryTests(unittest.TestCase):
         # position of Group is just position of first element
         self.assertTrue(np.allclose(eye.lenses[0].pos - eye.pos, 0))
 
-        # test if extent correct. In the eye model the retina has the highest xy extent
-        # first values of z-extent is given by the first lens
-        ext = np.array(eye.detectors[-1].extent)
+        # test if extent correct. In the eye model the eye volume has the highest xy extent
+        # first values of z-extent is given by the first lens (cornea)
+        ext = np.array(eye.volumes[0].extent)
         ext[4] = eye.lenses[0].extent[4]
         self.assertTrue(np.allclose(np.array(eye.extent) - ext, 0))
 
@@ -767,6 +767,7 @@ class GeometryTests(unittest.TestCase):
             ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 11], desc="5"),
             ot.Aperture(ot.RingSurface(r=3, ri=1), pos=[0, 0, 13], desc="6"),
             ot.PointMarker("7", pos=[0, 0, 15]),
+            ot.CylinderVolume(r=3, length=5, pos=[0, 0, 20], desc="8")
         ])
 
         # check that after reversing the desc are in reversed order
@@ -825,6 +826,7 @@ class GeometryTests(unittest.TestCase):
               ot.presets.geometry.arizona_eye().lenses[-2],
               ot.presets.geometry.arizona_eye().detectors[-1],
               ot.PointMarker("defg", [0, 0, 0]),
+              ot.SphereVolume(R=5, pos=[0, 1, 23])
              ]
 
         for SSi in Ss:
@@ -898,6 +900,40 @@ class GeometryTests(unittest.TestCase):
 
         # coverage: rotate empty group
         ot.Group().rotate(5)
+
+    def test_volumes(self):
+
+        # default calls
+        ot.SphereVolume(R=5, pos=[-8, 9, 10])
+        ot.BoxVolume(dim=[10, 20], length=5, pos=[-8, 9, 10])
+        ot.CylinderVolume(r=5, length=3, pos=[-8, 9, 10])
+        
+        # calls with opacity and color
+        ot.SphereVolume(R=5, pos=[-8, 9, 10], opacity=0.9, color=(1, 0.5, 0.1))
+        ot.BoxVolume(dim=[10, 20], length=5, pos=[-8, 9, 10], opacity=0.9, color=(1, 0.5, 0.1))
+        ot.CylinderVolume(r=5, length=3, pos=[-8, 9, 10], opacity=0.9, color=(1, 0.5, 0.1))
+
+        # Volume exceptions, tested with the help of a sphere volume
+        self.assertRaises(ValueError, ot.SphereVolume, pos=[1, 2, 3], R=5, opacity=-1)  # opacity negative
+        self.assertRaises(ValueError, ot.SphereVolume, pos=[1, 2, 3], R=5, opacity=2)  # opacity > 1
+        self.assertRaises(TypeError, ot.SphereVolume, pos=[1, 2, 3], R=5, opacity=[])  # invalid opacity type
+        self.assertRaises(TypeError, ot.SphereVolume, pos=[1, 2, 3], R=5, color=2)  # invalid color type
+        self.assertRaises(ValueError, ot.SphereVolume, pos=[1, 2, 3], R=5, color=[1, 2])  # invalid color length
+
+        # sphere volume pos defines sphere center
+        sphv = ot.SphereVolume(R=3, pos=[1, 2, 3])
+        self.assertAlmostEqual(sphv.extent[4], 0)
+        self.assertAlmostEqual(sphv.extent[5], 6)
+        
+        # cylinder volume pos defines center of front surface
+        cylv = ot.CylinderVolume(r=3, length=5, pos=[1, 2, 3])
+        self.assertAlmostEqual(cylv.extent[4], 3)
+        self.assertAlmostEqual(cylv.extent[5], 8)
+        
+        # box volume pos defines center of front surface
+        boxv = ot.BoxVolume(dim=[2, 3], length=6, pos=[1, 2, 3])
+        self.assertAlmostEqual(boxv.extent[4], 3)
+        self.assertAlmostEqual(boxv.extent[5], 9)
 
 if __name__ == '__main__':
     unittest.main()

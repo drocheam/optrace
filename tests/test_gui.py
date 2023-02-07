@@ -94,6 +94,9 @@ def rt_example() -> ot.Raytracer:
     # add ideal lens
     RT.add(ot.IdealLens(r=3, D=1, pos=[0, 0, RT.outline[5]-1]))
 
+    # add some volume
+    RT.add(ot.BoxVolume(dim=[3, 2], length=1, pos=[0, 0, 9]))
+
     return RT
 
 class GUITests(unittest.TestCase):
@@ -1540,6 +1543,62 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
 
+    def test_volumes(self):
+        """plot volume plotting and handling"""
+
+        RT = rt_example()
+        RT.clear()
+        
+        def interact(sim):
+            with self._try(sim):
+
+                # create some volumes without specifying the color and opacity
+                sphv = ot.SphereVolume(R=5, pos=[3, 5, 6])
+                RT.add(sphv)
+                cylv = ot.CylinderVolume(r=5, length=5, pos=[0, 5, 6])
+                RT.add(cylv)
+                boxv = ot.BoxVolume(dim=[5, 6], length=4, pos=[3, 0, 6])
+                RT.add(boxv)
+
+                # user volume
+                front = ot.ConicSurface(r=4, k=2, R=50)
+                back = ot.RectangularSurface(dim=[3, 3])
+                vol = ot.Volume(front, back, pos=[0, 1, 2], d1=front.ds, d2=back.ds+1)
+                RT.add(vol)
+
+                # replot
+                sim._do_in_main(sim.replot)
+                sim._wait_for_idle()
+                self.assertEqual(len(sim._volume_plots), 4)  # elements were added
+                self.assertTrue(sim._volume_plots[0][3] is None)  # no text label for volumes
+
+                # tests that opacity and color is assigned correctly
+                sphv.opacity = 0.1
+                sphv.color = (1.0, 0.0, 1.0)
+                sim._do_in_main(sim.replot)
+                sim._wait_for_idle()
+                self.assertEqual(sim._volume_plots[0][0].actor.property.color, sphv.color)
+                self.assertEqual(sim._volume_plots[0][0].actor.property.opacity, sphv.opacity)
+                
+                # checks that automatic replotting works
+                sim._do_in_main(sim.send_cmd, "RT.volumes[0].opacity=0.9") 
+                sim._wait_for_idle()
+                self.assertEqual(sim._volume_plots[0][0].actor.property.opacity, 0.9)
+
+                # toggle contrast mode
+                sim._set_in_main("high_contrast", True)
+                sim._wait_for_idle()
+                # check that custom color gets unset with high contrast
+                self.assertEqual(sim._volume_plots[0][0].actor.property.color, sim._volume_color)
+
+                sim._set_in_main("high_contrast", False)
+                sim._wait_for_idle()
+                # check that custom color gets set again without high contrast
+                self.assertEqual(sim._volume_plots[0][0].actor.property.color, sphv.color)
+
+        sim = TraceGUI(RT)
+        sim.debug(_func=interact, silent=True, _args=(sim,))
+        self.raise_thread_exceptions()
 
 if __name__ == '__main__':
     unittest.main()

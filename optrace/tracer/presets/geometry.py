@@ -2,7 +2,8 @@
 import numpy as np  # np.ndarray type
 
 from ..geometry import Aperture, Detector, Lens, IdealLens, SphericalSurface,\
-        RectangularSurface, ConicSurface, RingSurface, Group  # Elements and Surfaces in the preset geometries
+    RectangularSurface, ConicSurface, RingSurface, Group, SphereVolume, BoxVolume, Volume 
+    # Elements and Surfaces in the preset geometries
 from ..refraction_index import RefractionIndex  # media in the geometries
 
 from ..misc import PropertyChecker as pc
@@ -38,7 +39,13 @@ def ideal_camera(cam_pos:   np.ndarray,
     DET = Detector(RectangularSurface([2*r_det, 2*r_det]), pos=np.array(cam_pos)+[0, 0, b],
                    long_desc="Camera Sensor", desc="Sensor")
 
-    return Group([IL, DET], long_desc="Ideal Camera", desc="Camera")
+    # add camera box
+    rb = max(r, r_det)
+    VOL = BoxVolume(dim=[2*rb, 2*rb], length=b, pos=cam_pos, color=(0.2, 0.2, 0.2))
+    
+    VOL = Volume(IL.front.copy(), DET.front.copy(), pos=cam_pos, d1=0, d2=b, color=(0, 0, 0))
+
+    return Group([IL, DET, VOL], long_desc="Ideal Camera", desc="Camera")
 
 
 # Eye models
@@ -103,6 +110,12 @@ def arizona_eye(adaptation:  float = 0.,
     Det = Detector(DetS, pos=pos0+[0, 0, 24], desc="Retina")
     geom.add(Det)
 
+    # see notes in legrand_eye() on how these parameters are calculated
+    front = ConicSurface(r=12.776270, R=14.8152, k=0.344612)
+    back = ConicSurface(r=12.776270, R=-13.4, k=0.1)
+    vol = Volume(front, back, pos=Det.pos, d1=front.ds+back.ds, d2=0, color=(1, 1, 0.95))
+    geom.add(vol)
+
     return geom
 
 
@@ -155,6 +168,20 @@ def legrand_eye(pupil: float = 5.7,
     DetS = SphericalSurface(r=r_det, R=-13.4, desc="Retina")
     Det = Detector(DetS, pos=pos0+[0, 0, 24.197], desc="Retina")
     geom.add(Det)
+
+    # approximate shape for the eye ball so length is correct and last curvature is correct
+    # r_e = R / sqrt(k + 1)  # maximum radial distance on conic
+    # z_e = abs(R / (k + 1))  # height at maximal radial distance
+    # front and back radius are equal:
+    # r_e1 = r_e2 =>  R1 / sqrt(k1 + 1) = R2 / sqrt(k2 + 1)
+    # both front+back are d in z-direction:
+    # z_e1 + z_e2 = d   =>  R1 / (k1 + 1) + R2 / (k2 + 1) = d
+    # chosen: R2 = -13.4, k2 = 0.1, d = 23.2
+
+    front = ConicSurface(r=12.776270, R=14.8152, k=0.344612)
+    back = ConicSurface(r=12.776270, R=-13.4, k=0.1)
+    vol = Volume(front, back, pos=Det.pos, d1=front.ds+back.ds, d2=0, color=(1, 1, 0.95))
+    geom.add(vol)
 
     return geom
 

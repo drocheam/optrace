@@ -277,7 +277,7 @@ class Surface(BaseClass):
 
     def edge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Get surface values of the surface edge, assumes a circular edge.
+        Get surface values of the surface edge.
 
         :param nc: number of points on edge (int)
         :return: X, Y, Z coordinate arrays (all numpy 2D array)
@@ -286,7 +286,8 @@ class Surface(BaseClass):
         if nc < 20:
             raise ValueError("Expected at least nc=20")
 
-        theta = np.linspace(0, 2 * np.pi, nc)
+        # start at -135 degrees, which is consistent how the RectangularSurface plots the edge
+        theta = np.linspace(-3/4*np.pi, 5/4 * np.pi, nc)
         xd = self.r * np.cos(theta)
         yd = self.r * np.sin(theta)
         zd = self._values(xd, yd)

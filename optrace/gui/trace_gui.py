@@ -23,6 +23,8 @@ from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, L
 import mayavi.modules.text  # Text type
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from mayavi.sources.parametric_surface import ParametricSurface  # provides outline and axes
+from mayavi.sources.builtin_surface import BuiltinSurface
+from mayavi.modules.surface import Surface as MayaviSurface
 
 import matplotlib.pyplot as plt  # closing plot windows
 import numpy as np  # calculations
@@ -31,9 +33,9 @@ import numpy as np  # calculations
 from ..tracer.geometry import Surface, Element
 from ..tracer import Lens, Filter, Aperture, RaySource, Detector, Raytracer, RImage, RefractionIndex,\
                      SphericalSurface, DataSurface1D, DataSurface2D, FunctionSurface2D, FunctionSurface1D,\
-                     ConicSurface, RectangularSurface, presets, color, misc,\
+                     ConicSurface, RectangularSurface, presets, color, misc, SphereVolume, BoxVolume, Volume,\
                      RingSurface, CircularSurface, TiltedSurface, Spectrum, LightSpectrum, TransmissionSpectrum,\
-                     Point, Line, LineMarker, TMA, Group, PointMarker, AsphericSurface, IdealLens
+                     Point, Line, LineMarker, TMA, Group, PointMarker, AsphericSurface, IdealLens, CylinderVolume
 from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
 
 from .property_browser import PropertyBrowser  # dictionary browser
@@ -41,6 +43,8 @@ from .command_window import CommandWindow
 
 from ..__metadata__ import __version__
 
+
+# TODO own class managing plots and plotting
 
 
 class TraceGUI(HasTraits):
@@ -419,7 +423,6 @@ class TraceGUI(HasTraits):
         :param ui_style: UI style string for Qt
         :param kwargs: additional arguments, options, traits and parameters
         """
-        # TODO documentation
         # set UI theme. Unfortunately this does not work dynamically (yet)
         if ui_style is not None:
             QtGui.QApplication.setStyle(ui_style)
@@ -453,6 +456,7 @@ class TraceGUI(HasTraits):
         self._marker_plots = []
         self._line_marker_plots = []
         self._index_box_plots = []
+        self._volume_plots = []
         self._crosshair = None
         self._orientation_axes = None
 
@@ -832,7 +836,7 @@ class TraceGUI(HasTraits):
         self._lens_color = (0.63, 0.79, 1.00) if not self.high_contrast else self.scene.foreground
         self._lens_alpha = 0.35
         self._aperture_color = (0, 0, 0)
-        self._detector_color = (0.10, 0.10, 0.10) if not self.high_contrast else self.scene.foreground
+        self._detector_color = (0, 0, 0) if not self.high_contrast else self.scene.foreground
         self._detector_alpha = 0.9
         self._subtle_color = (0.3, 0.3, 0.3) if not self.high_contrast else (0.7, 0.7, 0.7)
         self._crosshair_color = (1, 0, 0)
@@ -844,6 +848,7 @@ class TraceGUI(HasTraits):
         self._axis_alpha = 0.55
         self._info_frame_color = (0, 0, 0) if not self.high_contrast else (1, 1, 1)
         self._info_opacity = 0.2
+        self._volume_color = (0.45, 0.45, 0.45) if not self.high_contrast else (1, 1, 1)
 
     def _plot_element(self,
                       obj:      Element,
@@ -851,7 +856,8 @@ class TraceGUI(HasTraits):
                       color:    tuple,
                       alpha:    float,
                       spec:     bool = True,
-                      light:    bool = True)\
+                      light:    bool = True,
+                      no_label: bool = False)\
             -> tuple:
         """plotting of a Element. Gets called from plotting for Lens, Filter, Detector, RaySource. """
 
@@ -867,6 +873,11 @@ class TraceGUI(HasTraits):
             a.actor.actor.property.lighting = light
             if spec:
                 a.actor.property.trait_set(specular=0.5, ambient=0.25)
+                if self.high_contrast:
+                    a.actor.property.trait_set(specular_color=(0.15, 0.15, 0.15),
+                                               diffuse_color=(0.12, 0.12, 0.12))
+                a.actor.property.color = color  # reassign color
+
             return a
 
         # decide what to plot
@@ -886,7 +897,7 @@ class TraceGUI(HasTraits):
 
         # use wireframe mode, so edge is always visible, even if it is infinitesimal small
         if plotCyl and (not obj.has_back() or (obj.extent[5] - obj.extent[4] < 0.05)):
-            b.actor.property.trait_set(representation="wireframe", lighting=False, line_width=1.5, opacity=alpha/2)
+            b.actor.property.trait_set(representation="wireframe", lighting=False, line_width=1.75, opacity=alpha/1.5)
 
         # calculate middle center z-position
         if obj.has_back():
@@ -896,16 +907,21 @@ class TraceGUI(HasTraits):
             # 10/40 values in [0, 2pi] -> z - value at 90 deg relative to x axis in xy plane
             zl = obj.front.edge(40)[2][10] if isinstance(obj.front, Surface) else obj.pos[2]
 
-        # object label
-        label = f"{obj.abbr}{num}"
-        # add description if any exists. But only if we are not in "minimalistic_view" displaying mode
-        label = label if obj.desc == "" or bool(self.minimalistic_view) else label + ": " + obj.desc
-        text = self.scene.mlab.text(x=obj.extent[1], y=obj.pos[1], z=zl, text=label, name="Label")
-        text.actor.text_scale_mode = 'none'
-        if not self.vertical_labels:
-            text.property.trait_set(**self.LABEL_STYLE, justification="center", vertical_justification="bottom", orientation=0)
+        if not no_label:
+            # object label
+            label = f"{obj.abbr}{num}"
+            # add description if any exists. But only if we are not in "minimalistic_view" displaying mode
+            label = label if obj.desc == "" or bool(self.minimalistic_view) else label + ": " + obj.desc
+            text = self.scene.mlab.text(x=obj.extent[1], y=obj.pos[1], z=zl, text=label, name="Label")
+            text.actor.text_scale_mode = 'none'
+            if not self.vertical_labels:
+                text.property.trait_set(**self.LABEL_STYLE, justification="center", vertical_justification="bottom", 
+                                        orientation=0)
+            else:
+                text.property.trait_set(**self.LABEL_STYLE, justification="left", orientation=90, 
+                                        vertical_justification="center")
         else:
-            text.property.trait_set(**self.LABEL_STYLE, justification="left", orientation=90, vertical_justification="center")
+            text = None
 
         # plot BackSurface if one exists
         c = plot(obj.back.plotting_mesh(N=self.SURFACE_RES), "back") if plotBack else None
@@ -1183,7 +1199,8 @@ class TraceGUI(HasTraits):
                 m.parent.parent.parent.parent.name = f"Marker {num}"
                 m.actor.actor.trait_set(pickable=False, force_translucent=True)
             
-                text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], text=mark.desc, name="Label")
+                text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
+                                            text=mark.desc, name="Label")
                 text.actor.text_scale_mode = 'none'
                 tprop = dict(justification="center") if not self.vertical_labels\
                         else dict(justification="left", orientation=90, vertical_justification="center")
@@ -1191,6 +1208,15 @@ class TraceGUI(HasTraits):
                 text.property.font_size = int(8 * mark.text_factor)
 
                 self._line_marker_plots.append((m, None, None, text, mark))
+
+    def _plot_volumes(self):
+        """plot volumes inside the scene"""
+        self.__remove_objects(self._volume_plots)
+
+        for num, V in enumerate(self.raytracer.volumes):
+            color = self._volume_color if (V.color is None or self.high_contrast) else V.color
+            t = self._plot_element(V, num, color, V.opacity, no_label=True, spec=False)
+            self._volume_plots.append(t)
 
     def _init_crosshair(self) -> None:
         """init a crosshair for the picker"""
@@ -1469,6 +1495,9 @@ class TraceGUI(HasTraits):
 
             if all_ or change["Apertures"]:
                 self._plot_apertures()
+            
+            if all_ or change["Volumes"]:
+                self._plot_volumes()
 
             if all_ or change["Markers"]:
                 self._plot_point_markers()
@@ -1587,19 +1616,25 @@ class TraceGUI(HasTraits):
             for Fi in F[:2]:
                 if Fi is not None and F[4] is not None:
                     Fi.actor.property.color = F[4].color()[:3] if not self.high_contrast else self.scene.foreground
+        
+        # update volume colors
+        for V in self._volume_plots:
+            for Vi in V[:3]:
+                Vi.actor.property.color = self._volume_color if V[4].color is None or self.high_contrast else V[4].color
 
         # update misc color
         for color, objs in zip([self._lens_color, self._detector_color, self._aperture_color, self._marker_color,
                                 self._line_marker_color, self._crosshair_color, self._outline_color],
                                [self._lens_plots, self._detector_plots, self._aperture_plots,
-                                self._marker_plots, self._line_marker_plots, [[self._crosshair]], self._outline_plots]):
+                                self._marker_plots, self._line_marker_plots, [[self._crosshair]], 
+                                self._outline_plots]):
             for obj in objs:
                 for el in obj[:3]:
                     if el is not None:
-                        if self.high_contrast:
-                            el.actor.property.specular_color = (0.15, 0.15, 0.15)
-                            el.actor.property.diffuse_color = (0.12, 0.12, 0.12)
                         el.actor.property.color = color
+                        if self.high_contrast and el is not self._crosshair:
+                            el.actor.property.trait_set(specular_color=(0.15, 0.15, 0.15),
+                                                        diffuse_color=(0.12, 0.12, 0.12))
 
         # update axes color
         for ax in self._axis_plots:
@@ -2328,11 +2363,13 @@ class TraceGUI(HasTraits):
         self._status["Drawing"] += 1
         repr_ = "wireframe" if bool(self.wireframe_surfaces) else "surface"
 
-        for obj in [*self._ray_source_plots, *self._lens_plots,
+        for obj in [*self._ray_source_plots, *self._lens_plots, *self._volume_plots,
                     *self._filter_plots, *self._aperture_plots, *self._detector_plots]:
             for obji in obj[:3]:
-                # don't change mode of object side if it has no back (in this case wireframe only)
-                if obji is not None and not (obji is obj[1] and obj[2] is None):
+                # don't change mode of object side if it has no back (in this case wireframe
+                # even without wireframe mode) or the z-extent is too small
+                if obji is not None and not (obji is obj[1] and\
+                        (obj[2] is None or (obj[4].extent[5] - obj[4].extent[4] < 0.05))):
                     obji.actor.property.representation = repr_
 
         self._status["Drawing"] -= 1

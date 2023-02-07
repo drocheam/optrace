@@ -2,9 +2,9 @@ from typing import Any  # Any type
 
 import numpy as np  # for ndarray type
 
-from ..misc import PropertyChecker as pc  # check types and values
-from .element import Element  # parent class
-from .point import Point  # front object of the Marker
+from ...misc import PropertyChecker as pc  # check types and values
+from ..element import Element  # parent class
+from ..point import Point  # front object of the Marker
 
 
 class PointMarker(Element):

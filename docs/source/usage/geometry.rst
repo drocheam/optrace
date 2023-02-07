@@ -23,11 +23,18 @@ In ``optrace`` the class |Element| denotes an object which has no, one or two su
 
 This includes the classes
 
+Types
+##############
+
+
+**Tracing Elements**
+
+Elements with direct ray interaction.
+
 .. list-table::
    :widths: 100 400
    :header-rows: 0
    :align: left
-   :stub-columns: 1
 
    * - :class:`RaySource <optrace.tracer.geometry.ray_source.RaySource>`
      - An element with a light emitting surface
@@ -35,16 +42,58 @@ This includes the classes
      - An element with two surfaces on which light is refracted.
    * - |IdealLens|
      - Like a Lens, except that it has a planar surface and refracts light without aberration
-   * - :class:`Detector <optrace.tracer.geometry.detector.Detector>`
-     - Element with one surface on which images can be rendered
    * - :class:`Filter <optrace.tracer.geometry.filter.Filter>`
      - Element with a surface on which wavelength-dependent or wavelength-independent filtering takes place.
    * - :class:`Aperture <optrace.tracer.geometry.aperture.Aperture>`
      - Like a filter, except that incident light is completely absorbed.
-   * - :class:`PointMarker <optrace.tracer.geometry.point_marker.PointMarker>`
+
+**Rendering Elements**
+
+Elements with no ray interaction for tracing, but the possibility to render images of intersecting rays.
+
+.. list-table::
+   :widths: 200 400
+   :header-rows: 0
+   :align: left
+
+   * - :class:`Detector <optrace.tracer.geometry.detector.Detector>`
+     - Element with one surface on which images can be rendered
+
+
+**Markers**
+
+Elements for 3D annotation.
+
+.. list-table::
+   :widths: 200 400
+   :header-rows: 0
+   :align: left
+
+   * - :class:`PointMarker <optrace.tracer.geometry.marker.point_marker.PointMarker>`
      - element consisting of a point and a label, useful for annotating things.
-   * - :class:`LineMarker <optrace.tracer.geometry.line_marker.LineMarker>`
+   * - :class:`LineMarker <optrace.tracer.geometry.marker.line_marker.LineMarker>`
      - element consisting of a line and a label, useful for annotating things.
+
+
+**Volumes**
+
+Objects for plotting volumes in the TraceGUI, for instance an enclosing cylinder or medium outline.
+
+.. list-table::
+   :widths: 200 400
+   :header-rows: 0
+   :align: left
+
+   * - :class:`BoxVolume <optrace.tracer.geometry.volume.box_volume.BoxVolume>`
+     - Volume of a box or cube
+   * - :class:`CylinderVolume <optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume>`
+     - Cylinder volume with symmetry axis in diretion of the optical axis
+   * - :class:`SphereVolume <optrace.tracer.geometry.volume.sphere_volume.SphereVolume>`
+     - spheric volume
+
+
+Usage
+############
 
 These subclasses have the same methods as the |Element| superclass, these include:
 

@@ -21,8 +21,14 @@ from .aperture import Aperture
 from .detector import Detector
 from .lens import Lens
 from .ideal_lens import IdealLens
-from .point_marker import PointMarker
-from .line_marker import LineMarker
 from .ray_source import RaySource
+
+from .marker.point_marker import PointMarker
+from .marker.line_marker import LineMarker
+
+from .volume.sphere_volume import SphereVolume
+from .volume.cylinder_volume import CylinderVolume
+from .volume.box_volume import BoxVolume
+from .volume.volume import Volume
 
 from .group import Group

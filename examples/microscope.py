@@ -4,10 +4,9 @@ import optrace as ot
 from optrace.gui import TraceGUI
 import numpy as np
 
-# TODO add field stop
 
 # make raytracer
-RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 300])
+RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 300])
 
 # object
 RSS = ot.RectangularSurface(dim=[200e-3, 200e-3])
@@ -81,9 +80,14 @@ L1f1 = eyepiece.tma().focal_points[1]
 RT.add(eyepiece)
 
 # add eye geometry
-geom = ot.presets.geometry.arizona_eye(pos=[0, 0, L1f1+12], pupil=5)
-# geom = ot.presets.geometry.ideal_camera(z_g=-np.inf, cam_pos=[0, 0,  L1f1+12], r=5, r_det=5, b=30)
-RT.add(geom)
+eye = ot.presets.geometry.arizona_eye(pos=[0, 0, L1f1+12], pupil=5)
+# eye = ot.presets.geometry.ideal_camera(z_g=-np.inf, cam_pos=[0, 0,  L1f1+12], r=5, r_det=5, b=30)
+RT.add(eye)
+
+# add cylinder for displaying the microscope
+vol = ot.CylinderVolume(r=6, length=eye.extent[4]-objective.extent[4]-3, 
+                        pos=[0, 0, objective.extent[4]-3], color=(0, 0, 0))
+RT.add(vol)
 
 # calculate magnification
 tma_ok = eyepiece.tma()
@@ -104,7 +108,7 @@ RT.add(ot.PointMarker("F_ok", [0, 0, tma_ok.focal_points[1]]))
 RT.add(ot.PointMarker("Objective", [-14, 0, L01.pos[2]+2], label_only=True, text_factor=1.2))
 RT.add(ot.PointMarker("Body Tube", [-14, 0, (L02.pos[2] + L12.pos[2])/2], label_only=True, text_factor=1.2))
 RT.add(ot.PointMarker("Eyepiece", [-14, 0, L11.pos[2]], label_only=True, text_factor=1.2))
-RT.add(ot.PointMarker(geom.long_desc, [-14, 0, RT.lenses[-1].pos[2] + 10], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker(eye.long_desc, [-14, 0, RT.lenses[-1].pos[2] + 10], label_only=True, text_factor=1.2))
 
 # add line markers
 RT.add(ot.LineMarker(r=5, pos=[0, 0, RS.pos[2]], desc="Object\nPlane"))

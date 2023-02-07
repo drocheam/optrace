@@ -146,6 +146,7 @@ class Raytracer(Group):
                     Apertures=[D.crepr() for D in self.apertures],
                     RaySources=[D.crepr() for D in self.ray_sources],
                     Markers=[D.crepr() for D in self.markers],
+                    Volumes=[D.crepr() for D in self.volumes],
                     Detectors=[D.crepr() for D in self.detectors])
 
     def compare_property_snapshot(self, h1: dict, h2: dict) -> dict:
