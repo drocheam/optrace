@@ -71,9 +71,11 @@ class CommandWindow(HasTraits):
             output += el + "\n"
 
         clipboard = QtGui.QApplication.clipboard()
-        clipboard.clear()  # needed to work on Windows?
+        clipboard.clear(mode=clipboard.Clipboard)  # needed to work on Windows?
         clipboard.setText(output, mode=clipboard.Clipboard)
-    
+   
+        # TODO revert to Ubuntu 20.04 because installation of pyqt fails
+
     @observe('_run_button')
     def send_cmd(self, event=None) -> None:
         """
