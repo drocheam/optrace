@@ -865,6 +865,7 @@ class GUITests(unittest.TestCase):
 
                 # check if setting and getting clipboard works globally
                 clipboard = QtGui.QApplication.clipboard()
+                clipboard.clear(mode=clipboard.Clipboard)
                 clipboard.setText("a", mode=clipboard.Clipboard)
                 self.assertTrue(clipboard.text(), "a")
 
