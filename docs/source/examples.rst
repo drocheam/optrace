@@ -31,6 +31,7 @@ Arizona Eye Model
 
 **Screenshots**:
 
+
 .. figure:: images/arizona_eye_scene.png
    :align: center
    :width: 600

@@ -76,11 +76,12 @@ class CommandWindow(HasTraits):
         clipboard.setText(output, mode=clipboard.Clipboard)
  
         # check if actually copied
-        if clipboard.text(mode=clipboard.Clipboard) != output:
-            if not self.silent:
-                print(output + "\n\n")
-                print("Copying to clipboard failed. This can be an library or system issue.\n"
-                      "The history was instead output to the terminal, you can copy it from there.")
+        if clipboard.text(mode=clipboard.Clipboard) != output:  
+            # can't test these, because it seems to fail only on Windows
+            if not self.silent:  # pragma: no cover
+                print(output + "\n\n")  # pragma: no cover
+                print("Copying to clipboard failed. This can be an library or system issue.\n"  # pragma: no cover
+                      "The history was instead output to the terminal, you can copy it from there.")  # pragma: no cover
 
     @observe('_run_button')
     def send_cmd(self, event=None) -> None:

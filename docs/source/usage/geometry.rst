@@ -511,7 +511,6 @@ As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` we 
 
    eye_model = ot.presets.geometry.arizona_eye(adaptation=1, pupil=3, r_det=10, pos=[0.3, 0.7, 1.2])
 
-
 .. figure:: ../images/arizona_eye_scene.png
    :align: center
    :width: 600
