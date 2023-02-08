@@ -199,9 +199,6 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
         mask = ~np.all(RGB == 0, axis=2)
         RGB[mask] /= np.sum(RGB[mask], axis=1)[:, np.newaxis]  # normalize brightness
 
-    else:
-        raise ValueError(f"Invalid norm '{norm}', must be one of {chromaticity_norms}")
-
     # convert to sRGB
     sRGB = color.srgb_linear_to_srgb(RGB)
 

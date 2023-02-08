@@ -44,12 +44,13 @@ class CommandWindow(HasTraits):
                 height=800,
                 title="Command Window")
 
-    def __init__(self, gui) -> None:
+    def __init__(self, gui, silent: bool = False) -> None:
         """
 
         :param gui:
         """
         self.gui = gui
+        self.silent = silent
         super().__init__()
 
     @observe('_clear_button')
@@ -71,10 +72,15 @@ class CommandWindow(HasTraits):
             output += el + "\n"
 
         clipboard = QtGui.QApplication.clipboard()
-        clipboard.clear(mode=clipboard.Clipboard)  # needed to work on Windows?
+        clipboard.clear(mode=clipboard.Clipboard)  
         clipboard.setText(output, mode=clipboard.Clipboard)
-   
-        # TODO revert to Ubuntu 20.04 because installation of pyqt fails
+ 
+        # check if actually copied
+        if clipboard.text(mode=clipboard.Clipboard) != output:
+            if not self.silent:
+                print(output + "\n\n")
+                print("Copying to clipboard failed. This can be an library or system issue.\n"
+                      "The history was instead output to the terminal, you can copy it from there.")
 
     @observe('_run_button')
     def send_cmd(self, event=None) -> None:

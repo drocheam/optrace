@@ -2340,7 +2340,7 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
         if self._cdb is None:
-            self._cdb = CommandWindow(self)
+            self._cdb = CommandWindow(self, self.silent)
         self._cdb.edit_traits()
 
     @observe('_property_browser_button', dispatch="ui")

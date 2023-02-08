@@ -867,23 +867,28 @@ class GUITests(unittest.TestCase):
                 clipboard = QtGui.QApplication.clipboard()
                 clipboard.clear(mode=clipboard.Clipboard)
                 clipboard.setText("a", mode=clipboard.Clipboard)
-                self.assertTrue(clipboard.text(mode=clipboard.Clipboard), "a")
+                can_copy = clipboard.text(mode=clipboard.Clipboard) == "a"
 
-                # check that empty strings are copied correctly in the command window
-                sim._do_in_main(sim._cdb.copy_history)
-                sim._wait_for_idle()
-                self.assertEqual(clipboard.text(), "")
-               
-                # check if full history is copied
-                sim._cdb._cmd = "self.replot()"
-                sim._do_in_main(sim._cdb.send_cmd)
-                sim._wait_for_idle()
-                sim._cdb._cmd = "a=5"
-                sim._do_in_main(sim._cdb.send_cmd)
-                sim._wait_for_idle()
-                sim._do_in_main(sim._cdb.copy_history)
-                sim._wait_for_idle()
-                self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
+                if not can_copy:
+                    warnings.warn("Copying to clipboard failed. Can by a system or library issue, "
+                                  "skipping additional clipboard tests.")
+                
+                else:
+                    # check that empty strings are copied correctly in the command window
+                    sim._do_in_main(sim._cdb.copy_history)
+                    sim._wait_for_idle()
+                    self.assertEqual(clipboard.text(), "")
+                   
+                    # check if full history is copied
+                    sim._cdb._cmd = "self.replot()"
+                    sim._do_in_main(sim._cdb.send_cmd)
+                    sim._wait_for_idle()
+                    sim._cdb._cmd = "a=5"
+                    sim._do_in_main(sim._cdb.send_cmd)
+                    sim._wait_for_idle()
+                    sim._do_in_main(sim._cdb.copy_history)
+                    sim._wait_for_idle()
+                    self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
 
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()

@@ -183,12 +183,12 @@ class PropertyChecker:
     @staticmethod
     def check_none_or_callable(key, val) -> None:
         if val is not None and not callable(val):
-            raise TypeError(f"{key} needs to be callable or None, but is {type(val)}.")
+            raise TypeError(f"{key} needs to be callable or None, but is '{type(val)}'.")
     
     @staticmethod
     def check_if_element(key, val, list_) -> None:
         if val not in list_:
-            raise ValueError(f"Invalid value '{val}' for property '{key}'. Needs to be one of {list_}, but is {val}.")
+            raise ValueError(f"Invalid value '{val}' for property '{key}'. Needs to be one of {list_}, but is '{val}'.")
 
 
 def random_from_distribution(x: np.ndarray, f: np.ndarray, S: int | np.ndarray, kind="continuous") -> np.ndarray:
