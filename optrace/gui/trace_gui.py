@@ -797,7 +797,6 @@ class TraceGUI(HasTraits):
 
                     else:
                         self._plot.remove_fault_markers()
-
                         self._status["Tracing"] -= 1
                         self.replot_rays()
 
@@ -1319,7 +1318,7 @@ class TraceGUI(HasTraits):
         self._plot.change_surface_mode()
         self._status["Drawing"] -= 1
 
-    def send_cmd(self, cmd) -> None:
+    def send_cmd(self, cmd: str) -> None:
         """
         send/execute a command
         """
@@ -1337,7 +1336,7 @@ class TraceGUI(HasTraits):
                          mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
                          camera=self.scene.camera, GUI=self,
 
-                         # abbreviations for raytracer and object lists
+                         # abbreviations for the raytracer and object lists
                          RT=self.raytracer, LL=self.raytracer.lenses, FL=self.raytracer.filters,
                          APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
                          DL=self.raytracer.detectors, ML=self.raytracer.markers)
@@ -1364,7 +1363,7 @@ class TraceGUI(HasTraits):
     # this is the only trait so far that does not work with @observe, like:
     # @observe("scene:scene_editor:interactor:size:items:value")
     @observe("scene:scene_editor:busy", dispatch="ui")
-    def _resize_scene_elements(self, event) -> None:
+    def _resize_scene_elements(self, event=None) -> None:
         """
         Handles GUI window size changes. Fixes incorrect scaling by mayavi.
 
