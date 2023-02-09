@@ -3,6 +3,7 @@
 │   ├── command_window.py
 │   ├── __init__.py
 │   ├── property_browser.py
+│   ├── _scene_plotting.py
 │   └── trace_gui.py
 ├── __init__.py
 ├── __metadata__.py
@@ -92,4 +93,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-13 directories, 80 files
+13 directories, 81 files
