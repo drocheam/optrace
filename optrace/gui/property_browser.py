@@ -95,7 +95,7 @@ class PropertyBrowser(HasTraits):
         :param event: optional event from traits observe decorator
         """
         self.raytracer_dict = self._gen_dict_repr(self.raytracer.__dict__)
-        self.ray_dict = self._gen_dict_repr(self.gui._ray_property_dict)
+        self.ray_dict = self._gen_dict_repr(self.gui._plot._ray_property_dict)
         self.scene_dict = self._gen_dict_repr(self.scene.trait_get())
         self.trace_gui_dict = self._gen_dict_repr(self.gui.trait_get())
         self.card_dict = self._gen_dict_repr(self._gen_cardinals())

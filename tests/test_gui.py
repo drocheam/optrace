@@ -611,12 +611,12 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             with self._try(sim):
                 # check if replot actually removes old plot elements
-                L0id = id(sim._lens_plots[0][0])
-                F0id = id(sim._filter_plots[0][0])
+                L0id = id(sim._plot._lens_plots[0][0])
+                F0id = id(sim._plot._filter_plots[0][0])
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertNotEqual(L0id, id(sim._lens_plots[0][0]))
-                self.assertNotEqual(F0id, id(sim._filter_plots[0][0]))
+                self.assertNotEqual(L0id, id(sim._plot._lens_plots[0][0]))
+                self.assertNotEqual(F0id, id(sim._plot._filter_plots[0][0]))
 
                 sim._set_in_main("ray_count", 20000)  # fewer rays so tracing is faster
                 sim._wait_for_idle()
@@ -780,10 +780,10 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 
                 # replot rays
-                id0 = id(sim._ray_property_dict["p"])
+                id0 = id(sim._plot._ray_property_dict["p"])
                 send_key(sim, "n")
                 sim._wait_for_idle()
-                self.assertNotEqual(id0, id(sim._ray_property_dict["p"]))  # array changed, therefore the id too
+                self.assertNotEqual(id0, id(sim._plot._ray_property_dict["p"]))  # array changed, therefore the id too
               
                 # do this one last, since it raises another window
                 # and I don't know how to focus the scene after this
@@ -832,7 +832,7 @@ class GUITests(unittest.TestCase):
                 state = RT.rays.crepr()
                 send("RT.remove(APL[0])")
                 self.assertEqual(len(RT.apertures), 0)  # check if apertures empty after removal
-                self.assertEqual(len(sim._aperture_plots), 0)  # check if aperture plot is removed
+                self.assertEqual(len(sim._plot._aperture_plots), 0)  # check if aperture plot is removed
                 self.assertFalse(state == RT.rays.crepr())  # check if raytraced
               
                 sim._do_in_main(sim.open_command_window)
@@ -910,13 +910,13 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("coloring_type", "Power")  # shows a side bar, that also needs to be rescaled
                 sim._wait_for_idle()
 
-                SceneSize0 = sim._scene_size.copy()
+                SceneSize0 = sim._plot._scene_size.copy()
                 Window = sim.scene.scene_editor._content.window()
 
                 # properties before resizing
-                ff = sim._axis_plots[0][0].axes.font_factor
-                zoom = sim._orientation_axes.widgets[0].zoom
-                pos2 = sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2
+                ff = sim._plot._axis_plots[0][0].axes.font_factor
+                zoom = sim._plot._orientation_axes.widgets[0].zoom
+                pos2 = sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2
 
                 qsize = Window.size()
                 ss0 = np.array([qsize.width(), qsize.height()])
@@ -928,14 +928,14 @@ class GUITests(unittest.TestCase):
                 time.sleep(0.5)  # how to check how much time it takes?
 
                 # check if scale properties changed
-                self.assertNotAlmostEqual(sim._scene_size[0], SceneSize0[0])  # scene size variable changed
-                self.assertNotAlmostEqual(sim._scene_size[1], SceneSize0[1])  # scene size variable changed
-                self.assertNotAlmostEqual(ff, sim._axis_plots[0][0].axes.font_factor)
-                self.assertNotAlmostEqual(zoom, sim._orientation_axes.widgets[0].zoom)
+                self.assertNotAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])  # scene size variable changed
+                self.assertNotAlmostEqual(sim._plot._scene_size[1], SceneSize0[1])  # scene size variable changed
+                self.assertNotAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor)
+                self.assertNotAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom)
                 self.assertNotAlmostEqual(pos2[0],
-                                          sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
+                                          sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
                 self.assertNotAlmostEqual(pos2[1],
-                                          sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+                                          sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
 
                 sim._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(0.5)
@@ -951,18 +951,18 @@ class GUITests(unittest.TestCase):
                 time.sleep(0.5)
                
                 # check if scale properties are back at their default state
-                self.assertAlmostEqual(sim._scene_size[0], SceneSize0[0])
-                self.assertAlmostEqual(sim._scene_size[1], SceneSize0[1])
-                self.assertAlmostEqual(ff, sim._axis_plots[0][0].axes.font_factor)
-                self.assertAlmostEqual(zoom, sim._orientation_axes.widgets[0].zoom)
+                self.assertAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])
+                self.assertAlmostEqual(sim._plot._scene_size[1], SceneSize0[1])
+                self.assertAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor)
+                self.assertAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom)
                 self.assertAlmostEqual(pos2[0],
-                                       sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
+                                       sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
                 self.assertAlmostEqual(pos2[1],
-                                       sim._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+                                       sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
 
 
                 # coverage test: delete orientation:axes and resize
-                sim._orientation_axes = None
+                sim._plot._orientation_axes = None
                 sim._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(0.5)
                 
@@ -1058,11 +1058,11 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 # check if rays are removed correctly in replot()
-                assert len(RT.ray_sources) and RT.rays.N and sim._rays_plot is not None
+                assert len(RT.ray_sources) and RT.rays.N and sim._plot._rays_plot is not None
                 sim._do_in_main(sim.send_cmd, "RT.clear()")
                 sim._wait_for_idle()
-                self.assertTrue(sim._rays_plot is None)
-                self.assertFalse(sim._ray_property_dict)
+                self.assertTrue(sim._plot._rays_plot is None)
+                self.assertFalse(sim._plot._ray_property_dict)
 
         sim.debug(_func=interact, silent=True, _args=(sim,))
         self.raise_thread_exceptions()
@@ -1078,7 +1078,7 @@ class GUITests(unittest.TestCase):
 
                 # delete one raysource plot but still try to color it
                 # do with silent = True and False
-                sim._ray_source_plots = sim._ray_source_plots[:-1]
+                sim._plot._ray_source_plots = sim._plot._ray_source_plots[:-1]
                 sim._do_in_main(sim.retrace)
                 sim._wait_for_idle()
                 sim.silent = False
@@ -1087,7 +1087,7 @@ class GUITests(unittest.TestCase):
                 sim.silent = True
 
                 # only time replotting the orientation axes, since normally they don't need to change
-                sim._do_in_main(sim._plot_orientation_axes)
+                sim._do_in_main(sim._plot.plot_orientation_axes)
                 sim._wait_for_idle()
 
                 # assign some weird outline so plot axes finds no optimal number of labels 
@@ -1108,9 +1108,9 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.replot, cmp)
                 sim._wait_for_idle()
               
-                sim._filter_plots[0] = (sim._filter_plots[0][0], None, None, None,
-                                        sim._filter_plots[0][4])
-                sim._aperture_plots[0] = (sim._aperture_plots[0][0], None, None, None, None)
+                sim._plot._filter_plots[0] = (sim._plot._filter_plots[0][0], None, None, None,
+                                        sim._plot._filter_plots[0][4])
+                sim._plot._aperture_plots[0] = (sim._plot._aperture_plots[0][0], None, None, None, None)
                 sim._wait_for_idle()
 
                 # check exception handling of raytracer actions
@@ -1148,7 +1148,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim._do_in_main(sim.send_cmd, "RT.remove(APL[0])")
                 sim._wait_for_idle()
-                self.assertEqual(len(sim._aperture_plots), 1)  # plot object still there, not replotted
+                self.assertEqual(len(sim._plot._aperture_plots), 1)  # plot object still there, not replotted
                 sim._set_in_main("command_dont_replot", False)
                 sim._wait_for_idle()
 
@@ -1174,14 +1174,14 @@ class GUITests(unittest.TestCase):
                 RT.lenses[0].move_to(RT.lenses[1].pos)
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertTrue(sim._rays_plot is None)
+                self.assertTrue(sim._plot._rays_plot is None)
                 
                 # still works when some objects are none
-                sim._orientation_axes = None
+                sim._plot._orientation_axes = None
                 tn4 = (None, None, None, None)
-                sim._index_box_plots[0] = tn4
-                sim._ray_source_plots[0] = tn4
-                sim._axis_plots[0] = tn4
+                sim._plot._index_box_plots[0] = tn4
+                sim._plot._ray_source_plots[0] = tn4
+                sim._plot._axis_plots[0] = tn4
                 sim._do_in_main(sim._change_minimalistic_view)
                 sim._wait_for_idle()
 
@@ -1216,7 +1216,7 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
                 # no rays traced because of error in geometry
                 self.assertEqual(sim.raytracer.rays.N, 0)  # nothing traced
-                self.assertTrue(len(sim._fault_markers) > 0)  # fault markers in GUI
+                self.assertTrue(len(sim._plot._fault_markers) > 0)  # fault markers in GUI
                 self.assertTrue(len(RT.markers) > 0)  # fault markers in RT
 
                 # retrace and print error message
@@ -1262,7 +1262,7 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
                 self.assertTrue(RT.rays.N > 0)  # rays traced
-                self.assertEqual(len(sim._fault_markers), 0)  # no fault_marker in GUI
+                self.assertEqual(len(sim._plot._fault_markers), 0)  # no fault_marker in GUI
                 self.assertEqual(len(RT.markers), 0)  # no fault markers in RT
 
         sim = TraceGUI(RT)
@@ -1282,19 +1282,19 @@ class GUITests(unittest.TestCase):
                 RT.add(ot.PointMarker("Test1", [0., 0., 0]))
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertEqual(len(sim._marker_plots), 1)  # element was added
-                self.assertTrue(np.allclose(sim._marker_plots[0][0].actor.actor.center, 0))  # check position
+                self.assertEqual(len(sim._plot._marker_plots), 1)  # element was added
+                self.assertTrue(np.allclose(sim._plot._marker_plots[0][0].actor.actor.center, 0))  # check position
 
                 # marker 2, enlarged
                 RT.add(ot.PointMarker("Test2", [0., 1., 5.2], text_factor=2, marker_factor=2))
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertEqual(len(sim._marker_plots), 2)  # element was added
-                self.assertTrue(np.allclose(sim._marker_plots[1][0].actor.actor.center\
+                self.assertEqual(len(sim._plot._marker_plots), 2)  # element was added
+                self.assertTrue(np.allclose(sim._plot._marker_plots[1][0].actor.actor.center\
                                             - np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
 
                 # check size change
-                a, b = tuple(sim._marker_plots)
+                a, b = tuple(sim._plot._marker_plots)
                 self.assertAlmostEqual(b[0].glyph.glyph.scale_factor/a[0].glyph.glyph.scale_factor, 2)
                 self.assertAlmostEqual(b[3].property.font_size/a[3].property.font_size, 2)
 
@@ -1312,10 +1312,10 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.send_cmd, "RT.remove(ML[-1])") # also checks that alias ML exists
                 sim._wait_for_idle()
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
-                self.assertEqual(len(sim._marker_plots), 1)  # element was removed in scene
+                self.assertEqual(len(sim._plot._marker_plots), 1)  # element was removed in scene
 
                 # first marker now should have no crosshair shown
-                a = sim._marker_plots[0]
+                a = sim._plot._marker_plots[0]
                 self.assertFalse(a[0].visible)
 
         sim = TraceGUI(RT)
@@ -1335,19 +1335,19 @@ class GUITests(unittest.TestCase):
                 RT.add(ot.LineMarker(r=5, desc="Test1", pos=[0., 0., 0]))
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertEqual(len(sim._line_marker_plots), 1)  # element was added
-                self.assertTrue(np.allclose(sim._line_marker_plots[0][0].actor.actor.center, 0))  # check position
+                self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was added
+                self.assertTrue(np.allclose(sim._plot._line_marker_plots[0][0].actor.actor.center, 0))  # check position
 
                 # marker 2, enlarged
                 RT.add(ot.LineMarker(r=5, angle=-20, desc="Test2", pos=[0., 1., 5.2], text_factor=2, line_factor=2))
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertEqual(len(sim._line_marker_plots), 2)  # element was added
-                self.assertTrue(np.allclose(sim._line_marker_plots[1][0].actor.actor.center\
+                self.assertEqual(len(sim._plot._line_marker_plots), 2)  # element was added
+                self.assertTrue(np.allclose(sim._plot._line_marker_plots[1][0].actor.actor.center\
                                             - np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
 
                 # check size change
-                a, b = tuple(sim._line_marker_plots)
+                a, b = tuple(sim._plot._line_marker_plots)
                 self.assertAlmostEqual(b[0].actor.actor.property.line_width/a[0].actor.actor.property.line_width, 2)
                 self.assertAlmostEqual(b[3].property.font_size/a[3].property.font_size, 2)
 
@@ -1359,7 +1359,7 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.send_cmd, "RT.remove(ML[-1])") # also checks that alias ML exists
                 sim._wait_for_idle()
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
-                self.assertEqual(len(sim._line_marker_plots), 1)  # element was removed in scene
+                self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was removed in scene
 
         sim = TraceGUI(RT)
         sim.debug(_func=interact, silent=True, _args=(sim,))
@@ -1381,30 +1381,30 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.scene.z_plus_view)
                 sim._wait_for_idle()
            
-                default_text = sim._ray_text.text  # save default text for comparison
+                default_text = sim._plot._ray_text.text  # save default text for comparison
 
                 # ray picked -> show default infos
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)  # delay so a human user can check the text
-                text1 = sim._ray_text.text
+                text1 = sim._plot._ray_text.text
                 self.assertNotEqual(text1, default_text)  # shows a ray info text
                
                 # ray picked -> show verbose info
                 pyautogui.keyDown("shiftleft")
                 time.sleep(0.1)
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)
-                text2 = sim._ray_text.text
+                text2 = sim._plot._ray_text.text
                 self.assertNotEqual(text2, default_text)  # no default text
                 self.assertNotEqual(text1, text2)  # not the old text
                
                 # no ray picked -> default text
-                sim._do_in_main(sim._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)
-                text2 = sim._ray_text.text
+                text2 = sim._plot._ray_text.text
                 self.assertEqual(text2, default_text)  # shows default text
               
                 # redraw ray info only if it is the default one
@@ -1414,33 +1414,33 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 # remove crosshair and pick a ray
-                sim._crosshair = None
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
+                sim._plot._crosshair = None
+                sim._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 sim._wait_for_idle()
 
                 # remove crosshair and pick no ray
-                sim._do_in_main(sim._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 
                 # restore crosshair
-                sim._do_in_main(sim._init_crosshair)
+                sim._do_in_main(sim._plot.init_crosshair)
                 sim._wait_for_idle()
                 
                 # we have an extra picker sim._space_picker for right+clicking in the scene,
                 # but I don't know how to make the Picker.pick() function pick with a right click
                 # so currently we overide the RayPicker with the onSpacePick method
                 # do via command string, so it is guaranteed to run in main thread
-                sim._do_in_main(sim.send_cmd, "self._ray_picker = self.scene.mlab.gcf().on_mouse_pick("
-                                         "self._on_space_pick, button='Left')")
+                sim._do_in_main(sim.send_cmd, "self._plot._ray_picker = self.scene.mlab.gcf().on_mouse_pick("
+                                         "self._plot._on_space_pick, button='Left')")
                 sim._wait_for_idle()
 
                 # space picked -> show coordinates
                 pyautogui.keyUp("shiftleft")
                 time.sleep(0.1)
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 3, sim._scene_size[1] / 3, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3, sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)
-                text3 = sim._ray_text.text
+                text3 = sim._plot._ray_text.text
                 self.assertNotEqual(text3, default_text)  # not the default text
                 self.assertNotEqual(text3, text2)  # not the old text
                 
@@ -1448,19 +1448,19 @@ class GUITests(unittest.TestCase):
                 pyautogui.keyDown("shiftleft")
                 time.sleep(0.1)
                 old_pos = RT.detectors[0].pos
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 3, sim._scene_size[1] / 3, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3, sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)
-                text4 = sim._ray_text.text
+                text4 = sim._plot._ray_text.text
                 self.assertEqual(text4, default_text)  # not the default text
                 self.assertNotEqual(RT.detectors[0].pos[2], old_pos[2])
                 
                 # space outside outline picked with shift -> move detector
                 sim._do_in_main(sim.scene.y_plus_view)
-                sim._do_in_main(sim._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)
-                text4 = sim._ray_text.text
+                text4 = sim._plot._ray_text.text
                 self.assertEqual(text4, default_text)  # not the default text
                 self.assertEqual(RT.detectors[0].pos[2], RT.outline[4])  # detector moved to the outline beginning
               
@@ -1468,12 +1468,12 @@ class GUITests(unittest.TestCase):
                 RT.detectors = []
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                sim._do_in_main(sim._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
                 sim._wait_for_idle()
 
                 # remove crosshair and pick
-                sim._crosshair = None
-                sim._do_in_main(sim._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
+                sim._plot._crosshair = None
+                sim._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
                 sim._wait_for_idle()
 
                 # release shift key
@@ -1481,16 +1481,16 @@ class GUITests(unittest.TestCase):
                 time.sleep(0.1)
                 
                 # remove crosshair and pick without shift key
-                sim._do_in_main(sim._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
                 sim._wait_for_idle()
                 
                 # restore crosshair
-                sim._do_in_main(sim._init_crosshair)
+                sim._do_in_main(sim._plot.init_crosshair)
                 sim._wait_for_idle()
 
                 # test case where RayText is missing
-                sim._ray_text = None
-                sim._do_in_main(sim._on_ray_pick)
+                sim._plot._ray_text = None
+                sim._do_in_main(sim._plot._on_ray_pick)
                 sim._wait_for_idle()
 
         sim = TraceGUI(RT)
@@ -1504,7 +1504,7 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             def pick():    
                 sim._wait_for_idle()
-                sim._do_in_main(sim._ray_picker.pick, sim._scene_size[0] / 2, sim._scene_size[1] / 2, 0, sim.scene.renderer)
+                sim._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 sim._wait_for_idle()
                 time.sleep(0.2)  # delay so a human user can check the text
 
@@ -1575,32 +1575,32 @@ class GUITests(unittest.TestCase):
                 # replot
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertEqual(len(sim._volume_plots), 4)  # elements were added
-                self.assertTrue(sim._volume_plots[0][3] is None)  # no text label for volumes
+                self.assertEqual(len(sim._plot._volume_plots), 4)  # elements were added
+                self.assertTrue(sim._plot._volume_plots[0][3] is None)  # no text label for volumes
 
                 # tests that opacity and color is assigned correctly
                 sphv.opacity = 0.1
                 sphv.color = (1.0, 0.0, 1.0)
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertEqual(sim._volume_plots[0][0].actor.property.color, sphv.color)
-                self.assertEqual(sim._volume_plots[0][0].actor.property.opacity, sphv.opacity)
+                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sphv.color)
+                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.opacity, sphv.opacity)
                 
                 # checks that automatic replotting works
                 sim._do_in_main(sim.send_cmd, "RT.volumes[0].opacity=0.9") 
                 sim._wait_for_idle()
-                self.assertEqual(sim._volume_plots[0][0].actor.property.opacity, 0.9)
+                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.opacity, 0.9)
 
                 # toggle contrast mode
                 sim._set_in_main("high_contrast", True)
                 sim._wait_for_idle()
                 # check that custom color gets unset with high contrast
-                self.assertEqual(sim._volume_plots[0][0].actor.property.color, sim._volume_color)
+                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sim._plot._volume_color)
 
                 sim._set_in_main("high_contrast", False)
                 sim._wait_for_idle()
                 # check that custom color gets set again without high contrast
-                self.assertEqual(sim._volume_plots[0][0].actor.property.color, sphv.color)
+                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sphv.color)
 
         sim = TraceGUI(RT)
         sim.debug(_func=interact, silent=True, _args=(sim,))
