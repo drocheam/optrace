@@ -20,7 +20,6 @@ from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeE
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool
 
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
-
 import matplotlib.pyplot as plt  # closing plot windows
 
 # provides types and plotting functionality, most of these are also imported for the TCP protocol scope
@@ -209,7 +208,7 @@ class TraceGUI(HasTraits):
     _detector_cut_button:        Button = Button(label="Detector Image Cut", desc="detector image cut is shown")
     _source_image_button:        Button = Button(label="Source Image", desc="Source Image of the Chosen Source")
     _auto_focus_button:          Button = Button(label="Find Focus", desc="Finding the Focus Between the Lenses"
-                                                                         " around the Detector Position")
+                                                                          " around the Detector Position")
 
     # Strings and Labels
 
@@ -260,26 +259,22 @@ class TraceGUI(HasTraits):
                             Item("_trace_label", style='readonly', show_label=False, emphasized=True),
                             Item('ray_count'),
                             Item('absorb_missing', style="custom", show_label=False),
-                            _separator,
-                            _separator,
+                            _separator, _separator,
                             Item("_plotting_label", style='readonly', show_label=False, emphasized=True),
                             Item("plotting_type", label='Plotting'),
                             Item("coloring_type", label='Coloring'),
-                            _separator,
-                            _separator,
+                            _separator, _separator,
                             Item("_ray_visual_label", style='readonly', show_label=False, emphasized=True),
                             Item('ray_amount_shown'),
                             Item('ray_opacity'),
                             Item('ray_width'),
-                            _separator,
-                            _separator,
+                            _separator, _separator,
                             Item("_ui_visual_label", style='readonly', show_label=False, emphasized=True),
                             Item('minimalistic_view', style="custom", show_label=False),
                             Item('maximize_scene', style="custom", show_label=False),
                             Item('high_contrast', style="custom", show_label=False),
                             Item('vertical_labels', style="custom", show_label=False),
-                            _separator,
-                            _separator,
+                            _separator, _separator,
                             Item("_property_label", style='readonly', show_label=False, emphasized=True),
                             Item('_property_browser_button', show_label=False),
                             Item('_command_window_button', show_label=False),
@@ -319,14 +314,12 @@ class TraceGUI(HasTraits):
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
                             Item('det_pos'),
-                            _separator,
-                            _separator,
+                            _separator, _separator,
                             Item("_spectrum_label", style='readonly', show_label=False, emphasized=True),
                             Item('_source_spectrum_button', show_label=False),
                             Item('det_spectrum_one_source', style="custom", show_label=False),
                             Item('_detector_spectrum_button', show_label=False),
-                            _separator,
-                            _separator,
+                            _separator, _separator,
                             Item("_spectrum_output_label", style='readonly', show_label=False, emphasized=True),
                             Item("_spectrum_information", show_label=False, style="custom"),
                             label="Spectrum",
@@ -337,8 +330,7 @@ class TraceGUI(HasTraits):
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
                             Item('det_pos'),
-                            _separator,
-                            _separator,
+                            _separator, _separator,
                             Item("_autofocus_label", style='readonly', show_label=False, emphasized=True),
                             Item('focus_type', label='Mode'),
                             Item('af_one_source', style="custom", show_label=False),
@@ -353,17 +345,13 @@ class TraceGUI(HasTraits):
                         HSplit(  # hsplit with whitespace group so we have a left margin in this tab
                             TGroup(Item("_whitespace_label", style='readonly', show_label=False, width=50)),
                             TGroup(
-                                _separator,
-                                _separator,
-                                _separator,
+                                _separator, _separator, _separator,
                                 Item("_debug_options_label", style='readonly', show_label=False, emphasized=True),
                                 Item('raytracer_single_thread', style="custom", show_label=False),
                                 Item('show_all_warnings', style="custom", show_label=False),
                                 Item('garbage_collector_stats', style="custom", show_label=False),
                                 Item('wireframe_surfaces', style="custom", show_label=False),
-                                _separator,
-                                _separator,
-                                _separator,
+                                _separator, _separator, _separator,
                                 Item("_debug_command_label", style='readonly', show_label=False, emphasized=True),
                                 Item('command_dont_replot', style="custom", show_label=False),
                                 Item('command_dont_skip', style="custom", show_label=False),
@@ -868,9 +856,9 @@ class TraceGUI(HasTraits):
                         self._det_ind = int(self.detector_selection.split(":", 1)[0].split("DET")[1])
                         self.det_pos = self.raytracer.detectors[self._det_ind].pos[2]
 
-                    self.__detector_lock.release()
                     self.projection_method_enabled = \
                         isinstance(self.raytracer.detectors[self._det_ind].surface, SphericalSurface)
+                    self.__detector_lock.release()
                     self._status["ChangingDetector"] -= 1
 
                 self.__detector_lock.acquire()
@@ -886,7 +874,6 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
-
         if not self._no_trait_action_flag and self.raytracer.detectors:
 
             self._status["ChangingDetector"] += 1
@@ -945,8 +932,8 @@ class TraceGUI(HasTraits):
                             # only calculate Image if raytracer Snapshot, selected Source or image_pixels changed
                             # otherwise we can replot the old Image with the new visual settings
                             source_index = None if not self.det_image_one_source else self._source_ind
-                            snap = [self.raytracer.property_snapshot(), self.detector_selection, source_index, 
-                                    self.projection_method, self.activate_filter, self.filter_constant]
+                            snap = [self.raytracer.property_snapshot(), *self.detector_selection, source_index, 
+                                    *self.projection_method, *self.activate_filter, self.filter_constant]
                             rerender = snap != self._last_det_snap or self.last_det_image is None
 
                             log, mode, px, dindex, flip, pm = bool(self.log_image), self.image_type,\
@@ -1091,8 +1078,8 @@ class TraceGUI(HasTraits):
                     with self.__ray_access_lock:
                         # only calculate Image if raytracer Snapshot, selected Source or image_pixels changed
                         # otherwise we can replot the old Image with the new visual settings
-                        snap = [self.raytracer.property_snapshot(), self.source_selection,
-                                self.activate_filter, self.filter_constant]
+                        snap = [self.raytracer.property_snapshot(), *self.source_selection,
+                                *self.activate_filter, self.filter_constant]
 
                         rerender = snap != self._last_source_snap or self.last_source_image is None
                         log, mode, px, source_index = bool(self.log_image), self.image_type, int(self.image_pixels), \
@@ -1230,7 +1217,7 @@ class TraceGUI(HasTraits):
             self._plot.change_minimalistic_view()
             self._status["Drawing"] -= 1
     
-    @observe('vertical_labels')
+    @observe('vertical_labels', dispatch="ui")
     def change_label_orientation(self, event=None):
         """
         Make element labels horizontal or vertical

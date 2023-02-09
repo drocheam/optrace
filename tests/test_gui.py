@@ -659,6 +659,8 @@ class GUITests(unittest.TestCase):
                 props = [('ray_amount_shown', 500), ('ray_amount_shown', 2000), ('minimalistic_view', True),
                          ('minimalistic_view', False), ('plotting_type', "Rays"), ('plotting_type', "Points"),
                          ('absorb_missing', True), ('absorb_missing', False), ('ray_opacity', 0.06), ('ray_width', 12),
+                         ('ray_opacity', 0.8), ('ray_width', 2), ('cut_value', 0), ('cut_dimension', 'x'), 
+                         ('cut_dimension', 'y'),
                          ('af_one_source', False), ('af_one_source', True), ('det_image_one_source', False),
                          ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), 
                          ('flip_det_image', False), ('det_spectrum_one_source', True), ('det_image_one_source', False),
@@ -675,10 +677,10 @@ class GUITests(unittest.TestCase):
                     n = np.random.uniform(-4, 0.5)
                     time.sleep(10**n)
 
-                    match np.random.randint(0, 11):
+                    match np.random.randint(0, 13):
                         case 0:
                             sim._do_in_main(np.random.choice(funcs))
-                        case 1:
+                        case 1 | 11:
                             ch = np.random.randint(0, len(props))
                             sim._set_in_main(*props[ch])
                         case 2:
@@ -703,6 +705,10 @@ class GUITests(unittest.TestCase):
                             cmds = ['GUI.replot()', 'scene.render()', 'scene.z_minus_view()']
                             cmd = np.random.choice(cmds)
                             sim._do_in_main(sim.send_cmd, cmd)
+                        case 12:
+                            if isinstance(sim.raytracer.detectors[sim._det_ind].front, ot.SphericalSurface):
+                                sim._set_in_main("projection_method", 
+                                                 np.random.choice(ot.SphericalSurface.sphere_projection_methods))
 
                     # close plots from time to time
                     if i % 20 == 0:

@@ -13,6 +13,11 @@ from ..tracer import *
 
 class ScenePlotting:
 
+    """
+    This class provides the functionality for plotting elements and rays of the raytracer inside a mayavi scene.
+    It uses properties and settings from a TraceGUI.
+    """
+
     SURFACE_RES: int = 150
     """Surface sampling count in each dimension"""
 
@@ -35,13 +40,8 @@ class ScenePlotting:
         self.ui = ui
         self._scene_size = np.array(ui._scene_size0)
         self._scene_size0 = self._scene_size.copy()
-
         self.scene = ui.scene
         self.raytracer = raytracer
-
-        self._rays_plot = None  # plot for visualization of rays/points
-        self._ray_text = None  # textbox for ray information
-        self._ray_text_parent = None
 
         # plot object lists
         self._lens_plots = []
@@ -55,19 +55,20 @@ class ScenePlotting:
         self._line_marker_plots = []
         self._index_box_plots = []
         self._volume_plots = []
+        self._fault_markers = []
+        self._rays_plot = None 
         self._crosshair = None
         self._orientation_axes = None
 
+        # texts 
         self._status_text = None
-        self._status_text_parent = None
-
-        # markers for geometric errors like collisions
-        self._fault_markers = []
+        self._ray_text = None  # textbox for ray information
 
         # ray properties
         self.__ray_property_dict = {}  # properties of shown rays, set while tracing
         self._ray_property_dict = {}  # properties of shown rays, set after tracing
 
+        # pickers
         self._ray_picker = None
         self._space_picker = None
 
@@ -478,6 +479,7 @@ class ScenePlotting:
     ###################################################################################################################
 
     def set_colors(self) -> None:
+        """initialize or change colors depending on high_contrast setting"""
 
         high_contrast = self.ui.high_contrast
 
@@ -568,7 +570,7 @@ class ScenePlotting:
         self._ray_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_ray_pick, button='Left')
 
         # add ray info text
-        self._ray_text_parent = self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
+        self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
         self._ray_text = self.scene.mlab.text(0.02, 0.97, "")
         self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
                                           opacity=1, color=self.scene.foreground, vertical_justification="top",
@@ -581,7 +583,7 @@ class ScenePlotting:
         self._space_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_space_pick, button='Right')
 
         # add status text
-        self._status_text_parent = self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
+        self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
         self._status_text = self.scene.mlab.text(0.97, 0.01, "Status Text")
         self._status_text.property.trait_set(**self.INFO_STYLE, justification="right")
         self._status_text.actor.text_scale_mode = 'none'
@@ -769,14 +771,16 @@ class ScenePlotting:
         # chose some random fault positions, maximum 5
         pfault = self.raytracer.fault_pos
         ch = min(5, pfault.shape[0])
-        f_ind = np.random.choice(np.arange(pfault.shape[0]), size=ch, replace=False)
 
-        self.raytracer.remove(self._fault_markers)
-        self._fault_markers = [PointMarker("COLLISION", pos=pfault[ind], text_factor=1.5, 
-                                           marker_factor=1.5)\
-                              for ind in f_ind]
-        self.raytracer.add(self._fault_markers)
-        self.plot_point_markers()
+        if ch:
+            f_ind = np.random.choice(np.arange(pfault.shape[0]), size=ch, replace=False)
+
+            self.raytracer.remove(self._fault_markers)
+            self._fault_markers = [PointMarker("COLLISION", pos=pfault[ind], text_factor=1.5, 
+                                               marker_factor=1.5)\
+                                  for ind in f_ind]
+            self.raytracer.add(self._fault_markers)
+            self.plot_point_markers()
 
     def remove_fault_markers(self):
         """remove the fault markers from the scene and raytracer"""
@@ -837,7 +841,7 @@ class ScenePlotting:
                     if not self.ui.silent:
                         print("WARNING: Polarization calculation turned off in raytracer, "
                               "reverting to a different mode")
-                    # TODO this changes the TraceGUI!!!
+
                     self.ui.coloring_type = "Power"
                     return
                 if self.ui.coloring_type == "Polarization yz":
