@@ -59,8 +59,6 @@ RT.add(Det)
 Det2 = ot.Detector(ot.SphericalSurface(R=-1.1, r=1), pos=[0, 0, 40])
 RT.add(Det2)
 
-# TODO document that this is possible
-
 # Instantiate the GUI and start it.
 sim = TraceGUI(RT, minimalistic_view=True, func2=lambda: RT.clear(), ui_style="kvantum-dark")
 sim.run()

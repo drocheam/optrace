@@ -180,7 +180,7 @@ class GUITests(unittest.TestCase):
             trace_gui_run(plotting_type=ptype)
 
         trace_gui_run(ray_count=100000)
-        trace_gui_run(ray_amount_shown=200)
+        trace_gui_run(rays_visible=200)
         trace_gui_run(absorb_missing=False)
         trace_gui_run(minimalistic_view=True)
         trace_gui_run(high_contrast=True)
@@ -192,14 +192,14 @@ class GUITests(unittest.TestCase):
         trace_gui_run(ui_style="Fusion")
 
         # many parameters
-        trace_gui_run(ray_count=100000, ray_amount_shown=1500, absorb_missing=False, ray_opacity=0.1, ray_width=5,
+        trace_gui_run(ray_count=100000, rays_visible=1500, absorb_missing=False, ray_opacity=0.1, ray_width=5,
                       coloring_type="Wavelength", plotting_type="Points", minimalistic_view=True, 
                       raytracer_single_thread=True, vertical_labels=True, ui_style="Windows")
 
         # this attributes can't bet set initially
         self.assertRaises(RuntimeError, TraceGUI, RT, detector_selection="DET1")
         self.assertRaises(RuntimeError, TraceGUI, RT, source_selection="RS1")
-        self.assertRaises(RuntimeError, TraceGUI, RT, det_pos=0)
+        self.assertRaises(RuntimeError, TraceGUI, RT, z_det=0)
 
     @pytest.mark.slow
     def test_interaction1(self) -> None:
@@ -219,14 +219,14 @@ class GUITests(unittest.TestCase):
                         self.assertNotEqual(dname0, dname1)
                     
                     assert z0 != RT.detectors[i].pos[2]
-                    self.assertEqual(sim.det_pos, RT.detectors[i].pos[2])
+                    self.assertEqual(sim.z_det, RT.detectors[i].pos[2])
                     # position updated after changing detector
                    
                     # change detector position
-                    sim._set_in_main("det_pos", z0)
+                    sim._set_in_main("z_det", z0)
                     sim._wait_for_idle()
                     dname2 = sim.detector_selection
-                    self.assertEqual(sim.det_pos, RT.detectors[i].pos[2])  # position updated
+                    self.assertEqual(sim.z_det, RT.detectors[i].pos[2])  # position updated
                     self.assertNotEqual(dname1, sim.detector_names[i])  # name updated after position change
                     self.assertEqual(dname2, sim.detector_names[i])  # name updated after position change
                     
@@ -244,7 +244,7 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("detector_selection", sim.detector_names[1])
                 sim._wait_for_idle()
                 self.assertTrue(sim._det_ind == 1)
-                self.assertTrue(sim.det_pos == sim.raytracer.detectors[1].pos[2])
+                self.assertTrue(sim.z_det == sim.raytracer.detectors[1].pos[2])
                 sim._do_in_main(sim.show_detector_image)
                 sim._wait_for_idle()
 
@@ -279,7 +279,7 @@ class GUITests(unittest.TestCase):
                     sim._wait_for_idle()
                     sim._do_in_main(sim.move_to_focus)
                     sim._wait_for_idle()
-                    sim._set_in_main("det_pos", pos0[2])
+                    sim._set_in_main("z_det", pos0[2])
                     sim._wait_for_idle()
 
                 # Focus Test 4, show Debug Plot
@@ -291,7 +291,7 @@ class GUITests(unittest.TestCase):
                 # Focus Test 5, one source only
                 sim._set_in_main("focus_cost_plot", False)
                 sim._wait_for_idle()
-                sim._set_in_main("det_pos", pos0[2])
+                sim._set_in_main("z_det", pos0[2])
                 sim._wait_for_idle()
                 sim._set_in_main("af_one_source", True)
                 sim._do_in_main(sim.move_to_focus)
@@ -315,10 +315,10 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("ray_count", 100000)
                 sim._wait_for_idle()
                 
-                sim._set_in_main("ray_amount_shown", 50)
+                sim._set_in_main("rays_visible", 50)
                 sim._wait_for_idle()
 
-                sim._set_in_main("ray_amount_shown", 500)
+                sim._set_in_main("rays_visible", 500)
 
         RT = rt_example()
         sim = TraceGUI(RT)
@@ -493,7 +493,7 @@ class GUITests(unittest.TestCase):
                     sim._wait_for_idle()
                     sim._do_in_main(sim.move_to_focus)
                     sim._wait_for_idle()
-                    sim._set_in_main("det_pos", 10.)
+                    sim._set_in_main("z_det", 10.)
                     sim._wait_for_idle()
                     sim._do_in_main(sim.show_source_image)
                     sim._wait_for_idle()
@@ -505,7 +505,7 @@ class GUITests(unittest.TestCase):
                     sim._wait_for_idle()
                     sim._set_in_main("absorb_missing", False)
                     sim._wait_for_idle()
-                    sim._set_in_main("ray_amount_shown", 4000)
+                    sim._set_in_main("rays_visible", 4000)
                     sim._wait_for_idle()
                     sim._set_in_main("minimalistic_view", True)
                     sim._wait_for_idle()
@@ -573,7 +573,7 @@ class GUITests(unittest.TestCase):
 
                 time.sleep(0.01)
                 sim._set_in_main("ray_count", int(N0/1.3))
-                sim._set_in_main("det_pos", (RT.outline[5] - RT.outline[4])/2)
+                sim._set_in_main("z_det", (RT.outline[5] - RT.outline[4])/2)
                 sim._do_in_main(sim.show_source_cut)
                 sim._do_in_main(sim.move_to_focus)
                 sim._set_in_main("detector_selection", sim.detector_names[1])
@@ -656,7 +656,7 @@ class GUITests(unittest.TestCase):
                          sim.replot_rays, sim.open_property_browser, sim.open_command_window,
                          sim.show_detector_spectrum, sim.show_detector_cut, sim.show_source_cut, sim.replot]
 
-                props = [('ray_amount_shown', 500), ('ray_amount_shown', 2000), ('minimalistic_view', True),
+                props = [('rays_visible', 500), ('rays_visible', 2000), ('minimalistic_view', True),
                          ('minimalistic_view', False), ('plotting_type', "Rays"), ('plotting_type', "Points"),
                          ('absorb_missing', True), ('absorb_missing', False), ('ray_opacity', 0.06), ('ray_width', 12),
                          ('ray_opacity', 0.8), ('ray_width', 2), ('cut_value', 0), ('cut_dimension', 'x'), 
@@ -698,7 +698,7 @@ class GUITests(unittest.TestCase):
                         case 7:
                             sim._set_in_main("source_selection", np.random.choice(sim.source_names))
                         case 8:
-                            sim._set_in_main("det_pos", np.random.uniform(RT.outline[4], RT.outline[5]))
+                            sim._set_in_main("z_det", np.random.uniform(RT.outline[4], RT.outline[5]))
                         case 9:
                             sim._set_in_main("image_pixels", np.random.choice(ot.RImage.SIZES))
                         case 10:
@@ -922,7 +922,7 @@ class GUITests(unittest.TestCase):
                 # properties before resizing
                 ff = sim._plot._axis_plots[0][0].axes.font_factor
                 zoom = sim._plot._orientation_axes.widgets[0].zoom
-                pos2 = sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2
+                pos2 = sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2
 
                 qsize = Window.size()
                 ss0 = np.array([qsize.width(), qsize.height()])
@@ -939,9 +939,9 @@ class GUITests(unittest.TestCase):
                 self.assertNotAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor)
                 self.assertNotAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom)
                 self.assertNotAlmostEqual(pos2[0],
-                                          sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
+                                          sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
                 self.assertNotAlmostEqual(pos2[1],
-                                          sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+                                          sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
 
                 sim._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(0.5)
@@ -962,9 +962,9 @@ class GUITests(unittest.TestCase):
                 self.assertAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor)
                 self.assertAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom)
                 self.assertAlmostEqual(pos2[0],
-                                       sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
+                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
                 self.assertAlmostEqual(pos2[1],
-                                       sim._plot._rays_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
 
 
                 # coverage test: delete orientation:axes and resize
@@ -1064,10 +1064,10 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
                 # check if rays are removed correctly in replot()
-                assert len(RT.ray_sources) and RT.rays.N and sim._plot._rays_plot is not None
+                assert len(RT.ray_sources) and RT.rays.N and sim._plot._ray_plot is not None
                 sim._do_in_main(sim.send_cmd, "RT.clear()")
                 sim._wait_for_idle()
-                self.assertTrue(sim._plot._rays_plot is None)
+                self.assertTrue(sim._plot._ray_plot is None)
                 self.assertFalse(sim._plot._ray_property_dict)
 
         sim.debug(_func=interact, silent=True, _args=(sim,))
@@ -1180,7 +1180,7 @@ class GUITests(unittest.TestCase):
                 RT.lenses[0].move_to(RT.lenses[1].pos)
                 sim._do_in_main(sim.replot)
                 sim._wait_for_idle()
-                self.assertTrue(sim._plot._rays_plot is None)
+                self.assertTrue(sim._plot._ray_plot is None)
                 
                 # still works when some objects are none
                 sim._plot._orientation_axes = None
@@ -1245,7 +1245,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim._set_in_main("absorb_missing", False)
                 sim._wait_for_idle()
-                sim._set_in_main("ray_amount_shown", 3000)
+                sim._set_in_main("rays_visible", 3000)
                 sim._wait_for_idle()
                 sim._set_in_main("minimalistic_view", True)
                 sim._wait_for_idle()

@@ -104,7 +104,6 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "otp._check_types", locals())
         self.assertRaises(AttributeError, eval, "otp._check_labels", locals())
         self.assertRaises(AttributeError, eval, "otp._show_grid", locals())
-        self.assertRaises(AttributeError, eval, "otp._set_font", locals())
         self.assertRaises(AttributeError, eval, "otp._spectrum_plot", locals())
         self.assertRaises(AttributeError, eval, "otp._chromacity_plot", locals())
         self.assertRaises(AttributeError, eval, "otp._red_xyz", locals())

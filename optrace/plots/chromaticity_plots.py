@@ -8,7 +8,6 @@ import matplotlib.patheffects as path_effects  # path effects for plot lines
 from ..tracer.r_image import RImage
 from ..tracer.spectrum import LightSpectrum
 from ..tracer import color  # color conversions for chromaticity plots
-from ..plots.misc_plots import _set_font
 from ..tracer.misc import PropertyChecker as pc
 
 chromaticity_norms: list[str, str, str] = ["Largest", "Sum"]
@@ -202,7 +201,6 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     # convert to sRGB
     sRGB = color.srgb_linear_to_srgb(RGB)
 
-    _set_font()
     plt.figure()
     plt.minorticks_on()
 

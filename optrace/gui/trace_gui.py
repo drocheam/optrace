@@ -49,12 +49,12 @@ class TraceGUI(HasTraits):
                              auto_set=False, label="Limit (µm)", mode='text')
     """gaussian filter constant standard deviation"""
 
-    ray_amount_shown: Range = Range(1, 10000, 2000, desc='the number of rays which is drawn', enter_set=False,
-                                    auto_set=False, label="Count", mode='logslider')
+    rays_visible: Range = Range(1, 10000, 2000, desc='the number of rays which is drawn', enter_set=False,
+                                auto_set=False, label="Count", mode='logslider')
     """Number of rays shown in mayavi scene"""
 
-    det_pos: Range = Range(low='_det_pos_min', high='_det_pos_max', value='_det_pos_max', mode='text',
-                           desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_det")
+    z_det: Range = Range(low='_z_det_min', high='_z_det_max', value='_z_det_max', mode='text',
+                         desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_det")
     """z-Position of Detector. Lies inside z-range of :obj:`Backend.raytracer.outline`"""
 
     ray_opacity: Range = Range(1e-5, 1, 0.01, desc='Opacity of the rays/Points', enter_set=True,
@@ -246,9 +246,9 @@ class TraceGUI(HasTraits):
 
     view = View(
                 HSplit(
-                    TGroup(
+                    TGroup(  # additional group so scene-sidebar ratio stays the same on windows resizing
                         TGroup(
-                            Item('scene', editor=SceneEditor(scene_class=MayaviScene),
+                            Item('scene', editor=SceneEditor(scene_class=MayaviScene), resizable=True,
                                  height=_scene_size0[1], width=_scene_size0[0], show_label=False),
                              ),
                         layout="split",
@@ -265,7 +265,7 @@ class TraceGUI(HasTraits):
                             Item("coloring_type", label='Coloring'),
                             _separator, _separator,
                             Item("_ray_visual_label", style='readonly', show_label=False, emphasized=True),
-                            Item('ray_amount_shown'),
+                            Item('rays_visible'),
                             Item('ray_opacity'),
                             Item('ray_width'),
                             _separator, _separator,
@@ -286,7 +286,7 @@ class TraceGUI(HasTraits):
                             Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
-                            Item('det_pos'),
+                            Item('z_det'),
                             _separator,
                             Item("_image_label", style='readonly', show_label=False, emphasized=True),
                             Item('image_type', label='Mode'),
@@ -313,7 +313,7 @@ class TraceGUI(HasTraits):
                             Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
-                            Item('det_pos'),
+                            Item('z_det'),
                             _separator, _separator,
                             Item("_spectrum_label", style='readonly', show_label=False, emphasized=True),
                             Item('_source_spectrum_button', show_label=False),
@@ -329,7 +329,7 @@ class TraceGUI(HasTraits):
                             Item("_geometry_label", style='readonly', show_label=False, emphasized=True),
                             Item('source_selection', label="Source"),
                             Item('detector_selection', label="Detector"),
-                            Item('det_pos'),
+                            Item('z_det'),
                             _separator, _separator,
                             Item("_autofocus_label", style='readonly', show_label=False, emphasized=True),
                             Item('focus_type', label='Mode'),
@@ -396,12 +396,12 @@ class TraceGUI(HasTraits):
         self._cdb = None
 
         # minimal/maximal z-positions of Detector_obj
-        self._det_pos_min = self.raytracer.outline[4]
-        self._det_pos_max = self.raytracer.outline[5]
+        self._z_det_min = self.raytracer.outline[4]
+        self._z_det_max = self.raytracer.outline[5]
 
         self._det_ind = 0
         if len(self.raytracer.detectors):
-            self.det_pos = self.raytracer.detectors[self._det_ind].pos[2]
+            self.z_det = self.raytracer.detectors[self._det_ind].pos[2]
         self._source_ind = 0
 
         self.silent = False
@@ -420,7 +420,7 @@ class TraceGUI(HasTraits):
        
         # these properties should not be set, since they have to be initialized first
         # and setting as inits them would lead to issues
-        forbidden = ["source_selection", "detector_selection", "det_pos"]
+        forbidden = ["source_selection", "detector_selection", "z_det"]
         if any(key in kwargs for key in forbidden):
             raise RuntimeError(f"Assigning an initial value for properties '{forbidden}' is not supported")
 
@@ -615,8 +615,8 @@ class TraceGUI(HasTraits):
                 self._plot.plot_outline()
 
                 # minimal/maximal z-positions of Detector_obj
-                self._det_pos_min = self.raytracer.outline[4]
-                self._det_pos_max = self.raytracer.outline[5]
+                self._z_det_min = self.raytracer.outline[4]
+                self._z_det_max = self.raytracer.outline[5]
 
         self.scene.disable_render = False
         self.scene.render()
@@ -705,7 +705,7 @@ class TraceGUI(HasTraits):
         self._plot.change_contrast()
         self._status["Drawing"] -= 1
 
-    @observe('ray_amount_shown', dispatch="ui")
+    @observe('rays_visible', dispatch="ui")
     def replot_rays(self, event=None) -> None:
         """
         choose a subset of all raytracer rays and plot them with :obj:`TraceGUI._plot_rays`.
@@ -730,14 +730,14 @@ class TraceGUI(HasTraits):
 
                 def on_finish():
 
-                    self._plot.assign_ray_props()
+                    self._plot.assign_ray_properties()
 
                     with self._plot.constant_camera():
                         self._plot.plot_rays(*res)
                         self._change_ray_and_source_colors()
 
                     # reset picker text
-                    self._plot.reset_ray_text()
+                    self._plot.clear_ray_text()
 
                     self._status["Drawing"] -= 1
 
@@ -823,8 +823,8 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
-        self._plot.assign_ray_colors()
-        self._plot.assign_ray_source_colors()
+        self._plot.color_rays()
+        self._plot.color_ray_sources()
 
     @observe("plotting_type", dispatch="ui")
     def _change_ray_representation(self, event=None) -> None:
@@ -833,7 +833,7 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
-        self._plot.set_ray_repr()
+        self._plot.set_ray_representation()
 
     @observe('detector_selection', dispatch="ui")
     def _change_detector(self, event=None) -> None:
@@ -853,7 +853,7 @@ class TraceGUI(HasTraits):
 
                     with self._no_trait_action():
                         self._det_ind = int(self.detector_selection.split(":", 1)[0].split("DET")[1])
-                        self.det_pos = self.raytracer.detectors[self._det_ind].pos[2]
+                        self.z_det = self.raytracer.detectors[self._det_ind].pos[2]
 
                     self.projection_method_enabled = \
                         isinstance(self.raytracer.detectors[self._det_ind].surface, SphericalSurface)
@@ -866,7 +866,7 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('det_pos', dispatch="ui")
+    @observe('z_det', dispatch="ui")
     def _move_detector(self, event=None) -> None:
         """
         move chosen detector.
@@ -883,7 +883,7 @@ class TraceGUI(HasTraits):
 
                     # move detector object
                     xp, yp, zp = self.raytracer.detectors[self._det_ind].pos
-                    self.raytracer.detectors[self._det_ind].move_to([xp, yp, self.det_pos])
+                    self.raytracer.detectors[self._det_ind].move_to([xp, yp, self.z_det])
                     self._plot.move_detector_diff(self._det_ind, event.new - event.old)
 
                     # reinit detectors and Selection to update z_pos in detector name
@@ -1137,12 +1137,12 @@ class TraceGUI(HasTraits):
                 error = False
 
                 source_index = None if not self.af_one_source else self._source_ind
-                mode, det_pos, ret_cost, det_ind = self.focus_type, self.det_pos, bool(self.focus_cost_plot), \
+                mode, z_det, ret_cost, det_ind = self.focus_type, self.z_det, bool(self.focus_cost_plot), \
                     self._det_ind
 
                 with self.__ray_access_lock:
                     with self._try() as error:
-                        res, afdict = self.raytracer.autofocus(mode, det_pos, return_cost=ret_cost,
+                        res, afdict = self.raytracer.autofocus(mode, z_det, return_cost=ret_cost,
                                                                source_index=source_index)
 
                 if not error:
@@ -1158,7 +1158,7 @@ class TraceGUI(HasTraits):
                         bounds, pos, N = afdict["bounds"], afdict["pos"], afdict["N"]
                         
                         if det_ind < len(self.raytracer.detectors):  # pragma: no branch
-                            self.det_pos = self.raytracer.detectors[det_ind].pos[2]
+                            self.z_det = self.raytracer.detectors[det_ind].pos[2]
 
                         if self.focus_cost_plot:
                             with self._try():
@@ -1186,8 +1186,8 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
         self._plot.init_crosshair()
-        self._plot.init_ray_info_text()
-        self._plot.init_status_text()
+        self._plot.init_ray_info()
+        self._plot.init_status_info()
         self._plot.init_keyboard_shortcuts()
 
         self._plot.plot_orientation_axes()

@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt  # actual plotting
 
 import numpy as np  # calculations
 
+from .misc_plots import _show_grid
+
 from ..tracer.r_image import RImage  # RImage type and RImage displaying
 from ..tracer.misc import PropertyChecker as pc  # check types and values
 
@@ -54,10 +56,6 @@ def r_image_plot(im:       RImage,
         Imd = np.fliplr(np.flipud(Imd))
         extent = extent[[1, 0, 3, 2]]
 
-    # better fonts to make everything look more professional
-    matplotlib.rcParams['mathtext.fontset'] = 'stix'
-    matplotlib.rcParams['font.family'] = 'STIXGeneral'
-
     # set colormap and color norm
     current_cmap = matplotlib.colormaps["Greys_r"].copy()
     current_cmap.set_bad(color='black')
@@ -72,7 +70,9 @@ def r_image_plot(im:       RImage,
 
     # plot image
     fig = plt.figure()
-    plt.imshow(Imd, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, vmin=vmin, vmax=vmax, origin="lower")
+    _show_grid()
+    plt.imshow(Imd, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, 
+               vmin=vmin, vmax=vmax, origin="lower", zorder=10)
 
     # plot labels
     plt.xlabel(xlabel)
@@ -141,10 +141,6 @@ def r_image_cut_plot(im:       RImage,
     # overwrite title if provided
     if title is not None:
         text = title
-    
-    # better fonts to make everything look more professional
-    matplotlib.rcParams['mathtext.fontset'] = 'stix'
-    matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
     # convert angles to degrees with projection mode equidistant
     if im.projection == "Equidistant":
@@ -152,6 +148,7 @@ def r_image_cut_plot(im:       RImage,
 
     # new figure
     fig = plt.figure()
+    _show_grid()
 
     # enforce rgb colors for rgb modes
     colors = ["r", "g", "b"] if mode.startswith("sRGB") else [None, None, None]
@@ -171,10 +168,6 @@ def r_image_cut_plot(im:       RImage,
     if im.projection not in ["Equidistant", None, "Orthographic"]:
         fig.axes[0].set_xticklabels([])
 
-    # major and finer grid
-    plt.grid(visible=True, which='major')
-    plt.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
-    plt.minorticks_on()
 
     # toggle log mode
     if log and any(np.any(Imdi > 0) for Imdi in Imd) and len(Imd) == 1:

@@ -1,3 +1,12 @@
+import matplotlib
+
+# set font globally
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
+# increase dpi if in inline backend, otherwise the resolution is way too low in spyder etc.
+if "inline" in matplotlib.rcParams["backend"]:
+    matplotlib.rcParams["figure.dpi"] = 200
 
 from .r_image_plots import r_image_plot, r_image_cut_plot
 from .misc_plots import autofocus_cost_plot, abbe_plot, surface_profile_plot

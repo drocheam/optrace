@@ -7,17 +7,16 @@ from pyface.qt import QtGui  # copying to clipboard
 class CommandWindow(HasTraits):
 
     _cmd:                 Str = Str()
+    _history:             List = List()
+
     _execute_label:       Str = Str('Command:')
     _history_label:       Str = Str('History:')
     _whitespace_label:    Str = Str()
-    _status:              Str = Str()
 
-    _history:             List = List()
-    
     _run_button:          Button = Button(label="Run", desc="runs the specified command")
     _clear_button:        Button = Button(label="Clear", desc="clear command history")
-    _clipboard_button:    Button = Button(label="Copy History to Clipboard", desc="copies the full history to the clipboard")
-    
+    _clipboard_button:    Button = Button(label="Copy History to Clipboard",
+                                          desc="copies the full history to the clipboard")
 
     view = View(
                 Group(
@@ -37,7 +36,6 @@ class CommandWindow(HasTraits):
                         Item("_clear_button", show_label=False),
                         Item("_clipboard_button", show_label=False),
                     ),
-                    Item("_status", style="readonly", show_label=False),
                     ),
                 resizable=True,
                 width=700,
@@ -46,8 +44,10 @@ class CommandWindow(HasTraits):
 
     def __init__(self, gui, silent: bool = False) -> None:
         """
+        Initialize the command window from a gui
 
-        :param gui:
+        :param gui: parent TraceGUI
+        :param silent: if standard output should be omitted
         """
         self.gui = gui
         self.silent = silent
@@ -86,6 +86,8 @@ class CommandWindow(HasTraits):
     @observe('_run_button')
     def send_cmd(self, event=None) -> None:
         """
+        Execute a command in the TraceGUI
+
         :param event: optional event from traits observe decorator
         """
         if self._cmd:
@@ -94,4 +96,3 @@ class CommandWindow(HasTraits):
             # add to history if something happened and if the command differs from the last one
             if ret and (not self._history or self._cmd != self._history[-1]):
                 self._history = self._history + [self._cmd]
-

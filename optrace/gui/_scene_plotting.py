@@ -56,7 +56,7 @@ class ScenePlotting:
         self._index_box_plots = []
         self._volume_plots = []
         self._fault_markers = []
-        self._rays_plot = None 
+        self._ray_plot = None
         self._crosshair = None
         self._orientation_axes = None
 
@@ -255,12 +255,12 @@ class ScenePlotting:
         self.__remove_objects(self._index_box_plots)
 
         # sort Element list in z order
-        Lenses = sorted(self.raytracer.lenses, key=lambda Element: Element.pos[2])
+        Lenses = sorted(self.raytracer.lenses, key=lambda element: element.pos[2])
 
         # create n list and z-boundary list
-        nList = [self.raytracer.n0] + [Element.n2 for Element in Lenses] + [self.raytracer.n0]
+        nList = [self.raytracer.n0] + [element.n2 for element in Lenses] + [self.raytracer.n0]
         BoundList = [self.raytracer.outline[[4, 4]]] +\
-                    [(np.mean(Element.front.extent[4:]), np.mean(Element.back.extent[4:])) for Element in Lenses]\
+                    [(np.mean(element.front.extent[4:]), np.mean(element.back.extent[4:])) for element in Lenses]\
                     + [self.raytracer.outline[[5, 5]]]
 
         # replace None values of Lenses n2 with the ambient n0
@@ -402,18 +402,18 @@ class ScenePlotting:
             -> None:
         """plot a subset of traced rays"""
 
-        if self._rays_plot is not None:
-            self._rays_plot.parent.parent.remove()
+        if self._ray_plot is not None:
+            self._ray_plot.parent.parent.remove()
 
-        self._rays_plot = self.scene.mlab.quiver3d(x, y, z, u, v, w, scalars=s,
-                                                   scale_mode="vector", scale_factor=1, colormap="Greys", mode="2ddash")
-        self._rays_plot.glyph.trait_set(color_mode="color_by_scalar")
-        self._rays_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True,
-                                                       opacity=self.ui.ray_opacity)
-        self._rays_plot.actor.property.trait_set(line_width=self.ui.ray_width,
-                                                 point_size=self.ui.ray_width if self.ui.plotting_type == "Points" else 0.1)
-        self._rays_plot.parent.parent.name = "Rays"
-        self._rays_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
+        self._ray_plot = self.scene.mlab.quiver3d(x, y, z, u, v, w, scalars=s,
+                                                  scale_mode="vector", scale_factor=1, colormap="Greys", mode="2ddash")
+        self._ray_plot.glyph.trait_set(color_mode="color_by_scalar")
+        self._ray_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True,
+                                                      opacity=self.ui.ray_opacity)
+        self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width,
+                                                point_size=self.ui.ray_width if self.ui.plotting_type == "Points" else 0.1)
+        self._ray_plot.parent.parent.name = "Rays"
+        self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
     def plot_point_markers(self) -> None:
         """plot point markers inside the scene"""
@@ -565,7 +565,7 @@ class ScenePlotting:
         self._crosshair.glyph.glyph.scale_factor = 1.5
         self._crosshair.visible = False
 
-    def init_ray_info_text(self) -> None:
+    def init_ray_info(self) -> None:
         """init detection of ray point clicks and the info display"""
         self._ray_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_ray_pick, button='Left')
 
@@ -578,7 +578,7 @@ class ScenePlotting:
         self._ray_text.actor.text_scale_mode = 'none'
         self._ray_text.text = ""
 
-    def init_status_text(self) -> None:
+    def init_status_info(self) -> None:
         """init GUI status text display"""
         self._space_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_space_pick, button='Right')
 
@@ -692,12 +692,12 @@ class ScenePlotting:
                 obj[0].actor.property.color = self._outline_color
 
         # reassign ray source colors
-        self.assign_ray_source_colors()
+        self.color_ray_sources()
 
         # in coloring type Plain the ray color is changed from white to a bright orange
-        if self.ui.coloring_type == "Plain" and self._rays_plot is not None:
-            self._rays_plot.parent.scalar_lut_manager.lut_mode = "Greys" if not high_contrast else "Wistia"
-            self._rays_plot.parent.scalar_lut_manager.reverse_lut = bool(high_contrast)
+        if self.ui.coloring_type == "Plain" and self._ray_plot is not None:
+            self._ray_plot.parent.scalar_lut_manager.lut_mode = "Greys" if not high_contrast else "Wistia"
+            self._ray_plot.parent.scalar_lut_manager.reverse_lut = bool(high_contrast)
 
         if self._ray_text is not None:
             self._ray_text.property.background_color = self._info_frame_color
@@ -722,8 +722,8 @@ class ScenePlotting:
                 if self._orientation_axes is not None:
                     self._orientation_axes.widgets[0].zoom *= ch1 / ch2
 
-                if self._rays_plot is not None:
-                    bar = self._rays_plot.parent.scalar_lut_manager.scalar_bar_representation
+                if self._ray_plot is not None:
+                    bar = self._ray_plot.parent.scalar_lut_manager.scalar_bar_representation
                     bar.position2 = bar.position2 * self._scene_size / scene_size
                     bar.position = [bar.position[0], (1-bar.position2[1])/2]
 
@@ -732,18 +732,18 @@ class ScenePlotting:
 
     def set_ray_opacity(self):
         """change the ray opacity"""
-        if self._rays_plot is not None:
-            self._rays_plot.actor.property.opacity = self.ui.ray_opacity
+        if self._ray_plot is not None:
+            self._ray_plot.actor.property.opacity = self.ui.ray_opacity
     
-    def set_ray_repr(self):
+    def set_ray_representation(self):
         """change the ray representation between 'points' and 'surface'"""
-        if self._rays_plot is not None:
-            self._rays_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
+        if self._ray_plot is not None:
+            self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
     def set_ray_width(self):
         """change the ray width"""
-        if self._rays_plot is not None:
-            self._rays_plot.actor.property.trait_set(line_width=self.ui.ray_width, point_size=self.ui.ray_width)
+        if self._ray_plot is not None:
+            self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width, point_size=self.ui.ray_width)
 
     def set_status(self, _status):
         """sets the status in the status text depending on the _status dictionary"""
@@ -796,17 +796,17 @@ class ScenePlotting:
             self._detector_plots[ind][1].mlab_source.z += diff
             self._detector_plots[ind][3].z_position += diff
 
-    def reset_ray_text(self):
+    def clear_ray_text(self):
         """clear the ray info text"""
         self._ray_text.text = ""
 
     # Ray and RaySource plotting
     ###################################################################################################################
 
-    def assign_ray_colors(self) -> None:
+    def color_rays(self) -> None:
         """color the ray representation and the ray source"""
 
-        if self._rays_plot is None:
+        if self._ray_plot is None:
             return
 
         pol_, w_, wl_, snum_, n_ = self._ray_property_dict["pol"], self._ray_property_dict["w"], \
@@ -859,10 +859,10 @@ class ScenePlotting:
                 cm = "Greys" if not self.ui.high_contrast else "Wistia"
                 title = "None"
 
-        self._rays_plot.mlab_source.trait_set(scalars=s)
+        self._ray_plot.mlab_source.trait_set(scalars=s)
 
         # lut legend settings
-        lutm = self._rays_plot.parent.scalar_lut_manager
+        lutm = self._ray_plot.parent.scalar_lut_manager
         lutm.trait_set(use_default_range=True, show_scalar_bar=True, use_default_name=False,
                        show_legend=self.ui.coloring_type != "Plain", lut_mode=cm, reverse_lut=False)
 
@@ -899,13 +899,13 @@ class ScenePlotting:
             case 'Plain':
                 lutm.reverse_lut = bool(self.ui.high_contrast)
 
-    def assign_ray_source_colors(self) -> None:
+    def color_ray_sources(self) -> None:
         """sets colors of ray sources"""
 
-        if self._rays_plot is None:
+        if self._ray_plot is None:
             return
 
-        lutm = self._rays_plot.parent.scalar_lut_manager
+        lutm = self._ray_plot.parent.scalar_lut_manager
 
         match self.ui.coloring_type:
 
@@ -957,7 +957,7 @@ class ScenePlotting:
         """assign traced and selected rays into a ray dictionary"""
         
         N = self.raytracer.rays.N
-        set_size = min(N, self.ui.ray_amount_shown)
+        set_size = min(N, self.ui.rays_visible)
         rindex = np.random.choice(N, size=set_size, replace=False)  # random choice
 
         # make bool array with chosen rays set to true
@@ -984,7 +984,7 @@ class ScenePlotting:
         return x, y, z, u, v, w, s
 
     # TODO better name
-    def assign_ray_props(self):
+    def assign_ray_properties(self):
         """safely copies the ray property dicts"""
         # set _ray_property_dict, that is used by other methods
         # other methods can't use __ray_property_dict, since this would require locks in the main thread
@@ -993,10 +993,10 @@ class ScenePlotting:
     def remove_rays(self):
         """remove ray properties and ray plot object"""
         self._ray_property_dict = {}
-        if self._rays_plot is not None:
+        if self._ray_plot is not None:
             with self.constant_camera():
-                self._rays_plot.parent.parent.remove()
-                self._rays_plot = None
+                self._ray_plot.parent.parent.remove()
+                self._ray_plot = None
 
     # Picking Handler
     ###################################################################################################################
@@ -1017,7 +1017,7 @@ class ScenePlotting:
                 pos_z = max(self.raytracer.outline[4], pos[2])
                 pos_z = min(self.raytracer.outline[5], pos_z)
 
-                self.ui.det_pos = pos_z  # move detector
+                self.ui.z_det = pos_z  # move detector
                 self._ray_text.text = ""  # reset info text
                 if self._crosshair is not None:
                     self._crosshair.visible = False  # hide crosshair
@@ -1042,7 +1042,7 @@ class ScenePlotting:
         # so we only can use it when the RayPlot is first in the list
         # see https://github.com/enthought/mayavi/issues/906
         if picker_obj is not None and len(picker_obj.actors) != 0 \
-           and picker_obj.actors[0]._vtk_obj is self._rays_plot.actor.actor._vtk_obj:
+           and picker_obj.actors[0]._vtk_obj is self._ray_plot.actor.actor._vtk_obj:
 
             a = self._ray_property_dict["p"].shape[1]  # number of points per ray plotted
             b = picker_obj.point_id  # point id of the ray point
@@ -1149,4 +1149,3 @@ class ScenePlotting:
             self._ray_text.text = ""
             if self._crosshair is not None:
                 self._crosshair.visible = False
-

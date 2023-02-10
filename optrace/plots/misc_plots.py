@@ -43,7 +43,6 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
 
     r, vals = afdict["z"], afdict["cost"]
 
-    _set_font()
     plt.figure()
 
     # evaluation points and connection line of cost function
@@ -87,7 +86,7 @@ def abbe_plot(ri:     list[RefractionIndex],
     pc.check_type("ri", ri, list)
 
     lines = Lines.FdC if lines is None else lines
-    _set_font()
+   
     plt.figure()
     _show_grid()
 
@@ -151,7 +150,6 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     Surf_list = [surface] if isinstance(surface, Surface) else surface  # enforce list even for one element
     legends = []  # legend entries
 
-    _set_font()
     plt.figure()
 
     plottable = False  # if at least one plot is plottable
@@ -195,8 +193,3 @@ def _show_grid(what=plt) -> None:
     what.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
     what.minorticks_on()
 
-
-def _set_font() -> None:
-    """set the font to something professionally looking (similar to Times New Roman)"""
-    matplotlib.rcParams['mathtext.fontset'] = 'stix'
-    matplotlib.rcParams['font.family'] = 'STIXGeneral'

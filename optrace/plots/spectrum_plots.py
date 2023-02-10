@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt  # actual plotting
 from ..tracer import color as mcolor  # color conversions for chromaticity plots
 from ..tracer.spectrum import Spectrum, LightSpectrum
 from ..tracer.refraction_index import RefractionIndex
-from .misc_plots import _set_font, _show_grid
+from .misc_plots import _show_grid
 
 from ..tracer.misc import PropertyChecker as pc
 
@@ -78,7 +78,6 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # wavelength range
     wl0, wl1 = mcolor.WL_BOUNDS
 
-    _set_font()
     fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [15, 1]})
 
     # get spectrum values
