@@ -1,0 +1,676 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>8.1. General Guidelines &#8212; optrace 1.3.7 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'development/guidelines';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="8.2. Testing" href="testing.html" />
+    <link rel="prev" title="8. Development" href="development.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">optrace 1.3.7 documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="general-guidelines">
+<span id="guidelines"></span><h1><span class="section-number">8.1. </span>General Guidelines<a class="headerlink" href="#general-guidelines" title="Permalink to this heading">#</a></h1>
+<p><strong>Library Design</strong></p>
+<ul class="simple">
+<li><p>modular design with multiple submodules</p></li>
+<li><p>plotting and TraceGUI are independent of the tracing backend</p></li>
+<li><p>automation/scripting easily possible</p></li>
+<li><p>platform independent and open source</p></li>
+<li><p>importing only the backend tracing functionality does not import GUI and plotting libraries.
+This ensures better performance and enables us to use this functionality without
+ever needing to install this heavy libraries when they are never needed.</p></li>
+</ul>
+<p><strong>Dependencies</strong></p>
+<ul class="simple">
+<li><p>balance of minimizing dependencies while also trying not to implemnt too much manually</p></li>
+<li><p>outsource GUI and plotting functionality/backend to external libraries</p></li>
+<li><p>tracing, color conversion, geometry manipulations etc. are implemented in library itself</p></li>
+<li><p>prefer python standard libraries</p></li>
+<li><p>use only open source dependencies</p></li>
+</ul>
+<p><strong>Documentation Style</strong></p>
+<ul class="simple">
+<li><p>publication-like design</p></li>
+<li><p>serif fonts (Times New Roman, Cambria, …)</p></li>
+<li><p>LaTeX equations (🠪 <a class="reference external" href="https://www.mathjax.org/">MathJax</a>)</p></li>
+<li><p>citations and bibliography (ideally per webpage)</p></li>
+<li><p>clickable references to sections, table, equations, citations</p></li>
+<li><p>keyword/topic index</p></li>
+<li><p>no use or including of external images, all images should be self-made (so no copyright issues)</p></li>
+</ul>
+<p><strong>Graphical Outputs</strong></p>
+<ul class="simple">
+<li><p>professional, publication-like plots</p></li>
+<li><p>prefer serif fonts (e.g. Times New Roman)</p></li>
+<li><p>minimize different fonts</p></li>
+<li><p>use LaTeX formatted equations/labels</p></li>
+<li><p>highlight more important elements by colors, font size or boldness</p></li>
+<li><p>axes, minor and major grid lines, titles and legend are a must</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">block</span></code> option allows for halting the rest of the program when plotting or continuing it with <code class="docutils literal notranslate"><span class="pre">block=False</span></code></p></li>
+<li><p>options for hiding some visual elements (labels, axes in GUI, legend entries)</p></li>
+</ul>
+<p><strong>Multithreading and Multiprocessing</strong></p>
+<ul class="simple">
+<li><p>outsource heavy calculation tasks onto multiple cores</p></li>
+<li><dl class="simple">
+<dt>prefer threads over processes (no copying overhead). However we need to:</dt><dd><ul>
+<li><p>ensure there are no race conditions by using locks or by ensuring each thread writes on a different memory location</p></li>
+<li><p>minimize python code (because of the GIL limitation while multithreading). Use lower level libraries with no python code like numpy for heavy tasks</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>all worker and background threads need to terminate immediately when the main thread is terminated.
+This is ensured by providing <code class="docutils literal notranslate"><span class="pre">daemon=True</span></code> while creating the <code class="docutils literal notranslate"><span class="pre">Thread</span></code> object.</p></li>
+<li><p>all classes and functions using multithreading should have a boolean threading option that can be set to <code class="docutils literal notranslate"><span class="pre">threading=False</span></code>.
+Turning off threading is useful when debugging, profiling or running multiple things in parrallel.</p></li>
+<li><dl class="simple">
+<dt>threading rules <code class="docutils literal notranslate"><span class="pre">TraceGUI</span></code>, with some ideas from <a class="reference external" href="https://traits-futures.readthedocs.io/en/latest/guide/threading.html">traits Futures</a></dt><dd><ul>
+<li><p>GUI changes only in main thread</p></li>
+<li><p>the GUI must be responsive at all costs</p></li>
+<li><p>simplified Read/Write access model: only one thread can read and write</p></li>
+<li><p>no locks in main thread, waiting for locks only in worker threads</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Performance and Memory</strong></p>
+<ul class="simple">
+<li><p>use multithreading</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numpy</span></code> where possible</p></li>
+<li><p>avoid loops</p></li>
+<li><p>sometimes noticeable speed-ups when using <code class="docutils literal notranslate"><span class="pre">numexpr</span></code> over <code class="docutils literal notranslate"><span class="pre">numpy</span></code></p></li>
+<li><p>work with references when possible (instead copies)</p></li>
+<li><p>use masks on arrays instead of creating new ones</p></li>
+<li><p>only do calculations on elements actually needed</p></li>
+<li><p>initial initialization instead of growing an array step by step</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">float32</span></code> or <code class="docutils literal notranslate"><span class="pre">int</span></code> instead of <code class="docutils literal notranslate"><span class="pre">float64</span></code> where high precision is not needed</p></li>
+<li><p>prefer analytical solutions instead of iterative numerical approximations</p></li>
+<li><p>multi-dimensional array access can profit from the correct memory layout of the <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> (<code class="docutils literal notranslate"><span class="pre">order=&quot;F&quot;,</span> <span class="pre">order=&quot;C&quot;</span></code> etc.)</p></li>
+<li><p>always keep the GUI responsive</p></li>
+<li><p>range indexing (<code class="docutils literal notranslate"><span class="pre">array[52:79829]</span></code>) is faster than boolean indexing (<code class="docutils literal notranslate"><span class="pre">array[[False,</span> <span class="pre">False,</span> <span class="pre">True,</span> <span class="pre">...,</span> <span class="pre">True,</span> <span class="pre">False]]</span></code>,
+which is faster than indexing by index list (<code class="docutils literal notranslate"><span class="pre">array[[52,</span> <span class="pre">456,</span> <span class="pre">897987,</span> <span class="pre">0,</span> <span class="pre">77,</span> <span class="pre">...]]</span></code>)</p></li>
+<li><p>limit array sizes</p></li>
+<li><p>store results that will be needed in the future or are accessed multiple times</p></li>
+<li><p>when plotting only use a reasonable amount of points and curves</p></li>
+</ul>
+<p><strong>File Input/Output</strong></p>
+<ul class="simple">
+<li><p>OS independent file names</p></li>
+<li><p>save under a fallback path when files exists/ can’t be written</p></li>
+<li><p>write file in one go, don’t append iteratively</p></li>
+<li><p>use external library for loading special files (images, spreadsheets etc.)</p></li>
+<li><p>use <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.savez.html">compressed numpy archives</a> (<code class="docutils literal notranslate"><span class="pre">.npz</span></code>) to save some space</p></li>
+<li><p>don’t save anything in any proprietary formats</p></li>
+<li><p>try to detect the correct text encoding before loading any clear text formats. Outsource the work to <a class="reference external" href="https://github.com/chardet/chardet">chardet</a></p></li>
+<li><p>only load files once, no need to reload them</p></li>
+</ul>
+<p><strong>Type and Value Checking</strong></p>
+<ul class="simple">
+<li><p>functions and classes that are used and exposed to the user should have type and value checking</p></li>
+<li><dl class="simple">
+<dt>some people will tell you “this is not the pythonic way”, however:</dt><dd><ul>
+<li><p>clear error messages before an action are more helpful than trying for 20 minutes to comprehend some internal exception</p></li>
+<li><p>even the author does not remember the types and value ranges of all function parameters</p></li>
+<li><p>some values produce results that are valid mathematically, but impossible according to physics (e.g. negative energies, zero sized geometries etc.).
+This can sometimes appear unexpectedly, so value checking is crucial.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Object and Geometry Locks</strong></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Class functions change parameters of the object itself, assigning parameters directly to the object can break things. Hard to debug, very frustrating.</dt><dd><ul>
+<li><p>e.g. the surface height depends on the surface parameters. Changing one without the other leads to very weird issues</p></li>
+<li><p>This however depends on the parameters/variables and their roles.</p></li>
+<li><p>Some parameters are even read-only.</p></li>
+<li><p>a change is not propagated to the parent/child object</p></li>
+<li><p>we can’t expect the user to know where assignments are possible without side effects and where not. The library has too much complexity for this.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>➜ restricting assignments</dt><dd><ul>
+<li><p>ignore people saying “this is not pythonic!!”</p></li>
+<li><p>lock the geometry of an <code class="docutils literal notranslate"><span class="pre">Element</span></code>, surfaces can only be assigned by using a special functions, the position can only be changed with a dedicated method</p></li>
+<li><p>lock objects like a <code class="docutils literal notranslate"><span class="pre">Surface</span></code> to avoid nasty side effects</p></li>
+<li><p>allow assignments where possible</p></li>
+<li><p>make numpy arrays read-only while locking</p></li>
+<li><p>when knowing the internals of the locking mechanism the user could turn it off. Let’s hope warning and info messages convince him not to do so.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Comments</strong></p>
+<ul class="simple">
+<li><p>use of docstrings for functions, classes and important variables</p></li>
+<li><dl class="simple">
+<dt>Comments should do the following things</dt><dd><ul>
+<li><p>explain what a function does and what parameters and return values are</p></li>
+<li><p>describe what a module of class does</p></li>
+<li><p>describe steps inside the function</p></li>
+<li><p>provide additional information why something is done</p></li>
+<li><p>subdivide a longer function into smaller parts</p></li>
+<li><p>link to documentation resources or related sources</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Coding Style</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CamelCase</span></code> class names, <code class="docutils literal notranslate"><span class="pre">lower_case_with_underscores</span></code> for functions, filenames, parameters. Note that the latter this is not always possible when mathematical or physical quantities are used</p></li>
+<li><p>increased line length of 120 characters</p></li>
+<li><p>prefer writing out keyword arguments (<code class="docutils literal notranslate"><span class="pre">function(width=1026,</span> <span class="pre">height=4596)</span></code>) instead just the value (<code class="docutils literal notranslate"><span class="pre">function(1026,</span> <span class="pre">4596)</span></code>) for readability and simpler documentation</p></li>
+</ul>
+<p><strong>Standard Output</strong></p>
+<ul class="simple">
+<li><p>functions and classes output information and warnings, when operations are experimental, have inprecise results or use edge cases</p></li>
+<li><p>all classes and functions writing to standard output have a “silent” boolean parameter that can be set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to mute output</p></li>
+<li><p>clear, explaining warning messages and exceptions</p></li>
+</ul>
+<p><strong>Responsiveness</strong></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>some actions take a while, however we need to ensure that the user instantly knows, that the programm is doing something. This can be ensured by:</dt><dd><ul>
+<li><p>a message</p></li>
+<li><p>a progressbar indicating that something is happening an how long the action will take approximately. This progessbar also has the advantage of distracting the user, lowering the “subjective time” something takes</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>TraceGUI actions like tracing, focussing etc. need to run in background threads, so the main UI thread stays responsive</p></li>
+</ul>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="development.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">8. </span>Development</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="testing.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">8.2. </span>Testing</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  <!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
+<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
+<!--(similar to page-toc.html)-->
+<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">8.1. General Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">8.2. Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">8.3. Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">8.4. Packaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_features.html">8.5. Future Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">8.6. Changelog</a></li>
+</ul>
+
+  </div>
+</nav>
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Damian Mendroch.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

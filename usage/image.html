@@ -1,0 +1,1256 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>4.7. Image and Spectrum Rendering &#8212; optrace 1.3.7 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/image';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.8. Focus Finding" href="focus.html" />
+    <link rel="prev" title="4.6. Refractive Indices" href="refraction_index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">optrace 1.3.7 documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="image-and-spectrum-rendering">
+<h1><span class="section-number">4.7. </span>Image and Spectrum Rendering<a class="headerlink" href="#image-and-spectrum-rendering" title="Permalink to this heading">#</a></h1>
+<section id="overview">
+<h2><span class="section-number">4.7.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
+<p>When rendering images inside the raytracer geometry an RImage object is calculated.</p>
+<p>Compared to a typical colored image, this object has the following advantages:</p>
+<ul class="simple">
+<li><p>rescaling the image data to other sizes without distorting or interpolating information</p></li>
+<li><p>calculating different image modes (sRGB, Hue, Lightness, Irradiance, …)</p></li>
+<li><p>the image data is available at a higher bit depth than a normal image</p></li>
+<li><p>smoothing the image without loosing the original data</p></li>
+<li><p>stores image geometry information (absolute positions) and metadata</p></li>
+<li><p>guaranteed odd pixel side count, so the center and center axes have a well defined pixel position</p></li>
+</ul>
+<p><strong>Motivation</strong></p>
+<p><em>Case 1</em>: A user rendered a detector image with 100 million rays in 30 minutes. After rendering he notices that choosing a image resolution of 100x100 pixels was too modest. But now his only option is to rerender the image in a higher resolution.</p>
+<p><em>Case 2</em>: After rendering the image has the size 950 x 1028. The user wants to rescale the image to lower noise or because it would be easier to work with. But rescaling to something like 200 x 218 could not be done without interpolating and distorting the image data, which would deviate from the physical reality of the image.</p>
+<p><em>Case 3</em>: A setup with rotational symmetry creates a line and a point focus. Due to the image being rendered in an even resolution of 100 x 100 neither the line nor the point are at the correct pixel position, since they lie at pixel edges. Depending on the numerical precision or behavior of the system the line or focus would be either located in a neighboring pixel or in multiple pixels at once.</p>
+<p><strong>Solution</strong></p>
+<ul class="simple">
+<li><p>store two images: Internal image with higher resolution and a second image with the approximate desired properties for the user</p></li>
+<li><p>restrict the pixel sizes and ratios so rescaling can be done by joining bins (= pixels)</p></li>
+<li><p>enforce odd pixel numbers so center and center axes always get their own pixel/pixel column/pixel row</p></li>
+</ul>
+<p>The pixel sizes for the smaller side are limited to:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot</span><span class="o">.</span><span class="n">RImage</span><span class="o">.</span><span class="n">SIZES</span>
+<span class="go">[1, 3, 5, 7, 9, 15, 21, 27, 35, 45, 63, 105, 135, 189, 315, 945]</span>
+</pre></div>
+</div>
+<p>Whereas the larger side is larger by a factor with elements of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.SIZES" title="optrace.tracer.r_image.RImage.SIZES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ot.RImage.SIZES</span></code></a> up to:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot</span><span class="o">.</span><span class="n">RImage</span><span class="o">.</span><span class="n">MAX_IMAGE_RATIO</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+<p>And therefore values of <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span></code>. For arbitrary side ratios this leads to non-square pixels, but which pose no problem in plotting and processing.</p>
+<p>So if the user wants an image with 500 pixels for the smaller side and the exposed area on the detector has a side ratio of 2.63, the internal image is rendered in the resolution 945x2835. This is the case because the nearest side factor to 2.63 is 3 and because 945 is the size for all internally rendered images.
+From this resolution the image can be scaled to 315x945 189x567 135x405 105x315 63x189 45x135 35x105 27x81 21x63 15x45 9x27 7x21 5x15 3x9 1x3. The user image is then scaled into size 315x945, as it is the nearest to a size of 500.</p>
+<p>Rescaling would then be done by joining a group of nine pixels (three in each dimension) to change the resolution of 945x2835 to 315x945.</p>
+</section>
+<section id="image-types">
+<h2><span class="section-number">4.7.2. </span>Image Types<a class="headerlink" href="#image-types" title="Permalink to this heading">#</a></h2>
+<p>Internally the RImage objects saves a power and XYZ color space image, from which the following image modes can be generated:</p>
+<table class="table table-left">
+<colgroup>
+<col style="width: 23.1%" />
+<col style="width: 76.9%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Irradiance&quot;</span></code></p></th>
+<td><p>Image of power per area, equivalent to an intensity image</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Illuminance&quot;</span></code></p></th>
+<td><p>Image of luminous power per area</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;sRGB (Absolute RI)&quot;</span></code></p></th>
+<td><p>A human vision approximation of the image. Colors outside the gamut are saturation-clipped. Preferred sRGB-Mode for “natural”/”everyday” scenes.</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;sRGB (Perceptual RI)&quot;</span></code></p></th>
+<td><p>Similar to sRGB (Absolute RI), but instead saturation scaling for all pixels. Preferred mode for scenes with monochromatic sources or highly dispersive optics.</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Outside sRGB Gamut&quot;</span></code></p></th>
+<td><p>Boolean image showing pixels outside the sRGB gamut</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Lightness&quot;</span></code></p></th>
+<td><p>Human vision approximation in greyscale colors. Similar to Illuminance, but with non-linear brightness function.</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Hue&quot;</span></code></p></th>
+<td><p>Measure of the type of color tint (red, orange, yellow, …)</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Chroma&quot;</span></code></p></th>
+<td><p>How colorful an area seems compared to a similar illuminated area.</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Saturation&quot;</span></code></p></th>
+<td><p>How colorful an area seems compared to its brightness. Quotient of Chroma and Lightness.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The difference between chroma and saturation is elaborately explained in <a class="footnote-reference brackets" href="#footcite-briggschroma" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Due to subtle differences saturation is often put to use as light property and chroma as property for an illuminated object.</p>
+<p>An example for the difference of both sRGB modes is seen in <a class="reference internal" href="../math/color.html#color-dispersive1"><span class="std std-numref">Fig. 6.14</span></a>.</p>
+<table class="table" id="id8">
+<caption><span class="caption-number">Table 4.6 </span><span class="caption-text">Renderes images from the <code class="docutils literal notranslate"><span class="pre">image_rgb.py</span></code> example. From left to right, top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.</span><a class="headerlink" href="#id8" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_srgb1.svg"><img alt="../_images/rgb_render_srgb1.svg" src="../_images/rgb_render_srgb1.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_srgb2.svg"><img alt="../_images/rgb_render_srgb2.svg" src="../_images/rgb_render_srgb2.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_srgb3.svg"><img alt="../_images/rgb_render_srgb3.svg" src="../_images/rgb_render_srgb3.svg" width="300" /></a>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_lightness.svg"><img alt="../_images/rgb_render_lightness.svg" src="../_images/rgb_render_lightness.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_irradiance.svg"><img alt="../_images/rgb_render_irradiance.svg" src="../_images/rgb_render_irradiance.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_illuminance.svg"><img alt="../_images/rgb_render_illuminance.svg" src="../_images/rgb_render_illuminance.svg" width="300" /></a>
+</figure>
+</td>
+</tr>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_hue.svg"><img alt="../_images/rgb_render_hue.svg" src="../_images/rgb_render_hue.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_chroma.svg"><img alt="../_images/rgb_render_chroma.svg" src="../_images/rgb_render_chroma.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rgb_render_saturation.svg"><img alt="../_images/rgb_render_saturation.svg" src="../_images/rgb_render_saturation.svg" width="300" /></a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sphere-projections">
+<h2><span class="section-number">4.7.3. </span>Sphere Projections<a class="headerlink" href="#sphere-projections" title="Permalink to this heading">#</a></h2>
+<p>With a spherical detector surface, there are multiple ways to project it down to a rectangular surface. Note that there is no possible way for a projection, that correctly represents angles, distances and areas. One might now this problem from different map projections.</p>
+<p>Below you can find the projection methods implemented in <code class="docutils literal notranslate"><span class="pre">optrace</span></code> and Wikipedia links for their detailed explanation.
+Details on the math applied internally are found in the math section in <a class="reference internal" href="../math/geometry.html#sphere-projections"><span class="std std-numref">Section 6.3.8</span></a>.</p>
+<p>Available methods are:</p>
+<table class="table table-left">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Orthographic&quot;</span></code></p></th>
+<td><p>Perspective projection, sphere surface seen from far away <a class="footnote-reference brackets" href="#footcite-orthographicprojwiki" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Stereographic&quot;</span></code></p></th>
+<td><p>Conformal projection (preserving local angles and shapes) <a class="footnote-reference brackets" href="#footcite-steographicprojwiki" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Equidistant&quot;</span></code></p></th>
+<td><p>Projection keeping the radial direction from a center point equal <a class="footnote-reference brackets" href="#footcite-equidistantprojwiki" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p><code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Equal-Area&quot;</span></code></p></th>
+<td><p>Area preserving projection <a class="footnote-reference brackets" href="#footcite-equalareaprojwiki" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="table" id="id9">
+<caption><span class="caption-number">Table 4.7 </span><span class="caption-text"><a class="reference external" href="https://en.wikipedia.org/wiki/Tissot%27s_indicatrix">Tissot’s indicatrices</a> for different projection methods. All circles should have the same size, shape and brightness. Taken from the <code class="docutils literal notranslate"><span class="pre">sphere_projections.py</span></code> example.</span><a class="headerlink" href="#id9" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/indicatrix_equidistant.svg"><img alt="../_images/indicatrix_equidistant.svg" src="../_images/indicatrix_equidistant.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/indicatrix_equal_area.svg"><img alt="../_images/indicatrix_equal_area.svg" src="../_images/indicatrix_equal_area.svg" width="300" /></a>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/indicatrix_stereographic.svg"><img alt="../_images/indicatrix_stereographic.svg" src="../_images/indicatrix_stereographic.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/indicatrix_orthographic.svg"><img alt="../_images/indicatrix_orthographic.svg" src="../_images/indicatrix_orthographic.svg" width="300" /></a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="resolution-limit-filter">
+<h2><span class="section-number">4.7.4. </span>Resolution Limit Filter<a class="headerlink" href="#resolution-limit-filter" title="Permalink to this heading">#</a></h2>
+<p>Unfortunately, <code class="docutils literal notranslate"><span class="pre">optrace</span></code> does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage" title="optrace.tracer.r_image.RImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RImage</span></code></a> class provides a limit parameter. This parameter describes the width of an airy disc and blurs the image with a gaussian filter that is approximately the size of the zeroth order of an airy disc with the same resolution limit.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The limit parameter is only an estimation of how large the impact of a resolution limit on the image is.
+The simulation neither knows the actual limit nor takes into account higher order maxima or interference of light.
+This feature should only be used to estimate how far the image quality is from a resolution-limited image or if chromatic dispersion or the focal point width is in the same magnitude as this limit.</p>
+</div>
+<p>To some degree this parameter is also suitable to estimate the effect of different resolution limits.</p>
+<table class="table" id="id10">
+<caption><span class="caption-number">Table 4.8 </span><span class="caption-text">Images of the focus in the <code class="docutils literal notranslate"><span class="pre">achromat.py</span></code> example. From left to right: No filter, filter with 2 µm size, filter with 10 µm size. For a setup with a resolution limit of 10 µm we are clearly inside the limit, but even for 2 µm we are diffraction limited.</span><a class="headerlink" href="#id10" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rimage_limit_off.svg"><img alt="../_images/rimage_limit_off.svg" src="../_images/rimage_limit_off.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rimage_limit_on.svg"><img alt="../_images/rimage_limit_on.svg" src="../_images/rimage_limit_on.svg" width="300" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/rimage_limit_on2.svg"><img alt="../_images/rimage_limit_on2.svg" src="../_images/rimage_limit_on2.svg" width="300" /></a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="rendering-an-image">
+<h2><span class="section-number">4.7.5. </span>Rendering an Image<a class="headerlink" href="#rendering-an-image" title="Permalink to this heading">#</a></h2>
+<p><strong>Example Geometry</strong></p>
+<p>The below snippet generates a geometry with multiple sources and detectors. The actual function is not important, as it is only here to demonstrate image and spectrum rendering.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># make raytracer</span>
+<span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span> <span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># add Raysources</span>
+<span class="n">RSS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">RSS</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">FDC</span><span class="p">,</span>
+                  <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS</span><span class="p">)</span>
+
+<span class="n">RSS2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">RS2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">RSS2</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d65</span><span class="p">,</span>
+                   <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">pol_angle</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS2</span><span class="p">)</span>
+
+<span class="c1"># add Lens 1</span>
+<span class="n">front</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">ConicSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mf">0.444</span><span class="p">)</span>
+<span class="n">back</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">ConicSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">R</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mf">7.25</span><span class="p">)</span>
+<span class="n">nL1</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Cauchy&quot;</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="p">[</span><span class="mf">1.49</span><span class="p">,</span> <span class="mf">0.00354</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">L1</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Lens</span><span class="p">(</span><span class="n">front</span><span class="p">,</span> <span class="n">back</span><span class="p">,</span> <span class="n">de</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="n">nL1</span><span class="p">)</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">L1</span><span class="p">)</span>
+
+<span class="c1"># add Detector 1</span>
+<span class="n">Det</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Detector</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">RectangularSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Det</span><span class="p">)</span>
+
+<span class="c1"># add Detector 2</span>
+<span class="n">Det2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Detector</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">R</span><span class="o">=-</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Det2</span><span class="p">)</span>
+
+<span class="c1"># trace the geometry</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Source Image</strong></p>
+<p>Rendering a source image is done with the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_image" title="optrace.tracer.raytracer.Raytracer.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_image</span></code></a> method of the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class. Note that it expects, that scene has already been traced and rays were calculated.</p>
+<p>The function takes a pixel size parameter, that determines the pixel count for the smaller image size.
+Note that only image sizes of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.SIZES" title="optrace.tracer.r_image.RImage.SIZES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.SIZES</span></code></a> are valid, when different values are specified the nearest values is chosen.</p>
+<p>Example for the function call:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">source_image</span><span class="p">(</span><span class="mi">389</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This renders an RImage for the first source and returns an RImage.</p>
+<p>The following code renders it for the second source (since index counting starts at zero) and additionally provides the resolution limit <code class="code highlight python docutils literal highlight-python"><span class="n">limit</span></code> parameter of 3 µm.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">source_image</span><span class="p">(</span><span class="mi">389</span><span class="p">,</span> <span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Detector Image</strong></p>
+<p>Calculating a <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_image" title="optrace.tracer.raytracer.Raytracer.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_image</span></code></a> is done in a similar fashion:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">(</span><span class="mi">389</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compared to <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_image" title="optrace.tracer.raytracer.Raytracer.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_image</span></code></a> you can not only provide a <code class="code highlight python docutils literal highlight-python"><span class="n">detector_index</span></code>, but also a <code class="code highlight python docutils literal highlight-python"><span class="n">source_index</span></code>, which limit the rendering to the light from this source. By default all sources are used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">(</span><span class="mi">389</span><span class="p">,</span> <span class="n">detector_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For spherical surface detectors a <code class="code highlight python docutils literal highlight-python"><span class="n">projection_method</span></code> can be chosen. Moreover, the extent of the detector can be limited with the <code class="code highlight python docutils literal highlight-python"><span class="n">extent</span></code> parameter, that is provided as <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">]</span></code> with <span class="math notranslate nohighlight">\(x_0 &lt; x_1, ~ y_0 &lt; y_1\)</span>. By default the extent gets adjusted automatically to contain all rays hitting the detector.
+As for <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_image" title="optrace.tracer.raytracer.Raytracer.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_image</span></code></a> the <code class="code highlight python docutils literal highlight-python"><span class="n">limit</span></code> parameter can also be provided.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">(</span><span class="mi">389</span><span class="p">,</span> <span class="n">detector_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">projection_method</span><span class="o">=</span><span class="s2">&quot;Orthographic&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="iterative-render">
+<h2><span class="section-number">4.7.6. </span>Iterative Render<a class="headerlink" href="#iterative-render" title="Permalink to this heading">#</a></h2>
+<p>When tracing, the amount of rays is limited by the system’s available RAM. Many million rays would not fit in the finite working memory. However, some more complicated scenes need a huge amount of rays, especially for low image noise.
+For this the function <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.iterative_render" title="optrace.tracer.raytracer.Raytracer.iterative_render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iterative_render</span></code></a> exists. It does multiple traces and iteratively adds up the image components to a summed image. In this way there is no upper bound on the ray count. With enough available user time, images can be rendered with many billion rays.</p>
+<p>Parameter <code class="code highlight python docutils literal highlight-python"><span class="n">N_rays</span></code> provides the overall number of rays for raytracing.
+The first returned value of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.iterative_render" title="optrace.tracer.raytracer.Raytracer.iterative_render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iterative_render</span></code></a> is a list of rendered sources, the second a list of rendered detector images.</p>
+<p>If the detector position parameter <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> is not provided, a single detector image is rendered at the position of the detector specified by <code class="code highlight python docutils literal highlight-python"><span class="n">detector_index</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RT</span><span class="o">.</span><span class="n">iterative_render</span><span class="p">(</span><span class="n">N_rays</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">detector_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> is provided as coordinate, the detector is moved beforehand.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RT</span><span class="o">.</span><span class="n">iterative_render</span><span class="p">(</span><span class="n">N_rays</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">detector_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> is a list, <code class="code highlight python docutils literal highlight-python"><span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></code> detector images are rendered. All other parameters are either automatically
+repeated <code class="code highlight python docutils literal highlight-python"><span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></code> times or can be specified as list with the same length as <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code>.</p>
+<p>Exemplary calls:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RT</span><span class="o">.</span><span class="n">iterative_render</span><span class="p">(</span><span class="n">N_rays</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">]],</span> <span class="n">detector_index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">N_px_D</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">])</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">iterative_render</span><span class="p">(</span><span class="n">N_rays</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">]],</span> <span class="n">detector_index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">limit</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">N_px_S</span></code> can also be provided as list, note however, that when provided as list, it needs to have the same length as the number of sources.</p>
+<p>By default, source images are also rendered. Providing <code class="code highlight python docutils literal highlight-python"><span class="n">no_sources</span><span class="o">=</span><span class="kc">True</span></code> skips source rendering and simply returns an empty list.</p>
+<p><strong>Tips for Faster Rendering</strong></p>
+<p>With large rendering times, even small speed-up amounts add up significantly:</p>
+<ul class="simple">
+<li><p>As mentioned above, source rendering can be skipped with <code class="code highlight python docutils literal highlight-python"><span class="n">no_sources</span><span class="o">=</span><span class="kc">True</span></code> when not needed. Depending on the complexity of the setup this option can increase performance by 5%.</p></li>
+<li><p>Setting the raytracer option <code class="code highlight python docutils literal highlight-python"><span class="n">RT</span><span class="o">.</span><span class="n">no_pol</span></code> skips the calculation of the light polarization, note that depending on the geometry the polarization direction can have an influence of the amount of light transmission at different surfaces. It is advised to experiment beforehand, if the parameter seems to have any effect on the image.
+Depending on the geometry <code class="code highlight python docutils literal highlight-python"><span class="n">no_pol</span><span class="o">=</span><span class="kc">True</span></code> can lead to a speed-up of 10-30%.</p></li>
+<li><p>Prefer inbuilt surface types to data or function surfaces</p></li>
+<li><dl class="simple">
+<dt>try to limit the light through the geometry to rays hitting all lenses. For instance:</dt><dd><ul>
+<li><p>Moving the color filters to the front of the system avoids the calculation of ray refractions that get absorbed in a later stage.</p></li>
+<li><p>Orienting the ray direction cone of the source towards the setup, therfore maximizing rays hitting all lenses. See the <code class="docutils literal notranslate"><span class="pre">arizona_eye_model.py</span></code> example on how this could be done.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="getting-an-image-by-mode">
+<h2><span class="section-number">4.7.7. </span>Getting an Image by Mode<a class="headerlink" href="#getting-an-image-by-mode" title="Permalink to this heading">#</a></h2>
+<p><strong>Image</strong></p>
+<p>As described above, multiple different image modes can be generated. This is done by utilizing the <code class="code highlight python docutils literal highlight-python"><span class="n">get</span></code> function of the image and a selected image mode name:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Illuminance&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the sRGB modes there is an additional <code class="code highlight python docutils literal highlight-python"><span class="n">log</span></code> parameter, that scales the color brightness logarithmically. However this is done in a different color space.
+While the other modes also can be scaled logarithmically, this can be done by the user or the plotting function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sRGB (Perceptual RI)&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The returned value is a three-dimensional numpy array for sRGB color modes and a two dimensional for all other modes.</p>
+<p><strong>Image Cut</strong></p>
+<p>An image cut is the profile of a generated image in x- or y-direction. It has the same parameter as the <code class="code highlight python docutils literal highlight-python"><span class="n">get</span></code> function, but includes the additional parameters <code class="code highlight python docutils literal highlight-python"><span class="n">x</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">y</span></code>.</p>
+<p>If one wants to generate an image cut in y-direction for a fixed <code class="code highlight python docutils literal highlight-python"><span class="n">x</span></code> of 0, one can write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bins</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="s2">&quot;Illuminance&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For a cut in x-direction the following can be used:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bins</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="s2">&quot;Illuminance&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As for <code class="code highlight python docutils literal highlight-python"><span class="n">get</span></code> there is a <code class="code highlight python docutils literal highlight-python"><span class="n">log</span></code> parameter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bins</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="s2">&quot;sRGB (Perceptual RI)&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The function returns a tuple of the histogram bin edges and the histogram values, both one dimensional numpy arrays. Note that the bin arrays is larger by one element.</p>
+</section>
+<section id="rescaling-and-filtering-an-image">
+<h2><span class="section-number">4.7.8. </span>Rescaling and Filtering an Image<a class="headerlink" href="#rescaling-and-filtering-an-image" title="Permalink to this heading">#</a></h2>
+<p>As discussed before, internally the RImage data is saved in a higher resolution. After generating such an RImage you can rescale it afterwards.
+Note that no interpolation takes place, the histogram bins just get joined together without distorting or guessing any information.</p>
+<p>Rescaling is done with the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.rescale" title="optrace.tracer.r_image.RImage.rescale"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rescale</span></code></a> function and a size parameter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The size doesn’t need to be one of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.SIZES" title="optrace.tracer.r_image.RImage.SIZES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.SIZES</span></code></a>, but the nearest one of these values gets chosen automatically.</p>
+<p>The size should now be:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">N</span>
+<span class="go">315</span>
+</pre></div>
+</div>
+<p>Which is the nearest value in <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.SIZES" title="optrace.tracer.r_image.RImage.SIZES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.SIZES</span></code></a>.</p>
+<p>The <code class="code highlight python docutils literal highlight-python"><span class="n">limit</span></code> parameter can also be changed afterwards, as internally the RImage holds the unfiltered version.
+However, after changing the member variable the image needs to be refiltered by the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.refilter" title="optrace.tracer.r_image.RImage.refilter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">refilter</span></code></a> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">img</span><span class="o">.</span><span class="n">refilter</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="saving-loading-and-exporting-an-image">
+<h2><span class="section-number">4.7.9. </span>Saving, Loading and Exporting an Image<a class="headerlink" href="#saving-loading-and-exporting-an-image" title="Permalink to this heading">#</a></h2>
+<p><strong>Saving</strong></p>
+<p>An RImage can be saved on the disk for later use in <code class="docutils literal notranslate"><span class="pre">optrace</span></code>. In the simplest case saving is done with the following command, that takes a file path as argument:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;RImage_12345&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the path is invalid, the object is saved under a fallback name in the current directory. If the file already exists, this is also the case. Otherwise you can specify <code class="code highlight python docutils literal highlight-python"><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span></code> to force an overwrite.
+There is an additional parameter <code class="code highlight python docutils literal highlight-python"><span class="n">save_32bit</span></code> that lowers the bit depth, loosing some information but saving disk space.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;RImage_12345&quot;</span><span class="p">,</span> <span class="n">save_32bit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Loading</strong></p>
+<p>For loading the object the static method <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.load" title="optrace.tracer.r_image.RImage.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load</span></code></a> of the RImage class is used. It takes a path and returns the RImage object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RImage</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;RImage_12345&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Export as PNG</strong></p>
+<p>You can also export an image mode as .png file. The function <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.export_png" title="optrace.tracer.r_image.RImage.export_png"><code class="xref py py-meth docutils literal notranslate"><span class="pre">export_png</span></code></a> takes a file path, an image mode and a side length as arguments. The size is specified to the smaller side length.</p>
+<p>Note that the export resolution (= export image size) and the RImage pixel count (= histogram resolution) differ.
+So saving an RImage with pixel side length 5 (<a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.N" title="optrace.tracer.r_image.RImage.N"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.N</span></code></a>) with a resolution of <code class="code highlight python docutils literal highlight-python"><span class="n">size</span><span class="o">=</span><span class="mi">500</span></code> creates a larger image, but not a finer one.
+You can therefore parametrize the histogram resolution of the RImage and the export size independently by rescaling the image beforehand.</p>
+<p>An exemplary function call could be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">export_png</span><span class="p">(</span><span class="s2">&quot;Image_12345_sRGB&quot;</span><span class="p">,</span> <span class="s2">&quot;sRGB (Absolute RI)&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As for the image modes, one can specify the parameters <code class="code highlight python docutils literal highlight-python"><span class="n">log</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">flip</span></code>. And as for the RImage export the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">overwrite</span></code> to force an overwrite.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">export_png</span><span class="p">(</span><span class="s2">&quot;Image_12345_sRGB&quot;</span><span class="p">,</span> <span class="s2">&quot;sRGB (Absolute RI)&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">389</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The image rescaling is done with methods from the <a class="reference external" href="https://pillow.readthedocs.io/en/stable/">Pillow</a> python library. By default, nearest neighbor interpolation is applied if the export resolution is higher than the RImage resolution and bilinear interpolation otherwise.</p>
+<p>You can overwrite this behavior with the <code class="code highlight python docutils literal highlight-python"><span class="n">resample</span></code> parameter and the method flag from <a class="reference external" href="https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Resampling" title="(in Pillow (PIL Fork) v9.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PIL.Image.Resampling</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">export_png</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="n">PIL</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">Resampling</span><span class="o">.</span><span class="n">NEAREST</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While the RImage has arbitrary, generally non-square pixels, for the export the image is rescaled to have square pixels. However, in many cases there is no exact ratio that matches the side ratio with integer pixel counts. For instance, an image with sides 12.532 x 3.159 mm and a desired export size of 100 pixels for the smaller side leads to an image of 397 x 100 pixels. This matches the ratio approximately, but is still off by 0.29 pixels (around 9.2 µm). Typically this error gets larger the smaller the resolution is.</p>
+</div>
+</section>
+<section id="image-properties">
+<h2><span class="section-number">4.7.10. </span>Image Properties<a class="headerlink" href="#image-properties" title="Permalink to this heading">#</a></h2>
+<p><strong>Power Properties</strong></p>
+<p>Power in W and luminous power in lm are calculated from the following functions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span><span class="o">.</span><span class="n">power</span><span class="p">()</span>
+<span class="n">img</span><span class="o">.</span><span class="n">luminous_power</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Size Properties</strong></p>
+<p>Additionally, there are multiple size related properties available.</p>
+<p>The extent provides the corner points of the rectangle encompassing the image with values <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">]</span></code>.
+<code class="code highlight python docutils literal highlight-python"><span class="n">Nx</span></code> describes the pixel count in x-direction and <code class="code highlight python docutils literal highlight-python"><span class="n">Ny</span></code> the count in y-direction. <code class="code highlight python docutils literal highlight-python"><span class="n">N</span></code> is the smaller of those two.
+Properties <code class="code highlight python docutils literal highlight-python"><span class="n">sx</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">sy</span></code> specify the side lengths of the image in millimeters in its dimensions.
+<code class="code highlight python docutils literal highlight-python"><span class="n">Apx</span></code> is the pixel area in mm².</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">extent</span>
+<span class="go">array([-0.002625,  1.002625, -0.002625,  1.002625])</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">Nx</span>
+<span class="go">315</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">sy</span>
+<span class="go">1.0052500000000002</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">Apx</span>
+<span class="go">1.0184203199798441e-05</span>
+</pre></div>
+</div>
+</section>
+<section id="rendering-a-lightspectrum">
+<h2><span class="section-number">4.7.11. </span>Rendering a LightSpectrum<a class="headerlink" href="#rendering-a-lightspectrum" title="Permalink to this heading">#</a></h2>
+<p>Rendering a light spectrum is also done on the source or detector surface.</p>
+<p>Analogously to rendering a source image, we can render a spectrum with <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_spectrum" title="optrace.tracer.raytracer.Raytracer.source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_spectrum</span></code></a> and by providing a <code class="code highlight python docutils literal highlight-python"><span class="n">source_index</span></code> parameter (default to zero).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">source_spectrum</span><span class="p">(</span><span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For a detector spectrum the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_spectrum" title="optrace.tracer.raytracer.Raytracer.detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_spectrum</span></code></a> function is applied. It takes a <code class="code highlight python docutils literal highlight-python"><span class="n">detector_index</span></code> argument, that also defaults to zero.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_spectrum</span><span class="p">(</span><span class="n">detector_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Additionally we can limit the rendering to a source by providing a <code class="code highlight python docutils literal highlight-python"><span class="n">source_index</span></code> or limit the detector area by providing the <code class="code highlight python docutils literal highlight-python"><span class="n">extent</span></code> parameter, as we did for the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_image" title="optrace.tracer.raytracer.Raytracer.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_image</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_spectrum</span><span class="p">(</span><span class="n">detector_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The above methods return an object of type <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> with <code class="code highlight python docutils literal highlight-python"><span class="n">spectrum_type</span><span class="o">=</span><span class="s2">&quot;Histogram&quot;</span></code>.</p>
+</section>
+<section id="plotting-image-and-spectra">
+<span id="image-plots"></span><h2><span class="section-number">4.7.12. </span>Plotting Image and Spectra<a class="headerlink" href="#plotting-image-and-spectra" title="Permalink to this heading">#</a></h2>
+<p><strong>Spectrum</strong></p>
+<p>A rendered spectrum can be plotted with the <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.spectrum_plots.spectrum_plot" title="optrace.plots.spectrum_plots.spectrum_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">spectrum_plot</span></code></a> function from <a class="reference internal" href="../library/optrace_plots.html#module-optrace.plots" title="optrace.plots"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optrace.plots</span></code></a>.
+More on plotting spectra is found in <a class="reference internal" href="spectrum.html#spectrum-plots"><span class="std std-numref">Section 4.5.4</span></a>.</p>
+<p><strong>Image</strong></p>
+<p>With a RImage object an image plot is created with the function <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.r_image_plots.r_image_plot" title="optrace.plots.r_image_plots.r_image_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">r_image_plot</span></code></a>. But first, the plotting namespace needs to be imported:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">optrace.plots</span> <span class="k">as</span> <span class="nn">otp</span>
+</pre></div>
+</div>
+<p>The plotting function takes the RImage as parameter. Next, we need to specify the image mode string, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">r_image_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="s2">&quot;Lightness (CIELUV)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can use the additional parameter <code class="code highlight python docutils literal highlight-python"><span class="n">log</span></code> to scale the image values logarithmically or provide <code class="code highlight python docutils literal highlight-python"><span class="n">flip</span><span class="o">=</span><span class="kc">True</span></code> to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the <code class="code highlight python docutils literal highlight-python"><span class="n">title</span></code> parameter and we can make the plotting window blocking with <code class="code highlight python docutils literal highlight-python"><span class="n">block</span><span class="o">=</span><span class="kc">True</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">r_image_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="s2">&quot;Lightness (CIELUV)&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Title 123&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Image Cut</strong></p>
+<p>For plotting an image cut the analogous function <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.r_image_plots.r_image_cut_plot" title="optrace.plots.r_image_plots.r_image_cut_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">r_image_cut_plot</span></code></a> is applied. It takes the same arguments, but needs a cut parameter <code class="code highlight python docutils literal highlight-python"><span class="n">x</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="n">y</span></code>. These are the same parameters as for the function <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.cut" title="optrace.tracer.r_image.RImage.cut"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RImage.cut</span></code></a>, so setting a value for <code class="code highlight python docutils literal highlight-python"><span class="n">x</span></code> creates a profile in y-direction for the given x value and vice versa.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">r_image_cut_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="s2">&quot;Lightness (CIELUV)&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Supporting all the same parameters as for <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.r_image_plots.r_image_plot" title="optrace.plots.r_image_plots.r_image_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">r_image_plot</span></code></a>, the following call is also valid:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">r_image_cut_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="s2">&quot;Lightness (CIELUV)&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Title 123&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="table" id="id11">
+<caption><span class="caption-number">Table 4.9 </span><span class="caption-text">Exemplary image plot and image cut plot from the <code class="docutils literal notranslate"><span class="pre">double_prism.py</span></code> example.</span><a class="headerlink" href="#id11" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/color_dispersive3.svg"><img alt="../_images/color_dispersive3.svg" src="../_images/color_dispersive3.svg" width="400" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/color_dispersive1_cut.svg"><img alt="../_images/color_dispersive1_cut.svg" src="../_images/color_dispersive1_cut.svg" width="400" /></a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+<figure class="align-center" id="id12">
+<a class="reference internal image-reference" href="../_images/example_spectrum_histogram.svg"><img alt="../_images/example_spectrum_histogram.svg" src="../_images/example_spectrum_histogram.svg" width="400" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.28 </span><span class="caption-text">Exemplary rendered histogram spectrum from the <code class="docutils literal notranslate"><span class="pre">custom_surfaces.py</span></code> example script.</span><a class="headerlink" href="#id12" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="chromaticity-plots">
+<span id="id6"></span><h2><span class="section-number">4.7.13. </span>Chromaticity Plots<a class="headerlink" href="#chromaticity-plots" title="Permalink to this heading">#</a></h2>
+<p><strong>Usage</strong></p>
+<p>In some use cases it is helpful to display the spectrum color or image values inside a chromaticity diagram to see the color distribution.
+When doing so, the choice between the CIE 1931 xy chromaticity diagram and the CIE 1976 UCS chromaticity diagram must be undertaken. Differences are described in &lt;&gt;.</p>
+<p>Depending on your choice the <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.chromaticity_plots.chromaticities_cie_1931" title="optrace.plots.chromaticity_plots.chromaticities_cie_1931"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromaticities_cie_1931</span></code></a> or <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.chromaticity_plots.chromaticities_cie_1976" title="optrace.plots.chromaticity_plots.chromaticities_cie_1976"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromaticities_cie_1976</span></code></a> function is called. In the simplest case it takes an RImage as parameter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1931</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> can also be provided:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1976</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or a list of multiple spectra:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1976</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">standard</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A user defined <code class="code highlight python docutils literal highlight-python"><span class="n">title</span></code> can also be set. The parameter <code class="code highlight python docutils literal highlight-python"><span class="n">rendering_intent</span></code> is specified for the conversion of the colors into the sRGB color space, but generally the default value of “Absolute” is suited. <code class="code highlight python docutils literal highlight-python"><span class="n">block</span><span class="o">=</span><span class="kc">True</span></code> interrupts the rest of the program and <code class="code highlight python docutils literal highlight-python"><span class="n">norm</span></code> specifies the brightness normalization, explained a few paragraphs below.</p>
+<p>A full function call could look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1976</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">standard</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Standard Illuminants&quot;</span><span class="p">,</span>\
+                            <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rendering_intent</span><span class="o">=</span><span class="s2">&quot;Perceptual&quot;</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;Largest&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="table" id="id13">
+<caption><span class="caption-number">Table 4.10 </span><span class="caption-text">Examples of CIE 1931 and 1976 chromaticity diagrams.</span><a class="headerlink" href="#id13" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/chroma_1931.svg"><img alt="../_images/chroma_1931.svg" src="../_images/chroma_1931.svg" width="400" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/chroma_1976.svg"><img alt="../_images/chroma_1976.svg" src="../_images/chroma_1976.svg" width="400" /></a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Norms</strong></p>
+<p>Chromaticity norms describe the brightness normalization for the colored diagram background. There are multiple norms available:</p>
+<ul class="simple">
+<li><p><strong>Largest</strong>: Maximum brightness for this sRGB color. Leads to colors with maximum brightness and saturation.</p></li>
+<li><p><strong>Sum</strong>: Normalize the sRGB such that the sum of all channels equals one. Leads to a diagram with smooth color changes and approximately equal brightness.</p></li>
+</ul>
+<table class="table" id="id14">
+<caption><span class="caption-number">Table 4.11 </span><span class="caption-text">Example of a chromaticity plots showing the color coordinates of fluorescent lamp presets. Norms are “Sum”, “Largest” and “Ignore” (from left to right, top to bottom).</span><a class="headerlink" href="#id14" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/fl_chroma_sum_norm.svg"><img alt="../_images/fl_chroma_sum_norm.svg" src="../_images/fl_chroma_sum_norm.svg" width="400" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/fl_chroma_largest_norm.svg"><img alt="../_images/fl_chroma_largest_norm.svg" src="../_images/fl_chroma_largest_norm.svg" width="400" /></a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="image-presets">
+<h2><span class="section-number">4.7.14. </span>Image Presets<a class="headerlink" href="#image-presets" title="Permalink to this heading">#</a></h2>
+<p>Below you can find preset images that can be used for a ray source.</p>
+<table class="table" id="id15">
+<caption><span class="caption-number">Table 4.12 </span><span class="caption-text">Photos of natural scenes or objects</span><a class="headerlink" href="#id15" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id16">
+<a class="reference internal image-reference" href="../_images/cell.webp"><img alt="../_images/cell.webp" src="../_images/cell.webp" style="width: 350px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.29 </span><span class="caption-text">Cell image for microscope examples. Usable as <code class="docutils literal notranslate"><span class="pre">ot.presets.image.cell</span></code>.
+Image created with <a class="reference external" href="https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064">Stable Diffusion</a>.</span><a class="headerlink" href="#id16" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id17">
+<a class="reference internal image-reference" href="../_images/group_photo.jpg"><img alt="../_images/group_photo.jpg" src="../_images/group_photo.jpg" style="width: 250px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.30 </span><span class="caption-text">Group photo of managers. Usable as <code class="docutils literal notranslate"><span class="pre">ot.presets.image.group_photo</span></code>
+Image created with <a class="reference external" href="https://lexica.art/prompt/06ba5ac6-7bfd-4ce6-8002-9d0e487b36b2">Stable Diffusion</a>.</span><a class="headerlink" href="#id17" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id18">
+<a class="reference internal image-reference" href="../_images/interior.jpg"><img alt="../_images/interior.jpg" src="../_images/interior.jpg" style="width: 400px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.31 </span><span class="caption-text">Photo of an interior living room. Usable as <code class="docutils literal notranslate"><span class="pre">ot.presets.image.interior</span></code>
+Image created with <a class="reference external" href="https://lexica.art/prompt/44d7e1fe-ba3b-4e73-972c-a30b95897434">Stable Diffusion</a>.</span><a class="headerlink" href="#id18" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id19">
+<a class="reference internal image-reference" href="../_images/landscape.jpg"><img alt="../_images/landscape.jpg" src="../_images/landscape.jpg" style="width: 400px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.32 </span><span class="caption-text">Photo of an european landscape. Usable as <code class="docutils literal notranslate"><span class="pre">ot.presets.image.landscape</span></code>
+Image created with <a class="reference external" href="https://lexica.art/prompt/0da3a592-465e-46d6-8ee6-dfe17ddea386">Stable Diffusion</a>.</span><a class="headerlink" href="#id19" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table" id="id20">
+<caption><span class="caption-number">Table 4.13 </span><span class="caption-text">Test images for color, resolution or distortion</span><a class="headerlink" href="#id20" title="Permalink to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id21">
+<a class="reference internal image-reference" href="../_images/ColorChecker.jpg"><img alt="../_images/ColorChecker.jpg" src="../_images/ColorChecker.jpg" style="width: 300px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.33 </span><span class="caption-text">Color checker chart. Public domain image from <a class="reference external" href="https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg">here</a>.
+Usage with <code class="docutils literal notranslate"><span class="pre">ot.presets.image.color_checker</span></code></span><a class="headerlink" href="#id21" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id22">
+<a class="reference internal image-reference" href="../_images/ETDRS_Chart.png"><img alt="../_images/ETDRS_Chart.png" src="../_images/ETDRS_Chart.png" style="width: 300px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.34 </span><span class="caption-text">ETDRS Chart standard. Public Domain Image from <a class="reference external" href="https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg">here</a>.
+Usage with <code class="docutils literal notranslate"><span class="pre">ot.presets.image.ETDRS_chart</span></code></span><a class="headerlink" href="#id22" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id23">
+<a class="reference internal image-reference" href="../_images/ETDRS_Chart_inverted.png"><img alt="../_images/ETDRS_Chart_inverted.png" src="../_images/ETDRS_Chart_inverted.png" style="width: 300px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.35 </span><span class="caption-text">ETDRS Chart standard. Edited version of the ETDRS image.
+Usage with <code class="docutils literal notranslate"><span class="pre">ot.presets.image.ETDRS_chart_inverted</span></code></span><a class="headerlink" href="#id23" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id24">
+<a class="reference internal image-reference" href="../_images/TestScreen_square.png"><img alt="../_images/TestScreen_square.png" src="../_images/TestScreen_square.png" style="width: 300px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.36 </span><span class="caption-text">TV test screen. Public Domain Image from <a class="reference external" href="https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg">here</a>.
+Usage with <code class="docutils literal notranslate"><span class="pre">ot.presets.image.test_screen</span></code></span><a class="headerlink" href="#id24" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Additional presets include:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../library/optrace_tracer_presets.html#optrace.tracer.presets.image.checkerboard" title="optrace.tracer.presets.image.checkerboard"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ot.presets.image.checkerboard</span></code></a>: 8x8 black and white chess-like board image</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id7">
+<aside class="footnote brackets" id="footcite-briggschroma" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>David Briggs. The difference between chroma and saturation. 2016. URL: <a class="reference external" href="https://munsell.com/color-blog/difference-chroma-saturation/">https://munsell.com/color-blog/difference-chroma-saturation/</a> (visited on 2023-01-03).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-orthographicprojwiki" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Orthographic map projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Orthographic_map_projection">https://en.wikipedia.org/wiki/Orthographic_map_projection</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-steographicprojwiki" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Stereographic map projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Stereographic_map_projection">https://en.wikipedia.org/wiki/Stereographic_map_projection</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-equidistantprojwiki" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Azimuthal equidistant projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection">https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-equalareaprojwiki" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Lambert azimuthal equal-area projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection">https://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection</a> (visited on 2022-12-01).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="refraction_index.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">4.6. </span>Refractive Indices</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="focus.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">4.8. </span>Focus Finding</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#overview">
+   4.7.1. Overview
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#image-types">
+   4.7.2. Image Types
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sphere-projections">
+   4.7.3. Sphere Projections
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#resolution-limit-filter">
+   4.7.4. Resolution Limit Filter
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rendering-an-image">
+   4.7.5. Rendering an Image
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#iterative-render">
+   4.7.6. Iterative Render
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#getting-an-image-by-mode">
+   4.7.7. Getting an Image by Mode
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rescaling-and-filtering-an-image">
+   4.7.8. Rescaling and Filtering an Image
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#saving-loading-and-exporting-an-image">
+   4.7.9. Saving, Loading and Exporting an Image
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#image-properties">
+   4.7.10. Image Properties
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rendering-a-lightspectrum">
+   4.7.11. Rendering a LightSpectrum
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting-image-and-spectra">
+   4.7.12. Plotting Image and Spectra
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#chromaticity-plots">
+   4.7.13. Chromaticity Plots
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#image-presets">
+   4.7.14. Image Presets
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  <!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
+<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
+<!--(similar to page-toc.html)-->
+<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">4.2. Base Geometries (Element, Group, Raytracer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.3. Base Shapes (Surface, Point, Line)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elements.html">4.4. Defining Elements (Lens, RaySource, Detector, Filter, Aperture, Marker)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">4.5. Spectrum (LightSpectrum, TransmissionSpectrum)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.7. Image and Spectrum Rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="focus.html">4.8. Focus Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tma.html">4.9. Paraxial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">4.10. Plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ui.html">4.11. Using the GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.12. Advanced Topics</a></li>
+</ul>
+
+  </div>
+</nav>
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Damian Mendroch.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

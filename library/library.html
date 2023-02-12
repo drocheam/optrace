@@ -1,0 +1,1360 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>7. Code Reference &#8212; optrace 1.3.7 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'library/library';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="7.1. Library Structure" href="structure.html" />
+    <link rel="prev" title="6.7. Color Management" href="../math/color.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">optrace 1.3.7 documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="code-reference">
+<h1><span class="section-number">7. </span>Code Reference<a class="headerlink" href="#code-reference" title="Permalink to this heading">#</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">7.1. Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer.html">7.2. tracer Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.base_class">7.2.1. tracer.base_class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.base_class.BaseClass"><code class="docutils literal notranslate"><span class="pre">BaseClass</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.base_class.BaseClass.copy"><code class="docutils literal notranslate"><span class="pre">BaseClass.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.base_class.BaseClass.crepr"><code class="docutils literal notranslate"><span class="pre">BaseClass.crepr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.base_class.BaseClass.get_desc"><code class="docutils literal notranslate"><span class="pre">BaseClass.get_desc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.base_class.BaseClass.get_long_desc"><code class="docutils literal notranslate"><span class="pre">BaseClass.get_long_desc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.base_class.BaseClass.lock"><code class="docutils literal notranslate"><span class="pre">BaseClass.lock()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.base_class.BaseClass.print"><code class="docutils literal notranslate"><span class="pre">BaseClass.print()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.load">7.2.2. tracer.load</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.load.agf"><code class="docutils literal notranslate"><span class="pre">agf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.load.zmx"><code class="docutils literal notranslate"><span class="pre">zmx()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.misc">7.2.3. tracer.misc</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker"><code class="docutils literal notranslate"><span class="pre">PropertyChecker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_above"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_above()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_below"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_below()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_callable"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_callable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_if_element"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_if_element()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_none_or_callable"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_none_or_callable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_not_above"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_not_above()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_not_below"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_not_below()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_type"><code class="docutils literal notranslate"><span class="pre">PropertyChecker.check_type()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.cross"><code class="docutils literal notranslate"><span class="pre">cross()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.normalize"><code class="docutils literal notranslate"><span class="pre">normalize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.part_mask"><code class="docutils literal notranslate"><span class="pre">part_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.random"><code class="docutils literal notranslate"><span class="pre">random()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.random_from_distribution"><code class="docutils literal notranslate"><span class="pre">random_from_distribution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.rdot"><code class="docutils literal notranslate"><span class="pre">rdot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.ring_uniform"><code class="docutils literal notranslate"><span class="pre">ring_uniform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.save_with_fallback"><code class="docutils literal notranslate"><span class="pre">save_with_fallback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.timer"><code class="docutils literal notranslate"><span class="pre">timer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.misc.uniform2"><code class="docutils literal notranslate"><span class="pre">uniform2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.ray_storage">7.2.4. tracer.ray_storage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage"><code class="docutils literal notranslate"><span class="pre">RayStorage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.init"><code class="docutils literal notranslate"><span class="pre">RayStorage.init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.optical_lengths"><code class="docutils literal notranslate"><span class="pre">RayStorage.optical_lengths()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.ray_lengths"><code class="docutils literal notranslate"><span class="pre">RayStorage.ray_lengths()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.rays_by_mask"><code class="docutils literal notranslate"><span class="pre">RayStorage.rays_by_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.source_sections"><code class="docutils literal notranslate"><span class="pre">RayStorage.source_sections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.thread_rays"><code class="docutils literal notranslate"><span class="pre">RayStorage.thread_rays()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.B_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.B_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.N"><code class="docutils literal notranslate"><span class="pre">RayStorage.N</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.N_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.N_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.Nt"><code class="docutils literal notranslate"><span class="pre">RayStorage.Nt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.n_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.n_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.p_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.p_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.pol_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.pol_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.ray_source_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.ray_source_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.s0_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.s0_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.w_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.w_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.wl_list"><code class="docutils literal notranslate"><span class="pre">RayStorage.wl_list</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.r_image">7.2.5. tracer.r_image</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage"><code class="docutils literal notranslate"><span class="pre">RImage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.cut"><code class="docutils literal notranslate"><span class="pre">RImage.cut()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.export_png"><code class="docutils literal notranslate"><span class="pre">RImage.export_png()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.get"><code class="docutils literal notranslate"><span class="pre">RImage.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.has_image"><code class="docutils literal notranslate"><span class="pre">RImage.has_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.load"><code class="docutils literal notranslate"><span class="pre">RImage.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.luminous_power"><code class="docutils literal notranslate"><span class="pre">RImage.luminous_power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.luv"><code class="docutils literal notranslate"><span class="pre">RImage.luv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.power"><code class="docutils literal notranslate"><span class="pre">RImage.power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.refilter"><code class="docutils literal notranslate"><span class="pre">RImage.refilter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.render"><code class="docutils literal notranslate"><span class="pre">RImage.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.rescale"><code class="docutils literal notranslate"><span class="pre">RImage.rescale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.rgb"><code class="docutils literal notranslate"><span class="pre">RImage.rgb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.save"><code class="docutils literal notranslate"><span class="pre">RImage.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.xyz"><code class="docutils literal notranslate"><span class="pre">RImage.xyz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.Apx"><code class="docutils literal notranslate"><span class="pre">RImage.Apx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.EPS"><code class="docutils literal notranslate"><span class="pre">RImage.EPS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.K"><code class="docutils literal notranslate"><span class="pre">RImage.K</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.MAX_IMAGE_RATIO"><code class="docutils literal notranslate"><span class="pre">RImage.MAX_IMAGE_RATIO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.MAX_IMAGE_SIDE"><code class="docutils literal notranslate"><span class="pre">RImage.MAX_IMAGE_SIDE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.N"><code class="docutils literal notranslate"><span class="pre">RImage.N</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.Nx"><code class="docutils literal notranslate"><span class="pre">RImage.Nx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.Ny"><code class="docutils literal notranslate"><span class="pre">RImage.Ny</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.SIZES"><code class="docutils literal notranslate"><span class="pre">RImage.SIZES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.display_modes"><code class="docutils literal notranslate"><span class="pre">RImage.display_modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.extent"><code class="docutils literal notranslate"><span class="pre">RImage.extent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.sx"><code class="docutils literal notranslate"><span class="pre">RImage.sx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.r_image.RImage.sy"><code class="docutils literal notranslate"><span class="pre">RImage.sy</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.raytracer">7.2.6. tracer.raytracer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer"><code class="docutils literal notranslate"><span class="pre">Raytracer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MEDIA_TRANS"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS.ABSORB_MEDIA_TRANS</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS.ABSORB_MISSING</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ONLY_HIT_BACK"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS.ONLY_HIT_BACK</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ONLY_HIT_FRONT"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS.ONLY_HIT_FRONT</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS.OUTLINE_INTERSECTION</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.TIR"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS.TIR</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.T_BELOW_TTH"><code class="docutils literal notranslate"><span class="pre">Raytracer.INFOS.T_BELOW_TTH</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.autofocus"><code class="docutils literal notranslate"><span class="pre">Raytracer.autofocus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.check_collision"><code class="docutils literal notranslate"><span class="pre">Raytracer.check_collision()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.clear"><code class="docutils literal notranslate"><span class="pre">Raytracer.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.compare_property_snapshot"><code class="docutils literal notranslate"><span class="pre">Raytracer.compare_property_snapshot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_image"><code class="docutils literal notranslate"><span class="pre">Raytracer.detector_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_spectrum"><code class="docutils literal notranslate"><span class="pre">Raytracer.detector_spectrum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.iterative_render"><code class="docutils literal notranslate"><span class="pre">Raytracer.iterative_render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.property_snapshot"><code class="docutils literal notranslate"><span class="pre">Raytracer.property_snapshot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_image"><code class="docutils literal notranslate"><span class="pre">Raytracer.source_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_spectrum"><code class="docutils literal notranslate"><span class="pre">Raytracer.source_spectrum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.trace"><code class="docutils literal notranslate"><span class="pre">Raytracer.trace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.ITER_RAYS_STEP"><code class="docutils literal notranslate"><span class="pre">Raytracer.ITER_RAYS_STEP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.MAX_RAYS"><code class="docutils literal notranslate"><span class="pre">Raytracer.MAX_RAYS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.N_EPS"><code class="docutils literal notranslate"><span class="pre">Raytracer.N_EPS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.T_TH"><code class="docutils literal notranslate"><span class="pre">Raytracer.T_TH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.absorb_missing"><code class="docutils literal notranslate"><span class="pre">Raytracer.absorb_missing</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.autofocus_methods"><code class="docutils literal notranslate"><span class="pre">Raytracer.autofocus_methods</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.extent"><code class="docutils literal notranslate"><span class="pre">Raytracer.extent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.no_pol"><code class="docutils literal notranslate"><span class="pre">Raytracer.no_pol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.outline"><code class="docutils literal notranslate"><span class="pre">Raytracer.outline</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.pos"><code class="docutils literal notranslate"><span class="pre">Raytracer.pos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer.rays"><code class="docutils literal notranslate"><span class="pre">Raytracer.rays</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.refraction_index">7.2.7. tracer.refraction_index</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex"><code class="docutils literal notranslate"><span class="pre">RefractionIndex</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.__call__"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.__eq__"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.__eq__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.__ne__"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.__ne__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.abbe_number"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.abbe_number()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.is_dispersive"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.is_dispersive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.coeff_count"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.coeff_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.n_types"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.n_types</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.quantity"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.quantity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.spectrum_types"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.spectrum_types</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.unit"><code class="docutils literal notranslate"><span class="pre">RefractionIndex.unit</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html#module-optrace.tracer.transfer_matrix_analysis">7.2.8. tracer.transfer_matrix_analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA"><code class="docutils literal notranslate"><span class="pre">TMA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.image_magnification"><code class="docutils literal notranslate"><span class="pre">TMA.image_magnification()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.image_position"><code class="docutils literal notranslate"><span class="pre">TMA.image_position()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.matrix_at"><code class="docutils literal notranslate"><span class="pre">TMA.matrix_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.object_magnification"><code class="docutils literal notranslate"><span class="pre">TMA.object_magnification()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.object_position"><code class="docutils literal notranslate"><span class="pre">TMA.object_position()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification"><code class="docutils literal notranslate"><span class="pre">TMA.pupil_magnification()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.pupil_position"><code class="docutils literal notranslate"><span class="pre">TMA.pupil_position()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.abcd"><code class="docutils literal notranslate"><span class="pre">TMA.abcd</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.bfl"><code class="docutils literal notranslate"><span class="pre">TMA.bfl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.d"><code class="docutils literal notranslate"><span class="pre">TMA.d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.efl"><code class="docutils literal notranslate"><span class="pre">TMA.efl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.efl_n"><code class="docutils literal notranslate"><span class="pre">TMA.efl_n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.ffl"><code class="docutils literal notranslate"><span class="pre">TMA.ffl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths"><code class="docutils literal notranslate"><span class="pre">TMA.focal_lengths</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n"><code class="docutils literal notranslate"><span class="pre">TMA.focal_lengths_n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_points"><code class="docutils literal notranslate"><span class="pre">TMA.focal_points</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.n1"><code class="docutils literal notranslate"><span class="pre">TMA.n1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.n2"><code class="docutils literal notranslate"><span class="pre">TMA.n2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.nodal_points"><code class="docutils literal notranslate"><span class="pre">TMA.nodal_points</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.optical_center"><code class="docutils literal notranslate"><span class="pre">TMA.optical_center</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.powers"><code class="docutils literal notranslate"><span class="pre">TMA.powers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.powers_n"><code class="docutils literal notranslate"><span class="pre">TMA.powers_n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.principal_points"><code class="docutils literal notranslate"><span class="pre">TMA.principal_points</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.vertex_points"><code class="docutils literal notranslate"><span class="pre">TMA.vertex_points</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.wl"><code class="docutils literal notranslate"><span class="pre">TMA.wl</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_color.html">7.3. tracer.color Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html#module-optrace.tracer.color.tools">7.3.1. tracer.color.tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.tools.blackbody"><code class="docutils literal notranslate"><span class="pre">blackbody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.tools.normalized_blackbody"><code class="docutils literal notranslate"><span class="pre">normalized_blackbody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.tools.wavelengths"><code class="docutils literal notranslate"><span class="pre">wavelengths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.tools.WL_BOUNDS"><code class="docutils literal notranslate"><span class="pre">WL_BOUNDS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html#module-optrace.tracer.color.illuminants">7.3.2. tracer.color.illuminants</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.a_illuminant"><code class="docutils literal notranslate"><span class="pre">a_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.c_illuminant"><code class="docutils literal notranslate"><span class="pre">c_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.d50_illuminant"><code class="docutils literal notranslate"><span class="pre">d50_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.d55_illuminant"><code class="docutils literal notranslate"><span class="pre">d55_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.d65_illuminant"><code class="docutils literal notranslate"><span class="pre">d65_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.d75_illuminant"><code class="docutils literal notranslate"><span class="pre">d75_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.e_illuminant"><code class="docutils literal notranslate"><span class="pre">e_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.fl11_illuminant"><code class="docutils literal notranslate"><span class="pre">fl11_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.fl2_illuminant"><code class="docutils literal notranslate"><span class="pre">fl2_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.fl7_illuminant"><code class="docutils literal notranslate"><span class="pre">fl7_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.led_b1_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b1_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.led_b2_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b2_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.led_b3_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b3_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.led_b4_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b4_illuminant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.illuminants.led_b5_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b5_illuminant()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html#module-optrace.tracer.color.observers">7.3.3. tracer.color.observers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.observers.x_observer"><code class="docutils literal notranslate"><span class="pre">x_observer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.observers.y_observer"><code class="docutils literal notranslate"><span class="pre">y_observer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.observers.z_observer"><code class="docutils literal notranslate"><span class="pre">z_observer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html#module-optrace.tracer.color.xyz">7.3.4. tracer.color.xyz</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.xyz.complementary_wavelength"><code class="docutils literal notranslate"><span class="pre">complementary_wavelength()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.xyz.dominant_wavelength"><code class="docutils literal notranslate"><span class="pre">dominant_wavelength()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.xyz.xyY_to_xyz"><code class="docutils literal notranslate"><span class="pre">xyY_to_xyz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.xyz.xyz_from_spectrum"><code class="docutils literal notranslate"><span class="pre">xyz_from_spectrum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.xyz.xyz_to_xyY"><code class="docutils literal notranslate"><span class="pre">xyz_to_xyY()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.xyz.WP_D65_XY"><code class="docutils literal notranslate"><span class="pre">WP_D65_XY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.xyz.WP_D65_XYZ"><code class="docutils literal notranslate"><span class="pre">WP_D65_XYZ</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html#module-optrace.tracer.color.srgb">7.3.5. tracer.color.srgb</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.gauss"><code class="docutils literal notranslate"><span class="pre">gauss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.outside_srgb_gamut"><code class="docutils literal notranslate"><span class="pre">outside_srgb_gamut()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.random_wavelengths_from_srgb"><code class="docutils literal notranslate"><span class="pre">random_wavelengths_from_srgb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.spectral_colormap"><code class="docutils literal notranslate"><span class="pre">spectral_colormap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.srgb_b_primary"><code class="docutils literal notranslate"><span class="pre">srgb_b_primary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.srgb_g_primary"><code class="docutils literal notranslate"><span class="pre">srgb_g_primary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.srgb_linear_to_srgb"><code class="docutils literal notranslate"><span class="pre">srgb_linear_to_srgb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.srgb_linear_to_xyz"><code class="docutils literal notranslate"><span class="pre">srgb_linear_to_xyz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.srgb_r_primary"><code class="docutils literal notranslate"><span class="pre">srgb_r_primary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.srgb_to_srgb_linear"><code class="docutils literal notranslate"><span class="pre">srgb_to_srgb_linear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.srgb_to_xyz"><code class="docutils literal notranslate"><span class="pre">srgb_to_xyz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.xyz_to_srgb"><code class="docutils literal notranslate"><span class="pre">xyz_to_srgb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.xyz_to_srgb_linear"><code class="docutils literal notranslate"><span class="pre">xyz_to_srgb_linear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.SRGB_B_XY"><code class="docutils literal notranslate"><span class="pre">SRGB_B_XY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.SRGB_G_XY"><code class="docutils literal notranslate"><span class="pre">SRGB_G_XY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.SRGB_RENDERING_INTENTS"><code class="docutils literal notranslate"><span class="pre">SRGB_RENDERING_INTENTS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.srgb.SRGB_R_XY"><code class="docutils literal notranslate"><span class="pre">SRGB_R_XY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html#module-optrace.tracer.color.luv">7.3.6. tracer.color.luv</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.luv_chroma"><code class="docutils literal notranslate"><span class="pre">luv_chroma()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.luv_hue"><code class="docutils literal notranslate"><span class="pre">luv_hue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.luv_saturation"><code class="docutils literal notranslate"><span class="pre">luv_saturation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.luv_to_u_v_l"><code class="docutils literal notranslate"><span class="pre">luv_to_u_v_l()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.luv_to_xyz"><code class="docutils literal notranslate"><span class="pre">luv_to_xyz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.xyz_to_luv"><code class="docutils literal notranslate"><span class="pre">xyz_to_luv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.SRGB_B_UV"><code class="docutils literal notranslate"><span class="pre">SRGB_B_UV</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.SRGB_G_UV"><code class="docutils literal notranslate"><span class="pre">SRGB_G_UV</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.SRGB_R_UV"><code class="docutils literal notranslate"><span class="pre">SRGB_R_UV</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.WP_D65_LUV"><code class="docutils literal notranslate"><span class="pre">WP_D65_LUV</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_color.html#optrace.tracer.color.luv.WP_D65_UV"><code class="docutils literal notranslate"><span class="pre">WP_D65_UV</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry.html">7.4. tracer.geometry Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.aperture">7.4.1. tracer.geometry.aperture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture"><code class="docutils literal notranslate"><span class="pre">Aperture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture.abbr"><code class="docutils literal notranslate"><span class="pre">Aperture.abbr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.detector">7.4.2. tracer.geometry.detector</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector"><code class="docutils literal notranslate"><span class="pre">Detector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector.abbr"><code class="docutils literal notranslate"><span class="pre">Detector.abbr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.filter">7.4.3. tracer.geometry.filter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter.__call__"><code class="docutils literal notranslate"><span class="pre">Filter.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter.color"><code class="docutils literal notranslate"><span class="pre">Filter.color()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter.abbr"><code class="docutils literal notranslate"><span class="pre">Filter.abbr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.group">7.4.4. tracer.geometry.group</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group"><code class="docutils literal notranslate"><span class="pre">Group</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.add"><code class="docutils literal notranslate"><span class="pre">Group.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.clear"><code class="docutils literal notranslate"><span class="pre">Group.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.flip"><code class="docutils literal notranslate"><span class="pre">Group.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.has"><code class="docutils literal notranslate"><span class="pre">Group.has()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.move_to"><code class="docutils literal notranslate"><span class="pre">Group.move_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.remove"><code class="docutils literal notranslate"><span class="pre">Group.remove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.rotate"><code class="docutils literal notranslate"><span class="pre">Group.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.tma"><code class="docutils literal notranslate"><span class="pre">Group.tma()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.apertures"><code class="docutils literal notranslate"><span class="pre">Group.apertures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.detectors"><code class="docutils literal notranslate"><span class="pre">Group.detectors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.elements"><code class="docutils literal notranslate"><span class="pre">Group.elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.extent"><code class="docutils literal notranslate"><span class="pre">Group.extent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.filters"><code class="docutils literal notranslate"><span class="pre">Group.filters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.lenses"><code class="docutils literal notranslate"><span class="pre">Group.lenses</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.markers"><code class="docutils literal notranslate"><span class="pre">Group.markers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.n0"><code class="docutils literal notranslate"><span class="pre">Group.n0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.pos"><code class="docutils literal notranslate"><span class="pre">Group.pos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.ray_sources"><code class="docutils literal notranslate"><span class="pre">Group.ray_sources</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.tracing_surfaces"><code class="docutils literal notranslate"><span class="pre">Group.tracing_surfaces</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.volumes"><code class="docutils literal notranslate"><span class="pre">Group.volumes</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.ideal_lens">7.4.5. tracer.geometry.ideal_lens</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens"><code class="docutils literal notranslate"><span class="pre">IdealLens</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens.is_ideal"><code class="docutils literal notranslate"><span class="pre">IdealLens.is_ideal</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.lens">7.4.6. tracer.geometry.lens</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens"><code class="docutils literal notranslate"><span class="pre">Lens</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens.tma"><code class="docutils literal notranslate"><span class="pre">Lens.tma()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens.abbr"><code class="docutils literal notranslate"><span class="pre">Lens.abbr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens.d"><code class="docutils literal notranslate"><span class="pre">Lens.d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens.de"><code class="docutils literal notranslate"><span class="pre">Lens.de</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens.is_ideal"><code class="docutils literal notranslate"><span class="pre">Lens.is_ideal</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.ray_source">7.4.7. tracer.geometry.ray_source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource"><code class="docutils literal notranslate"><span class="pre">RaySource</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.color"><code class="docutils literal notranslate"><span class="pre">RaySource.color()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.create_rays"><code class="docutils literal notranslate"><span class="pre">RaySource.create_rays()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.abbr"><code class="docutils literal notranslate"><span class="pre">RaySource.abbr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.divergences"><code class="docutils literal notranslate"><span class="pre">RaySource.divergences</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.orientations"><code class="docutils literal notranslate"><span class="pre">RaySource.orientations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.polarizations"><code class="docutils literal notranslate"><span class="pre">RaySource.polarizations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.element">7.4.8. tracer.geometry.element</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element"><code class="docutils literal notranslate"><span class="pre">Element</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.cylinder_surface"><code class="docutils literal notranslate"><span class="pre">Element.cylinder_surface()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.flip"><code class="docutils literal notranslate"><span class="pre">Element.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.get_desc"><code class="docutils literal notranslate"><span class="pre">Element.get_desc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.has_back"><code class="docutils literal notranslate"><span class="pre">Element.has_back()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.move_to"><code class="docutils literal notranslate"><span class="pre">Element.move_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.rotate"><code class="docutils literal notranslate"><span class="pre">Element.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.set_surface"><code class="docutils literal notranslate"><span class="pre">Element.set_surface()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.abbr"><code class="docutils literal notranslate"><span class="pre">Element.abbr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.extent"><code class="docutils literal notranslate"><span class="pre">Element.extent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.pos"><code class="docutils literal notranslate"><span class="pre">Element.pos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.surface"><code class="docutils literal notranslate"><span class="pre">Element.surface</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.point">7.4.9. tracer.geometry.point</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point"><code class="docutils literal notranslate"><span class="pre">Point</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point.flip"><code class="docutils literal notranslate"><span class="pre">Point.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point.move_to"><code class="docutils literal notranslate"><span class="pre">Point.move_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point.random_positions"><code class="docutils literal notranslate"><span class="pre">Point.random_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point.rotate"><code class="docutils literal notranslate"><span class="pre">Point.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point.extent"><code class="docutils literal notranslate"><span class="pre">Point.extent</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.line">7.4.10. tracer.geometry.line</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line.flip"><code class="docutils literal notranslate"><span class="pre">Line.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line.move_to"><code class="docutils literal notranslate"><span class="pre">Line.move_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line.random_positions"><code class="docutils literal notranslate"><span class="pre">Line.random_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line.rotate"><code class="docutils literal notranslate"><span class="pre">Line.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line.extent"><code class="docutils literal notranslate"><span class="pre">Line.extent</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.marker.point_marker">7.4.11. tracer.geometry.marker.point_marker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.marker.point_marker.PointMarker"><code class="docutils literal notranslate"><span class="pre">PointMarker</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.marker.line_marker">7.4.12. tracer.geometry.marker.line_marker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker"><code class="docutils literal notranslate"><span class="pre">LineMarker</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.volume.sphere_volume">7.4.13. tracer.geometry.volume.sphere_volume</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.volume.sphere_volume.SphereVolume"><code class="docutils literal notranslate"><span class="pre">SphereVolume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.volume.box_volume">7.4.14. tracer.geometry.volume.box_volume</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume"><code class="docutils literal notranslate"><span class="pre">BoxVolume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.volume.cylinder_volume">7.4.15. tracer.geometry.volume.cylinder_volume</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume"><code class="docutils literal notranslate"><span class="pre">CylinderVolume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html#module-optrace.tracer.geometry.volume.volume">7.4.16. tracer.geometry.volume.volume</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.volume.volume.Volume"><code class="docutils literal notranslate"><span class="pre">Volume</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.volume.volume.Volume.abbr"><code class="docutils literal notranslate"><span class="pre">Volume.abbr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry_surface.html">7.5. tracer.geometry.surface Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.aspheric_surface">7.5.1. tracer.geometry.surface.aspheric_surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface"><code class="docutils literal notranslate"><span class="pre">AsphericSurface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.flip"><code class="docutils literal notranslate"><span class="pre">AsphericSurface.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.info"><code class="docutils literal notranslate"><span class="pre">AsphericSurface.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">AsphericSurface.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.circular_surface">7.5.2. tracer.geometry.surface.circular_surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.circular_surface.CircularSurface"><code class="docutils literal notranslate"><span class="pre">CircularSurface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.circular_surface.CircularSurface.random_positions"><code class="docutils literal notranslate"><span class="pre">CircularSurface.random_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.circular_surface.CircularSurface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">CircularSurface.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.conic_surface">7.5.3. tracer.geometry.surface.conic_surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface"><code class="docutils literal notranslate"><span class="pre">ConicSurface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface.find_hit"><code class="docutils literal notranslate"><span class="pre">ConicSurface.find_hit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface.flip"><code class="docutils literal notranslate"><span class="pre">ConicSurface.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface.normals"><code class="docutils literal notranslate"><span class="pre">ConicSurface.normals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface.info"><code class="docutils literal notranslate"><span class="pre">ConicSurface.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">ConicSurface.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.data_surface_1d">7.5.4. tracer.geometry.surface.data_surface_1d</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D"><code class="docutils literal notranslate"><span class="pre">DataSurface1D</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">DataSurface1D.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.data_surface_2d">7.5.5. tracer.geometry.surface.data_surface_2d</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D"><code class="docutils literal notranslate"><span class="pre">DataSurface2D</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.flip"><code class="docutils literal notranslate"><span class="pre">DataSurface2D.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.normals"><code class="docutils literal notranslate"><span class="pre">DataSurface2D.normals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotate"><code class="docutils literal notranslate"><span class="pre">DataSurface2D.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">DataSurface2D.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.function_surface_1d">7.5.6. tracer.geometry.surface.function_surface_1d</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D"><code class="docutils literal notranslate"><span class="pre">FunctionSurface1D</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">FunctionSurface1D.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.function_surface_2d">7.5.7. tracer.geometry.surface.function_surface_2d</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D"><code class="docutils literal notranslate"><span class="pre">FunctionSurface2D</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.flip"><code class="docutils literal notranslate"><span class="pre">FunctionSurface2D.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.mask"><code class="docutils literal notranslate"><span class="pre">FunctionSurface2D.mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.normals"><code class="docutils literal notranslate"><span class="pre">FunctionSurface2D.normals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotate"><code class="docutils literal notranslate"><span class="pre">FunctionSurface2D.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">FunctionSurface2D.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.rectangular_surface">7.5.8. tracer.geometry.surface.rectangular_surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.edge"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.edge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.flip"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.mask"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.plotting_mesh"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.plotting_mesh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.random_positions"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.random_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotate"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.extent"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.extent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.info"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">RectangularSurface.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.ring_surface">7.5.9. tracer.geometry.surface.ring_surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="docutils literal notranslate"><span class="pre">RingSurface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface.mask"><code class="docutils literal notranslate"><span class="pre">RingSurface.mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface.plotting_mesh"><code class="docutils literal notranslate"><span class="pre">RingSurface.plotting_mesh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface.random_positions"><code class="docutils literal notranslate"><span class="pre">RingSurface.random_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface.info"><code class="docutils literal notranslate"><span class="pre">RingSurface.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">RingSurface.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.spherical_surface">7.5.10. tracer.geometry.surface.spherical_surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface"><code class="docutils literal notranslate"><span class="pre">SphericalSurface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection"><code class="docutils literal notranslate"><span class="pre">SphericalSurface.sphere_projection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.info"><code class="docutils literal notranslate"><span class="pre">SphericalSurface.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">SphericalSurface.rotational_symmetry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods"><code class="docutils literal notranslate"><span class="pre">SphericalSurface.sphere_projection_methods</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.surface">7.5.11. tracer.geometry.surface.surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface"><code class="docutils literal notranslate"><span class="pre">Surface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.edge"><code class="docutils literal notranslate"><span class="pre">Surface.edge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.find_hit"><code class="docutils literal notranslate"><span class="pre">Surface.find_hit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.flip"><code class="docutils literal notranslate"><span class="pre">Surface.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.is_flat"><code class="docutils literal notranslate"><span class="pre">Surface.is_flat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.mask"><code class="docutils literal notranslate"><span class="pre">Surface.mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.move_to"><code class="docutils literal notranslate"><span class="pre">Surface.move_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.normals"><code class="docutils literal notranslate"><span class="pre">Surface.normals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.plotting_mesh"><code class="docutils literal notranslate"><span class="pre">Surface.plotting_mesh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.rotate"><code class="docutils literal notranslate"><span class="pre">Surface.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.values"><code class="docutils literal notranslate"><span class="pre">Surface.values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.C_EPS"><code class="docutils literal notranslate"><span class="pre">Surface.C_EPS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.N_EPS"><code class="docutils literal notranslate"><span class="pre">Surface.N_EPS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.dn"><code class="docutils literal notranslate"><span class="pre">Surface.dn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.dp"><code class="docutils literal notranslate"><span class="pre">Surface.dp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.ds"><code class="docutils literal notranslate"><span class="pre">Surface.ds</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.extent"><code class="docutils literal notranslate"><span class="pre">Surface.extent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.info"><code class="docutils literal notranslate"><span class="pre">Surface.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">Surface.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.tilted_surface">7.5.12. tracer.geometry.surface.tilted_surface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface"><code class="docutils literal notranslate"><span class="pre">TiltedSurface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.find_hit"><code class="docutils literal notranslate"><span class="pre">TiltedSurface.find_hit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.flip"><code class="docutils literal notranslate"><span class="pre">TiltedSurface.flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.normals"><code class="docutils literal notranslate"><span class="pre">TiltedSurface.normals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotate"><code class="docutils literal notranslate"><span class="pre">TiltedSurface.rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.info"><code class="docutils literal notranslate"><span class="pre">TiltedSurface.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotational_symmetry"><code class="docutils literal notranslate"><span class="pre">TiltedSurface.rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_spectrum.html">7.6. tracer.spectrum Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html#module-optrace.tracer.spectrum.light_spectrum">7.6.1. tracer.spectrum.light_spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.__call__"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.centroid_wavelength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.color"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.color()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.complementary_wavelength"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.complementary_wavelength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.dominant_wavelength"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.dominant_wavelength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.fwhm"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.fwhm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.luminous_power"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.luminous_power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.peak()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak_wavelength"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.peak_wavelength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.power"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.random_wavelengths"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.random_wavelengths()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.render"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.xyz"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.xyz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.spectrum_types"><code class="docutils literal notranslate"><span class="pre">LightSpectrum.spectrum_types</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html#module-optrace.tracer.spectrum.spectrum">7.6.2. tracer.spectrum.spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum"><code class="docutils literal notranslate"><span class="pre">Spectrum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum.__call__"><code class="docutils literal notranslate"><span class="pre">Spectrum.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum.get_desc"><code class="docutils literal notranslate"><span class="pre">Spectrum.get_desc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum.is_continuous"><code class="docutils literal notranslate"><span class="pre">Spectrum.is_continuous()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum.quantity"><code class="docutils literal notranslate"><span class="pre">Spectrum.quantity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum.spectrum_types"><code class="docutils literal notranslate"><span class="pre">Spectrum.spectrum_types</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum.unit"><code class="docutils literal notranslate"><span class="pre">Spectrum.unit</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html#module-optrace.tracer.spectrum.transmission_spectrum">7.6.3. tracer.spectrum.transmission_spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.__call__"><code class="docutils literal notranslate"><span class="pre">TransmissionSpectrum.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.color"><code class="docutils literal notranslate"><span class="pre">TransmissionSpectrum.color()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.xyz"><code class="docutils literal notranslate"><span class="pre">TransmissionSpectrum.xyz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.spectrum_types"><code class="docutils literal notranslate"><span class="pre">TransmissionSpectrum.spectrum_types</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_presets.html">7.7. tracer.presets Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html#module-optrace.tracer.presets.geometry">7.7.1. tracer.presets.geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.geometry.arizona_eye"><code class="docutils literal notranslate"><span class="pre">arizona_eye()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.geometry.ideal_camera"><code class="docutils literal notranslate"><span class="pre">ideal_camera()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.geometry.legrand_eye"><code class="docutils literal notranslate"><span class="pre">legrand_eye()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html#module-optrace.tracer.presets.image">7.7.2. tracer.presets.image</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.ETDRS_chart"><code class="docutils literal notranslate"><span class="pre">ETDRS_chart</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.ETDRS_chart_inverted"><code class="docutils literal notranslate"><span class="pre">ETDRS_chart_inverted</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.all_presets"><code class="docutils literal notranslate"><span class="pre">all_presets</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.cell"><code class="docutils literal notranslate"><span class="pre">cell</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.checkerboard"><code class="docutils literal notranslate"><span class="pre">checkerboard</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.color_checker"><code class="docutils literal notranslate"><span class="pre">color_checker</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.group_photo"><code class="docutils literal notranslate"><span class="pre">group_photo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.interior"><code class="docutils literal notranslate"><span class="pre">interior</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.landscape"><code class="docutils literal notranslate"><span class="pre">landscape</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.scenes"><code class="docutils literal notranslate"><span class="pre">scenes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.test_images"><code class="docutils literal notranslate"><span class="pre">test_images</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.image.test_screen"><code class="docutils literal notranslate"><span class="pre">test_screen</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html#module-optrace.tracer.presets.light_spectrum">7.7.3. tracer.presets.light_spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.FDC"><code class="docutils literal notranslate"><span class="pre">FDC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.F_eC_"><code class="docutils literal notranslate"><span class="pre">F_eC_</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.FdC"><code class="docutils literal notranslate"><span class="pre">FdC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.FeC"><code class="docutils literal notranslate"><span class="pre">FeC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.a"><code class="docutils literal notranslate"><span class="pre">a</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.all_presets"><code class="docutils literal notranslate"><span class="pre">all_presets</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.c"><code class="docutils literal notranslate"><span class="pre">c</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.d50"><code class="docutils literal notranslate"><span class="pre">d50</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.d55"><code class="docutils literal notranslate"><span class="pre">d55</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.d65"><code class="docutils literal notranslate"><span class="pre">d65</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.d75"><code class="docutils literal notranslate"><span class="pre">d75</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.e"><code class="docutils literal notranslate"><span class="pre">e</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.fl11"><code class="docutils literal notranslate"><span class="pre">fl11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.fl2"><code class="docutils literal notranslate"><span class="pre">fl2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.fl7"><code class="docutils literal notranslate"><span class="pre">fl7</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_b1"><code class="docutils literal notranslate"><span class="pre">led_b1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_b2"><code class="docutils literal notranslate"><span class="pre">led_b2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_b3"><code class="docutils literal notranslate"><span class="pre">led_b3</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_b4"><code class="docutils literal notranslate"><span class="pre">led_b4</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_b5"><code class="docutils literal notranslate"><span class="pre">led_b5</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.lines"><code class="docutils literal notranslate"><span class="pre">lines</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.rgb_lines"><code class="docutils literal notranslate"><span class="pre">rgb_lines</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.srgb"><code class="docutils literal notranslate"><span class="pre">srgb</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.srgb_b"><code class="docutils literal notranslate"><span class="pre">srgb_b</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.srgb_g"><code class="docutils literal notranslate"><span class="pre">srgb_g</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.srgb_r"><code class="docutils literal notranslate"><span class="pre">srgb_r</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.srgb_w"><code class="docutils literal notranslate"><span class="pre">srgb_w</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard"><code class="docutils literal notranslate"><span class="pre">standard</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard_fl"><code class="docutils literal notranslate"><span class="pre">standard_fl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard_led"><code class="docutils literal notranslate"><span class="pre">standard_led</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard_natural"><code class="docutils literal notranslate"><span class="pre">standard_natural</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html#module-optrace.tracer.presets.spectral_lines">7.7.4. tracer.presets.spectral_lines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.A_"><code class="docutils literal notranslate"><span class="pre">A_</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.C"><code class="docutils literal notranslate"><span class="pre">C</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.C_"><code class="docutils literal notranslate"><span class="pre">C_</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.D"><code class="docutils literal notranslate"><span class="pre">D</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.F"><code class="docutils literal notranslate"><span class="pre">F</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.FDC"><code class="docutils literal notranslate"><span class="pre">FDC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.F_"><code class="docutils literal notranslate"><span class="pre">F_</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.F_eC_"><code class="docutils literal notranslate"><span class="pre">F_eC_</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.FdC"><code class="docutils literal notranslate"><span class="pre">FdC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.FeC"><code class="docutils literal notranslate"><span class="pre">FeC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.all_line_combinations"><code class="docutils literal notranslate"><span class="pre">all_line_combinations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.all_lines"><code class="docutils literal notranslate"><span class="pre">all_lines</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.d"><code class="docutils literal notranslate"><span class="pre">d</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.e"><code class="docutils literal notranslate"><span class="pre">e</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.g"><code class="docutils literal notranslate"><span class="pre">g</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.h"><code class="docutils literal notranslate"><span class="pre">h</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.r"><code class="docutils literal notranslate"><span class="pre">r</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.rgb"><code class="docutils literal notranslate"><span class="pre">rgb</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html#module-optrace.tracer.presets.refraction_index">7.7.5. tracer.presets.refraction_index</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.BAF10"><code class="docutils literal notranslate"><span class="pre">BAF10</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.BAK1"><code class="docutils literal notranslate"><span class="pre">BAK1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.BASF64"><code class="docutils literal notranslate"><span class="pre">BASF64</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.BK7"><code class="docutils literal notranslate"><span class="pre">BK7</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.BaF2"><code class="docutils literal notranslate"><span class="pre">BaF2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.COC"><code class="docutils literal notranslate"><span class="pre">COC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.CR39"><code class="docutils literal notranslate"><span class="pre">CR39</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.CaF2"><code class="docutils literal notranslate"><span class="pre">CaF2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.F2"><code class="docutils literal notranslate"><span class="pre">F2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.FK51A"><code class="docutils literal notranslate"><span class="pre">FK51A</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.Finalite"><code class="docutils literal notranslate"><span class="pre">Finalite</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.K5"><code class="docutils literal notranslate"><span class="pre">K5</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LAF2"><code class="docutils literal notranslate"><span class="pre">LAF2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LAK22"><code class="docutils literal notranslate"><span class="pre">LAK22</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LAK8"><code class="docutils literal notranslate"><span class="pre">LAK8</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LASF44"><code class="docutils literal notranslate"><span class="pre">LASF44</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LASF9"><code class="docutils literal notranslate"><span class="pre">LASF9</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LF5"><code class="docutils literal notranslate"><span class="pre">LF5</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.MR7"><code class="docutils literal notranslate"><span class="pre">MR7</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.MgF2"><code class="docutils literal notranslate"><span class="pre">MgF2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.Ormex"><code class="docutils literal notranslate"><span class="pre">Ormex</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.PC"><code class="docutils literal notranslate"><span class="pre">PC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.PDSM"><code class="docutils literal notranslate"><span class="pre">PDSM</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.PET"><code class="docutils literal notranslate"><span class="pre">PET</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.PMMA"><code class="docutils literal notranslate"><span class="pre">PMMA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.PS"><code class="docutils literal notranslate"><span class="pre">PS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SF10"><code class="docutils literal notranslate"><span class="pre">SF10</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SF11"><code class="docutils literal notranslate"><span class="pre">SF11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SF5"><code class="docutils literal notranslate"><span class="pre">SF5</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SF6"><code class="docutils literal notranslate"><span class="pre">SF6</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SF66"><code class="docutils literal notranslate"><span class="pre">SF66</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SK14"><code class="docutils literal notranslate"><span class="pre">SK14</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SSK8"><code class="docutils literal notranslate"><span class="pre">SSK8</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.Spectralite"><code class="docutils literal notranslate"><span class="pre">Spectralite</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.air"><code class="docutils literal notranslate"><span class="pre">air</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.all_presets"><code class="docutils literal notranslate"><span class="pre">all_presets</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.diamond"><code class="docutils literal notranslate"><span class="pre">diamond</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.ethanol"><code class="docutils literal notranslate"><span class="pre">ethanol</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.fused_silica"><code class="docutils literal notranslate"><span class="pre">fused_silica</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.glasses"><code class="docutils literal notranslate"><span class="pre">glasses</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.ice"><code class="docutils literal notranslate"><span class="pre">ice</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.misc"><code class="docutils literal notranslate"><span class="pre">misc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.plastics"><code class="docutils literal notranslate"><span class="pre">plastics</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.soda_lime"><code class="docutils literal notranslate"><span class="pre">soda_lime</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.vacuum"><code class="docutils literal notranslate"><span class="pre">vacuum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.water"><code class="docutils literal notranslate"><span class="pre">water</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html#module-optrace.tracer.presets.spectrum">7.7.6. tracer.presets.spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectrum.all_presets"><code class="docutils literal notranslate"><span class="pre">all_presets</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectrum.x"><code class="docutils literal notranslate"><span class="pre">x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectrum.xyz_observers"><code class="docutils literal notranslate"><span class="pre">xyz_observers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectrum.y"><code class="docutils literal notranslate"><span class="pre">y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_tracer_presets.html#optrace.tracer.presets.spectrum.z"><code class="docutils literal notranslate"><span class="pre">z</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_plots.html">7.8. plots Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html#module-optrace.plots.r_image_plots">7.8.1. plots.r_image_plots</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.r_image_plots.r_image_cut_plot"><code class="docutils literal notranslate"><span class="pre">r_image_cut_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.r_image_plots.r_image_plot"><code class="docutils literal notranslate"><span class="pre">r_image_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html#module-optrace.plots.spectrum_plots">7.8.2. plots.spectrum_plots</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.spectrum_plots.refraction_index_plot"><code class="docutils literal notranslate"><span class="pre">refraction_index_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.spectrum_plots.spectrum_plot"><code class="docutils literal notranslate"><span class="pre">spectrum_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html#module-optrace.plots.chromaticity_plots">7.8.3. plots.chromaticity_plots</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.chromaticity_plots.chromaticities_cie_1931"><code class="docutils literal notranslate"><span class="pre">chromaticities_cie_1931()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.chromaticity_plots.chromaticities_cie_1976"><code class="docutils literal notranslate"><span class="pre">chromaticities_cie_1976()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.chromaticity_plots.chromaticity_norms"><code class="docutils literal notranslate"><span class="pre">chromaticity_norms</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html#module-optrace.plots.misc_plots">7.8.4. plots.misc_plots</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.misc_plots.abbe_plot"><code class="docutils literal notranslate"><span class="pre">abbe_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.misc_plots.autofocus_cost_plot"><code class="docutils literal notranslate"><span class="pre">autofocus_cost_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optrace_plots.html#optrace.plots.misc_plots.surface_profile_plot"><code class="docutils literal notranslate"><span class="pre">surface_profile_plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_gui.html">7.9. gui Submodule</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html#module-optrace.gui.command_window">7.9.1. gui.command_window</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_gui.html#optrace.gui.command_window.CommandWindow"><code class="docutils literal notranslate"><span class="pre">CommandWindow</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.command_window.CommandWindow.clear_history"><code class="docutils literal notranslate"><span class="pre">CommandWindow.clear_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.command_window.CommandWindow.copy_history"><code class="docutils literal notranslate"><span class="pre">CommandWindow.copy_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.command_window.CommandWindow.send_cmd"><code class="docutils literal notranslate"><span class="pre">CommandWindow.send_cmd()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html#module-optrace.gui.property_browser">7.9.2. gui.property_browser</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.update_dict"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.update_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.card_dict"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.card_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.legend_title"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.legend_title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.preset_dict"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.preset_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.ray_dict"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.ray_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.ray_legend"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.ray_legend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.raytracer_dict"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.raytracer_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.scene_dict"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.scene_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.tma_legend"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.tma_legend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.trace_gui_dict"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.trace_gui_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.unit_label"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.unit_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.update_button"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser.update_button</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html#module-optrace.gui.trace_gui">7.9.3. gui.trace_gui</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI"><code class="docutils literal notranslate"><span class="pre">TraceGUI</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.change_label_orientation"><code class="docutils literal notranslate"><span class="pre">TraceGUI.change_label_orientation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.close"><code class="docutils literal notranslate"><span class="pre">TraceGUI.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.debug"><code class="docutils literal notranslate"><span class="pre">TraceGUI.debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="docutils literal notranslate"><span class="pre">TraceGUI.move_to_focus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_command_window"><code class="docutils literal notranslate"><span class="pre">TraceGUI.open_command_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_property_browser"><code class="docutils literal notranslate"><span class="pre">TraceGUI.open_property_browser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot"><code class="docutils literal notranslate"><span class="pre">TraceGUI.replot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot_rays"><code class="docutils literal notranslate"><span class="pre">TraceGUI.replot_rays()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.retrace"><code class="docutils literal notranslate"><span class="pre">TraceGUI.retrace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run"><code class="docutils literal notranslate"><span class="pre">TraceGUI.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.send_cmd"><code class="docutils literal notranslate"><span class="pre">TraceGUI.send_cmd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_cut"><code class="docutils literal notranslate"><span class="pre">TraceGUI.show_detector_cut()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_image"><code class="docutils literal notranslate"><span class="pre">TraceGUI.show_detector_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_spectrum"><code class="docutils literal notranslate"><span class="pre">TraceGUI.show_detector_spectrum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_cut"><code class="docutils literal notranslate"><span class="pre">TraceGUI.show_source_cut()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_image"><code class="docutils literal notranslate"><span class="pre">TraceGUI.show_source_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_spectrum"><code class="docutils literal notranslate"><span class="pre">TraceGUI.show_source_spectrum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.absorb_missing"><code class="docutils literal notranslate"><span class="pre">TraceGUI.absorb_missing</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.activate_filter"><code class="docutils literal notranslate"><span class="pre">TraceGUI.activate_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.af_one_source"><code class="docutils literal notranslate"><span class="pre">TraceGUI.af_one_source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.busy"><code class="docutils literal notranslate"><span class="pre">TraceGUI.busy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_type"><code class="docutils literal notranslate"><span class="pre">TraceGUI.coloring_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_types"><code class="docutils literal notranslate"><span class="pre">TraceGUI.coloring_types</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.command_dont_replot"><code class="docutils literal notranslate"><span class="pre">TraceGUI.command_dont_replot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.command_dont_skip"><code class="docutils literal notranslate"><span class="pre">TraceGUI.command_dont_skip</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.cut_dimension"><code class="docutils literal notranslate"><span class="pre">TraceGUI.cut_dimension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.cut_value"><code class="docutils literal notranslate"><span class="pre">TraceGUI.cut_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.det_image_one_source"><code class="docutils literal notranslate"><span class="pre">TraceGUI.det_image_one_source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.det_spectrum_one_source"><code class="docutils literal notranslate"><span class="pre">TraceGUI.det_spectrum_one_source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_names"><code class="docutils literal notranslate"><span class="pre">TraceGUI.detector_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="docutils literal notranslate"><span class="pre">TraceGUI.detector_selection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.filter_constant"><code class="docutils literal notranslate"><span class="pre">TraceGUI.filter_constant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.flip_det_image"><code class="docutils literal notranslate"><span class="pre">TraceGUI.flip_det_image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_cost_plot"><code class="docutils literal notranslate"><span class="pre">TraceGUI.focus_cost_plot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_type"><code class="docutils literal notranslate"><span class="pre">TraceGUI.focus_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.garbage_collector_stats"><code class="docutils literal notranslate"><span class="pre">TraceGUI.garbage_collector_stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.high_contrast"><code class="docutils literal notranslate"><span class="pre">TraceGUI.high_contrast</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_pixels"><code class="docutils literal notranslate"><span class="pre">TraceGUI.image_pixels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_type"><code class="docutils literal notranslate"><span class="pre">TraceGUI.image_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.log_image"><code class="docutils literal notranslate"><span class="pre">TraceGUI.log_image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.maximize_scene"><code class="docutils literal notranslate"><span class="pre">TraceGUI.maximize_scene</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.minimalistic_view"><code class="docutils literal notranslate"><span class="pre">TraceGUI.minimalistic_view</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_type"><code class="docutils literal notranslate"><span class="pre">TraceGUI.plotting_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_types"><code class="docutils literal notranslate"><span class="pre">TraceGUI.plotting_types</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.projection_method"><code class="docutils literal notranslate"><span class="pre">TraceGUI.projection_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.projection_method_enabled"><code class="docutils literal notranslate"><span class="pre">TraceGUI.projection_method_enabled</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_count"><code class="docutils literal notranslate"><span class="pre">TraceGUI.ray_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_opacity"><code class="docutils literal notranslate"><span class="pre">TraceGUI.ray_opacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_width"><code class="docutils literal notranslate"><span class="pre">TraceGUI.ray_width</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="docutils literal notranslate"><span class="pre">TraceGUI.rays_visible</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.raytracer"><code class="docutils literal notranslate"><span class="pre">TraceGUI.raytracer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.raytracer_single_thread"><code class="docutils literal notranslate"><span class="pre">TraceGUI.raytracer_single_thread</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.scene"><code class="docutils literal notranslate"><span class="pre">TraceGUI.scene</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_all_warnings"><code class="docutils literal notranslate"><span class="pre">TraceGUI.show_all_warnings</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_names"><code class="docutils literal notranslate"><span class="pre">TraceGUI.source_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection"><code class="docutils literal notranslate"><span class="pre">TraceGUI.source_selection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.vertical_labels"><code class="docutils literal notranslate"><span class="pre">TraceGUI.vertical_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.view"><code class="docutils literal notranslate"><span class="pre">TraceGUI.view</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.wireframe_surfaces"><code class="docutils literal notranslate"><span class="pre">TraceGUI.wireframe_surfaces</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det"><code class="docutils literal notranslate"><span class="pre">TraceGUI.z_det</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="../math/color.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">6.7. </span>Color Management</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="structure.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">7.1. </span>Library Structure</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  <!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
+<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
+<!--(similar to page-toc.html)-->
+<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="structure.html">7.1. Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer.html">7.2. tracer Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_color.html">7.3. tracer.color Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry.html">7.4. tracer.geometry Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry_surface.html">7.5. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_spectrum.html">7.6. tracer.spectrum Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_presets.html">7.7. tracer.presets Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_plots.html">7.8. plots Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_gui.html">7.9. gui Submodule</a></li>
+</ul>
+
+  </div>
+</nav>
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Damian Mendroch.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

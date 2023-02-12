@@ -1,0 +1,1162 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>4.11. Using the GUI &#8212; optrace 1.3.7 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/ui';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.12. Advanced Topics" href="advanced.html" />
+    <link rel="prev" title="4.10. Plotting" href="plots.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">optrace 1.3.7 documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="using-the-gui">
+<h1><span class="section-number">4.11. </span>Using the GUI<a class="headerlink" href="#using-the-gui" title="Permalink to this heading">#</a></h1>
+<section id="loading-the-gui">
+<h2><span class="section-number">4.11.1. </span>Loading the GUI<a class="headerlink" href="#loading-the-gui" title="Permalink to this heading">#</a></h2>
+<p><strong>Example</strong></p>
+<p>As always, import the main optrace namespace:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">optrace</span> <span class="k">as</span> <span class="nn">ot</span>
+</pre></div>
+</div>
+<p>To import the TraceGUI into the current namespace write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">optrace.gui.trace_gui</span> <span class="kn">import</span> <span class="n">TraceGUI</span>
+</pre></div>
+</div>
+<p>Let’s create some exemplary geometry:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+
+<span class="n">disc</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">disc</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">])</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS</span><span class="p">)</span>
+
+<span class="n">eye</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">legrand_eye</span><span class="p">()</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eye</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A TraceGUI takes the raytracer as argument:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The GUI is now assigned to the <code class="code highlight python docutils literal highlight-python"><span class="n">sim</span></code> variable, but has not started yet.
+For running the GUI you need to write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This loads the main window and also raytraces the geometry.</p>
+<p><strong>Parameters</strong></p>
+<p>When creating the GUI, additional properties can be assigned.
+For instance, setting the scene to high contrast mode and increasing the amount of rays traced, we can write instead:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">high_contrast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ray_count</span><span class="o">=</span><span class="mi">2000000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Available properties are discussed in <a class="reference internal" href="#gui-tabs"><span class="std std-numref">Section 4.11.4</span></a>.</p>
+<p><strong>UI Theme</strong></p>
+<p>The TraceGUI uses Qt5 as UI backend. Qt5 supports different themes that can be controlled with the <code class="code highlight python docutils literal highlight-python"><span class="n">ui_theme</span></code> parameter on the TraceGUI initialization.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">ui_theme</span><span class="o">=</span><span class="s2">&quot;Windows&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Details on styles can be found in the <a class="reference external" href="https://doc.qt.io/qt-5/qstyle.html#details">Qt documentation</a>.
+Available themes depend on your system and Qt installation, but can be extended using plugins.
+Normally, at least styles <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Windows&quot;</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Fusion&quot;</span></code> should be available on all systems.
+Most notably, dark themes like in <a class="reference internal" href="#ui-dark-theme"><span class="std std-numref">Fig. 4.39</span></a> prove especially useful in low light environments.</p>
+</section>
+<section id="ui-overview">
+<h2><span class="section-number">4.11.2. </span>UI Overview<a class="headerlink" href="#ui-overview" title="Permalink to this heading">#</a></h2>
+<section id="full-ui">
+<h3><span class="section-number">4.11.2.1. </span>Full UI<a class="headerlink" href="#full-ui" title="Permalink to this heading">#</a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_full.png"><img alt="../_images/ui_full.png" src="../_images/ui_full.png" style="width: 800px;" /></a>
+</figure>
+</section>
+<section id="scene">
+<h3><span class="section-number">4.11.2.2. </span>Scene<a class="headerlink" href="#scene" title="Permalink to this heading">#</a></h3>
+<p>Details on the scene navigation are found in the mayavi documentation <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/application.html#interaction-with-the-scene" title="(in mayavi v4.8.1)"><span class="xref std std-ref">here</span></a> under “Mouse Interaction”.
+There are also keyboard shortcuts available that are discussed in <a class="reference internal" href="#gui-keyboard-shortcuts"><span class="std std-numref">Table 4.15</span></a>.</p>
+</section>
+<section id="toolbar">
+<h3><span class="section-number">4.11.2.3. </span>Toolbar<a class="headerlink" href="#toolbar" title="Permalink to this heading">#</a></h3>
+<p>The mayavi scene toolbar is positioned above the scene. It includes buttons for the pipeline view window, different perspectives, fullscreen, screenshot saving and scene settings. Details are found in the mayavi documentation <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/application.html#interaction-with-the-scene" title="(in mayavi v4.8.1)"><span class="xref std std-ref">here</span></a>.</p>
+</section>
+<section id="sidebar">
+<h3><span class="section-number">4.11.2.4. </span>Sidebar<a class="headerlink" href="#sidebar" title="Permalink to this heading">#</a></h3>
+<p>The sidebar is positioned at the right hand side of the scene and consists of multiple tabs:</p>
+<table class="table table-left">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><th class="stub"><p>Main Tab</p></th>
+<td><p>Includes settings for raytracing, scene visualization and buttons for opening additional windows</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Image Tab</p></th>
+<td><p>Features options for rendering source and detector images</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Spectrum Tab</p></th>
+<td><p>Settings for the rendering of source or detector light spectrum histograms</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>Focus Tab</p></th>
+<td><p>Option View and result output for finding the focus in the optical setup</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Debug Tab</p></th>
+<td><p>Advanced options, especially for development of optrace</p></td>
+</tr>
+</tbody>
+</table>
+<p>The following figure shows all tabs except the debug tab.
+The UI elements will be discussed in the following sections.</p>
+<table class="table table-center">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_main_tab.png"><img alt="../_images/ui_main_tab.png" src="../_images/ui_main_tab.png" style="width: 200px;" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_image_tab.png"><img alt="../_images/ui_image_tab.png" src="../_images/ui_image_tab.png" style="width: 200px;" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_spectrum_tab.png"><img alt="../_images/ui_spectrum_tab.png" src="../_images/ui_spectrum_tab.png" style="width: 200px;" /></a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_focus_tab.png"><img alt="../_images/ui_focus_tab.png" src="../_images/ui_focus_tab.png" style="width: 200px;" /></a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="additional-windows">
+<h3><span class="section-number">4.11.2.5. </span>Additional Windows<a class="headerlink" href="#additional-windows" title="Permalink to this heading">#</a></h3>
+<p>Beside the main window there are additional windows in the interface. These will be discussed in <a class="reference internal" href="#gui-windows"><span class="std std-numref">Section 4.11.5</span></a>, but a quick overview is given here:</p>
+<table class="table table-left">
+<colgroup>
+<col style="width: 14.3%" />
+<col style="width: 35.7%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Window</p></th>
+<th class="head"><p>Access</p></th>
+<th class="head"><p>Function</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Pipeline View</p></td>
+<td><p>Leftmost button in the toolbar</p></td>
+<td><p>Access to viewing and editing the mayavi graphical elements</p></td>
+</tr>
+<tr class="row-odd"><td><p>Scene Settings</p></td>
+<td><p>Rightmost button in the toolbar</p></td>
+<td><p>mayavi settings, including lighting and scene properties</p></td>
+</tr>
+<tr class="row-even"><td><p>Command Window</p></td>
+<td><p>button at the bottom of the main tab in the sidebar</p></td>
+<td><p>command execution and history for controlling the GUI and raytracer</p></td>
+</tr>
+<tr class="row-odd"><td><p>Property Browser</p></td>
+<td><p>button at the bottom of the main tab in the sidebar</p></td>
+<td><p>overview of raytracer, scene and ray properties as well as cardinal points</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="the-scene">
+<h2><span class="section-number">4.11.3. </span>The Scene<a class="headerlink" href="#the-scene" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="sidebar-tabs">
+<span id="gui-tabs"></span><h2><span class="section-number">4.11.4. </span>Sidebar Tabs<a class="headerlink" href="#sidebar-tabs" title="Permalink to this heading">#</a></h2>
+<section id="main-tab">
+<h3><span class="section-number">4.11.4.1. </span>Main Tab<a class="headerlink" href="#main-tab" title="Permalink to this heading">#</a></h3>
+<table class="table table-left">
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Variable Name / Method</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Rays</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_count" title="optrace.gui.trace_gui.TraceGUI.ray_count"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_count</span></code></a></p></td>
+<td><p>integer, 0 - 6000000</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Absorb Rays Missing Lens</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.absorb_missing" title="optrace.gui.trace_gui.TraceGUI.absorb_missing"><code class="xref py py-attr docutils literal notranslate"><span class="pre">absorb_missing</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Plotting</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_type" title="optrace.gui.trace_gui.TraceGUI.plotting_type"><code class="xref py py-attr docutils literal notranslate"><span class="pre">plotting_type</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;Rays&#39;</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;Points&#39;</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Coloring</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_type" title="optrace.gui.trace_gui.TraceGUI.coloring_type"><code class="xref py py-attr docutils literal notranslate"><span class="pre">coloring_type</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;Plain&#39;</span><span class="p">,</span> <span class="s1">&#39;Power&#39;</span><span class="p">,</span> <span class="s1">&#39;Wavelength&#39;</span><span class="p">,</span> <span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;Polarization xz&#39;</span><span class="p">,</span> <span class="s1">&#39;Polarization yz&#39;</span><span class="p">,</span> <span class="s1">&#39;Refractive Index&#39;</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Count</p></td>
+<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_amount_shown</span></code></p></td>
+<td><p>integer, 1 - 1000</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Opacity</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_opacity" title="optrace.gui.trace_gui.TraceGUI.ray_opacity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_opacity</span></code></a></p></td>
+<td><p>float, 1e-05 - 1</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Width</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_width" title="optrace.gui.trace_gui.TraceGUI.ray_width"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_width</span></code></a></p></td>
+<td><p>float, 1 - 20</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>More Minimalistic Scene</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.minimalistic_view" title="optrace.gui.trace_gui.TraceGUI.minimalistic_view"><code class="xref py py-attr docutils literal notranslate"><span class="pre">minimalistic_view</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Maximize Scene</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.maximize_scene" title="optrace.gui.trace_gui.TraceGUI.maximize_scene"><code class="xref py py-attr docutils literal notranslate"><span class="pre">maximize_scene</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>High Contrast Mode</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.high_contrast" title="optrace.gui.trace_gui.TraceGUI.high_contrast"><code class="xref py py-attr docutils literal notranslate"><span class="pre">high_contrast</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Vertical Labels</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.vertical_labels" title="optrace.gui.trace_gui.TraceGUI.vertical_labels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vertical_labels</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Open Property Browser</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_property_browser" title="optrace.gui.trace_gui.TraceGUI.open_property_browser"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open_property_browser()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Open Command Window</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_command_window" title="optrace.gui.trace_gui.TraceGUI.open_command_window"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open_command_window()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="image-tab">
+<h3><span class="section-number">4.11.4.2. </span>Image Tab<a class="headerlink" href="#image-tab" title="Permalink to this heading">#</a></h3>
+<table class="table table-left">
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Variable Name / Method</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Detector</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>z_det</p></td>
+<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">det_pos</span></code></p></td>
+<td><p>float</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Image Mode</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_type" title="optrace.gui.trace_gui.TraceGUI.image_type"><code class="xref py py-attr docutils literal notranslate"><span class="pre">image_type</span></code></a></p></td>
+<td><p>string, one of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.display_modes" title="optrace.tracer.r_image.RImage.display_modes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.display_modes</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Projection Method</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.projection_method" title="optrace.gui.trace_gui.TraceGUI.projection_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">projection_method</span></code></a></p></td>
+<td><p>string, one of <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods" title="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SphericalSurface.sphere_projection_methods</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Pixels_xy</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_pixels" title="optrace.gui.trace_gui.TraceGUI.image_pixels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">image_pixels</span></code></a></p></td>
+<td><p>integer, one of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.r_image.RImage.SIZES" title="optrace.tracer.r_image.RImage.SIZES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.SIZES</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Logarithmic Scaling</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.log_image" title="optrace.gui.trace_gui.TraceGUI.log_image"><code class="xref py py-attr docutils literal notranslate"><span class="pre">log_image</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Flip Detector Image</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.flip_det_image" title="optrace.gui.trace_gui.TraceGUI.flip_det_image"><code class="xref py py-attr docutils literal notranslate"><span class="pre">flip_det_image</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Rays from Selected Source Only</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.det_image_one_source" title="optrace.gui.trace_gui.TraceGUI.det_image_one_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">det_image_one_source</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Source Image</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_image" title="optrace.gui.trace_gui.TraceGUI.show_source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_source_image()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Detector Image</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_image" title="optrace.gui.trace_gui.TraceGUI.show_detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_detector_image()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Cut at</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.cut_dimension" title="optrace.gui.trace_gui.TraceGUI.cut_dimension"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cut_dimension</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Cut Value</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.cut_value" title="optrace.gui.trace_gui.TraceGUI.cut_value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cut_value</span></code></a></p></td>
+<td><p>float</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Source Image Cut</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_cut" title="optrace.gui.trace_gui.TraceGUI.show_source_cut"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_source_cut()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Detector Image Cut</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_cut" title="optrace.gui.trace_gui.TraceGUI.show_detector_cut"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_detector_cut()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Activate Filter</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.activate_filter" title="optrace.gui.trace_gui.TraceGUI.activate_filter"><code class="xref py py-attr docutils literal notranslate"><span class="pre">activate_filter</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Resolution Limit</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.filter_constant" title="optrace.gui.trace_gui.TraceGUI.filter_constant"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filter_constant</span></code></a></p></td>
+<td><p>float, 0.3 - 40</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="spectrum-tab">
+<h3><span class="section-number">4.11.4.3. </span>Spectrum Tab<a class="headerlink" href="#spectrum-tab" title="Permalink to this heading">#</a></h3>
+<table class="table table-left">
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Variable Name / Method</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Detector</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>z_det</p></td>
+<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">det_pos</span></code></p></td>
+<td><p>float</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Source Spectrum</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_spectrum" title="optrace.gui.trace_gui.TraceGUI.show_source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_source_spectrum()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Rays from Selected Source Only</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.det_spectrum_one_source" title="optrace.gui.trace_gui.TraceGUI.det_spectrum_one_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">det_spectrum_one_source</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Detector Spectrum</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_spectrum" title="optrace.gui.trace_gui.TraceGUI.show_detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_detector_spectrum()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Spectrum Properties</p></td>
+<td></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="focus-tab">
+<h3><span class="section-number">4.11.4.4. </span>Focus Tab<a class="headerlink" href="#focus-tab" title="Permalink to this heading">#</a></h3>
+<table class="table table-left">
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Variable Name / Method</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Detector</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>z_det</p></td>
+<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">det_pos</span></code></p></td>
+<td><p>float</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Focus Mode</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_type" title="optrace.gui.trace_gui.TraceGUI.focus_type"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focus_type</span></code></a></p></td>
+<td><p>string, one of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.autofocus_methods" title="optrace.tracer.raytracer.Raytracer.autofocus_methods"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.autofocus_methods</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Rays From Selected Source Only</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.af_one_source" title="optrace.gui.trace_gui.TraceGUI.af_one_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">af_one_source</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Plot Cost Function</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_cost_plot" title="optrace.gui.trace_gui.TraceGUI.focus_cost_plot"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focus_cost_plot</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Find Focus</p></td>
+<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.move_to_focus" title="optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_to_focus()</span></code></a></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Optimization  Output</p></td>
+<td></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="gui-windows">
+<span id="id1"></span><h2><span class="section-number">4.11.5. </span>Additional Windows<a class="headerlink" href="#gui-windows" title="Permalink to this heading">#</a></h2>
+<section id="pipeline-view">
+<h3><span class="section-number">4.11.5.1. </span>Pipeline View<a class="headerlink" href="#pipeline-view" title="Permalink to this heading">#</a></h3>
+<p><a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/pipeline.html">https://docs.enthought.com/mayavi/mayavi/pipeline.html</a></p>
+<p><a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html">https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html</a></p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_pipeline.png"><img alt="../_images/ui_pipeline.png" src="../_images/ui_pipeline.png" style="width: 600px;" /></a>
+</figure>
+</section>
+<section id="property-viewer">
+<h3><span class="section-number">4.11.5.2. </span>Property Viewer<a class="headerlink" href="#property-viewer" title="Permalink to this heading">#</a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_property_browser.png"><img alt="../_images/ui_property_browser.png" src="../_images/ui_property_browser.png" style="width: 600px;" /></a>
+</figure>
+</section>
+<section id="command-window">
+<h3><span class="section-number">4.11.5.3. </span>Command Window<a class="headerlink" href="#command-window" title="Permalink to this heading">#</a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/ui_command_window.png"><img alt="../_images/ui_command_window.png" src="../_images/ui_command_window.png" style="width: 600px;" /></a>
+</figure>
+</section>
+</section>
+<section id="tips-and-tricks">
+<h2><span class="section-number">4.11.6. </span>Tips and Tricks<a class="headerlink" href="#tips-and-tricks" title="Permalink to this heading">#</a></h2>
+<p><strong>Keyboard Shortcuts</strong></p>
+<p>The following keyboard shortcuts are available inside the scene:</p>
+<span id="gui-keyboard-shortcuts"></span><table class="table table-center" id="id2">
+<caption><span class="caption-number">Table 4.15 </span><span class="caption-text">Available keyboards shortcuts</span><a class="headerlink" href="#id2" title="Permalink to this table">#</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Shortcut</p></th>
+<th class="head"><p>Function</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">y</span></code></p></td>
+<td><p>set scene view to default y view</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">h</span></code></p></td>
+<td><p>maximize scene (hide toolbar and sidebar)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">v</span></code></p></td>
+<td><p>toggle minimalistic view option</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">c</span></code></p></td>
+<td><p>toggle high contrast mode</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">r</span></code></p></td>
+<td><p>toggle plotting type of rays (points or beams)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">d</span></code></p></td>
+<td><p>render detector image with the current settings</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">n</span></code></p></td>
+<td><p>randomly re-chose the plotted rays</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">s</span></code></p></td>
+<td><p>save a screenshot of the scene</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">f</span></code></p></td>
+<td><div class="line-block">
+<div class="line">set the camera focal point to the position of the mouse.</div>
+<div class="line">Useful for scene rotations, since the geometry is rotated around this point.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">l</span></code></p></td>
+<td><p>change lighting properties</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
+<td><p>anaglyph view (view for red-cyan 3D glasses)</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Changing the UI Theme Externally</strong></p>
+<p>UI themes can also be set externally, however any theme set inside the script overwrites the global style.</p>
+<p>From outside the theme can either be provided by setting an environment variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>env<span class="w"> </span><span class="nv">QT_STYLE_OVERRIDE</span><span class="o">=</span>kvantum-dark<span class="w"> </span>python<span class="w"> </span>./examples/microscope.py
+</pre></div>
+</div>
+<p>…Or by providing a <code class="docutils literal notranslate"><span class="pre">style</span></code> parameter when calling the script/intepreter.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>./examples/microscope.py<span class="w"> </span>-style<span class="w"> </span>kvantum-dark
+</pre></div>
+</div>
+<p>Note that the mentioned style needs to be supported by your Qt installation. The above syntax is that for an Unix system and can differ for other systems.</p>
+<figure class="align-center" id="id3">
+<span id="ui-dark-theme"></span><a class="reference internal image-reference" href="../_images/ui_kvantum_theme.png"><img alt="../_images/ui_kvantum_theme.png" src="../_images/ui_kvantum_theme.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.39 </span><span class="caption-text">UI with the dark theme.</span><a class="headerlink" href="#id3" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+<p><strong>Passing Properties to the GUI object</strong></p>
+<p>Under some circumstances it is useful to provide additional parameters like properties or functions to the GUI so they can be accessed in the control window.
+For instance, we implemented a function that changes the geometry in some specific way or steps through different source or lens constellations.</p>
+<p>As example, the user can define some function <code class="code highlight python docutils literal highlight-python"><span class="n">func</span></code> inside his script and pass it to the TraceGUI:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+     <span class="c1"># do some complicated things inside here</span>
+     <span class="o">...</span>
+
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">important_function</span><span class="o">=</span><span class="n">func</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">func</span></code> get assigned to the TraceGUI under the name <code class="code highlight python docutils literal highlight-python"><span class="n">important_function</span></code>. Therefore it can be used inside the command window as <code class="code highlight python docutils literal highlight-python"><span class="bp">self</span><span class="o">.</span><span class="n">important_function</span></code>.</p>
+<p>This is not limited to functions but works for arbitrary objects, however note that the assigned name must not collide with any variable or method name already implemented in the TraceGUI class.</p>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="plots.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">4.10. </span>Plotting</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="advanced.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">4.12. </span>Advanced Topics</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-the-gui">
+   4.11.1. Loading the GUI
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ui-overview">
+   4.11.2. UI Overview
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#full-ui">
+     4.11.2.1. Full UI
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#scene">
+     4.11.2.2. Scene
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#toolbar">
+     4.11.2.3. Toolbar
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#sidebar">
+     4.11.2.4. Sidebar
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#additional-windows">
+     4.11.2.5. Additional Windows
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-scene">
+   4.11.3. The Scene
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sidebar-tabs">
+   4.11.4. Sidebar Tabs
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#main-tab">
+     4.11.4.1. Main Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#image-tab">
+     4.11.4.2. Image Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#spectrum-tab">
+     4.11.4.3. Spectrum Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#focus-tab">
+     4.11.4.4. Focus Tab
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#gui-windows">
+   4.11.5. Additional Windows
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pipeline-view">
+     4.11.5.1. Pipeline View
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#property-viewer">
+     4.11.5.2. Property Viewer
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#command-window">
+     4.11.5.3. Command Window
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tips-and-tricks">
+   4.11.6. Tips and Tricks
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  <!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
+<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
+<!--(similar to page-toc.html)-->
+<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">4.2. Base Geometries (Element, Group, Raytracer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.3. Base Shapes (Surface, Point, Line)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elements.html">4.4. Defining Elements (Lens, RaySource, Detector, Filter, Aperture, Marker)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">4.5. Spectrum (LightSpectrum, TransmissionSpectrum)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image.html">4.7. Image and Spectrum Rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="focus.html">4.8. Focus Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tma.html">4.9. Paraxial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">4.10. Plotting</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.11. Using the GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.12. Advanced Topics</a></li>
+</ul>
+
+  </div>
+</nav>
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Damian Mendroch.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
