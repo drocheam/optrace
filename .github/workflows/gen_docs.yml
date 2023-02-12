@@ -18,6 +18,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    # see https://stackoverflow.com/questions/72874772/pytest-core-dump-on-unbutu-22-04-lts-when-using-pyqt5-with-mayavi-and-pyvirtuald
+    - name: Install Qt5
+      run: |
+        sudo apt-get update
+        sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake
+        
+    # needed for the x-server to work
+    - name: Setup headless display
+      uses: pyvista/setup-headless-display-action@v1
+
     # set up python and dependecies
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -28,13 +38,16 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install tox tox-gh-actions
 
+    # setup grahpviz needed for pydeps
     - name: Setup Graphviz
       uses: ts-graphviz/setup-graphviz@v1
 
+    # build the documentation
     - name: Build Sphinx Documentation
       run: |
         tox -e docs -- -v
       
+    # publish it
     - name: Publish Sphinx Documentation
       uses: peaceiris/actions-gh-pages@v3
       with:
