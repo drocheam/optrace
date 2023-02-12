@@ -1,4 +1,4 @@
-
+from __future__ import annotations
 from typing import Any  # Any type
 import numpy as np  # numpy ndarray type
 
@@ -74,7 +74,7 @@ class PropertyBrowser(HasTraits):
                 height=800,
                 title="Property Browser")
 
-    def __init__(self, gui) -> None:
+    def __init__(self, gui: TraceGUI) -> None:
         """
         Initialize a PropertyBrowser
 

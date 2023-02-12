@@ -44,11 +44,11 @@ class Element(BaseClass):
     _allow_non_2D: bool = True  # allow points or lines as surfaces
 
     def __init__(self,
-                 front: Surface | Line | Point,
-                 pos:   (list | np.ndarray),
-                 back:  Surface | Point | Line = None,
-                 d1:    float = None,
-                 d2:    float = None,
+                 front:    Surface | Line | Point,
+                 pos:      (list | np.ndarray),
+                 back:     Surface | Point | Line = None,
+                 d1:       float = None,
+                 d2:       float = None,
                  **kwargs)\
             -> None:
         """
@@ -177,13 +177,17 @@ class Element(BaseClass):
         if self.has_back():
             # flip and swap both surfaces, swap d1, d2
             self._geometry_lock = False
+
             self.back.flip()
             self.front.flip()
+            
             zp = self.pos[2]
             self.front.move_to([*self.front.pos[:2], zp + self.d1])
             self.back.move_to([*self.back.pos[:2], zp - self.d2])
+            
             self.front, self.back = self.back, self.front
             self.d1, self.d2 = self.d2, self.d1
+            
             self._geometry_lock = True
 
         else:
@@ -208,25 +212,27 @@ class Element(BaseClass):
         """
         # lock changing of geometry directly
         if "_geometry_lock" in self.__dict__ and self._geometry_lock:
+            
             if key in ["d1", "d2", "front", "surface", "back"]:
                 raise RuntimeError("Use Functions set_surface to reassign a new Surface or its thickness.")
+
             if key == "pos":
-                raise RuntimeError("Use move_to(pos) to move the Object")
+                raise RuntimeError("Use move_to(pos) to move the object")
 
         match key:
 
             case "front":
-                pc.check_type(key, val, (Surface | Point | Line | None) if self._allow_non_2D else Surface)
+                pc.check_type(key, val, (Surface | Point | Line) if self._allow_non_2D else Surface)
                 super().__setattr__(key, val.copy())  # save internal copy
                 return
 
-            case "back":
-                pc.check_type(key, val, (Surface | Point | Line | None) if self._allow_non_2D else (Surface | None))
-                super().__setattr__(key, val.copy() if val is not None else None)  # save internal copy
+            case "back" if val is not None:
+                pc.check_type(key, val, (Surface | Point | Line) if self._allow_non_2D else Surface)
+                super().__setattr__(key, val.copy())  # save internal copy
                 return
 
-            case ("d1" | "d2"):
-                pc.check_type(key, val, int | float | None)
-                val = float(val) if val is not None else val
+            case ("d1" | "d2") if val is not None:
+                pc.check_type(key, val, int | float)
+                val = float(val) 
 
         super().__setattr__(key, val)

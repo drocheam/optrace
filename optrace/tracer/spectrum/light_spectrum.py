@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 import numpy as np  # calculations
 import scipy.special  # error function and inverse
@@ -39,7 +40,7 @@ class LightSpectrum(Spectrum):
     def render(wl:        np.ndarray,
                w:         np.ndarray,
                **kwargs)\
-            -> 'LightSpectrum':
+            -> LightSpectrum:
         """
         Render a LightSpectrum from a list of wavelengths and powers.
         The resulting LightSpectrum has type "Histogram" and unit W/nm

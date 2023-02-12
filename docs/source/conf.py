@@ -74,6 +74,7 @@ html_theme_options = {
                     "url": "https://github.com/drocheam/optrace",
                     "icon": "fa-brands fa-square-github",
                     "type": "fontawesome",},],
+    "pygment_dark_style": "github-dark",
 }
 
 # html_context = {

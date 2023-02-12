@@ -2,14 +2,14 @@
 /*font and header settings*/
 html {
 	--pst-header-height: 2rem;
-    --pst-font-family-base-system: "Times New Roman", serif;
-	--pst-font-size-base: 16px;
-    --pst-font-size-h1: 26px;
-    --pst-font-size-h2: 24px;
-    --pst-font-size-h3: 22px;
-    --pst-font-size-h4: 20px;
-    --pst-font-size-h5: 18px;
-    --pst-font-size-h6: 17px;
+    /*--pst-font-family-base-system: "Times New Roman", serif;*/
+	/*--pst-font-size-base: 16px;*/
+	--pst-font-size-h1: 26px;
+	--pst-font-size-h2: 24px;
+	--pst-font-size-h3: 22px;
+	--pst-font-size-h4: 20px;
+	--pst-font-size-h5: 18px;
+	--pst-font-size-h6: 17px;
 }
 
 
@@ -50,7 +50,7 @@ div.math mjx-container {
 /*lower row padding in tables*/
 .table td, .table th {
     padding: 0.1rem;
-	vertical-align: middle;
+	/*vertical-align: middle;*/
 }
 
 /*fix for badly displayed reference links*/
@@ -66,73 +66,3 @@ a::after {
    color: var(--pst-color-text-muted);
 }
 
-
-/*.bd-content {*/
-  /*flex-grow: 1;*/
-  /*max-width: 100%;*/
-/*}*/
-
-/*[>navigation, footer and side bar are way too small (defaults for pyramid theme are in the range 0.7em-0.9em<]*/
-/*[>increase the size<]*/
-/*div.related, div.footer, div.sphinxsidebar {*/
-	/*font-size: 0.95em;*/
-/*}*/
-
-
-/*[> make sidebar sticky <]*/
-/*[> and make sidebar scrollable if larger than rest of the page <]*/
-/*div.sphinxsidebar {*/
-    /*position: fixed;*/
-    /*margin-left: 0;*/
-    /*max-height: 92%;*/
-    /*overflow-y: auto;*/
-/*}*/
-
-/** fix for equation numbers being display on top instead of on the right side
- * see https://github.com/readthedocs/sphinx_rtd_theme/pull/383#issuecomment-348803509
- * **/
-
-/*div.math {*/
-    /*position: relative;*/
-    /*padding-right: 2.5em;*/
-/*}*/
-/*.eqno {*/
-    /*height: 100%;*/
-    /*position: absolute;*/
-    /*right: 0;*/
-    /*padding-left: 5px;*/
-    /*padding-bottom: 5px;*/
-    /*[> Fix for mouse over in Firefox <]*/
-    /*padding-right: 1px;*/
-/*}*/
-/*.eqno:before {*/
-    /*[> Force vertical alignment of number <]*/
-    /*display: inline-block;*/
-    /*height: 100%;*/
-    /*vertical-align: middle;*/
-    /*content: "";*/
-/*}*/
-/*.eqno .headerlink {*/
-    /*display: none;*/
-    /*visibility: hidden;*/
-    /*font-size: 14px;*/
-    /*padding-left: .3em;*/
-/*}*/
-/*.eqno:hover .headerlink {*/
-    /*display: inline-block;*/
-    /*visibility: hidden;*/
-    /*margin-right: -1.05em;*/
-/*}*/
-/*.eqno .headerlink:after {*/
-    /*visibility: visible;*/
-    /*content: "\f0c1";*/
-    /*font-family: FontAwesome;*/
-    /*display: inline-block;*/
-    /*margin-left: -.9em;*/
-/*}*/
-/*[> Make responsive <]*/
-/*.MathJax_Display {*/
-    /*max-width: 100%;*/
-    /*overflow-x: auto;*/
-    /*overflow-y: hidden;*/
-/*}*/

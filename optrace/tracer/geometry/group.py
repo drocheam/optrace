@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any  # Any type
 
 import numpy as np  # calculations
@@ -12,15 +13,14 @@ from ..refraction_index import RefractionIndex  # ambient media
 from ..misc import PropertyChecker as pc  # check types and values
 
 
-class Group:
-    pass
 
 class Group(BaseClass):
 
     def __init__(self, 
-                 elements: list[Element] = None, 
-                 n0: RefractionIndex = None,
-                 **kwargs) -> None:
+                 elements:  list[Element] = None, 
+                 n0:        RefractionIndex = None,
+                 **kwargs)\
+            -> None:
         """
         Create a group by including elements from the 'elements' parameter.
         Without this parameter an empty group is created.

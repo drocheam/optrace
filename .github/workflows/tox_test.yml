@@ -25,14 +25,12 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake
-    #    sudo apt-get install qtbase5-dev 
-    # qtchooser qt5-qmake qtbase5-dev-tools
         
     # needed for the x-server to work
     - name: Setup headless display
       uses: pyvista/setup-headless-display-action@v1
       
-    # need for pyautogui
+    # needed for pyautogui
     # see https://micwan88.github.io/linux/xauth/2019/10/16/create-xauthority-manually.html
     - name: Create Xauthority manually
       run: |

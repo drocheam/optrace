@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 from traitsui.api import View, Item, ValueEditor, Group, CodeEditor, ListStrEditor
 from traits.api import HasTraits, observe, Button, Dict, Str, List
@@ -42,7 +43,7 @@ class CommandWindow(HasTraits):
                 height=800,
                 title="Command Window")
 
-    def __init__(self, gui, silent: bool = False) -> None:
+    def __init__(self, gui: TraceGUI, silent: bool = False) -> None:
         """
         Initialize the command window from a gui
 

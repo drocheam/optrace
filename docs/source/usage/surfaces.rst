@@ -6,6 +6,10 @@ Base Shapes (Surface, Point, Line)
    import optrace as ot
    import numpy as np
 
+.. role:: python(code)
+  :language: python
+  :class: highlight
+
 Overview
 _________________
 
@@ -118,7 +122,7 @@ _____________________
 A TiltedSurface has a circular projection in the xy-plane, but has a surface normal that is generally not parallel to the optical axis.
 It can be used for creating prisms or tilted glass plates.
 
-As for most other surfaces it is defined by a radius :math:`r`. Additionally a normal vector must be provided. This can either be done in the cartesian form, with 3 elements and parameter ``normal=[x, y, z]`` or using spherical coordinates ``normal_sph=[theta, phi]`` with two elements. ``theta`` describes the angle between the normal and the optical axis (z-axis), while ``phi`` describes the angle in the xy-plane.
+As for most other surfaces it is defined by a radius :math:`r`. Additionally a normal vector must be provided. This can either be done in the cartesian form, with 3 elements and parameter :python:`normal=[x, y, z]` or using spherical coordinates :python:`normal_sph=[theta, phi]` with two elements. :python:`theta` describes the angle between the normal and the optical axis (z-axis), while :python:`phi` describes the angle in the xy-plane.
 The following examples both describe the same surface. Depending on the case, one of the methods for specifying the normal might be preffered.
 
 .. testcode::
@@ -160,7 +164,7 @@ Constructing such a surface is done with:
    Conic surface geometry with a different conic constant :math:`k` signs. 
    An aspheric surface has a small additional rotationally symmetric polynomial added.
 
-A conical surface takes another parameter, the conical constant ``k``:
+A conical surface takes another parameter, the conical constant :python:`k`:
 
 .. testcode::
 
@@ -219,14 +223,14 @@ As an example we want to create an axicon surface. In the simplest case the heig
    Class ...
 
 We can use a FunctionSurface2D with rotational symmetry, which is called FunctionSurface1D.
-The user defined function must take r-values (as numpy array), return a numpy array and is provided as the ``func`` parameter.
+The user defined function must take r-values (as numpy array), return a numpy array and is provided as the :python:`func` parameter.
 While we could add an offset to the axicon function, this is not needed, as a constant offset is removed/adapted when the surface is initialized.
 
 **Providing partial derivatives**
 
 To speed up tracing and enhance numerical precision we can provide the partial derivatives of the surface in x and y-direction.
 For our axicon the special case :math:`r=0` needs to be handled separately.
-The derivative function is passed with the ``deriv_func``-parameter.
+The derivative function is passed with the :python:`deriv_func`-parameter.
 
 
 .. testcode::
@@ -248,7 +252,7 @@ The derivative function is passed with the ``deriv_func``-parameter.
 
 In many cases one uses a already defined function with additional parameters, or in a different case we don't want to hard-code the values into any function.
 The user can provide a dictionary of parameters that will get passed down to the corresponding function.
-For the ``func`` argument the matching parameter would be ``func_args``.
+For the :python:`func` argument the matching parameter would be :python:`func_args`.
 
 .. testcode::
 
@@ -270,11 +274,11 @@ For the ``func`` argument the matching parameter would be ``func_args``.
 
 **z-Range**
 
-When initializing a surface ``optrace`` tries to determine the surface extent in z-direction. The ``z_min`` and ``z_max`` values are needed to know the surface bounds, which in turn are needed for tracing of the surface.
+When initializing a surface ``optrace`` tries to determine the surface extent in z-direction. The :python:`z_min` and :python:`z_max` values are needed to know the surface bounds, which in turn are needed for tracing of the surface.
 While this works automatically in many cases, the user has the option to provide these values manually.
 If these values should largely differ from the automatically estimated values a warning or for large deviation an exception is issued.
 
-For a ``a=-0.3`` and ``r=3`` the z-bounds are ``[-0.9, 0]``. This can be provided using:
+For a :python:`a=-0.3` and :python:`r=3` the z-bounds are ``[-0.9, 0]``. This can be provided using:
 
 .. code-block:: python
 
@@ -296,8 +300,8 @@ Note that for our axicon example there can be no paraxial radius of curvature de
 **Mask function**
 
 
-When defining custom apertures or filters, the ``mask_func``-parameter comes in handy.
-As well as for the other function parameters an optional ``mask_args`` can be provided.
+When defining custom apertures or filters, the :python:`mask_func`-parameter comes in handy.
+As well as for the other function parameters an optional :python:`mask_args` can be provided.
 
 To define a half circular aperture with radius :math:`r=0.1`, one can write:
 
@@ -313,7 +317,7 @@ To define a half circular aperture with radius :math:`r=0.1`, one can write:
 
    Class ...
 
-In this case the ``func``-parameter is just a plane. Note that we need to use the FunctionSurface2D class, as there is not rotational symmetry anymore.
+In this case the :python:`func`-parameter is just a plane. Note that we need to use the FunctionSurface2D class, as there is not rotational symmetry anymore.
 
 
 Data Surfaces
@@ -323,7 +327,7 @@ ________________________
 
 A DataSurface2D is defined by a height dataset in a square matrix.
 This square set gets cut into a disc after initialization.
-Together with this set the radius of the disc is needed, which is the ``r`` parameter.
+Together with this set the radius of the disc is needed, which is the :python:`r` parameter.
 
 It is recommended to have 200x200 or larger matrices. 
 Values between data cells are interpolated with a polynomial of forth order, so that curvature changes at the surface are smooth.
@@ -344,7 +348,7 @@ Here is and example of a lens with direction dependent curvature and a little no
 
    Class ...
 
-Note that we can also add the parameters ``z_min=...``, ``z_max=``, ``parax_roc`` as for the FunctionSurface class.
+Note that we can also add the parameters :python:`z_min=...`, :python:`z_max=`, :python:`parax_roc` as for the FunctionSurface class.
 
 **DataSurface1D**
 
@@ -378,7 +382,7 @@ Bewlo you can see some additional geometrical quantities that are useful when mo
 :math:`z_\text{min}` and :math:`z_\text{max}` describe the minimal and maximal z-position on the surface, while :math:`z_0` is the z-position of the center.
 :math:`d_\text{s}` is the difference between :math:`z_\text{min}` and :math:`z_\text{max}`, :math:`d_\text{p}` is the difference between :math:`z_\text{max}` and :math:`z_0` and :math:`d_\text{n}` the difference between :math:`z_0` and :math:`z_\text{min}`.
 
-There is a smallest three-dimensional box encompassing all of the surface. It can be described by four values, the ``extent``. It consists of two values per dimension, where each describes one of the bounds in this dimension.
+There is a smallest three-dimensional box encompassing all of the surface. It can be described by four values, the :python:`extent`. It consists of two values per dimension, where each describes one of the bounds in this dimension.
 
 
 .. _surface_plotting:
@@ -386,9 +390,9 @@ There is a smallest three-dimensional box encompassing all of the surface. It ca
 Plotting
 __________________________
 
-Visualizing surfaces is done with the function ``surface_profile_plot`` from ``optrace.plots``.
-The surface profiles are plotted with absolute coordinates, if you want to display them relative to each other provide ``remove_offset=True``.
-``surface_profile_plot`` takes a Surface or a list of Surfaces as argument as well as some other display options.
+Visualizing surfaces is done with the function :python:`surface_profile_plot` from :python:`optrace.plots`.
+The surface profiles are plotted with absolute coordinates, if you want to display them relative to each other provide :python:`remove_offset=True`.
+:python:`surface_profile_plot` takes a Surface or a list of Surfaces as argument as well as some other display options.
 
 In the following examples both cornea surfaces of the arizona eye model are plotted:
 
@@ -402,7 +406,7 @@ In the following examples both cornea surfaces of the arizona eye model are plot
    otp.surface_profile_plot([L0.front, L0.back], remove_offset=True)
    
 
-Optionally a ``title`` parameter can be provided. You can plot only part of the profiles by providing values for ``x0`` and ``xe``.
+Optionally a :python:`title` parameter can be provided. You can plot only part of the profiles by providing values for :python:`x0` and :python:`xe`.
 
 .. testcode::
 

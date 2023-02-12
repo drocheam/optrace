@@ -11,21 +11,19 @@ from progressbar import progressbar, ProgressBar  # fancy progressbars
 
 # needed for raytracing geometry and functionality
 from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface,\
-                      RectangularSurface, Line, Point, SphericalSurface
-from .geometry.group import Group
+                      RectangularSurface, Line, Point, SphericalSurface, Group
 
 from .spectrum import LightSpectrum
 from .refraction_index import RefractionIndex
 from .ray_storage import RayStorage
 from .r_image import RImage
+from .transfer_matrix_analysis import TMA
 
 from . import misc  # calculations
 from .misc import PropertyChecker as pc  # check types and values
 
-from .transfer_matrix_analysis import TMA
 
 
-# sub-threads for all actions should not throw! this would make exception handling difficult
 
 class Raytracer(Group):
 

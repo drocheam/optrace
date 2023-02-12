@@ -1,12 +1,10 @@
+from __future__ import annotations
 import copy  # deepcopy
 from typing import Any  # Any type
+
 import numpy as np  # calculations
 
 from .misc import PropertyChecker as pc  # type checking
-
-
-class BaseClass:
-    pass
 
 
 class BaseClass:

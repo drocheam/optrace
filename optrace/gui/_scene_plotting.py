@@ -1,4 +1,4 @@
-
+from __future__ import annotations
 from contextlib import contextmanager  # context manager for _no_trait_action()
 
 import numpy as np  # calculations
@@ -35,7 +35,7 @@ class ScenePlotting:
 
     ##########
 
-    def __init__(self, ui, raytracer: Raytracer) -> None:
+    def __init__(self, ui: TraceGUI, raytracer: Raytracer) -> None:
 
         self.ui = ui
         self._scene_size = np.array(ui._scene_size0)
@@ -104,14 +104,14 @@ class ScenePlotting:
     def constant_camera(self, *args, **kwargs) -> None:
         """context manager the saves and restores the camera view"""
 
-        has_cam = self.scene is not None and self.scene.camera is not None
-        if has_cam:
+        if self.scene and self.scene.camera:
             cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
                                                         "clipping_range", "parallel_scale")
         try:
             yield
+
         finally:
-            if has_cam:
+            if self.scene and self.scene.camera:
                 self.scene.camera.trait_set(**cc_traits_org)
 
     # Element Plotting
@@ -466,7 +466,7 @@ class ScenePlotting:
 
                 self._line_marker_plots.append((m, None, None, text, mark))
 
-    def plot_volumes(self):
+    def plot_volumes(self) -> None:
         """plot volumes inside the scene"""
         self.__remove_objects(self._volume_plots)
 
@@ -483,7 +483,7 @@ class ScenePlotting:
 
         high_contrast = self.ui.high_contrast
 
-        if self.scene is not None:
+        if self.scene:
             self.scene.background = (0.205, 0.19, 0.19) if not high_contrast else (1, 1, 1)
             self.scene.foreground = (1, 1, 1) if not high_contrast else (0, 0, 0)
 
@@ -605,7 +605,7 @@ class ScenePlotting:
                         (obj[2] is None or (obj[4].extent[5] - obj[4].extent[4] < 0.05))):
                     obji.actor.property.representation = repr_
 
-    def change_label_orientation(self):
+    def change_label_orientation(self) -> None:
         """
         """
        
@@ -730,22 +730,22 @@ class ScenePlotting:
                 # set current window size
                 self._scene_size = scene_size
 
-    def set_ray_opacity(self):
+    def set_ray_opacity(self) -> None:
         """change the ray opacity"""
-        if self._ray_plot is not None:
+        if self._ray_plot:
             self._ray_plot.actor.property.opacity = self.ui.ray_opacity
     
-    def set_ray_representation(self):
+    def set_ray_representation(self) -> None:
         """change the ray representation between 'points' and 'surface'"""
-        if self._ray_plot is not None:
+        if self._ray_plot:
             self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
-    def set_ray_width(self):
+    def set_ray_width(self) -> None:
         """change the ray width"""
-        if self._ray_plot is not None:
+        if self._ray_plot:
             self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width, point_size=self.ui.ray_width)
 
-    def set_status(self, _status):
+    def set_status(self, _status: dict[str]) -> None:
         """sets the status in the status text depending on the _status dictionary"""
 
         msgs = {"RunningCommand": "Running Command",
@@ -765,7 +765,7 @@ class ScenePlotting:
                 if _status[key]:
                     self._status_text.text += msgs[key] + "...\n"
 
-    def set_fault_markers(self):
+    def set_fault_markers(self) -> None:
         """calculate and plot fault markers marking geometry collisions"""
         # remove old markers, generate and plot new ones
         # chose some random fault positions, maximum 5
@@ -782,21 +782,21 @@ class ScenePlotting:
             self.raytracer.add(self._fault_markers)
             self.plot_point_markers()
 
-    def remove_fault_markers(self):
+    def remove_fault_markers(self) -> None:
         """remove the fault markers from the scene and raytracer"""
         if self._fault_markers:
             self.raytracer.remove(self._fault_markers)
             self._fault_markers = []
             self.plot_point_markers()
 
-    def move_detector_diff(self, ind, diff):
+    def move_detector_diff(self, ind: int, diff: float) -> None:
         """move the detector plot with index ind differentially"""
         if ind < len(self._detector_plots):
             self._detector_plots[ind][0].mlab_source.z += diff
             self._detector_plots[ind][1].mlab_source.z += diff
             self._detector_plots[ind][3].z_position += diff
 
-    def clear_ray_text(self):
+    def clear_ray_text(self) -> None:
         """clear the ray info text"""
         self._ray_text.text = ""
 
@@ -806,7 +806,7 @@ class ScenePlotting:
     def color_rays(self) -> None:
         """color the ray representation and the ray source"""
 
-        if self._ray_plot is None:
+        if not self._ray_plot:
             return
 
         pol_, w_, wl_, snum_, n_ = self._ray_property_dict["pol"], self._ray_property_dict["w"], \
@@ -902,7 +902,7 @@ class ScenePlotting:
     def color_ray_sources(self) -> None:
         """sets colors of ray sources"""
 
-        if self._ray_plot is None:
+        if not self._ray_plot:
             return
 
         lutm = self._ray_plot.parent.scalar_lut_manager
@@ -983,17 +983,16 @@ class ScenePlotting:
 
         return x, y, z, u, v, w, s
 
-    # TODO better name
-    def assign_ray_properties(self):
+    def assign_ray_properties(self) -> None:
         """safely copies the ray property dicts"""
         # set _ray_property_dict, that is used by other methods
         # other methods can't use __ray_property_dict, since this would require locks in the main thread
         self._ray_property_dict = copy.deepcopy(self.__ray_property_dict)
     
-    def remove_rays(self):
+    def remove_rays(self) -> None:
         """remove ray properties and ray plot object"""
         self._ray_property_dict = {}
-        if self._ray_plot is not None:
+        if self._ray_plot:
             with self.constant_camera():
                 self._ray_plot.parent.parent.remove()
                 self._ray_plot = None
@@ -1001,7 +1000,7 @@ class ScenePlotting:
     # Picking Handler
     ###################################################################################################################
 
-    def _on_space_pick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker') -> None:
+    def _on_space_pick(self, picker_obj: tvtk.tvtk_classes.point_picker.PointPicker) -> None:
         """
         3D Space Clicking Handler. Shows Click Coordinates or moves Detector to this position when Shift is pressed.
 
@@ -1029,7 +1028,7 @@ class ScenePlotting:
                 self._crosshair.mlab_source.trait_set(x=[pos[0]], y=[pos[1]], z=[pos[2]])
                 self._crosshair.visible = True
 
-    def _on_ray_pick(self, picker_obj: 'tvtk.tvtk_classes.point_picker.PointPicker' = None) -> None:
+    def _on_ray_pick(self, picker_obj: tvtk.tvtk_classes.point_picker.PointPicker = None) -> None:
         """
         Ray Picking Handler. Shows ray properties in the scene.
 
@@ -1142,10 +1141,11 @@ class ScenePlotting:
             self._ray_text.text = text
             self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
                                               opacity=1, color=self.scene.foreground)
-            if self._crosshair is not None:
+            if self._crosshair:
                 self._crosshair.mlab_source.trait_set(x=[p[0]], y=[p[1]], z=[p[2]])
                 self._crosshair.visible = True
         else:
             self._ray_text.text = ""
-            if self._crosshair is not None:
+            if self._crosshair:
                 self._crosshair.visible = False
+

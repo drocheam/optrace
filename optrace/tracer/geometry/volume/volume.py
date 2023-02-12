@@ -9,6 +9,9 @@ from ..surface.surface import Surface
 
 
 class Volume(Element):
+    
+    abbr: str = "V"  #: abbreviation for objects of this class
+    _allow_non_2D: bool = False  # allow points or lines as surfaces
 
     def __init__(self,
                  front,

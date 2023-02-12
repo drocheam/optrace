@@ -621,7 +621,11 @@ Supporting all the same parameters as for :func:`r_image_plot <optrace.plots.r_i
 .. list-table::
    Exemplary image plot and image cut plot from the ``double_prism.py`` example.
 
-   * - .. figure:: ../images/color_dispersive3.svg
+   * - |
+       |
+       |
+
+       .. figure:: ../images/color_dispersive3.svg
           :align: center
           :width: 400
    

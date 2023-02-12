@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any  # Callable and Any type
 from threading import Thread  # multithreading
 
@@ -465,7 +466,7 @@ class RImage(BaseClass):
         return misc.save_with_fallback(path, sfunc, "Image", ".png", overwrite, self.silent)
 
     @staticmethod
-    def load(path: str) -> 'RImage':
+    def load(path: str) -> RImage:
         """:return: a saved image object from numpy archive to a image object"""
 
         # load npz archive
