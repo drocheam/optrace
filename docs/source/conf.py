@@ -38,6 +38,7 @@ extensions = [
         'sphinx.ext.mathjax',
         'sphinx.ext.doctest',
         'sphinxcontrib.bibtex',
+        # 'sphinxcontrib.inkscapeconverter',  # convert svg to pdf for latex output
 ]
 
 doctest_test_doctest_blocks = ""
@@ -93,6 +94,7 @@ math_numfig = True
 intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'numpy': ('http://numpy.org/doc/stable', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/', None),
+                       'traits': ('https://docs.enthought.com/traits/', None),
                        'matplotlib': ('http://matplotlib.org/stable', None),
                        'mayavi': ('https://docs.enthought.com/mayavi/mayavi', None),
                        'pillow': ('https://pillow.readthedocs.io/en/stable/', None)}

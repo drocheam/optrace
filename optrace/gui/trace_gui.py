@@ -55,7 +55,7 @@ class TraceGUI(HasTraits):
 
     z_det: Range = Range(low='_z_det_min', high='_z_det_max', value='_z_det_max', mode='text',
                          desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_det")
-    """z-Position of Detector. Lies inside z-range of :obj:`Backend.raytracer.outline`"""
+    """z-Position of Detector. Lies inside z-range of `Raytracer.outline`"""
 
     ray_opacity: Range = Range(1e-5, 1, 0.01, desc='Opacity of the rays/Points', enter_set=True,
                                auto_set=True, label="Opacity", editor=RangeEditor(format_str="%.4g", low=1e-5, 
@@ -708,7 +708,7 @@ class TraceGUI(HasTraits):
     @observe('rays_visible', dispatch="ui")
     def replot_rays(self, event=None) -> None:
         """
-        choose a subset of all raytracer rays and plot them with :obj:`TraceGUI._plot_rays`.
+        choose a subset of all raytracer rays and plot them with :`TraceGUI._plot_rays`.
 
         :param event: optional event from traits observe decorator
         """
@@ -753,7 +753,7 @@ class TraceGUI(HasTraits):
     @observe('ray_count, absorb_missing', dispatch="ui")
     def retrace(self, event=None) -> None:
         """
-        raytrace in separate thread, after that call :obj:`TraceGUI.replot_rays`.
+        raytrace in separate thread, after that call `TraceGUI.replot_rays`.
 
         :param event: optional event from traits observe decorator
         """

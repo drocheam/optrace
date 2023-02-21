@@ -49,7 +49,7 @@ class RImage(BaseClass):
 
 
     def __init__(self,
-                 extent:            (list | np.ndarray),
+                 extent:            (list | numpy.ndarray),
                  projection:        str = None,
                  limit:             float = None,
                  **kwargs)\
@@ -520,7 +520,7 @@ class RImage(BaseClass):
                N:             int = MAX_IMAGE_SIDE,
                p:             np.ndarray = None,
                w:             np.ndarray = None,
-               wl:            np.array = None,
+               wl:            np.ndarray = None,
                keep_extent:   bool = False,
                _dont_rescale: bool = False)\
             \
@@ -533,7 +533,7 @@ class RImage(BaseClass):
         :param p: ray position matrix, xyz components in columns, (numpy 1D array)
         :param w: ray weight array (numpy 1D array)
         :param wl: ray wavelength array (numpy 1D array)
-        :param keep_extent: True if :obj:`Image.__fixExtent` shouldn't be called before image calculation
+        :param keep_extent: True if RImage.__fix_extent() shouldn't be called before image calculation
         :param _dont_rescale:
         """
 

@@ -51,7 +51,7 @@ A TraceGUI takes the raytracer as argument:
 The GUI is now assigned to the :python:`sim` variable, but has not started yet.
 For running the GUI you need to write:
 
-.. testcode::
+.. code-block:: python
 
    sim.run()
 
@@ -218,7 +218,7 @@ Main Tab
      - :python:`'Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz', 'Polarization yz', 'Refractive Index'`
      -
    * - Count
-     - :attr:`ray_amount_shown <optrace.gui.trace_gui.TraceGUI.ray_amount_shown>`
+     - :attr:`rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`
      - integer, 1 - 1000
      -
    * - Opacity
@@ -275,7 +275,7 @@ Image Tab
      - string
      - 
    * - z_det
-     - :attr:`det_pos <optrace.gui.trace_gui.TraceGUI.det_pos>`
+     - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
      - float
      - 
    * - Image Mode
@@ -355,7 +355,7 @@ Spectrum Tab
      - string
      - 
    * - z_det
-     - :attr:`det_pos <optrace.gui.trace_gui.TraceGUI.det_pos>`
+     - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
      - float
      - 
    * -  Source Spectrum
@@ -395,7 +395,7 @@ Focus Tab
      - string
      - 
    * - z_det
-     - :attr:`det_pos <optrace.gui.trace_gui.TraceGUI.det_pos>`
+     - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
      - float
      - 
    * -  Focus Mode     

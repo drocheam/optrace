@@ -214,7 +214,7 @@ When searching for chromaticity diagrams, a lot of negative examples can be foun
 
 In most cases negative sRGB values were simply clipped, distorting not only saturation, but also hue and brightness. For instance, colors near 510 nm get shown in deep green compared to a slightly nuanced greenish-cyan. In some cases even the representable colors inside the gamut are incorrect, which can be for instance seen as high saturated colors everywhere inside the diagram. 
 On the other hand, positive examples are found here:
-`Link6 <https://en.wikipedia.org/wiki/CIE_1931_color_space#/media/File:CIE1931xy_blank.svg>`_,
+`Link6 <https://commons.wikimedia.org/wiki/File:CIE1931xy_blank.svg>`_,
 `Link7 <https://www.wavemetrics.com/sites/www.wavemetrics.com/files/styles/content_body/public/2019-04/Chromaticity_1931.png>`_
 Note that the positive examples have a different luminance norm, showing the colors with a higher brightness.
 

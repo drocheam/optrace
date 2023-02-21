@@ -39,7 +39,7 @@ class Raytracer(Group):
     """ maximum number of rays. Limited by RAM usage """
 
     ITER_RAYS_STEP: int = 1000000
-    """ number of rays per iteration in :obj:`raytracer.iterative_render` """
+    """ number of rays per iteration in Raytracer.iterative_render()"""
 
     class INFOS(IntEnum):
         ABSORB_MISSING = 0

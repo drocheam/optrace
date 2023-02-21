@@ -1,28 +1,27 @@
 
 
 """
-Parent class for :obj:`optrace.tracer.geometry.filter.Filter`, :obj:`optrace.tracer.geometry.aperture.Aperture`,
-:obj:`optrace.tracer.geometry.ray_source.RaySource`, :obj:`optrace.tracer.geometry.lens.Lens` and :obj:`optrace.tracer.geometry.detector.Detector`
+Parent class for  `Filter`, `Aperture`, `Lens`, `Detector`, `Volume`, `RaySource`, `Marker` and `Volume`
 
 A Element has a front and an optional back.
 
 Meaning of 'front' and 'back'
- * Defined by the :obj:`surface` z-position
- * :obj:`Element.front`: Surface with smaller z-position
- * :obj:`Element.back`: Surface with larger z-position
+ * Defined by the `surface` z-position
+ * `Element.front`: Surface with smaller z-position
+ * `Element.back`: Surface with larger z-position
 
 Properties with FrontSurface only:
- * :obj:`Element.pos` is :obj:`Element.front.pos`.
- * :obj:`Element.extent` is :obj:`Element.front.extent`.
- * :obj:`Element.surface` is an alias for :obj:`Element.front`
+ * `Element.pos` is `Element.front.pos`.
+ * `Element.extent` is `Element.front.extent`.
+ * `Element.surface` is an alias for `Element.front`
 
 Properties with FrontSurface + BackSurface:
- * d = (:obj:`Element.d1` + :obj:`Element.d2`) is the whole z-difference between the centers of both surfaces
- * :obj:`Element.d1` defines the z-distance between z-pos of the Element and the z-pos of :obj:`Element.front`
- * :obj:`Element.d2` defines the z-distance between z-pos of the Element and the z-pos of :obj:`Element.back`
- * :obj:`Element.pos` is (z-pos of front + d1) or (z-pos of back - d2),
-                    which by above definitions are the same.
- * :obj:`Element.extent` is the extent of both surfaces,
+ * d = (`Element.d1` + `Element.d2`) is the whole z-difference between the centers of both surfaces
+ * `Element.d1` defines the z-distance between z-pos of the Element and the z-pos of `Element.front`
+ * `Element.d2` defines the z-distance between z-pos of the Element and the z-pos of `Element.back`
+ * `Element.pos` is (z-pos of front + d1) or (z-pos of back - d2),
+               which by above definitions are the same.
+ * `Element.extent` is the extent of both surfaces,
                     each value is determined by checking which surface has a larger extent in this dimension
 """
 
@@ -59,7 +58,7 @@ class Element(BaseClass):
         :param back: back surface
         :param d1: z-distance between front and pos
         :param d2: z-distance between pos and back
-        :param kwargs: keyword arguments for :obj:`optrace.tracer.base_class.BaseClass`
+        :param kwargs: keyword arguments for `optrace.tracer.base_class.BaseClass`
         """
         self._geometry_lock = False
 
@@ -120,7 +119,7 @@ class Element(BaseClass):
 
     @property
     def surface(self):
-        """alias for :obj:`Element.FrontSurface` for a Element without BackSurface"""
+        """alias for `Element.front`"""
         return self.front
 
     @property

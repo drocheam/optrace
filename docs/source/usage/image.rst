@@ -600,7 +600,7 @@ We can use the additional parameter :python:`log` to scale the image values loga
 
 .. testcode::
 
-   otp.r_image_plot(img, "Lightness (CIELUV)", title="Title 123", log=True, flip=True, block=True)
+   otp.r_image_plot(img, "Lightness (CIELUV)", title="Title 123", log=True, flip=True, block=False)
 
 **Image Cut**
 
@@ -614,7 +614,7 @@ Supporting all the same parameters as for :func:`r_image_plot <optrace.plots.r_i
 
 .. testcode::
 
-   otp.r_image_cut_plot(img, "Lightness (CIELUV)", y=0.2, title="Title 123", log=True, flip=True, block=True)
+   otp.r_image_cut_plot(img, "Lightness (CIELUV)", y=0.2, title="Title 123", log=True, flip=True, block=False)
 
 
 
@@ -677,7 +677,7 @@ A full function call could look like this:
 .. testcode::
 
    otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard, title="Standard Illuminants",\
-                               block=True, rendering_intent="Perceptual", norm="Largest")
+                               block=False, rendering_intent="Perceptual", norm="Largest")
 
 
 .. list-table:: Examples of CIE 1931 and 1976 chromaticity diagrams.

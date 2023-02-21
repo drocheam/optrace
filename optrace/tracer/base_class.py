@@ -15,7 +15,7 @@ class BaseClass:
                  silent:    bool = False,
                  threading: bool = True):
         """
-        common parent class for almost all :obj:`optrace.tracer` classes.
+        common parent class for almost all `optrace.tracer` classes.
         Features description properties, print and threading options as well
         as methods for making the object read-only (kind of)
 
@@ -99,7 +99,7 @@ class BaseClass:
 
     def print(self, message: str) -> None:
         """
-        prints the message if :obj:`BaseClass.silent` is False
+        prints the message if `BaseClass.silent` is False
         :param message: string to print
         """
         if not self.silent:

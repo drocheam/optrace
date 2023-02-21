@@ -132,7 +132,7 @@ class LightSpectrum(Spectrum):
 
         return wl
 
-    def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
+    def __call__(self, wl: list | numpy.ndarray | float) -> numpy.ndarray:
         """
         Get the spectrum values
 

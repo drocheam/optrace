@@ -463,7 +463,7 @@ In fact, doing this with two ideal lenses with focal lengths :math:`f_1` and :ma
    \text{OC} = V_1 + \frac{V_2 - V_1}{1 + \frac{f_2}{f_1}}
    :label: eq_oc_two_lenses
 
-For :math:`R_2 = -R_1` in :math:numref:`eq_oc_radii` or :math:`f_2 = f_1` in :math:numref:`eq_oc_focals` the optical center lies at exactly the center of the lens/lens combination.
+For :math:`R_2 = -R_1` in :math:numref:`eq_oc_radii` or :math:`f_2 = f_1` in :math:numref:`eq_oc_two_lenses` the optical center lies at exactly the center of the lens/lens combination.
 
 Image and Object Distances 
 =================================================

@@ -227,7 +227,7 @@ On the contrary we can calculate an object position from a known image position 
 .. doctest::
 
    >>> tma.object_position(100)
-   -33.84654855214075
+   -33.84654855214077
 
 For both function infinite values (:python:`-np.inf, np.inf`) are supported as function parameters.
 For the image position at infinity we get:
@@ -235,7 +235,7 @@ For the image position at infinity we get:
 .. doctest::
 
    >>> tma.object_position(np.inf)
-   -16.931238099315877
+   -16.93123809931588
 
 Which should be exactly the same position as the first focal point:
 
@@ -292,7 +292,7 @@ Regarding the position of the stop, the aperture can lie inside, behind or in fr
 .. doctest::
    
    >>> tma.pupil_position(aps)
-   (3.0375652165508553, 3.6821114369501466)
+   (3.037565216550855, 3.6821114369501466)
 
 Magnifications are returned with the member function :meth:`pupil_magnification <optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification>`.
 
