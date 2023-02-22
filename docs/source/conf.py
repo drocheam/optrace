@@ -41,8 +41,6 @@ extensions = [
         # 'sphinxcontrib.inkscapeconverter',  # convert svg to pdf for latex output
 ]
 
-doctest_test_doctest_blocks = ""
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -113,3 +111,12 @@ autoclass_content = "init"
 
 # move typehints from header to description
 autodoc_typehints = "description"
+
+
+# -- Options for misc output -------------------------------------------------
+
+# ignore this link in linkcheck building because of a deprecated SSL negotation
+linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.htm']
+
+# only check doctest blocks
+doctest_test_doctest_blocks = ""
