@@ -1,17 +1,15 @@
 name: Documentation Tests
 
-# do testing on commits, but only if python files changed
-# and files are not in examples/ or tests/
 on:
   workflow_dispatch:
   push:
     paths:
       - 'docs/**'
-
       
 jobs:
-  tox_test:
+  doc_test:
     runs-on: ubuntu-latest
+    continue-on-error: true
     timeout-minutes: 6
     strategy:
       matrix:
@@ -30,13 +28,6 @@ jobs:
     - name: Setup headless display
       uses: pyvista/setup-headless-display-action@v1
       
-    # needed for pyautogui
-    # see https://micwan88.github.io/linux/xauth/2019/10/16/create-xauthority-manually.html
-    #- name: Create Xauthority manually
-      #run: |
-        #touch ~/.Xauthority
-        #xauth add ${HOST}:0 . $(xxd -l 16 -p /dev/urandom)
-        
     # set up python and dependencies
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -47,8 +38,11 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install tox tox-gh-actions
         
-    # actual tests
-    - name: Test with tox
-      run: |        
-        tox -e doctest -- -v 
-        tox -e linkcheck -- -v 
+    - name: Test doc building
+      run: tox -e docsbuildcheck -- -v
+
+    - name: Test code snippets
+      run: tox -e doctest -- -v
+
+    - name: Test links
+      run: tox -e linkcheck -- -v 

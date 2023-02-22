@@ -496,6 +496,7 @@ The following keyboard shortcuts are available inside the scene:
    * - ``3``
      - anaglyph view (view for red-cyan 3D glasses)
 
+
 **Changing the UI Theme Externally**
 
 UI themes can also be set externally, however any theme set inside the script overwrites the global style.
