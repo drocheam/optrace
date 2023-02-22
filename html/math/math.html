@@ -1,0 +1,637 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>6. Implementation Details &#8212; optrace 1.3.7 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'math/math';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6.1. Property Sampling" href="sampling.html" />
+    <link rel="prev" title="5. Example Gallery" href="../examples.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">optrace 1.3.7 documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="implementation-details">
+<h1><span class="section-number">6. </span>Implementation Details<a class="headerlink" href="#implementation-details" title="Permalink to this heading">#</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">6.1. Property Sampling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#overview">6.1.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#ray-properties">6.1.2. Ray Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#stochastic-sampling">6.1.3. Stochastic Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#inverse-transform-sampling">6.1.4. Inverse Transform Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#stratified-sampling">6.1.5. Stratified Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#disc-annulus-sampling">6.1.6. Disc/Annulus Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#power-sampling">6.1.7. Power Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#position-sampling">6.1.8. Position Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#wavelength-sampling">6.1.9. Wavelength Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#direction-cone">6.1.10. Direction Cone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#d-direction-sampling">6.1.11. 2D Direction Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#id17">6.1.12. 3D Direction sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sampling.html#polarization-sampling">6.1.13. Polarization Sampling</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tracing.html">6.2. Tracing Procedure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#pathtracing-versus-raytracing">6.2.1. Pathtracing versus Raytracing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#units-and-conventions">6.2.2. Units and Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#tracing-process">6.2.3. Tracing Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#refraction">6.2.4. Refraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#polarization">6.2.5. Polarization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#transmission">6.2.6. Transmission</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#refraction-at-an-ideal-lens">6.2.7. Refraction at an Ideal Lens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#filtering">6.2.8. Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#geometry-checks">6.2.9. Geometry Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#outline-intersection">6.2.10. Outline Intersection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#abnormal-lens-rays">6.2.11. Abnormal Lens Rays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#hit-finding">6.2.12. Hit Finding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#detector-intersection">6.2.13. Detector Intersection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html#image-rendering">6.2.14. Image Rendering</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">6.3. Geometric Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#point">6.3.1. Point</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#line">6.3.2. Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#surfaces">6.3.3. Surfaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#conic">6.3.3.1. Conic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#sphere">6.3.3.2. Sphere</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#asphere">6.3.3.3. Asphere</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#rectangle">6.3.3.4. Rectangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#ring">6.3.3.5. Ring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#circle">6.3.3.6. Circle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#tilted-surface">6.3.3.7. Tilted Surface</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#analytical-hit-detection">6.3.4. Analytical Hit Detection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#intersection-ray-with-xy-plane">6.3.4.1. Intersection Ray with xy-Plane</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#intersection-ray-with-a-conic">6.3.4.2. Intersection Ray with a Conic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#surface-extension">6.3.4.3. Surface Extension</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#numerical-hit-detection">6.3.5. Numerical Hit Detection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#bound-calculation">6.3.5.1. Bound Calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#intersections">6.3.5.2. Intersections</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#normal-calculation">6.3.6. Normal Calculation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#general">6.3.6.1. General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#numerical">6.3.6.2. Numerical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#plane">6.3.6.3. Plane</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#id4">6.3.6.4. Conic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#id5">6.3.6.5. Sphere</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#id6">6.3.6.6. Asphere</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#numerical-differentiation">6.3.7. Numerical Differentiation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#central-first-derivative">6.3.7.1. Central first derivative</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#step-width-selection">6.3.7.2. Step Width Selection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#sphere-projections">6.3.8. Sphere Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#random-sampling">6.3.9. Random Sampling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#id13">6.3.9.1. Point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#id14">6.3.9.2. Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#id15">6.3.9.3. Rectangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#ring-sampling">6.3.9.4. Ring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geometry.html#circle-sampling">6.3.9.5. Circle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">6.4. Spectrum and Refraction Index</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html#spectrum">6.4.1. Spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spectrum.html#functions">6.4.1.1. Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spectrum.html#color">6.4.1.2. Color</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spectrum.html#random-wavelengths">6.4.1.3. Random Wavelengths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spectrum.html#wavelength-properties">6.4.1.4. Wavelength Properties</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html#refractionindex">6.4.2. RefractionIndex</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spectrum.html#index-functions">6.4.2.1. Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spectrum.html#abbe-number">6.4.2.2. Abbe Number</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spectrum.html#curve-from-abbe-number">6.4.2.3. Curve from Abbe Number</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">6.5. Ray Transfer Matrix Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#abcd-matrix">6.5.1. ABCD Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#propagation-through-free-space">6.5.2. Propagation through Free Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#refraction-on-a-curved-interface">6.5.3. Refraction on a Curved Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#refraction-on-a-flat-interface">6.5.4. Refraction on a Flat Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#thick-lens">6.5.5. Thick Lens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#thin-lens">6.5.6. Thin Lens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#lensmaker-equation">6.5.7. Lensmaker Equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#gullstrand-equation">6.5.8. Gullstrand Equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#cardinal-points">6.5.9. Cardinal Points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#optical-power">6.5.10. Optical Power</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#lens-setups">6.5.11. Lens Setups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#optical-center">6.5.12. Optical Center</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#image-and-object-distances">6.5.13. Image and Object Distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html#entrance-and-exit-pupils">6.5.14. Entrance and Exit Pupils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autofocus.html">6.6. Autofocus Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autofocus.html#positional-methods">6.6.1. Positional Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autofocus.html#rendering-methods">6.6.2. Rendering Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autofocus.html#additional-notes">6.6.3. Additional Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">6.7. Color Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="color.html#xyz-color-space">6.7.1. XYZ Color Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html#xyy-color-space">6.7.2. xyY Color Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html#srgb-color-space">6.7.3. sRGB Color Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html#cieluv-color-space">6.7.4. CIELUV Color Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html#srgb-spectral-upsampling">6.7.5. sRGB Spectral Upsampling</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="../examples.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">5. </span>Example Gallery</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="sampling.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">6.1. </span>Property Sampling</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  <!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
+<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
+<!--(similar to page-toc.html)-->
+<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">6.1. Property Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracing.html">6.2. Tracing Procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">6.3. Geometric Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">6.4. Spectrum and Refraction Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">6.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autofocus.html">6.6. Autofocus Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">6.7. Color Management</a></li>
+</ul>
+
+  </div>
+</nav>
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Damian Mendroch.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
