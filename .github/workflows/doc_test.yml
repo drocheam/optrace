@@ -9,8 +9,7 @@ on:
 jobs:
   doc_test:
     runs-on: ubuntu-latest
-    continue-on-error: true
-    timeout-minutes: 6
+    timeout-minutes: 15
     strategy:
       matrix:
         python-version: ['3.10']
