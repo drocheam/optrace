@@ -13,6 +13,9 @@ import optrace as ot
 
 
 class LoadTests(unittest.TestCase):
+    
+    pytestmark = pytest.mark.random_order(disabled=True)
+
 
     def save_file(self, source, path):
 

@@ -47,7 +47,7 @@ if __name__ == '__main__':
                       "optrace.tracer.geometry.volume", "optrace.tracer.spectrum", "optrace.tracer.presets", 
                       "optrace.ressources", "optrace.ressources.images", "optrace.gui", "optrace.plots"],
             install_requires=['numpy>1.21', 'numexpr', 'chardet', 'scipy>=1.10', 'Pillow', 'vtk', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi'],
-            tests_require=['pyautogui', 'pytest', 'colour-science', 'requests', 'mock'],
+            tests_require=['pyautogui', 'pytest', 'colour-science', 'requests', 'mock', 'pytest-random-order'],
             package_data={"": ["*.png", "*.jpg", "*.webp", "*.csv"]},   # includes tables and images
             include_package_data=True,
         )
