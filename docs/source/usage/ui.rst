@@ -82,9 +82,9 @@ Available themes depend on your system and Qt installation, but can be extended 
 Normally, at least styles :python:`"Windows"` and :python:`"Fusion"` should be available on all systems.
 Most notably, dark themes like in :numref:`ui_dark_theme` prove especially useful in low light environments.
 
+
 UI Overview
 _________________
-
 
 Full UI
 ######################
