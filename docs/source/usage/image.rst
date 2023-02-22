@@ -9,7 +9,13 @@ Image and Spectrum Rendering
   :language: python
   :class: highlight
 
+.. mock progressbar library, so we have no stdout output for it
+
 .. testsetup:: *
+
+   import sys 
+   import mock
+   sys.modules['progressbar'] = mock.MagicMock()
 
    import optrace as ot
 
@@ -258,7 +264,7 @@ The below snippet generates a geometry with multiple sources and detectors. The 
     RT.add(Det2)
 
     # trace the geometry
-    RT.trace(100000)
+    RT.trace(1000000)
 
 **Source Image**
 
@@ -317,7 +323,7 @@ If the detector position parameter :python:`pos` is not provided, a single detec
 
 .. testcode::
 
-   RT.iterative_render(N_rays=10000, detector_index=1) 
+   RT.iterative_render(N_rays=1000000, detector_index=1) 
 
 If :python:`pos` is provided as coordinate, the detector is moved beforehand.
 
