@@ -47,6 +47,7 @@ The Y component is responsible for the brightness stimulus. Converting to the so
 
 Note that :math:numref:`luminous_flux` and using Y as luminance is only valid for photopic vision, for mesoscopic and scotopic vision another luminous efficiency function needs to be applied.
 
+
 xyY Color Space
 ================
 
