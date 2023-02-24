@@ -506,6 +506,9 @@ class TracerMiscTests(unittest.TestCase):
         color.WL_BOUNDS[1] = wl1
         self.assertRaises(RuntimeError, ot.presets.refraction_index.PET, color.wavelengths(1000))
 
+        # reset color bounds
+        color.WL_BOUNDS[:] = [wl0, wl1]
+
     def test_refraction_index_equality(self):
         # equal operator
         self.assertTrue(ot.RefractionIndex("Constant") == ot.RefractionIndex("Constant"))
