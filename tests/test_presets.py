@@ -16,6 +16,9 @@ from optrace.tracer import color
 class PresetTests(unittest.TestCase):
 
     def test_refraction_index_presets(self):
+        """check that all refraction index presets are callable 
+        and their values and abbe numbers are in a reasonable range.
+        All presets also should have descriptions"""
 
         wl = color.wavelengths(1000)
 
@@ -37,6 +40,8 @@ class PresetTests(unittest.TestCase):
 
     @pytest.mark.os
     def test_light_spectrum_presets(self):
+        """check light spectrum presets"""
+
         # check presets
         wl = color.wavelengths(1000)
         for spec in ot.presets.light_spectrum.all_presets:
@@ -54,6 +59,8 @@ class PresetTests(unittest.TestCase):
 
     @pytest.mark.os
     def test_spectrum_presets(self):
+        """check spectrum presets"""
+
         # check presets
         wl = color.wavelengths(1000)
         for spec in ot.presets.spectrum.xyz_observers:
@@ -66,6 +73,7 @@ class PresetTests(unittest.TestCase):
             self.assertNotEqual(spec.long_desc, "")
 
     def test_spectrum_outside_definition(self):
+        """check that all spectrum presets are zero outside the visible range"""
         # check that spectrum presets have constant 0 beyond their definition
         for spec in [*ot.presets.light_spectrum.standard, *ot.presets.spectrum.xyz_observers]:
             if spec.desc != "E":

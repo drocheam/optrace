@@ -1,23 +1,27 @@
 #!/bin/env python3
 
-import sys
+import sys  # adding to PATH
 sys.path.append('.')
-import pathlib
-import os
+import pathlib  # handling file paths
+import os  # deleting files
 
-import pytest
-import requests
-import unittest
+import pytest  # testing framework
+import requests  # downloading web ressources
+import unittest  # testing framework
 
 import optrace as ot
 
 
 class LoadTests(unittest.TestCase):
     
+    # down sort tests randomly
     pytestmark = pytest.mark.random_order(disabled=True)
 
-
-    def save_file(self, source, path):
+    def save_file(self, source: str, path: str) -> bool:
+        """
+        try to download a web ressource 'source' to a file 'path'
+        This function returns True if successfull, False if otherwise (Timeout, ConnectionResetError, etc)
+        """
 
         try:
             r = requests.get(source)
@@ -31,21 +35,21 @@ class LoadTests(unittest.TestCase):
         except (ConnectionResetError, TimeoutError):
             return False
 
-    # normally we would download the file in __init__ and delete in __del__
-    # but using unittest multiple objects of this class are created
-    
     # run first
     @pytest.mark.os
     def test_0_download_schott(self):
+        """download schott catalogue needed for some examples"""
         self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/schott.agf", "schott.agf")
 
     # run last
     @pytest.mark.os
     def test_zzzzzzzzzz_delete_schott(self):
+        """delete schott catalogue needed for some examples"""
         os.remove("schott.agf")
 
     @pytest.mark.os
     def test_readlines(self):
+        """test text loading for different encodings"""
 
         self.assertRaises(FileNotFoundError, ot.load._read_lines, "jiohunzuiznuiIz")  # no such file
         self.assertRaises(FileNotFoundError, ot.load._read_lines, ".")  # not a file
@@ -74,9 +78,9 @@ class LoadTests(unittest.TestCase):
 
     @pytest.mark.os
     def test_agf_valid_files(self):
+        """load different agf catalogues and check if everything is handled correctly"""
 
-        # not sure about the copyright of these files, that's while download it only for testing
-        
+        # not sure about the copyright of these files, that's why we download them only for testing
         url0 = "https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/"
         webfiles = ["archer.agf", "arton.agf", "birefringent.agf", "cdgm.agf", "corning.agf", "heraeus.agf",
                     "hikari.agf", "hoya.agf", "infrared.agf", "isuzu.agf", "liebetraut.agf", "lightpath.agf",
@@ -110,11 +114,12 @@ class LoadTests(unittest.TestCase):
                 self.assertTrue(len(ns)/ncount > 0.95)  # more than 95% detected
             # sometimes the files have media with the same name or media with invalid n below 1
 
-            # remove file
+            # delete file
             os.remove(temp_file)
 
     @pytest.mark.os
     def test_zmx_errors(self):
+        """test runtime errors that occur with invalid zmx files"""
 
         path0 = pathlib.Path(__file__).resolve().parent / "test_files"
         self.assertRaises(RuntimeError, ot.load.zmx, str(path0 / "zmx_invalid_mode.zmx"))
@@ -124,6 +129,7 @@ class LoadTests(unittest.TestCase):
 
     @pytest.mark.os
     def test_zmx_endoscope(self):
+        """load an endoscope example"""
 
         RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 200], silent=True)
 
@@ -144,6 +150,7 @@ class LoadTests(unittest.TestCase):
         os.remove("temp.zmx")
     
     def test_zmx_portrait_lens(self):
+        """load an potrait lens example"""
 
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
         RS = ot.RaySource(ot.CircularSurface(r=7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
@@ -163,6 +170,7 @@ class LoadTests(unittest.TestCase):
         os.remove("temp.zmx")
     
     def test_zmx_camera_lens(self):
+        """load a camera lens example"""
 
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
         RS = ot.RaySource(ot.CircularSurface(r=0.7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
@@ -183,6 +191,7 @@ class LoadTests(unittest.TestCase):
     
     @pytest.mark.os
     def test_zmx_smith_tessar(self):
+        """load a tessar example"""
 
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
         RS = ot.RaySource(ot.CircularSurface(r=7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
@@ -206,7 +215,8 @@ class LoadTests(unittest.TestCase):
         os.remove("temp.zmx")
 
     def test_zmx_achromat(self):
-        
+        """load an achromat example"""
+
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
         RS = ot.RaySource(ot.CircularSurface(r=10), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
@@ -232,15 +242,14 @@ class LoadTests(unittest.TestCase):
         os.remove("temp.zmx")
 
     def test_zmx_microscope_objective(self):
+        """load an objective example"""
 
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
         RS = ot.RaySource(ot.CircularSurface(r=0.8), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
         self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/4037934a.zmx", "temp.zmx") 
-
         n_schott = ot.load.agf("schott.agf")
-
         G = ot.load.zmx("temp.zmx", n_schott, no_marker=True)  # coverage test with no_marker
 
         RT.add(G)
@@ -282,15 +291,17 @@ class LoadTests(unittest.TestCase):
 
     @pytest.mark.os
     def test_zmx_minimal(self):
-        # minimal example from https://documents.pub/document/zemaxmanual.html?page=461
-        # there should be no surfaces and lenses created, only a marker
-        # which gets ignored with no_marker=True
-
+        """
+        minimal example from https://documents.pub/document/zemaxmanual.html?page=461
+        there should be no surfaces and lenses created, only a marker
+        which gets ignored with no_marker=True
+        """
         path = pathlib.Path(__file__).resolve().parent / "test_files" / "minimal.zmx"
         G = ot.load.zmx(str(path), no_marker=True)  # coverage test with no_marker
 
         # check if empty
         self.assertEqual(len(G.elements), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

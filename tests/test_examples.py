@@ -1,15 +1,14 @@
 #!/bin/env python3
 
-from pathlib import Path
+from pathlib import Path  # path of this file
+import os  # environment variables
+
+import unittest  # testing framework
+import subprocess  # running processes
+import pytest # testing framework
+
 
 # add PYTHONPATH to env, so the examples can find optrace
-import os
-
-import unittest
-import subprocess
-import pytest  
-
-
 if "TOX_ENV_DIR" not in os.environ:
     os.environ["PYTHONPATH"] = "."
 
@@ -65,7 +64,7 @@ class ExampleTests(unittest.TestCase):
     
     @pytest.mark.slow
     def test_microscope(self):
-        self.execute("microscope.py")
+        self.execute("microscope.py", 25)
     
     @pytest.mark.slow
     def test_presets_spectrum(self):
