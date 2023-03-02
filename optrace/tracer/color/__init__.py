@@ -9,5 +9,5 @@ from .xyz import xyz_to_xyY, xyz_from_spectrum, xyY_to_xyz, WP_D65_XY, WP_D65_XY
 from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, luv_saturation, luv_chroma, luv_hue, WP_D65_LUV, WP_D65_UV,\
         SRGB_R_UV, SRGB_G_UV, SRGB_B_UV
 from .srgb import SRGB_RENDERING_INTENTS, SRGB_R_XY, SRGB_G_XY, SRGB_B_XY, srgb_to_srgb_linear, srgb_linear_to_xyz,\
-        srgb_to_xyz, xyz_to_srgb, outside_srgb_gamut, srgb_r_primary, srgb_g_primary, srgb_b_primary,\
+        srgb_to_xyz, xyz_to_srgb, outside_srgb_gamut, srgb_r_primary, srgb_g_primary, srgb_b_primary, log_srgb_linear,\
         random_wavelengths_from_srgb, _power_from_srgb, spectral_colormap, xyz_to_srgb_linear, srgb_linear_to_srgb

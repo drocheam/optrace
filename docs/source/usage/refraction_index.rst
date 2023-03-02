@@ -62,7 +62,7 @@ In the case of the Schott model the initialization could look as follows:
 
 **User Function**
 
-``optrace`` also supports user functions for the refractive index. The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
+`optrace` also supports user functions for the refractive index. The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
 
 .. testcode::
 
@@ -176,7 +176,7 @@ Loading material catalogues (.agf)
 _________________________________________
 
 
-``optrace``  can also load .agf catalogue files containing different materials.
+`optrace`  can also load .agf catalogue files containing different materials.
 The function :func:`ot.load.agf <optrace.tracer.load.agf>` takes a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
 
 For instance, loading the Schott catalogue and accessing the material ``N-LAF21`` can be done as follows:
@@ -199,7 +199,7 @@ and `here <https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_man
 Presets
 _________________
 
-``optrace`` comes with multiple material presets, which can be accessed using ``ot.presets.refractive_index.<name>``, where ``<name>`` is the material name.
+`optrace` comes with multiple material presets, which can be accessed using ``ot.presets.refractive_index.<name>``, where ``<name>`` is the material name.
 The materials are also grouped into multiple lists :python:`ot.presets.refractive_index.glasses, ot.presets.refractive_index.plastics, ot.presets.refractive_index.misc`. 
 
 These groups are plotted below in an index and an Abbe plot.

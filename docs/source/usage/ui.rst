@@ -196,6 +196,7 @@ Main Tab
 .. list-table::
    :header-rows: 1
    :align: left
+   :widths: 75 100 150 150
    
    * - Property
      - Variable Name / Method
@@ -204,55 +205,55 @@ Main Tab
    * - Rays
      - :attr:`ray_count <optrace.gui.trace_gui.TraceGUI.ray_count>`
      - integer, 0 - 6000000
-     -
+     - number of rays for raytracing
    * - Absorb Rays Missing Lens
      - :attr:`absorb_missing <optrace.gui.trace_gui.TraceGUI.absorb_missing>`
      - :python:`True` or :python:`False`
-     -
+     - if rays are absorbed when missing a lens
    * - Plotting
      - :attr:`plotting_type <optrace.gui.trace_gui.TraceGUI.plotting_type>`
      - :python:`'Rays'` or :python:`'Points'`
-     -
+     - Visulation type of the rays
    * - Coloring
      - :attr:`coloring_type <optrace.gui.trace_gui.TraceGUI.coloring_type>`
      - :python:`'Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz', 'Polarization yz', 'Refractive Index'`
-     -
+     - Quantity determining the color of the rays/points
    * - Count
      - :attr:`rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`
      - integer, 1 - 1000
-     -
+     - number of visible rays in the scene
    * - Opacity
      - :attr:`ray_opacity <optrace.gui.trace_gui.TraceGUI.ray_opacity>`
      - float, 1e-05 - 1
-     -
+     - opacity of the rays/points
    * - Width
      - :attr:`ray_width <optrace.gui.trace_gui.TraceGUI.ray_width>`
      - float, 1 - 20
-     -
+     - ray width/ point size
    * - More Minimalistic Scene
      - :attr:`minimalistic_view <optrace.gui.trace_gui.TraceGUI.minimalistic_view>`
      - :python:`True` or :python:`False`
-     -
+     - if axis labels and long descriptions should be hidden
    * - Maximize Scene
      - :attr:`maximize_scene <optrace.gui.trace_gui.TraceGUI.maximize_scene>`     
      - :python:`True` or :python:`False`
-     -
+     - if tool- and side bar should be hidden
    * - High Contrast Mode
      - :attr:`high_contrast <optrace.gui.trace_gui.TraceGUI.high_contrast>`
      - :python:`True` or :python:`False`
-     -
+     - dark elements on white background
    * - Vertical Labels
      - :attr:`vertical_labels <optrace.gui.trace_gui.TraceGUI.vertical_labels>`
      - :python:`True` or :python:`False`
-     -
+     - if object labels are justified vertically (in lateral direction)
    * - Open Property Browser
      - :meth:`open_property_browser() <optrace.gui.trace_gui.TraceGUI.open_property_browser>`
      -
-     -
+     - open the property browser
    * - Open Command Window
      - :meth:`open_command_window() <optrace.gui.trace_gui.TraceGUI.open_command_window>`
      -
-     -
+     - open the command window
 
 Image Tab
 #######################
@@ -261,6 +262,7 @@ Image Tab
 .. list-table::
    :header-rows: 1
    :align: left
+   :widths: 75 100 150 150
    
    * - Property
      - Variable Name / Method
@@ -269,71 +271,71 @@ Image Tab
    * - Source 
      - :attr:`source_selection <optrace.gui.trace_gui.TraceGUI.source_selection>`
      - string
-     -
+     - selection of the ray source
    * - Detector
      - :attr:`detector_selection <optrace.gui.trace_gui.TraceGUI.detector_selection>` 
      - string
-     - 
+     - selection of the detector
    * - z_det
      - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
      - float
-     - 
+     - position of the currently chosen detector
    * - Image Mode
      - :attr:`image_type <optrace.gui.trace_gui.TraceGUI.image_type>`
      - string, one of :attr:`RImage.display_modes <optrace.tracer.r_image.RImage.display_modes>`
-     -
+     - image mode for rendering
    * - Projection Method
      - :attr:`projection_method <optrace.gui.trace_gui.TraceGUI.projection_method>`
      - string, one of :attr:`SphericalSurface.sphere_projection_methods <optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods>`
-     - 
+     - sphere projection method for spherical detectors
    * - Pixels_xy
      - :attr:`image_pixels <optrace.gui.trace_gui.TraceGUI.image_pixels>`
      - integer, one of :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>`
-     - 
+     - number of pixels in smaller image dimension
    * - Logarithmic Scaling 
      - :attr:`log_image <optrace.gui.trace_gui.TraceGUI.log_image>`
      - :python:`True` or :python:`False`
-     -
+     - if image values should be scaled logarithmically
    * - Flip Detector Image
      - :attr:`flip_det_image <optrace.gui.trace_gui.TraceGUI.flip_det_image>`
      - :python:`True` or :python:`False`
-     -
+     - if the detector image should be flipped (rotated by 180 degrees)
    * - Rays from Selected Source Only
      - :attr:`det_image_one_source <optrace.gui.trace_gui.TraceGUI.det_image_one_source>`
      - :python:`True` or :python:`False`
-     -
+     - if only the selected ray source should contribute to the image
    * - Source Image
      - :meth:`show_source_image() <optrace.gui.trace_gui.TraceGUI.show_source_image>`
      -
-     - 
+     - render a source image with the given settings
    * - Detector Image 
      - :meth:`show_detector_image() <optrace.gui.trace_gui.TraceGUI.show_detector_image>`
      -
-     - 
+     - render a detector image with the given settings
    * - Cut at
      - :attr:`cut_dimension <optrace.gui.trace_gui.TraceGUI.cut_dimension>`
      - :python:`'x', 'y'`
-     - 
+     - image cut dimension
    * - Cut Value
      - :attr:`cut_value <optrace.gui.trace_gui.TraceGUI.cut_value>`
      - float
-     - 
+     - image cut value for the chosen dimension
    * - Source Image Cut
      - :meth:`show_source_cut() <optrace.gui.trace_gui.TraceGUI.show_source_cut>`
      -
-     - 
+     - render a source image cut
    * - Detector Image Cut
      - :meth:`show_detector_cut() <optrace.gui.trace_gui.TraceGUI.show_detector_cut>`
      -
-     - 
+     - render a detector image cut
    * - Activate Filter 
      - :attr:`activate_filter <optrace.gui.trace_gui.TraceGUI.activate_filter>`
      - :python:`True` or :python:`False`
-     - 
+     - activate the smoothing filter
    * - Resolution Limit 
      - :attr:`filter_constant <optrace.gui.trace_gui.TraceGUI.filter_constant>`
      -  float, 0.3 - 40
-     -
+     - resolution filter filter constant
 
 Spectrum Tab
 #######################
@@ -349,31 +351,31 @@ Spectrum Tab
    * - Source 
      - :attr:`source_selection <optrace.gui.trace_gui.TraceGUI.source_selection>`
      - string
-     -
+     - the selected ray source
    * - Detector
      - :attr:`detector_selection <optrace.gui.trace_gui.TraceGUI.detector_selection>` 
      - string
-     - 
+     - the selected detector
    * - z_det
      - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
      - float
-     - 
+     - position of the selected detector
    * -  Source Spectrum
      - :meth:`show_source_spectrum() <optrace.gui.trace_gui.TraceGUI.show_source_spectrum>`
      - 
-     -
+     - render a source spectrum for the chosen source
    * - Rays from Selected Source Only 
      - :attr:`det_spectrum_one_source <optrace.gui.trace_gui.TraceGUI.det_spectrum_one_source>` 
      - :python:`True` or :python:`False`
-     -
+     - if only the selected ray source should contribute to the detector image
    * -  Detector Spectrum
      - :meth:`show_detector_spectrum() <optrace.gui.trace_gui.TraceGUI.show_detector_spectrum>`
      - 
-     -
-   * -  Spectrum Properties
+     - render a detector image
+   * - Spectrum Properties
      - 
      - string
-     -
+     - output for spectrum properties, like wavelengths and power
 
 Focus Tab
 #######################
@@ -389,35 +391,35 @@ Focus Tab
    * - Source 
      - :attr:`source_selection <optrace.gui.trace_gui.TraceGUI.source_selection>`
      - string
-     -
+     - the selected source
    * - Detector
      - :attr:`detector_selection <optrace.gui.trace_gui.TraceGUI.detector_selection>` 
      - string
-     - 
+     - the selected detector
    * - z_det
      - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
      - float
-     - 
-   * -  Focus Mode     
+     - position of the chosen detector
+   * - Focus Mode     
      - :attr:`focus_type <optrace.gui.trace_gui.TraceGUI.focus_type>`
      - string, one of :attr:`Raytracer.autofocus_methods <optrace.tracer.raytracer.Raytracer.autofocus_methods>`
-     -
-   * -  Rays From Selected Source Only
+     - mode for focus finding
+   * - Rays From Selected Source Only
      - :attr:`af_one_source <optrace.gui.trace_gui.TraceGUI.af_one_source>`
      - :python:`True` or :python:`False`
-     -
+     - only use the rays from the selected source for focus finding
    * -  Plot Cost Function
      - :attr:`focus_cost_plot <optrace.gui.trace_gui.TraceGUI.focus_cost_plot>`
      - :python:`True` or :python:`False`
-     -
+     - plots the evaluated cost function value in a window
    * -  Find Focus
      - :meth:`move_to_focus() <optrace.gui.trace_gui.TraceGUI.move_to_focus>`
      - 
-     -
+     - execute focus finding
    * -  Optimization  Output
      - 
      - string
-     -
+     - output for displaying optimization information
 
 .. _gui_windows:
 

@@ -10,6 +10,8 @@ from ..tracer.refraction_index import RefractionIndex
 from ..tracer.geometry import Surface
 from ..tracer.presets import spectral_lines as Lines  # spectral lines for AbbePlot
 from ..tracer.misc import PropertyChecker as pc
+from ..tracer import misc as misc
+from ..tracer import color as color
 
 
 def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
@@ -58,6 +60,94 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.ylabel("cost")
     plt.legend(["cost estimation", "cost values", "found minimum"])
     plt.title(title)
+    plt.show(block=block)
+    plt.pause(0.1)
+
+# TODO simple plot image function
+
+# TODO test
+
+def convolve_debug_plots(img2:      np.ndarray, 
+                         s:         list[float, float], 
+                         dbg:       dict,
+                         log:       bool = True,
+                         log_exp:   float = 3,
+                         block:     bool = False)\
+        -> None:
+    """
+
+    """
+    s_psf, psf, s_img, img = dbg["s_psf"], dbg["psf"], dbg["s_img"], dbg["img"]
+
+    # adapt fourier images
+    dbg["F_img2"] = dbg["F_img"]*dbg["F_psf"]
+    for key in ["F_img2", "F_img", "F_psf"]:
+        val = dbg[key]
+        val /= np.max(val)
+        val = np.clip(val, 0, 1)
+        if log:
+            val = color.log_srgb_linear(val, exp=log_exp)
+        dbg[key] = color.srgb_linear_to_srgb(val)
+
+    # calculate min and max frequencies, 
+    # see for x: https://numpy.org/doc/stable/reference/generated/numpy.fft.rfftfreq.html
+    # see for y: https://numpy.org/doc/stable/reference/generated/numpy.fft.fftfreq.html
+    ny, nx, = img2.shape[:2]
+    dx, dy = s[0]/nx, s[1]/ny
+    fx0, fx1 = (0, nx/2/dx/nx) if not nx % 2 else (0, (nx-1)/2/dx/nx)
+    fy0, fy1 = (-ny/2/dy/ny, (ny/2 - 1)/dy/ny) if not ny % 2 else (-(ny-1)/2/dy/ny, (ny-1)/2/dy/ny)
+
+    extf = [fx0, fx1, fy0, fy1]
+    extp = [-s_psf[0]/2, s_psf[0]/2, -s_psf[1]/2, s_psf[1]/2]
+    exti = [-s_img[0]/2, s_img[0]/2, -s_img[1]/2, s_img[1]/2]
+    exti2 = [-s[0]/2, s[0]/2, -s[1]/2, s[1]/2]
+
+    plt.figure()
+    _show_grid()
+    plt.title("FT of Input Image")
+    plt.imshow(np.fft.ifftshift(dbg["F_img"], axes=0), extent=extf, zorder=10)
+    plt.xlabel(r"$f_x$ in 1/mm")
+    plt.ylabel(r"$f_y$ in 1/mm")
+    plt.show(block=False)
+
+    plt.figure()
+    _show_grid()
+    plt.title("Cut and interpolated FT of PSF")
+    plt.imshow(np.fft.ifftshift(dbg["F_psf"], axes=0), extent=extf, zorder=10)
+    plt.xlabel(r"$f_x$ in 1/mm")
+    plt.ylabel(r"$f_y$ in 1/mm")
+    plt.show(block=False)
+    #
+    plt.figure()
+    _show_grid()
+    plt.title("Product of both FTs")
+    plt.imshow(np.fft.ifftshift(dbg["F_img2"], axes=0), extent=extf, zorder=10)
+    plt.xlabel(r"$f_x$ in 1/mm")
+    plt.ylabel(r"$f_y$ in 1/mm")
+    plt.show(block=False)
+
+    plt.figure()
+    _show_grid()
+    plt.title("PSF")
+    plt.imshow(psf, extent=extp, zorder=10)
+    plt.xlabel("x in mm")
+    plt.ylabel("y in mm")
+    plt.show(block=False)
+
+    plt.figure()
+    _show_grid()
+    plt.title("Convoluted Image Result")
+    plt.imshow(img2, extent=exti2, zorder=10)
+    plt.xlabel("x in mm")
+    plt.ylabel("y in mm")
+    plt.show(block=False)
+
+    plt.figure()
+    _show_grid()
+    plt.title("Input Image")
+    plt.imshow(img, extent=exti, zorder=10)
+    plt.xlabel("x in mm")
+    plt.ylabel("y in mm")
     plt.show(block=block)
     plt.pause(0.1)
 

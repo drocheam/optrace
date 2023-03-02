@@ -254,22 +254,11 @@ class RImage(BaseClass):
         """
         img = color.xyz_to_srgb_linear(self.xyz(), rendering_intent=rendering_intent)
 
-        # addition, multiplication etc. only work correctly in the linear color space
-        # otherwise we would change the color ratios, but we only want the brightness to change
-        if log and np.any(img > 0):
-            rgbs = np.sum(img, axis=2)  # assume RGB channel sum as brightness
-            wmax = np.max(rgbs)  # maximum brightness
-            wmin = np.min(rgbs[rgbs > 0])  # minimum nonzero brightness
-            maxrgb = np.max(img, axis=2)  # highest rgb value for each pixel
-
-            # normalize pixel so highest channel value is 1, then rescale logarithmically.
-            # Highest value is 1, lowest 0. Exclude all zero channels (maxrgb = 0) for calculation
-            fact = 1 / maxrgb[maxrgb > 0] * (1 - np.log(rgbs[maxrgb > 0] / wmax)/np.log(wmin / wmax))
-            img[maxrgb > 0] *= fact[:, np.newaxis]
+        if log:
+            img = color.log_srgb_linear(img)
 
         img = np.clip(img, 0, 1)
-        img = color.srgb_linear_to_srgb(img)
-        return img
+        return color.srgb_linear_to_srgb(img)
 
     def __fix_extent(self) -> None:
         """

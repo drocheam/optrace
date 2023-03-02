@@ -762,7 +762,7 @@ class TracerTests(unittest.TestCase):
         RT.detector_image(100)
         RT.source_spectrum()
         RT.detector_spectrum()
-        RT.iterative_render(100000, silent=False)
+        RT.iterative_render(100000)
 
         # show all tracing messages
         for i in np.arange(len(RT.INFOS)):
@@ -986,6 +986,7 @@ class TracerTests(unittest.TestCase):
     def test_iterative_render(self):
         RT = rt_example()
         RT.no_pol = True
+        RT.silent = True
 
         # testing only makes sense with multiple sources and detectors
         assert len(RT.ray_sources) > 1
@@ -994,80 +995,78 @@ class TracerTests(unittest.TestCase):
         N_rays = int(RT.ITER_RAYS_STEP/10)
         
         # default call
-        sim, dim = RT.iterative_render(N_rays, silent=True)
+        sim, dim = RT.iterative_render(N_rays)
         self.assertEqual(len(sim), len(RT.ray_sources))
         self.assertEqual(len(dim), 1)
         self.assertTrue(dim[0].limit is None)
         
         # default call with no sources
-        sim, dim = RT.iterative_render(N_rays, no_sources=True, silent=True)
+        sim, dim = RT.iterative_render(N_rays, no_sources=True)
         self.assertEqual(len(sim), 0)
 
         # call with explicit position
-        sim, dim = RT.iterative_render(N_rays, pos=[0, 0, 13.3], silent=True)
+        sim, dim = RT.iterative_render(N_rays, pos=[0, 0, 13.3])
         
         # call with explicit extent = [...]
         ext2 = [0, *RT.detectors[0].extent[1:4]]
-        sim, dim = RT.iterative_render(N_rays, extent=ext2, silent=True)
+        sim, dim = RT.iterative_render(N_rays, extent=ext2)
         self.assertTrue(np.all(dim[0].extent == ext2))
         
         # call with explicit detector_index
-        sim, dim = RT.iterative_render(N_rays, detector_index=1, silent=True)
+        sim, dim = RT.iterative_render(N_rays, detector_index=1)
         
         # call with explicit detector pixel number
-        sim, dim = RT.iterative_render(N_rays, N_px_D=315, silent=True)
+        sim, dim = RT.iterative_render(N_rays, N_px_D=315)
         self.assertEqual(dim[0].N, 315)
         
         # call with explicit source pixel number
-        sim, dim = RT.iterative_render(N_rays, N_px_S=315, silent=True)
+        sim, dim = RT.iterative_render(N_rays, N_px_S=315)
         self.assertEqual(sim[0].N, 315)
         
         # call with explicit projection_method
-        sim, dim = RT.iterative_render(N_rays, N_px_S=400, silent=True, detector_index=1, 
+        sim, dim = RT.iterative_render(N_rays, N_px_S=400, detector_index=1, 
                                        projection_method="Stereographic")
         self.assertEqual(dim[0].projection, "Stereographic")
         
         # call with explicit limit
-        sim, dim = RT.iterative_render(N_rays, N_px_S=400, silent=True, detector_index=1, 
-                                       limit=5)
+        sim, dim = RT.iterative_render(N_rays, N_px_S=400, detector_index=1, limit=5)
         self.assertEqual(dim[0].limit, 5)
         
         # call with multiple positions
-        sim, dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]], silent=True)
+        sim, dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]])
         self.assertEqual(len(dim), 2)
         
         # call with multiple positions and detector_indices
         sim, dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]], 
-                                       detector_index=[0, 1], silent=True)
+                                       detector_index=[0, 1])
         self.assertEqual(len(dim), 2)
         self.assertNotEqual(dim[0].projection, dim[1].projection) 
         # the detectors have different coordinate types
 
         # call with multiple positions and detector pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
-                                       N_px_D=[5, 500], silent=True)
+                                       N_px_D=[5, 500])
         self.assertNotEqual(dim[0].Nx, dim[1].Nx) 
         
         # call with multiple positions and projection_methods
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
-                                       N_px_D=500, silent=True, detector_index=1,
+                                       N_px_D=500, detector_index=1,
                                        projection_method=["Equidistant", "Equal-Area"])
         self.assertNotEqual(dim[0].projection, dim[1].projection) 
         
         # call with multiple positions and limits
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
-                                       N_px_D=500, silent=True, detector_index=1,
+                                       N_px_D=500, detector_index=1,
                                        limit=[10, 12])
         self.assertNotEqual(dim[0].limit, dim[1].limit) 
         
         # call with multiple source pixel numbers
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4),
-                                       N_px_S=[5, 500], silent=True)
+        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), N_px_S=[5, 500])
         self.assertNotEqual(sim[0].Nx, sim[1].Nx) 
         
         # call with multiple positions and detector pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]],
-                                       extent=[None, [-1, 1, 2, 3]], silent=True)
+                                       extent=[None, [-1, 1, 2, 3]])
         self.assertFalse(np.all(dim[0].extent == dim[1].extent)) 
         
         self.assertRaises(ValueError, RT.iterative_render, 0)  # zero ray number
@@ -1093,14 +1092,15 @@ class TracerTests(unittest.TestCase):
         # coverage tests:
 
         # do multiple iterative steps
-        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2, silent=True)
+        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2)
 
         # do multiple iterative steps with an un-full last iteration
-        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2+100, silent=True)
+        RT.silent = False  # turn on pogressbar
+        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2+100)
         
         # render without detectors
         RT.detectors = []
-        sim, dim = RT.iterative_render(N_rays, silent=True)
+        sim, dim = RT.iterative_render(N_rays)
 
         self.assertRaises(RuntimeError, RT.iterative_render, 10000, pos=[0, 0, 0])  # no detectors to move
 

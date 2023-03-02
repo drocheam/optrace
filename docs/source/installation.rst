@@ -17,7 +17,7 @@ This library requires Python 3.10.
 #. open a terminal in the downloaded folder and run :python:`pip install .` :math:`\leftarrow` Note that the dot is part of the command.
 
 This automatically runs the file ``setup.py``, which provides all the required information for the installation.
-After this, ``optrace`` should be installed on your system. 
+After this, `optrace` should be installed on your system. 
 
 **External dependencies**
 

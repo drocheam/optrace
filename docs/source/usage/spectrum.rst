@@ -1,4 +1,4 @@
-Spectrum (LightSpectrum, TransmissionSpectrum)
+Spectrum Classes
 --------------------------------------------------
 
 .. role:: python(code)
@@ -325,7 +325,7 @@ Examples for a spectrum plot are found below.
 Spectral Lines
 ______________________
 
-``optrace`` has some spectral wavelength lines defined in its presets.
+`optrace` has some spectral wavelength lines defined in its presets.
 While there are many such lines, only those relevant for the calculation of the Abbe number are built-in.
 More about the Abbe number can be found in :numref:`abbe_number`.
 

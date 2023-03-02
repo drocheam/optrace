@@ -1,4 +1,4 @@
-Base Geometries (Element, Group, Raytracer)
+Base Geometries
 ------------------------------------------------
 
 
@@ -19,17 +19,15 @@ Base Geometries (Element, Group, Raytracer)
 Elements
 __________________
 
-In ``optrace`` the class |Element| denotes an object which has no, one or two surfaces and belongs to the tracing geometry.
-
-This includes the classes
 
 Types
 ##############
 
+In `optrace` the class |Element| denotes an object which has no, one or two surfaces and belongs to the tracing geometry.
 
 **Tracing Elements**
 
-Elements with direct ray interaction.
+Tracing elements are Elements with direct ray interaction:
 
 .. list-table::
    :widths: 100 400
@@ -41,61 +39,61 @@ Elements with direct ray interaction.
    * - |Lens|
      - An element with two surfaces on which light is refracted.
    * - |IdealLens|
-     - Like a Lens, except that it has a planar surface and refracts light without aberration
+     - A Lens, except that it has a planar surface and refracts light without aberrations
    * - :class:`Filter <optrace.tracer.geometry.filter.Filter>`
-     - Element with a surface on which wavelength-dependent or wavelength-independent filtering takes place.
+     - Element with a surface on which wavelength-dependent filtering takes place.
    * - :class:`Aperture <optrace.tracer.geometry.aperture.Aperture>`
-     - Like a filter, except that incident light is completely absorbed.
+     - Similar to a Filter, except that incident light is completely absorbed.
 
 **Rendering Elements**
 
 Elements with no ray interaction for tracing, but the possibility to render images of intersecting rays.
 
 .. list-table::
-   :widths: 200 400
+   :widths: 100 400
    :header-rows: 0
    :align: left
 
    * - :class:`Detector <optrace.tracer.geometry.detector.Detector>`
-     - Element with one surface on which images can be rendered
+     - Element with one surface on which images or spectra can be rendered
 
 
 **Markers**
 
-Elements for 3D annotation.
+Markers are Elements for annotations in 3D space.
 
 .. list-table::
-   :widths: 200 400
+   :widths: 100 400
    :header-rows: 0
    :align: left
 
    * - :class:`PointMarker <optrace.tracer.geometry.marker.point_marker.PointMarker>`
-     - element consisting of a point and a label, useful for annotating things.
+     - Element consisting of a point and a label
    * - :class:`LineMarker <optrace.tracer.geometry.marker.line_marker.LineMarker>`
-     - element consisting of a line and a label, useful for annotating things.
+     - Element consisting of a line and a label
 
 
 **Volumes**
 
-Objects for plotting volumes in the TraceGUI, for instance an enclosing cylinder or medium outline.
+Objects for plotting volumes in the TraceGUI, for instance an enclosing cylinder or a medium outline.
 
 .. list-table::
-   :widths: 200 400
+   :widths: 100 400
    :header-rows: 0
    :align: left
 
    * - :class:`BoxVolume <optrace.tracer.geometry.volume.box_volume.BoxVolume>`
      - Volume of a box or cube
    * - :class:`CylinderVolume <optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume>`
-     - Cylinder volume with symmetry axis in diretion of the optical axis
+     - Cylinder volume with the symmetry axis in direction of the optical axis
    * - :class:`SphereVolume <optrace.tracer.geometry.volume.sphere_volume.SphereVolume>`
-     - spheric volume
+     - A spherical volume
 
 
 Usage
 ############
 
-These subclasses have the same methods as the |Element| superclass, these include:
+All subclasses of |Element| share the following methods and properties:
 
 .. list-table::
    :header-rows: 1
@@ -119,6 +117,8 @@ These subclasses have the same methods as the |Element| superclass, these includ
 
 Group
 ________________
+
+**Overview**
 
 A |Group| can be seen as a list or container of several elements.
 
@@ -147,12 +147,12 @@ It contains the following functionality:
      - :python:`G.tma()`
 
 A |Group| object stores all elements in their own class lists:
-:python:`lenses, ray_sources, detectors, markers, filters, apertures`.
-Where |IdealLens| and |Lens| are included in the same list.
+:python:`lenses, ray_sources, detectors, markers, filters, apertures, volumes`.
+Where |IdealLens| and |Lens| are included in the same list, all marker types are included in :python:`markers` and all volume types in :python:`volumes`.
 
 When adding objects, the order of objects remains the same.
 Thus :python:`lenses[2]` denotes the lens that was added third (since counting starts at 0).
-In principle it is recommended to add objects in the order in which the light passes through them.
+For simplicity it is recommended to add objects in the order in which the light passes through them.
 
 **Example**
 
@@ -166,8 +166,8 @@ The following example creates a Group consisting of an |IdealLens| and an :class
    G = ot.Group([IL, F])
 
 Next, we flip the group, reversing the z-order of the elements and flipping each element around its x-axis through the center.
-Since all elements are rotationally symmetric, this has only a effect on the order of them.
-After flipping we move the group to a new position. This position is the new position for the first element (which after flipping is the Filter), whereas all relative distances to all other elements are kept equal.
+Since all elements are rotationally symmetric, this has only an effect on the order of them.
+After flipping we move the group to a new position. This position is the new position for the first element (which after flipping is the filter), whereas all relative distances to all other elements are kept equal.
 
 .. testcode::
 
@@ -192,8 +192,9 @@ The lens has the same relative distance of :math:`\Delta z = 20` mm relative to 
 Raytracer
 ________________
 
+**Overview**
 
-The |Raytracer| class provides the functionality for tracing, geometry checking, rendering spectra and images, and focusing.
+The |Raytracer| class provides the functionality for tracing, geometry checking, rendering spectra and images and focusing.
 
 Since the |Raytracer| is a subclass of a |Group|, elements can be changed or added in the same way.
 
@@ -220,15 +221,17 @@ This is also the only mandatory parameter of this class
 
 **Geometry**
 
-Since ``optrace`` implements sequential raytracing, the surfaces and objects must be in a well-defined and unique sequence. This applies to all elements with interactions of light: :python:`Lens, IdealLens, Filter, Aperture, RaySource`.
-The elements :python:`Detector, LineMarker, PointMarker` are excluded from this.
-All RaySource elements must lie before all lenses, filters and apertures. And all subsequent lenses, filters, apertures must not collide and be inside the outline.
+Since `optrace` implements sequential raytracing, the surfaces and objects must be in a well-defined and unique sequence. This applies to all elements with interactions of light: :python:`Lens, IdealLens, Filter, Aperture, RaySource`.
+The elements :python:`Detector, LineMarker, PointMarker, BoxVolume, SphereVolume, CylinderVolume` are excluded from this.
+All ray source elements must lie before all lenses, filters and apertures. And all subsequent lenses, filters, apertures must not collide and be inside the outline.
 
 
 **Surrounding Media**
 
-Earlier we learned that when creating a lens, you can use the :python:`n2` parameter to define the subsequent media. In the case of multiple lenses, the :python:`n2` of the previous lens is the medium before the next lens.
+In :ref:`usage_lens` we will learn that when creating a lens, you can use the :python:`n2` parameter to define the subsequent medium. In the case of multiple lenses, the :python:`n2` of the previous lens is the medium before the next lens.
 In the case of the raytracer, we can define an :python:`n0` which defines the refractive index for all undefined :python:`n2=None` as well as for the region to the first lens.
+
+The following figure shows a setup with lenses :python:`L0, L2` having a :python:`n2` defined and a custom :python:`n0` parameter in the raytracer class. The medium before the first lens as well as the medium behind :python:`L1` are therefore also :python:`n0`.
 
 .. figure:: ../images/rt_setup_different_ambient_media.svg
    :width: 700
@@ -241,7 +244,7 @@ In the case of the raytracer, we can define an :python:`n0` which defines the re
 
 The :python:`absorb_missing` parameter, which is set to :python:`True` by default, ensures that light which does not hit a lens is absorbed. In principle, this is the typical and desired case. However, there are geometries where :python:`absorb_missing=False` could be useful. 
 
-A special case is when a ray does not hit a lens where a transition from surrounding media takes place. Here the rays are absorbed in any case, because the exact transition geometry is defined only at the lens itself.
+A special case is when a ray does not hit a lens where a transition from surrounding media takes place (:python:`n2` differ). Here the rays are absorbed in any case, because the boundary surface is defined only at the lens itself.
 
 
 **no_pol**
@@ -251,7 +254,7 @@ Unfortunately, the calculation is comparatively computationally intensive.
 
 With the parameter :python:`no_pol=True` no polarizations are calculated and we assume unpolarized/uniformly polarized light at each transmission. Typically this speeds up the tracing by 10-30%.
 Whether you can neglect the influence of polarization depends of course on the exact setup of the geometry.
-However, for setups where the angles of the beams to surface normals are small, this is usually the case.
+However, for setups where the beam angles to the surface normals are small, this is usually the case.
 
 
 **Example**
@@ -292,7 +295,7 @@ Loading ZEMAX Geometries (.zmx)
 __________________________________
 
 
-It is possible to load ``.zmx`` geometries into ``optrace``. For instance, the following example load some geometry from file ``setup.zmx`` into the raytracer.
+It is possible to load ``.zmx`` geometries into `optrace`. For instance, the following example load some geometry from file ``setup.zmx`` into the raytracer.
 
 .. code-block:: python
 
@@ -318,7 +321,7 @@ Unfortunately, the support is only experimental, as there is no actual documenta
 
 * ``SEQ``-mode only
 * ``UNIT`` must be ``MM``
-* only ``STANDARD`` or ``EVENASPH`` surfaces, this is equivalent to :python:`RingSurface, CircularSurface, SphericalSurface, ConicSurface, AsphericSurface` in ``optrace``
+* only ``STANDARD`` or ``EVENASPH`` surfaces, this is equivalent to :python:`RingSurface, CircularSurface, SphericalSurface, ConicSurface, AsphericSurface` in `optrace`
 * no support for coatings
 * temperature or absorption behavior of the material is neglected
 * only loads lens and aperture geometries, no support for additional objects
@@ -340,6 +343,9 @@ For this application an ideal camera preset is included, that provides aberratio
 
 The preset is loaded with :func:`ot.presets.geometry.ideal_camera <optrace.tracer.presets.geometry.ideal_camera>` and returns a |Group| object consisting of a lens and a detector.
 Required parameters are the object position :python:`z_g` as well as the camera position (the position of the lens) :python:`cam_pos`, as well as the image distance :python:`b`, which in this case is just the difference distance between lens and detector.
+A visual presentation of these quantities is shown in the figure below.
+
+An exemplary call could be:
 
 .. testcode::
 
@@ -418,7 +424,7 @@ The LeGrand full theoretical eye model is a simple model consisting of only sphe
      - `-`
 
 
-The preset :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` is located in :mod:`ot.presets.geometry <optrace.tracer.presets.geometry>` and is called as function. It returns a |Group| object that can be added to a |Raytracer|. Provide a :python:`pos` parameter to position it at an other position than :python:`[0, 0, 0]`.
+The preset :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` is located in :mod:`ot.presets.geometry <optrace.tracer.presets.geometry>` and is called as a function. It returns a |Group| object that can be added to a |Raytracer|. Provide a :python:`pos` parameter to position it at an other position than :python:`[0, 0, 0]`.
 
 .. testcode::
 
@@ -426,7 +432,7 @@ The preset :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` is 
    eye_model = ot.presets.geometry.legrand_eye(pos=[0.3, 0.7, 1.2])
    RT.add(eye_model)
 
-Optional parameters include a pupil diameter and a detector (retina) radius, both provided in millimeters.
+Optional parameters include a pupil diameter and a lateral detector (retina) radius, both provided in millimeters.
 
 .. testcode::
 
@@ -497,7 +503,7 @@ With an accommodation level :math:`A` in dpt the missing parameters are calculat
    \end{array}
 
 
-Accessing and adding works like for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` preset.
+Accessing and adding works as for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` preset.
 
 .. testcode::
 
@@ -505,7 +511,7 @@ Accessing and adding works like for the :func:`legrand_eye <optrace.tracer.prese
    eye_model = ot.presets.geometry.arizona_eye(pos=[0.3, 0.7, 1.2])
    RT.add(eye_model)
 
-As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` we have the parameters :python:`pupil` and :python:`r_det`. Additionally there is a :python:`adaptation` parameter specified in diopters, which defaults to 0 dpt.
+As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>`, we have the parameters :python:`pupil` and :python:`r_det`. Additionally there is an :python:`adaptation` parameter specified in diopters, which defaults to 0 dpt.
 
 .. testcode::
 

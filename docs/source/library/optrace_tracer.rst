@@ -8,6 +8,10 @@ tracer.base_class
 _________________________________
 .. automodule:: optrace.tracer.base_class
 
+tracer.convolve
+_________________________________
+.. automodule:: optrace.tracer.convolve
+
 tracer.load
 _________________________________
 .. automodule:: optrace.tracer.load

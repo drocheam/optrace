@@ -1,6 +1,9 @@
 Advanced Topics
 ------------------------------------------------
 
+.. role:: python(code)
+  :language: python
+  :class: highlight
 
 Raytracing Errors
 _________________________
@@ -71,9 +74,46 @@ Masking
 ################
 
 
-Controlling Threading and Standard Output
-______________________________________________
+Controlling Threading
+_______________________________
 
+All classes in :mod:`optrace.tracer <optrace.tracer>` are derived from the class :class:`BaseClass <optrace.tracer.base_class.BaseClass>`.
+Derived object include a boolean :python:`threading` property that is turned on by default.
+Turning it off with :python:`threading=False` disabled multithreading and thread creation.
+This can be useful when profiling and debugging or if multiple objects are run in parallel anyway.
+
+When creating a raytracer with this option
+
+.. code-block:: python
+
+   RT = ot.Raytracer(..., threading=False)
+
+All methods (tracing, rendering, focussing, ...) of this class as well as all created child objects (image, spectrum, ...) are handled in the main thread and have :python:`threading=False` assigned.
+
+
+Note that all plotting functions from :mod:`optrace.plots` are run only in the main thread. Furthermore, threading for the module :mod:`optrace.gui` can't be turned off.
+
+
+Silencing Standard Output
+____________________________________________
+
+As mentioned above, all classes in :mod:`optrace.tracer <optrace.tracer>` are derived from the class :class:`BaseClass <optrace.tracer.base_class.BaseClass>`.
+This class includes a :python:`silent` parameter that with :python:`silent=True` does not emit any messages to the standard output (terminal), also including the output from the progressbar.
+Note that this also goes for warnings and important info messages.
+Nevertheless, this option can be useful in automation or minimizing the amount of messages.
+
+The :class:`TraceGUI <optrace.gui.trace_gui.TraceGUI>` and the plotting functions in :mod:`optrace.plots` also support this option.
+
+When providing the parameter in the raytracer class all created child objects share the same property. When :python:`TraceGUI.silent=True` is set, the raytracer is also silenced.
+
+
+
+Object Descriptions
+_____________________________
+
+Child classes of :class:`BaseClass <optrace.tracer.base_class.BaseClass>` include parameters :python:`desc, long_desc`. The former should be a short descriptive string and the latter a more verbose one.
+
+These descriptions can be user provided and are used in for the plotting in plots or the GUI and for some standard output messages.
 
 Modifying Initialized Objects
 ____________________________________________

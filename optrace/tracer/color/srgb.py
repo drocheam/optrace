@@ -296,6 +296,37 @@ def xyz_to_srgb(xyz:                np.ndarray,
     return RGB
 
 
+def log_srgb_linear(img: np.ndarray, exp: float = 1) -> np.ndarray:
+    """
+    Logarithmically scale linear sRGB components and additionally exponentiate by exp
+
+    :param img: input image, shape (Ny, Nx, 3) in linear sRGB
+    :param exp: scaling exponent, optional
+    :return: logarithmically scaled and exponated linear sRGB values
+    """
+
+    # addition, multiplication etc. only work correctly in the linear color space
+    # otherwise we would change the color ratios, but we only want the brightness to change
+    if np.any(img > 0):
+        rgbs = np.sum(img, axis=2)  # assume RGB channel sum as brightness
+        nz = rgbs > 0
+        rgbsnz = rgbs[nz]
+        wmin = np.min(rgbsnz)  # minimum nonzero brightness
+        wmax = np.max(rgbsnz)  # minimum brightness
+        maxrgb = np.max(img, axis=2)  # highest rgb value for each pixel
+
+        # normalize pixel so highest channel value is 1, then rescale logarithmically.
+        # Highest value is 1, lowest 0. Exclude all zero channels (maxrgb = 0) for calculation
+        mrgb, exp_ = maxrgb[nz], exp
+        fact = np.zeros(img.shape[:2])
+        fact[nz] = ne.evaluate("1/mrgb * (1 - log(rgbsnz/ wmax) / log(wmin / wmax)) ** exp_")
+
+        return img * fact[:, :, np.newaxis]
+
+    else:
+        return img.copy()
+
+
 def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     """
     Normalized Gauss Function

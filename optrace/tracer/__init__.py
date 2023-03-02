@@ -54,3 +54,4 @@ from .geometry.group import Group
 # tools
 from . import load
 from .color.tools import WL_BOUNDS
+from .convolve import convolve

@@ -6,6 +6,7 @@ from typing import Callable, Any  # Callable and Any types
 from functools import wraps  # wrapping of functions
 import time  # timing
 
+from PIL import Image as PILImage
 import scipy.interpolate  # linear interpolation
 import scipy.integrate
 import numpy as np  # calculations
@@ -15,6 +16,9 @@ import numexpr as ne  # faster calculations
 def random():
     """less secure (= lower quality of randomness), but faster random number generator"""
     return np.random.Generator(np.random.SFC64())
+
+def load_image(path: str) -> np.ndarray:
+    return np.asarray(PILImage.open(path).convert("RGB"), dtype=float) / 2**8
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function

@@ -245,7 +245,7 @@ This is especially important as the center of the disc typically lies at the opt
 Reducing those artefacts is done by first sampling a square grid that then gets mapped onto a disc.
 The difference is that using special mapping methods the square cells comparatively get less distorted, or alternatively get distorted more uniformly. Note that equi-areal mapping methods are needed, since we want to keep the point density and uniformity of the noise.
 
-One such method is the Square-Disc Mapping method from :footcite:p:`doi:10.1080/10867651.1997.10487479`. ``optrace`` implements a simplified method from :footcite:`ShirleyCode`.
+One such method is the Square-Disc Mapping method from :footcite:p:`doi:10.1080/10867651.1997.10487479`. `optrace` implements a simplified method from :footcite:`ShirleyCode`.
 
 
 Sampled grid values :math:`x,~y` lie inside a grid with bounds :math:`(-r_\text{o}, ~r_\text{o}, ~-r_\text{o}, ~r_\text{o})` and get transformed to radial disc coordinates using:

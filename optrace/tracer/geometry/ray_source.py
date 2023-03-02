@@ -3,7 +3,6 @@
 from typing import Callable, Any  # Callable and Any type
 
 # external libs
-from PIL import Image as PILImage  # image loading
 import numpy as np  # ndarray type and calculations
 import numexpr as ne  # faster calculations
 
@@ -444,7 +443,7 @@ class RaySource(Element):
                 pc.check_type(key, val, str | np.ndarray)
 
                 if isinstance(val, str):
-                    img = np.asarray_chkfinite(PILImage.open(val).convert("RGB"), dtype=np.float64) / 255
+                    img = misc.load_image(val)
                 else:
                     img = np.asarray_chkfinite(val, dtype=np.float64)
 

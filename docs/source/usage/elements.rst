@@ -1,5 +1,5 @@
-Defining Elements (Lens, RaySource, Detector, Filter, Aperture, Marker)
-------------------------------------------------------------------------
+Defining Elements
+------------------------------
 
 
 .. testsetup:: *
@@ -230,6 +230,8 @@ Above we talked how for instance for :python:`polarization="x"` the rays are par
 
    RS = ot.RaySource(circ, polarization="Function", pol_func=lambda ang: np.exp(-(ang - 30)**2/10))
 
+
+.. _usage_lens:
 
 Lens
 ________

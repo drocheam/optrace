@@ -260,6 +260,9 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, SPP, L.front, silent=2)
         self.assertRaises(TypeError, SPP, 5)
 
+    def test_convolution_plots(self):
+        # TODO
+        pass
 
 if __name__ == '__main__':
     unittest.main()

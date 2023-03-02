@@ -88,7 +88,7 @@ Limitations
 __________________
 
 
-Below you can find some limitations of :python:`autofocus` in ``optrace``
+Below you can find some limitations of :python:`autofocus` in `optrace`
 
 * search only between lenses or a lens and the outline
 * the behavior of filters and apertures is ignored. If a ray exists at the start of a search region, it also exists at the end.

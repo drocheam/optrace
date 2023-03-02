@@ -14,6 +14,7 @@ Usage
    image
    focus
    tma
+   convolve
    plots
    ui
    advanced

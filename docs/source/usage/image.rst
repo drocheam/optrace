@@ -1,9 +1,6 @@
 Image and Spectrum Rendering
 ---------------------------------
 
-.. TODO alle code zeilen oder verweise sollen in die python role kommen
-.. TODO Verweise 
-
 
 .. role:: python(code)
   :language: python
@@ -152,7 +149,7 @@ ___________________________
 
 With a spherical detector surface, there are multiple ways to project it down to a rectangular surface. Note that there is no possible way for a projection, that correctly represents angles, distances and areas. One might now this problem from different map projections.
 
-Below you can find the projection methods implemented in ``optrace`` and Wikipedia links for their detailed explanation.
+Below you can find the projection methods implemented in `optrace` and Wikipedia links for their detailed explanation.
 Details on the math applied internally are found in the math section in :numref:`sphere_projections`.
 
 Available methods are:
@@ -199,7 +196,7 @@ Available methods are:
 Resolution Limit Filter
 ___________________________
 
-Unfortunately, ``optrace`` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RImage <optrace.tracer.r_image.RImage>` class provides a limit parameter. This parameter describes the width of an airy disc and blurs the image with a gaussian filter that is approximately the size of the zeroth order of an airy disc with the same resolution limit.
+Unfortunately, `optrace` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RImage <optrace.tracer.r_image.RImage>` class provides a limit parameter. This parameter describes the width of an airy disc and blurs the image with a gaussian filter that is approximately the size of the zeroth order of an airy disc with the same resolution limit.
 
 .. note::
 
@@ -445,7 +442,7 @@ ___________________________________________
 
 **Saving**
 
-An RImage can be saved on the disk for later use in ``optrace``. In the simplest case saving is done with the following command, that takes a file path as argument:
+An RImage can be saved on the disk for later use in `optrace`. In the simplest case saving is done with the following command, that takes a file path as argument:
 
 .. code-block:: python
 

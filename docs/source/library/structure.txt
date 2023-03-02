@@ -35,6 +35,7 @@
     │   ├── srgb.py
     │   ├── tools.py
     │   └── xyz.py
+    ├── convolve.py
     ├── geometry
     │   ├── aperture.py
     │   ├── detector.py
@@ -93,4 +94,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-13 directories, 81 files
+13 directories, 82 files

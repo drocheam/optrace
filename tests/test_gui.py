@@ -167,8 +167,8 @@ class GUITests(unittest.TestCase):
         def trace_gui_run(**kwargs):
             trace_gui_run.i += 1
             with self.subTest(i=trace_gui_run.i, args=kwargs):
-                sim = TraceGUI(RT, **kwargs)
-                sim.debug(_exit=True, silent=True)
+                sim = TraceGUI(RT, silent=True, **kwargs)
+                sim.debug(_exit=True)
         trace_gui_run.i = 0
 
         trace_gui_run()  # default init
@@ -321,8 +321,8 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("rays_visible", 500)
 
         RT = rt_example()
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact, _args=(sim,))
         plt.close('all')
         self.raise_thread_exceptions()
 
@@ -393,8 +393,8 @@ class GUITests(unittest.TestCase):
                 time.sleep(2)  # wait some time so windows can be seen by a human user
 
         RT = rt_example()
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact2, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact2, _args=(sim,))
         plt.close('all')
         self.raise_thread_exceptions()
 
@@ -451,8 +451,8 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 
         RT = rt_example()
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact3, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact3, _args=(sim,))
         plt.close('all')
         self.raise_thread_exceptions()
 
@@ -476,8 +476,8 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 
         RT = rt_example()
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact4, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact4, _args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -485,7 +485,7 @@ class GUITests(unittest.TestCase):
         """test TraceGUI operation when Filter, Lenses, Detectors or Sources are missing"""
 
         def test_features(RT):
-            sim = TraceGUI(RT)
+            sim = TraceGUI(RT, silent=True)
 
             def interact(sim):
                 with self._try(sim):
@@ -528,7 +528,7 @@ class GUITests(unittest.TestCase):
 
                     sim._do_in_main(sim.replot)
 
-            sim.debug(_func=interact, silent=True, _args=(sim,))
+            sim.debug(_func=interact, _args=(sim,))
             self.raise_thread_exceptions()
             time.sleep(1)
 
@@ -560,7 +560,7 @@ class GUITests(unittest.TestCase):
         """spam the gui with many possible actions to check threading locks and for race conditions"""
 
         RT = rt_example()
-        sim = TraceGUI(RT)
+        sim = TraceGUI(RT, silent=True)
 
         def interact(sim):
             
@@ -598,7 +598,7 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(sim.ray_count, 1000000)
                 self.assertEqual(sim.raytracer.rays.N, 1000000)
 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -606,7 +606,7 @@ class GUITests(unittest.TestCase):
         """check replotting by setting random combinations inside the change dictionary for replot()"""
 
         RT = rt_example()
-        sim = TraceGUI(RT)
+        sim = TraceGUI(RT, silent=True)
 
         def interact(sim):
             with self._try(sim):
@@ -638,7 +638,7 @@ class GUITests(unittest.TestCase):
                     sim._do_in_main(sim.replot, cmp)
                     sim._wait_for_idle()
 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -648,7 +648,7 @@ class GUITests(unittest.TestCase):
 
         RT = rt_example()
 
-        sim = TraceGUI(RT)
+        sim = TraceGUI(RT, silent=True)
 
         def interact(sim):
             with self._try(sim):
@@ -714,14 +714,14 @@ class GUITests(unittest.TestCase):
                     if i % 20 == 0:
                         plt.close('all')
         
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
    
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
         RT = rt_example()
-        sim = TraceGUI(RT)
+        sim = TraceGUI(RT, silent=True)
 
         def send_key(sim, key):
             sim._do_in_main(sim.scene.scene_editor._content.setFocus)
@@ -799,7 +799,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 self.assertTrue(sim.last_det_image is not None)
 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
    
     # os test because clipboard is system dependent
@@ -896,7 +896,7 @@ class GUITests(unittest.TestCase):
                     sim._wait_for_idle()
                     self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     def test_resize(self):
@@ -908,7 +908,7 @@ class GUITests(unittest.TestCase):
         """
 
         RT = rt_example()
-        sim = TraceGUI(RT)
+        sim = TraceGUI(RT, silent=True)
 
         def interact(sim):
             with self._try(sim):
@@ -972,7 +972,7 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(0.5)
                 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
         
     def test_non_2d(self):
@@ -997,7 +997,7 @@ class GUITests(unittest.TestCase):
                            pos=[0, 0, 0], s=[0, 0, 1])
         RT.add(RS2)
 
-        sim = TraceGUI(RT, ColoringType="Wavelength")
+        sim = TraceGUI(RT, ColoringType="Wavelength", silent=True)
 
         def interact(sim):
             with self._try(sim):
@@ -1007,7 +1007,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim._do_in_main(sim.replot)
 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -1015,7 +1015,7 @@ class GUITests(unittest.TestCase):
         """additionial coverage tests"""
 
         RT = rt_example()
-        sim = TraceGUI(RT)
+        sim = TraceGUI(RT, silent=True)
 
         def interact(sim):
             with self._try(sim):
@@ -1070,14 +1070,14 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(sim._plot._ray_plot is None)
                 self.assertFalse(sim._plot._ray_property_dict)
 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
     
     def test_additional_coverage_2(self):
         """additionial coverage tests"""
 
         RT = rt_example()
-        sim = TraceGUI(RT)
+        sim = TraceGUI(RT, silent=True)
 
         def interact(sim):
             with self._try(sim):
@@ -1191,7 +1191,7 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim._change_minimalistic_view)
                 sim._wait_for_idle()
 
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     def test_run(self):
@@ -1271,8 +1271,8 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(len(sim._plot._fault_markers), 0)  # no fault_marker in GUI
                 self.assertEqual(len(RT.markers), 0)  # no fault markers in RT
 
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     def test_point_marker(self):
@@ -1324,8 +1324,8 @@ class GUITests(unittest.TestCase):
                 a = sim._plot._marker_plots[0]
                 self.assertFalse(a[0].visible)
 
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
     
     def test_line_marker(self):
@@ -1367,8 +1367,8 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
                 self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was removed in scene
 
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     def test_picker(self):
@@ -1499,8 +1499,8 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim._plot._on_ray_pick)
                 sim._wait_for_idle()
 
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     def test_picker_coverage(self):
@@ -1551,8 +1551,8 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.replot)
                 pick_shift_combs()
 
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
     def test_volumes(self):
@@ -1608,8 +1608,8 @@ class GUITests(unittest.TestCase):
                 # check that custom color gets set again without high contrast
                 self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sphv.color)
 
-        sim = TraceGUI(RT)
-        sim.debug(_func=interact, silent=True, _args=(sim,))
+        sim = TraceGUI(RT, silent=True)
+        sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
 if __name__ == '__main__':

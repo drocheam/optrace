@@ -43,7 +43,7 @@ Such an equation can be found in :footcite:`OptikHaferkorn`:
    s^{\prime}=\frac{n_1}{n_2} s-n\left\{\frac{n_1}{n_2}(n s)-\sqrt{1-\left(\frac{n_1}{n_2}\right)^{2}\left[1-(n s)^{2}\right]}\right\}
    :label: refraction
 
-In case of total internal reflection (TIR) the root argument becomes negative. In ``optrace`` TIR rays get absorbed, as reflections are not modelled, and the user is notified with a message.
+In case of total internal reflection (TIR) the root argument becomes negative. In `optrace` TIR rays get absorbed, as reflections are not modelled, and the user is notified with a message.
 
 
 .. _tracing_pol:

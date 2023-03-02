@@ -370,11 +370,12 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Class constructor
 
-    def __init__(self, raytracer: Raytracer, ui_style=None, **kwargs) -> None:
+    def __init__(self, raytracer: Raytracer, silent: bool = False, ui_style: str = None, **kwargs) -> None:
         """
         Create a new TraceGUI with the assigned Raytracer.
 
         :param RT: raytracer
+        :param silent: if standard output shouldn't be omitted
         :param ui_style: UI style string for Qt
         :param kwargs: additional arguments, options, traits and parameters
         """
@@ -404,7 +405,8 @@ class TraceGUI(HasTraits):
             self.z_det = self.raytracer.detectors[self._det_ind].pos[2]
         self._source_ind = 0
 
-        self.silent = False
+        self.silent = silent
+        self.raytracer.silent = silent
         self._exit = False
 
         self._last_det_snap = None
@@ -652,7 +654,7 @@ class TraceGUI(HasTraits):
         # it could also be in some trait_handlers or functions from other classes
         return self.scene.busy or any(val > 0 for val in self._status.values())
 
-    def debug(self, silent: bool = False, _exit: bool = False, _func: Callable = None, _args: tuple = None) -> None:
+    def debug(self, _exit: bool = False, _func: Callable = None, _args: tuple = None) -> None:
         """
         Run in debugging mode
 
@@ -662,8 +664,6 @@ class TraceGUI(HasTraits):
         :param _args: arguments for _func
         """
         self._exit = _exit
-        self.silent = silent
-        self.raytracer.silent = silent
 
         if _func is not None:
             th = Thread(target=_func, args=_args, daemon=True)
@@ -671,14 +671,12 @@ class TraceGUI(HasTraits):
 
         self.configure_traits()
 
-    def run(self, silent: bool = False) -> None:
+    def run(self) -> None:
         """
         Run the TraceGUI
 
         :param silent: if all standard output should be muted
         """
-        self.silent = silent
-        self.raytracer.silent = silent
         self.configure_traits()
 
     @observe('scene:closing', dispatch="ui")  # needed so this gets also called when clicking x on main window

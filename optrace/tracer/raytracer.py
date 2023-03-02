@@ -1099,7 +1099,6 @@ class Raytracer(Group):
                          projection_method: str | list = "Equidistant",
                          limit:             float | list = None,
                          pos:               int | list = None,
-                         silent:            bool = False,
                          no_sources:        bool = False,
                          extent:            list | np.ndarray = None)\
             -> tuple[list[RImage], list[RImage]]:
@@ -1130,7 +1129,6 @@ class Raytracer(Group):
         :param pos: 3D position(s) of the detector(s)
         :param projection_method: type/list of projection methods for SphericalSurface
         :param limit: list/resolution limits for detector images
-        :param silent: if all standard output should be muted
         :param no_sources: don't render sources, speeds things up a little
         :param extent: list/value for the extent of the detector images
         :return: list of rendered source images, list of rendered detector images
@@ -1215,7 +1213,7 @@ class Raytracer(Group):
         SIm_res = []
 
         iter_ = range(iterations)
-        iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if not silent\
+        iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if not silent_old\
             else iter_
 
         # for all render iterations
