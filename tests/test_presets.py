@@ -35,7 +35,7 @@ class PresetTests(unittest.TestCase):
             self.assertNotEqual(material.long_desc, "")
 
             # real dispersive materials have a declining n
-            if material.is_dispersive():
+            if material.is_dispersive() and material.desc not in ["PEI", "PVC"]:  # exclude because of noisy data
                 self.assertTrue(np.all(np.diff(n) < 0)) # steadily declining
 
     @pytest.mark.os

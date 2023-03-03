@@ -12,6 +12,7 @@ import unittest
 import optrace as ot
 import optrace.plots as otp
 import optrace.tracer.color as color
+from optrace.tracer import misc as misc
 
 import matplotlib.pyplot as plt
 
@@ -261,8 +262,54 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, SPP, 5)
 
     def test_convolution_plots(self):
-        # TODO
-        pass
+
+        # parameters
+        img = ot.presets.image.color_checker
+        s_img = [5, 6]
+        psf = ot.presets.image.ETDRS_chart_inverted
+        s_psf = [0.1, 0.3]
+
+        # check that call is correct, also tests threading
+        img2, s2, dbg = ot.convolve(img, s_img, psf, s_psf, silent=True)
+
+        # default call
+        otp.convolve_debug_plots(img2, s2, dbg, block=self.manual)
+
+        # linear mode
+        otp.convolve_debug_plots(img2, s2, dbg, log=False, block=self.manual)
+        plt.close("all")
+
+        # log modes
+        for log_exp in [1, 3, 10.]:
+            otp.convolve_debug_plots(img2, s2, dbg, log=True, log_exp=log_exp, block=self.manual)
+
+        # type errors
+        self.assertRaises(TypeError, otp.convolve_debug_plots, img2, s2, dbg, block=[])  # invalid block
+        self.assertRaises(TypeError, otp.convolve_debug_plots, img2, s2, dbg, log=[])  # invalid log
+        self.assertRaises(TypeError, otp.convolve_debug_plots, img2, s2, dbg, log_exp=[])  # invalid log_exp
+        self.assertRaises(TypeError, otp.convolve_debug_plots, img2, 5, dbg)  # invalid s2
+        self.assertRaises(TypeError, otp.convolve_debug_plots, 6, s2, dbg)  # invalid img2
+        self.assertRaises(TypeError, otp.convolve_debug_plots, img2, s2, 5)  # invalid dbg
+
+
+    def test_image_plot(self):
+
+        # image and image path
+        path = ot.presets.image.color_checker
+        img2 = misc.load_image(path)
+
+        # check different images, extents and titles
+        for img in [img2, path]:
+            for s in [[3, 2], [1, 3]]:
+                for title in ["", "abc"]:
+                    otp.image_plot(img, s, title=title, block=self.manual)
+
+        # check types
+        self.assertRaises(TypeError, otp.image_plot, img, s, title=5)  # invalid title
+        self.assertRaises(TypeError, otp.image_plot, img, s, block=[])  # invalid block
+        self.assertRaises(TypeError, otp.image_plot, 5, s)  # invalid img
+        self.assertRaises(TypeError, otp.image_plot, img, 5)  # invalid s
+
 
 if __name__ == '__main__':
     unittest.main()

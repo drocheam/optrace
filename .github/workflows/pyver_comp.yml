@@ -9,7 +9,7 @@ on:
       - 'optrace/**'
       
 jobs:
-  os_test:
+  comp_test:
     strategy:
       matrix:
         os: [ubuntu-latest]

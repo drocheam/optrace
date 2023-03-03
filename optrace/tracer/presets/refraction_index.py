@@ -160,6 +160,11 @@ COC: RefractionIndex = RefractionIndex("Sellmeier2", coeff=[1.045, 0.266, 0.206,
 see G. Khanarian, Hoechst Celanese - "Optical properties of cyclic olefin copolymers", Table 1"""
 
 
+COP: RefractionIndex = RefractionIndex("Sellmeier1", coeff=[1.2969, 0.011721, 0, 0, 0, 0],
+                                       desc="COP", long_desc="COP (Zeonex E48R)")
+"""Zeonex E48R, see https://refractiveindex.info/?shelf=other&book=ZeonexE48R&page=Sultanova"""
+
+
 Finalite: RefractionIndex = RefractionIndex("Abbe", n=1.600, V=42, desc="Finalite", long_desc="Sola Finalite")
 """
 Sola Finalite from https://eyewiki.aao.org/Lens_Material_Properties
@@ -186,6 +191,17 @@ PDSM: RefractionIndex = RefractionIndex("Sellmeier1", coeff=[1.0057, 0.013217, 0
 see https://refractiveindex.info/?shelf=organic&book=polydimethylsiloxane&page=Schneider-RTV615"""
 
 
+PEI: RefractionIndex = RefractionIndex("Data", wls=380+10*np.arange(41),
+                                        vals=[1.66217, 1.65853, 1.65489, 1.65125, 1.64792, 1.64503, 1.64280, 1.64096, 
+                                              1.63893, 1.63755, 1.63586, 1.63415, 1.63333, 1.63220, 1.63076, 1.62948, 
+                                              1.62900, 1.62795, 1.62746, 1.62653, 1.62629, 1.62609, 1.62439, 1.62401, 
+                                              1.62392, 1.62250, 1.62273, 1.62204, 1.62185, 1.62057, 1.62139, 1.62040, 
+                                              1.62058, 1.61972, 1.61996, 1.61953, 1.61865, 1.61865, 1.61975, 
+                                              1.61784, 1.61865], 
+                                       desc="PEI", long_desc="Polyetherimide")
+"""Polyetherimide, see https://refractiveindex.info/?shelf=organic&book=polyetherimide&page=Zhang"""
+
+
 PET: RefractionIndex = RefractionIndex("Data", wls=380+10*np.arange(41),
                                        vals=[1.61891, 1.61459, 1.61027, 1.60595, 1.60212, 1.59847, 1.59528, 1.59247, 
                                              1.58988, 1.58716, 1.58496, 1.58304, 1.58111, 1.57927, 1.57769, 1.57630, 
@@ -209,13 +225,25 @@ PS: RefractionIndex = RefractionIndex("Sellmeier1", coeff=[1.4435, 0.020216, 0, 
 """Polystyren, see https://refractiveindex.info/?shelf=3d&book=plastics&page=ps"""
 
 
+PVC: RefractionIndex = RefractionIndex("Data", wls=380+10*np.arange(41),
+                                       vals=[1.56439, 1.56287, 1.56135, 1.55983, 1.55812, 1.55625, 1.55491, 1.55388, 
+                                             1.55236, 1.55145, 1.55010, 1.54940, 1.54850, 1.54761, 1.54692, 1.54626, 
+                                             1.54533, 1.54493, 1.54389, 1.54325, 1.54275, 1.54238, 1.54137, 1.54114, 
+                                             1.54073, 1.54004, 1.53987, 1.53987, 1.53946, 1.53880, 1.53812, 1.53791, 
+                                             1.53754, 1.53727, 1.53732, 1.53674, 1.53593, 1.53544, 1.53569, 
+                                             1.53528, 1.53526],
+                                       desc="PVC", long_desc="Polyvinyl chloride")
+"""PVC, see https://refractiveindex.info/?shelf=organic&book=polyvinil_chloride&page=Zhang
+linearly extrapolated for 380 and 390nm"""
+
+
 Spectralite: RefractionIndex = RefractionIndex("Abbe", n=1.537, V=47, desc="Spectralite", long_desc="Sola Spectralite")
 """
 Sola Spectralite from https://eyewiki.aao.org/Lens_Material_Properties
 """
 
 
-plastics: list = [COC, CR39, Finalite, MR7, Ormex, PC, PDSM, PET, PMMA, PS, Spectralite]
+plastics: list = [COC, COP, CR39, Finalite, MR7, Ormex, PC, PDSM, PEI, PET, PMMA, PS, PVC, Spectralite]
 """plastics refraction index presets"""
 
 

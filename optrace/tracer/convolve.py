@@ -7,18 +7,28 @@ from progressbar import progressbar, ProgressBar
 
 from . import color
 from ..tracer import misc as misc
+from ..tracer.misc import PropertyChecker as pc
 
 
 # TODO explain
 # why rfft, why half of frequencies in x axis
 
-def _grid_interp(x:     np.ndarray, y:     np.ndarray, 
-                 f:     np.ndarray, xi:    np.ndarray, 
+def _grid_interp(x:     np.ndarray, 
+                 y:     np.ndarray, 
+                 f:     np.ndarray, 
+                 xi:    np.ndarray, 
                  yi:    np.ndarray, 
                  k:     int)\
         -> np.ndarray:
     """
-    
+
+    :param x:
+    :param y:
+    :param f:
+    :param xi:
+    :param yi:
+    :param k:
+    :return:
     """
     interp = scipy.interpolate.RectBivariateSpline(x, y, f.T, kx=k, ky=k)
     return interp(xi, yi).T
@@ -27,6 +37,11 @@ def _grid_interp(x:     np.ndarray, y:     np.ndarray,
 def _fourier_props(arr: np.ndarray, px: float, py: float)\
         -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
+
+    :param arr:
+    :param px:
+    :param py:
+    :return:
     """
     # shift fft frequencies
     A = np.fft.fftshift(arr)
@@ -55,14 +70,27 @@ def _threaded(img:          np.ndarray,
               threading:    bool)\
         -> None:
     """
+
+    :param img:
+    :param psf:
+    :param i:
+    :param iprop:
+    :param pprop:
+    :param img2:
+    :param F_img:
+    :paramg F_psf:
+    :param bar:
+    :param k:
+    :param silent:
+    :param threading:
     """
 
     inx, iny, isx, isy, ipx, ipy, iex, iey = iprop
     pnx, pny, psx, psy, ppx, ppy = pprop
 
     # extend image by black borders
-    img_p = np.pad(img, (iey, iex), mode="constant", constant_values=0)
-
+    img_p = np.pad(img, ((iey, iey), (iex, iex)), mode="constant", constant_values=0)
+    
     # interpolate PSF
     sc = max(ppx/ipx, ppy/ipy)
     sc = min(sc, 3)
@@ -81,7 +109,7 @@ def _threaded(img:          np.ndarray,
 
     # extend psf by black borders
     pny, pnx = psf_i.shape
-    psf_p = np.pad(psf_i, (pny, pnx), mode="constant", constant_values=0)
+    psf_p = np.pad(psf_i, ((pny, pny), (pnx, pnx)), mode="constant", constant_values=0)
 
     # get fourier transformed images and frequency vectors
     F_psf0, fx, fy = _fourier_props(psf_p, ppx, ppy)
@@ -120,7 +148,6 @@ def _threaded(img:          np.ndarray,
     F_img[:, :, i] = np.abs(F_img0)
     F_psf[:, :, i] = np.abs(F_psf0i)
 
-# TODO test psf and image format and shape
 
 def convolve(img:       np.ndarray | str, 
              s_img:     list[float, float], 
@@ -131,7 +158,23 @@ def convolve(img:       np.ndarray | str,
              threading: bool = True)\
         -> tuple[np.ndarray, list[float], dict]:
     """
+
+    :param img:
+    :param s_img:
+    :param psf:
+    :param s_psf:
+    :param k:
+    :param silent:
+    :param threading:
+    :return:
     """
+    pc.check_type("img", "img", np.ndarray | str)
+    pc.check_type("psf", "psf", np.ndarray | str)
+    pc.check_type("s_img", s_img, tuple | list)
+    pc.check_type("s_psf", s_psf, tuple | list)
+    pc.check_type("k", k, int)
+    pc.check_type("silent", silent, bool)
+    pc.check_type("threading", threading, bool)
 
     # create progress bar
     bar_steps = 7 + 2*5*(1 - threading) 
@@ -151,6 +194,21 @@ def convolve(img:       np.ndarray | str,
     
     if not silent:
         bar.update(2)
+   
+    # function for raising the exception and finishing the progress bar
+    def raise_(excp):
+        if not silent:
+            bar.finish()
+        raise excp
+
+
+    if img.ndim != 3 or img.shape[2] != 3:
+        raise_(ValueError(f"Image needs to be a three dimensional array with three sRGB channels,"
+                          f" but has shape {img.shape}"))
+    
+    if psf.ndim != 3 or psf.shape[2] != 3:
+        raise_(ValueError(f"PSF needs to be a three dimensional array with three sRGB channels,"
+                         f" but has shape {psf.shape}"))
 
     # image and psf properties
     iny, inx = img.shape[:2]  # image pixel count
@@ -159,21 +217,27 @@ def convolve(img:       np.ndarray | str,
     pny, pnx = psf.shape[:2]  # psf pixel counts
     psx, psy = s_psf  # psf side lengths
     ppx, ppy = psx/pnx, psy/pny  # psf pixel sizes
-        
+       
     if psx > isx or psy > isy:
-        raise ValueError(f"Image size [{isx:.5g}, {isy:.5g}] is smaller than PSF size [{psx:.5g}, {psy:.5g}].")
+        raise_(ValueError(f"Image size [{isx:.5g}, {isy:.5g}] is smaller than PSF size [{psx:.5g}, {psy:.5g}]."))
 
     if pnx*pny > 4e6:
-        raise ValueError("PSF needs to be smaller than 4MP")
+        raise_(ValueError("PSF needs to be smaller than 4MP"))
 
     if inx*iny > 4e6:
-        raise ValueError("Image needs to be smaller than 4MP")
+        raise_(ValueError("Image needs to be smaller than 4MP"))
 
     if ppx > ipx or ppy > ipy:
         if not silent:
             print(f"WARNING: PSF pixel sizes [{ppx:.5g}, {ppy:.5g}] larger than image pixel sizes"
                   f" [{ipx:.5g}, {ipy:.5g}], generally you want a PSF in a higher resolution")
 
+    if pnx <= 10 or pny <= 10:
+        raise_(ValueError(f"PSF too small with shape {psf.shape}, needs to have at least 10 values in each dimension."))
+    
+    if inx <= 10 or iny <= 10:
+        raise_(ValueError(f"Image too small with shape {img.shape}, needs to have at least 10 values in each dimension."))
+    
     if inx*iny < 1e4:
         if not silent:
             print(f"WARNING: Low resolution image.")
@@ -181,12 +245,6 @@ def convolve(img:       np.ndarray | str,
     if pnx*pny < 1e3:
         if not silent:
             print(f"WARNING: Low resolution PSF.")
-
-    if pnx*pny < 100:
-        raise ValueError(f"PSF too small with shape {PSF.shape}.")
-    
-    if inx*iny < 100:
-        raise ValueError(f"Image too small with shape {img.shape}.")
 
     # image extension size
     iex = np.ceil(psx / 2 / ipx).astype(int)

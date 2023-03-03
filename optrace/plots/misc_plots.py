@@ -1,4 +1,5 @@
 
+import copy
 
 import numpy as np  # calculations
 import scipy.optimize  # optimize result type
@@ -63,31 +64,79 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.show(block=block)
     plt.pause(0.1)
 
-# TODO simple plot image function
 
-# TODO test
+def image_plot(img:     np.ndarray | str, 
+               s:       list[float, float], 
+               title:   str = "",
+               block:   bool = True)\
+        -> None:
+    """
+    Plot an image (array or path).
+
+    img needs to be a valid path or a sRGB numpy array with value range [0, 1].
+    Note that image arrays will get normalized to use the whole range.
+
+    :param img: image path or image array
+    :param s: image side lengths in mms (list of two elements, with first element being the x-length)
+    :param title: optional title of the plot
+    :param block: if the plot window should be blocking
+    """
+    pc.check_type("img", img, np.ndarray | str)
+    pc.check_type("s", s, list | tuple)
+    pc.check_type("title", title, str)
+    pc.check_type("block", block, bool)
+
+    img = misc.load_image(img) if isinstance(img, str) else img / np.max(img) 
+
+    plt.figure()
+    _show_grid()
+    plt.title(title)
+
+    plt.imshow(img, extent=[-s[0]/2, s[0]/2, -s[1]/2, s[1]/2], zorder=10)
+
+    plt.xlabel("x in mm")
+    plt.ylabel("y in mm")
+
+    plt.show(block=block)
+    plt.pause(0.1)
+
 
 def convolve_debug_plots(img2:      np.ndarray, 
                          s:         list[float, float], 
                          dbg:       dict,
                          log:       bool = True,
-                         log_exp:   float = 3,
+                         log_exp:   float = 3.,
                          block:     bool = False)\
         -> None:
     """
+    Plot debugging information for convolve().
+    This plots the PSF and initial image, as well as the convoluted one and the fourier transformated images.
 
+    :param img2: convoluted image from convolve()
+    :param s: image side lengths from convolve()
+    :param dbg: debug dictionary from convolve() function
+    :param log: if fourier images are plotted logarithmically
+    :param log_exp: additional exponent/gamma correction for the logarithmic plotting
+    :param blocK: if the last plot window should be blocking
     """
-    s_psf, psf, s_img, img = dbg["s_psf"], dbg["psf"], dbg["s_img"], dbg["img"]
+    pc.check_type("img2", img2, np.ndarray)
+    pc.check_type("s", s, list | tuple)
+    pc.check_type("dbg", dbg, dict)
+    pc.check_type("log", log, bool)
+    pc.check_type("log_exp", log_exp, int | float)
+    pc.check_type("block", block, bool)
+
+    dbg2 = copy.deepcopy(dbg)
 
     # adapt fourier images
-    dbg["F_img2"] = dbg["F_img"]*dbg["F_psf"]
+    dbg2["F_img2"] = dbg["F_img"]*dbg["F_psf"]
     for key in ["F_img2", "F_img", "F_psf"]:
-        val = dbg[key]
+        val = dbg2[key]
         val /= np.max(val)
         val = np.clip(val, 0, 1)
         if log:
             val = color.log_srgb_linear(val, exp=log_exp)
-        dbg[key] = color.srgb_linear_to_srgb(val)
+        dbg2[key] = color.srgb_linear_to_srgb(val)
 
     # calculate min and max frequencies, 
     # see for x: https://numpy.org/doc/stable/reference/generated/numpy.fft.rfftfreq.html
@@ -96,60 +145,38 @@ def convolve_debug_plots(img2:      np.ndarray,
     dx, dy = s[0]/nx, s[1]/ny
     fx0, fx1 = (0, nx/2/dx/nx) if not nx % 2 else (0, (nx-1)/2/dx/nx)
     fy0, fy1 = (-ny/2/dy/ny, (ny/2 - 1)/dy/ny) if not ny % 2 else (-(ny-1)/2/dy/ny, (ny-1)/2/dy/ny)
-
     extf = [fx0, fx1, fy0, fy1]
-    extp = [-s_psf[0]/2, s_psf[0]/2, -s_psf[1]/2, s_psf[1]/2]
-    exti = [-s_img[0]/2, s_img[0]/2, -s_img[1]/2, s_img[1]/2]
-    exti2 = [-s[0]/2, s[0]/2, -s[1]/2, s[1]/2]
 
     plt.figure()
+    plt.subplot(1, 3, 1)
     _show_grid()
     plt.title("FT of Input Image")
-    plt.imshow(np.fft.ifftshift(dbg["F_img"], axes=0), extent=extf, zorder=10)
+    plt.imshow(np.fft.ifftshift(dbg2["F_img"], axes=0), extent=extf, zorder=10)
     plt.xlabel(r"$f_x$ in 1/mm")
     plt.ylabel(r"$f_y$ in 1/mm")
     plt.show(block=False)
 
-    plt.figure()
+    plt.subplot(1, 3, 2)
     _show_grid()
-    plt.title("Cut and interpolated FT of PSF")
-    plt.imshow(np.fft.ifftshift(dbg["F_psf"], axes=0), extent=extf, zorder=10)
+    plt.title("Cut and interpolated\n FT of PSF")
+    plt.imshow(np.fft.ifftshift(dbg2["F_psf"], axes=0), extent=extf, zorder=10)
     plt.xlabel(r"$f_x$ in 1/mm")
-    plt.ylabel(r"$f_y$ in 1/mm")
+    plt.gca().set_yticklabels([])
     plt.show(block=False)
-    #
-    plt.figure()
+
+    plt.subplot(1, 3, 3)
     _show_grid()
-    plt.title("Product of both FTs")
-    plt.imshow(np.fft.ifftshift(dbg["F_img2"], axes=0), extent=extf, zorder=10)
+    plt.title("Product of\n both FTs")
+    plt.imshow(np.fft.ifftshift(dbg2["F_img2"], axes=0), extent=extf, zorder=10)
     plt.xlabel(r"$f_x$ in 1/mm")
-    plt.ylabel(r"$f_y$ in 1/mm")
+    plt.gca().set_yticklabels([])
     plt.show(block=False)
 
-    plt.figure()
-    _show_grid()
-    plt.title("PSF")
-    plt.imshow(psf, extent=extp, zorder=10)
-    plt.xlabel("x in mm")
-    plt.ylabel("y in mm")
-    plt.show(block=False)
-
-    plt.figure()
-    _show_grid()
-    plt.title("Convoluted Image Result")
-    plt.imshow(img2, extent=exti2, zorder=10)
-    plt.xlabel("x in mm")
-    plt.ylabel("y in mm")
-    plt.show(block=False)
-
-    plt.figure()
-    _show_grid()
-    plt.title("Input Image")
-    plt.imshow(img, extent=exti, zorder=10)
-    plt.xlabel("x in mm")
-    plt.ylabel("y in mm")
-    plt.show(block=block)
-    plt.pause(0.1)
+    # plot images
+    s_psf, psf, s_img, img = dbg2["s_psf"], dbg2["psf"], dbg2["s_img"], dbg2["img"]
+    image_plot(img, s_img, title="Input Image", block=False)
+    image_plot(psf, s_psf, title="PSF", block=False)
+    image_plot(img2, s, title="Convoluted Image", block=block)
 
 
 def abbe_plot(ri:     list[RefractionIndex],
