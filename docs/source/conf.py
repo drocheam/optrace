@@ -116,8 +116,9 @@ autodoc_typehints = "description"
 
 # -- Options for misc output -------------------------------------------------
 
-# ignore this link in linkcheck building because of a deprecated SSL negotation
-linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.htm']
+# ignore links that only work in a browser
+linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.htm',
+                    'https://doi.org/10.1002/9783527648962.app1']
 
 # only check doctest blocks
 doctest_test_doctest_blocks = ""
