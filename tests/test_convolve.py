@@ -78,6 +78,16 @@ class ConvolutionTests(unittest.TestCase):
         img2 = np.ones((300, 2))
         self.assertRaises(ValueError, ot.convolve, img2, s_img, psf, s_psf)
 
+        # color test
+        #############################################
+
+        img2 = np.ones((100, 100, 3))
+        psf2 = np.ones((100, 100, 3))
+        img2[:, :, 0] = 0
+        psf2[:, :, 0] = 0
+        
+        self.assertRaises(ValueError, ot.convolve, img2, s_img, psf2, s_psf)
+        
         # coverage tests
         #############################################
 
@@ -91,10 +101,19 @@ class ConvolutionTests(unittest.TestCase):
         for sil in [True, False]:
             ot.convolve(img2, s_img, psf, s_psf, silent=sil)
 
-
     def test_point_psf(self):
-        # test if convolution with a point produces the same image
-        pass
+        """test if convolution with a point produces the same image"""
+
+        image = ot.presets.image.cell
+        s_img = [1, 1]
+        psf = np.ones((200, 200, 3))
+        s_psf = [1e-9, 1e-9]
+
+        img2, s2, dbg = ot.convolve(image, s_img, psf, s_psf)
+
+        # compare
+        mdiff = np.max(img2[1:-1, 1:-1] - dbg["img"])
+        self.assertTrue(mdiff**2.2 < 2e-5)  # should stay the same, but small numerical errors
 
     def test_behavior_basic(self):
         # test odd and even pixel counts, different pixel ratios

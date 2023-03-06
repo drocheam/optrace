@@ -313,13 +313,18 @@ def log_srgb_linear(img: np.ndarray, exp: float = 1) -> np.ndarray:
         rgbsnz = rgbs[nz]
         wmin = np.min(rgbsnz)  # minimum nonzero brightness
         wmax = np.max(rgbsnz)  # minimum brightness
+
+        # constant image or image differences due to numerical errors
+        if wmin > (1 - 1e-6)*wmax:
+            return img.copy()
+
         maxrgb = np.max(img, axis=2)  # highest rgb value for each pixel
 
         # normalize pixel so highest channel value is 1, then rescale logarithmically.
         # Highest value is 1, lowest 0. Exclude all zero channels (maxrgb = 0) for calculation
         mrgb, exp_ = maxrgb[nz], exp
         fact = np.zeros(img.shape[:2])
-        fact[nz] = ne.evaluate("1/mrgb * (1 - log(rgbsnz/ wmax) / log(wmin / wmax)) ** exp_")
+        fact[nz] = ne.evaluate("1/mrgb * (1 - 0.995*log(rgbsnz/ wmax) / log(wmin / wmax)) ** exp_")
 
         return img * fact[:, :, np.newaxis]
 

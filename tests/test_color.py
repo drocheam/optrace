@@ -17,7 +17,6 @@ import optrace.tracer.misc as misc
 from optrace.tracer.color.tools import _WL_MIN0, _WL_MAX0
 
 
-# TODO test log_srgb
 
 class ColorTests(unittest.TestCase):
 
@@ -448,6 +447,35 @@ class ColorTests(unittest.TestCase):
         for T in [100, 1000, 3000, 500, 7800, 10000]:
             spec = color.normalized_blackbody(wl, T)
             self.assertAlmostEqual(np.max(spec), 1)
+
+    def test_log_srgb(self):
+
+        # log scale some image
+        arr = np.array([[[0.2, 0.2, 0.1], [0.1, 0.1, 0.1]], [[1, 1, 1], [0, 0, 0]]])
+        arr2 = color.log_srgb_linear(arr)
+
+        # check values
+        self.assertFalse(np.all(arr2[0, 0] == arr[0, 0]))  # first value differs now
+        self.assertTrue(np.all(arr2[0, 1] > 0))  # smallest value stays non-zero
+        self.assertTrue(np.all(arr[1] == arr2[1]))  # maximum and zero values stay the same
+        
+        # exp > 1
+        arr3 = color.log_srgb_linear(arr, exp=2)
+        self.assertTrue(np.all(arr3[0, 1] < arr2[0, 1]))
+        
+        # exp < 1
+        arr4 = color.log_srgb_linear(arr, exp=0.5)
+        self.assertTrue(np.all(arr4[0, 1] > arr2[0, 1]))
+
+        # test const image
+        const = np.ones((100, 100, 3))
+        const2 = color.log_srgb_linear(const)
+        self.assertTrue(np.all(const == const2))
+
+        # test zero image
+        zero = np.zeros((100, 100, 3))
+        zero2 = color.log_srgb_linear(zero)
+        self.assertTrue(np.all(zero == zero2))
 
 if __name__ == '__main__':
     unittest.main()

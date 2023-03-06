@@ -1,6 +1,7 @@
 import sys
 from threading import Thread  # threading
 
+import numexpr as ne
 import numpy as np
 import scipy.interpolate
 from progressbar import progressbar, ProgressBar  
@@ -149,6 +150,20 @@ def _threaded(img:          np.ndarray,
     F_psf[:, :, i] = np.abs(F_psf0i)
 
 
+def _color_check(img: np.ndarray, th: float = 1e-5) -> bool:
+    """
+    Check if an image has color information. 
+    If any channel difference is above th this function returns True.
+
+    :param img: img to check
+    :param th: sRGB value threshold
+    :return:  if 
+    """
+    i0, i1, i2 = img[:, :, 0], img[:, :, 1], img[:, :, 2]
+
+    return np.any(ne.evaluate("abs(i0-i1) > th")) or np.any(ne.evaluate("abs(i1-i2) > th"))
+
+
 def convolve(img:       np.ndarray | str, 
              s_img:     list[float, float], 
              psf:       np.ndarray | str, 
@@ -191,7 +206,7 @@ def convolve(img:       np.ndarray | str,
     # load psf and convert to linear sRGB
     psf = misc.load_image(psf) if isinstance(psf, str) else psf / np.max(psf)
     psf_lin = color.srgb_to_srgb_linear(psf)
-    
+   
     if not silent:
         bar.update(2)
    
@@ -201,7 +216,6 @@ def convolve(img:       np.ndarray | str,
             bar.finish()
         raise excp
 
-
     if img.ndim != 3 or img.shape[2] != 3:
         raise_(ValueError(f"Image needs to be a three dimensional array with three sRGB channels,"
                           f" but has shape {img.shape}"))
@@ -209,6 +223,14 @@ def convolve(img:       np.ndarray | str,
     if psf.ndim != 3 or psf.shape[2] != 3:
         raise_(ValueError(f"PSF needs to be a three dimensional array with three sRGB channels,"
                          f" but has shape {psf.shape}"))
+    
+    # check that only one image is colored
+    psf_color = _color_check(psf_lin)
+    if psf_color:
+        img_color = _color_check(img_lin)
+        if img_color:
+            raise_(ValueError("Only one of image or psf can have color information, "
+                              "otherwise results will be physically wrong"))
 
     # image and psf properties
     iny, inx = img.shape[:2]  # image pixel count
