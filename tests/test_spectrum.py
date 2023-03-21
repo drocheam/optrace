@@ -690,6 +690,48 @@ class SpectrumTests(unittest.TestCase):
         w = np.ones_like(wl)
         spec = ot.LightSpectrum.render(wl, w)
         self.assertAlmostEqual(spec.peak(), 1 / (color.WL_BOUNDS[1] - color.WL_BOUNDS[0]) * (len(spec._wls)-1))
+    
+    @pytest.mark.os
+    def test_light_spectrum_presets(self):
+        """check light spectrum presets"""
+
+        # check presets
+        wl = color.wavelengths(1000)
+        for spec in ot.presets.light_spectrum.all_presets:
+
+            if spec.is_continuous():
+                spec(wl)
+
+            spec.xyz()
+            spec.color()
+            spec.random_wavelengths(1000)
+
+            # should have descriptions
+            self.assertNotEqual(spec.desc, "")
+            self.assertNotEqual(spec.long_desc, "")
+
+    @pytest.mark.os
+    def test_spectrum_presets(self):
+        """check spectrum presets"""
+
+        # check presets
+        wl = color.wavelengths(1000)
+        for spec in ot.presets.spectrum.xyz_observers:
+
+            if spec.is_continuous():
+                spec(wl)  # call
+            
+            # should have descriptions
+            self.assertNotEqual(spec.desc, "")
+            self.assertNotEqual(spec.long_desc, "")
+
+    def test_spectrum_outside_definition(self):
+        """check that all spectrum presets are zero outside the visible range"""
+        # check that spectrum presets have constant 0 beyond their definition
+        for spec in [*ot.presets.light_spectrum.standard, *ot.presets.spectrum.xyz_observers]:
+            if spec.desc != "E":
+                self.assertEqual(spec(10), 0)
+                self.assertEqual(spec(1000), 0)
 
 if __name__ == '__main__':
     unittest.main()

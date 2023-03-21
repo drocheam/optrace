@@ -349,7 +349,7 @@ class Surface(BaseClass):
             ill = f1*f2 > 0
             if np.any(ill):
                 illc = np.count_nonzero(ill)
-                self.print(f"WARNING: There are {illc} rays that are ill-conditioned for numerical hit finding."
+                self.print(f"WARNING: There are {illc} rays that are ill-conditioned for numerical hit finding. "
                            "Their hit position will certainly be wrong."
                            " A possible cause can be a ray hitting a surface multiple times.")
 

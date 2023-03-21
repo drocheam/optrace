@@ -300,15 +300,28 @@ class PlotTests(unittest.TestCase):
 
         # check different images, extents and titles
         for img in [img2, path]:
-            for s in [[3, 2], [1, 3]]:
-                for title in ["", "abc"]:
-                    otp.image_plot(img, s, title=title, block=self.manual)
+            for flip in [True, False]:
+                for s in [[3, 2], [1, 3]]:
+                    for title in ["", "abc"]:
+                        otp.image_plot(img, s, title=title, block=self.manual, flip=flip)
 
         # check types
         self.assertRaises(TypeError, otp.image_plot, img, s, title=5)  # invalid title
         self.assertRaises(TypeError, otp.image_plot, img, s, block=[])  # invalid block
         self.assertRaises(TypeError, otp.image_plot, 5, s)  # invalid img
         self.assertRaises(TypeError, otp.image_plot, img, 5)  # invalid s
+
+        # coverage
+        ########################################
+
+        # plot RImage
+        RI = ot.RImage([-1, 1, -1, 1])
+        RI.render()
+        otp.image_plot(RI, [2, 2])
+
+        # plot empty array
+        arr = np.zeros((100, 100, 3))
+        otp.image_plot(arr, [3, 3])
 
 
 if __name__ == '__main__':

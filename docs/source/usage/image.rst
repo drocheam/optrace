@@ -726,28 +726,28 @@ Below you can find preset images that can be used for a ray source.
           :align: center
           :width: 350
 
-          Cell image for microscope examples. Usable as ``ot.presets.image.cell``.
+          Cell image for microscope examples. Usable as :python:`ot.presets.image.cell`.
           Image created with `Stable Diffusion <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__.
    
      - .. figure:: ../../../optrace/ressources/images/group_photo.jpg
           :align: center
           :width: 250
 
-          Group photo of managers. Usable as ``ot.presets.image.group_photo``
+          Group photo of managers. Usable as :python:`ot.presets.image.group_photo`
           Image created with `Stable Diffusion <https://lexica.art/prompt/06ba5ac6-7bfd-4ce6-8002-9d0e487b36b2>`__.
    
    * - .. figure:: ../../../optrace/ressources/images/interior.jpg
           :align: center
           :width: 400
 
-          Photo of an interior living room. Usable as ``ot.presets.image.interior``
+          Photo of an interior living room. Usable as :python:`ot.presets.image.interior`
           Image created with `Stable Diffusion <https://lexica.art/prompt/44d7e1fe-ba3b-4e73-972c-a30b95897434>`__.
    
      - .. figure:: ../../../optrace/ressources/images/landscape.jpg
           :align: center
           :width: 400
 
-          Photo of an european landscape. Usable as ``ot.presets.image.landscape``
+          Photo of an european landscape. Usable as :python:`ot.presets.image.landscape`
           Image created with `Stable Diffusion <https://lexica.art/prompt/0da3a592-465e-46d6-8ee6-dfe17ddea386>`__.
    
 
@@ -759,33 +759,39 @@ Below you can find preset images that can be used for a ray source.
           :width: 300
 
           Color checker chart. Public domain image from `here <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__.
-          Usage with ``ot.presets.image.color_checker``
+          Usage with :python:`ot.presets.image.color_checker`
 
      - .. figure:: ../../../optrace/ressources/images/ETDRS_Chart.png
           :align: center
           :width: 300
 
           ETDRS Chart standard. Public Domain Image from `here <https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg>`__.
-          Usage with ``ot.presets.image.ETDRS_chart``
+          Usage with :python:`ot.presets.image.ETDRS_chart`
    
    * - .. figure:: ../../../optrace/ressources/images/ETDRS_Chart_inverted.png
           :align: center
           :width: 300
           
           ETDRS Chart standard. Edited version of the ETDRS image.
-          Usage with ``ot.presets.image.ETDRS_chart_inverted``
+          Usage with :python:`ot.presets.image.ETDRS_chart_inverted`
 
      - .. figure:: ../../../optrace/ressources/images/TestScreen_square.png
           :align: center
           :width: 300
 
           TV test screen. Public Domain Image from `here <https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg>`__.
-          Usage with ``ot.presets.image.test_screen``
+          Usage with :python:`ot.presets.image.test_screen`
+
+   * - .. figure:: ../images/checkerboard.png
+          :align: center
+          :width: 300
+          
+          Checkerboard image, 8x8 black and white chess-like board image.
+          Usage with :python:`ot.presets.image.checkerboard`
+
+     - 
 
 
-Additional presets include:
-
-* :attr:`ot.presets.image.checkerboard <optrace.tracer.presets.image.checkerboard>`: 8x8 black and white chess-like board image
 
 
 ------------

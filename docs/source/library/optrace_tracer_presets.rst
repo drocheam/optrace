@@ -18,14 +18,19 @@ _________________________________
 .. automodule:: optrace.tracer.presets.light_spectrum
    :no-value:
 
-tracer.presets.spectral_lines
+tracer.presets.psf
 _________________________________
-.. automodule:: optrace.tracer.presets.spectral_lines
+.. automodule:: optrace.tracer.presets.psf
    :no-value:
 
 tracer.presets.refraction_index
 _________________________________
 .. automodule:: optrace.tracer.presets.refraction_index
+   :no-value:
+
+tracer.presets.spectral_lines
+_________________________________
+.. automodule:: optrace.tracer.presets.spectral_lines
    :no-value:
 
 tracer.presets.spectrum

@@ -1337,7 +1337,7 @@ class TraceGUI(HasTraits):
                          # abbreviations for the raytracer and object lists
                          RT=self.raytracer, LL=self.raytracer.lenses, FL=self.raytracer.filters,
                          APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
-                         DL=self.raytracer.detectors, ML=self.raytracer.markers)
+                         DL=self.raytracer.detectors, ML=self.raytracer.markers, VL=self.raytracer.volumes)
             
             pyface_gui.process_events()
 

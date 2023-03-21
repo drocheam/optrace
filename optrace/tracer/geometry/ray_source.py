@@ -457,8 +457,6 @@ class RaySource(Element):
                 if np.min(img) < 0 or np.max(img) > 1:
                     raise ValueError("Image values need to be inside range [0, 1]")
 
-                img = np.flipud(img)
-
                 # calculate pixel probability from relative power for each pixel
                 If = color._power_from_srgb(img).ravel()
                 Ifs = np.sum(If)

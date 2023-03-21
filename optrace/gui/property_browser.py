@@ -138,9 +138,11 @@ class PropertyBrowser(HasTraits):
                  "presets.light_spectrum": otp.light_spectrum.__dict__,
                  "presets.refraction_index": otp.refraction_index.__dict__,
                  "presets.spectrum": otp.spectrum.__dict__,
+                 "presets.psf": otp.psf.__dict__,
                  "presets.spectral_lines": otp.spectral_lines.__dict__,}
 
-        return {key0:  {key: val for key, val in val0.items() if not key.startswith("__")}\
+        return {key0:  {key: val for key, val in val0.items() if not key.startswith("__") and\
+                        not "module" in str(val) and not "class" in str(val)}\
                 for key0, val0 in pdict.items()}
 
     def _gen_cardinals(self) -> dict:

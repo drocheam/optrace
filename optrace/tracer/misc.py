@@ -18,7 +18,14 @@ def random():
     return np.random.Generator(np.random.SFC64())
 
 def load_image(path: str) -> np.ndarray:
-    return np.asarray(PILImage.open(path).convert("RGB"), dtype=float) / 2**8
+    """
+    Loads an image file and converts it into a numpy array.
+    
+    :param path: path to the file
+    :return: image numpy array, three dimensions, three channels, value range 0-1
+    """
+    img =  np.asarray(PILImage.open(path).convert("RGB"), dtype=float) / 2**8
+    return np.flipud(img)
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function

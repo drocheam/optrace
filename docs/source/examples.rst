@@ -213,6 +213,19 @@ Microscope
           :width: 400
           :align: center
 
+
+PSF Imaging
+----------------------
+
+.. TODO
+
+**File**: ``examples/psf_imaging.py``
+
+**Description**: 
+
+**Screenshots**:
+
+
 Refraction Index Presets
 --------------------------
 

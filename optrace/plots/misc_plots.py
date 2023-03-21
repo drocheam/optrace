@@ -13,6 +13,7 @@ from ..tracer.presets import spectral_lines as Lines  # spectral lines for AbbeP
 from ..tracer.misc import PropertyChecker as pc
 from ..tracer import misc as misc
 from ..tracer import color as color
+from ..tracer import RImage
 
 
 def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
@@ -65,10 +66,14 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.pause(0.1)
 
 
+
+# TODO fix extent. Pixel coordinates are at center of pixel
+
 def image_plot(img:     np.ndarray | str, 
-               s:       list[float, float], 
+               s:       list[float, float],
+               flip:    bool = False,
                title:   str = "",
-               block:   bool = True)\
+               block:   bool = False)\
         -> None:
     """
     Plot an image (array or path).
@@ -78,25 +83,46 @@ def image_plot(img:     np.ndarray | str,
 
     :param img: image path or image array
     :param s: image side lengths in mms (list of two elements, with first element being the x-length)
+    :param flip: flip the image (rotate by 180 degrees)
     :param title: optional title of the plot
     :param block: if the plot window should be blocking
     """
-    pc.check_type("img", img, np.ndarray | str)
+    pc.check_type("img", img, np.ndarray | str | RImage)
     pc.check_type("s", s, list | tuple)
     pc.check_type("title", title, str)
+    pc.check_type("flip", flip, bool)
     pc.check_type("block", block, bool)
 
-    img = misc.load_image(img) if isinstance(img, str) else img / np.max(img) 
+    if isinstance(img, str):
+        img_ = misc.load_image(img)
+    elif isinstance(img, RImage):
+        img_ = img.get("sRGB (Absolute RI)")
+    else:
+        img_ = img
+        if (img_max := np.max(img_)):
+            img_ /= img_max
 
+        if img_.ndim == 2:
+            img_ = np.repeat(img_[:, :, np.newaxis], 3, axis=2)
+            img_ = color.srgb_linear_to_srgb(img_)
+
+    extent = np.array([-s[0]/2, s[0]/2, -s[1]/2, s[1]/2])
+
+    # rotate 180 deg
+    if flip:
+        img_ = np.fliplr(np.flipud(img_))
+        extent = extent[[1, 0, 3, 2]]
+    
     plt.figure()
     _show_grid()
     plt.title(title)
 
-    plt.imshow(img, extent=[-s[0]/2, s[0]/2, -s[1]/2, s[1]/2], zorder=10)
+    plt.imshow(img_, extent=extent, zorder=10, aspect="equal", origin="lower")
 
     plt.xlabel("x in mm")
     plt.ylabel("y in mm")
 
+    plt.tight_layout()
     plt.show(block=block)
     plt.pause(0.1)
 
@@ -105,7 +131,7 @@ def convolve_debug_plots(img2:      np.ndarray,
                          s:         list[float, float], 
                          dbg:       dict,
                          log:       bool = True,
-                         log_exp:   float = 3.,
+                         log_exp:   float = 4.,
                          block:     bool = False)\
         -> None:
     """
@@ -145,32 +171,36 @@ def convolve_debug_plots(img2:      np.ndarray,
     dx, dy = s[0]/nx, s[1]/ny
     fx0, fx1 = (0, nx/2/dx/nx) if not nx % 2 else (0, (nx-1)/2/dx/nx)
     fy0, fy1 = (-ny/2/dy/ny, (ny/2 - 1)/dy/ny) if not ny % 2 else (-(ny-1)/2/dy/ny, (ny-1)/2/dy/ny)
+
     extf = [fx0, fx1, fy0, fy1]
 
     plt.figure()
+    plt.suptitle("Frequency Amplitudes" + ("" if not log else " (Non-Linear Visualization)"))
+
     plt.subplot(1, 3, 1)
     _show_grid()
     plt.title("FT of Input Image")
-    plt.imshow(np.fft.ifftshift(dbg2["F_img"], axes=0), extent=extf, zorder=10)
+    plt.imshow(np.fft.ifftshift(dbg2["F_img"], axes=0), extent=extf, aspect="equal", zorder=10, origin="lower")
     plt.xlabel(r"$f_x$ in 1/mm")
     plt.ylabel(r"$f_y$ in 1/mm")
     plt.show(block=False)
 
     plt.subplot(1, 3, 2)
     _show_grid()
-    plt.title("Cut and interpolated\n FT of PSF")
-    plt.imshow(np.fft.ifftshift(dbg2["F_psf"], axes=0), extent=extf, zorder=10)
+    plt.title("Cut and Interpolated\n FT of PSF")
+    plt.imshow(np.fft.ifftshift(dbg2["F_psf"], axes=0), extent=extf, aspect="equal", zorder=10, origin="lower")
     plt.xlabel(r"$f_x$ in 1/mm")
     plt.gca().set_yticklabels([])
     plt.show(block=False)
 
     plt.subplot(1, 3, 3)
     _show_grid()
-    plt.title("Product of\n both FTs")
-    plt.imshow(np.fft.ifftshift(dbg2["F_img2"], axes=0), extent=extf, zorder=10)
+    plt.title("Product of\n Both FTs")
+    plt.imshow(np.fft.ifftshift(dbg2["F_img2"], axes=0), extent=extf, aspect="equal", zorder=10, origin="lower")
     plt.xlabel(r"$f_x$ in 1/mm")
     plt.gca().set_yticklabels([])
     plt.show(block=False)
+    plt.tight_layout()
 
     # plot images
     s_psf, psf, s_img, img = dbg2["s_psf"], dbg2["psf"], dbg2["s_img"], dbg2["img"]

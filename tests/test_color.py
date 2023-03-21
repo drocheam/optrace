@@ -476,6 +476,85 @@ class ColorTests(unittest.TestCase):
         zero = np.zeros((100, 100, 3))
         zero2 = color.log_srgb_linear(zero)
         self.assertTrue(np.all(zero == zero2))
+    
+    @pytest.mark.os
+    def test_illuminant_whitepoint(self):
+
+        # coordinates from https://en.wikipedia.org/wiki/Standard_illuminant#Illuminant_A
+        coords = {
+            "A": 	    (0.44757, 0.40745),
+            "C": 	    (0.31006, 0.31616),
+            "D50":      (0.34567, 0.35850),
+            "D55":      (0.33242, 0.34743),
+            "D65":      (0.31271, 0.32902),
+            "D75":      (0.29902, 0.31485),
+            "E":        (0.33333, 0.33333),
+            "FL2":      (0.37208, 0.37529),
+            "FL7":      (0.31292, 0.32933),
+            "FL11":     (0.38052, 0.37713),
+            "LED-B1":   (0.4560, 0.4078), 
+            "LED-B2":   (0.4357, 0.4012), 
+            "LED-B3":   (0.3756, 0.3723), 
+            "LED-B4":   (0.3422, 0.3502), 
+            "LED-B5":   (0.3118, 0.3236)
+        }
+
+        for ill in ot.presets.light_spectrum.standard:
+            xyz = np.array([[[*ill.xyz()]]])
+            coord = color.xyz_to_xyY(xyz)[0, 0]
+
+            # higher delta, because we get different results depending on interpolation method of the illuminant
+            self.assertAlmostEqual(coord[0], coords[ill.desc][0], delta=0.0003)
+            self.assertAlmostEqual(coord[1], coords[ill.desc][1], delta=0.0003)
+
+    def test_srgb_primaries(self):
+
+        # text xy and uv positions of srgb primaries
+        # also tests the corresponding constants in ot.tracer.color
+
+        xy_coords = [color.SRGB_R_XY, color.SRGB_G_XY, color.SRGB_B_XY, color.WP_D65_XY]
+        uv_coords = [color.SRGB_R_UV, color.SRGB_G_UV, color.SRGB_B_UV, color.WP_D65_UV]
+        prec = 2e-5
+
+        for ch, coord_xy, coord_uv in zip(ot.presets.light_spectrum.srgb, xy_coords, uv_coords):
+            xyz = np.array([[[*ch.xyz()]]])
+            xy = color.xyz_to_xyY(xyz)[0, 0]
+            self.assertAlmostEqual(xy[0], coord_xy[0], delta=prec)
+            self.assertAlmostEqual(xy[1], coord_xy[1], delta=prec)
+            self.assertAlmostEqual(1-xy[0]-xy[1], 1-coord_xy[1]-coord_xy[0], delta=prec)
+
+            uv = color.luv_to_u_v_l(color.xyz_to_luv(xyz))[0, 0, :2]
+            self.assertAlmostEqual(uv[0], coord_uv[0], delta=prec)
+            self.assertAlmostEqual(uv[1], coord_uv[1], delta=prec)
+
+    def test_srgb_lines(self):
+
+        # rgb lines have same dominant wavelength as rgb primaries
+        # so with srgb conversion with mode "Absolute" we should get the same chromaticities as the primaries
+        BGR = np.array(ot.presets.spectral_lines.rgb)
+        XYZ = np.array([np.vstack((color.x_observer(BGR),
+                                   color.y_observer(BGR),
+                                   color.z_observer(BGR)))])
+        XYZ = np.swapaxes(XYZ, 2, 1)
+        XYZ2 = color.srgb_linear_to_xyz(color.xyz_to_srgb_linear(XYZ, rendering_intent="Absolute"))
+        xyY = color.xyz_to_xyY(XYZ2)
+
+        for xy0, xy1 in zip(xyY[0], [color.SRGB_B_XY, color.SRGB_G_XY, color.SRGB_R_XY]):
+            self.assertAlmostEqual(xy0[0], xy1[0], delta=0.00001)
+            self.assertAlmostEqual(xy0[1], xy1[1], delta=0.00001)
+
+    def test_lines(self):
+        # check type and value of spectral lines
+
+        for lines in [ot.presets.spectral_lines.all_lines, *ot.presets.spectral_lines.all_line_combinations]:
+            for line in lines:
+                self.assertTrue(isinstance(line, float))
+                self.assertTrue(line >= 380)
+                self.assertTrue(line <= 780)
+
+        # lines should be sorted by value
+        lines = ot.presets.spectral_lines.all_lines
+        self.assertTrue(np.all(np.diff(lines) > 0))
 
 if __name__ == '__main__':
     unittest.main()

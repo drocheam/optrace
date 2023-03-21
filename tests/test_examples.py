@@ -59,12 +59,16 @@ class ExampleTests(unittest.TestCase):
         self.execute("spherical_aberration.py")
     
     @pytest.mark.slow
+    def test_convolve(self):
+        self.execute("psf_imaging.py")
+    
+    @pytest.mark.slow
     def test_achromat(self):
         self.execute("achromat.py")
     
     @pytest.mark.slow
     def test_microscope(self):
-        self.execute("microscope.py", 25)
+        self.execute("microscope.py", 30)
     
     @pytest.mark.slow
     def test_presets_spectrum(self):

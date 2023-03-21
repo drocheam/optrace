@@ -89,7 +89,7 @@ _________________
 Full UI
 ######################
 
-.. figure:: ../images/ui_full.png
+.. figure:: ../images/UI_scene_full.svg
    :align: center
    :width: 800
 
@@ -97,10 +97,59 @@ Full UI
 Scene
 ######################
 
+**Overview**
 
 Details on the scene navigation are found in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>` under "Mouse Interaction".
 There are also keyboard shortcuts available that are discussed in :numref:`gui_keyboard_shortcuts`.
 
+In the bottom left you can find orientation axes, that display the directions of the cartesian axes in the 3D view. When an action/tasks is running, you are informed by a text in the bottom right.
+
+**Picking and Clicking**
+
+When clicking on the ray intersection of ray and a surface, there is a list of properties shown for the selected ray, that is also marked with a red crosshair.
+
+When using ``Shift+Click`` an advanced output is shown, showing even more properties.
+
+Right-clicking inside the scene displays the coordinates of the picked point.
+
+``Shift+ Right Click`` moves the currently selected detector to the picked. z-position.
+
+**Keyboard Shortcuts**
+
+The following keyboard shortcuts are available inside the scene:
+
+.. _gui_keyboard_shortcuts:
+
+.. list-table:: Available keyboards shortcuts
+   :header-rows: 1
+   :align: center
+   :widths: 100 300
+
+   * - Shortcut
+     - Function
+   * - ``y``
+     - set scene view to default y view
+   * - ``h``
+     - maximize scene (hide toolbar and sidebar)
+   * - ``v``
+     - toggle minimalistic view option
+   * - ``c``
+     - toggle high contrast mode
+   * - ``r``
+     - toggle plotting type of rays (points or beams)
+   * - ``d``
+     - render detector image with the current settings
+   * - ``n``
+     - randomly re-chose the plotted rays
+   * - ``s``
+     - save a screenshot of the scene
+   * - ``f``
+     - | set the camera focal point to the position of the mouse. 
+       | Useful for scene rotations, since the geometry is rotated around this point.
+   * - ``l``
+     - change lighting properties
+   * - ``3``
+     - anaglyph view (view for red-cyan 3D glasses)
 
 Toolbar
 ######################
@@ -429,10 +478,11 @@ ____________________
 Pipeline View
 #######################
 
+The pipeline of the mayavi scene enables the viewing and alteration of different geometry objects of the visible scene. For instance, one can change the colors or representation of different elements.
+Note that editing the visualization objects inside the scene is different from changing the geometry objects inside the raytracer.
 
-`<https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__
-
-`<https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__
+Here you can read more about the `pipeline view <https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__
+and here about the `different objects populating the view <https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__
 
 
 .. figure:: ../images/ui_pipeline.png
@@ -443,6 +493,18 @@ Pipeline View
 Property Viewer
 #######################
 
+The property viewer provides an interactive tree view to the following properties:
+
+* properties about the rays/points currently shown
+* cardinal points and other paraxial properties of the lenses and the whole lens setup
+* properties of and objects inside the Raytracer class
+* available presets
+* TraceGUI properties
+* TraceGUI scene properties
+
+All property values are a read-only snapshot, to update the values click on the ``Update`` button.
+Navigate the tabs to switch to different trees.
+
 .. figure:: ../images/ui_property_browser.png
    :align: center
    :width: 600
@@ -451,52 +513,58 @@ Command Window
 #######################
 
 
-.. TODO single elements from the history can be copied by selecting them and pressing ctrl+c
+Inside the command window commands can run from inside the TraceGUI class.
+You can therefore do scripting on the GUI or change raytracer properties, like adding, changing or removing geometries.
+
+After entering a command in the above text field the ``Run``-Button must be pressed.
+Note that the command is only run, if the GUI is idle, therefore not doing any other tasks.
+
+After running the command, the scene is automatically updated and if required the geometry is retraced.
+
+The command gets added to the history. From the history field entries can be copied using ``Ctrl+C``
+or you can export the whole history into the clipboard by pressing the according button.
+Also available is a ``Clear``-Button that empties the history.
+
 
 .. figure:: ../images/ui_command_window.png
    :align: center
    :width: 600
 
-Tips and Tricks
-____________________
+As mentioned, the commands are run from within the TraceGUI object :python:`self` therefore denotes the object itself, so e.g. :python:`self.replot()` would replot the geometry.
+There are multiple object aliases available to simplify coding inside the command window
 
-
-**Keyboard Shortcuts**
-
-The following keyboard shortcuts are available inside the scene:
-
-.. _gui_keyboard_shortcuts:
-
-.. list-table:: Available keyboards shortcuts
+.. list-table:: Some object aliases
    :header-rows: 1
    :align: center
    :widths: 100 300
 
-   * - Shortcut
-     - Function
-   * - ``y``
-     - set scene view to default y view
-   * - ``h``
-     - maximize scene (hide toolbar and sidebar)
-   * - ``v``
-     - toggle minimalistic view option
-   * - ``c``
-     - toggle high contrast mode
-   * - ``r``
-     - toggle plotting type of rays (points or beams)
-   * - ``d``
-     - render detector image with the current settings
-   * - ``n``
-     - randomly re-chose the plotted rays
-   * - ``s``
-     - save a screenshot of the scene
-   * - ``f``
-     - | set the camera focal point to the position of the mouse. 
-       | Useful for scene rotations, since the geometry is rotated around this point.
-   * - ``l``
-     - change lighting properties
-   * - ``3``
-     - anaglyph view (view for red-cyan 3D glasses)
+   * - Alias
+     - Referenced
+   * - :python:`GUI`
+     - the TraceGUI object (same as :python:`self`)
+   * - :python:`RT`
+     - the raytracer used
+   * - :python:`LL`
+     - the lens list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.lenses`)
+   * - :python:`AL`
+     - the aperture list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.apertures`)
+   * - :python:`FL`
+     - the filter list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.filters`)
+   * - :python:`RSL`
+     - the ray source list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.ray_sources`)
+   * - :python:`DL`
+     - the detector list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.detectors`)
+   * - :python:`ML`
+     - the marker list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.markers`)
+   * - :python:`VL`
+     - the volume list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.volumes`)
+
+For instance, inside the command window you can write :python:`RT.remove(AL[1])` to remove the second aperture of tracing geometry.
+By default, you also have access to most `optrace` classes like :python:`Raytracer, RImage, Group, RingSurface, ...`.
+
+Tips and Tricks
+____________________
+
 
 
 **Changing the UI Theme Externally**
