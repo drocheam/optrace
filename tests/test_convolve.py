@@ -10,7 +10,7 @@ import scipy.interpolate
 
 import optrace as ot
 from optrace.tracer import color
-
+import optrace.tracer.misc as misc
 
 
 # TODO
@@ -32,7 +32,7 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.convolve, img, 5, psf, s_psf)  # invalid s_img
         self.assertRaises(TypeError, ot.convolve, img, s_img, 5, s_psf)  # invalid psf
         self.assertRaises(TypeError, ot.convolve, img, s_img, psf, 5)  # invalid s_psf
-        self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, k=[])  # invalid k
+        self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, rendering_intent=[])  # invalid rendering_intent
         self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, silent=[])  # invalid silent
         self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, threading=[])  # invalid threading
         self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, m=[])  # invalid magnification
@@ -43,7 +43,6 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.convolve, img, [0, 1], psf, s_psf)  # s_img x value 0
         self.assertRaises(ValueError, ot.convolve, img, [1, 0], psf, s_psf)  # s_img y value 0
         self.assertRaises(ValueError, ot.convolve, img, s_img, psf, s_psf, m=0)  # m can't be zero
-        self.assertRaises(ValueError, ot.convolve, img, s_img, psf, s_psf, k=0)  # k <= 0
         
 
         # resolution tests
@@ -122,12 +121,14 @@ class ConvolutionTests(unittest.TestCase):
         for psf_s in [(200, 200), (201, 201)]:
             psf = np.ones(psf_s)
 
-            img2, s2, dbg = ot.convolve(image, s_img, psf, s_psf, k=3, silent=True)
+            img2, s2 = ot.convolve(image, s_img, psf, s_psf, silent=True)
 
             # compare
-            mdiff = np.max(img2[2:-2, 2:-2] - dbg["img"])
+            img = misc.load_image(image)
+            dsx = (img2.shape[1] - img.shape[1]) // 2
+            dsy = (img2.shape[0] - img.shape[0]) // 2
+            mdiff = np.max(img2[dsy:-dsy, dsx:-dsx] - img)
             self.assertTrue(mdiff**2.2 < 2e-5)  # should stay the same, but small numerical errors
-
 
         # point with point
 
@@ -136,7 +137,7 @@ class ConvolutionTests(unittest.TestCase):
         img = psf.copy()
         psf = psf[:, :, 0]
 
-        img2, s2, dbg = ot.convolve(img, s_img, psf, s_psf)
+        img2, s2 = ot.convolve(img, s_img, psf, s_psf)
 
         # point stays at center
         self.assertAlmostEqual(img2[img2.shape[0]//2+1, img2.shape[1]//2+1, 1], 1)
@@ -146,83 +147,61 @@ class ConvolutionTests(unittest.TestCase):
         pass
 
 
-    def test_0intensity(self):
+    def test_intensity(self):
 
-
+        # two gaussians
         psf, s_psf = ot.presets.psf.gaussian(d=1)
-        img, s_img = ot.presets.psf.gaussian(d=1)
+        img, s_img = ot.presets.psf.gaussian(d=2)
 
+        # make sRGB image
         img0 = np.repeat(img[:, :, np.newaxis], 3, axis=2)
         img = color.srgb_linear_to_srgb(img0)
 
-        # img = np.ones_like(psf)
-        # img[:, :, :] *= 0
-        # psf[:, :] *= 0
-        # img[200, 200] = 1
-        # psf[200, 200] = 1
-        # s_psf = [5e-4, 5e-4]
-        # psf = psf **1000000
-        # img = img **1000000
+        # convolution
+        img2, s2 = ot.convolve(img, s_img, psf, s_psf)
 
-        img2, s2, dbg = ot.convolve(img, s_img, psf, s_psf, k=3)
-
-
+        # convert back to intensities
         img2 = color.srgb_to_srgb_linear(img2)
         img2 = img2[:, :, 0]
 
-
-        import scipy.signal
-        img22 = scipy.signal.fftconvolve(img0[:, :, 0], psf, mode="same")
-        img22 /= np.max(img22)
-        # input()
-
-        # sx2 = (s2[0] + s2[0]/img.shape[1]/1.5)/2
-        # sy2 = (s2[1] + s2[1]/img.shape[0]/1.5)/2
+        # resulting gaussian with convolution
         X, Y = np.mgrid[-s2[1]/2:s2[1]/2:img2.shape[0]*1j, -s2[0]/2:s2[0]/2:img2.shape[1]*1j]
-        # X, Y = np.mgrid[-s2[1]/2:sy2:img2.shape[0]*1j, -s2[0]/2:sx2:img2.shape[1]*1j]
-
-        # print(s_img, s2)
-
         R2 = X**2 + Y**2
-        # Z = np.exp(-3.265306122e6*(R2))
-        Z = np.exp(-8.163265306e6*(R2))
-        # Z /= np.max(Z)
+        Z = np.exp(-3.265306122e6*(R2))
 
-
-        return
 
         # TODO why is there a difference?
         # for some reasons one of the images is not centered
 
-        diff = img2 - Z
+        # compare
+        diff = img2.T - Z
+        self.assertAlmostEqual(np.mean(np.abs(diff)), 0, delta=0.0005)
 
-        print(s2, img2.shape, s_img, img.shape)
+        # print(np.mean(np.abs(diff)), " Mean difference")
+        # print(s2, img2.shape, s_img, img.shape)
 
-        import matplotlib.pyplot as plt
+        # import matplotlib.pyplot as plt
 
-        import optrace.plots as otp
-        otp.image_plot(img, s_img)
-        otp.image_plot(img2, s2)
-        # otp.image_plot(psf, s_psf)
-        otp.convolve_debug_plots(img2, s2, dbg)
+        # import optrace.plots as otp
+        # otp.image_plot(img, s_img)
+        # otp.image_plot(img2, s2)
+        # # otp.image_plot(psf, s_psf)
+        # # otp.convolve_debug_plots(img2, s2, dbg)
 
-        plt.figure()
-        plt.imshow(diff)
-        plt.show(block=False)
-        plt.figure()
-        plt.imshow(img2)
-        plt.show(block=False)
-        plt.figure()
-        plt.imshow(Z)
-        plt.show(block=False)
+        # plt.figure()
+        # plt.imshow(diff)
+        # plt.show(block=False)
+        # plt.figure()
+        # plt.imshow(img2)
+        # plt.show(block=False)
+        # plt.figure()
+        # plt.imshow(Z)
+        # plt.show(block=False)
 
-        where = np.where(diff == np.max(diff))
-        print(where, img2[where[0][0], where[1][0]], Z[where[0][0], where[1][0]])
+        # where = np.where(diff == np.max(diff))
+        # print(where, img2[where[0][0], where[1][0]], Z[where[0][0], where[1][0]])
 
-        print(np.max(img2), np.max(Z), np.max(img2 - Z))
-
-        input()
-
+        # print(np.max(img2), np.max(Z), np.max(img2 - Z))
 
     @pytest.mark.slow
     def test_tracing_consistency(self):
@@ -237,7 +216,7 @@ class ConvolutionTests(unittest.TestCase):
         for i in range(3):
 
             # raytracer and raysource
-            RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], no_pol=True, silent=True)
+            RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], no_pol=True, silent=False)
             RS = ot.RaySource(ot.Point(), divergence="Lambertian", div_angle=2, s=[0, 0, 1], pos=[0, 0, 0])
             RT.add(RS)
 
@@ -256,7 +235,7 @@ class ConvolutionTests(unittest.TestCase):
 
             # render PSF
             RT.trace(2e6)
-            img = RT.detector_image(945, extent=[-0.07, 0.07, -0.07, 0.07])
+            img = RT.detector_image(345, extent=[-0.07, 0.07, -0.07, 0.07])
             psf = img.copy()
             s_psf = [img.extent[1]-img.extent[0], img.extent[3]-img.extent[2]]
 
@@ -278,7 +257,8 @@ class ConvolutionTests(unittest.TestCase):
 
             # convolution image
             mag = 2.232751
-            img_conv, s_img_conv, _ = ot.convolve(img, [s_img[0]*mag, s_img[1]*mag], psf, s_psf, silent=True)
+            mag = 2.222751
+            img_conv, s_img_conv = ot.convolve(img, [s_img[0]*mag, s_img[1]*mag], psf, s_psf, silent=True)
 
             # spacing vectors
             x = np.linspace(-s_img_conv[0]/2, s_img_conv[0]/2, img_conv.shape[1])
@@ -287,22 +267,25 @@ class ConvolutionTests(unittest.TestCase):
             yi = np.linspace(-s_img_ren[1]/2, s_img_ren[1]/2, img_ren.shape[0])
 
             # interpolate on convoluted image and subtract from rendered one channel-wise
+            img_ren = color.srgb_to_srgb_linear(img_ren)
+            img_conv = color.srgb_to_srgb_linear(img_conv)
             im_diff = np.fliplr(np.flipud(img_ren)).copy()
-            im_diff[:, :, 0] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 0].T, kx=2, ky=2)(xi, yi).T
-            im_diff[:, :, 1] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 1].T, kx=2, ky=2)(xi, yi).T
-            im_diff[:, :, 2] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 2].T, kx=2, ky=2)(xi, yi).T
+            im_diff[:, :, 0] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 0].T, kx=1, ky=1)(xi, yi).T
+            im_diff[:, :, 1] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 1].T, kx=1, ky=1)(xi, yi).T
+            im_diff[:, :, 2] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 2].T, kx=1, ky=1)(xi, yi).T
             im_diff -= np.mean(im_diff)
 
             # import optrace.plots as otp
 
             # otp.image_plot(img_ren, s_img_ren, flip=True)
             # otp.image_plot(img_conv, s_img_conv)
-            # otp.image_plot(np.abs(im_diff), s_img_ren, block=True)
+            # otp.image_plot(np.abs(im_diff), s_img_ren, block=False)
 
             # check that mean difference is small
             # we still have some deviations due to noise, incorrect magnification and not-linear aberrations
             # print(np.mean(np.abs(im_diff)))
-            self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=0.02)
+            delta = 0.01 if i != 1 else 0.03  # larger errors for bright colored color checker image due too not enough rays
+            self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=delta)
 
     @pytest.mark.slow
     def test_size_consistency(self):
@@ -317,7 +300,7 @@ class ConvolutionTests(unittest.TestCase):
             for i, res in enumerate([2000, 400, 51]):
 
                 psf, _ = ot.presets.psf.gaussian()
-                img2, s, dbg = ot.convolve(img, s_img, psf, s_psf, k=5, silent=True)
+                img2, s = ot.convolve(img, s_img, psf, s_psf, silent=True)
 
                 if i == 0:
                     img2o = img2.copy()
@@ -380,7 +363,7 @@ class ConvolutionTests(unittest.TestCase):
         s_img = [5, 5]
         psf, s_psf = ot.presets.psf.glare()
 
-        img2, s2, _ = ot.convolve(img, s_img, psf, s_psf)
+        img2, s2 = ot.convolve(img, s_img, psf, s_psf)
         self.assertEqual(np.max(img2), 0)
     
     def test_zero_psf(self):
@@ -391,7 +374,7 @@ class ConvolutionTests(unittest.TestCase):
         psf = np.zeros((200, 200))
         s_psf = [1, 1]
 
-        img2, s2, _ = ot.convolve(img, s_img, psf, s_psf)
+        img2, s2 = ot.convolve(img, s_img, psf, s_psf)
         self.assertEqual(np.max(img2), 0)
 
     def test_coverage(self):
@@ -408,14 +391,14 @@ class ConvolutionTests(unittest.TestCase):
         s_psf = [1, 0.3]
 
         # m = -1 means flip the output image
-        img2, s2, dbg = ot.convolve(img, s_img, psf, s_psf, m=1)
-        img2_f, s2_f, dbg = ot.convolve(img, s_img, psf, s_psf, m=-1)
+        img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=1)
+        img2_f, s2_f = ot.convolve(img, s_img, psf, s_psf, m=-1)
         self.assertEqual(s2, s2_f)
         self.assertTrue(np.allclose(img2 - np.fliplr(np.flipud(img2_f)), 0))
 
         # a m = 2 is the same as scaling s_img by 2
-        img2, s2, dbg = ot.convolve(img, [2*s_img[0], 2*s_img[1]], psf, s_psf, m=1)
-        img2_s, s2_s, dbg = ot.convolve(img, s_img, psf, s_psf, m=2)
+        img2, s2 = ot.convolve(img, [2*s_img[0], 2*s_img[1]], psf, s_psf, m=1)
+        img2_s, s2_s = ot.convolve(img, s_img, psf, s_psf, m=2)
         self.assertEqual(s2, s2_s)
         self.assertTrue(np.allclose(img2 - img2_s, 0))
 

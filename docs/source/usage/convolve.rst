@@ -26,6 +26,11 @@ _______________
 
 .. TODO explain: image side lengths, non-square pixels, different resolutions, image and psf can be file paths, limitations on color images, images must be sRGB
 
+The image is a sRGB array with dimensions (Ny, Nx, 3) with value range 0-1. Alternatively a filepath to an image file can be provided.
+In contrast, the PSF holds linear power/intensity information and is there a simpler (Ny2, Nx2) shape. Alternatively an RImage object can be used to apply a colored PSF.
+
+Parameters :python:`s_img` and :python:`s_psf` describe the side lengths of both images in millimeters, specified as list of two floats.
+
 
 .. testcode::
 
@@ -34,34 +39,31 @@ _______________
 
    psf, s_psf = ot.presets.psf.halo()
 
-When provided as numpy arrays,
-:python:`img` and :python:`psf` are interpreted as sRGB image data. They therefore must be three dimensional with three elements in the third dimension.
-Alternatively each can be path string to an image file that will be loaded inside :python:`convolve`.
 
 The call to :python:`convolve` looks like this:
 
 .. testcode::
 
-   img2, s2, dbg = ot.convolve(img, s_img, psf, s_psf)
+   img2, s2 = ot.convolve(img, s_img, psf, s_psf)
 
-The function returns the convolved image :python:`img2`, the new image side lengths :python:`s2` as well as a debugging information dictionary :python:`dbg`.
+The function returns the convolved image :python:`img2`, the new image side lengths :python:`s2`.
 
-Additional parameters for this function include :python:`silent`, which omits all text output like a progressbar and informational messages. :python:`threading=False` disables multithreading and :python:`k` defines an interpolation parameter for :obj:`scipy.interpolate.RectBivariateSpline` that is used inside the function.
+Additional parameters for this function include :python:`silent`, which omits all text output like a progressbar and informational messages. :python:`threading=False` disables multithreading and :python:`rendering_intent` defines the used intent for the sRGB conversion.
 
 .. testcode::
 
-   img2, s2, dbg = ot.convolve(img, s_img, psf, s_psf, silent=True, threading=False, k=5)
+   img2, s2 = ot.convolve(img, s_img, psf, s_psf, silent=True, threading=False, rendering_intent="Perceptual")
 
 
 **Restrictions**
 
-
-* PSF and image must be path strings or numpy arrays with shape (Ny, Nx, 3)
+* image is a (Ny, Nx, 3) sRGB array or filepath to a sRGB image
+* PSF is either an intensity array or an RImage object
 * the value range should be inside 0-1
-* array values are interpreted as sRGB values, not linear intensities
 * resolutions must be between 50x50 pixels and 4 megapixels
-* at most one image has color information
-* the size of the PSF must be smaller than that of the image
+* at most one image or PSF has color information
+* the size of the PSF can't be much larger than the image scaled by the magnification factor
+
 
 **Example for Intensity Images**
 
@@ -83,21 +85,19 @@ Additional parameters for this function include :python:`silent`, which omits al
    s_img = [0.9, 0.9]
   
    # square psf
-   psf = np.zeros((200, 200, 3))
+   psf = np.zeros((200, 200))
    psf[50:150, 50:150] = 1
-   # conversion to sRGB not needed, as we have binary values (0, 1)
 
    # psf size
    s_psf = [0.1, 0.08]
 
    # convolution
-   img2, s2, dbg = ot.convolve(img, s_img, psf, s_psf)
+   img2, s2 = ot.convolve(img, s_img, psf, s_psf)
 
 
-Plotting
+Image Plotting
 ________________
 
-**Simple Image Plot**
 
 .. testcode::
 
@@ -117,20 +117,6 @@ ________________
 .. testcode::
 
    otp.image_plot(img, s_img, title="Input Image", flip=True, block=False)
-
-
-**Debugging Information**
-
-
-
-.. testcode::
-
-   otp.convolve_debug_plots(img2, s2, dbg)
-
-
-.. testcode::
-
-   otp.convolve_debug_plots(img2, s2, dbg, log=True, log_exp=5, block=False)
 
 
 

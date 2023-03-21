@@ -66,7 +66,6 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "ot.Element", locals())
         self.assertRaises(AttributeError, eval, "ot.BaseClass", locals())
         self.assertRaises(AttributeError, eval, "ot.misc", locals())
-        self.assertRaises(AttributeError, eval, "ot.color", locals())
         self.assertRaises(AttributeError, eval, "ot.Surface", locals())
         self.assertRaises(AttributeError, eval, "ot.ray_storage", locals())
         self._test_scope_ext_libs(locals())

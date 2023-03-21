@@ -211,7 +211,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         _triangle_intersect(r, g, b, w, x, y)
 
         # rescale x, y, z so the color has the same Y as original color
-        k = Y/y  # okay since y == 0 is an invalid color outside the visible gamut
+        k = Y/np.where(y > 0, y, np.inf)
         XYZ[inv, 0] = k*x
         XYZ[inv, 2] = ne.evaluate("k*(1-x-y)")
 
@@ -326,7 +326,7 @@ def log_srgb_linear(img: np.ndarray, exp: float = 1) -> np.ndarray:
         fact = np.zeros(img.shape[:2])
         fact[nz] = ne.evaluate("1/mrgb * (1 - 0.995*log(rgbsnz/ wmax) / log(wmin / wmax)) ** exp_")
 
-        return img * fact[:, :, np.newaxis]
+        return img * fact[..., np.newaxis]
 
     else:
         return img.copy()

@@ -11,10 +11,13 @@ img = ot.presets.image.ETDRS_chart
 s_img = [1.5, 1.2]
 
 # halo preset, returns the psf and the side lengths
-psf, s_psf = ot.presets.psf.halo(d1=8, d2=40, a=0.1, w=2)
+# sizes d1, d2, ... are in micrometers
+psf, s_psf = ot.presets.psf.halo(d1=12, d2=40, a=0.2, w=2)
 
 # convolve
-img2, s, dbg = ot.convolve(img, s_img, psf, s_psf, m=0.75)
+img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=0.75)
 
-# plot the images as well as the Fourier images
-otp.convolve_debug_plots(img2, s, dbg, block=True)
+# plot images
+otp.image_plot(img, s_img, title="Initial Image")
+otp.image_plot(psf, s_psf, title="PSF")
+otp.image_plot(img2, s2, title="Convoluted Image", block=True)

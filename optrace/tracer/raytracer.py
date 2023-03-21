@@ -1118,9 +1118,11 @@ class Raytracer(Group):
         >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256]) 
         >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
 
-        N_px_S can also be provided as list, note however, that when provided as list it needs to have the same length as the number of sources.
+        N_px_S can also be provided as list, note however, that when provided as list it needs 
+        to have the same length as the number of sources.
 
-        By default, source images are also rendered. Providing no_sources=True skips source rendering and simply returns an empty list.
+        By default, source images are also rendered. Providing no_sources=True skips source rendering 
+        and simply returns an empty list.
 
         :param N_rays: number of rays
         :param N_px_D: number/list of detector image pixels for smaller image size

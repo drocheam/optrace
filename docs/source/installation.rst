@@ -34,7 +34,7 @@ After this, `optrace` should be installed on your system.
      - 3D plotting library
    * - `matplotlib <https://matplotlib.org/stable/users/index>`_
      - 2D plotting library
-   * - `numexpr <https://numexpr.readthedocs.io/projects/NumExpr3/en/latest/user_guide.html>`_
+   * - `numexpr <https://numexpr.readthedocs.io/en/latest/>`_
      - sped-up and optimized calculations
    * - `numpy <https://numpy.org/doc/stable/user/index.html#user>`_
      - matrix calculations
