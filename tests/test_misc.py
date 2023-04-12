@@ -54,9 +54,9 @@ class TracerMiscTests(unittest.TestCase):
 
         # printing
         BC.silent = False
-        BC.print("abc")
+        BC.print("Test Message")
         BC.silent = True
-        BC.print("abc")
+        BC.print("Test Message")
 
         # coverage: crepr of different member types
         L = ot.presets.geometry.arizona_eye().lenses[0]
@@ -256,6 +256,24 @@ class TracerMiscTests(unittest.TestCase):
         self.assertTrue(b2x)  # check if shuffled x
         self.assertTrue(b1y)  # check if dithered y
         self.assertTrue(b2y)  # check if shuffled y
+
+        # test discrepancy
+
+        N = 50000
+        from scipy.stats import qmc
+
+        # sampling from latin hypercube
+        lhc = qmc.LatinHypercube(d=2)
+        sample_lhc = lhc.random(n=N)
+        d_lhc = qmc.discrepancy(sample_lhc)
+
+        # samples with optrace stratified sampling
+        strat = misc.uniform2(0, 1, 0, 1, N)
+        strat = np.vstack(strat).T
+        d_strat = qmc.discrepancy(strat)
+
+        # stratified sampling has smaller discrepancy
+        self.assertTrue(d_strat < d_lhc)
 
     def test_misc_calc(self):
        

@@ -359,7 +359,9 @@ class ColorTests(unittest.TestCase):
         RSS = ot.RectangularSurface(dim=[6, 6])
         RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65)
         RT.add(RS)
-        
+       
+        # TODO should we flip image arrays inside a ray source?
+
         # assign colored image to RaySource
         RS.image = Image = np.array([[[0, 1, 0], [1, 1, 1], [1, 0, 0], [0, 0, 1], [0, 0, 0]],
                                     [[1, 1, 0], [1, 0, 1], [0, 1, 1], [0.1, 0.1, 0.1], [0, 0, 0]],
@@ -369,7 +371,8 @@ class ColorTests(unittest.TestCase):
         SIm, _ = RT.iterative_render(100000000, N_px_S=5)
 
         # get Source Image
-        RS_XYZ = np.flipud(SIm[0].xyz())  # flip so element [0, 0] is in lower left
+        # RS_XYZ = np.flipud(SIm[0].xyz())  # flip so element [0, 0] is in lower left
+        RS_XYZ = SIm[0].xyz()  # flip so element [0, 0] is in lower left
         Im_px = color.srgb_to_xyz(Image).reshape((25, 3))
         RS_px = RS_XYZ.reshape((25, 3))
         Im_px /= np.max(Im_px)

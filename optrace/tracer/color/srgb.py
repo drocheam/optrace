@@ -326,7 +326,7 @@ def log_srgb_linear(img: np.ndarray, exp: float = 1) -> np.ndarray:
         fact = np.zeros(img.shape[:2])
         fact[nz] = ne.evaluate("1/mrgb * (1 - 0.995*log(rgbsnz/ wmax) / log(wmin / wmax)) ** exp_")
 
-        return img * fact[..., np.newaxis]
+        return img * fact[:, :, np.newaxis]
 
     else:
         return img.copy()

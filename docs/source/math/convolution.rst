@@ -26,43 +26,44 @@ optrace
 Initially, the pixel sizes, counts and ratios and overall sizes of the PSF and image differ.
 The processing steps consist of the following ones:
 
-* convert PSF and image to linear sRGB values
-* pad the image by black borders of half the size of the PSF
-* pad the PSF by black borders, so the fourier transformation has more low frequency components
-* interpolate the PSF if the image has a smaller pixel size
-* fourier transform both PSF and image
-* interpolate the image frequencies on the PSF
-* multiply interpolated PSF FT and image FT
-* transform back to original domain
-
-All these steps are applied on the per-channel basis of the sRGB images. Due to limitations discussed in :numref:`color_handling` only one of the PSF or image can have color information, otherwise the physical description becomes incorrect.
-
-An overview of the most important steps is shown in figure :numref:`psf_convolution`.
-
-.. _psf_convolution:
-
-.. figure:: ../images/psf_convolution.svg
-   :align: center
-   :width: 600
-
-   Exemplary convolution of two images.
-   
-
-To speed things up, only one half plane of the Fourier images is calculated, as for real signals the output is Hermitian-symmetric (the negative frequencies are the complex conjugate of the positive ones, therefore redundant). This can be done with the :obj:`numpy.fft.rfft2` function.
+1. convert both image and PSF to linear sRGB values
+2. interpolate the PSF so that the grid locations match
+3. pad the PSF
+4. convolve channel-wise using :func:`scipy.signal.convolve`
+5. convert the resulting image back to sRGB linear while doing gamut clipping
 
 
 .. _color_handling:
 
-Color Handling
+Limitations on Color
 =================================================
 
+**Overview**
 
-.. note::
+Ravikumar et al described the convolution of polychromatic point spread functions in detail :footcite:`Ravikumar_2008`. A physically correct approach would be the convolution on a per-wavelength-basis, therefore needing a spectral distribution for every location on object and PSF. With the restriction of a spatially constant distribution on the object, scaled only with an intensity factor, a PSF in RGB channels is also sufficient. This can be described as the spectrum being homogeneous over the object. In the case of a sRGB monitor image, the emission of each pixel can be described as linear combination of the channel emission spectra. In this case the whole object is heterogeneous, but homogeneous on a per-channel-basis. Therefore convolution on a per-channel basis is also viable for a RGB colored PSF and object.
+"Natural scenes" can have largely spatially varying spectral distributions, that would lead to different results. It is important to note that the result of the above a approach is only one possible solution with the assumption of such an man-made RGB object.
 
-   Wavelength dependent point spread functions and images are convoluted on a per-wavelength basis.
-   Converting the spectral images into color value images (like sRGB) and then convolving only works when one of the initial images is wavelength independent, as the mapping from spectrum to color is ambigious
+Proofs of this concept are shown by Ravikumar et. al., while building on the results of Barnden :footcite:`Ravikumar_2008,Barnden_1974`.
+
+
+Let's define two terms, that will be useful later:
+
+* single-colored: an image having the same hue and saturation for all pixels, but different lightness/brightness/intensity values at different locations. This also includes an image without colors.
+* multicolored: image with arbitrary hue, saturation and brightness pixels
+
+
+To put it short, the convolution approach produces correct results if
+
+* both image and PSF are wavelength-independent or single-colored
+* the image is single-colored and the PSF multicolored, or vice versa
+* if both image and PSF are multicolored, but under the assumption that the object emits a superposition of RGB spectra everywhere
+
+For physically correct results the PSF should have a color space with all human visible colors and the color values should be linear to physical intensities/powers.
+
 
 **Proof**
+
+This sections presents an alternative proof of this concept.
 
 The convoluted image :math:`\text{im}_2` is calculated by a two dimensional spatial convolution between the image :math:`\text{im}` and the point spread function :math:`\text{psf}`.
 When done correctly, all three not only depend on the position :math:`x, y` inside the image but also the wavelength :math:`\lambda` as the image and PSF can have different spectral distributions depending on the location.
@@ -104,34 +105,38 @@ This is done by expanding all integrals:
    :label: eq_conv_proof
 
 
-Unfortunately, the above form can't be led to that of :math:numref:`eq_conv_desired`, which would proof the desired case.
+Unfortunately, the above form can't be led to that of :math:numref:`eq_conv_desired` without further restrictions.
 
-This looks differently with the PSF being wavelength-independent:
+One such restrictions could be that the image pixels are composed of a linear combination of spectral distributions :math:`S_\text{im,r}, S_\text{im,g}, S_\text{im,b}`. While the factors :math:`\text{im}_\text{r},\text{im}_\text{g},\text{im}_\text{b}` vary for each pixel, the spectral distributions don't vary locally.
+
+.. math::
+   \text{im}(x, y, \lambda_1) = \text{im}_\text{r}(x, y) S_\text{im,r}(\lambda_1) + \text{im}_\text{g}(x, y) S_\text{im,g}(\lambda_1) +\text{im}_\text{b}(x, y) S_\text{im,b}(\lambda_1)
+   :label: eq_srgb_comp
+
+
+The spectral distributions have their corresponding color matching functions (CMF) :math:`r, g, b`
+
+An important criterion is that all three spectral distributions are orthogonal to the other channels color matching functions, but are non-orthogonal to their own CMF. What this means is that for instance the red spectrum :math:`S_\text{im,r}` only gets registered by the :math:`r` color matching function according to :math:numref:`eq_conv_channel` but not the :math:`g,b` ones, leading to an exclusively red signal in the color space.
+This criterion is equivalent to the spectral distributions leading to color values on all three corners of the triangle sRGB color gamut that is indirectly defined by the CMF.
+
+Plugging :math:numref:`eq_srgb_comp` into :math:numref:`eq_conv_proof` we can rewrite:
 
 .. math::
    \text{im}_{2,r}(x, y) 
-   &= \iint \Bigl[  \text{im}(x, y, \lambda_1) \ast\ast\; \text{psf}(x, y)\Bigr] \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2\\
-   &= \int r(\lambda_2) \cdot \text{d}\lambda_2 \cdot \int \Bigl[\text{im}(x, y, \lambda_1) \ast\ast\; \text{psf}(x, y)\Bigr] \cdot r(\lambda_1) \;\text{d}\lambda_1\\
-   &= R \cdot \int   \Bigl[\text{im}(x, y, \lambda_1) \ast\ast\; \text{psf}(x, y)\Bigr] \cdot r(\lambda_1) \;\text{d}\lambda_1\\
-   &= R \cdot \int   \text{im}_2(x, y, \lambda_1) \cdot r(\lambda_1) \;\text{d}\lambda_1\\
-   :label: eq_conv_psf_independent
-
-Here :math:`R` is a constant scaling factor that depends on the area of :math:`r(\lambda)`.
-
-If on the other hand the image is wavelength independent, we also achieve the same conclusion:
-
-.. math::
-   \text{im}_{2,r}(x, y) 
-   &= \iint \Bigl[  \text{im}(x, y) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2\\
-   &= \int r(\lambda_1) \cdot \text{d}\lambda_1 \cdot \int \Bigl[\text{im}(x, y) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
-   &= R \cdot \int   \Bigl[\text{im}(x, y) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
-   &= R \cdot \int   \text{im}_2(x, y, \lambda_2) \cdot r(\lambda_2) \;\text{d}\lambda_2\\
+   &= \iint \Bigl[  \text{im}(x, y, \lambda_1) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2\\
+   &= \int \Biggl[  \left( \int\text{im}(x, y, \lambda_1) \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \ast\ast\; \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
+   &= \int \Biggl[  \left( \int \Bigl\{ \text{im}_\text{r}(x, y) S_\text{im,r}(\lambda_1) + \text{im}_\text{g}(x, y) S_\text{im,g}(\lambda_1) +\text{im}_\text{b}(x, y) S_\text{im,b}(\lambda_1) \Bigr\} \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \ast\ast\; \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
+   &= \int \Biggl[  \left( \int \text{im}_\text{r}(x, y) S_\text{im,r}(\lambda_1) \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \ast\ast\; \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
+   &= \int S_\text{im,r}(\lambda_1) \cdot r(\lambda_1) \, \text{d}\lambda_1 \cdot \int \Bigl[\text{im}(x, y) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
+   &= R_\text{im} \cdot \int   \Bigl[\text{im}(x, y) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
+   &= R_\text{im} \cdot \int   \text{im}_2(x, y, \lambda_2) \cdot r(\lambda_2) \;\text{d}\lambda_2\\
    :label: eq_conv_img_independent
     
-Analogously, this works for both image and PSF not being dependent on the wavelength.
+This works because the spectral components for the image become independent of the other channel signals. Furthermore, the image convolution becomes independent of the wavelength :math:`\lambda_1` and this part can be integrated separately, leading to a constant factor of  :math:`R_\text{im}`.
 
-Therefore the simplification of using the color channels directly is only physically viable, if at least one of PSF or image are wavelength independent.
-Note that for :math:numref:`eq_conv_channel` to work, we must have a linear color space like linear sRGB, therefore the gamma correction of normal sRGB values must be removed first.
+For all this to work the convolution needs to take place in a linear color space system with the orthogonality criterion from before.
+In our case the linear sRGB colorspace is applied, while also negative values are used to contain all human-visible colors, which wouldn't be the case for the typical positive-value gamut. Linearity would also be lost because of gamut clipping.
+Color matching functions :math:`r, g, b` were chosen according to sRGB specifications and spectral distributions according to the procedure in :numref:`random_srgb`.
 
 
 PSF Presets

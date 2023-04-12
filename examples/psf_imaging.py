@@ -6,6 +6,7 @@ import optrace.plots as otp
 
 # load a resolution chart
 img = ot.presets.image.ETDRS_chart
+# img = ot.presets.image.color_checker
 
 # define the image lengths in mm
 s_img = [1.5, 1.2]

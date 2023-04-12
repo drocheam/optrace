@@ -55,7 +55,8 @@ def timer(func: Callable) -> Any:
 
 def uniform2(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray, np.ndarray]:
     """
-    Stratified Sampling 2D.
+    Stratified Sampling 2D. 
+    Lower discrepancy than scipy.stats.qmc.LatinHypercube.
     
     :param a: lower x-bound
     :param b: upper x-bound
@@ -269,6 +270,7 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     >>> rdot(np.array([[2., 3.], [4., 5.]]), np.array([[-1., 2.], [8., 9.]]))
     array([ 4., 77.])
     """
+
     if a.shape[1] == 3:
         return a[:, 0]*b[:, 0] + a[:, 1]*b[:, 1] + a[:, 2]*b[:, 2]
 

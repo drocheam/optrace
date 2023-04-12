@@ -98,9 +98,7 @@ def image_plot(img:     np.ndarray | str,
     elif isinstance(img, RImage):
         img_ = img.get("sRGB (Absolute RI)")
     else:
-        img_ = img
-        if (img_max := np.max(img_)):
-            img_ /= img_max
+        img_ = img.copy()
 
         if img_.ndim == 2:
             img_ = np.repeat(img_[:, :, np.newaxis], 3, axis=2)

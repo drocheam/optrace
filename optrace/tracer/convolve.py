@@ -15,18 +15,21 @@ from ..tracer.misc import PropertyChecker as pc
 from ..tracer.r_image import RImage
 
 
-def _color_check(img: np.ndarray, th: float = 1e-3) -> bool:
+
+def _color_variation(img: np.ndarray, th: float = 1e-3) -> bool:
     """
-    Check if an image has color information. 
-    If any channel difference is above th this function returns True.
+    Check if an image has color variation. 
+    If any channel pixel is above th over the channel mean this function returns True.
 
     :param img: img to check
     :param th: sRGB value threshold
-    :return:  if image has color information 
+    :return:  if image has color variation
     """
     i0, i1, i2 = img[:, :, 0], img[:, :, 1], img[:, :, 2]
+    im0, im1, im2 = np.mean(img, axis=(0, 1))
 
-    return np.any(ne.evaluate("abs(i0-i1) > th")) or np.any(ne.evaluate("abs(i1-i2) > th"))
+    return np.any(ne.evaluate("abs(i0-im0) > th")) or np.any(ne.evaluate("abs(i1-im1) > th"))\
+            or np.any(ne.evaluate("abs(i2-im2) > th"))
 
 
 def _safe_normalize(img: np.ndarray) -> np.ndarray:
@@ -39,26 +42,31 @@ def _threaded(img:      np.ndarray,
               psf:      np.ndarray, 
               i:        int, 
               img_out:  np.ndarray, 
-              psfm:     float, 
               scx:      float, 
               pnx:      int, 
               scy:      float, 
               pny:      int)\
         -> None:
 
-    # psf too small -> dirac pulse with correct color
+    # psf too small -> dirac pulse
     if scy*pny < 1 and scx*pnx < 1:
-        psf2 = np.array([[psfm]])
+        psf2 = np.array([[1.0]])
 
     # zoom (=rescale) PSF
     else:
-        psf2 = scipy.ndimage.zoom(psf, [scy, scx], order=3, mode="constant", grid_mode=False, prefilter=True)
+        psf2 = scipy.ndimage.zoom(psf, [scy, scx], order=3, mode="grid-constant", grid_mode=True, prefilter=True)
+
+    # adapt values such that power mean after and before zooming stays the same
+    # .. . the reason we need to do this is because some color components are lost in higher frequency components
+    # but would nonetheless color the image
+    if (mean_ := np.mean(psf2)):
+        psf2 *= np.mean(psf) / mean_
 
     # pad psf
     psf2 = np.pad(psf2, ((4, 4), (4, 4)), mode="constant", constant_values=0)
 
     # do convolution
-    img_out[:, :, i] = scipy.signal.fftconvolve(img, psf2, mode="same")
+    img_out[:, :, i] = scipy.signal.fftconvolve(img, psf2, mode="full")
 
 
 def convolve(img:                np.ndarray | str, 
@@ -67,6 +75,7 @@ def convolve(img:                np.ndarray | str,
              s_psf:              list[float, float],
              m:                  float = 1,
              rendering_intent:   str =  "Absolute",
+             normalize:          bool = True,
              silent:             bool = False, 
              threading:          bool = True)\
         -> tuple[np.ndarray, list[float]]:
@@ -79,6 +88,7 @@ def convolve(img:                np.ndarray | str,
     :param m: magnification factor, abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
               m < 0 image flipping, m > 0 an upright image
     :param rendering_intent:
+    :param normalize: if output image should be normalized to range [0-1] (input images are normalized by default)
     :param silent:
     :param threading:
     :return:
@@ -129,7 +139,6 @@ def convolve(img:                np.ndarray | str,
                               f" but has shape {img_srgb.shape}"))
 
     img_lin = color.srgb_to_srgb_linear(img_srgb)  # linear sRGB version
-    img_color = _color_check(img_lin)  # if it has color information
 
     if not silent:
         bar.update(1)
@@ -140,18 +149,15 @@ def convolve(img:                np.ndarray | str,
 
     # rendered image with color information
     if isinstance(psf, RImage):
-        psf_srgb = psf.get("sRGB (Absolute RI)")
 
-        if img_color:
-            # use irradiance and stack in channels
-            psf_lin = np.repeat(psf.get("Irradiance")[:, :, np.newaxis], 3, axis=2)
-            psf_color = False
+        img_color = _color_variation(img_lin)  # if it has color information
+        if img_color and not silent:
+            print("WARNING: Using an image with color variation in combination with a colored PSF. "
+                  "As there many possible results depending on the spectral and local distributions on the object, "
+                  "the scene will be rendered as one seen on a sRGB monitor.")
 
-            if not silent:
-                print("WARNING: Image has color information, using irradiance of the PSF")
-        else:
-            psf_lin = psf.xyz()  # use XYZ color space as it includes all human visible colors
-            psf_color = True
+        # use srgb with negative values
+        psf_lin = color.xyz_to_srgb_linear(psf.xyz(), rendering_intent="Ignore")
         
         # normalize
         psf_lin = _safe_normalize(psf_lin)
@@ -166,8 +172,6 @@ def convolve(img:                np.ndarray | str,
         
         # repeat intensities
         psf_lin = np.repeat(psf_lin[..., np.newaxis], 3, axis=2)
-        psf_srgb = color.srgb_linear_to_srgb(psf_lin)  # srgb image for debug dictionary
-        psf_color = False
 
     if not silent:
         bar.update(2)
@@ -175,6 +179,12 @@ def convolve(img:                np.ndarray | str,
     # Shape Checks
     ###################################################################################################################
     ###################################################################################################################
+
+    # grid coordinates:
+    # image with side coordinates -5, 0, 5 has n = three pixels, 
+    # but a side length of s=10, as we measure from the center of the pixels
+    # the pixel size p is therefore s/(n-1)
+    # from a known pixel size the length s is then (n-1)*p
 
     # image and psf properties
     iny, inx = img_lin.shape[:2]  # image pixel count
@@ -185,7 +195,7 @@ def convolve(img:                np.ndarray | str,
     ppx, ppy = psx/(pnx-1), psy/(pny-1)  # psf pixel sizes
       
     if psx > 2*isx or psy > 2*isy:
-        raise_(ValueError(f"m-scaled image size [{isx:.5g}, {isy:.5g}] is more than two times" 
+        raise_(ValueError(f"m-scaled image size [{isx:.5g}, {isy:.5g}] is more than two times " 
                           f"smaller than PSF size [{psx:.5g}, {psy:.5g}]."))
 
     if pnx*pny > 4e6:
@@ -215,38 +225,40 @@ def convolve(img:                np.ndarray | str,
         if not silent:
             print(f"WARNING: Low resolution PSF.")
 
+    if not (0.2 < ppx/ppy < 5):
+        if not silent:
+            print(f"WARNING: Pixels of PSF are strongly non-square with side lengths [{ppx}mm, {ppy}mm]")
+    
+    if not (0.2 < ipx/ipy < 5):
+        if not silent:
+            print(f"WARNING: Pixels of image are strongly non-square with side lengths [{ipx}mm, {ipy}mm]")
+
     # Convolution
     ###################################################################################################################
     ###################################################################################################################
 
-    # image padding size
-    iex = 1 + np.ceil(psx / 2 / ipx).astype(int)
-    iey = 1 + np.ceil(psy / 2 / ipy).astype(int)
-
-    # pad input image
-    img_lin = np.pad(img_lin, ((iey, iey), (iex, iex), (0, 0)), mode="constant", constant_values=0)
-
-    # output image
-    img2 = np.zeros_like(img_lin)
-
-    # mean color, used for dirac pulse if PSF is too small
-    psfm = np.mean(psf_lin, axis=(0, 1))
-
-    # psf side scaling factors
+    # psf rescale factors
     scx = ppx / ipx
     scy = ppy / ipy
+    
+    # new psf pixel sizes, 8 for padding and rescaled size because of ndimage.zoom()
+    pnx_ = 8 + max(round(pnx*scx), 1)
+    pny_ = 8 + max(round(pny*scy), 1)
+
+    # output image
+    img2 = np.zeros((iny + pny_ - 1, inx + pnx_ - 1, 3), dtype=np.float64)
 
     if not silent:
         bar.update(3)
 
     if not threading:
         for i in range(3):
-            _threaded(img_lin[:, :, i], psf_lin[:, :, i], i, img2, psfm[i], scx, pnx, scy, pny)
+            _threaded(img_lin[:, :, i], psf_lin[:, :, i], i, img2, scx, pnx, scy, pny)
    
     else:
         # create threads
         thread_list = [Thread(target=_threaded, 
-                              args=(img_lin[:, :, i], psf_lin[:, :, i], i, img2, psfm[i], scx, pnx, scy, pny))
+                              args=(img_lin[:, :, i], psf_lin[:, :, i], i, img2, scx, pnx, scy, pny))
                        for i in range(3)]
 
         # execute threads
@@ -261,19 +273,17 @@ def convolve(img:                np.ndarray | str,
     ###################################################################################################################
 
     # normalize image
-    img2 = _safe_normalize(img2)
+    if normalize:
+        img2 = _safe_normalize(img2)
 
-    # convert sRGB linear image to XYZ
-    if not psf_color:
-        img2 = color.srgb_linear_to_xyz(img2)
-    
-    # convert to sRGB
-    img2 = color.xyz_to_srgb(img2, rendering_intent=rendering_intent) 
+    # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
+    img2 = color.srgb_linear_to_xyz(img2)
+    img2 = color.xyz_to_srgb(img2, rendering_intent=rendering_intent, normalize=normalize) 
     
     # new image side lengths
-    s2 = [isx+2*iex*ipx, isy+2*iey*ipy]
+    s2 = [(img2.shape[1]-1)*ipx, (img2.shape[0]-1)*ipy]
 
-    # flip image when m is negative
+    # rotate image by 180deg when m is negative
     if m < 0:
         img2 = np.fliplr(np.flipud(img2))
 
