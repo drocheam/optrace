@@ -1,0 +1,68 @@
+
+/*font and header settings*/
+html {
+	/*--pst-header-height: 2rem;*/
+    /*--pst-font-family-base-system: "Times New Roman", serif;*/
+	/*--pst-font-size-base: 16px;*/
+	--pst-font-size-h1: 26px;
+	--pst-font-size-h2: 24px;
+	--pst-font-size-h3: 22px;
+	--pst-font-size-h4: 20px;
+	--pst-font-size-h5: 18px;
+	--pst-font-size-h6: 17px;
+}
+
+
+/*lower the line height*/
+body {
+    line-height: 1.5em;
+}
+
+/*increase page size*/
+/*.bd-page-width {*/
+    /*max-width: 95rem;*/
+/*}*/
+
+/*set "Section Navigation" title in side bar to normal size*/
+nav.bd-links p.bd-links__title {
+	font-size: unset;
+}
+
+
+/*fixes issue with mathjax multiline equations having incorrect size and position in chrome*/
+div.math mjx-container {
+	overflow-x: unset;
+}
+
+/*increase size of article content from 60rem to 80rem*/
+.bd-main .bd-content .bd-article-container {
+   max-width: 80rem;
+}
+
+/*unset "width 100%" for a table so width gets adjusted automatically*/
+.table {
+	width: unset;
+	margin-top: 1rem;
+	margin-bottom: 2rem;
+	color: unset;
+}
+
+/*lower row padding in tables*/
+.table td, .table th {
+    padding: 0.1rem;
+	/*vertical-align: middle;*/
+}
+
+/*fix for badly displayed reference links*/
+/*a.footnote-reference, a::before, a::after {*/
+	/*vertical-align: unset;*/
+	/*font-size: unset;*/
+	/*font-family: unset;*/
+	/*margin-right: unset;*/
+/*}*/
+
+/*[>fix for badly displayed reference link part 2<]*/
+/*a::after {*/
+   /*color: var(--pst-color-text-muted);*/
+/*}*/
+

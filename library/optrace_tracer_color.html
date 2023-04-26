@@ -1,0 +1,1587 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>7.3. tracer.color Submodule &#8212; optrace 1.4.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'library/optrace_tracer_color';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="7.4. tracer.geometry Submodule" href="optrace_tracer_geometry.html" />
+    <link rel="prev" title="7.2. tracer Submodule" href="optrace_tracer.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../math/math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="library.html" class="nav-link"><span class="section-number">7. </span>Code Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">7.3. </span>tracer.color Submodule</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="module-optrace.tracer.color">
+<span id="tracer-color-submodule"></span><h1><span class="section-number">7.3. </span>tracer.color Submodule<a class="headerlink" href="#module-optrace.tracer.color" title="Permalink to this heading">#</a></h1>
+<section id="module-optrace.tracer.color.tools">
+<span id="tracer-color-tools"></span><h2><span class="section-number">7.3.1. </span>tracer.color.tools<a class="headerlink" href="#module-optrace.tracer.color.tools" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.tools.blackbody">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.tools.</span></span><span class="sig-name descname"><span class="pre">blackbody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6504.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.tools.blackbody" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the spectral radiance of a planck blackbody curve. Unit is W/(sr m³).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength vector in nm (numpy 1D array)</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – blackbody temperature in Kelvin (float)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>blackbody curve values (numpy 1D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">blackbody</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">380.</span><span class="p">,</span> <span class="mf">500.</span><span class="p">,</span> <span class="mf">600.</span><span class="p">]),</span> <span class="n">T</span><span class="o">=</span><span class="mi">5500</span><span class="p">)</span>
+<span class="go">array([ 1.54073437e+13, 2.04744373e+13, 1.98272922e+13])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.tools.normalized_blackbody">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.tools.</span></span><span class="sig-name descname"><span class="pre">normalized_blackbody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6504.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.tools.normalized_blackbody" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the spectral power density of a planck blackbody curve.
+The values are normalized so that the highest value in the visible region,
+defined by WL_BOUNDS is equal to 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength vector in nm (numpy 1D array)</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – blackbody temperature in Kelvin (float)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>blackbody curve values (numpy 1D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_blackbody</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">380.</span><span class="p">,</span> <span class="mf">500.</span><span class="p">,</span> <span class="mf">600.</span><span class="p">]),</span> <span class="n">T</span><span class="o">=</span><span class="mi">5500</span><span class="p">)</span>
+<span class="go">array([ 0.74746157, 0.99328316, 0.961888 ])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.tools.wavelengths">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.tools.</span></span><span class="sig-name descname"><span class="pre">wavelengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.tools.wavelengths" title="Permalink to this definition">#</a></dt>
+<dd><p>Get a wavelength range array with equal spacing and N points.
+The first and last wavelength are specified by WL_BOUNDS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – number of values</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>wavelength vector in nm, 1D numpy array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wavelengths</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">array([ 380., 480., 580., 680., 780.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.tools.WL_BOUNDS">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.tools.</span></span><span class="sig-name descname"><span class="pre">WL_BOUNDS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[380.0,</span> <span class="pre">780.0]</span></em><a class="headerlink" href="#optrace.tracer.color.tools.WL_BOUNDS" title="Permalink to this definition">#</a></dt>
+<dd><p>visible wavelength range</p>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.color.illuminants">
+<span id="tracer-color-illuminants"></span><h2><span class="section-number">7.3.2. </span>tracer.color.illuminants<a class="headerlink" href="#module-optrace.tracer.color.illuminants" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.a_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">a_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.a_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>A standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.c_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">c_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.c_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>C standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.d50_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">d50_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.d50_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>D50 standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.d55_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">d55_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.d55_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>D55 standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.d65_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">d65_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.d65_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>D65 standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.d75_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">d75_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.d75_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>D75 standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.e_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">e_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.e_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>E standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.fl11_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">fl11_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.fl11_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>FL11 standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.fl2_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">fl2_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.fl2_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>FL2 standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.fl7_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">fl7_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.fl7_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>FL7 standard illuminant (CIE Colorimetry, 3. Edition, 2004)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.led_b1_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">led_b1_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.led_b1_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>LED-B1 standard illuminant (CIE Colorimetry, 4th Edition, 2018)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.led_b2_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">led_b2_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.led_b2_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>LED-B2 standard illuminant (CIE Colorimetry, 4th Edition, 2018)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.led_b3_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">led_b3_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.led_b3_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>LED-B3 standard illuminant (CIE Colorimetry, 4th Edition, 2018)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.led_b4_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">led_b4_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.led_b4_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>LED-B4 standard illuminant (CIE Colorimetry, 4th Edition, 2018)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.illuminants.led_b5_illuminant">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.illuminants.</span></span><span class="sig-name descname"><span class="pre">led_b5_illuminant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.illuminants.led_b5_illuminant" title="Permalink to this definition">#</a></dt>
+<dd><p>LED-B5 standard illuminant (CIE Colorimetry, 4th Edition, 2018)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.color.observers">
+<span id="tracer-color-observers"></span><h2><span class="section-number">7.3.3. </span>tracer.color.observers<a class="headerlink" href="#module-optrace.tracer.color.observers" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.observers.x_observer">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.observers.</span></span><span class="sig-name descname"><span class="pre">x_observer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.observers.x_observer" title="Permalink to this definition">#</a></dt>
+<dd><p>Eye x observer values (CIE 1931 2° Standard Observer)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.observers.y_observer">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.observers.</span></span><span class="sig-name descname"><span class="pre">y_observer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.observers.y_observer" title="Permalink to this definition">#</a></dt>
+<dd><p>Eye y observer values (CIE 1931 2° Standard Observer)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.observers.z_observer">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.observers.</span></span><span class="sig-name descname"><span class="pre">z_observer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.observers.z_observer" title="Permalink to this definition">#</a></dt>
+<dd><p>Eye z observer values (CIE 1931 2° Standard Observer)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength array in nm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.color.xyz">
+<span id="tracer-color-xyz"></span><h2><span class="section-number">7.3.4. </span>tracer.color.xyz<a class="headerlink" href="#module-optrace.tracer.color.xyz" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.xyz.complementary_wavelength">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.xyz.</span></span><span class="sig-name descname"><span class="pre">complementary_wavelength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">XYZ_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.xyz.complementary_wavelength" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the complementary wavelength for a given XYZ color coordinate and the D65 whitepoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>XYZ_s</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – 3 element array with the XYZ values</p></li>
+<li><p><strong>res</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – spectral locus sampling resolution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>complementary wavelength in nm</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.xyz.dominant_wavelength">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.xyz.</span></span><span class="sig-name descname"><span class="pre">dominant_wavelength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">XYZ_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.xyz.dominant_wavelength" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the dominant wavelength for a given XYZ color coordinate and the D65 whitepoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>XYZ_s</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – 3 element array with the XYZ values</p></li>
+<li><p><strong>res</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – spectral locus sampling resolution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dominant wavelength in nm</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.xyz.xyY_to_xyz">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.xyz.</span></span><span class="sig-name descname"><span class="pre">xyY_to_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.xyz.xyY_to_xyz" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert xyY to XYZ colorspace values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xyy</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – xyY values, 2D image with channels in third dimension</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>converted values, same shape as input</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.xyz.xyz_from_spectrum">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.xyz.</span></span><span class="sig-name descname"><span class="pre">xyz_from_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.xyz.xyz_from_spectrum" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the tristimulus values XYZ from a spectral distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wl</strong> – 1D wavelength vector</p></li>
+<li><p><strong>spec</strong> – 1D spectral value vector, same shape as wl parameter</p></li>
+<li><p><strong>method</strong> – “sum” or “trapz”, method for numerical integration</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy array of 3 elements</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.xyz.xyz_to_xyY">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.xyz.</span></span><span class="sig-name descname"><span class="pre">xyz_to_xyY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.xyz.xyz_to_xyY" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert XYZ to xyY coordinates.
+Black gets mapped to the whitepoint and Y=0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xyz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – input values, 2D image with channels in third dimension</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>converted values with same shape as input</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.xyz.WP_D65_XY">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.xyz.</span></span><span class="sig-name descname"><span class="pre">WP_D65_XY</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.31272,</span> <span class="pre">0.32903]</span></em><a class="headerlink" href="#optrace.tracer.color.xyz.WP_D65_XY" title="Permalink to this definition">#</a></dt>
+<dd><p>whitepoint D65 xy chromaticity coordinates, see CIE Colorimetry, 3. Edition, 2004, table 11.3</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.xyz.WP_D65_XYZ">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.xyz.</span></span><span class="sig-name descname"><span class="pre">WP_D65_XYZ</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.95047,</span> <span class="pre">1.0,</span> <span class="pre">1.08883]</span></em><a class="headerlink" href="#optrace.tracer.color.xyz.WP_D65_XYZ" title="Permalink to this definition">#</a></dt>
+<dd><p>whitepoint D65 in XYZ, see <a class="reference external" href="https://en.wikipedia.org/wiki/Illuminant_D65">https://en.wikipedia.org/wiki/Illuminant_D65</a></p>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.color.srgb">
+<span id="tracer-color-srgb"></span><h2><span class="section-number">7.3.5. </span>tracer.color.srgb<a class="headerlink" href="#module-optrace.tracer.color.srgb" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.gauss">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">gauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.gauss" title="Permalink to this definition">#</a></dt>
+<dd><p>Normalized Gauss Function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – 1D value vector</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – mean value</p></li>
+<li><p><strong>sig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – standard deviation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>function values with same shape as x</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gauss</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]),</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">array([ 0.30113743, 0.38666812, 0.30113743])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.log_srgb_linear">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">log_srgb_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.log_srgb_linear" title="Permalink to this definition">#</a></dt>
+<dd><p>Logarithmically scale linear sRGB components and additionally exponentiate by exp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – input image, shape (Ny, Nx, 3) in linear sRGB</p></li>
+<li><p><strong>exp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – scaling exponent, optional</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>logarithmically scaled and exponated linear sRGB values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.outside_srgb_gamut">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">outside_srgb_gamut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.outside_srgb_gamut" title="Permalink to this definition">#</a></dt>
+<dd><p>Checks if the XYZ colors produce valid colors inside the sRGB gamut</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xyz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – XYZ values, 2D image with channels in the third dimension</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>boolean 2D image</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.random_wavelengths_from_srgb">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">random_wavelengths_from_srgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.random_wavelengths_from_srgb" title="Permalink to this definition">#</a></dt>
+<dd><p>Choose random wavelengths from RGB colors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgb</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – RGB values (numpy 2D array, RGB channels in second dimension)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>random wavelengths for every color (numpy 1D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.spectral_colormap">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">spectral_colormap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wl0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wl1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.spectral_colormap" title="Permalink to this definition">#</a></dt>
+<dd><p>Get a spectral colormap with N steps in sRGB.
+The Hue is rendered physically correct, however the lightness and saturation are set to be visually pleasing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wl0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em> | </em><em>None</em>) – lower wavelength</p></li>
+<li><p><strong>wl1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em> | </em><em>None</em>) – upper wavelength</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – number of steps (int)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sRGBA array (numpy 2D array, shape (N, 4))</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spectral_colormap</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+<span class="go">array([[ 3.81626223e+01, 9.30946402e+00, 7.20900561e+01, 2.55000000e+02],</span>
+<span class="go">       [ 1.14017400e-04, 2.52697905e+02, 2.13400035e+02, 2.55000000e+02],</span>
+<span class="go">       [ 2.41139375e+02, 1.07694238e+02, 7.92225931e+01, 2.55000000e+02]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.srgb_b_primary">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">srgb_b_primary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.srgb_b_primary" title="Permalink to this definition">#</a></dt>
+<dd><p>Possible sRGB b primary curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength vector, 1D numpy array</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>curve values, 1D numpy array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.srgb_g_primary">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">srgb_g_primary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.srgb_g_primary" title="Permalink to this definition">#</a></dt>
+<dd><p>Possible sRGB g primary curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength vector, 1D numpy array</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>curve values, 1D numpy array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.srgb_linear_to_srgb">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">srgb_linear_to_srgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgbl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.srgb_linear_to_srgb" title="Permalink to this definition">#</a></dt>
+<dd><p>Conversion linear RGB to sRGB. Values should be inside range [0, 1], however this is not enforced.
+For negative values srgb(-a) is the same as -srgb(a)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgbl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – linear RGB values (numpy 1D, 2D or 3D array)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sRGB image (same shape as input)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.srgb_linear_to_xyz">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">srgb_linear_to_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgbl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.srgb_linear_to_xyz" title="Permalink to this definition">#</a></dt>
+<dd><p>Conversion from linear sRGB values to XYZ</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgbl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – linear RGB image (numpy 3D array, RGB channels in third dimension)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>XYZ image (numpy 3D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.srgb_r_primary">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">srgb_r_primary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.srgb_r_primary" title="Permalink to this definition">#</a></dt>
+<dd><p>Possible sRGB r primary curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – wavelength vector, 1D numpy array</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>curve values, 1D numpy array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.srgb_to_srgb_linear">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">srgb_to_srgb_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.srgb_to_srgb_linear" title="Permalink to this definition">#</a></dt>
+<dd><p>Conversion from sRGB to linear RGB values. sRGB values should be inside [0, 1], however this is not checked or enforced.
+For negative values -a  srgb_to_srgb_linear(-a) is the same as -srgb_to_srgb_linear(a)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgb</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – RGB values (numpy 1D, 2D or 3D array)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>linear RGB values, array with same shape as input</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.srgb_to_xyz">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">srgb_to_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.srgb_to_xyz" title="Permalink to this definition">#</a></dt>
+<dd><p>Conversion from sRGB to XYZ.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgb</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – sRGB image (numpy 3D array, RGB channels in third dimension)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>XYZ image (numpy 3D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.xyz_to_srgb">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">xyz_to_srgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rendering_intent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Absolute'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.xyz_to_srgb" title="Permalink to this definition">#</a></dt>
+<dd><p>Conversion of XYZ to sRGB.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – XYZ image (numpy 3D array, XYZ channels in third dimension)</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – if values are normalized before conversion (bool)</p></li>
+<li><p><strong>rendering_intent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – one of SRGB_RENDERING_INTENTS (“Ignore”, “Absolute”, “Perceptual”)</p></li>
+<li><p><strong>clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – if sRGB values are clipped before gamma correction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sRGB image (numpy 3D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.xyz_to_srgb_linear">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">xyz_to_srgb_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rendering_intent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Absolute'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.srgb.xyz_to_srgb_linear" title="Permalink to this definition">#</a></dt>
+<dd><p>Conversion XYZ to linear RGB values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – XYZ image (numpy 3D array, XYZ channels in third dimension)</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – if image is normalized to highest value before conversion (bool)</p></li>
+<li><p><strong>rendering_intent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>linear RGB image (numpy 3D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.SRGB_B_XY">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">SRGB_B_XY</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.15,</span> <span class="pre">0.06]</span></em><a class="headerlink" href="#optrace.tracer.color.srgb.SRGB_B_XY" title="Permalink to this definition">#</a></dt>
+<dd><p>sRGB blue primary in xy coordinates</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.SRGB_G_XY">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">SRGB_G_XY</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.3,</span> <span class="pre">0.6]</span></em><a class="headerlink" href="#optrace.tracer.color.srgb.SRGB_G_XY" title="Permalink to this definition">#</a></dt>
+<dd><p>sRGB green primary in xy coordinates</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.SRGB_RENDERING_INTENTS">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">SRGB_RENDERING_INTENTS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Ignore',</span> <span class="pre">'Absolute',</span> <span class="pre">'Perceptual']</span></em><a class="headerlink" href="#optrace.tracer.color.srgb.SRGB_RENDERING_INTENTS" title="Permalink to this definition">#</a></dt>
+<dd><p>Rendering intents for XYZ to sRGB conversion</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.srgb.SRGB_R_XY">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.srgb.</span></span><span class="sig-name descname"><span class="pre">SRGB_R_XY</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.64,</span> <span class="pre">0.33]</span></em><a class="headerlink" href="#optrace.tracer.color.srgb.SRGB_R_XY" title="Permalink to this definition">#</a></dt>
+<dd><p>sRGB red primary in xy coordinates</p>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.color.luv">
+<span id="tracer-color-luv"></span><h2><span class="section-number">7.3.6. </span>tracer.color.luv<a class="headerlink" href="#module-optrace.tracer.color.luv" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.luv_chroma">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">luv_chroma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">luv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.luv.luv_chroma" title="Permalink to this definition">#</a></dt>
+<dd><p>Get Chroma from CIELUV values. Calculation using <a class="reference external" href="https://en.wikipedia.org/wiki/Colorfulness#Chroma">https://en.wikipedia.org/wiki/Colorfulness#Chroma</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>luv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – Luv Image, np.ndarray with shape (Ny, Nx, 3)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Chroma Image, np.ndarray with shape (Ny, Nx)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.luv_hue">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">luv_hue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">luv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.luv.luv_hue" title="Permalink to this definition">#</a></dt>
+<dd><p>Get Hue from CIELUV values. Calculation using <a class="reference external" href="https://en.wikipedia.org/wiki/Colorfulness#Chroma">https://en.wikipedia.org/wiki/Colorfulness#Chroma</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>luv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – Luv Image, np.ndarray with shape (Ny, Nx, 3)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Hue Image, np.ndarray with shape (Ny, Nx)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.luv_saturation">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">luv_saturation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">luv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.luv.luv_saturation" title="Permalink to this definition">#</a></dt>
+<dd><p>Get Chroma from CIELUV values. Calculation using <a class="reference external" href="https://en.wikipedia.org/wiki/Colorfulness#Saturation">https://en.wikipedia.org/wiki/Colorfulness#Saturation</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>luv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – Luv Image, np.ndarray with shape (Ny, Nx, 3)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Saturation Image, np.ndarray with shape (Ny, Nx)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.luv_to_u_v_l">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">luv_to_u_v_l</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">luv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.luv.luv_to_u_v_l" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert to CIELUV to chromaticity color space u’v’L</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>luv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – CIELUV image, 2D image with channels in third dimension</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>u’v’L image, same shape as input</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.luv_to_xyz">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">luv_to_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">luv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.luv.luv_to_xyz" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert CIELUV back to XYZ.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>luv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – CIELUV image (2D, with channels in third dimension)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>XYZ image, same shape as input</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.xyz_to_luv">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">xyz_to_luv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.color.luv.xyz_to_luv" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert XYZ values to CIELUV colorspace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a>) – XYZ image (2D with channels in third dimension)</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – if lightness is normalized</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CIELUV image, same shape as input</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.SRGB_B_UV">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">SRGB_B_UV</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.1754385965,</span> <span class="pre">0.1578947368]</span></em><a class="headerlink" href="#optrace.tracer.color.luv.SRGB_B_UV" title="Permalink to this definition">#</a></dt>
+<dd><p>sRGBgblue primary  in u’v’ coordinates</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.SRGB_G_UV">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">SRGB_G_UV</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.125,</span> <span class="pre">0.5625]</span></em><a class="headerlink" href="#optrace.tracer.color.luv.SRGB_G_UV" title="Permalink to this definition">#</a></dt>
+<dd><p>sRGB green primary in u’v’ coordinates</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.SRGB_R_UV">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">SRGB_R_UV</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.4507042254,</span> <span class="pre">0.5228873239]</span></em><a class="headerlink" href="#optrace.tracer.color.luv.SRGB_R_UV" title="Permalink to this definition">#</a></dt>
+<dd><p>sRGB red primary in u’v’ coordinates</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.WP_D65_LUV">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">WP_D65_LUV</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[100,</span> <span class="pre">0.19783982,</span> <span class="pre">0.4683363]</span></em><a class="headerlink" href="#optrace.tracer.color.luv.WP_D65_LUV" title="Permalink to this definition">#</a></dt>
+<dd><p>whitepoint D65 in Lu’v’, calculate from whitepoint XYZ coordinates</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="optrace.tracer.color.luv.WP_D65_UV">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.color.luv.</span></span><span class="sig-name descname"><span class="pre">WP_D65_UV</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.19783982,</span> <span class="pre">0.4683363]</span></em><a class="headerlink" href="#optrace.tracer.color.luv.WP_D65_UV" title="Permalink to this definition">#</a></dt>
+<dd><p>whitepoint D65 in u’v’, calculated from XYZ coordinates</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="optrace_tracer.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">7.2. </span>tracer Submodule</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="optrace_tracer_geometry.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">7.4. </span>tracer.geometry Submodule</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-optrace.tracer.color.tools">7.3.1. tracer.color.tools</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.tools.blackbody"><code class="docutils literal notranslate"><span class="pre">blackbody()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.tools.normalized_blackbody"><code class="docutils literal notranslate"><span class="pre">normalized_blackbody()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.tools.wavelengths"><code class="docutils literal notranslate"><span class="pre">wavelengths()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.tools.WL_BOUNDS"><code class="docutils literal notranslate"><span class="pre">WL_BOUNDS</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-optrace.tracer.color.illuminants">7.3.2. tracer.color.illuminants</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.a_illuminant"><code class="docutils literal notranslate"><span class="pre">a_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.c_illuminant"><code class="docutils literal notranslate"><span class="pre">c_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.d50_illuminant"><code class="docutils literal notranslate"><span class="pre">d50_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.d55_illuminant"><code class="docutils literal notranslate"><span class="pre">d55_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.d65_illuminant"><code class="docutils literal notranslate"><span class="pre">d65_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.d75_illuminant"><code class="docutils literal notranslate"><span class="pre">d75_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.e_illuminant"><code class="docutils literal notranslate"><span class="pre">e_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.fl11_illuminant"><code class="docutils literal notranslate"><span class="pre">fl11_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.fl2_illuminant"><code class="docutils literal notranslate"><span class="pre">fl2_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.fl7_illuminant"><code class="docutils literal notranslate"><span class="pre">fl7_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.led_b1_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b1_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.led_b2_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b2_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.led_b3_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b3_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.led_b4_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b4_illuminant()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.illuminants.led_b5_illuminant"><code class="docutils literal notranslate"><span class="pre">led_b5_illuminant()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-optrace.tracer.color.observers">7.3.3. tracer.color.observers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.observers.x_observer"><code class="docutils literal notranslate"><span class="pre">x_observer()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.observers.y_observer"><code class="docutils literal notranslate"><span class="pre">y_observer()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.observers.z_observer"><code class="docutils literal notranslate"><span class="pre">z_observer()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-optrace.tracer.color.xyz">7.3.4. tracer.color.xyz</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.xyz.complementary_wavelength"><code class="docutils literal notranslate"><span class="pre">complementary_wavelength()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.xyz.dominant_wavelength"><code class="docutils literal notranslate"><span class="pre">dominant_wavelength()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.xyz.xyY_to_xyz"><code class="docutils literal notranslate"><span class="pre">xyY_to_xyz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.xyz.xyz_from_spectrum"><code class="docutils literal notranslate"><span class="pre">xyz_from_spectrum()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.xyz.xyz_to_xyY"><code class="docutils literal notranslate"><span class="pre">xyz_to_xyY()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.xyz.WP_D65_XY"><code class="docutils literal notranslate"><span class="pre">WP_D65_XY</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.xyz.WP_D65_XYZ"><code class="docutils literal notranslate"><span class="pre">WP_D65_XYZ</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-optrace.tracer.color.srgb">7.3.5. tracer.color.srgb</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.gauss"><code class="docutils literal notranslate"><span class="pre">gauss()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.log_srgb_linear"><code class="docutils literal notranslate"><span class="pre">log_srgb_linear()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.outside_srgb_gamut"><code class="docutils literal notranslate"><span class="pre">outside_srgb_gamut()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.random_wavelengths_from_srgb"><code class="docutils literal notranslate"><span class="pre">random_wavelengths_from_srgb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.spectral_colormap"><code class="docutils literal notranslate"><span class="pre">spectral_colormap()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.srgb_b_primary"><code class="docutils literal notranslate"><span class="pre">srgb_b_primary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.srgb_g_primary"><code class="docutils literal notranslate"><span class="pre">srgb_g_primary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.srgb_linear_to_srgb"><code class="docutils literal notranslate"><span class="pre">srgb_linear_to_srgb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.srgb_linear_to_xyz"><code class="docutils literal notranslate"><span class="pre">srgb_linear_to_xyz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.srgb_r_primary"><code class="docutils literal notranslate"><span class="pre">srgb_r_primary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.srgb_to_srgb_linear"><code class="docutils literal notranslate"><span class="pre">srgb_to_srgb_linear()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.srgb_to_xyz"><code class="docutils literal notranslate"><span class="pre">srgb_to_xyz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.xyz_to_srgb"><code class="docutils literal notranslate"><span class="pre">xyz_to_srgb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.xyz_to_srgb_linear"><code class="docutils literal notranslate"><span class="pre">xyz_to_srgb_linear()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.SRGB_B_XY"><code class="docutils literal notranslate"><span class="pre">SRGB_B_XY</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.SRGB_G_XY"><code class="docutils literal notranslate"><span class="pre">SRGB_G_XY</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.SRGB_RENDERING_INTENTS"><code class="docutils literal notranslate"><span class="pre">SRGB_RENDERING_INTENTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.srgb.SRGB_R_XY"><code class="docutils literal notranslate"><span class="pre">SRGB_R_XY</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-optrace.tracer.color.luv">7.3.6. tracer.color.luv</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.luv_chroma"><code class="docutils literal notranslate"><span class="pre">luv_chroma()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.luv_hue"><code class="docutils literal notranslate"><span class="pre">luv_hue()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.luv_saturation"><code class="docutils literal notranslate"><span class="pre">luv_saturation()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.luv_to_u_v_l"><code class="docutils literal notranslate"><span class="pre">luv_to_u_v_l()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.luv_to_xyz"><code class="docutils literal notranslate"><span class="pre">luv_to_xyz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.xyz_to_luv"><code class="docutils literal notranslate"><span class="pre">xyz_to_luv()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.SRGB_B_UV"><code class="docutils literal notranslate"><span class="pre">SRGB_B_UV</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.SRGB_G_UV"><code class="docutils literal notranslate"><span class="pre">SRGB_G_UV</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.SRGB_R_UV"><code class="docutils literal notranslate"><span class="pre">SRGB_R_UV</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.WP_D65_LUV"><code class="docutils literal notranslate"><span class="pre">WP_D65_LUV</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optrace.tracer.color.luv.WP_D65_UV"><code class="docutils literal notranslate"><span class="pre">WP_D65_UV</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
+<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
+<!--(similar to page-toc.html)-->
+<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="structure.html">7.1. Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer.html">7.2. tracer Submodule</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">7.3. tracer.color Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry.html">7.4. tracer.geometry Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry_surface.html">7.5. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_spectrum.html">7.6. tracer.spectrum Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_presets.html">7.7. tracer.presets Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_plots.html">7.8. plots Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_gui.html">7.9. gui Submodule</a></li>
+</ul>
+
+  </div>
+</nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022, Damian Mendroch.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

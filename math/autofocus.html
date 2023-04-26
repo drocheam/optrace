@@ -1,0 +1,689 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>6.7. Autofocus Methods &#8212; optrace 1.4.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'math/autofocus';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6.8. Color Management" href="color.html" />
+    <link rel="prev" title="6.6. PSF Convolution" href="convolution.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../quickstart.html">
+                        Quickstart
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../usage/usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Example Gallery
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="math.html">
+                        Implementation Details
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../library/library.html">
+                        Code Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../development/development.html">
+                        Development
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="math.html" class="nav-link"><span class="section-number">6. </span>Implementation Details</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">6.7. </span>Autofocus Methods</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="autofocus-methods">
+<span id="autofocus"></span><h1><span class="section-number">6.7. </span>Autofocus Methods<a class="headerlink" href="#autofocus-methods" title="Permalink to this heading">#</a></h1>
+<section id="positional-methods">
+<h2><span class="section-number">6.7.1. </span>Positional Methods<a class="headerlink" href="#positional-methods" title="Permalink to this heading">#</a></h2>
+<p>The two following methods use a weighting of the spatial ray positions.
+Above a few ten thousand rays the results are consistent enough that the result isn’t dependent on the number of rays anymore.
+This is why internally the methods only use a subset if there are more rays available than needed.</p>
+<p><strong>Position Variance</strong></p>
+<p>Minimizing the position variance <span class="math notranslate nohighlight">\(\sigma^2\)</span> of lateral ray positions <span class="math notranslate nohighlight">\(X_z\)</span> and <span class="math notranslate nohighlight">\(Y_z\)</span> at axial position <span class="math notranslate nohighlight">\(z\)</span>. All positions are weighted with their power <span class="math notranslate nohighlight">\(P\)</span> when calculating the weighted variance <span class="math notranslate nohighlight">\(\sigma^2_P\)</span>. The pythagorean sum is applied using both variances to get a simple quantity <span class="math notranslate nohighlight">\(R_\text{v}\)</span> for optimization.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-position">
+<span class="eqno">(6.176)<a class="headerlink" href="#equation-autofocus-position" title="Permalink to this equation">#</a></span>\[\text{minimize}~~ R_\text{v}(z) := \sqrt{\sigma^2_P(X_z) + \sigma^2_P(Y_z)}\]</div>
+<p>This procedure is simple and performant. However, the disadvantage of this method is that it minimizes the position variance of all beams. For example, if there is a strong outlying halo, the method also tries to keep it as small as possible, which can lead to a compromise between the halo and the size of the actual focus.</p>
+<p><strong>Airy Disc Weighting</strong></p>
+<p>A virtual detector with roughly the spatial sensitivity <span class="math notranslate nohighlight">\(S\)</span> of an airy disc.
+The numerical aperture <span class="math notranslate nohighlight">\(\text{NA}\)</span> needed is estimated using the ray angles.
+Only the zeroth order of the airy disc is used, there it can be approximated using a gaussian, see <a class="footnote-reference brackets" href="#footcite-airywiki" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>The stimulus for one ray is the product of gauss function value at radial position <span class="math notranslate nohighlight">\(r_i(z)\)</span> from the disc center and ray power <span class="math notranslate nohighlight">\(P_i(z)\)</span>. Summing up all ray stimuli and dividing by the overall power we get the cost function value for position <span class="math notranslate nohighlight">\(z\)</span>.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-airy">
+<span class="eqno">(6.177)<a class="headerlink" href="#equation-autofocus-airy" title="Permalink to this equation">#</a></span>\[\text{maximize}~~ S(z) := \frac{\displaystyle\sum_{i}^{} P_i(z) \cdot \exp \left( {-0.5\left(\frac{r_i(z)}{0.42\,r_0}\right)^2} \right)}{\displaystyle\sum_{i}^{} P_i(z)}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-airy-r">
+<span class="eqno">(6.178)<a class="headerlink" href="#equation-autofocus-airy-r" title="Permalink to this equation">#</a></span>\[r_0 = \frac{\lambda}{\text{NA}}\]</div>
+<p><span class="math notranslate nohighlight">\(S(z)\)</span> is bound to <span class="math notranslate nohighlight">\([0, 1]\)</span> with <span class="math notranslate nohighlight">\(S=0\)</span> being completely defocused light and <span class="math notranslate nohighlight">\(S=1\)</span> being an ideal focus where all the light is exactly in the center of the gaussian function.</p>
+<p>It can be shown, that when the light is also distributed according to a gaussian pattern with the same center as the airy disc approximation, with a standard deviation being factor <span class="math notranslate nohighlight">\(k\)</span> times larger, the stimulus <span class="math notranslate nohighlight">\(S_k\)</span> is then:</p>
+<div class="math notranslate nohighlight">
+\[S_k = \frac{1}{\sqrt{k^2 + 1}}\]</div>
+<p>Exemplary values for <span class="math notranslate nohighlight">\(S_k\)</span> can be found in the following table</p>
+<table class="table table-center" id="id3">
+<caption><span class="caption-number">Table 6.5 </span><span class="caption-text">Values for <span class="math notranslate nohighlight">\(S_k\)</span></span><a class="headerlink" href="#id3" title="Permalink to this table">#</a></caption>
+<colgroup>
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><span class="math notranslate nohighlight">\(k\)</span></p></th>
+<th class="head"><p>0</p></th>
+<th class="head"><p>1</p></th>
+<th class="head"><p>2</p></th>
+<th class="head"><p>3</p></th>
+<th class="head"><p>5</p></th>
+<th class="head"><p>10</p></th>
+<th class="head"><p>20</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\infty\)</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(S_k\)</span></p></td>
+<td><p>1.00</p></td>
+<td><p>0.71</p></td>
+<td><p>0.45</p></td>
+<td><p>0.32</p></td>
+<td><p>0.20</p></td>
+<td><p>0.10</p></td>
+<td><p>0.05</p></td>
+<td><p>0.00</p></td>
+</tr>
+</tbody>
+</table>
+<p>In physical reality we can’t get a higher value for <span class="math notranslate nohighlight">\(S_k\)</span> than that for <span class="math notranslate nohighlight">\(k=1\)</span> since this is equivalent to the resolution limit. Since the simulation does not factor in wave-optical properties, they can nevertheless appear in the raytracer.
+Another disadvantage of the method is that it ignores all behavior of the beams far outside the sensitive range of the virtual receiver.</p>
+</section>
+<section id="rendering-methods">
+<h2><span class="section-number">6.7.2. </span>Rendering Methods<a class="headerlink" href="#rendering-methods" title="Permalink to this heading">#</a></h2>
+<p>The next three methods render multiple images (actually being power histograms) <span class="math notranslate nohighlight">\(P_z\)</span> with pixel number <span class="math notranslate nohighlight">\(N_\text{px} \cdot N_\text{px}\)</span>.
+<span class="math notranslate nohighlight">\(N_\text{px}\)</span> is dependent on the number of rays used for focus finding, for few rays we want to keep the number also low to minimize effects of noise. For a larger amount of rays we can increase the number step by step. This is actually even implicitly needed to resolve small structures.
+<span class="math notranslate nohighlight">\(N\)</span> rays being distributed on a square area means we need to increase <span class="math notranslate nohighlight">\(N_\text{px}\)</span> proportionally to <span class="math notranslate nohighlight">\(\sqrt{N}\)</span> to achieve a somehow constant SNR. The formula implemented has the form <span class="math notranslate nohighlight">\(N_\text{px} = \text{offset} + \text{factor} \cdot \sqrt{N}\)</span>.</p>
+<p>The most outside rays define the image dimensions, the absolute image size therefore varies along the beam path. This can be an issue when few rays are far away from the optical axis, since the resolution suffers because of these marginal rays.</p>
+<p>In contrast to the methods above the following methods always use all rays available after tracing to achieve satisfying results. However, this can lead to large processing times for many million rays.</p>
+<p><strong>Irradiance Variance</strong></p>
+<p>Render a power histogram for rays at position <span class="math notranslate nohighlight">\(z\)</span>. Divide by pixel area to get an irradiance image <span class="math notranslate nohighlight">\(E_z\)</span>
+Calculate the variance of the pixel values. Find the <span class="math notranslate nohighlight">\(z\)</span> with the largest variance.</p>
+<p>The variance is large when there are bright areas in the image (much power per area) or if their is large value variance between the pixels, which is typically the case if structures are present.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-image">
+<span class="eqno">(6.179)<a class="headerlink" href="#equation-autofocus-image" title="Permalink to this equation">#</a></span>\[\text{maximize}~~ I_\text{v}(z) := \sigma^2(E_z)\]</div>
+<p><strong>Irradiance Maximum</strong></p>
+<p>Similar to Irradiance Variance, but instead the maximum value in <span class="math notranslate nohighlight">\(E_z\)</span> is maximized.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-maximum">
+<span class="eqno">(6.180)<a class="headerlink" href="#equation-autofocus-maximum" title="Permalink to this equation">#</a></span>\[\text{maximize}~~ I_\text{p}(z) := \text{max}(E_z)\]</div>
+<p><strong>Image Sharpness</strong></p>
+<p>We are using the power image <span class="math notranslate nohighlight">\(P_z\)</span> and transform it into the fourier domain.
+This creates an fourier power image <span class="math notranslate nohighlight">\(p_f\)</span> with image frequencies <span class="math notranslate nohighlight">\(f_x\)</span> and <span class="math notranslate nohighlight">\(f_y\)</span>.
+Using the pythagorean theorem we can join the frequency components into a radial frequency.
+The radial frequency of each pixel is scaled with the corresponding pixel power.
+We want to maximize this product, which is large when there are many high frequency components in the original image <span class="math notranslate nohighlight">\(P_z\)</span> or when high frequency components have a high power.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-image-sharpness">
+<span class="eqno">(6.181)<a class="headerlink" href="#equation-autofocus-image-sharpness" title="Permalink to this equation">#</a></span>\[\text{maximize}~~ F_\text{p}(z) := p_\text{f} \cdot \sqrt{f^2_x + f^2_y}\]</div>
+<p>This method is independent of the image size, since we used the power image instead of a irradiance image.</p>
+</section>
+<section id="additional-notes">
+<h2><span class="section-number">6.7.3. </span>Additional Notes<a class="headerlink" href="#additional-notes" title="Permalink to this heading">#</a></h2>
+<aside class="topic">
+<p class="topic-title">Notes</p>
+<ul class="simple">
+<li><p>As the name suggests, minimization methods in scipy try to find the minimum of a cost function. Some methods above however require a maximization. In these cases the cost function was simply inverted or subtracted from a reference value.</p></li>
+<li><p>For the methods Irradiance Variance and Maximum the root of the cost function is taken, so the value range and value changes are more smooth.</p></li>
+<li><p>focus finding always searches in the region between two lenses or a lens and the outline.</p></li>
+<li><p>focus finding ignores filters, apertures and the outline while finding the focus. So if a ray exists inside the search region but is absorbed or filtered in the region it is assumed as not being so.</p></li>
+<li><p>if any rays in this region intersect with the tracing outline, this is not handled.</p></li>
+</ul>
+</aside>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id2">
+<aside class="footnote brackets" id="footcite-airywiki" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Airy disk - Approximation using a Gaussian profile. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Airy_disk#Approximation_using_a_Gaussian_profile">https://en.wikipedia.org/wiki/Airy_disk#Approximation_using_a_Gaussian_profile</a> (visited on 2022-12-01).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="convolution.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">6.6. </span>PSF Convolution</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="color.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">6.8. </span>Color Management</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#positional-methods">6.7.1. Positional Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering-methods">6.7.2. Rendering Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-notes">6.7.3. Additional Notes</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
+<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
+<!--(similar to page-toc.html)-->
+<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">6.1. Property Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracing.html">6.2. Tracing Procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">6.3. Geometric Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">6.4. Spectrum and Refraction Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">6.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolution.html">6.6. PSF Convolution</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">6.7. Autofocus Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">6.8. Color Management</a></li>
+</ul>
+
+  </div>
+</nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022, Damian Mendroch.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
