@@ -103,7 +103,7 @@ def image_plot(img:     np.ndarray | str,
 
     # adapt extent so the coordinates are at the center of pixels
     extent = np.array([-s[0]/2, s[0]/2, -s[1]/2, s[1]/2])
-    dy, dx = s[1] / img.shape[0], s[0] / img.shape[1]
+    dy, dx = s[1] / img_.shape[0], s[0] / img_.shape[1]
     extent += [-dx/2, dx/2, -dy/2, dy/2]
 
     # rotate 180 deg
