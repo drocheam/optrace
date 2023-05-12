@@ -7,6 +7,8 @@ on:
   push:
     paths:
       - 'optrace/**'
+    tags-ignore:
+      - '**'
       
 jobs:
   comp_test:

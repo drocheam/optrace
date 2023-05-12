@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - 'docs/**'
+    tags-ignore:
+      - '**'
       
 jobs:
   doc_test:
