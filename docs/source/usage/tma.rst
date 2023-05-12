@@ -104,92 +104,92 @@ Below a tabular overview of the supported properties is found. Details on their 
      - Meaning
 
    * - :attr:`n1 <optrace.tracer.transfer_matrix_analysis.TMA.n1>`
-     - float
+     - :python:`float`
      - ``-``
      - refractive index value before the lens setup
    
    * - :attr:`n2 <optrace.tracer.transfer_matrix_analysis.TMA.n2>`
-     - float
+     - :python:`float`
      - ``-``
      - refractive index value after the lens setup
    
    * - :attr:`vertex_points <optrace.tracer.transfer_matrix_analysis.TMA.vertex_points>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - mm
      - front and back position of vertices of the system 
    
    * - :attr:`d <optrace.tracer.transfer_matrix_analysis.TMA.d>`
-     - float
+     - :python:`float`
      - mm
      - thickness, distance between vertex points
    
    * - :attr:`abcd <optrace.tracer.transfer_matrix_analysis.TMA.abcd>`
-     - numpy array, shape (2, 2)
+     - :class:`numpy.ndarray`, shape (2, 2)
      - ``-``
      - ABCD matrix
 
    * - :attr:`principal_points <optrace.tracer.transfer_matrix_analysis.TMA.principal_points>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - mm
      - principal points (z-positions)
 
    * - :attr:`nodal_points <optrace.tracer.transfer_matrix_analysis.TMA.nodal_points>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - mm
      - nodal points (z-positions)
    
    * - :attr:`optical_center <optrace.tracer.transfer_matrix_analysis.TMA.optical_center>`
-     - float
+     - :python:`float`
      - mm
      - optical center (z-position)
    
    * - :attr:`focal_points <optrace.tracer.transfer_matrix_analysis.TMA.focal_points>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - mm
      - focal points (z-positions)
    
    * - :attr:`focal_lengths <optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - mm
      - focal lengths
    
    * - :attr:`focal_lengths_n <optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - mm
      - focal lengths, scaled with refractive index
 
    * - :attr:`powers <optrace.tracer.transfer_matrix_analysis.TMA.powers>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - dpt
      - optical powers of the system
    
    * - :attr:`powers_n <optrace.tracer.transfer_matrix_analysis.TMA.powers_n>`
-     - float, float (tuple)
+     - :python:`tuple[float, float]`
      - dpt
      - optical powers, scaled with the refractive index
    
    * - :attr:`efl <optrace.tracer.transfer_matrix_analysis.TMA.efl>`
-     - float
+     - :python:`float`
      - mm
      - effective focal length of the system
 
    * - :attr:`efl_n <optrace.tracer.transfer_matrix_analysis.TMA.efl_n>`
-     - float
+     - :python:`float`
      - mm
      - effective focal length, scaled by the refractive index
    
    * - :attr:`bfl <optrace.tracer.transfer_matrix_analysis.TMA.bfl>`
-     - float
+     - :python:`float`
      - mm
      - back focal length
 
    * - :attr:`ffl <optrace.tracer.transfer_matrix_analysis.TMA.ffl>`
-     - float
+     - :python:`float`
      - mm
      - front focal length
 
    * - :attr:`wl <optrace.tracer.transfer_matrix_analysis.TMA.wl>`
-     - float
+     - :python:`float`
      - nm
      - wavelength for the analysis
 

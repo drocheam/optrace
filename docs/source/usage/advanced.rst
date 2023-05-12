@@ -40,28 +40,28 @@ The number of sections is the same for all rays. If a ray gets absorbed early, a
      - Type
      - Unit
      - Function
-   * - ``p_list``
-     - ``np.ndarray`` of type ``np.float64`` of shape N x nt x 3
+   * - :attr:`p_list <optrace.tracer.ray_storage.RayStorage.p_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape N x nt x 3
      - mm
      - 3D starting position for all ray sections 
-   * - ``s0_list``
-     - ``np.ndarray`` of type ``np.float64`` of shape N x 3
+   * - :attr:`s0_list <optrace.tracer.ray_storage.RayStorage.s0_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape N x 3
      - ``-``
      - unity direction vector at the ray source
-   * - ``pol_list``
-     - ``np.ndarray`` of type ``np.float32`` of shape N x nt x 3
+   * - :attr:`pol_list <optrace.tracer.ray_storage.RayStorage.pol_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape N x nt x 3
      - ``-``
      - unity 3D polarization vector
-   * - ``w_list``
-     - ``np.ndarray`` of type ``np.float32`` of shape N x nt
+   * - :attr:`w_list <optrace.tracer.ray_storage.RayStorage.w_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape N x nt
      - W
      - ray power
-   * - ``n_list``
-     - ``np.ndarray`` of type ``np.float64`` of shape N x nt
+   * - :attr:`n_list <optrace.tracer.ray_storage.RayStorage.n_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape N x nt
      - ``-``
      - refractive indices for all ray sections
-   * - ``wl_list``
-     - ``np.ndarray`` of type ``np.float32`` of shape N
+   * - :attr:`wl_list <optrace.tracer.ray_storage.RayStorage.wl_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape N
      - nm
      - wavelength of the ray
     

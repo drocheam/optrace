@@ -1,7 +1,6 @@
 PSF Convolution
 ------------------------------------------------------------------------
 
-.. TODO
 
 .. role:: python(code)
   :language: python
@@ -21,13 +20,26 @@ PSF Convolution
 Convolving
 _______________
 
+**Overview**
+
+Instead of waiting a long time for high quality, noise-free detector image renders in some cases the image can also be created by a PSF (point spread function= convolution. A PSF is nothing different than the impulse response of the optical system for the given object and image distance combination.
+It has to be noted, that the PSF changes spatially, but for paraxial imaging it can be assumed constant.
+However this also means, that many aberration can't be simulated this way (astigmatism, coma, vignette, distortion, ...).
+
+In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF to an object using the convolution functionality in ``optrace``.
+
+For the convolution to work the object and PSF size are needed besides the PSF and objects itself. Most optical systems also have a magnification factor that rescaled the object size by a specific amount.
+
+Both colored objects and PSFs are supported. 
+Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible cases. 
+Also see the section :numref:`psf_color_handling` on this.
+
 
 **Usage**
 
-.. TODO explain: image side lengths, non-square pixels, different resolutions, image and psf can be file paths, limitations on color images, images must be sRGB
 
-The image is a sRGB array with dimensions (Ny, Nx, 3) with value range 0-1. Alternatively a filepath to an image file can be provided.
-In contrast, the PSF holds linear power/intensity information and is there a simpler (Ny2, Nx2) shape. Alternatively an RImage object can be used to apply a colored PSF.
+The image is a sRGB numpy array with dimensions (Ny, Nx, 3) with value range 0-1. Alternatively a filepath to an image file can be provided.
+In contrast, the PSF holds linear power/intensity information and is there a simpler (Ny2, Nx2) shape. Alternatively an :class:`RImage <optrace.tracer.r_image.RImage>` object can be used to apply a colored PSF.
 
 Parameters :python:`s_img` and :python:`s_psf` describe the side lengths of both images in millimeters, specified as list of two floats.
 
@@ -40,13 +52,16 @@ Parameters :python:`s_img` and :python:`s_psf` describe the side lengths of both
    psf, s_psf = ot.presets.psf.halo()
 
 
-The call to :python:`convolve` looks like this:
+Typically the imaging system has a magnification factor :python:`m` that is also needed to scale the input object size.
+This factor is equivalent the magnification factor known from geometrical optics.
+
+You can call :python:`convolve` like this:
 
 .. testcode::
 
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf)
+   img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=0.5)
 
-The function returns the convolved image :python:`img2`, the new image side lengths :python:`s2`.
+The function returns the convolved sRGB image :python:`img2`, the new image side lengths :python:`s2`.
 
 Additional parameters for this function include :python:`silent`, which omits all text output like a progressbar and informational messages. :python:`threading=False` disables multithreading and :python:`rendering_intent` defines the used intent for the sRGB conversion.
 
@@ -57,29 +72,44 @@ Additional parameters for this function include :python:`silent`, which omits al
 
 **Restrictions**
 
-* image is a (Ny, Nx, 3) sRGB array or filepath to a sRGB image
+* object image is a (Ny, Nx, 3) sRGB array or filepath to a sRGB image
 * PSF is either an intensity array or an RImage object
-* the value range should be inside 0-1
 * resolutions must be between 50x50 pixels and 4 megapixels
-* at most one image or PSF has color information
 * the size of the PSF can't be much larger than the image scaled by the magnification factor
+* as side lengths of PSF and object can be otherwise arbitrary the pixels are generally non-square
 
 
-**Example for Intensity Images**
+**Image Example**
 
-.. TODO explain that these are not linear intensities
+
+.. list-table:: Image convolution from ``./examples/psf_imaging.py``
+
+   * - .. figure:: ../images/example_psf1.svg
+          :align: center
+          :width: 400
+
+   
+     - .. figure:: ../images/example_psf2.svg
+          :align: center
+          :width: 400
+
+
+.. figure:: ../images/example_psf3.svg
+   :align: center
+   :width: 400
+
+
+**Code Example**
+
+
+The following example loads an image preset and convolves it with a square PSF that was created as a numpy array.
 
 .. testcode::
-   
+  
    import numpy as np
 
-   # intensity function
-   X, Y = np.mgrid[-1:1:200j, -1:1:200j]  # data grid
-   img = np.sin(30*X**2)**2 + Y**2  # data function
-   
-   # make a sRGB array
-   img = np.repeat(img[:, :, np.newaxis], 3, axis=2)  # repeat so we have three channels
-   img = ot.color.srgb_linear_to_srgb(img)  # convert intensities to sRGB (gamma correction)
+   # load image preset
+   img = ot.presets.image.ETDRS_chart_inverted
 
    # image size
    s_img = [0.9, 0.9]
@@ -92,12 +122,16 @@ Additional parameters for this function include :python:`silent`, which omits al
    s_psf = [0.1, 0.08]
 
    # convolution
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf)
+   img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=-1.75)
 
 
 Image Plotting
 ________________
 
+Images, whether they are numpy arrays or paths to image files, are plotted with the :func:`image_plot <optrace.plots.misc_plots.image_plot>` function.
+Additionally a tuple of image side lengths is required.
+
+Import the plotting functionality:
 
 .. testcode::
 
@@ -109,10 +143,14 @@ ________________
    import matplotlib.pyplot as plt
    plt.close("all")
 
+Then call the plot with:
 
 .. testcode::
 
    otp.image_plot(img, s_img)
+
+A user title is provided with the :python:`title` parameter, additionally the image can be flipped (rotated 180 degrees) with :python:`flip=True`.
+Like all other plotting function the window can block the execution of the rest of the program with :python:`block=True`.
 
 .. testcode::
 
@@ -123,8 +161,13 @@ ________________
 Presets
 _____________________
 
+`optrace` features presets for different PSF shapes.
+In the next section a gallery of point spread function presets can be found.
+Alternatively a more mathematical description is featured in section :numref:`math_psf_presets`.
 
 **Circle**
+
+A circle PSF is defined using the :python:`d` parameter that defines the circle diameter.
 
 .. testcode::
 
@@ -132,11 +175,16 @@ _____________________
 
 **Gaussian**
 
+A gaussian function can model the zeroth order shape of an airy disc.
+The diameter parameter `d` defines the diameter/resolution limit for this.
+
 .. testcode::
 
    psf, s_psf = ot.presets.psf.gaussian(d=2.0) 
 
 **Airy**
+
+An Airy PSF also include higher order diffraction and is also characterized by its first zero crossing diameter.
 
 .. testcode::
 
@@ -144,12 +192,16 @@ _____________________
 
 **Glare**
 
+The glare consists of two gaussians, the first with diameter :python:`d1` and  intensity 1, the other with larger diameter :python:`d2` and intensity :python:`a`.
+
 .. testcode::
 
    psf, s_psf = ot.presets.psf.glare(d1=2.0, d2=3.5, a=0.05) 
 
 
 **Halo**
+
+A halo consists of a center gaussian of diameter :python:`d1` and intensity 1, as well as a ring with diameter :python:`d2`, which is in fact a shifted gaussian function with width :python:`w`.
 
 .. testcode::
 

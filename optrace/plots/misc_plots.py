@@ -67,8 +67,6 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
 
 
 
-# TODO fix extent. Pixel coordinates are at center of pixel
-
 def image_plot(img:     np.ndarray | str, 
                s:       list[float, float],
                flip:    bool = False,
@@ -100,11 +98,13 @@ def image_plot(img:     np.ndarray | str,
     else:
         img_ = img.copy()
 
-        if img_.ndim == 2:
-            img_ = np.repeat(img_[:, :, np.newaxis], 3, axis=2)
-            img_ = color.srgb_linear_to_srgb(img_)
+        if (imax := np.max(img_)):
+            img_ /= imax
 
+    # adapt extent so the coordinates are at the center of pixels
     extent = np.array([-s[0]/2, s[0]/2, -s[1]/2, s[1]/2])
+    dy, dx = s[1] / img.shape[0], s[0] / img.shape[1]
+    extent += [-dx/2, dx/2, -dy/2, dy/2]
 
     # rotate 180 deg
     if flip:
@@ -114,11 +114,10 @@ def image_plot(img:     np.ndarray | str,
     plt.figure()
     _show_grid()
     plt.title(title)
-
-    plt.imshow(img_, extent=extent, zorder=10, aspect="equal", origin="lower")
-
     plt.xlabel("x in mm")
     plt.ylabel("y in mm")
+
+    plt.imshow(img_, extent=extent, zorder=10, aspect="equal", origin="lower")
 
     plt.tight_layout()
     plt.show(block=block)

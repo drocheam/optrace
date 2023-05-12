@@ -12,6 +12,8 @@ docs/build
 # backups don't need to be included
 bak
 
+.python-version
+
 # testing and CI
 .hypothesis
 .coverage

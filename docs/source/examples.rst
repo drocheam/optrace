@@ -217,13 +217,27 @@ Microscope
 PSF Imaging
 ----------------------
 
-.. TODO
-
 **File**: ``examples/psf_imaging.py``
 
-**Description**: 
+**Description**: Demonstrates image forming by convolution for a resolution chart and a halo PSF.
 
 **Screenshots**:
+
+.. list-table::
+
+   * - .. figure:: ./images/example_psf1.svg
+          :align: center
+          :width: 400
+
+   
+     - .. figure:: ./images/example_psf2.svg
+          :align: center
+          :width: 400
+
+
+.. figure:: ./images/example_psf3.svg
+   :align: center
+   :width: 400
 
 
 Refraction Index Presets

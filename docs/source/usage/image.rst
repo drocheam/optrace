@@ -488,7 +488,7 @@ As for the image modes, one can specify the parameters :python:`log` and :python
 
 The image rescaling is done with methods from the `Pillow <https://pillow.readthedocs.io/en/stable/>`__ python library. By default, nearest neighbor interpolation is applied if the export resolution is higher than the RImage resolution and bilinear interpolation otherwise.
 
-You can overwrite this behavior with the :python:`resample` parameter and the method flag from :class:`PIL.Image.Resampling`
+You can overwrite this behavior with the :python:`resample` parameter and the method flag from `PIL.Image.Resampling <https://pillow.readthedocs.io/en/stable/reference/Image.html#resampling-filters>`__
 
 .. `PIL.Image.Resampling <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Resampling>`__.
 

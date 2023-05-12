@@ -1,20 +1,6 @@
 Future Features
 -----------------
 
-Image Formation by PSF convolution
-_____________________________________
-
-* Name: ot.psf_convolve? ot.psf_imaging?
-* Simulates the imaging through a system with the help of a given PSF
-* Inputs: Object image and PSF image, as well as both extent
-* Output: Convoluted image and extent
-
-
-Problems: 
-
-1. Different extents, pixel side lengths
-2. different resolutions -> interpolation, extrapolation?
-
 
 TRA, LRA calculations and plots
 _____________________________________

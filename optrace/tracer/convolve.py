@@ -1,5 +1,5 @@
 import sys
-from threading import Thread  # threading
+from threading import Thread
 
 import numexpr as ne
 import numpy as np
@@ -80,18 +80,26 @@ def convolve(img:                np.ndarray | str,
              threading:          bool = True)\
         -> tuple[np.ndarray, list[float]]:
     """
+    Convolve an image with a point spread function.
+    Sizes of both are provided as lengths in parameters s_img and s_psf.
+    The system magnification factor m scales the image.
 
-    :param img:
-    :param s_img:
-    :param psf:
-    :param s_psf:
+    Image data should be a sRGB array or a path, in the latter case the image is loaded from file.
+    The PSF is either an intensity image (when provided as array) or a colored on (when the type is RImage).
+
+    Note that in the case that both are colored the convolution is only one possible solution of many.
+
+    :param img: image. 3D sRGB numpy array (value range 0-1) or path string
+    :param s_img: side lengths image in mm (x-length and y-length)
+    :param psf: point spread function, 2D numpy intensity array or RImage
+    :param s_psf: side lengths psf in mm(x-length and y-length)
     :param m: magnification factor, abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
               m < 0 image flipping, m > 0 an upright image
-    :param rendering_intent:
+    :param rendering_intent: rendering intent used for sRGB conversion of output
     :param normalize: if output image should be normalized to range [0-1] (input images are normalized by default)
-    :param silent:
-    :param threading:
-    :return:
+    :param silent: if text output should be silenced
+    :param threading: turn multithreading on and off
+    :return: convoled image (3D sRGB numpy array) and new image side lengths list
     """
     # Init
     ###################################################################################################################

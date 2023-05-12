@@ -189,13 +189,9 @@ The dominant wavelength is calculated using:
    584.7508883332902
 
 When dominant or complementary are not existent, as for instance magenta can't be described by a single wavelength, the values are set to NaN (not a number).
+You can find a visual explanation on both dominant and complementary wavelength `on this Wiki page <https://en.wikipedia.org/wiki/Dominant_wavelength>`__.
 
-.. TODO show example for comp and dom wavelength
-.. https://commons.wikimedia.org/wiki/File:Dominant_wavelength.png     is public domain
-.. include here or in color management section?
-
-
-The FWHM can be calculated with:
+The FWHM (full width at half maximum) can be calculated with:
 
 .. doctest::
 
@@ -203,7 +199,7 @@ The FWHM can be calculated with:
    129.18529185291857
 
 
-The function calculates the smallest FWHM around the highest peak. Note that for some spectral distributions, for instance multuple gaussians, this function is not suitable, as the FWHM is not meaningful here.
+The function calculates the smallest FWHM around the highest peak. Note that for some spectral distributions, for instance multiple gaussians, this function is not suitable, as the FWHM is not meaningful here.
 
 
 Power

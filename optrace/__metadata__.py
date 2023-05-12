@@ -1,9 +1,9 @@
 
 __name__ = "optrace"
 __author__ = "Damian Mendroch"
-__copyright__ = "Copyright 2022, Damian Mendroch"
+__copyright__ = "Copyright 2023, Damian Mendroch"
 __credits__ = []
-__license__ = "GPLv3"
+__license__ = "not specified yet"#"GPLv3"
 __version__ = "1.4.3"
 __maintainer__ = "Damian Mendroch"
 __email__ = "damian.mendroch@th-koeln.de"

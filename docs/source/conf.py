@@ -97,7 +97,7 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'traits': ('https://docs.enthought.com/traits/', None),
                        'matplotlib': ('http://matplotlib.org/stable', None),
                        'mayavi': ('https://docs.enthought.com/mayavi/mayavi', None),
-                       'pillow': ('https://pillow.readthedocs.io/en/stable/', None)}
+                       'PIL': ('https://pillow.readthedocs.io/en/stable/', None)}
 
 autodoc_default_options = {
 	'members': True,

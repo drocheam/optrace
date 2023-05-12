@@ -33,7 +33,7 @@ The processing steps consist of the following ones:
 5. convert the resulting image back to sRGB linear while doing gamut clipping
 
 
-.. _color_handling:
+.. _psf_color_handling:
 
 Limitations on Color
 =================================================
@@ -54,9 +54,9 @@ Let's define two terms, that will be useful later:
 
 To put it short, the convolution approach produces correct results if
 
-* both image and PSF are wavelength-independent or single-colored
+* both image and PSF are single-colored
 * the image is single-colored and the PSF multicolored, or vice versa
-* if both image and PSF are multicolored, but under the assumption that the object emits a superposition of RGB spectra everywhere
+* if both image and PSF are multicolored, but under the assumption that the object emits a superposition of the same three RGB spectra everywhere
 
 For physically correct results the PSF should have a color space with all human visible colors and the color values should be linear to physical intensities/powers.
 
@@ -138,6 +138,8 @@ For all this to work the convolution needs to take place in a linear color space
 In our case the linear sRGB colorspace is applied, while also negative values are used to contain all human-visible colors, which wouldn't be the case for the typical positive-value gamut. Linearity would also be lost because of gamut clipping.
 Color matching functions :math:`r, g, b` were chosen according to sRGB specifications and spectral distributions according to the procedure in :numref:`random_srgb`.
 
+
+.. _math_psf_presets:
 
 PSF Presets
 =================================================

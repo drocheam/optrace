@@ -65,7 +65,7 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.convolve, img2, s_img, psf, s_psf)
         
         # huge resolution psf
-        psf2 = np.ones((3000, 3000, 3))
+        psf2 = np.ones((3000, 3000))
         self.assertRaises(ValueError, ot.convolve, img, s_img, psf2, s_psf)
         
         # psf much larger than image

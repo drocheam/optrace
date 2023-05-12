@@ -84,7 +84,8 @@ Note that :math:`\lambda` must be specified in meters.
    This is done while raytracing, where a specfic desired power is matched.
 
 
-.. TODO explain normalization
+There is an option to normalize the spectrum, such that the peak value inside the visible range is equal to one.
+If the peak wavelength is inside the visible range then to Stefan–Boltzmann law can be applied to calculate the normalization factor, otherwise the maximum value should lie at one of the edges of the visible range.
 
 Color
 ----------
@@ -92,9 +93,9 @@ Color
 Analogously to :numref:`xyz_color_space` the tristimulus values for the light spectrum :math:`S(\lambda)` can be calculated with:
 
 .. math::
-   X &=\int_{\lambda} S(\lambda) \cdot x(\lambda) ~d \lambda \\
-   Y &=\int_{\lambda} S(\lambda) \cdot y(\lambda) ~d \lambda \\
-   Z &=\int_{\lambda} S(\lambda) \cdot z(\lambda) ~d \lambda
+   X &=\int_{\lambda} S(\lambda) x(\lambda) ~d \lambda \\
+   Y &=\int_{\lambda} S(\lambda) y(\lambda) ~d \lambda \\
+   Z &=\int_{\lambda} S(\lambda) z(\lambda) ~d \lambda
    :label: XYZ_Calc_Spectrum
 
 From there on, typical color model conversions can be applied.
@@ -172,20 +173,38 @@ For these the inverse transform method in :numref:`inverse_transform` can be app
 Wavelength Properties
 ---------------------------
 
+The following wavelength properties are available:
 
 **Peak Wavelength**
 
+Wavelength inside the visible range with the highest spectrum value.
 
 **Centroid Wavelength**
 
+The centroid wavelength (center of mass) of spectrum :math:`S(\lambda)` is defined as:
+
+.. math::
+   \lambda_\text{c} = \frac{\int S(\lambda) \lambda~\text{d}\lambda}{\int S(\lambda) ~\text{d}\lambda}
+
 **Dominant Wavelength**
+
+The dominant wavelength is the wavelength with the same hue as the as the spectrum.
+For some colors there are is no dominant wavelength viable (for instance magenta), in these cases a complementary wavelength should be provided.
+See `Dominant Wavelength <https://en.wikipedia.org/wiki/Dominant_wavelength>`__ for a visual representation.
 
 **Complementary Wavelength**
 
+The dominant wavelength is the wavelength with the opposite hue as the as the spectrum.
+For some colors there are is no complementary wavelength viable (for instance green), in these cases a dominant wavelength should be used.
+See `Dominant Wavelength <https://en.wikipedia.org/wiki/Dominant_wavelength>`__ for a visual representation.
+
 **Full Width Half Maximum**
 
+This is the smallest distance in wavelength units around the peak where the spectrum crosses 50% of the spectrum peak's value.
+While this metric makes sense for bell-shaped curves, for more complicated curves it is not suited.
 
-RefractionIndex
+
+Refraction  Index
 ===================
 
 .. _index_functions:
