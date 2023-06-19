@@ -6,7 +6,8 @@ import numpy as np  # calculations
 from PIL import Image  # saving as png
 import scipy.interpolate  # interpolation
 import scipy.constants  # for luminous efficacy
-import scipy.ndimage  # gaussian filtering
+import scipy.special  # bessel functions
+import numexpr as ne  # accelerated calculations
 
 from . import color  # xyz_observers curves and sRGB conversions
 from . import misc  # interpolation and calculation methods
@@ -63,7 +64,7 @@ class RImage(BaseClass):
 
         :param extent: image extent in the form [xs, xe, ys, ye]
         :param projection: string containing information about the sphere projection method, if any
-        :param limit: rayleigh limit, used to approximate wave optics using a gaussian blur filter
+        :param limit: rayleigh limit, used to approximate wave optics using a airy disc kernel
         """
         self._new_lock = False
 
@@ -87,13 +88,6 @@ class RImage(BaseClass):
         """throw exception when image is missing"""
         if not self.has_image():
             raise RuntimeError("Image was not calculated.")
-
-    @property
-    def _sigma(self) -> float:
-        """standard deviation for a gaussian approximating an airy disc with a specific resolution limit"""
-        # an airy disc with roots at +-0.5*d can be approximated by a gauss with sigma = 0.175*d
-        # limit (=d) needs to be converted from um to mm first
-        return 0.175*self.limit/1000 if self.limit is not None else self.limit
 
     @property
     def sx(self) -> float:
@@ -173,12 +167,14 @@ class RImage(BaseClass):
 
         return sp, ims
 
-    def get(self, mode: str, log: bool = False) -> np.ndarray:
+    def get(self, mode: str, log: bool = False, L_th: float = 0, sat_scale: float = None) -> np.ndarray:
         """
         Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ
 
         :param mode: one of "display_modes"
         :param log: logarithmic image (sRGB modes only)
+        :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
+        :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
         :return: image as np.ndarray, shape depends on mode
         """
 
@@ -200,7 +196,7 @@ class RImage(BaseClass):
                 return rgb
 
             case "sRGB (Perceptual RI)":
-                return self.rgb(log=log, rendering_intent="Perceptual")
+                return self.rgb(log=log, rendering_intent="Perceptual", L_th=L_th, sat_scale=sat_scale)
 
             case "Outside sRGB Gamut":
                 # force conversion from bool to int so further algorithms work correctly
@@ -244,15 +240,17 @@ class RImage(BaseClass):
         xyz = self.xyz()
         return color.xyz_to_luv(xyz)
 
-    def rgb(self, log: bool = False, rendering_intent: str = "Absolute") -> np.ndarray:
+    def rgb(self, log: bool = False, rendering_intent: str = "Absolute", L_th: float = 0, sat_scale: float = None) -> np.ndarray:
         """
         Get sRGB image
 
         :param log: if brightness should be logarithmically scaled
         :param rendering_intent: rendering_intent for sRGB conversion
+        :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
+        :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
         :return: sRGB image (np.ndarray with shape (Ny, Nx, 3))
         """
-        img = color.xyz_to_srgb_linear(self.xyz(), rendering_intent=rendering_intent)
+        img = color.xyz_to_srgb_linear(self.xyz(), rendering_intent=rendering_intent, L_th=L_th, sat_scale=sat_scale)
 
         if log:
             img = color.log_srgb_linear(img)
@@ -285,9 +283,9 @@ class RImage(BaseClass):
             self.extent[2] = ym - sx/MR/2
             self.extent[3] = ym + sx/MR/2
 
-        # when filtering is active, add 5 sigma to the edges
-        if self._sigma is not None:
-            self.extent += np.array([-1, 1, -1, 1]) * 5*self._sigma
+        # when filtering is active, add 4 limit to the edges
+        if self.limit is not None:
+            self.extent += np.array([-1.0, 1.0, -1.0, 1.0]) * 3 * self.limit/1000.0
 
     def rescale(self, N: int) -> None:
         """
@@ -308,18 +306,38 @@ class RImage(BaseClass):
         Na  = self.SIZES[np.argmin(np.abs(N - np.array(self.SIZES)))]
         Nm = self.MAX_IMAGE_SIDE
         fact = int(self.MAX_IMAGE_SIDE/Na)
+                
+        if self.limit is not None and self.projection is not None:
+            raise RuntimeError("Resolution limit filter is not applicable for a projected image.")
 
         # for each of the XYZW channels:
         def threaded(ind, in_, out):
 
             # filter, if sigma provided
-            if self._sigma is not None:
-                # sigma size in pixel for each dimension
-                fcx = self._sigma / (self.sx/Nx)
-                fcy = self._sigma / (self.sy/Ny)
-              
-                # with this, with gaussian filtering the power sum in the image stays the same even after filtering
-                in_2 = scipy.ndimage.gaussian_filter(in_[:, :, ind], sigma=[fcy, fcx], mode="constant", cval=0)
+            if self.limit is not None:
+
+                # limit size in pixels
+                px = self.limit / 1000.0 / (self.sx/Nx)
+                py = self.limit / 1000.0 / (self.sy/Ny)
+
+                # larger of two sizes
+                ps = 4*int(np.ceil(max(px, py)))
+                ps = ps+1 if ps % 2 else ps  # enforce even number, so we can use odd number for psf image
+
+                # psf coordinates
+                Y, X = np.mgrid[-ps:ps:(2*ps+1)*1j, -ps:ps:(2*ps+1)*1j]
+                R = ne.evaluate("sqrt((X/px)**2 + (Y/py)**2) * 3.8317")
+                Rnz = R[R!=0]
+                
+                # psf
+                psf = np.ones((2*ps+1, 2*ps+1), dtype=np.float64)
+                j1 = scipy.special.j1(Rnz)
+                psf[R != 0] = ne.evaluate("(2*j1 / Rnz) ** 2")
+                psf[R > 10.1735] = 0  # only use up to third zero at 10.1735
+                psf /= np.sum(psf)
+
+                # resulting image
+                in_2 = scipy.signal.fftconvolve(in_[:, :, ind], psf, mode="same")
                 
             else:
                 in_2 = in_[:, :, ind]
@@ -352,7 +370,7 @@ class RImage(BaseClass):
             out[:, :, ind] = B5.reshape((Ny//fact, Nx//fact), order='F')
 
 
-        if fact <= 1 and self._sigma is None:
+        if fact <= 1 and self.limit is None:
             self.img = self._img
 
         else:
@@ -404,6 +422,8 @@ class RImage(BaseClass):
                    resample:     int = -1,
                    log:          bool = False,
                    flip:         bool = False,
+                   L_th:         float = 0.,
+                   sat_scale:    float = None,
                    overwrite:    bool = False)\
             -> str:
         """
@@ -422,10 +442,11 @@ class RImage(BaseClass):
                          scaling up relative to RImage resolution and bilinear interpolation for scaling down
         :param log: logarithmic image (bool), only for sRGB modes
         :param flip: rotate image by 180 degrees
+        :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
         :param overwrite: file if it exists, otherwise saved in a fallback path
         :return: path of saved file
         """
-        im = self.get(mode, log)
+        im = self.get(mode, log, L_th, sat_scale=sat_scale)
         if flip:
             im = np.fliplr(np.flipud(im))
 

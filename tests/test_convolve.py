@@ -180,7 +180,7 @@ class ConvolutionTests(unittest.TestCase):
             sig = 0.175  # sigma so approximating zeroth order of airy disk
             ds = 5*sig  # plot 5 sigma
 
-            X, Y = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
+            Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
             Z = ne.evaluate("exp(-(X**2 + Y**2) / 2 / sig**2)")
 
             return Z, [2*ds*d/1000, 2*ds*d/1000]  # scale size with d
@@ -204,7 +204,7 @@ class ConvolutionTests(unittest.TestCase):
             img2 = img2[:, :, 0]
 
             # resulting gaussian with convolution
-            X, Y = np.mgrid[-s2[1]/2:s2[1]/2:img2.shape[0]*1j, -s2[0]/2:s2[0]/2:img2.shape[1]*1j]
+            Y, X = np.mgrid[-s2[0]/2:s2[0]/2:img2.shape[1]*1j, -s2[1]/2:s2[1]/2:img2.shape[0]*1j]
             R2 = X**2 + Y**2
             Z = np.exp(-3.265306122449e6*(R2))
 
@@ -343,6 +343,23 @@ class ConvolutionTests(unittest.TestCase):
         # mean color of new image should also be white
         cerr = np.std(np.mean(img2l, axis=(0, 1)))
         self.assertAlmostEqual(cerr, 0, delta=1e-6)
+       
+        ### White balance colored image
+
+        # convolve with colored image
+        img = ot.presets.image.group_photo
+        s_img = [1, 1]
+        s_psf = [2*rimg.extent[1], 2*rimg.extent[3]]
+
+        # convolve and convert to linear sRGB
+        img2, s2 = ot.convolve(img, s_img, rimg, s_psf)
+
+        # mean color of new image should be almost the same (small difference because of image padding)
+        # sum of all color channels should be roughly the same before and after convolution
+        csum = np.sum(np.sum(color.srgb_to_srgb_linear(misc.load_image(ot.presets.image.group_photo)), axis=0), axis=0)
+        csum2 = np.sum(np.sum(color.srgb_to_srgb_linear(img2), axis=0), axis=0)
+        # compare std. dev. of ratio so normalization has no impact
+        self.assertAlmostEqual(np.std(csum2/csum), 0, delta=1e-6)
 
     @pytest.mark.slow
     def test_size_consistency(self):

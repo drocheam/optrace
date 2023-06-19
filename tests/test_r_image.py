@@ -278,9 +278,8 @@ class RImageTests(unittest.TestCase):
     def test_r_image_filter(self):
     
         # render a point
-        # gaussian resolution limit filter makes a gaussian function from this
-        # check if standard deviation is correct
-        # this also means, that the gaussian curve is completly inside, meaning the image extent was enlarged
+        # airy resolution limit filter makes an airy disc from this
+        # check if standard deviation is approximately that of a gaussian with comparable core
 
         # rays at center of image
         p = np.zeros((1000, 3))
@@ -292,7 +291,7 @@ class RImageTests(unittest.TestCase):
             r0 = 1e-4  # smaller than resolution limit
             img = ot.RImage([-r0, r0, -k/2*r0, k/2*r0])
 
-            for limit in [0.2, 20]:  # different limits
+            for limit in [0.3, 20]:  # different limits
 
                 img.limit = limit
                 img.render(900, p, w, wl)
@@ -300,19 +299,15 @@ class RImageTests(unittest.TestCase):
 
                 # radial distance in image
                 ny, nx = irr.shape[:2]
-                x = np.linspace(img.extent[0], img.extent[1], nx)
-                y = np.linspace(img.extent[2], img.extent[3], ny)
-                X, Y = np.meshgrid(x, y)
-                R = np.sqrt(X**2 + Y**2)
+                x = np.linspace(0, img.extent[1], nx//2+1)
 
-                # get standard deviation and limit
-                # we need to divide by two since we only integrate over half the region
-                # because of R**2 > 0
-                sigma = np.sqrt(np.sum(R**2 * irr)/np.sum(irr)/2)
-                limit2 = sigma / 0.175*1000
+                # check centroid
+                # for factor 1.10861 see https://www.wolframalpha.com/input?i=%28integrate+x*%282*J1%28x%29%2Fx%29%5E2+from+0+to+10.1735%29+%2F+%28integrate+%282*J1%28x%29%2Fx%29%5E2+from+0+to+10.1735%29%29
+                irr = irr[irr.shape[0]//2+1, irr.shape[1]//2:]
+                centroid = 3.8317*np.sum(x * irr)/np.sum(irr)
 
                 # compare to limit
-                self.assertAlmostEqual(limit, limit2, delta=0.012)
+                self.assertAlmostEqual(centroid/1.10861, limit/1000, delta=0.0002)
     
     @pytest.mark.os
     @pytest.mark.slow

@@ -20,7 +20,7 @@ def circle(d: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
     sz = 601
 
     # calculate radial data
-    X, Y = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
+    Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R2 = ne.evaluate("X**2 + Y**2")
 
     Z = np.zeros((sz, sz), dtype=np.float64)
@@ -47,7 +47,7 @@ def gaussian(d: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
     ds = 5*sig  # plot 5 sigma
     sz = 401
 
-    X, Y = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
+    Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     Z = ne.evaluate("exp(-(X**2 + Y**2) / 2 / sig**2)")
 
     s = [2*ds*d/1000, 2*ds*d/1000]  # scale size with d
@@ -70,7 +70,7 @@ def airy(d: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
     Z = np.ones((sz, sz), dtype=np.float64)
 
     # normalized r
-    X, Y = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
+    Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R = ne.evaluate("sqrt(X**2 + Y**2) * 3.8317 * 2")
 
     Rnz = R[R!=0]
@@ -106,7 +106,7 @@ def glare(d1: float = 1.0, d2: float = 7.0, a: float = 0.15):
     ds = 5*sig  # plot 5 sigma
     sz = 801
 
-    X, Y = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
+    Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R2 = ne.evaluate("X**2 + Y**2")
     Z = ne.evaluate("a/(1+a)*exp(-R2 / 2 / sig**2) +"
                     "1/(1+a)*exp(-R2 / 2 / (sig*d1/d2)**2)")
@@ -139,7 +139,7 @@ def halo(d1: float = 1.0, d2: float = 4.0, a: float = 0.3, w: float = 0.2):
     ds = d2/2 + 5*sig2 
     sz = 801
 
-    X, Y = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
+    Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R = ne.evaluate("sqrt(X**2 + Y**2)")
     Z = ne.evaluate("exp(-R**2 / 2 / sig**2) + a*exp(-(R - d2/2)**2 / 2 / sig2**2)")
 

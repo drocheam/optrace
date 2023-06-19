@@ -76,6 +76,10 @@ class PlotTests(unittest.TestCase):
         otp.r_image_plot(img, mode=ot.RImage.display_modes[0], flip=True, block=self.manual, title="Test title")
         otp.r_image_cut_plot(img, mode=ot.RImage.display_modes[0], flip=True, block=self.manual, x=0.15, title="Test title")
 
+        # check if 'limit' label works
+        img.limit = 1
+        otp.r_image_plot(img, mode=ot.RImage.display_modes[0], flip=True, block=self.manual)
+        
         # exception tests
         self.assertRaises(TypeError, otp.r_image_plot, [5, 5])  # invalid RImage
         self.assertRaises(TypeError, otp.r_image_cut_plot, [5, 5])  # invalid RImage

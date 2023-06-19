@@ -187,7 +187,7 @@ class Surface(BaseClass):
             raise ValueError("Expected at least N=10.")
 
         # rectangular grid
-        X, Y = np.mgrid[-self.r:self.r:N*1j,
+        Y, X = np.mgrid[-self.r:self.r:N*1j,
                         -self.r:self.r:N*1j]
 
         # convert to polar coordinates

@@ -418,7 +418,7 @@ class SurfaceTests(unittest.TestCase):
     def test_surface_zmin_zmax_values(self):
 
         r_ = np.linspace(0, 3, 1000)
-        X, Y = np.mgrid[-3:3:501j, -3:3:501j]
+        Y, X = np.mgrid[-3:3:501j, -3:3:501j]
         R = np.sqrt(X**2 + Y**2)
 
         for r, DataSurface in zip([r_, R], [ot.DataSurface1D, ot.DataSurface2D]):
@@ -530,7 +530,7 @@ class SurfaceTests(unittest.TestCase):
         ot.DataSurface1D(data=data, r=3)  
         
         # since the center is not included in the data set (200 is even), the surface height increases a little bit
-        X, Y = np.mgrid[-1:1:200j, -1:1:200j]
+        Y, X = np.mgrid[-1:1:200j, -1:1:200j]
         data = X**2 + Y**2
         ot.DataSurface2D(data=data, r=1)
 
@@ -709,7 +709,7 @@ class SurfaceTests(unittest.TestCase):
                         for N in [50, 51, 400, 401]:
                             for i in range(2):
                                 if not i:  # 2D data surface
-                                    X, Y = np.mgrid[-r:r:N*1j, -r:r:N*1j]
+                                    Y, X = np.mgrid[-r:r:N*1j, -r:r:N*1j]
                                     data = surf_f(X.flatten(), Y.flatten()).reshape(X.shape)
                                     surf2 = ot.DataSurface2D(data=data, r=r, silent=True)
                                 else:  # 1D data surface
@@ -726,7 +726,7 @@ class SurfaceTests(unittest.TestCase):
 
     def test_flip_surface(self):
 
-        X, Y = np.mgrid[-1:1:100j, -1:1:100j]
+        Y, X = np.mgrid[-1:1:100j, -1:1:100j]
 
         # different surface types
         Ss = [
@@ -765,7 +765,7 @@ class SurfaceTests(unittest.TestCase):
              ]
 
         pos = np.array([9, 7, 0.12])
-        X, Y = np.mgrid[-1:1:10j, -1:1:10j]
+        Y, X = np.mgrid[-1:1:10j, -1:1:10j]
         x, y = X.flatten(), Y.flatten()
 
         for i, S in enumerate(Ss):

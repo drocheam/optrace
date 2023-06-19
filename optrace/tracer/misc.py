@@ -79,7 +79,7 @@ def uniform2(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray
     ddc = (d-c)/N2
 
     # create rectangular grid and add dither
-    X, Y = np.mgrid[a:b-dba:N2*1j, c:d-ddc:N2*1j]
+    Y, X = np.mgrid[c:d-ddc:N2*1j, a:b-dba:N2*1j]
     X += random().uniform(0, dba, X.shape)
     Y += random().uniform(0, ddc, Y.shape)
 

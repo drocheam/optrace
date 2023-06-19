@@ -35,7 +35,7 @@ RT.add(F)
 
 # custom DataSurface
 r = 2.5
-X, Y = np.mgrid[-r:r:100j, -r:r:100j]
+Y, X = np.mgrid[-r:r:100j, -r:r:100j]
 m = X > 0
 Z = np.zeros_like(X)
 Z[m] = -(X[m]**2 + Y[m]**2)/40

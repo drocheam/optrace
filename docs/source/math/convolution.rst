@@ -157,7 +157,7 @@ PSF Presets
 
 .. math::
 
-   \sigma = 0.175 d
+   \sigma = 0.35 d
 
 
 **Airy**

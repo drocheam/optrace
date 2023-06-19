@@ -238,5 +238,8 @@ def _get_labels(im: RImage, mode: str, log: bool) -> tuple[str, str, str, str, s
 
     if im.projection is not None:
         text += f"\n{im.projection} Projection"
+    
+    if im.limit is not None:
+        text += f"\n{im.limit:.2f}µm Resolution Filter"
 
     return xname, xunit, xlabel, yname, yunit, ylabel, zname, zunit, zlabel, text

@@ -340,7 +340,7 @@ Here is and example of a lens with direction dependent curvature and a little no
 .. testcode::
 
    r0 = 3
-   X, Y = np.mgrid[-r0:r0:200j, -r0:r0:200j]
+   Y, X = np.mgrid[-r0:r0:200j, -r0:r0:200j]
    H = 0.1*X**2 + 0.2*Y**2 
    H += 0.005*np.random.sample(X.shape)
 

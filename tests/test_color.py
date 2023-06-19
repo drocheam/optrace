@@ -349,8 +349,12 @@ class ColorTests(unittest.TestCase):
             # however this is only true with normalize=True in srgb conversion
             if RI != "Ignore":
                 srgb2 = color.xyz_to_srgb(XYZ0, normalize=True, rendering_intent=RI, clip=False)
-                self.assertTrue(np.min(srgb2) > -1e-6)
                 self.assertTrue(np.max(srgb2) < 1 + 1e-6)
+                
+                # impossible colors are not corrected with RI == Perceptual
+                # so clip=True should be provided in xyz_to_srgb
+                if RI == "Absolute":
+                    self.assertTrue(np.min(srgb2) > -1e-6)
 
     @pytest.mark.slow
     def test_image_color_rendering(self):

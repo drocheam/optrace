@@ -143,6 +143,8 @@ An example for the difference of both sRGB modes is seen in :numref:`color_dispe
           :width: 300
 
 
+.. TODO describe different sRGB perceptual parameters
+
 Sphere Projections
 ___________________________
 
@@ -196,19 +198,27 @@ Available methods are:
 Resolution Limit Filter
 ___________________________
 
-Unfortunately, `optrace` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RImage <optrace.tracer.r_image.RImage>` class provides a limit parameter. This parameter describes the width of an airy disc and blurs the image with a gaussian filter that is approximately the size of the zeroth order of an airy disc with the same resolution limit.
+Unfortunately, `optrace` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RImage <optrace.tracer.r_image.RImage>` class provides a limit parameter. 
+For a limit value a corresponding airy disc is created, that is convolved with the image.
+This parameter describes the Rayleigh limit, being half the size of the airy disc core (zeroth order), known from the equation:
+Only the first two diffraction orders (core + 2 rings) are used.
+
+.. math::
+   :label: eq_rayleigh
+
+   r = 0.61 \frac{\lambda}{\text{NA}}
+
+Where :math:`\lambda` is the wavelength and :math:`\text{NA}` is the numerical aperture.
+While the limit is wavelength dependent, one fixed value is applied to all wavelengths
 
 .. note::
 
    The limit parameter is only an estimation of how large the impact of a resolution limit on the image is.
-   The simulation neither knows the actual limit nor takes into account higher order maxima or interference of light.
-   This feature should only be used to estimate how far the image quality is from a resolution-limited image or if chromatic dispersion or the focal point width is in the same magnitude as this limit.
+   The simulation neither knows the actual limit nor takes into interference and diffraction.
+   This can be seen as approximation for small angles, incoherent imaging and no destructice self-interference from a point source anywhere.
 
 
-To some degree this parameter is also suitable to estimate the effect of different resolution limits.
-
-
-.. list-table:: Images of the focus in the ``achromat.py`` example. From left to right: No filter, filter with 2 µm size, filter with 10 µm size. For a setup with a resolution limit of 10 µm we are clearly inside the limit, but even for 2 µm we are diffraction limited.   
+.. list-table:: Images of the focus in the ``achromat.py`` example. From left to right: No filter, filter with 1 µm size, filter with 5 µm size. For a setup with a resolution limit of 5 µm we are clearly inside the limit, but even for 1 µm we are diffraction limited.   
 
    * - .. figure:: ../images/rimage_limit_off.svg
           :align: center
@@ -221,6 +231,8 @@ To some degree this parameter is also suitable to estimate the effect of differe
      - .. figure:: ../images/rimage_limit_on2.svg
           :align: center
           :width: 300
+
+.. TODO code usage example
 
 
 Rendering an Image

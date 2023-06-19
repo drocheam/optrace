@@ -48,7 +48,12 @@ def _threaded(img:      np.ndarray,
               pny:      int)\
         -> None:
 
+    # NOTE due to numerical precision, interpolation, scaling, filter, convolution, 
+    # there can appear some small values even in zero regions
+    # this leads to impossible colors which need to be later correctly removed
+
     # psf too small -> dirac pulse
+    # color gets corrected in a next step
     if scy*pny < 1 and scx*pnx < 1:
         psf2 = np.array([[1.0]])
 
@@ -76,6 +81,8 @@ def convolve(img:                np.ndarray | str,
              m:                  float = 1,
              rendering_intent:   str =  "Absolute",
              normalize:          bool = True,
+             L_th:               float = 0,
+             sat_scale:          float = None,
              silent:             bool = False, 
              threading:          bool = True)\
         -> tuple[np.ndarray, list[float]]:
@@ -95,8 +102,10 @@ def convolve(img:                np.ndarray | str,
     :param s_psf: side lengths psf in mm(x-length and y-length)
     :param m: magnification factor, abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
               m < 0 image flipping, m > 0 an upright image
-    :param rendering_intent: rendering intent used for sRGB conversion of output
+    :param rendering_intent: rendering intent used for sRGB conversion of the output
     :param normalize: if output image should be normalized to range [0-1] (input images are normalized by default)
+    :param L_th: lightness threshold for function color.xyz_to_srgb and rendering_intent = "Perceptual"
+    :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
     :param silent: if text output should be silenced
     :param threading: turn multithreading on and off
     :return: convoled image (3D sRGB numpy array) and new image side lengths list
@@ -166,7 +175,7 @@ def convolve(img:                np.ndarray | str,
 
         # use srgb with negative values
         psf_lin = color.xyz_to_srgb_linear(psf.xyz(), rendering_intent="Ignore")
-        
+
         # normalize
         psf_lin = _safe_normalize(psf_lin)
 
@@ -286,7 +295,7 @@ def convolve(img:                np.ndarray | str,
 
     # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
     img2 = color.srgb_linear_to_xyz(img2)
-    img2 = color.xyz_to_srgb(img2, rendering_intent=rendering_intent, normalize=normalize) 
+    img2 = color.xyz_to_srgb(img2, rendering_intent=rendering_intent, normalize=normalize, clip=True, L_th=L_th, sat_scale=sat_scale) 
     
     # new image side lengths
     s2 = [(img2.shape[1]-1)*ipx, (img2.shape[0]-1)*ipy]

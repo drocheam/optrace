@@ -45,7 +45,7 @@ class TraceGUI(HasTraits):
                              auto_set=False, label="Rays", mode='text')
     """Number of rays for raytracing"""
     
-    filter_constant: Range = Range(0.3, 40., 1., desc='filter constant', enter_set=True,
+    filter_constant: Range = Range(0.3, 50., 1., desc='filter constant', enter_set=True,
                              auto_set=False, label="Limit (µm)", mode='text')
     """gaussian filter constant standard deviation"""
 
@@ -227,7 +227,7 @@ class TraceGUI(HasTraits):
     _ui_visual_label:            Str = Str('Scene and UI Settings:')
     _autofocus_output_label:     Str = Str('Optimization Output:')
     _spectrum_output_label:      Str = Str('Spectrum Properties:')
-    _filter_label:               Str = Str('Resolution Filter (Gaussian):')
+    _filter_label:               Str = Str('Resolution Limit Filter:')
     _whitespace_label:           Str = Str('')
 
     _separator: Item = Item("_whitespace_label", style='readonly', show_label=False, width=210)
@@ -303,9 +303,9 @@ class TraceGUI(HasTraits):
                             Item('_source_cut_button', show_label=False),
                             Item('_detector_cut_button', show_label=False),
                             _separator,
-                            Item("_filter_label", style='readonly', show_label=False, emphasized=True),
-                            Item('activate_filter', style="custom", show_label=False),
-                            Item('filter_constant'),
+                            Item("_filter_label", style='readonly', show_label=False, emphasized=True, enabled_when="not projection_method_enabled"),
+                            Item('activate_filter', style="custom", show_label=False, enabled_when="not projection_method_enabled"),
+                            Item('filter_constant', enabled_when="not projection_method_enabled"),
                             label="Image",
                             ),
                         TGroup(
@@ -935,7 +935,7 @@ class TraceGUI(HasTraits):
 
                             log, mode, px, dindex, flip, pm = bool(self.log_image), self.image_type,\
                                 int(self.image_pixels), self._det_ind, bool(self.flip_det_image), self.projection_method
-                            limit = None if not self.activate_filter else self.filter_constant
+                            limit = self.filter_constant if self.activate_filter and not self.projection_method_enabled else None
                             cut_args = {self.cut_dimension : self.cut_value}
 
                             if rerender:

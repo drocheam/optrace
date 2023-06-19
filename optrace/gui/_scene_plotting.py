@@ -913,7 +913,7 @@ class ScenePlotting:
                 RSColor = [self.scene.foreground for RSp in self._ray_source_plots]
 
             case 'Wavelength':
-                RSColor = [RS.color(rendering_intent="Absolute") for RS in self.raytracer.ray_sources]
+                RSColor = [RS.color(rendering_intent="Absolute", clip=True) for RS in self.raytracer.ray_sources]
 
             case ('Polarization xz' | "Polarization yz"):
                 # color from polarization projection on yz-plane

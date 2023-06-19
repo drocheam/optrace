@@ -519,7 +519,7 @@ class Raytracer(Group):
             return False, np.array([]), np.array([]), np.array([])
 
         # grid for overlap area
-        X, Y = np.mgrid[xs:xe:res*1j, ys:ye:res*1j]
+        Y, X = np.mgrid[ys:ye:res*1j, xs:xe:res*1j]
 
         # sample surface mask
         x2, y2 = X.flatten(), Y.flatten()
@@ -1406,7 +1406,7 @@ class Raytracer(Group):
                     Im = np.abs(np.fft.fft2(Im))
                     Im = np.fft.fftshift(Im)
 
-                    X, Y = np.mgrid[-1:1:N_px*1j, -1:1:N_px*1j]
+                    Y, X = np.mgrid[-1:1:N_px*1j, -1:1:N_px*1j]
                     cost = 1/np.mean((X**2 + Y**2)*Im)
                 else:
                     Im = Im[Im > 0]  # exclude empty pixels

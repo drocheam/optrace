@@ -92,7 +92,7 @@ class TracerSpecialTests(unittest.TestCase):
             L1 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 10])
             RT.add(L1)
 
-            X, Y = np.mgrid[-1:1:100j, -1:1:100j]
+            Y, X = np.mgrid[-1:1:100j, -1:1:100j]
             data = 3 - (X**2 + Y**2)
             front = ot.DataSurface2D(data=data, r=4, silent=True)
             back = ot.TiltedSurface(r=4, normal=[0, 0.01, 1])
@@ -147,7 +147,7 @@ class TracerSpecialTests(unittest.TestCase):
             RT.add(RS)
 
         # Data
-        X, Y = np.mgrid[-3:3:200j, -3:3:200j]
+        Y, X = np.mgrid[-3:3:200j, -3:3:200j]
         Z = -(X**2 + Y**2)/5
 
         # add Lens 1
@@ -207,7 +207,7 @@ class TracerSpecialTests(unittest.TestCase):
                 surfs = []
                 for N in [900, 200, 50, 901, 201, 51]:
                     # 2D surface
-                    X, Y = np.mgrid[-r:r:N*1j, -r:r:N*1j]
+                    Y, X = np.mgrid[-r:r:N*1j, -r:r:N*1j]
                     data = 4.657165 + 1/2/R_ * (X**2 + Y**2)  # some random offset
                     surf_ = ot.DataSurface2D(silent=True, r=r, data=data)
                     surfs.append(surf_)
@@ -317,8 +317,8 @@ class TracerSpecialTests(unittest.TestCase):
 
         surf2 = ot.TiltedSurface(r=0.7, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
 
-        X, Y = np.mgrid[-0.7:0.7:100j, -0.7:0.7:100j]
-        Z = np.tan(b_ang)*X
+        Y, X = np.mgrid[-0.7:0.7:100j, -0.7:0.7:100j]
+        Z = np.tan(b_ang)*Y
         surf3 = ot.DataSurface2D(r=0.7, data=Z, silent=True)
 
         for surf in [surf1, surf2, surf3]:

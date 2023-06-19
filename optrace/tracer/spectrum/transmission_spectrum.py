@@ -44,7 +44,7 @@ class TransmissionSpectrum(Spectrum):
         spec = color.d65_illuminant(wl) * self(wl)
         return color.xyz_from_spectrum(wl, spec)
 
-    def color(self, rendering_intent="Absolute", clip=True) -> tuple[float, float, float, float]:
+    def color(self, rendering_intent="Absolute", clip=True, L_th=0, sat_scale=None) -> tuple[float, float, float, float]:
         """
         Get the Spectrum sRGB color and the opacity.
 
@@ -64,7 +64,7 @@ class TransmissionSpectrum(Spectrum):
         XYZ /= Y0
 
         XYZ = np.array([[[*XYZ]]])  # needs to be 3D
-        RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip)[0, 0]
+        RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip, L_th=L_th, sat_scale=sat_scale)[0, 0]
 
         return RGB[0], RGB[1], RGB[2], alpha
 

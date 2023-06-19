@@ -8,6 +8,8 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 if "inline" in matplotlib.rcParams["backend"]:
     matplotlib.rcParams["figure.dpi"] = 200
 
+# TODO let all functions have figuresize parameter
+
 from .r_image_plots import r_image_plot, r_image_cut_plot
 from .misc_plots import autofocus_cost_plot, abbe_plot, surface_profile_plot, image_plot
 from .spectrum_plots import spectrum_plot, refraction_index_plot

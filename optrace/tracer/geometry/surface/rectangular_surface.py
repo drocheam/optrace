@@ -91,7 +91,7 @@ class RectangularSurface(Surface):
 
         # create a rotated grid
         xs, xe, ys, ye = self._extent[:4]
-        X, Y = np.mgrid[xs:xe:N*1j, ys:ye:N*1j]
+        Y, X = np.mgrid[ys:ye:N*1j, xs:xe:N*1j]
         x2, y2 = self._rotate_rc(X.flatten(), Y.flatten(), self._angle)
         X, Y = self.pos[0] + x2.reshape(X.shape), self.pos[1] + y2.reshape(Y.shape)
 

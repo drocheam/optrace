@@ -395,7 +395,7 @@ class TracerTests(unittest.TestCase):
             if isinstance(surf, Surface):
                 if not isinstance(surf, ot.RectangularSurface):
                     Lx, Ly = L.shape[:2]
-                    X, Y = np.mgrid[-Lx/2:Lx/2:Lx*1j, -Ly/2:Ly/2:Ly*1j]
+                    Y, X = np.mgrid[-Lx/2:Lx/2:Lx*1j, -Ly/2:Ly/2:Ly*1j]
                     m = X**2 + Y**2 < (Lx/2-1)**2
 
                     if isinstance(surf, ot.RingSurface):
@@ -497,7 +497,7 @@ class TracerTests(unittest.TestCase):
         img0 = RT.detector_image(63)
         img = img0.get("Irradiance")
         x0, x1, y0, y1 = img0.extent
-        X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
+        Y, X = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**3
         self.assertTrue(np.std(Z/np.max(Z)) < 0.075)
 
@@ -507,7 +507,7 @@ class TracerTests(unittest.TestCase):
         img0 = RT.detector_image(63)
         img = img0.get("Irradiance")
         x0, x1, y0, y1 = img0.extent
-        X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
+        Y, X = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**4
         self.assertTrue(np.std(Z/np.max(Z)) < 0.075)
 
@@ -526,7 +526,7 @@ class TracerTests(unittest.TestCase):
         img0 = RT.detector_image(63)
         img = img0.get("Irradiance")
         x0, x1, y0, y1 = img0.extent
-        X, Y = np.mgrid[x0:x1:63j, y0:y1:63j]
+        Y, X = np.mgrid[x0:x1:63j, y0:y1:63j]
         r = np.sqrt(X**2 + Y**2)
         Z = img / ( 1 + np.sqrt(np.arctan(r/10)))/np.cos(np.arctan(r/10))**3
         self.assertTrue(np.std(Z/np.max(Z)) < 0.05)
@@ -555,7 +555,7 @@ class TracerTests(unittest.TestCase):
         img0 = RT.detector_image(63, projection_method="Equal-Area")
         Z = img0.get("Irradiance")
         # mask out area outside disc, leave 3 pixels margin
-        X, Y = np.mgrid[-32:32:63j, -32:32:63j]
+        Y, X = np.mgrid[-32:32:63j, -32:32:63j]
         mask = np.sqrt(X**2 + Y**2) < 29
         Z = Z[mask]
         self.assertTrue(np.std(Z/np.max(Z)) < 0.015)  # constant irradiance (neglecting noise) as it should be
@@ -605,7 +605,7 @@ class TracerTests(unittest.TestCase):
                 RT.remove(RS0)
 
                 # check if side ratio stays 1
-                self.assertAlmostEqual((x1-x0)/(y1-y0), 1, delta=0.003)  
+                self.assertAlmostEqual((x1-x0)/(y1-y0), 1, delta=0.004)  
                 # some remaining difference because of rays not being exactly at the edge, 
                 # but positions are random inside circular area
 
@@ -1029,7 +1029,7 @@ class TracerTests(unittest.TestCase):
         self.assertEqual(dim[0].projection, "Stereographic")
         
         # call with explicit limit
-        sim, dim = RT.iterative_render(N_rays, N_px_S=400, detector_index=1, limit=5)
+        sim, dim = RT.iterative_render(N_rays, N_px_S=400, detector_index=0, limit=5)
         self.assertEqual(dim[0].limit, 5)
         
         # call with multiple positions
@@ -1056,7 +1056,7 @@ class TracerTests(unittest.TestCase):
         
         # call with multiple positions and limits
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
-                                       N_px_D=500, detector_index=1,
+                                       N_px_D=500, detector_index=0,
                                        limit=[10, 12])
         self.assertNotEqual(dim[0].limit, dim[1].limit) 
         

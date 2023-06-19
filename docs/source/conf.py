@@ -38,7 +38,6 @@ extensions = [
         'sphinx.ext.mathjax',
         'sphinx.ext.doctest',
         'sphinxcontrib.bibtex',
-        'sphinx_copybutton',  # add a copy button to all code snippets
         # 'sphinxcontrib.inkscapeconverter',  # convert svg to pdf for latex output
 ]
 

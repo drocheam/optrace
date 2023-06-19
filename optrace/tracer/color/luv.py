@@ -30,11 +30,13 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     _, un, vn = WP_D65_LUV
 
     # exclude Y = 0 otherwise divisions by zero occur
-    mask = xyz[:, :, 1] > 0  # Y > 0 for 3D array
-    X, Y, Z = xyz[mask, 0], xyz[mask, 1], xyz[mask, 2]
+    xyz2 = xyz.copy()
+    xyz2[xyz < 0] = 0  # negative values due to numerical errors
+    mask = xyz2[:, :, 1] > 0  # Y > 0 for 3D array
+    X, Y, Z = xyz2[mask, 0], xyz2[mask, 1], xyz2[mask, 2]
 
     if not X.shape[0]:
-        return np.zeros_like(xyz)
+        return np.zeros_like(xyz2)
 
     if normalize:
         Yn = np.nanmax(Y)

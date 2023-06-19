@@ -202,6 +202,8 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     sRGB = color.srgb_linear_to_srgb(RGB)
 
     plt.figure()
+    plt.xlim(ext[0], ext[1])
+    plt.ylim(ext[2], ext[3])
     plt.minorticks_on()
 
     # plot colored area, this also includes colors outside the gamut
