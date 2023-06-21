@@ -244,7 +244,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
     :param normalize: if image is normalized to highest value before conversion (bool)
     :param rendering_intent:
     :param L_th: lightness threshold for mode "Perceptual". 
-    :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
+    :param sat_scale: sat_scale option for mode "Perceptual" 
     :return: linear RGB image (numpy 3D array)
     """
 

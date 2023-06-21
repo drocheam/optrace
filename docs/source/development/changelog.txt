@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.4.4   |   2023-06-19   |   New parameters for sRGB Perceptual RI. Resolution filter is now an Airy disc. 
   1.4.3   |   2023-04-12   |   Support for convolution of both colored PSF and image. 
   1.4.2   |   2023-03-21   |   Rewrite of convolution functionality. Now faster and more robust. 
   1.4.1   |   2023-03-21   |   New PSF presets. 

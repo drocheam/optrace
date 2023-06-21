@@ -1232,14 +1232,14 @@ class Raytracer(Group):
                 for j in np.arange(len(pos)):
                     self.detectors[detector_index[j]].move_to(pos[j])
                     Imi = self.detector_image(N=N_px_D[j], detector_index=detector_index[j], 
-                                              extent=extentc[j], _dont_rescale=True, 
+                                              extent=extentc[j], _dont_rescale=True, limit=limit[j], 
                                               projection_method=projection_method[j])
                     Imi._img *= rays_step / N_rays
 
                     # append image to list in first iteration, after that just add image content
                     if i == 0:
                         DIm_res.append(Imi)
-                        extentc[j] = Imi.extent
+                        extentc[j] = Imi._extent0  # assign actual extent in case it was "auto"
                     else:
                         DIm_res[j]._img += Imi._img
 
@@ -1253,12 +1253,6 @@ class Raytracer(Group):
                         SIm_res.append(Imi)
                     else:
                         SIm_res[j]._img += Imi._img
-
-        # apply limit to detector images
-        # filter gets applied in rescale operation below
-        if limit:
-            for lim, DIm in zip(limit, DIm_res):
-                DIm.limit = lim
 
         # rescale images to update Im.Im, we only added Im._Im each
         # force rescaling even if Im has the same size as _Im, since only _Im holds the sum image of all iterations

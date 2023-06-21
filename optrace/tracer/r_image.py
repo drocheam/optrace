@@ -71,6 +71,9 @@ class RImage(BaseClass):
         self.extent: np.ndarray = extent
         """the image extent as [x0, x1, y0, y1] array"""
 
+        self._extent0 = self.extent.copy()
+        # initial extent before __fix_extent() changes
+
         self.img = None
         self._img = None
 
@@ -269,7 +272,7 @@ class RImage(BaseClass):
 
         # point image => make minimal dimensions
         if sx < 2*self.EPS and sy < 2*self.EPS:
-            self.extent += self.EPS * np.array([-1, 1, -1, 1])
+            self.extent = self._extent0 + self.EPS * np.array([-1, 1, -1, 1])
 
         # x side too small, expand
         elif not sx or sy/sx > MR:
@@ -285,7 +288,7 @@ class RImage(BaseClass):
 
         # when filtering is active, add 4 limit to the edges
         if self.limit is not None:
-            self.extent += np.array([-1.0, 1.0, -1.0, 1.0]) * 3 * self.limit/1000.0
+            self.extent = self._extent0 + np.array([-1.0, 1.0, -1.0, 1.0]) * 3 * self.limit/1000.0
 
     def rescale(self, N: int) -> None:
         """
