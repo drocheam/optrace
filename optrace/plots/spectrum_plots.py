@@ -12,6 +12,7 @@ from ..tracer.misc import PropertyChecker as pc
 
 def refraction_index_plot(ri:         RefractionIndex | list[RefractionIndex],
                           title:      str = "Refraction Index",
+                          fargs:      dict = None,
                           **kwargs)\
         -> None:
     """
@@ -19,17 +20,19 @@ def refraction_index_plot(ri:         RefractionIndex | list[RefractionIndex],
 
     :param ri: RefractionIndex or list of RefractionIndex
     :param title: title of the plot
+    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting arguments, including:
         block: if the plot should be blocking
         legend_off: if the legend should be turned off
         label_off: if the labels should be turned off
         color: a single or a list of colors
     """
-    spectrum_plot(ri, title=title, **kwargs)
+    spectrum_plot(ri, title=title, fargs=fargs, **kwargs)
 
 
 def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
                   title:     str = "Spectrum",
+                  fargs:     dict = None,
                   **kwargs)\
         -> None:
     """
@@ -37,6 +40,7 @@ def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
 
     :param spectrum: spectrum or a list of spectra
     :param title: title of the plot
+    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting arguments, including:
         block: if the plot should be blocking
         legend_off: if the legend should be turned off
@@ -50,7 +54,7 @@ def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
     ylabel = Spec0.quantity if Spec0 and Spec0.quantity != "" else "value"
     ylabel += f" in {Spec0.unit}" if Spec0 and Spec0.unit != "" else ""
 
-    _spectrum_plot(spectrum, r"$\lambda$ in nm", ylabel, title=title, **kwargs)
+    _spectrum_plot(spectrum, r"$\lambda$ in nm", ylabel, title=title, fargs=fargs, **kwargs)
 
 
 def _spectrum_plot(obj:          Spectrum | list[Spectrum],
@@ -61,6 +65,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
                    legend_off:   bool = False,
                    labels_off:   bool = False,
                    color:        str | list[str] = None,
+                   fargs:        dict = None,
                    block:        bool = False)\
         -> None:
     """Lower level plotting function. Don't use directly"""
@@ -78,7 +83,8 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # wavelength range
     wl0, wl1 = mcolor.WL_BOUNDS
 
-    fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [15, 1]})
+    fargs = dict() if fargs is None else fargs
+    fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [15, 1]}, **fargs)
 
     # get spectrum values
     def get_val(obj):

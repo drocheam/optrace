@@ -80,6 +80,9 @@ class PlotTests(unittest.TestCase):
         img.limit = 1
         otp.r_image_plot(img, mode=ot.RImage.display_modes[0], flip=True, block=self.manual)
         
+        # test fargs
+        otp.r_image_plot(img, mode=ot.RImage.display_modes[0], flip=True, block=self.manual, fargs=dict(figsize=(10, 10)))
+        
         # exception tests
         self.assertRaises(TypeError, otp.r_image_plot, [5, 5])  # invalid RImage
         self.assertRaises(TypeError, otp.r_image_cut_plot, [5, 5])  # invalid RImage
@@ -132,6 +135,9 @@ class PlotTests(unittest.TestCase):
         # test empty calls
         otp.chromaticities_cie_1931(block=self.manual)
         otp.chromaticities_cie_1976(block=self.manual)
+        
+        # test fargs
+        otp.chromaticities_cie_1976(block=self.manual, fargs=dict(figsize=(10, 10)))
 
         # exception tests
         self.assertRaises(TypeError, otp.chromaticities_cie_1931, ot.Point())  # invalid type
@@ -164,7 +170,7 @@ class PlotTests(unittest.TestCase):
    
         # RefractionIndexPlots
         otp.refraction_index_plot(ot.presets.refraction_index.misc, block=self.manual)
-        otp.refraction_index_plot(ot.presets.refraction_index.SF10, block=self.manual, title="Test title")
+        otp.refraction_index_plot(ot.presets.refraction_index.SF10, block=self.manual, title="Test title", fargs=dict(figsize=(10, 10)))
        
         # refraction_index_plot and spectrum_plot both call the underlying _spectrum_plot, without doing much else
         # so it is sufficient to test one of them
@@ -189,7 +195,7 @@ class PlotTests(unittest.TestCase):
                                 title = None if not lab else "abc"  # sometimes set a different title
                                 args = dict(labels_off=lab, legend_off=leg, block=self.manual, color=color_)
                                 args = args if title is None else (args | dict(title=title))
-                                otp.spectrum_plot(list_, **args)
+                                otp.spectrum_plot(list_, fargs=dict(figsize=(5, 5)), **args)
 
                     plt.close("all")
 
@@ -212,7 +218,7 @@ class PlotTests(unittest.TestCase):
 
         # calls
         otp.autofocus_cost_plot(sci, afdict, block=self.manual)
-        otp.autofocus_cost_plot(sci, afdict, title="Test title", block=self.manual)
+        otp.autofocus_cost_plot(sci, afdict, title="Test title", block=self.manual, fargs=dict(figsize=(10, 10)))
 
         # missing z, cost in afdict, possible with "Position Variance" but without return_cost = True
         otp.autofocus_cost_plot(sci, afdict | dict(z=None), silent=False)
@@ -238,7 +244,7 @@ class PlotTests(unittest.TestCase):
                 for sil in [False, True]:
                     title = None if not sil else "Test title"  # sometimes set a different title
                     args = dict(lines=lines, silent=sil) | (dict(title=title) if title is not None else {})
-                    otp.abbe_plot(ri,  **args, block=self.manual)
+                    otp.abbe_plot(ri, fargs=dict(figsize=(5, 5)), **args, block=self.manual)
             plt.close("all")
 
     def test_surface_profile_plot(self) -> None:
@@ -253,7 +259,7 @@ class PlotTests(unittest.TestCase):
                 L.move_to(pos)
                 for ro in [False, True]:
                     for xb in [[None, None], [None, 1], [1, None], [-1, 2], [1, 2], [None, 12], [-10, 12], [15, 18]]:
-                        SPP(sl, remove_offset=ro, silent=ro, x0=xb[0], xe=xb[1], block=self.manual)
+                        SPP(sl, remove_offset=ro, silent=ro, x0=xb[0], xe=xb[1], block=self.manual, fargs=dict(figsize=(5, 5)))
                 plt.close("all")
 
         # check type checking
@@ -287,10 +293,10 @@ class PlotTests(unittest.TestCase):
         # coverage
         ########################################
 
-        # plot RImage
+        # plot RImage and use fargs
         RI = ot.RImage([-1, 1, -1, 1])
         RI.render()
-        otp.image_plot(RI, [2, 2])
+        otp.image_plot(RI, [2, 2], fargs=dict(figsize=(5, 5)))
 
         # plot empty array
         arr = np.zeros((100, 100, 3))

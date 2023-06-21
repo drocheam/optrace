@@ -19,6 +19,7 @@ from ..tracer import RImage
 def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
                         afdict:  dict,
                         title:   str = "Autofocus Cost Function",
+                        fargs:   dict = None,
                         block:   bool = False,
                         silent:  bool = False)\
         -> None:
@@ -28,6 +29,7 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     :param res: optimize result from Raytracer.autofocus()
     :param afdict: dictionary from Raytracer.autofocus()
     :param title: title of the plot
+    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param block: if the plot should be blocking the execution of the program
     :param silent: if all standard output should be muted
     """
@@ -47,7 +49,8 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
 
     r, vals = afdict["z"], afdict["cost"]
 
-    plt.figure()
+    fargs = dict() if fargs is None else fargs
+    plt.figure(**fargs)
 
     # evaluation points and connection line of cost function
     plt.plot(r, vals)
@@ -70,6 +73,7 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
 def image_plot(img:     np.ndarray | str, 
                s:       list[float, float],
                flip:    bool = False,
+               fargs:   dict = None,
                title:   str = "",
                block:   bool = False)\
         -> None:
@@ -82,6 +86,7 @@ def image_plot(img:     np.ndarray | str,
     :param img: image path or image array
     :param s: image side lengths in mms (list of two elements, with first element being the x-length)
     :param flip: flip the image (rotate by 180 degrees)
+    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: optional title of the plot
     :param block: if the plot window should be blocking
     """
@@ -111,7 +116,9 @@ def image_plot(img:     np.ndarray | str,
         img_ = np.fliplr(np.flipud(img_))
         extent = extent[[1, 0, 3, 2]]
     
-    plt.figure()
+    fargs = dict() if fargs is None else fargs
+    plt.figure(**fargs)
+    
     _show_grid()
     plt.title(title)
     plt.xlabel("x in mm")
@@ -127,6 +134,7 @@ def image_plot(img:     np.ndarray | str,
 def abbe_plot(ri:     list[RefractionIndex],
               title:  str = "Abbe Diagram",
               lines:  list = None,
+              fargs:   dict = None,
               block:  bool = False,
               silent: bool = False)\
         -> None:
@@ -136,6 +144,7 @@ def abbe_plot(ri:     list[RefractionIndex],
     :param ri: list of RefractionIndex
     :param title: title of the plot
     :param lines: spectral lines to use for the Abbe number calculation
+    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param block: if the plot should block the execution of the program
     :param silent: if all standard output of this function should be muted
     """
@@ -149,7 +158,8 @@ def abbe_plot(ri:     list[RefractionIndex],
 
     lines = Lines.FdC if lines is None else lines
    
-    plt.figure()
+    fargs = dict() if fargs is None else fargs
+    plt.figure(**fargs)
     _show_grid()
 
     for i, RIi in enumerate(ri):
@@ -181,6 +191,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
                          x0:               float = None,
                          xe:               float = None,
                          remove_offset:    bool = False,
+                         fargs:            dict = None,
                          title:            str = "Surface Profile",
                          silent:           bool = False,
                          block:            bool = False)\
@@ -195,6 +206,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     :param x0: x start value for the plot, defaults to the beginning of the surface
     :param xe: x end value for the plot, defaults to the end of the surface
     :param remove_offset: remove the height offset for each surface
+    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: title of the plot
     :param silent: if all standard output of this function should be muted
     :param block: if the plot should block the execution of the program
@@ -212,7 +224,8 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     Surf_list = [surface] if isinstance(surface, Surface) else surface  # enforce list even for one element
     legends = []  # legend entries
 
-    plt.figure()
+    fargs = dict() if fargs is None else fargs
+    plt.figure(**fargs)
 
     plottable = False  # if at least one plot is plottable
 
