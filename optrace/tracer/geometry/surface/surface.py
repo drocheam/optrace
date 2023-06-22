@@ -297,13 +297,13 @@ class Surface(BaseClass):
             zd + self.pos[2]
 
     def find_hit(self, p: np.ndarray, s: np.ndarray)\
-            -> tuple[np.ndarray, np.ndarray]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Find the position of hits on surface using the iterative regula falsi algorithm.
 
         :param p: position array (numpy 2D array, shape (N, 3))
         :param s: direction array (numpy 2D array, shape (N, 3))
-        :return: positions of hit (shape as p), bool numpy 1D array if ray hits lens
+        :return: positions of hit (shape as p), bool numpy 1D array if ray hits lens, indices of ill-conditioned rays
         """
 
         if self.is_flat():
@@ -314,7 +314,7 @@ class Surface(BaseClass):
 
             self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
-            return p_hit, is_hit
+            return p_hit, is_hit, np.array([])
 
         else:
             # ray parameters for just above and below the surface
@@ -347,11 +347,6 @@ class Surface(BaseClass):
 
             # we need values with different signs to find the root
             ill = f1*f2 > 0
-            if np.any(ill):
-                illc = np.count_nonzero(ill)
-                self.print(f"WARNING: There are {illc} rays that are ill-conditioned for numerical hit finding. "
-                           "Their hit position will certainly be wrong."
-                           " A possible cause can be a ray hitting a surface multiple times.")
 
             it = 1  # number of iteration
             # do until all rays have converged
@@ -406,7 +401,7 @@ class Surface(BaseClass):
             # handle rays that start behind surface or inside its extent 
             self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
-        return p_hit, is_hit
+        return p_hit, is_hit, ill
 
     def flip(self) -> None:
         """flip the surface around the x-axis"""

@@ -295,7 +295,7 @@ The following code renders it for the second source (since index counting starts
 
 .. testcode::
 
-   img = RT.source_image(389, source_index=1, limit=3)
+   img = RT.source_image(389, source_index=0, limit=3)
 
 
 **Detector Image**
@@ -349,7 +349,7 @@ Exemplary calls:
 .. testcode::
 
    RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256]) 
-   RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
+   RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 0], limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
 
 :python:`N_px_S` can also be provided as list, note however, that when provided as list, it needs to have the same length as the number of sources.
 
@@ -540,7 +540,7 @@ Properties :python:`sx` and :python:`sy` specify the side lengths of the image i
 .. doctest::
 
    >>> img.extent
-   array([-0.002625,  1.002625, -0.002625,  1.002625])
+   array([-0.009,  1.009, -0.009,  1.009])
 
 .. doctest::
 
@@ -550,12 +550,12 @@ Properties :python:`sx` and :python:`sy` specify the side lengths of the image i
 .. doctest::
 
    >>> img.sy
-   1.0052500000000002
+   1.0179999999999998
 
 .. doctest::
 
    >>> img.Apx
-   1.0184203199798441e-05
+   1.044418241370622e-05
 
 
 Rendering a LightSpectrum

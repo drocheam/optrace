@@ -103,7 +103,7 @@ class BaseClass:
         :param message: string to print
         """
         if not self.silent:
-            print(f"Class {type(self).__name__}: {message}")
+            print(f"{type(self).__name__}: {message}")
 
     def __str__(self) -> str:
         """gets called when print(obj) or repr(obj) gets called"""

@@ -49,6 +49,7 @@ class Raytracer(Group):
         ONLY_HIT_BACK = 4
         T_BELOW_TTH = 5
         ABSORB_MEDIA_TRANS = 6
+        ILL_COND = 7
     """enum for info messages in raytracing"""
 
     autofocus_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
@@ -202,7 +203,7 @@ class Raytracer(Group):
 
                         case self.INFOS.OUTLINE_INTERSECTION:
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"hitting outline, set to absorbed.")
+                                       f"hitting outline after surface {surf}, set to absorbed.")
 
                         case self.INFOS.T_BELOW_TTH:
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
@@ -211,11 +212,16 @@ class Raytracer(Group):
 
                         case self.INFOS.ONLY_HIT_FRONT:
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"hitting lens front but missing back, setting to absorbed.")
+                                       f"hitting lens front but missing back (lens with surface {surf}), setting to absorbed.")
 
                         case self.INFOS.ONLY_HIT_BACK:
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"missing lens front but hitting back, setting to absorbed.")
+                                       f"missing lens front but hitting back (lens with surface {surf}), setting to absorbed.")
+                        
+                        case self.INFOS.ILL_COND:
+                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for numerical hit "
+                                       f"finding at surface {surf}. "
+                                       f"Their hit position will certainly be wrong.")
 
     def trace(self, N: int) -> None:
         """
@@ -275,8 +281,9 @@ class Raytracer(Group):
                 if isinstance(element, Lens):
 
                     hw_front = hw.copy()
-                    p[hw, i+1], hit_front = element.front.find_hit(p[hw, i], s[hw])
+                    p[hw, i+1], hit_front, ill = element.front.find_hit(p[hw, i], s[hw])
                     hwh = misc.part_mask(hw, hit_front)  # rays having power and hitting lens front
+                    msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
 
                     # index after lens
                     n2 = element.n2 or self.n0
@@ -300,7 +307,8 @@ class Raytracer(Group):
                         ns[:, i], ns[:, i+1] = n_l, n2_l
 
                         hw = weights[:, i] > 0
-                        p[hw, i+1], hit_back = element.back.find_hit(p[hw, i], s[hw])
+                        p[hw, i+1], hit_back, ill = element.back.find_hit(p[hw, i], s[hw])
+                        msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
                         hwb = misc.part_mask(hw, hit_back)  # rays having power and hitting lens back
                         self.__refraction(element.back, p, s, weights, n_l, n2_l, pols, hwb, i, msg)
 
@@ -335,7 +343,8 @@ class Raytracer(Group):
                     n1 = n2
 
                 elif isinstance(element, Filter | Aperture):  # pragma: no branch
-                    p[hw, i+1], hit = element.surface.find_hit(p[hw, i], s[hw])
+                    p[hw, i+1], hit, ill = element.surface.find_hit(p[hw, i], s[hw])
+                    msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
                     hwh = misc.part_mask(hw, hit)  # rays having power and hitting filter
 
                     if isinstance(element, Filter):
@@ -951,7 +960,8 @@ class Raytracer(Group):
                     w[rsi] = 0  # set invalid to weight of zero
                     p, s, rs2 = p[val], s[val], rs2[val]  # only use valid rays
 
-                ph[rs3], ish[rs3] = dsurf.find_hit(p, s)  # find hit
+                ph[rs3], ish[rs3], _ = dsurf.find_hit(p, s)  # find hit
+                # TODO ^-- how to handle illcount parameter?
 
                 p2z = self.rays.p_list[rs, rs2, 2]
                 rs4 = ph[rs3, 2] > p2z + dsurf.C_EPS  # hit point behind next surface intersection -> no valid hit

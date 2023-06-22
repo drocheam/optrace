@@ -230,7 +230,7 @@ class SurfaceTests(unittest.TestCase):
         
         for i, Si in enumerate(self._test_surfaces()):
             with self.subTest(i=i, Surface=type(Si).__name__):
-                p_hit, is_hit = Si.find_hit(p, s)
+                p_hit, is_hit, _ = Si.find_hit(p, s)
 
                 # check that all hitting rays have the correct z-value at the surface
                 z_hit = Si.values(p_hit[is_hit, 0], p_hit[is_hit, 1])
@@ -250,7 +250,7 @@ class SurfaceTests(unittest.TestCase):
 
                 # when rays start behind the surface their hit position is just the start position
                 p_hit[:, 2] = Si.z_max + 2
-                p_hit2, is_hit = Si.find_hit(p_hit, s)
+                p_hit2, is_hit, _ = Si.find_hit(p_hit, s)
                 self.assertTrue(np.allclose(p_hit2 - p_hit, 0))
                 self.assertFalse(np.any(is_hit))
 
@@ -876,7 +876,7 @@ class SurfaceTests(unittest.TestCase):
                 z0 = S.values(x, y)
                 n0 = S.normals(x, y)
                 m0 = S.mask(x, y)
-                ph0, ish0 = S.find_hit(p, s)
+                ph0, ish0, _ = S.find_hit(p, s)
 
                 S.rotate(angle)
                 xr, yr = self.relative_rotate(x-pos0[0], y-pos0[1], np.deg2rad(angle))  # rotate coordinates
@@ -898,7 +898,7 @@ class SurfaceTests(unittest.TestCase):
                 s2 = s.copy()
                 s2[:, 0], s2[:, 1] = self.relative_rotate(s2[:, 0], s2[:, 1], np.deg2rad(angle))
 
-                ph1, ish1 = S.find_hit(p2, s2)
+                ph1, ish1, _ = S.find_hit(p2, s2)
                 ph1[:, 0], ph1[:, 1] = self.relative_rotate(ph1[:, 0] - pos0[0], ph1[:, 1] - pos0[1], -np.deg2rad(angle))
                 ph1[:, 0] += pos0[0]
                 ph1[:, 1] += pos0[1]

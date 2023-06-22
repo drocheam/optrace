@@ -88,13 +88,13 @@ class TiltedSurface(Surface):
 
         return n
 
-    def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Find hit/intersections of rays with this surface.
 
         :param p: ray position array, shape (N, 3)
         :param s: unity ray direction vectors, shape (N, 3)
-        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit
+        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit, indices of ill-conditioned rays
         """
         # intersection ray with plane
         # see https://www.scratchapixel.com/lessons/3d-basic-rendering/
@@ -107,7 +107,7 @@ class TiltedSurface(Surface):
         # handle rays that start behind surface or inside its extent 
         self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
-        return p_hit, is_hit
+        return p_hit, is_hit, np.array([])
 
     def flip(self) -> None:
         """flip the surface around the x-axis"""

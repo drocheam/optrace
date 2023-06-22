@@ -60,3 +60,11 @@ Legends and labels inside the figures are generated from descriptions from the o
    obj2 = Object(..., long_desc="Some long description")
 
    some_plotting_function([obj, obj2], ...)
+
+
+Additionally a parameter dictionary :python:`fargs` can be passed to the function that holds options for :func:`pyplot.figure`.
+For instance, to provide a custom figure size, one might use:
+
+.. code-block:: python
+   
+   some_plotting_function([obj, obj2], fargs=dict(figsize=(8, 5)))

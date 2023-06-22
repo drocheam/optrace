@@ -108,13 +108,13 @@ class ConicSurface(Surface):
 
         return n
 
-    def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Find hit/intersections of rays with this surface.
 
         :param p: ray position array, shape (N, 3)
         :param s: unity ray direction vectors, shape (N, 3)
-        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit
+        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit, indices of ill-conditioned rays
         """
 
         o = p - self.pos  # coordinates relative to surface center
@@ -182,7 +182,7 @@ class ConicSurface(Surface):
         p_hit[m] = p[m]
         is_hit[m] = False
 
-        return p_hit, is_hit
+        return p_hit, is_hit, np.array([])
 
     def flip(self) -> None:
         """flip the surface around the x-axis"""

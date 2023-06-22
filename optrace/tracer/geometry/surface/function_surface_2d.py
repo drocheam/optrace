@@ -97,7 +97,7 @@ class FunctionSurface2D(Surface):
             z_range_provided = z_max - z_min
             
             if z_range_probed and z_range_provided + self.N_EPS < z_range_probed:
-                self.print(f"Provided a z-extent of {z_range_provided} for surface {repr(self)},"
+                self.print(f"Provided a z-extent of {z_range_provided} for surface {self.get_desc(hex(id(self)))},"
                            f"but measured range is at least {z_range_probed}, an increase of at "
                            f"least {100*(z_range_probed - z_range_provided)/z_range_probed:.5g}."
                            f" I will use the measured values for now.")
@@ -122,8 +122,8 @@ class FunctionSurface2D(Surface):
                     self.z_min, self.z_max = z_min - self._offset, z_max - self._offset
 
         elif z_max is None and z_min is None:
-            self.print(f"Estimated z-bounds of surface {repr(self)}: [{self._offset+self.z_min}, "
-                       f"{self._offset+self.z_max}], provide actual values to make it more exact.")
+            self.print(f"Estimated z-bounds of surface {self.get_desc(hex(id(self)))}: [{self._offset+self.z_min:.9g}, "
+                       f"{self._offset+self.z_max:.9g}], provide actual values to make it more exact.")
         
         else:
             raise ValueError(f"z_max and z_min need to be both None or both need a value")
