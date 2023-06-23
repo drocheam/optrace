@@ -62,7 +62,7 @@ Legends and labels inside the figures are generated from descriptions from the o
    some_plotting_function([obj, obj2], ...)
 
 
-Additionally a parameter dictionary :python:`fargs` can be passed to the function that holds options for :func:`pyplot.figure`.
+Additionally a parameter dictionary :python:`fargs` can be passed to the function that holds options for :func:`matplotlib.pyplot.figure`.
 For instance, to provide a custom figure size, one might use:
 
 .. code-block:: python

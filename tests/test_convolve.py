@@ -400,8 +400,8 @@ class ConvolutionTests(unittest.TestCase):
         for pst in psts:
 
             # small psfs, units in mms
-            self.assertTrue(pst[1][0] < 3e-2)
-            self.assertTrue(pst[1][1] < 3e-2)
+            self.assertTrue(pst[1][0] < 6e-2)
+            self.assertTrue(pst[1][1] < 6e-2)
 
             # square psf
             self.assertTrue(pst[0].shape[0] == pst[0].shape[1])
@@ -418,18 +418,17 @@ class ConvolutionTests(unittest.TestCase):
 
         self.assertRaises(ValueError, ot.presets.psf.airy, -1)  # invalid d
         self.assertRaises(ValueError, ot.presets.psf.circle, -1)  # invalid d
-        self.assertRaises(ValueError, ot.presets.psf.gaussian, -1)  # invalid d
+        self.assertRaises(ValueError, ot.presets.psf.gaussian, -1)  # invalid sig
 
-        self.assertRaises(ValueError, ot.presets.psf.glare, -1)  # invalid d1
-        self.assertRaises(ValueError, ot.presets.psf.glare, 1, -2)  # invalid d2
+        self.assertRaises(ValueError, ot.presets.psf.glare, -1)  # invalid sig1
+        self.assertRaises(ValueError, ot.presets.psf.glare, 1, -2)  # invalid sig2
         self.assertRaises(ValueError, ot.presets.psf.glare, 1, 2, -1)  # invalid a
-        self.assertRaises(ValueError, ot.presets.psf.glare, 2, 1)  # d2 < d1
+        self.assertRaises(ValueError, ot.presets.psf.glare, 2, 1)  # sig2 < sig1
 
-        self.assertRaises(ValueError, ot.presets.psf.halo, -1)  # invalid d1
-        self.assertRaises(ValueError, ot.presets.psf.halo, 1, -2)  # invalid d2
-        self.assertRaises(ValueError, ot.presets.psf.halo, 1, 2, -1)  # invalid s
+        self.assertRaises(ValueError, ot.presets.psf.halo, -1)  # invalid sig1
+        self.assertRaises(ValueError, ot.presets.psf.halo, 1, -2)  # invalid sig2
+        self.assertRaises(ValueError, ot.presets.psf.halo, 1, 2, -1)  # invalid r
         self.assertRaises(ValueError, ot.presets.psf.halo, 1, 2, 1, -1)  # invalid a
-        self.assertRaises(ValueError, ot.presets.psf.halo, 2, 1)  # d2 < d1
 
     def test_zero_image(self):
         """no warnings/exceptions with zero image"""

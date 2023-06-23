@@ -289,7 +289,7 @@ A point source is added at the retina and the geometry is traced.
 .. testoutput::
    :hide:
 
-   Class ...
+   Raytracer: ...
 
 Loading ZEMAX Geometries (.zmx)
 __________________________________

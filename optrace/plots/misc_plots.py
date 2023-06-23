@@ -82,6 +82,7 @@ def image_plot(img:     np.ndarray | str,
 
     img needs to be a valid path or a sRGB numpy array with value range [0, 1].
     Note that image arrays will get normalized to use the whole range.
+    There will be always a sRGB image shown and not values linear to the intensity.
 
     :param img: image path or image array
     :param s: image side lengths in mms (list of two elements, with first element being the x-length)
@@ -103,8 +104,13 @@ def image_plot(img:     np.ndarray | str,
     else:
         img_ = img.copy()
 
-        if (imax := np.max(img_)):
-            img_ /= imax
+        if img_.ndim == 2:
+            img_ = np.repeat(img_[:, :, np.newaxis], 3, axis=2)
+            
+            if (imax := np.max(img_)):
+                img_ /= imax
+
+            img_ = color.srgb_linear_to_srgb(img_)
 
     # adapt extent so the coordinates are at the center of pixels
     extent = np.array([-s[0]/2, s[0]/2, -s[1]/2, s[1]/2])

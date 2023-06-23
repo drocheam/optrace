@@ -190,7 +190,7 @@ For :math:`a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}` the surface is cr
 .. testoutput::
    :hide:
 
-   Class ...
+   AsphericSurface: ...
 
 Generally there is no limit on the number of coefficients, however after a dozen one should ask oneself if they are worth the additional computational effort.
 
@@ -223,7 +223,7 @@ As an example we want to create an axicon surface. In the simplest case the heig
 .. testoutput::
    :hide:
 
-   Class ...
+   FunctionSurface1D: ...
 
 We can use a FunctionSurface2D with rotational symmetry, which is called FunctionSurface1D.
 The user defined function must take r-values (as numpy array), return a numpy array and is provided as the :python:`func` parameter.
@@ -248,7 +248,7 @@ The derivative function is passed with the :python:`deriv_func`-parameter.
 .. testoutput::
    :hide:
 
-   Class ...
+   FunctionSurface1D: ...
 
 
 **Function parameters**
@@ -272,7 +272,7 @@ For the :python:`func` argument the matching parameter would be :python:`func_ar
 .. testoutput::
    :hide:
 
-   Class ...
+   FunctionSurface1D: ...
 
 
 **z-Range**
@@ -318,7 +318,7 @@ To define a half circular aperture with radius :math:`r=0.1`, one can write:
 .. testoutput::
    :hide:
 
-   Class ...
+   FunctionSurface2D: ...
 
 In this case the :python:`func`-parameter is just a plane. Note that we need to use the FunctionSurface2D class, as there is not rotational symmetry anymore.
 
@@ -349,7 +349,7 @@ Here is and example of a lens with direction dependent curvature and a little no
 .. testoutput::
    :hide:
 
-   Class ...
+   DataSurface2D: ...
 
 Note that we can also add the parameters :python:`z_min=...`, :python:`z_max=`, :python:`parax_roc` as for the FunctionSurface class.
 
@@ -370,7 +370,7 @@ For a surface with rotational symmetry one radial vector is sufficient, for this
 .. testoutput::
    :hide:
 
-   Class ...
+   DataSurface1D: ...
 
 
 Additional Geometrical Quantities

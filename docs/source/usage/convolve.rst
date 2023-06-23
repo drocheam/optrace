@@ -176,36 +176,36 @@ A circle PSF is defined using the :python:`d` parameter that defines the circle 
 **Gaussian**
 
 A gaussian function can model the zeroth order shape of an airy disc.
-The diameter parameter `d` defines the diameter/resolution limit for this.
+The shape parameter `sig` defines the gaussian's standard deviation.
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.gaussian(d=2.0) 
+   psf, s_psf = ot.presets.psf.gaussian(sig=2.0) 
 
 **Airy**
 
-An Airy PSF also include higher order diffraction and is also characterized by its first zero crossing diameter.
+An Airy PSF also include higher order diffraction and is also characterized by the resolution limit which is the first zero crossing position relative to its core.
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.airy(d=2.0) 
+   psf, s_psf = ot.presets.psf.airy(r=2.0) 
 
 **Glare**
 
-The glare consists of two gaussians, the first with diameter :python:`d1` and  intensity 1, the other with larger diameter :python:`d2` and intensity :python:`a`.
+The glare consists of two gaussians, the first with parameter :python:`sig1`, the other with larger :python:`sig2` and relative intensity :python:`a`.
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.glare(d1=2.0, d2=3.5, a=0.05) 
+   psf, s_psf = ot.presets.psf.glare(sig1=2.0, sig2=3.5, a=0.05) 
 
 
 **Halo**
 
-A halo consists of a center gaussian of diameter :python:`d1` and intensity 1, as well as a ring with diameter :python:`d2`, which is in fact a shifted gaussian function with width :python:`w`.
+A halo consists of a center gaussian with :python:`sig1` and intensity 1, as well as a ring at :math:`r` with standard deviation :python:`sig2` with intensity :math:`a`.
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.halo(d1=2.0, d2=3.5, a=0.05, w=0.1) 
+   psf, s_psf = ot.presets.psf.halo(sig1=0.5, sig2=0.25, r=3.5, a=0.05) 
 
 
 
@@ -219,31 +219,31 @@ _____________________
           :align: center
           :width: 400
 
-          Circle PSF with standard parameters.
+          Exemplary Circle PSF.
    
      - .. figure:: ../images/psf_gaussian.svg
           :align: center
           :width: 400
 
-          Gaussian PSF with standard parameters.
+          Exemplary Gaussian PSF.
 
    * - .. figure:: ../images/psf_airy.svg
           :align: center
           :width: 400
 
-          Airy PSF with standard parameters.
+          Exemplary Airy PSF.
    
      - .. figure:: ../images/psf_halo.svg
           :align: center
           :width: 400
 
-          Halo PSF with standard parameters.
+          Exemplary Halo PSF.
    
    * - .. figure:: ../images/psf_glare.svg
           :align: center
           :width: 400
 
-          Glare PSF with standard parameters.
+          Exemplary Glare PSF.
 
      - 
 

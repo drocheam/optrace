@@ -7,7 +7,7 @@ from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context manager for _no_trait_action()
 
-# enforce qt backend
+# enforce qt backend  # TODO qt5 support?
 from traits.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt'
 

@@ -13,7 +13,8 @@ s_img = [1.5, 1.2]
 
 # halo preset, returns the psf and the side lengths
 # sizes d1, d2, ... are in micrometers
-psf, s_psf = ot.presets.psf.halo(d1=12, d2=40, a=0.2, w=2)
+psf, s_psf = ot.presets.psf.halo(sig1=6, sig2=2, a=0.2, r=40)
+# psf, s_psf = ot.presets.psf.airy(r=8)
 
 # convolve
 img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=0.75)

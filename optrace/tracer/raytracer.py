@@ -956,7 +956,7 @@ class Raytracer(Group):
                 if not np.all(val):
                     rs = misc.part_mask(rs, val)  # only use valid rays
                     rsi = misc.part_mask(rs3, ~val)  # current rays that are not valid
-                    rs3 = misc.part_mask(rs3, val)  # current rays that are not valid
+                    rs3 = misc.part_mask(rs3, val)  # current rays that are valid
                     w[rsi] = 0  # set invalid to weight of zero
                     p, s, rs2 = p[val], s[val], rs2[val]  # only use valid rays
 

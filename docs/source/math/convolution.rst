@@ -151,16 +151,16 @@ PSF Presets
 
 **Gaussian**
 
+A simple gaussian intensity distribution is described as:
+
 .. math::
 
    I_{d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)
 
-.. math::
-
-   \sigma = 0.35 d
-
 
 **Airy**
+
+The Airy function is:
 
 .. math::
 
@@ -168,31 +168,30 @@ PSF Presets
 
 .. math::
 
-   r_d = 7.6634 \frac{\sqrt{x^2 + y^2}}{d}
+   r_d = 3.8317 \frac{\sqrt{x^2 + y^2}}{r}
+
+The resolution limit is described as distance from the center to the first function zero, so the diameter describes the distance between the zero on one and the other side.
 
 **Glare**
 
+A glare consists of two different gaussians. Parameter :math:`a` describes the relative intensity of the larger one.
+
 .. math::
 
-  I_{\sigma_1,\sigma_2,d}(x, y) = \frac{1}{1+a}\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + \frac{a}{1+a}\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
+  I_{\sigma_1,\sigma_2,d}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
 
 
 **Halo**
 
-.. math::
-
-   I_{d_1,d_2,a,w}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - d_2\right)^2}{2 \sigma_2^2}\right) 
-
-
-With 
+A halo consists of a central gaussian and annular gaussian function around :math:`r`.
+:math:`sig_1, sig_2` describe the standard deviations of the gaussians.
+:math:`a` describes the intensity of the ring.
 
 .. math::
 
-   \sigma_1 = 0.175 d_1
+   I_{d_1,d_2,a,w}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
 
-.. math::
 
-   \sigma_2 = 0.233 w
 
 
 
