@@ -686,7 +686,7 @@ class SpectrumTests(unittest.TestCase):
         spec = ot.LightSpectrum("Data", wls=[380, 480, 580], vals=[1, 2, 3])
         self.assertAlmostEqual(spec.peak(), 3)
 
-        wl = color.wavelengths(100)
+        wl = color.wavelengths(50)  # every bin gets a ray
         w = np.ones_like(wl)
         spec = ot.LightSpectrum.render(wl, w)
         self.assertAlmostEqual(spec.peak(), 1 / (color.WL_BOUNDS[1] - color.WL_BOUNDS[0]) * (len(spec._wls)-1))

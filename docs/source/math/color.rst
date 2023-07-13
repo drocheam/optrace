@@ -184,6 +184,12 @@ Implemented Rendering Intents:
 Intersecting the gamut edge for mode *Absolute Colorimetric* is done in the CIE 1931 xy chromaticity diagram and towards the whitepoint of the standard illuminants D65.
 Determining and rescaling the saturation in *Perceptual Colorimetric* mode is done in the CIE 1976 uv chromaticity diagram, since this is a representation where color differences directly correspond to spatial differences.
 
+
+In the default configuration Perceptual Colorimetric scales the saturation such that all colors are inside the gamut.
+A fixed rescaling factor (range 0-1) can be provided as ``sat_scale`` parameter that can enforce the same factor when for instance comparing different images.
+In the former adaptive case an additional ``L_th`` can be applied, which is a relative threshold and ignores values below this threshold for the calculation of the scaling factor.
+This proves useful when dark but saturated regions are inside the image but which can be neglected.
+
 The effect of different rendering intents is illustrated in the next figures. The rendered images were created using the double prism example from the example folder, where light is decomposed into its components. Since all spectral wavelengths create colors beyond the sRGB gamut, this leads to an extreme case.
 In the first image the lightness component is pictured, the following images should be the colored version of this lightness image.
 With the Absolute Colorimetric rendering intent one can see not only the colors having different saturation, but the lightness gradient is different compared to the first image. This can especially be seen around :math:`x = 1.3` mm to :math:`x= 1.4` mm. While the lightness values were in fact unchanged, this subjective difference comes from the Helmholtz-Kohlrausch effect :footcite:`HelmKohlWiki`, which describes that color saturation can lead to higher perceived lightness. Since the saturation was clipped, and the maximum value depends on the spectral wavelength, saturation ratios are falsified, leading to this effect behaving differently for every color.

@@ -47,7 +47,6 @@ class ScenePlotting:
         self._lens_plots = []
         self._axis_plots = []
         self._filter_plots = []
-        self._outline_plots = []
         self._aperture_plots = []
         self._detector_plots = []
         self._ray_source_plots = []
@@ -58,6 +57,7 @@ class ScenePlotting:
         self._fault_markers = []
         self._ray_plot = None
         self._crosshair = None
+        self._outline = None
         self._orientation_axes = None
 
         # texts 
@@ -161,13 +161,12 @@ class ScenePlotting:
 
     def plot_outline(self) -> None:
         """replot the raytracer outline"""
-        self.__remove_objects(self._outline_plots)
+        if self._outline is not None:
+            self._outline.remove()
 
         self.scene.engine.add_source(ParametricSurface(name="Outline"), self.scene)
-        a = self.scene.mlab.outline(extent=self.raytracer.outline.copy(), color=self._outline_color)
-        a.actor.actor.pickable = False  # only rays should be pickable
-
-        self._outline_plots.append((a,))
+        self._outline = self.scene.mlab.outline(extent=self.raytracer.outline.copy(), color=self._outline_color)
+        self._outline.actor.actor.pickable = False  # only rays should be pickable
 
     def plot_orientation_axes(self) -> None:
         """plot orientation axes"""
@@ -496,10 +495,10 @@ class ScenePlotting:
         self._crosshair_color = (1, 0, 0)
         self._marker_color = (0, 1, 0) if not high_contrast else self.scene.foreground
         self._line_marker_color = (0.8, 0, 0.8) if not high_contrast else self.scene.foreground
-        self._outline_color = (0, 0, 0)
+        self._outline_color = (0, 0, 0) if not high_contrast else (0.8, 0.8, 0.8)
         self._raysource_alpha = 0.55
-        self._axis_color = (1, 1, 1) if not high_contrast else (0, 0, 0)
-        self._axis_alpha = 0.55
+        self._axis_color = (1, 1, 1) if not high_contrast else (0.5, 0.5, 0.5)
+        self._axis_alpha = 0.55 if not high_contrast else 0.35
         self._info_frame_color = (0, 0, 0) if not high_contrast else (1, 1, 1)
         self._info_opacity = 0.2
         self._volume_color = (0.45, 0.45, 0.45) if not high_contrast else (1, 1, 1)
@@ -668,12 +667,12 @@ class ScenePlotting:
                                 self._line_marker_color, self._crosshair_color, self._outline_color],
                                [self._lens_plots, self._detector_plots, self._aperture_plots,
                                 self._marker_plots, self._line_marker_plots, [[self._crosshair]], 
-                                self._outline_plots]):
+                                [[self._outline]]]):
             for obj in objs:
                 for el in obj[:3]:
                     if el is not None:
-                        el.actor.property.color = color
-                        if high_contrast and el is not self._crosshair:
+                        el.actor.property.trait_set(color = color)
+                        if high_contrast and el not in [self._crosshair, self._outline]:
                             el.actor.property.trait_set(specular_color=(0.15, 0.15, 0.15),
                                                         diffuse_color=(0.12, 0.12, 0.12))
 
@@ -682,6 +681,8 @@ class ScenePlotting:
             for el in ax:
                 if el is not None:
                     el.axes.property.color = self._outline_color
+                    el.label_text_property.opacity = self._axis_alpha
+                    el.title_text_property.opacity = self._axis_alpha
 
         # change index plot objects
         for obj in self._index_box_plots:

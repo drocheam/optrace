@@ -15,7 +15,7 @@ This ignores aberrations like coma, off-axis astigmatism, field curvature, vigne
 Image convolution is done by applying the convolution theorem of the Fourier transformation:
 
 .. math::
-   g \ast h=\mathcal{F}^{-1}\{G \cdot H\}
+   g \otimes h=\mathcal{F}^{-1}\{G \cdot H\}
    :label: eq_conv_theorem
     
 Where :math:`g` and :math:`h` are the original functions. A convolution in the original domain is therefore a multiplication in the Fourier domain.
@@ -69,7 +69,7 @@ The convoluted image :math:`\text{im}_2` is calculated by a two dimensional spat
 When done correctly, all three not only depend on the position :math:`x, y` inside the image but also the wavelength :math:`\lambda` as the image and PSF can have different spectral distributions depending on the location.
 
 .. math::
-   \text{im}_2(x, y, \lambda) &= \text{im}(x, y, \lambda) \ast\ast\; \text{psf}(x, y, \lambda)\\
+   \text{im}_2(x, y, \lambda) &= \text{im}(x, y, \lambda) \otimes \text{psf}(x, y, \lambda)\\
    &= \iint \text{im}(\tau_x, \tau_y, \lambda) \cdot \text{psf}(x-\tau_x, y-\tau_y, \lambda)  \;\text{d} \tau_x \,\text{d}\tau_y\\
    :label: eq_conv_double_conv
 
@@ -88,20 +88,20 @@ The following proposition is applied in a later derivation:
 In the next step we want to proof that convolving the image channels is the same as calculating the image with equation :math:numref:`eq_conv_double_conv` and then converting it to a color channel.
 
 .. math::
-   \text{im}_{2,r} = \int   \text{im}_2(x, y, \lambda) \cdot r(\lambda) \;\text{d}\lambda \stackrel{!}{=} \text{im}_{r}(x, y) \ast\ast\; \text{psf}_r(x, y) 
+   \text{im}_{2,r} = \int   \text{im}_2(x, y, \lambda) \cdot r(\lambda) \;\text{d}\lambda \stackrel{!}{=} \text{im}_{r}(x, y) \otimes \text{psf}_r(x, y) 
    :label: eq_conv_desired
 
 This is done by expanding all integrals:
 
 .. math::
    \text{im}_{2,r}(x, y) 
-   &= \text{im}_{r}(x, y) \ast\ast\; \text{psf}_r(x, y)\\
+   &= \text{im}_{r}(x, y) \otimes \text{psf}_r(x, y)\\
    &= \iint \text{im}_r(\tau_x, \tau_y) \cdot \text{psf}_r(x-\tau_x, y-\tau_y)  \;\text{d} \tau_x \,\text{d}\tau_y\\
    &= \iint \left( \int \text{im}(\tau_x, \tau_y, \lambda) \cdot r(\lambda) \, \text{d}\lambda \cdot \int \text{psf}(x-\tau_x, y-\tau_y, \lambda) \cdot r(\lambda) \,\text{d}\lambda \right) \;\text{d} \tau_x \,\text{d}\tau_y\\
    &= \iint \left( \int \text{im}(\tau_x, \tau_y, \lambda_1) \cdot r(\lambda_1) \, \text{d}\lambda_1 \cdot \int \text{psf}(x-\tau_x, y-\tau_y, \lambda_2) \cdot r(\lambda_2) \,\text{d}\lambda_2 \right) \;\text{d} \tau_x \,\text{d}\tau_y\\
    &= \iiiint \text{im}(\tau_x, \tau_y, \lambda_1) \cdot \text{psf}(x-\tau_x, y-\tau_y, \lambda_2) \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2  \,\text{d} \tau_x \,\text{d}\tau_y\\
    &= \iint \left(  \iint \text{im}(\tau_x, \tau_y, \lambda_1) \cdot \text{psf}(x-\tau_x, y-\tau_y, \lambda_2) \,\text{d} \tau_x \,\text{d}\tau_y \right) \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2  \\
-   &= \iint \Bigl[  \text{im}(x, y, \lambda_1) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2\\
+   &= \iint \Bigl[  \text{im}(x, y, \lambda_1) \otimes \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2\\
    :label: eq_conv_proof
 
 
@@ -123,12 +123,12 @@ Plugging :math:numref:`eq_srgb_comp` into :math:numref:`eq_conv_proof` we can re
 
 .. math::
    \text{im}_{2,r}(x, y) 
-   &= \iint \Bigl[  \text{im}(x, y, \lambda_1) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2\\
-   &= \int \Biggl[  \left( \int\text{im}(x, y, \lambda_1) \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \ast\ast\; \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
-   &= \int \Biggl[  \left( \int \Bigl\{ \text{im}_\text{r}(x, y) S_\text{im,r}(\lambda_1) + \text{im}_\text{g}(x, y) S_\text{im,g}(\lambda_1) +\text{im}_\text{b}(x, y) S_\text{im,b}(\lambda_1) \Bigr\} \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \ast\ast\; \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
-   &= \int \Biggl[  \left( \int \text{im}_\text{r}(x, y) S_\text{im,r}(\lambda_1) \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \ast\ast\; \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
-   &= \int S_\text{im,r}(\lambda_1) \cdot r(\lambda_1) \, \text{d}\lambda_1 \cdot \int \Bigl[\text{im}(x, y) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
-   &= R_\text{im} \cdot \int   \Bigl[\text{im}(x, y) \ast\ast\; \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
+   &= \iint \Bigl[  \text{im}(x, y, \lambda_1) \otimes \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_1) \cdot r(\lambda_2) \;\text{d}\lambda_1 \, \text{d}\lambda_2\\
+   &= \int \Biggl[  \left( \int\text{im}(x, y, \lambda_1) \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \otimes \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
+   &= \int \Biggl[  \left( \int \Bigl\{ \text{im}_\text{r}(x, y) S_\text{im,r}(\lambda_1) + \text{im}_\text{g}(x, y) S_\text{im,g}(\lambda_1) +\text{im}_\text{b}(x, y) S_\text{im,b}(\lambda_1) \Bigr\} \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \otimes \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
+   &= \int \Biggl[  \left( \int \text{im}_\text{r}(x, y) S_\text{im,r}(\lambda_1) \cdot r(\lambda_1)\;\text{d}\lambda_1 \right) \otimes \text{psf}(x, y, \lambda_2)\Biggr]  \cdot r(\lambda_2) \, \text{d}\lambda_2\\
+   &= \int S_\text{im,r}(\lambda_1) \cdot r(\lambda_1) \, \text{d}\lambda_1 \cdot \int \Bigl[\text{im}(x, y) \otimes \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
+   &= R_\text{im} \cdot \int   \Bigl[\text{im}(x, y) \otimes \text{psf}(x, y, \lambda_2)\Bigr] \cdot r(\lambda_2) \;\text{d}\lambda_2\\
    &= R_\text{im} \cdot \int   \text{im}_2(x, y, \lambda_2) \cdot r(\lambda_2) \;\text{d}\lambda_2\\
    :label: eq_conv_img_independent
     
@@ -147,7 +147,6 @@ PSF Presets
 
 `optrace` includes multiple PSF presets.
 
-.. TODO Quellen und Dokumentation
 
 **Gaussian**
 
@@ -184,7 +183,7 @@ A glare consists of two different gaussians. Parameter :math:`a` describes the r
 **Halo**
 
 A halo consists of a central gaussian and annular gaussian function around :math:`r`.
-:math:`sig_1, sig_2` describe the standard deviations of the gaussians.
+:math:`\sigma_1, \sigma_2` describe the standard deviations of the gaussians.
 :math:`a` describes the intensity of the ring.
 
 .. math::

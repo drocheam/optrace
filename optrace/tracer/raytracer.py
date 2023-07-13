@@ -1578,7 +1578,6 @@ class Raytracer(Group):
             r0 = 3e-3
 
         if method != "Position Variance" or return_cost:
-            # sample smaller region around minimum with proper method
             r = np.linspace(bounds[0], bounds[1], Nt)
             vals = np.zeros_like(r)
 

@@ -304,6 +304,25 @@ After image rendering the image is optionally filtered with an Airy-disk resolut
    Detector intersection and image rendering flowchart.
 
 
+Spectrum Rendering
+====================
+
+Spectrum rendering works in a similar way to image rendering.
+Ray intersections are calculated, only hitting rays are selected and a histogram is rendered.
+But compared to an image, this is a spectral histogram within a wavelength range resulting from the rays wavelengths and powers.
+Instead of an ``RImage`` a ``LightSpectrum`` object is created with type ``"Histogram"``.
+
+
+The number of bins for the histogram is:
+
+.. math::
+   N_\text{b} = 1 + 2 \; \text{floor} \left(\frac{ \text{max}\left( 51, \frac{\sqrt{N}}{2}\right)} {2}\right)
+
+This formula ensures :math:`N_\text{b}` is odd, so the center is well-defined.
+Independent of the number of rays :math:`N` the minimum of bins is set to 51 and scales with the square root of this number above a specific value.
+The latter is due to the SNR of the mean also increasing with :math:`\sqrt{N}` for normal-distributed noise.
+So the number of bins is adapted so that the SNR stays the same, but the spectrum resolution increases.
+
 ------------
 
 **References**

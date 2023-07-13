@@ -53,9 +53,9 @@ class LightSpectrum(Spectrum):
         # init light spectrum
         spec = LightSpectrum("Histogram", **kwargs)
 
-        # set bins to at least 101, scale using sqrt(N) above that
+        # set bins to at least 51, scale using sqrt(N) above that (since mean SNR grows with sqrt(N))
         # make sure it is an odd int, so we have a bin for the range center
-        N = max(101, np.sqrt(np.count_nonzero(w)))
+        N = max(51, np.sqrt(np.count_nonzero(w))/2)
         N = 1 + 2 * (int(N) // 2)  # make an odd int
 
         # empty spectrum
