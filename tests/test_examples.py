@@ -51,6 +51,10 @@ class ExampleTests(unittest.TestCase):
         self.execute("sphere_projections.py")
     
     @pytest.mark.slow
+    def test_cosine_surfaces(self):
+        self.execute("cosine_surfaces.py")
+    
+    @pytest.mark.slow
     def test_astigmatism(self):
         self.execute("astigmatism.py")
     

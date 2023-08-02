@@ -3,8 +3,9 @@
 import numpy as np
 import optrace as ot
 from optrace.gui import TraceGUI
+import optrace.plots as otp
 
-# Tissot’s indicatrix
+# create Tissot’s indicatrix and compare projection methods
 
 R = 90
 
@@ -23,6 +24,14 @@ for theta, num in zip([0, 25, 50, 75], [1, 6, 12, 12]):
 DETS = ot.SphericalSurface(r=(1-1e-6)*R, R=-R)
 DET = ot.Detector(DETS, pos=[0, 0, R])
 RT.add(DET)
+
+# trace some rays
+RT.trace(200000)
+
+# plot detector images for different projection types
+for proj in ot.SphericalSurface.sphere_projection_methods:
+    img = RT.detector_image(189, projection_method=proj)
+    otp.r_image_plot(img, "Irradiance", block=False)
 
 # run the simulator
 sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance")

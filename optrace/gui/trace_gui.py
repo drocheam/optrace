@@ -32,7 +32,7 @@ from ._scene_plotting import ScenePlotting
 
 from ..__metadata__ import __version__
 
-
+# TODO don't retrace when init and already rays included in raytracer?
 
 class TraceGUI(HasTraits):
 
