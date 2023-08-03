@@ -81,7 +81,7 @@ class Raytracer(Group):
         self.rays = RayStorage()  #: traced rays
         self._msgs = np.array([])
         self._ignore_geometry_error = False
-        self.geometry_error = False
+        self.geometry_error = False  #: if geometry checks returned an error
         self._force_threads = None
         self.fault_pos = np.array([])
 

@@ -1,3 +1,5 @@
+.. _color_management:
+
 ***********************
 Color Management
 ***********************

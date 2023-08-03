@@ -1,3 +1,5 @@
+.. _usage_focus:
+
 Focus Finding
 -----------------------
 

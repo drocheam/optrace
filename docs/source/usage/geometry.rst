@@ -16,6 +16,9 @@ Base Geometries
   :language: python
   :class: highlight
 
+.. TODO part about rotation and flipping. Here or somewhere elese? Includes surfaces, groups, SObjects
+
+
 Elements
 __________________
 
@@ -188,6 +191,8 @@ The lens has the same relative distance of :math:`\Delta z = 20` mm relative to 
    >>> G.lenses[0].pos
    array([ 0.,  1., 20.])
 
+
+.. _usage_raytracer:
 
 Raytracer
 ________________

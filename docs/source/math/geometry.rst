@@ -608,9 +608,20 @@ Implemented as ring with :math:`r_\text{i} = 0`.
 Related: :footcite:`WolframDiskPicking`.
 
 
+Flipping and Rotation
+=======================
 
-.. TODO part about rotation and flipping
+Flipping a surface is implemented as a 180 degree rotation around the x-axis.
 
+This is equivalent to negating its relative shape :math:`z_r` to an offset :math:`z_0` and mirroring the y-component: :math:`z_0 + z_r(x, y) \Rightarrow z_0 - z(x, -y)`.
+For a surface with rotational symmetry this simplifies to :math:`z_0 + z_r(r) \Rightarrow z_0 - z(r)`
+
+Rotation is done by changing the accessing coordinates through a rotation of the coordinate system:
+
+:math:`z(x, y) \Rightarrow z(x_0 + r \cos \alpha, y_0 + r \sin \alpha)` with :math:`r = \sqrt{(x-x_0)^2 + (y - y_0)^2}`.
+Here :math:`x_0,\; y_0` are the rotation center coordinates and :math:`\alpha` is the rotation angle.
+
+By simply changing the value of the rotation angle the surface values can be rotated without actually rotating the surface.
 
 ------------
 

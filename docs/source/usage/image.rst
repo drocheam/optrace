@@ -1,3 +1,5 @@
+.. _usage_image:
+
 Image and Spectrum Rendering
 ---------------------------------
 
@@ -233,8 +235,7 @@ While the limit is wavelength dependent, one fixed value is applied to all wavel
           :align: center
           :width: 300
 
-.. TODO code usage example
-
+The limit parameter can be applied either while creating the RImage (:python:`ot.RImage(..., limit=5)`) or by providing it to methods the create an RImage (:python:`Raytracer.detector_image(..., limit=1)`, :python:`Raytracer.iterative_render(..., limit=2.5)`.
 
 Rendering an Image
 _____________________________________

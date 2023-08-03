@@ -76,6 +76,30 @@ Brewster Polarizer
    :align: center
    :width: 600
 
+Cosine Surfaces
+----------------------
+
+**File**: ``examples/cosine_surfaces.py``
+
+**Description**: An example with two lenses with orthogonal cosine modulations on each side. Creates squary, caleidoscope-like images inside the beam path.
+
+**Screenshots**:
+
+.. figure:: ./images/example_cosine_surfaces1.png
+   :width: 600
+   :align: center
+
+.. list-table::
+
+   * - .. figure:: ./images/example_cosine_surfaces2.svg
+          :align: center
+          :width: 400
+
+     - .. figure:: ./images/example_cosine_surfaces3.svg     
+          :align: center
+          :width: 400
+
+
 Custom Surfaces
 ----------------------
 
