@@ -496,7 +496,8 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
 
     # in this part we select the r, g or b spectrum depending on the mixing ratios from RGBL
     rgb_sum = np.cumsum(RGBL, axis=-1)
-    rgb_sum /= rgb_sum[:, -1, np.newaxis]
+    rgb_sum_last = rgb_sum[:, -1, np.newaxis]
+    rgb_sum /= np.where(rgb_sum_last, rgb_sum_last, 1)
 
     # chose x, y or z depending on in which range rgb_choice fell
     rgb_choice = misc.uniform(0, 1, rgb.shape[0])

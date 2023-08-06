@@ -12,16 +12,25 @@ image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources"
 cell: str = str(image_dir / "cell.webp")
 """Stable Diffusion image from https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064"""
 
-group_photo: str = str(image_dir / "group_photo.jpg")
-"""Stable Diffusion image from https://lexica.art/prompt/06ba5ac6-7bfd-4ce6-8002-9d0e487b36b2"""
+documents: str = str(image_dir / "documents.webp")
+"""Photo of a keyboard and documents on a desk. Source: https://www.pexels.com/photo/documents-on-wooden-surface-95916/ """
 
-interior: str = str(image_dir / "interior.jpg")
-"""Stable Diffusion image from https://lexica.art/prompt/44d7e1fe-ba3b-4e73-972c-a30b95897434"""
+fruits: str = str(image_dir / "fruits.webp")
+"""Photo of different fruits on a tray. Source: https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/ """
 
-landscape: str = str(image_dir / "landscape.jpg")
-"""Stable Diffusion image from https://lexica.art/prompt/0da3a592-465e-46d6-8ee6-dfe17ddea386"""
+group_photo: str = str(image_dir / "group_photo.webp")
+"""Photo of a group of people in front of a blackboard. Source: https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/ """
 
-scenes: list = [cell, group_photo, interior, landscape]
+hong_kong: str = str(image_dir / "hong_kong.webp")
+"""Photo of a Hong Kong street at night. Source: https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/ """
+
+interior: str = str(image_dir / "interior.webp")
+"""Green sofa in an interior room. Source: https://www.pexels.com/photo/green-2-seat-sofa-1918291/ """
+
+landscape: str = str(image_dir / "landscape.webp")
+"""Landscape image of a mountain and water scene. Source: https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/ """
+
+scenes: list = [cell, documents, fruits, group_photo, hong_kong, interior, landscape]
 """photography-like images for viewing natural scenes"""
 
 
@@ -33,24 +42,27 @@ checkerboard: np.ndarray = np.zeros((8, 8, 3), dtype=np.float64)
 checkerboard[::2, 1::2] = 1.0
 checkerboard[1::2, ::2] = 1.0
 
-color_checker: str = str(image_dir / "ColorChecker.jpg")
+color_checker: str = str(image_dir / "color_checker.webp")
 """Color checker chart
 Public domain image from
 https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg """
 
-ETDRS_chart: str = str(image_dir / "ETDRS_Chart.png")
+ETDRS_chart: str = str(image_dir / "ETDRS_chart.png")
 """ETDRS Chart standard
 Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
 
-ETDRS_chart_inverted: str = str(image_dir / "ETDRS_Chart_inverted.png")
+ETDRS_chart_inverted: str = str(image_dir / "ETDRS_chart_inverted.png")
 """ETDRS Chart inverted
 edited version of Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
 
-test_screen: str = str(image_dir / "TestScreen_square.png")
+eye_test_vintage: str = str(image_dir / "eye_test_vintage.webp")
+"""Photo of a vintage eye test chart. Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage """
+
+test_screen: str = str(image_dir / "test_screen.png")
 """TV test screen
 Public Domain Image from  https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg """
 
-test_images: list = [checkerboard, color_checker, ETDRS_chart, ETDRS_chart_inverted, test_screen]
+test_images: list = [checkerboard, color_checker, ETDRS_chart, ETDRS_chart_inverted, eye_test_vintage, test_screen]
 """test images for color, resolution or distortion"""
 
 

@@ -17,13 +17,17 @@
 │   ├── illuminants.csv
 │   ├── images
 │   │   ├── cell.webp
-│   │   ├── ColorChecker.jpg
-│   │   ├── ETDRS_Chart_inverted.png
-│   │   ├── ETDRS_Chart.png
-│   │   ├── group_photo.jpg
-│   │   ├── interior.jpg
-│   │   ├── landscape.jpg
-│   │   └── TestScreen_square.png
+│   │   ├── color_checker.webp
+│   │   ├── documents.webp
+│   │   ├── ETDRS_chart_inverted.png
+│   │   ├── ETDRS_chart.png
+│   │   ├── eye_test_vintage.webp
+│   │   ├── fruits.webp
+│   │   ├── group_photo.webp
+│   │   ├── hong_kong.webp
+│   │   ├── interior.webp
+│   │   ├── landscape.webp
+│   │   └── test_screen.png
 │   └── observers.csv
 └── tracer
     ├── base_class.py
@@ -95,4 +99,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-13 directories, 83 files
+13 directories, 87 files

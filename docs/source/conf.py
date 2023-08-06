@@ -117,7 +117,7 @@ autodoc_typehints = "description"
 # -- Options for misc output -------------------------------------------------
 
 # ignore links that only work in a browser
-linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.htm',
+linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.html',
                     'https://doi.org/10.1002/9783527648962.app1']
 
 # only check doctest blocks

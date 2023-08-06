@@ -738,73 +738,102 @@ Below you can find preset images that can be used for a ray source.
 
    * - .. figure:: ../../../optrace/ressources/images/cell.webp
           :align: center
+          :height: 300
+
+          Cell image for microscope examples (`Source <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__). 
+          Usable as :obj:`ot.presets.image.cell <optrace.tracer.presets.image.cell>`.
+   
+     - .. figure:: ../../../optrace/ressources/images/fruits.webp
+          :align: center
+          :width: 400
+        
+          Photo of different fruits on a tray (`Source <https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/>`__).
+          Usable as :obj:`ot.presets.image.fruits <optrace.tracer.presets.image.fruits>`.
+   
+   * - .. figure:: ../../../optrace/ressources/images/interior.webp
+          :align: center
+          :width: 400
+
+          Green sofa in an interior room (`Source <https://www.pexels.com/photo/green-2-seat-sofa-1918291/>`__).
+          Usable as :obj:`ot.presets.image.interior <optrace.tracer.presets.image.interior>`
+   
+     - .. figure:: ../../../optrace/ressources/images/landscape.webp
+          :align: center
+          :width: 400
+          
+          Landscape image of a mountain and water scene (`Source <https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/>`__).
+          Usable as :obj:`ot.presets.image.landscape  <optrace.tracer.presets.image.landscape>`
+   
+   * - .. figure:: ../../../optrace/ressources/images/documents.webp
+          :align: center
+          :width: 400
+          
+          Photo of a keyboard and documents on a desk (`Source <https://www.pexels.com/photo/documents-on-wooden-surface-95916/>`__).
+          Usable as :obj:`ot.presets.image.documents <optrace.tracer.presets.image.documents>`.
+     
+     - .. figure:: ../../../optrace/ressources/images/group_photo.webp
+          :align: center
+          :width: 400
+          
+          Photo of a group of people in front of a blackboard (`Source <https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/>`__).
+          Usable as :obj:`ot.presets.image.group_photo <optrace.tracer.presets.image.group_photo>`
+   
+   * - .. figure:: ../../../optrace/ressources/images/hong_kong.webp
+          :align: center
           :width: 350
 
-          Cell image for microscope examples. Usable as :python:`ot.presets.image.cell`.
-          Image created with `Stable Diffusion <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__.
+          Photo of a Hong Kong street at night (`Source <https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/>`__).
+          Usable as :obj:`ot.presets.image.hong_kong <optrace.tracer.presets.image.hong_kong>`.
    
-     - .. figure:: ../../../optrace/ressources/images/group_photo.jpg
-          :align: center
-          :width: 250
+     -  
 
-          Group photo of managers. Usable as :python:`ot.presets.image.group_photo`
-          Image created with `Stable Diffusion <https://lexica.art/prompt/06ba5ac6-7bfd-4ce6-8002-9d0e487b36b2>`__.
-   
-   * - .. figure:: ../../../optrace/ressources/images/interior.jpg
-          :align: center
-          :width: 400
-
-          Photo of an interior living room. Usable as :python:`ot.presets.image.interior`
-          Image created with `Stable Diffusion <https://lexica.art/prompt/44d7e1fe-ba3b-4e73-972c-a30b95897434>`__.
-   
-     - .. figure:: ../../../optrace/ressources/images/landscape.jpg
-          :align: center
-          :width: 400
-
-          Photo of an european landscape. Usable as :python:`ot.presets.image.landscape`
-          Image created with `Stable Diffusion <https://lexica.art/prompt/0da3a592-465e-46d6-8ee6-dfe17ddea386>`__.
-   
 
 
 .. list-table:: Test images for color, resolution or distortion
 
-   * - .. figure:: ../../../optrace/ressources/images/ColorChecker.jpg
-          :align: center
-          :width: 300
-
-          Color checker chart. Public domain image from `here <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__.
-          Usage with :python:`ot.presets.image.color_checker`
-
-     - .. figure:: ../../../optrace/ressources/images/ETDRS_Chart.png
-          :align: center
-          :width: 300
-
-          ETDRS Chart standard. Public Domain Image from `here <https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg>`__.
-          Usage with :python:`ot.presets.image.ETDRS_chart`
    
-   * - .. figure:: ../../../optrace/ressources/images/ETDRS_Chart_inverted.png
+   * - .. figure:: ../../../optrace/ressources/images/ETDRS_chart.png
+          :align: center
+          :width: 300
+
+          ETDRS Chart standard (`Source <https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg>`__).
+          Usage with :obj:`ot.presets.image.ETDRS_chart <optrace.tracer.presets.image.ETDRS_chart>`.
+          
+     - .. figure:: ../../../optrace/ressources/images/ETDRS_chart_inverted.png
           :align: center
           :width: 300
           
           ETDRS Chart standard. Edited version of the ETDRS image.
-          Usage with :python:`ot.presets.image.ETDRS_chart_inverted`
+          Usage with :obj:`ot.presets.image.ETDRS_chart_inverted <optrace.tracer.presets.image.ETDRS_chart_inverted>`
 
-     - .. figure:: ../../../optrace/ressources/images/TestScreen_square.png
+   * - .. figure:: ../../../optrace/ressources/images/test_screen.png
           :align: center
           :width: 300
 
-          TV test screen. Public Domain Image from `here <https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg>`__.
-          Usage with :python:`ot.presets.image.test_screen`
+          TV test screen (`Source <https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg>`__).
+          Usage with :obj:`ot.presets.image.test_screen <optrace.tracer.presets.image.test_screen>`
+   
+     - .. figure:: ../../../optrace/ressources/images/color_checker.webp
+          :align: center
+          :width: 400
+
+          Color checker chart (`Source <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__).
+          Usage with :obj:`ot.presets.image.color_checker <optrace.tracer.presets.image.color_checker>`
 
    * - .. figure:: ../images/checkerboard.png
           :align: center
           :width: 300
           
           Checkerboard image, 8x8 black and white chess-like board image.
-          Usage with :python:`ot.presets.image.checkerboard`
+          Usage with :obj:`ot.presets.image.checkerboard <optrace.tracer.presets.image.checkerboard>`
 
-     - 
+     - .. figure:: ../../../optrace/ressources/images/eye_test_vintage.webp
+          :align: center
+          :width: 400
 
+          Photo of a vintage eye test chart. 
+          `Image Source <https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage>`__
+          Usage with :obj:`ot.presets.image.eye_test_vintage <optrace.tracer.presets.image.eye_test_vintage>`.
 
 
 
