@@ -45,8 +45,8 @@ Internally these are characterized by flags, which can be found below:
    * - :python:`Raytracer.INFOS.ILL_COND`
      -  ill-conditioned rays for hit finding of a numerical, custom surface. In almost all cases the intersection will be wrong. This can happen if the surface is badly defined numerically or geometrically, there are surface collisions or a ray hits the surface multiple times. Please check the geometry of the raytracer and the surface definition.
 
-The raytracer also provides a :attr:`optrace.tracer.raytracer.Raytracer.geometry_error` flag that gets set when tracing was aborted due to issues with the geometry.
-Geometry checks are only executed while tracing, so :meth:`optrace.tracer.raytracer.Raytracer.trace` must be called to check for those.
+The raytracer also provides a :attr:`Raytracer.geometry_error <optrace.tracer.raytracer.Raytracer.geometry_error>` flag that gets set when tracing was aborted due to issues with the geometry.
+Geometry checks are only executed while tracing, so :meth:`Raytracer.trace <optrace.tracer.raytracer.Raytracer.trace>` must be called to check for those.
 
 When using the GUI, surface collisions will be displayed in the geometry.
 

@@ -303,3 +303,15 @@ Magnifications are returned with the member function :meth:`pupil_magnification 
    >>> tma.pupil_magnification(aps)
    (1.1310996628960361, 1.0410557184750733)
 
+
+Miscellaneous Properties
+__________________________________________
+
+Unfortunately pupil sizes, numerical apertures, f-numbers, airy disk diameters are not available (yet).
+This is due to the :python:`TMA` object not holding any information about the lens diameters or incident or outgoing light.
+
+If these properties are needed they can be estimated by tracing the scene and investigating the ray properties for instance through the picker mode in the GUI, see the section :ref:`GUI scene <gui_overview_scene>`.
+For instance, the pupil sizes can be calculated from the pupil positions from the :python:`TMA` and the radial distance of the outermost traced rays at this position.
+
+
+

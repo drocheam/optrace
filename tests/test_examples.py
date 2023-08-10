@@ -67,6 +67,10 @@ class ExampleTests(unittest.TestCase):
         self.execute("psf_imaging.py")
     
     @pytest.mark.slow
+    def test_double_gauss(self):
+        self.execute("double_gauss.py")
+    
+    @pytest.mark.slow
     def test_achromat(self):
         self.execute("achromat.py")
     

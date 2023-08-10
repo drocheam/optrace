@@ -113,6 +113,31 @@ Custom Surfaces
    :align: center
    :width: 600
 
+
+Double Gauss
+----------------------
+
+**File**: ``examples/double_gauss.py``
+
+**Description**: Example of the double gauss, Nikkor Wakamiya, 100mm, f1.4, objective. Point sources at -50m are traced through the setup and a PSF can be rendered.                
+
+**Screenshots**:
+
+.. figure:: images/example_double_gauss.png
+   :align: center
+   :width: 600
+
+.. list-table::
+
+   * - .. figure:: ./images/example_double_gauss2.svg
+          :align: center
+          :width: 400
+
+     - .. figure:: ./images/example_double_gauss3.svg
+          :align: center
+          :width: 400
+
+
 Double Prism
 ----------------------
 

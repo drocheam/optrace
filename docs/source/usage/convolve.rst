@@ -211,6 +211,8 @@ A halo consists of a center gaussian with :python:`sig1` and intensity 1, as wel
 
 
 
+.. _psf_preset_gallery:
+
 Preset Gallery
 _____________________
 

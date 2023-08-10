@@ -4,6 +4,8 @@ Implementation Details
 
 
 .. toctree::
+   :maxdepth: 2
+   
    sampling
    tracing
    geometry

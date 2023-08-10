@@ -96,6 +96,8 @@ Full UI
    :width: 800
 
 
+.. _gui_overview_scene:
+
 Scene
 ######################
 

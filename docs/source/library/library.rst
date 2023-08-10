@@ -3,6 +3,8 @@ Code Reference
 ################
 
 .. toctree::
+   :maxdepth: 2
+   
    structure
    optrace_tracer
    optrace_tracer_color

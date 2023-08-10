@@ -146,6 +146,7 @@ PSF Presets
 
 
 `optrace` includes multiple PSF presets.
+Images can be found in :numref:`psf_preset_gallery`.
 
 
 **Gaussian**
@@ -154,7 +155,7 @@ A simple gaussian intensity distribution is described as:
 
 .. math::
 
-   I_{d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)
+   I_{\sigma}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)
 
 
 **Airy**
@@ -177,7 +178,7 @@ A glare consists of two different gaussians. Parameter :math:`a` describes the r
 
 .. math::
 
-  I_{\sigma_1,\sigma_2,d}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
+  I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
 
 
 **Halo**
@@ -188,7 +189,7 @@ A halo consists of a central gaussian and annular gaussian function around :math
 
 .. math::
 
-   I_{d_1,d_2,a,w}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
+   I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
 
 
 
