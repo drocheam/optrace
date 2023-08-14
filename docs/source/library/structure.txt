@@ -18,7 +18,6 @@
 │   ├── images
 │   │   ├── cell.webp
 │   │   ├── color_checker.webp
-│   │   ├── documents.avif~
 │   │   ├── documents.webp
 │   │   ├── ETDRS_chart_inverted.png
 │   │   ├── ETDRS_chart.png
@@ -100,4 +99,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-13 directories, 88 files
+13 directories, 87 files

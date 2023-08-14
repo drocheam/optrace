@@ -363,6 +363,10 @@ class ScenePlotting:
         # cylinder between surfaces
         b = plot(obj.cylinder_surface(nc=2 * self.SURFACE_RES), "cylinder") if plotCyl else None
 
+        # adapt cylinder opacity
+        if plotCyl and isinstance(obj, Lens):
+            b.actor.property.trait_set(opacity=self._cylinder_opacity)
+
         # use wireframe mode, so edge is always visible, even if it is infinitesimal small
         if plotCyl and (not obj.has_back() or (obj.extent[5] - obj.extent[4] < 0.05)):
             b.actor.property.trait_set(representation="wireframe", lighting=False, line_width=1.75, opacity=alpha/1.5)
@@ -502,6 +506,7 @@ class ScenePlotting:
         self._info_frame_color = (0, 0, 0) if not high_contrast else (1, 1, 1)
         self._info_opacity = 0.2
         self._volume_color = (0.45, 0.45, 0.45) if not high_contrast else (1, 1, 1)
+        self._cylinder_opacity = self._lens_alpha if not high_contrast else 0.6
 
     def init_keyboard_shortcuts(self) -> None:
         """init keyboard shortcut detection inside the scene"""
@@ -671,10 +676,15 @@ class ScenePlotting:
             for obj in objs:
                 for el in obj[:3]:
                     if el is not None:
-                        el.actor.property.trait_set(color = color)
+                        el.actor.property.trait_set(color=color)
                         if high_contrast and el not in [self._crosshair, self._outline]:
                             el.actor.property.trait_set(specular_color=(0.15, 0.15, 0.15),
                                                         diffuse_color=(0.12, 0.12, 0.12))
+
+        # change lens cylinder visibility
+        for lens in self._lens_plots:
+            if lens[1] is not None:
+                lens[1].actor.property.trait_set(opacity=self._cylinder_opacity)
 
         # update axes color
         for ax in self._axis_plots:
