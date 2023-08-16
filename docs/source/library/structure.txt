@@ -27,7 +27,9 @@
 │   │   ├── hong_kong.webp
 │   │   ├── interior.webp
 │   │   ├── landscape.webp
-│   │   └── test_screen.png
+│   │   ├── siemens_star.webp
+│   │   ├── tv_testcard1.png
+│   │   └── tv_testcard2.png
 │   └── observers.csv
 └── tracer
     ├── base_class.py
@@ -99,4 +101,4 @@
     │   └── transmission_spectrum.py
     └── transfer_matrix_analysis.py
 
-13 directories, 87 files
+13 directories, 89 files

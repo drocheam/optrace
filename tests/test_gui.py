@@ -140,7 +140,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.slow 
     def test_gui_inits(self) -> None:
 
-        Image = ot.presets.image.test_screen
+        Image = ot.presets.image.tv_testcard1
 
         # make raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], silent=True)

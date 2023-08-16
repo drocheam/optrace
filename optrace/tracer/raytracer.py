@@ -1164,7 +1164,7 @@ class Raytracer(Group):
                     raise ValueError("detector_index list needs to have the same length as pos list")
                 pos = [self.detectors[detector_index].pos]
 
-            elif isinstance(pos, list) and not isinstance(pos[0], list):
+            elif isinstance(pos, list) and not isinstance(pos[0], list | np.ndarray):
                 pos = [pos]
 
             if not isinstance(N_px_D, list):

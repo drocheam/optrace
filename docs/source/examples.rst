@@ -179,10 +179,10 @@ LeGrand Eye Model
    :width: 600
    :align: center
 
-Image RGB
+Image Render
 ----------------------
 
-**File**: ``examples/image_rgb.py``
+**File**: ``examples/image_render.py``
 
 **Description**: A simple imaging system consisting of one lens. Suitable example to showcase the effect of spherical aberration, distortion and vignetting.
 
@@ -211,12 +211,12 @@ Image RGB
           :width: 400
      
 
-Image RGB Render
-----------------------
+Image Render Many Rays
+-------------------------
 
-**File**: ``examples/image_rgb_render.py``
+**File**: ``examples/image_render_many_rays.py``
 
-**Description**: Same as the ``image_rgb.py`` example, but instead of starting the GUI the geometry is traced with many rays and images are rendered in different distances.
+**Description**: Same as the ``image_render.py`` example, but instead of starting the GUI the geometry is traced with many rays and images are rendered in different distances.
 
 **Screenshots**:
 

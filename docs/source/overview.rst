@@ -22,7 +22,7 @@ Overview
 **What this isn't**
 
 * a GUI focussed tool
-* an optics design program with optimization and tolerancing
+* an optics design program with lens optimization, aberration analysis and tolerancing
 * simulation incorporating wave optics, e.g. diffraction, interference
 * a non-sequential raytracer, simulating ghost images, reflections
 * a tool supporting mirror or fresnel lens optics
@@ -52,6 +52,7 @@ See the :ref:`example gallery <examples>` for some functionality samples
 * Wave Optics
     * `diffractsim <https://github.com/rafael-fuente/diffractsim>`__ by Rafael de la Fuente. Waveoptics simulation of arbitrary apertures and phase holograms.
     * `poppy <https://github.com/spacetelescope/poppy>`__ by Space Telescope Science Institute. Fraunhofer and Fresnel propagation for optics.
+    * `prysm <https://prysm.readthedocs.io/en/stable/index.html>`__ by Brandon Dube. Interferometer and diffraction calculations.
 
 * Geometrical + Wave Optics
     * `opticspy <http://opticspy.org/>`__ by Xing Fan, tracing. Wave optics, aberration and Zernike polynomial analysis.

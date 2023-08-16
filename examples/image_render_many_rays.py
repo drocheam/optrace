@@ -4,15 +4,18 @@ import numpy as np
 import optrace as ot
 from optrace.plots import *
 
-Image_path = ot.presets.image.test_screen
+# same geometry as the 'image_render.py' example,
+# but different image and many more rays
+
+image = ot.presets.image.tv_testcard2
 
 # make raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
 # add Raysource
-RSS = ot.RectangularSurface(dim=[4, 4])
+RSS = ot.RectangularSurface(dim=[4, 3])
 RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8,
-                  image=Image_path, s=[0, 0, 1], pos=[0, 0, 0])
+                  image=image, s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 
 # add Lens 1

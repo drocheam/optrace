@@ -31,8 +31,8 @@ class ExampleTests(unittest.TestCase):
         self.assertTrue(process.returncode in [None, 0])
 
     @pytest.mark.slow
-    def test_rgb_render(self):
-        self.execute("image_rgb_render.py", 70)
+    def test_image_render_many_rays(self):
+        self.execute("image_render_many_rays.py", 70)
 
     @pytest.mark.slow
     def test_presets_refraction_index(self):
@@ -84,8 +84,8 @@ class ExampleTests(unittest.TestCase):
         self.execute("spectrum_presets.py")
     
     @pytest.mark.slow
-    def test_rgb(self):
-        self.execute("image_rgb.py")
+    def test_image_render(self):
+        self.execute("image_render.py")
 
     @pytest.mark.slow
     def test_prism(self):

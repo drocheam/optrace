@@ -58,11 +58,19 @@ edited version of Public Domain Image from https://commons.wikimedia.org/wiki/Fi
 eye_test_vintage: str = str(image_dir / "eye_test_vintage.webp")
 """Photo of a vintage eye test chart. Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage """
 
-test_screen: str = str(image_dir / "test_screen.png")
-"""TV test screen
+siemens_star: str = str(image_dir / "siemens_star.webp")
+"""Siemens Star Image. Own creation"""
+
+tv_testcard1: str = str(image_dir / "tv_testcard1.png")
+"""TV test card
 Public Domain Image from  https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg """
 
-test_images: list = [checkerboard, color_checker, ETDRS_chart, ETDRS_chart_inverted, eye_test_vintage, test_screen]
+tv_testcard2: str = str(image_dir / "tv_testcard2.png")
+"""TV test card
+Public Domain Image from https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png """
+
+test_images: list = [checkerboard, color_checker, ETDRS_chart, ETDRS_chart_inverted, 
+                     eye_test_vintage, siemens_star, tv_testcard1, tv_testcard2]
 """test images for color, resolution or distortion"""
 
 

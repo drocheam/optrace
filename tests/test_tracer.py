@@ -1195,7 +1195,7 @@ class TracerTests(unittest.TestCase):
         # this image is exactly the same as the input image, as all rays from each pixel are mapped into the same output pixel
         # check if the images are the same
 
-        Image = ot.presets.image.test_screen
+        Image = ot.presets.image.tv_testcard1
 
         # make raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])

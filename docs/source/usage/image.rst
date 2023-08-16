@@ -806,27 +806,27 @@ Below you can find preset images that can be used for a ray source.
           ETDRS Chart standard. Edited version of the ETDRS image.
           Usage with :obj:`ot.presets.image.ETDRS_chart_inverted <optrace.tracer.presets.image.ETDRS_chart_inverted>`
 
-   * - .. figure:: ../../../optrace/ressources/images/test_screen.png
+   * - .. figure:: ../../../optrace/ressources/images/tv_testcard1.png
           :align: center
           :width: 300
 
-          TV test screen (`Source <https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg>`__).
-          Usage with :obj:`ot.presets.image.test_screen <optrace.tracer.presets.image.test_screen>`
+          TV test card #1 (`Source <https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg>`__).
+          Usage with :obj:`ot.presets.image.tv_testcard1 <optrace.tracer.presets.image.tv_testcard1>`
    
-     - .. figure:: ../../../optrace/ressources/images/color_checker.webp
+     - .. figure:: ../../../optrace/ressources/images/tv_testcard2.png
+          :align: center
+          :width: 400
+
+          TV test card #2 (`Source <https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png>`__).
+          Usage with :obj:`ot.presets.image.tv_testcard2 <optrace.tracer.presets.image.tv_testcard2>`
+   
+   * - .. figure:: ../../../optrace/ressources/images/color_checker.webp
           :align: center
           :width: 400
 
           Color checker chart (`Source <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__).
           Usage with :obj:`ot.presets.image.color_checker <optrace.tracer.presets.image.color_checker>`
-
-   * - .. figure:: ../images/checkerboard.png
-          :align: center
-          :width: 300
-          
-          Checkerboard image, 8x8 black and white chess-like board image.
-          Usage with :obj:`ot.presets.image.checkerboard <optrace.tracer.presets.image.checkerboard>`
-
+     
      - .. figure:: ../../../optrace/ressources/images/eye_test_vintage.webp
           :align: center
           :width: 400
@@ -835,6 +835,21 @@ Below you can find preset images that can be used for a ray source.
           `Image Source <https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage>`__
           Usage with :obj:`ot.presets.image.eye_test_vintage <optrace.tracer.presets.image.eye_test_vintage>`.
 
+   * - .. figure:: ../images/checkerboard.png
+          :align: center
+          :width: 300
+          
+          Checkerboard image, 8x8 black and white chess-like board image.
+          Usage with :obj:`ot.presets.image.checkerboard <optrace.tracer.presets.image.checkerboard>`
+
+     - .. figure:: ../../../optrace/ressources/images/siemens_star.webp
+          :align: center
+          :width: 300
+
+          Siemens star image. 
+          Own creation.
+          Usage with :obj:`ot.presets.image.siemens_star <optrace.tracer.presets.image.siemens_star>`
+   
 
 
 ------------
