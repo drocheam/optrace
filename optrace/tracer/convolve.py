@@ -295,7 +295,8 @@ def convolve(img:                np.ndarray | str,
 
     # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
     img2 = color.srgb_linear_to_xyz(img2)
-    img2 = color.xyz_to_srgb(img2, rendering_intent=rendering_intent, normalize=normalize, clip=True, L_th=L_th, sat_scale=sat_scale) 
+    img2 = color.xyz_to_srgb(img2, rendering_intent=rendering_intent, normalize=normalize, clip=True,
+                             L_th=L_th, sat_scale=sat_scale)
     
     # new image side lengths
     s2 = [(img2.shape[1]-1)*ipx, (img2.shape[0]-1)*ipy]

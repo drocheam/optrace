@@ -5,6 +5,11 @@ Advanced Topics
   :language: python
   :class: highlight
 
+.. testsetup:: *
+
+   import optrace as ot
+
+
 Raytracing Errors
 _________________________
 

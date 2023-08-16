@@ -39,7 +39,7 @@ class RaySource(Element):
     def __init__(self,
 
                  # Surface Parameters
-                 surface:           Surface,
+                 surface:           Surface | Line | Point,
                  pos:               (list | np.ndarray) = None,
 
                  # Divergence Parameters

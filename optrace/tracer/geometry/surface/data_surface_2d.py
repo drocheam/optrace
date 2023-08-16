@@ -52,7 +52,8 @@ class DataSurface2D(Surface):
 
         # too few values warning
         if nx < 200:
-            self.print(f"At least 200 values per dimension are advised for a 'data' matrix, but got {nx} values for surface {self.get_desc(hex(id(self)))}.")
+            self.print(f"At least 200 values per dimension are advised for a 'data' matrix, "
+                       f"but got {nx} values for surface {self.get_desc(hex(id(self)))}.")
 
         if self._1D:
             

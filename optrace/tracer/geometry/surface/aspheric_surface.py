@@ -19,7 +19,8 @@ class AsphericSurface(FunctionSurface1D):
                  **kwargs)\
             -> None:
         """
-        Define an aspheric surface, which is a ConicSurface with an additional polynomial component a_0*r^2 + a_1*r^4 + ...
+        Define an aspheric surface, which is a ConicSurface with a
+        n additional polynomial component a_0*r^2 + a_1*r^4 + ...
         There is no upper bound on number of coefficients
 
         :param r: surface radius

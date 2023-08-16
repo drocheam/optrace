@@ -842,6 +842,9 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(state == RT.rays.crepr())  # check if raytraced
               
                 sim._do_in_main(sim.open_command_window)
+                sim._wait_for_idle()
+                sim._do_in_main(sim.open_command_window)  # reopen
+                sim._wait_for_idle()
                 
                 send("")  # check empty command
 
@@ -1104,6 +1107,8 @@ class GUITests(unittest.TestCase):
                 # open property browser with cardinal points, although we now don't have rotational symmetry
                 RT.lenses[0].move_to([0, 0.02, 2])
                 sim._do_in_main(sim.open_property_browser)
+                sim._wait_for_idle()
+                sim._do_in_main(sim.open_property_browser) # reopen
                 sim._wait_for_idle()
 
                 # special case where we don't need to retrace or redraw the rays

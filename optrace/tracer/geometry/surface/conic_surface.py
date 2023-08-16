@@ -114,7 +114,8 @@ class ConicSurface(Surface):
 
         :param p: ray position array, shape (N, 3)
         :param s: unity ray direction vectors, shape (N, 3)
-        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit, indices of ill-conditioned rays
+        :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit,
+                 indices of ill-conditioned rays
         """
 
         o = p - self.pos  # coordinates relative to surface center

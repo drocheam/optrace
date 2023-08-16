@@ -308,7 +308,13 @@ class RImageTests(unittest.TestCase):
 
                 # compare to limit
                 self.assertAlmostEqual(centroid/1.10861, limit/1000, delta=0.0002)
-    
+   
+        # coverage: RuntimeError when image is a projection and filter is applied
+        img = ot.RImage([-1, 1, -1, 1], projection="abc", limit=1)
+        self.assertRaises(RuntimeError, img.render)
+        self.assertRaises(RuntimeError, img.refilter)
+        self.assertRaises(RuntimeError, img.rescale, 315)
+
     @pytest.mark.os
     @pytest.mark.slow
     def test_image_presets(self) -> None:

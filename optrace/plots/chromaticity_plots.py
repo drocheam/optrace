@@ -21,7 +21,7 @@ chromaticity_norms: list[str, str, str] = ["Largest", "Sum"]
 # we do this since we can't normalize on the highest value in the chromaticity image,
 # since the brightest values come from impossible colors (colors outside human vision) clipped towards the gamut
 _red_xyz = np.array([[[*color.SRGB_R_XY, 1 - color.SRGB_R_XY[0] - color.SRGB_R_XY[1]]]])  # red in xyz chromaticities
-_CONV_XYZ_NORM = color.xyz_to_srgb_linear(_red_xyz, normalize=False)[0, 0, 0]  # srgb linear red channel for the red primary
+_CONV_XYZ_NORM = color.xyz_to_srgb_linear(_red_xyz, normalize=False)[0, 0, 0]  # srgb linear red channel primary
 
 
 def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[LightSpectrum] = None,

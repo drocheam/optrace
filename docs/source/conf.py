@@ -116,9 +116,18 @@ autodoc_typehints = "description"
 
 # -- Options for misc output -------------------------------------------------
 
-# ignore links that only work in a browser
+# ignore links that seemingly only work in a browser and not automated tests
 linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.html',
-                    'https://doi.org/10.1002/9783527648962.app1']
+                    'https://doi.org/10.1002/9783527648962.app1',
+                    'https://www.publicdomainpictures.net/en/view-image.php',
+                    'https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/',
+                    'https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/',
+                    'https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/',
+                    'https://www.pexels.com/photo/green-2-seat-sofa-1918291/',
+                    'https://www.pexels.com/photo/documents-on-wooden-surface-95916/',
+                    'https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/',
+                    'https://doi.org/10.1080/713818864',
+                    'https://doi.org/10.1080/10867651.1997.10487479']
 
 # only check doctest blocks
 doctest_test_doctest_blocks = ""

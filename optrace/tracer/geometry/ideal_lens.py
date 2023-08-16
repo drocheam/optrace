@@ -37,11 +37,7 @@ class IdealLens(Lens):
         if not D:
             raise ValueError("Optical Power needs to be non-zero")
 
-        super().__init__(front=CircularSurface(r=r),
-                         back=CircularSurface(r=r),
-                         n=RefractionIndex("Constant", n=1),  # actually not meaningful in any way
-                         pos=pos, 
-                         d=0, 
-                         n2=n2, 
-                         **kwargs)
+        super().__init__(front=CircularSurface(r=r), back=CircularSurface(r=r), n=RefractionIndex("Constant", n=1),
+                         pos=pos, d=0, n2=n2, **kwargs)
+        # n parameter actually not meaningful in any way
 

@@ -148,8 +148,10 @@ class Spectrum(BaseClass):
                 if val2.shape[0] == 0:
                     raise ValueError(f"'{key}' can't be empty.")
 
-                if key == "lines" and ((wlo := np.min(val2)) < color.WL_BOUNDS[0] or (wlo := np.max(val2)) > color.WL_BOUNDS[1]):
-                    raise ValueError(f"'lines' need to be inside visible range [{color.WL_BOUNDS[0]}nm, {color.WL_BOUNDS[1]}nm]"
+                if key == "lines" and ((wlo := np.min(val2)) < color.WL_BOUNDS[0]
+                                       or (wlo := np.max(val2)) > color.WL_BOUNDS[1]):
+                    raise ValueError(f"'lines' need to be inside visible range [{color.WL_BOUNDS[0]}nm, "
+                                     f"{color.WL_BOUNDS[1]}nm]"
                                      f", but got a value of {wlo}nm.")
 
                 if key == "line_vals" and (lmin := np.min(val2)) < 0:

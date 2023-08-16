@@ -303,6 +303,14 @@ class PlotTests(unittest.TestCase):
         arr = np.zeros((100, 100, 3))
         otp.image_plot(arr, [3, 3])
 
+        # plot 2D image
+        arr = np.random.sample((100, 100))
+        otp.image_plot(arr, [3, 3])
+        
+        # plot empty 2D image
+        arr = np.zeros((100, 100))
+        otp.image_plot(arr, [3, 3])
+
 
 if __name__ == '__main__':
     unittest.main()

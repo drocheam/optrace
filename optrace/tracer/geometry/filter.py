@@ -41,7 +41,8 @@ class Filter(Element):
         """
         return self.spectrum(wl)
 
-    def color(self, rendering_intent="Absolute", clip=True, L_th=0, sat_scale=None) -> tuple[float, float, float, float]:
+    def color(self, rendering_intent="Absolute", clip=True, L_th=0, sat_scale=None)\
+            -> tuple[float, float, float, float]:
         """
         Get Filter color under daylight (D65).
         pass-through of spectrum.color, see this method for details

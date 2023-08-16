@@ -20,7 +20,8 @@ SRGB_B_XY: list[float, float] = [0.15, 0.06]  #: sRGB blue primary in xy coordin
 
 def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     """
-    Conversion from sRGB to linear RGB values. sRGB values should be inside [0, 1], however this is not checked or enforced.
+    Conversion from sRGB to linear RGB values. sRGB values should be inside [0, 1],
+    however this is not checked or enforced.
     For negative values -a  srgb_to_srgb_linear(-a) is the same as -srgb_to_srgb_linear(a)
 
     :param rgb: RGB values (numpy 1D, 2D or 3D array)
@@ -169,14 +170,14 @@ def _triangle_intersect(r, g, b, w, x, y):
     y[is_br] = ne.evaluate("by + (t - bx)*abr")
 
 
-def get_saturation_scale(Luv, L_th: float = 0):
+def get_saturation_scale(Luv: np.ndarray, L_th: float = 0):
     """
     Calculate the saturation scaling factor for xyz_to_srgb_linear with mode "Perceptual"
     Ignore values below L_th*np.max(L) with L being the lightness.
     Impossible colors are also ignored.
 
-    :param Luv: CIELUV image values (numpy 3D array
-    :param L_th: optional lightness threshold as fraction of the peak lightness
+    :param Luv: CIELUV image values (numpy 3D array)
+    :param L_th: optional lightness threshold as fraction of the peak lightness (range 0 - 1)
     :return: saturation scaling factor (0-1)
     """
 
@@ -184,6 +185,10 @@ def get_saturation_scale(Luv, L_th: float = 0):
     u_v_L = luv_to_u_v_l(Luv)
     mask = Luv[:, :, 0] > L_th*np.max(Luv[:, :, 0])
     u_, v_ = u_v_L[mask, 0], u_v_L[mask, 1]
+
+    # no values above L_th threshold
+    if not u_.shape[0]:
+        return 1.0
 
     # sRGB primaries and D65 uv coordinates
     r, g, b, w = SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV
@@ -216,8 +221,11 @@ def get_saturation_scale(Luv, L_th: float = 0):
         s1_sq = ne.evaluate("(u_i-un)**2 + (v_i-vn)**2")
 
         # saturation ratio is minimal when squared saturation ratio is minimal
-        s_sq = np.min(s1_sq/s0_sq)
-        return np.sqrt(s_sq)
+        s_sq = np.min(s1_sq/(s0_sq+1e-9))
+        s = np.sqrt(s_sq)
+
+        # due to numerical issues s could be above 1 or below the worst case
+        return np.clip(s, 0.3236, 1.0)
 
 
 def xyz_to_srgb_linear(xyz:                 np.ndarray, 
@@ -288,7 +296,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         Luv = xyz_to_luv(XYZ, normalize=False)  
         # ^-- don't normalize, since we transform back and forth and expect the same L
 
-        if not sat_scale:
+        if sat_scale is None:
             sat_scale = get_saturation_scale(Luv, L_th)
 
         Luv[:, :, 1:] *= sat_scale
@@ -342,7 +350,8 @@ def xyz_to_srgb(xyz:                np.ndarray,
     :return: sRGB image (numpy 3D array)
     """
     # XYZ -> sRGB is just XYZ -> RGBLinear -> sRGB
-    RGBL = xyz_to_srgb_linear(xyz, normalize=normalize, rendering_intent=rendering_intent, L_th=L_th, sat_scale=sat_scale)
+    RGBL = xyz_to_srgb_linear(xyz, normalize=normalize, rendering_intent=rendering_intent,
+                              L_th=L_th, sat_scale=sat_scale)
 
     if clip:
         RGBL = np.clip(RGBL, 0, 1)
@@ -542,9 +551,9 @@ def spectral_colormap(N:    int,
     :return: sRGBA array (numpy 2D array, shape (N, 4))
 
     >>> spectral_colormap(3, 400, 600)
-    array([[ 3.81626223e+01, 9.30946402e+00, 7.20900561e+01, 2.55000000e+02],
-           [ 1.14017400e-04, 2.52697905e+02, 2.13400035e+02, 2.55000000e+02],
-           [ 2.41139375e+02, 1.07694238e+02, 7.92225931e+01, 2.55000000e+02]])
+    array([[ 3.81626224e+01, 9.30946428e+00, 7.20900561e+01, 2.55000000e+02],
+           [ 1.23039547e-04, 2.52697905e+02, 2.13400035e+02, 2.55000000e+02],
+           [ 2.41139375e+02, 1.07694239e+02, 7.92225936e+01, 2.55000000e+02]])
     """
     # wavelengths to XYZ color
     wl0 = wl0 if wl0 is not None else tools.WL_BOUNDS[0]

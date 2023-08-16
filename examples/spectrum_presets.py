@@ -7,7 +7,8 @@ import optrace.plots
 ot.plots.chromaticities_cie_1976(ot.presets.light_spectrum.standard_natural)
 ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_natural, labels_off=False, title="CIE Standard Illuminants")
 ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_led, labels_off=True, title="CIE Standard Illuminants LED")
-ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_fl, labels_off=True, title="CIE Standard Illuminants Fluorescent")
+ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_fl, labels_off=True,
+                       title="CIE Standard Illuminants Fluorescent")
 
 ot.plots.chromaticities_cie_1931(ot.presets.light_spectrum.srgb, norm="Largest")
 ot.plots.spectrum_plot(ot.presets.light_spectrum.srgb, color=["r", "g", "b", "k"],

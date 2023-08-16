@@ -44,7 +44,8 @@ class TransmissionSpectrum(Spectrum):
         spec = color.d65_illuminant(wl) * self(wl)
         return color.xyz_from_spectrum(wl, spec)
 
-    def color(self, rendering_intent="Absolute", clip=True, L_th=0, sat_scale=None) -> tuple[float, float, float, float]:
+    def color(self, rendering_intent="Absolute", clip=True, L_th=0, sat_scale=None)\
+            -> tuple[float, float, float, float]:
         """
         Get the Spectrum sRGB color and the opacity.
 

@@ -69,8 +69,7 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.pause(0.1)
 
 
-
-def image_plot(img:     np.ndarray | str, 
+def image_plot(img:     np.ndarray | RImage | str, 
                s:       list[float, float],
                flip:    bool = False,
                fargs:   dict = None,

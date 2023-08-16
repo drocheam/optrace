@@ -243,7 +243,8 @@ class RImage(BaseClass):
         xyz = self.xyz()
         return color.xyz_to_luv(xyz)
 
-    def rgb(self, log: bool = False, rendering_intent: str = "Absolute", L_th: float = 0, sat_scale: float = None) -> np.ndarray:
+    def rgb(self, log: bool = False, rendering_intent: str = "Absolute", L_th: float = 0, sat_scale: float = None)\
+            -> np.ndarray:
         """
         Get sRGB image
 

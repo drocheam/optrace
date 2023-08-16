@@ -175,7 +175,8 @@ class TraceGUI(HasTraits):
     """Image Type"""
    
     projection_method_enabled: Bool = False  #: if projection method is selectable, only the case for spherical detectors
-    projection_method: Enum = Enum(*SphericalSurface.sphere_projection_methods, desc="Projection Method for spherical detectors")
+    projection_method: Enum = Enum(*SphericalSurface.sphere_projection_methods,
+                                   desc="Projection Method for spherical detectors")
     """sphere surface projection method"""
 
     focus_type: Enum = Enum(*Raytracer.autofocus_methods, desc="Method for Autofocus")
@@ -303,8 +304,10 @@ class TraceGUI(HasTraits):
                             Item('_source_cut_button', show_label=False),
                             Item('_detector_cut_button', show_label=False),
                             _separator,
-                            Item("_filter_label", style='readonly', show_label=False, emphasized=True, enabled_when="not projection_method_enabled"),
-                            Item('activate_filter', style="custom", show_label=False, enabled_when="not projection_method_enabled"),
+                            Item("_filter_label", style='readonly', show_label=False, emphasized=True,
+                                 enabled_when="not projection_method_enabled"),
+                            Item('activate_filter', style="custom", show_label=False,
+                                 enabled_when="not projection_method_enabled"),
                             Item('filter_constant', enabled_when="not projection_method_enabled"),
                             label="Image",
                             ),
@@ -935,7 +938,8 @@ class TraceGUI(HasTraits):
 
                             log, mode, px, dindex, flip, pm = bool(self.log_image), self.image_type,\
                                 int(self.image_pixels), self._det_ind, bool(self.flip_det_image), self.projection_method
-                            limit = self.filter_constant if self.activate_filter and not self.projection_method_enabled else None
+                            limit = self.filter_constant if self.activate_filter \
+                                                            and not self.projection_method_enabled else None
                             cut_args = {self.cut_dimension : self.cut_value}
 
                             if rerender:
@@ -1102,7 +1106,8 @@ class TraceGUI(HasTraits):
                 def on_finish() -> None:
                     if not error:
                         with self._try():
-                            if (event is None and not cut) or (event is not None and event.name == "_source_image_button"):
+                            if (event is None and not cut) or \
+                                    (event is not None and event.name == "_source_image_button"):
                                 r_image_plot(SImg, log=log, mode=mode, imc=Imc)
                             else:
                                 r_image_cut_plot(SImg, log=log, mode=mode, imc=Imc, **cut_args)

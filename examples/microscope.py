@@ -86,7 +86,7 @@ RT.add(eye)
 
 # add cylinder for displaying the microscope
 vol = ot.CylinderVolume(r=6, length=eye.extent[4]-objective.extent[4]-3, 
-                        pos=[0, 0, objective.extent[4]-3], color=(0, 0, 0))
+                        pos=[0, 0, objective.extent[4]-3], color=(0.0, 0.0, 0.0))
 RT.add(vol)
 
 # calculate magnification

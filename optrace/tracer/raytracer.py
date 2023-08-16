@@ -212,15 +212,17 @@ class Raytracer(Group):
 
                         case self.INFOS.ONLY_HIT_FRONT:
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"hitting lens front but missing back (lens with surface {surf}), setting to absorbed.")
+                                       f"hitting lens front but missing back (lens with surface {surf}), "
+                                       "setting to absorbed.")
 
                         case self.INFOS.ONLY_HIT_BACK:
                             self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"missing lens front but hitting back (lens with surface {surf}), setting to absorbed.")
+                                       f"missing lens front but hitting back (lens with surface {surf}), "
+                                       "setting to absorbed.")
                         
                         case self.INFOS.ILL_COND:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for numerical hit "
-                                       f"finding at surface {surf}. "
+                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
+                                       f"numerical hit finding at surface {surf}. "
                                        f"Their hit position will certainly be wrong.")
 
     def trace(self, N: int) -> None:
@@ -312,8 +314,8 @@ class Raytracer(Group):
                         hwb = misc.part_mask(hw, hit_back)  # rays having power and hitting lens back
                         self.__refraction(element.back, p, s, weights, n_l, n2_l, pols, hwb, i, msg)
 
-                        # since we don't model the behaviour of the lens side cylinder, we need to absorb all rays passing
-                        # through the cylinder
+                        # since we don't model the behaviour of the lens side cylinder,
+                        # we need to absorb all rays passing through the cylinder
                         self.__absorb_cylinder_rays(p, weights, hw_front, hw, hit_front, hit_back, i, msg)
 
                     else:
@@ -321,7 +323,8 @@ class Raytracer(Group):
                         self.__refraction_ideal_lens(element.front, element.D, p, s, pols, hwh, i, msg)
                         ns[:, i+1] = n2_l
 
-                    # absorb rays if absorb_missing=True or if we have a media transition but the rays hit outside the lens
+                    # absorb rays if absorb_missing=True or if we have a media transition
+                    # but the rays hit outside the lens
                     # absorb rays missing lens, overwrite p to last ray starting point (=end of lens front surface)
                     if (self.absorb_missing or n1 != n2) and not np.all(hit_back):
                         miss_mask = misc.part_mask(hw, ~hit_back)
@@ -1102,7 +1105,7 @@ class Raytracer(Group):
         return spec
 
     def iterative_render(self,
-                         N_rays:            int,
+                         N_rays:            int | float,
                          N_px_D:            int | list = 400,
                          N_px_S:            int | list = 400,
                          detector_index:    int | list = 0,
@@ -1116,7 +1119,8 @@ class Raytracer(Group):
         Image render with N_rays rays.
         First returned value is a list of rendered sources, the second a list of rendered detector images.
 
-        If pos is not provided, a single detector image is rendered at the position of the detector specified by detector_index.
+        If pos is not provided,
+        a single detector image is rendered at the position of the detector specified by detector_index.
         >> RT.iterative_render(N_rays=10000, detector_index=1) 
         
         If pos is provided as coordinate, the detector is moved beforehand.
@@ -1537,7 +1541,8 @@ class Raytracer(Group):
         # no rays are used, return placeholder variables
         if N_use == 0:
             return scipy.optimize.OptimizeResult(),\
-                dict(pos=[np.nan, np.nan, np.nan], bounds=bounds, z=np.full(Nt, np.nan), cost=np.full(Nt, np.nan), N=N_use)
+                dict(pos=[np.nan, np.nan, np.nan], bounds=bounds, z=np.full(Nt, np.nan),
+                     cost=np.full(Nt, np.nan), N=N_use)
 
         # select random rays from all valid
         rp = np.where(rays_pos)[0]

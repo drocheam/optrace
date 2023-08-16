@@ -180,7 +180,7 @@ def legrand_eye(pupil: float = 5.7,
 
     front = ConicSurface(r=12.776270, R=14.8152, k=0.344612)
     back = ConicSurface(r=12.776270, R=-13.4, k=0.1)
-    vol = Volume(front, back, pos=Det.pos, d1=front.ds+back.ds, d2=0, color=(1, 1, 0.95))
+    vol = Volume(front, back, pos=Det.pos, d1=front.ds+back.ds, d2=0, color=(1.0, 1.0, 0.95))
     geom.add(vol)
 
     return geom

@@ -5,8 +5,8 @@ matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 # increase dpi if in "inline" backend, otherwise the resolution is way too low in IDEs like spyder
-if "inline" in matplotlib.rcParams["backend"]:
-    matplotlib.rcParams["figure.dpi"] = 200
+if "inline" in matplotlib.rcParams["backend"]: # pragma: no cover
+    matplotlib.rcParams["figure.dpi"] = 200 # pragma: no cover
 
 
 from .r_image_plots import r_image_plot, r_image_cut_plot

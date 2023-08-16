@@ -107,6 +107,9 @@ class ScenePlotting:
         if self.scene and self.scene.camera:
             cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
                                                         "clipping_range", "parallel_scale")
+        else:
+            cc_traits_org = {}
+
         try:
             yield
 
@@ -414,7 +417,8 @@ class ScenePlotting:
         self._ray_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True,
                                                       opacity=self.ui.ray_opacity)
         self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width,
-                                                point_size=self.ui.ray_width if self.ui.plotting_type == "Points" else 0.1)
+                                                point_size=self.ui.ray_width if self.ui.plotting_type == "Points"
+                                                           else 0.1)
         self._ray_plot.parent.parent.name = "Rays"
         self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
@@ -455,7 +459,8 @@ class ScenePlotting:
                 m = self.scene.mlab.plot3d([mark.pos[0]-drx, mark.pos[0]+drx], [mark.pos[1]-dry, mark.pos[1]+dry],
                                            [mark.pos[2], mark.pos[2]], tube_radius=0, color=self._line_marker_color)
 
-                m.actor.actor.property.trait_set(lighting=False, line_width=mark.line_factor, representation="wireframe")
+                m.actor.actor.property.trait_set(lighting=False, line_width=mark.line_factor,
+                                                 representation="wireframe")
                 m.parent.parent.parent.parent.name = f"Marker {num}"
                 m.actor.actor.trait_set(pickable=False, force_translucent=True)
             
@@ -486,9 +491,8 @@ class ScenePlotting:
 
         high_contrast = self.ui.high_contrast
 
-        if self.scene:
-            self.scene.background = (0.205, 0.19, 0.19) if not high_contrast else (1, 1, 1)
-            self.scene.foreground = (1, 1, 1) if not high_contrast else (0, 0, 0)
+        self.scene.background = (0.205, 0.19, 0.19) if not high_contrast else (1, 1, 1)
+        self.scene.foreground = (1, 1, 1) if not high_contrast else (0, 0, 0)
 
         self._lens_color = (0.63, 0.79, 1.00) if not high_contrast else self.scene.foreground
         self._lens_alpha = 0.35
@@ -613,7 +617,8 @@ class ScenePlotting:
         """
         """
        
-        opts = dict(justification="center", vertical_justification="bottom", orientation=0) if not self.ui.vertical_labels\
+        opts = dict(justification="center", vertical_justification="bottom", orientation=0) \
+            if not self.ui.vertical_labels\
             else dict(justification="left", orientation=90, vertical_justification="center")
 
         for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
@@ -1033,7 +1038,8 @@ class ScenePlotting:
                     self._crosshair.visible = False  # hide crosshair
         else:
             r, ang = np.hypot(pos[0], pos[1]), np.rad2deg(np.arctan2(pos[1], pos[0]))
-            self._ray_text.text = f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, {pos[2]:>9.6g} mm)\n"\
+            self._ray_text.text = f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, "\
+                                  f"{pos[2]:>9.6g} mm)\n"\
                                   f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)"
             if self._crosshair is not None:
                 self._crosshair.mlab_source.trait_set(x=[pos[0]], y=[pos[1]], z=[pos[2]])

@@ -66,12 +66,14 @@ class TMA(BaseClass):
         n1_, n2_ = self.n1, self.n2
         A, B, C, D = tuple(self.abcd.ravel())
 
-        self.principal_points: tuple[float, float] = (_1 - (n1_ - n2_ * D) / (n2_ * C), _2 + (1 - A) / C) if C else (np.nan, np.nan)
+        self.principal_points:\
+            tuple[float, float] = (_1 - (n1_ - n2_ * D) / (n2_ * C), _2 + (1 - A) / C) if C else (np.nan, np.nan)
         """z-position of principal points"""
 
         p1, p2 = self.principal_points
 
-        self.nodal_points: tuple[float, float] = (_1 - (1 - D) / C, _2 + (n1_ - n2_ * A) / (n2_ * C)) if C else (np.nan, np.nan)
+        self.nodal_points:\
+            tuple[float, float] = (_1 - (1 - D) / C, _2 + (n1_ - n2_ * A) / (n2_ * C)) if C else (np.nan, np.nan)
         """z-position of nodal points"""
         
         self.focal_points: tuple[float, float] = (p1 + n1_ / n2_ / C, p2 - 1 / C) if C else (np.nan, np.nan)

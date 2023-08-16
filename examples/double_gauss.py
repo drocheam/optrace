@@ -43,7 +43,8 @@ def F(x, y):
 for deg in [0, 5, 10, 15, 20]:
     xp = g * np.tan(deg/180*np.pi)
     RSS = ot.Point()
-    RS = ot.RaySource(RSS, divergence="Isotropic", orientation="Function", div_angle=0.03, or_func=F, pos=[-xp, 0, -g], desc=f"{deg}°")
+    RS = ot.RaySource(RSS, divergence="Isotropic", orientation="Function", div_angle=0.03,
+                      or_func=F, pos=[-xp, 0, -g], desc=f"{deg}°")
     RT.add(RS)
 
 # Lens 0

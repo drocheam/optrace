@@ -350,9 +350,12 @@ def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_mar
         surf2 = _make_surface(Surfaces[i+1])
 
         # NOTE
-        # Surface 1 with index, Surface 2 without index -> Surface 1 and 2 form a lens, gap, next lens consists of surface 3 and 4
+        # Surface 1 with index, Surface 2 without index -> Surface 1 and 2 form a lens,
+        #  gap, next lens consists of surface 3 and 4
+        #
         # Surface 1 with index, Surface 2 with index -> Surface 1 and 2 form a lens, next lens starts with surface 2
-        # for that we offset the start position of the next lens by a small value. The gap is filled with the medium of the last element.
+        # for that we offset the start position of the next lens by a small value.
+        # The gap is filled with the medium of the last element.
         n2 = Surfaces[i]["n"] if "n" in Surfaces[i+1] else None
 
         # create lens

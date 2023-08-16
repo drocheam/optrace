@@ -220,7 +220,8 @@ class Group(BaseClass):
         """
 
         if not isinstance(el, list) and self.has(el):
-            self.print(f"Element {self.get_desc(hex(id(self)))} already included in geometry. Make a copy to include it another time.")
+            self.print(f"Element {self.get_desc(hex(id(self)))} already included in geometry. "
+                       "Make a copy to include it another time.")
             return
 
         match el:

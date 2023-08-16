@@ -13,22 +13,27 @@ cell: str = str(image_dir / "cell.webp")
 """Stable Diffusion image from https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064"""
 
 documents: str = str(image_dir / "documents.webp")
-"""Photo of a keyboard and documents on a desk. Source: https://www.pexels.com/photo/documents-on-wooden-surface-95916/ """
+"""Photo of a keyboard and documents on a desk. 
+Source: https://www.pexels.com/photo/documents-on-wooden-surface-95916/ """
 
 fruits: str = str(image_dir / "fruits.webp")
 """Photo of different fruits on a tray. Source: https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/ """
 
 group_photo: str = str(image_dir / "group_photo.webp")
-"""Photo of a group of people in front of a blackboard. Source: https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/ """
+"""Photo of a group of people in front of a blackboard. 
+Source: https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/ """
 
 hong_kong: str = str(image_dir / "hong_kong.webp")
-"""Photo of a Hong Kong street at night. Source: https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/ """
+"""Photo of a Hong Kong street at night. 
+Source: https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/ """
 
 interior: str = str(image_dir / "interior.webp")
-"""Green sofa in an interior room. Source: https://www.pexels.com/photo/green-2-seat-sofa-1918291/ """
+"""Green sofa in an interior room. 
+Source: https://www.pexels.com/photo/green-2-seat-sofa-1918291/ """
 
 landscape: str = str(image_dir / "landscape.webp")
-"""Landscape image of a mountain and water scene. Source: https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/ """
+"""Landscape image of a mountain and water scene. 
+Source: https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/ """
 
 scenes: list = [cell, documents, fruits, group_photo, hong_kong, interior, landscape]
 """photography-like images for viewing natural scenes"""
@@ -56,7 +61,8 @@ ETDRS_chart_inverted: str = str(image_dir / "ETDRS_chart_inverted.png")
 edited version of Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
 
 eye_test_vintage: str = str(image_dir / "eye_test_vintage.webp")
-"""Photo of a vintage eye test chart. Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage """
+"""Photo of a vintage eye test chart. 
+Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage """
 
 siemens_star: str = str(image_dir / "siemens_star.webp")
 """Siemens Star Image. Own creation"""

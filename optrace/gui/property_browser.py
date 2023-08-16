@@ -18,9 +18,12 @@ class PropertyBrowser(HasTraits):
     unit_label:   Str = Str("Distances in mm, optical powers in dpt")
     legend_title: Str = Str("Legend")
 
-    ray_legend: Str = Str("p:      position                      s:    unity direction vector           s_un:  direction vector\n"
-                          "l:      ray length to next point      ol:   optical length to next point     pol:   polarization unity vector\n"
-                          "w:      power                         wv:   wavelength                       snum:  source number\n"
+    ray_legend: Str = Str("p:      position                      s:    unity direction vector           "
+                          "s_un:  direction vector\n"
+                          "l:      ray length to next point      ol:   optical length to next point     "
+                          "pol:   polarization unity vector\n"
+                          "w:      power                         wv:   wavelength                       "
+                          "snum:  source number\n"
                           "index:  ray index                     n:    ambient refractive index")
 
     tma_legend: Str = Str("abcd:  ABCD Matrix                bfl:  back focal length       d:  thickness\n"
