@@ -26,7 +26,7 @@ class RaySource(Element):
     divergences: list[str] = ["None", "Lambertian", "Isotropic", "Function"]
     """Possible divergence types"""
 
-    orientations: list[str] = ["Constant", "Function"]
+    orientations: list[str] = ["Constant", "Converging", "Function"]
     """Possible orientation types"""
 
     polarizations: list[str] = ["Constant", "Uniform", "List", "Function", "x", "y", "xy"]
@@ -59,8 +59,9 @@ class RaySource(Element):
                  s:                 (list | np.ndarray) = None,
                  s_sph:             (list | np.ndarray) = None,
                  orientation:       str = "Constant",
+                 conv_pos:          list[float] | np.ndarray = None,
                  or_func:           Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
-                 or_args:         dict = None,
+                 or_args:           dict = None,
 
                  # Polarization Parameters
                  polarization:      str = "Uniform",
@@ -68,7 +69,7 @@ class RaySource(Element):
                  pol_angles:        list[float] = None,
                  pol_probs:         list[float] = None,
                  pol_func:          Callable[[np.ndarray], np.ndarray] = None,
-                 pol_args:        dict = None,
+                 pol_args:          dict = None,
 
                  **kwargs)\
             -> None:
@@ -88,6 +89,7 @@ class RaySource(Element):
         :param div_func: divergence function, must take angles in radians in range [0, div_angle]
                 and return a probability
         :param div_args: additional keywords arguments for div_func in a dictionary
+        :param conv_pos: convergence position for orientation='Converging', 3D position
         :param pol_angle: polarization angle as float, value in degrees 
         :param pol_angles: polarization angle list, values in degrees
         :param pol_probs: probabilities for the pol_angles
@@ -128,6 +130,7 @@ class RaySource(Element):
         self.divergence = divergence
         self.div_angle = div_angle
         self.orientation = orientation
+        self.conv_pos = conv_pos if conv_pos is not None else [0, 0, 0]
         self.or_func = or_func
         self.or_args = or_args if or_args is not None else {}
 
@@ -223,6 +226,12 @@ class RaySource(Element):
 
             case "Constant":
                 s_or = np.tile(self.s, (N, 1))
+
+            case "Converging":
+                s_or = np.column_stack((self.conv_pos[0] - p[:, 0], 
+                                        self.conv_pos[1] - p[:, 1], 
+                                        self.conv_pos[2] - p[:, 2]))
+                s_or = misc.normalize(s_or)
 
             case "Function":  # pragma: no branch
                 pc.check_callable("RaySource.or_func", self.or_func)
@@ -420,6 +429,15 @@ class RaySource(Element):
 
                 pc.check_above("s[2]", val2[2], 0)
 
+                super().__setattr__(key, val2)
+                return
+            
+            case "conv_pos":
+                pc.check_type(key, val, list | np.ndarray)
+                val2 = np.asarray_chkfinite(val, dtype=np.float64)
+                if val2.shape[0] != 3:
+                    raise TypeError("conv_pos needs to have 3 dimensions")
+                
                 super().__setattr__(key, val2)
                 return
 

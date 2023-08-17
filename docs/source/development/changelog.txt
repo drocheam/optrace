@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.4.6   |   2023-08-16   |   New Siemens Star and TV test card image presets. 
   1.4.5   |   2023-08-06   |   Replaced image presets with better ones. 
   1.4.4   |   2023-06-19   |   New parameters for sRGB Perceptual RI. Resolution filter is now an Airy disc. 
   1.4.3   |   2023-04-12   |   Support for convolution of both colored PSF and image. 

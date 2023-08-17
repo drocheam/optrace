@@ -12,7 +12,7 @@ WP_D65_LUV: list[float, float, float] = [100, 0.19783982, 0.4683363]
 WP_D65_UV: list[float, float] = WP_D65_LUV[1:]
 """whitepoint D65 in u'v', calculated from XYZ coordinates"""
 
-# whitepoints and primary coordinates in u'v'
+# whitepoints and primary coordinates in u'v' diagram
 SRGB_R_UV: list[float, float] = [0.4507042254, 0.5228873239]  #: sRGB red primary in u'v' coordinates
 SRGB_G_UV: list[float, float] = [0.125, 0.5625]  #: sRGB green primary in u'v' coordinates
 SRGB_B_UV: list[float, float] = [0.1754385965, 0.1578947368]  #: sRGBgblue primary  in u'v' coordinates
@@ -20,10 +20,10 @@ SRGB_B_UV: list[float, float] = [0.1754385965, 0.1578947368]  #: sRGBgblue prima
 
 def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     """
-    Convert XYZ values to CIELUV colorspace.
+    Convert XYZ values to CIE 1976 LUV colorspace.
 
     :param xyz: XYZ image (2D with channels in third dimension)
-    :param normalize: if lightness is normalized
+    :param normalize: if should be normalized with the highest value in Y
     :return: CIELUV image, same shape as input
     """
 
@@ -76,7 +76,7 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
 
 def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
     """
-    Convert CIELUV back to XYZ.
+    Convert CIE 1976 LUV back to XYZ.
 
     :param luv: CIELUV image (2D, with channels in third dimension)
     :return: XYZ image, same shape as input
@@ -115,9 +115,9 @@ def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
 
 def luv_to_u_v_l(luv: np.ndarray) -> np.ndarray:
     """
-    Convert to CIELUV to chromaticity color space u'v'L
+    Convert to CIE 1976 LUV to chromaticity color space u'v'L (uniform chromaticity scale diagram coordinates)
 
-    :param luv: CIELUV image, 2D image with channels in third dimension
+    :param luv: CIELUV image, shape (Ny, Nx, 3)
     :return: u'v'L image, same shape as input
     """
     _, un, vn = WP_D65_LUV

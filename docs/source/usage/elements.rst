@@ -76,7 +76,13 @@ Or with :python:`s_sph` for spherical coordinates, where the first one is the an
 
    RS = ot.RaySource(circ, orientation="Constant", s_sph=[20, -30])
 
-It is also possible to define orientations depending on the position of the rays. For this we need to set :python:`orientation="Function"` and provide the :python:`or_func` parameter.
+If all rays from the source should be converging to a position :python:`conv_pos`, mode :python:`orientation="Converging"` can be used:
+
+.. testcode::
+
+   RS = ot.RaySource(circ, orientation="Converging", conv_pos=[10, 2, -1])
+
+It is also possible to define orientations as a function of the position of the rays. For this we need to set :python:`orientation="Function"` and provide the :python:`or_func` parameter.
 This parameter takes two numpy arrays containing the x and y-position and returns a two dimensional array with cartesian vector components in rows.
 
 .. testcode::

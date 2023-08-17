@@ -16,19 +16,15 @@ G = g*np.tan(G_alpha/180*np.pi) # half object size
 OL = max(G, 8)  # half of x, y, outline size
 sr_angle = np.arctan(1.25*P/2/g)/np.pi*180  # ray divergence needed for diffuse light
 
-# image vector pointing at the center of the cornea
-def F(x, y):
-    s = np.column_stack((-x, -y, np.ones_like(x)*g))
-    ab = (s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2) ** 0.5
-    return s / ab[:, np.newaxis]
-
 # create raytracer
 RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], absorb_missing=True, no_pol=False)
 
 # add RaySource
+# light is converging towards eye vertex at [0, 0, 0]
+# source area emits light according to an image light distribution and with lambertian divergence
 RSS = ot.RectangularSurface(dim=[2*G, 2*G])
 RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=sr_angle, image=ot.presets.image.ETDRS_chart_inverted, 
-               pos=[0, 0, -g], orientation="Function", or_func=F, desc="USAF Chart")
+               pos=[0, 0, -g], orientation="Converging", conv_pos=[0, 0, 0], desc="USAF Chart")
 RT.add(RS)
 
 # load Arizona Eye model

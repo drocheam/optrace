@@ -12,7 +12,7 @@ from .observers import x_observer, y_observer, z_observer
 SRGB_RENDERING_INTENTS: list[str, str, str] = ["Ignore", "Absolute", "Perceptual"]
 """Rendering intents for XYZ to sRGB conversion"""
 
-# whitepoints and primary coordinates in xy
+# whitepoints and primary coordinates in xy chromaticity diagram
 SRGB_R_XY: list[float, float] = [0.64, 0.33]  #: sRGB red primary in xy coordinates
 SRGB_G_XY: list[float, float] = [0.30, 0.60]  #: sRGB green primary in xy coordinates
 SRGB_B_XY: list[float, float] = [0.15, 0.06]  #: sRGB blue primary in xy coordinates
@@ -20,7 +20,7 @@ SRGB_B_XY: list[float, float] = [0.15, 0.06]  #: sRGB blue primary in xy coordin
 
 def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     """
-    Conversion from sRGB to linear RGB values. sRGB values should be inside [0, 1],
+    Conversion from sRGB to linear RGB values. sRGB values should be inside range [0, 1],
     however this is not checked or enforced.
     For negative values -a  srgb_to_srgb_linear(-a) is the same as -srgb_to_srgb_linear(a)
 
@@ -66,8 +66,8 @@ def srgb_to_xyz(rgb: np.ndarray) -> np.ndarray:
     """
     Conversion from sRGB to XYZ.
 
-    :param rgb: sRGB image (numpy 3D array, RGB channels in third dimension)
-    :return: XYZ image (numpy 3D array)
+    :param rgb: sRGB image (numpy 3D array, shape (Ny, Nx, 3) )
+    :return: XYZ image (shape (Ny, Nx, 3))
     """
     RGBL = srgb_to_srgb_linear(rgb)
     XYZ = srgb_linear_to_xyz(RGBL)
@@ -79,14 +79,20 @@ def outside_srgb_gamut(xyz: np.ndarray) -> np.ndarray:
     """
     Checks if the XYZ colors produce valid colors inside the sRGB gamut
 
-    :param xyz: XYZ values, 2D image with channels in the third dimension
-    :return: boolean 2D image
+    :param xyz: XYZ values, shape (Ny, Nx, 3)
+    :return: boolean 2D image, shape (Ny, Nx)
     """
     return np.any(xyz_to_srgb_linear(xyz, rendering_intent="Ignore") < 0, axis=2)
 
 
 def _to_srgb(xyz_: np.ndarray, normalize: bool) -> np.ndarray:
+    """
+    Helper function for conversion of XYZ to sRGB linear
 
+    :param xyz_: XYZ array (shape (Ny, Nx, 3))
+    :param normalize: if output values should be normalized by the highest value
+    :return: sRGB Linear array (shape (Ny, Nx, 3))
+    """
     # it makes no difference if we normalize before or after the matrix multiplication
     # since X, Y and Z gets scaled by the same value and matrix multiplication is a linear operation
     # normalizing after conversion makes it possible to normalize to the highest RGB value,
@@ -113,7 +119,19 @@ def _to_srgb(xyz_: np.ndarray, normalize: bool) -> np.ndarray:
 
 
 def _triangle_intersect(r, g, b, w, x, y):
+    """
+    Helper function.
+    Projects chromaticity values x,y towards the whitepoint w on the triangular gamut edge defined by r,g,b.
+    Values already inside the gamut are unchanged.
+    x, y are changed inplace (no return value)
 
+    :param r: xy red coordinates (tuple of two floats)
+    :param g: xy green coordinates (tuple of two floats)
+    :param b: xy blue coordinates (tuple of two floats)
+    :param b: xy whitepoint coordinates (tuple of two floats)
+    :param x: x chromaticity values input vector
+    :param y: y chromaticity values input vector
+    """
     # sRGB primaries and whitepoint D65 coordinates
     rx, ry, gx, gy, bx, by, wx, wy = *r, *g, *b, *w
 
@@ -170,13 +188,15 @@ def _triangle_intersect(r, g, b, w, x, y):
     y[is_br] = ne.evaluate("by + (t - bx)*abr")
 
 
-def get_saturation_scale(Luv: np.ndarray, L_th: float = 0):
+def get_saturation_scale(Luv: np.ndarray, L_th: float = 0.0) -> float:
     """
     Calculate the saturation scaling factor for xyz_to_srgb_linear with mode "Perceptual"
     Ignore values below L_th*np.max(L) with L being the lightness.
     Impossible colors are also ignored.
 
-    :param Luv: CIELUV image values (numpy 3D array)
+    This functions determines the needed saturation scaling factor so all image colors are inside the sRGB gamut.
+
+    :param Luv: CIELUV image values (shape (Ny, Nx, 3))
     :param L_th: optional lightness threshold as fraction of the peak lightness (range 0 - 1)
     :return: saturation scaling factor (0-1)
     """
@@ -204,6 +224,7 @@ def get_saturation_scale(Luv: np.ndarray, L_th: float = 0):
     l5 = v_ > (0.0-0.48)/(0.18-0)*u_ + 0.48
     in_gamut = l1 & l2 & l3 & l4 & l5
 
+    # only invalid colors
     if not np.any(in_gamut):
         return 1.0
 
@@ -224,8 +245,8 @@ def get_saturation_scale(Luv: np.ndarray, L_th: float = 0):
         s_sq = np.min(s1_sq/(s0_sq+1e-9))
         s = np.sqrt(s_sq)
 
-        # due to numerical issues s could be above 1 or below the worst case
-        return np.clip(s, 0.3236, 1.0)
+        # due to numerical issues s could be above 1 or below some worst case
+        return np.clip(s, 0.32, 1.0)
 
 
 def xyz_to_srgb_linear(xyz:                 np.ndarray, 
@@ -248,12 +269,12 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
     Impossible colors are left untouched by this mode, so clipping the output values is recommended.
     Alternatively the sat_scale parameter can be provided that scales the saturation down by a fixed amount
 
-    :param xyz: XYZ image (numpy 3D array, XYZ channels in third dimension)
+    :param xyz: XYZ image (shape (Ny, Nx, 3))
     :param normalize: if image is normalized to highest value before conversion (bool)
-    :param rendering_intent:
+    :param rendering_intent: "Absolute", "Perceptual" or "Ignore", see above
     :param L_th: lightness threshold for mode "Perceptual". 
     :param sat_scale: sat_scale option for mode "Perceptual" 
-    :return: linear RGB image (numpy 3D array)
+    :return: linear sRGB image (shape (Ny, Nx, 3))
     """
 
     # see https://snapshot.canon-asia.com/reg/article/eng/
@@ -339,7 +360,9 @@ def xyz_to_srgb(xyz:                np.ndarray,
                 sat_scale:          float = None)\
         -> np.ndarray:
     """
-    Conversion of XYZ to sRGB.
+    Conversion of XYZ to sRGB Linear to sRGB.
+
+    see function :srgb_linear_to_srgb() for detail on rendering intents.
 
     :param xyz: XYZ image (numpy 3D array, XYZ channels in third dimension)
     :param normalize: if values are normalized before conversion (bool)
@@ -360,7 +383,7 @@ def xyz_to_srgb(xyz:                np.ndarray,
     return RGB
 
 
-def log_srgb_linear(img: np.ndarray, exp: float = 1) -> np.ndarray:
+def log_srgb_linear(img: np.ndarray, exp: float = 1.0) -> np.ndarray:
     """
     Logarithmically scale linear sRGB components and additionally exponentiate by 'exp'
 
@@ -398,7 +421,8 @@ def log_srgb_linear(img: np.ndarray, exp: float = 1) -> np.ndarray:
 
 def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     """
-    Normalized Gauss Function
+    Gauss Function / Normal distribution.
+    Normaklized so peak value is 1.
 
     :param x: 1D value vector
     :param mu: mean value
@@ -422,7 +446,7 @@ def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
 
 def srgb_r_primary(wl: np.ndarray) -> np.ndarray:
     """
-    Possible sRGB r primary curve.
+    Exemplary sRGB r primary curve.
 
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
@@ -438,7 +462,7 @@ def srgb_r_primary(wl: np.ndarray) -> np.ndarray:
 
 def srgb_g_primary(wl: np.ndarray) -> np.ndarray:
     """
-    Possible sRGB g primary curve.
+    Exemplary sRGB g primary curve.
 
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
@@ -454,7 +478,7 @@ def srgb_g_primary(wl: np.ndarray) -> np.ndarray:
 
 def srgb_b_primary(wl: np.ndarray) -> np.ndarray:
     """
-    Possible sRGB b primary curve.
+    Exemplary sRGB b primary curve.
 
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
@@ -480,7 +504,7 @@ _SRGB_B_PRIMARY_POWER_FACTOR = 0.775993481741
 
 def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     """
-    Choose random wavelengths from RGB colors.
+    Choose random wavelengths from sRGB colors.
 
     :param rgb: RGB values (numpy 2D array, RGB channels in second dimension)
     :return: random wavelengths for every color (numpy 1D array)

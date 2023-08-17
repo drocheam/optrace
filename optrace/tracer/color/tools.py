@@ -4,6 +4,7 @@ import scipy.constants  # for c, h, k_B
 
 
 # default wavelength bounds
+# defines the range wavelengths can exist in
 _WL_MIN0 = 380.
 _WL_MAX0 = 780.
 

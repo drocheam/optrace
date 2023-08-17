@@ -618,7 +618,8 @@ class ColorTests(unittest.TestCase):
         self.assertAlmostEqual(sf, 1.0, delta=1e-5)  # faint values are ignored, factor is 1
 
         # case 7: all colors are outside the visible gamut (for coverage testing)
-        xyz = np.random.sample((100, 100, 3)) - 1.1  # all xyz values are now negative
+        xyz = np.zeros((100, 100, 3))
+        xyz[:, :, 1] = 1  # XYZ = (0, 1, 0) is a color left of the visible CIE xyz gamut
         luv = color.xyz_to_luv(xyz)
         sf = color.get_saturation_scale(luv)
         self.assertAlmostEqual(sf, 1.0, delta=1e-5)

@@ -412,6 +412,35 @@ class TracerTests(unittest.TestCase):
             RT.remove(RS)
 
     @pytest.mark.slow
+    def test_ray_source_convergence(self):
+    
+        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True, no_pol=True)
+
+        conv_pos = [30, -25, 25]
+
+        # light source with convergence
+        RSS0 = ot.RectangularSurface(dim=[50, 50])
+        RS0 = ot.RaySource(RSS0, divergence="None", orientation="Converging", conv_pos=conv_pos,
+                           pos=[-50, 10, -2.5])
+        RT.add(RS0)
+
+        # create aperture so we can check the last position of the rays
+        APS = ot.RectangularSurface(dim=[5, 5])
+        AP = ot.Aperture(APS, pos=conv_pos)
+        RT.add(AP)
+
+        RT.trace(50000)
+
+        # check that rays converged to correct position
+        self.assertTrue(np.allclose(RT.rays.p_list[:, -1, 0] - conv_pos[0], 0, 1e-10))
+        self.assertTrue(np.allclose(RT.rays.p_list[:, -1, 1] - conv_pos[1], 0, 1e-10))
+
+        # setting the position behind the source leads to rays in the wrong direction
+        # runtime error on tracing
+        RS0.conv_pos = [-10, 10, -10]
+        self.assertRaises(RuntimeError, RS0.create_rays, 200000)
+
+    @pytest.mark.slow
     def test_ray_source_divergence(self):
         """
         tests the behaviour of different ray source divergence modes in 2D and 3D mode

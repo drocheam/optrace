@@ -3,18 +3,15 @@ import pathlib
 
 import numpy as np  # calculations
 
-# Sources A, C, E, D50, D55, D65, D75, F2, F7, F11:
+# Sources for A, C, E, D50, D55, D65, D75, F2, F7, F11:
 # CIE Colorimetry, 3. Edition, 2004
 
-# Sources xyz_observers values:
-# https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer
-
-# Sources LED Series:
+# Sources for the LED Series:
 # eigentlich CIE Colorimetry, 4th Edition, 2018, Werte aber von
 # https://github.com/colour-science/colour/blob/develop/colour/colorimetry/datasets/illuminants/sds.py
 
 
-# load illuminants
+# load illuminants from file
 _ill_names = ["wl", "A", "C", "D50", "D55", "D65", "D75", "FL2", "FL7", "FL11",
               "LED-B1", "LED-B2", "LED-B3", "LED-B4", "LED-B5"]
 _ill_path = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "illuminants.csv"

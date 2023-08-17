@@ -489,7 +489,7 @@ class GeometryTests(unittest.TestCase):
         # use s other than [0, 0, 1]
         rargs = dict(spectrum=ot.presets.light_spectrum.d50, or_func=or_func, pos=[0.5, -2, 3], 
                      power=2.5, s=[0, 0.5, 1], pol_angle=0.5, div_func=lambda e: np.cos(e),
-                     pol_func=lambda x: x, pol_angles=[10, 30], pol_probs=[1, 2])
+                     pol_func=lambda x: x, pol_angles=[10, 30], pol_probs=[1, 2], conv_pos=[1, 2, 10])
        
         # possible surface types
         Surfaces = [ot.Point(), ot.Line(), ot.CircularSurface(r=2), 
@@ -577,6 +577,8 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_func=5)  # invalid pol_func type
         self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_angles=5)  # invalid pol_angles type
         self.assertRaises(TypeError, ot.RaySource, *rsargs, pol_probs=5)  # invalid pol_probs type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, conv_pos=5)  # invalid conv_pos type
+        self.assertRaises(TypeError, ot.RaySource, *rsargs, conv_pos=[2, 5])  # invalid conv_pos type
         
         # value errors
         self.assertRaises(ValueError, ot.RaySource, *rsargs, div_angle=0)  # pdiv_angle needs to be above 0

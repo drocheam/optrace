@@ -104,12 +104,10 @@ class ScenePlotting:
     def constant_camera(self, *args, **kwargs) -> None:
         """context manager the saves and restores the camera view"""
 
+        cc_traits_org = {}
         if self.scene and self.scene.camera:
             cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
                                                         "clipping_range", "parallel_scale")
-        else:
-            cc_traits_org = {}
-
         try:
             yield
 
