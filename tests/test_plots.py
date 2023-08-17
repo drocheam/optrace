@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 #######
 # set PlotTests.manual = True for manual mode, where each window needs to controlled and closed by hand 
 
-# TODO source selection in title ("from RS0" etc.?)
+# TODO source selection in plot title ("from RS0" etc.?)
 
 class PlotTests(unittest.TestCase):
 
