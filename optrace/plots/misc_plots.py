@@ -65,6 +65,7 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.ylabel("cost")
     plt.legend(["cost estimation", "cost values", "found minimum"])
     plt.title(title)
+    plt.tight_layout()
     plt.show(block=block)
     plt.pause(0.1)
 
@@ -188,6 +189,7 @@ def abbe_plot(ri:     list[RefractionIndex],
     plt.xlabel("Abbe Number V")
     plt.ylabel(r"Refraction Index n ($\lambda$" + f" = {lines[1]}nm)")
     plt.title(title)
+    plt.tight_layout()
     plt.show(block=block)
     plt.pause(0.1)
 
@@ -263,6 +265,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     plt.ylabel("z in mm")
     plt.title(title)
     plt.legend(legends)
+    plt.tight_layout()
     plt.show(block=block)
     plt.pause(0.1)
 

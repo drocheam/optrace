@@ -259,6 +259,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     plt.ylabel(yl)
     plt.title(title)
     plt.legend(["sRGB Gamut", "Whitepoint D65", legend3])
+    plt.tight_layout()
     plt.show(block=block)
     plt.pause(0.1)
 

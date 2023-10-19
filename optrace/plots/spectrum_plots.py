@@ -112,9 +112,9 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
 
         # assign title. add total power if it is a LightSpectrum
         if isinstance(obj, LightSpectrum):
-            fig.suptitle("\n" + obj.get_long_desc(fallback=title) + f"\nTotal Power: {obj.power():.5g}W")
+            ax1.set_title(obj.get_long_desc(fallback=title) + f"\nTotal Power: {obj.power():.5g}W")
         else:
-            fig.suptitle("\n" + obj.get_long_desc(fallback=title))
+            ax1.set_title(obj.get_long_desc(fallback=title))
 
     # multiple spectra
     else:
@@ -141,7 +141,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
         # add legend and title
         if not legend_off:
             ax1.legend(lg)
-        fig.suptitle("\n" + title)
+        ax1.set_title(title)
 
     _show_grid(ax1)
 
