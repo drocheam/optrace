@@ -1037,9 +1037,12 @@ class Raytracer(Group):
         else:
             raise ValueError(f"Invalid extent '{extent}'.")
 
+        # create description
         detector = self.detectors[detector_index]
         pname = f": {detector.desc}" if detector.desc != "" else ""
         desc = f"{Detector.abbr}{detector_index}{pname} at z = {detector.pos[2]:.5g} mm"
+        if source_index is not None:
+            desc = f"Rays from RS{source_index} at " + desc
 
         return ph, w, wl, extent_out, desc, projection, bar
 

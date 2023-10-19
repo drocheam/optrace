@@ -148,8 +148,8 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # add wavelength color bar
     # enforce image extent of 1:10 for every wavelength range,
     # otherwise the color bar size changes for different wavelength ranges
-    colors = np.array([mcolor.spectral_colormap(wl0=plt.xlim()[0], wl1=plt.xlim()[1], N=1000)[:, :3]]) / 255
-    ax2.imshow(colors, extent=[*plt.xlim(), 0.1*plt.xlim()[0], 0.1*plt.xlim()[1]], aspect="auto")
+    colors = np.array([mcolor.spectral_colormap(wl0=plt.xlim()[0], wl1=plt.xlim()[1], N=500)[:, :3]]) / 255
+    ax2.imshow(colors, extent=[*plt.xlim(), 0.1*plt.xlim()[0], 0.1*plt.xlim()[1]], aspect="auto", interpolation="gaussian")
 
     ax1.set(ylabel=ylabel)
     ax2.set(xlabel=xlabel)

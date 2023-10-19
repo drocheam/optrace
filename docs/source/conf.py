@@ -114,9 +114,9 @@ autoclass_content = "init"
 autodoc_typehints = "description"
 
 
-# -- Options for misc output -------------------------------------------------
+# -- Misc Options -------------------------------------------------
 
-# ignore links that seemingly only work in a browser and not automated tests
+# ignore links that seemingly only work in a browser and not in automated tests
 linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.html',
                     'https://doi.org/10.1002/9783527648962.app1',
                     'https://www.publicdomainpictures.net/en/view-image.php',

@@ -34,7 +34,7 @@ def r_image_plot(im:       RImage,
 
     Imd = imc.copy() if imc is not None else im.get(mode, log=log)
 
-    _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, mode, log)
+    _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, mode, log, None)
 
     if im.projection not in ["Equal-Area", None] and mode in ["Irradiance", "Illuminance"]:
         imax = np.max(Imd)
@@ -132,9 +132,8 @@ def r_image_cut_plot(im:       RImage,
     s, Imd = im.cut(mode, log=log, imc=imc, **kwargs)
 
     # get labels
-    xname, xunit, xlabel, yname, yunit, ylabel, _, _, zlabel, text = _get_labels(im, mode, log)
     cut_val = kwargs["x" if "x" in kwargs else "y"]
-    text += "\nCut at " + (f"{xname} = {cut_val:.5g} {xunit}" if "x" in kwargs else f"{yname} = {cut_val:.5g} {yunit}")
+    xname, xunit, xlabel, yname, yunit, ylabel, _, _, zlabel, text = _get_labels(im, mode, log, cut_val)
 
     # normalize values for sphere projections that are not Equal-Area
     # (since the values are incorrect anyway)
@@ -204,7 +203,7 @@ def _check_types(im, imc, block, log, flip, title, mode) -> None:
     pc.check_if_element("mode", mode, RImage.display_modes)
 
 
-def _get_labels(im: RImage, mode: str, log: bool) -> tuple[str, str, str, str, str, str, str, str, str, str]:
+def _get_labels(im: RImage, mode: str, log: bool, cut: str = None) -> tuple[str, str, str, str, str, str, str, str, str, str]:
     """get plot labels and title"""
 
     text = im.get_long_desc(fallback="")
@@ -220,8 +219,20 @@ def _get_labels(im: RImage, mode: str, log: bool) -> tuple[str, str, str, str, s
         case _:
             xname, xunit, xlabel = fr"Nonlinear Projection $p_x$", "", fr"Nonlinear Projection $p_x$"
             yname, yunit, ylabel = fr"Nonlinear Projection $p_y$", "", fr"Nonlinear Projection $p_y$"
+    
+    if cut is not None:
+        text += ", Cut at " + (f"{xname} = {cut:.5g} {xunit}" if cut == "x" else f"{yname} = {cut:.5g} {yunit}")
+    
+    zname, zunit, zlabel = mode, "", mode
+    zlabel += ", Logarithmic" if log and mode.startswith("sRGB") else ""
+    text += f"\nMode: {zlabel}"
 
-    # z-label
+    if im.projection is not None:
+        text += f", {im.projection} Projection"
+    
+    if im.limit is not None:
+        text += f", {im.limit:.2f}µm Resolution Filter"
+
     if mode in ["Irradiance", "Illuminance"]:
         punit, aname, srname, p = ("W", "Irradiance", "Radiant", im.power()) if mode == "Irradiance"\
                                   else ("lm", "Illuminance", "Luminous", im.luminous_power())
@@ -236,16 +247,5 @@ def _get_labels(im: RImage, mode: str, log: bool) -> tuple[str, str, str, str, s
                                        f"Normalized Projected {srname} Intensity"
         
         text += f"\n Total {srname} Flux: {p:.5g} {punit}"
-        
-    else:
-        zname, zunit, zlabel = mode, "", mode
-        zlabel += ", Logarithmic" if log and mode.startswith("sRGB") else ""
-        text += f"\nMode: {zlabel}"
-
-    if im.projection is not None:
-        text += f"\n{im.projection} Projection"
-    
-    if im.limit is not None:
-        text += f"\n{im.limit:.2f}µm Resolution Filter"
 
     return xname, xunit, xlabel, yname, yunit, ylabel, zname, zunit, zlabel, text

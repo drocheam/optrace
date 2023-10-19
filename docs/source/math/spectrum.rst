@@ -214,6 +214,7 @@ Functions
 
 The subsequent equations describe common refractive index models used in simulation software.
 They are taken from :footcite:`ComsolDispersion` and :footcite:`ZemaxHagen`.
+A comprehensive list of different index models is found in :footcite:`palmer2017`.
 
 Generally, all coefficients must be given in powers of µm, while the same is true for the wavelength input.
 

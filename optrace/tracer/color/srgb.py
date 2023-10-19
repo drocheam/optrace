@@ -611,3 +611,4 @@ def spectral_colormap(N:    int,
 
     # add alpha channel and rescale to range [0, 255]
     return 255*np.column_stack((RGB, np.ones_like(wl)))
+

@@ -37,7 +37,7 @@ The following figure shows the refraction of a ray on a curved surface.
 
 :math:`n_1, n_2` are the refractive indices of the media, :math:`s,s'` input and output propagation vectors. Both these vectors, as well as the normal vector :math:`n`, need to be normalized for subsequent calculations. Note that :math:`s` and :math:`n` need to point in the same half space direction, meaning :math:`s \cdot n \geq 0`.
 
-An equation for such a form of the refraction law can be found in :footcite:`OptikHaferkorn`:
+An equation for such a form of the refraction law can be found in :footcite:`OptikHaferkorn` or :footcite:`Greve_2006`:
 
 .. math::
    s^{\prime}=\frac{n_1}{n_2} s-n\left\{\frac{n_1}{n_2}(n s)-\sqrt{1-\left(\frac{n_1}{n_2}\right)^{2}\left[1-(n s)^{2}\right]}\right\}

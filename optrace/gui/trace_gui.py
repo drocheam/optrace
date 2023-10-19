@@ -6,6 +6,7 @@ import gc  # garbage collector stats
 from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context manager for _no_trait_action()
+import numpy as np
 
 # enforce qt backend  
 from traits.etsconfig.api import ETSConfig
@@ -1015,16 +1016,22 @@ class TraceGUI(HasTraits):
         self.show_source_image(cut=True)
     
     def _get_spectrum_information(self, spec) -> str:
-        return\
-            f"{spec.get_long_desc()}\n\n"\
+
+        stats = f"{spec.get_long_desc()}\n\n"\
             f"Power: {spec.power():.6g} W\n"\
             f"Luminous Power: {spec.luminous_power():.6g} lm\n\n"\
             f"Peak: {spec.peak():.6g} {spec.unit}\n"\
             f"Peak Wavelength: {spec.peak_wavelength():.3f} nm\n"\
             f"Centroid Wavelength: {spec.centroid_wavelength():.3f} nm\n"\
             f"FWHM: {spec.fwhm():.3f} nm\n\n"\
-            f"Dominant Wavelength: {spec.dominant_wavelength():.3f} nm\n"\
-            f"Complementary Wavelength: {spec.complementary_wavelength():.3f} nm\n"\
+
+        dom = spec.dominant_wavelength()
+        stats += "Dominant Wavelength: " + (f"{dom:.3f} nm" if np.isfinite(dom) else "None")
+
+        comp = spec.complementary_wavelength()
+        stats += "\nComplementary Wavelength: " + (f"{comp:.3f} nm" if np.isfinite(comp) else "None")
+
+        return stats
 
     @observe('_source_spectrum_button', dispatch="ui")
     def show_source_spectrum(self, event=None) -> None:

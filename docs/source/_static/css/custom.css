@@ -29,9 +29,10 @@ nav.bd-links p.bd-links__title {
 }
 
 
-/*fixes issue with mathjax multiline equations having incorrect size and position in chrome*/
+/**additional padding from pydata-sphinx theme cuts parts off the mathjax box**/
 div.math mjx-container {
-	overflow-x: unset;
+    padding-bottom: unset;
+    overflow: unset;
 }
 
 /*increase size of article content from 60rem to 80rem*/
@@ -51,6 +52,11 @@ div.math mjx-container {
 .table td, .table th {
     padding: 0.1rem;
 	/*vertical-align: middle;*/
+}
+
+/**move "back to top" button down**/
+#pst-back-to-top {
+    top: 95vh;
 }
 
 /*fix for badly displayed reference links*/
