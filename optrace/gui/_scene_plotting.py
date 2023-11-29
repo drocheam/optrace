@@ -10,6 +10,10 @@ from mayavi.sources.parametric_surface import ParametricSurface  # provides outl
 from ..tracer.geometry import Surface, Element
 from ..tracer import *
 
+# TODO remove crosshair when rays have been replotted
+# TODO don't remove crosshair and info text, when the info shows spatial information
+# TODO pick function that takes a ray number
+
 
 class ScenePlotting:
 
@@ -27,15 +31,16 @@ class ScenePlotting:
     LABEL_STYLE: dict = dict(font_size=11, bold=True, font_family="courier", shadow=True)
     """Standard Text Style. Used for object labels, legends and axes"""
 
-    TEXT_STYLE: dict = dict(font_size=11, font_family="courier", italic=False, bold=True)
-    """Standard Text Style. Used for object labels, legends and axes"""
-
     INFO_STYLE: dict = dict(font_size=13, bold=True, font_family="courier", shadow=True, italic=False)
     """Info Text Style. Used for status messages and interaction overlay"""
 
     ##########
 
-    def __init__(self, ui: TraceGUI, raytracer: Raytracer) -> None:
+    def __init__(self, 
+                 ui:                TraceGUI, 
+                 raytracer:         Raytracer,
+                 initial_camera:    dict = None)\
+            -> None:
 
         self.ui = ui
         self._scene_size = np.array(ui._scene_size0)
@@ -59,6 +64,9 @@ class ScenePlotting:
         self._crosshair = None
         self._outline = None
         self._orientation_axes = None
+        self._ray_highlight_plot = None
+
+        self._initial_camera = initial_camera
 
         # texts 
         self._status_text = None
@@ -92,14 +100,6 @@ class ScenePlotting:
 
         objs[:] = []
     
-    def default_camera_view(self) -> None:
-        """set scene camera view. This should be called after the objects are added,
-           otherwise the clipping range is incorrect"""
-        self.scene.parallel_projection = True
-        self.scene._def_pos = 1  # for some reason it is set to None
-        self.scene.y_plus_view()
-        self.scene.scene_editor.camera.parallel_scale *= 0.85
-    
     @contextmanager
     def constant_camera(self, *args, **kwargs) -> None:
         """context manager the saves and restores the camera view"""
@@ -114,6 +114,88 @@ class ScenePlotting:
         finally:
             if self.scene and self.scene.camera:
                 self.scene.camera.trait_set(**cc_traits_org)
+    
+    def screenshot(self, *args, **kwargs):
+        """
+        Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
+        See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
+        """
+        self.scene.mlab.savefig(*args, **kwargs)
+
+    def get_camera(self) -> tuple[np.ndarray, float, np.ndarray, float]:
+        """
+        Get the camera parameters that can be passed down to set_camera()
+
+        :return: Return the current camera parameters (center, height, direction, roll)
+        """
+        cam = self.scene.scene.camera
+        normal = (cam.focal_point - cam.position) / cam.distance 
+    
+        return cam.focal_point,\
+               cam.parallel_scale,\
+               normal,\
+               self.scene.mlab.roll()\
+
+    def set_camera(self, 
+                   center:          np.ndarray = None, 
+                   height:          float = None,
+                   direction:       list = None,
+                   roll:            float = None)\
+            -> None:
+        """
+        Sets the camera view.
+        Not all parameters must be defined, setting single properties is also allowed.
+        
+        :param focal_point: 3D position of camera focal point, also defines the center of the view
+        :param parallel_scale: view scaling. Defines half the size of the view in vertical direction.
+        :param center: 3D coordinates of center of view
+        :param height: half of vertical height in mm
+        :param direction: camera view direction vector (direction of vector perpendicular to your monitor and in your viewing direction)
+        :param roll: absolute camera roll angle
+        """
+        # force parallel projection
+        self.scene.parallel_projection = True
+       
+        # calculate vector between camera and focal point
+        cam = self.scene.scene.camera
+        normal = np.asarray(direction) if direction is not None else (cam.focal_point - cam.position) / cam.distance 
+        dist_vec = cam.distance * normal / (np.linalg.norm(normal) + 1e-12) 
+
+        if center is not None:
+            cam.focal_point = center
+
+        if height is not None:
+            cam.parallel_scale = height
+
+        # set/update camera position (since either/both focal_point or direction changed)
+        cam.position = cam.focal_point - dist_vec
+
+        # absolute roll angle
+        if roll is not None:
+            self.scene.mlab.roll(roll)
+        
+        # render
+        cam.compute_view_plane_normal()
+        self.scene.scene._renderer.reset_camera_clipping_range()
+        self.scene.scene.render()
+
+
+    def set_initial_camera(self):
+        """
+        sets the initial camera view
+
+        When parameter initial_camera is not set, it is a y-side view with all elements inside the viewable range
+        When it is set, the camera properties are applied.
+        """
+        
+        self.scene.parallel_projection = True
+        self.scene._def_pos = 1  # for some reason it is set to None
+        self.scene.y_plus_view()
+        
+        if self._initial_camera is not None:
+            self.set_camera(**self._initial_camera)
+        else:
+            self.scene.scene_editor.camera.parallel_scale *= 0.85
 
     # Element Plotting
     ###################################################################################################################
@@ -179,7 +261,7 @@ class ScenePlotting:
 
         # show axes indicator
         self._orientation_axes = self.scene.mlab.orientation_axes()
-        self._orientation_axes.text_property.trait_set(**self.TEXT_STYLE)
+        self._orientation_axes.text_property.trait_set(**self.LABEL_STYLE)
         self._orientation_axes.marker.interactive = 0  # make orientation axes non-interactive
         self._orientation_axes.visible = not bool(self.ui.minimalistic_view)
         self._orientation_axes.widgets[0].viewport = [0, 0, 0.1, 0.15]
@@ -223,8 +305,8 @@ class ScenePlotting:
             a.axes.trait_set(font_factor=ff_old, fly_mode='none', label_format=lform, x_label=label,
                              y_label=label, z_label=label, layer_number=1)
 
-            a.title_text_property.trait_set(**self.TEXT_STYLE, color=self._axis_color, opacity=self._axis_alpha)
-            a.label_text_property.trait_set(**self.TEXT_STYLE, color=self._axis_color, opacity=self._axis_alpha)
+            a.title_text_property.trait_set(**self.LABEL_STYLE, italic=False, color=self._axis_color, opacity=self._axis_alpha)
+            a.label_text_property.trait_set(**self.LABEL_STYLE, italic=False, color=self._axis_color, opacity=self._axis_alpha)
             a.actors[0].pickable = False
             a.visible = not bool(self.ui.minimalistic_view)
 
@@ -308,12 +390,12 @@ class ScenePlotting:
             text_ = f"ambient\nn={label}" if not self.ui.minimalistic_view else f"n={label}"
             text = self.scene.mlab.text(x_pos, y_pos, z=z_pos, text=text_, name="Label")
             text.actor.text_scale_mode = 'none'
-            text.property.trait_set(**self.TEXT_STYLE, frame=True, frame_color=self._subtle_color, 
+            text.property.trait_set(**self.LABEL_STYLE, frame=True, frame_color=self._subtle_color, 
                                     color=self._axis_color, opacity=self._axis_alpha)
             if not self.ui.vertical_labels:
-                text.property.trait_set(justification="center", bold=True)
+                text.property.trait_set(justification="center", bold=False)
             else:
-                text.property.trait_set(justification="left", orientation=90, bold=True, 
+                text.property.trait_set(justification="left", orientation=90, bold=False,
                                         vertical_justification="center")
 
             # append plot objects
@@ -389,10 +471,10 @@ class ScenePlotting:
             text.actor.text_scale_mode = 'none'
             if not self.ui.vertical_labels:
                 text.property.trait_set(**self.LABEL_STYLE, justification="center", vertical_justification="bottom", 
-                                        orientation=0)
+                                        orientation=0, background_opacity=0.5, background_color=self.scene.background)
             else:
                 text.property.trait_set(**self.LABEL_STYLE, justification="left", orientation=90, 
-                                        vertical_justification="center")
+                                        vertical_justification="center", background_opacity=0.5, background_color=self.scene.background)
         else:
             text = None
 
@@ -420,6 +502,28 @@ class ScenePlotting:
         self._ray_plot.parent.parent.name = "Rays"
         self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
+    def set_ray_highlight(self, index: int):
+
+        if not len(self._ray_property_dict):
+            return
+    
+        p_ = self.__ray_property_dict["p"]
+        s_un = self.__ray_property_dict["s_un"]
+
+        x, y, z = p_[index, :, 0].flatten(), p_[index, :, 1].flatten(), p_[index, :, 2].flatten()
+        u, v, w = s_un[index, :, 0].flatten(), s_un[index, :, 1].flatten(), s_un[index, :, 2].flatten()
+
+        if self._ray_highlight_plot is not None:
+            self._ray_highlight_plot.parent.parent.remove()
+
+        self._ray_highlight_plot = self.scene.mlab.quiver3d(x, y, z, u, v, w,
+                                                  scale_mode="vector", scale_factor=1, colormap="Reds", mode="2ddash", line_width=2)
+        self._ray_highlight_plot.glyph.trait_set(color_mode="color_by_scalar")
+        self._ray_highlight_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True)
+        self._ray_highlight_plot.parent.parent.name = "Ray Highlight"
+        self._ray_highlight_plot.actor.property.color = self._crosshair_color
+        self._ray_highlight_plot.actor.actor.pickable = False  # only rays should be pickable
+
     def plot_point_markers(self) -> None:
         """plot point markers inside the scene"""
         self.__remove_objects(self._marker_plots)
@@ -440,7 +544,8 @@ class ScenePlotting:
                 text.actor.text_scale_mode = 'none'
                 tprop = dict(justification="center") if not self.ui.vertical_labels\
                         else dict(justification="left", orientation=90, vertical_justification="center")
-                text.property.trait_set(**self.LABEL_STYLE, **tprop)
+                text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
+                                        background_color=self.scene.background, **tprop)
                 text.property.font_size = int(8 * mark.text_factor)
 
                 self._marker_plots.append((m, None, None, text, mark))
@@ -467,7 +572,8 @@ class ScenePlotting:
                 text.actor.text_scale_mode = 'none'
                 tprop = dict(justification="center") if not self.ui.vertical_labels\
                         else dict(justification="left", orientation=90, vertical_justification="center")
-                text.property.trait_set(**self.LABEL_STYLE, **tprop)
+                text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
+                                        background_color=self.scene.background, **tprop)
                 text.property.font_size = int(8 * mark.text_factor)
 
                 self._line_marker_plots.append((m, None, None, text, mark))
@@ -531,8 +637,8 @@ class ScenePlotting:
                     if not self.ui.silent:
                         print("Avoid pressing 'a' as it is a mayavi shortcut for actor mode, where rays can be moved.")
 
-                case "y":  # reset view
-                    self.default_camera_view()
+                case "i":  # reset view
+                    self.set_initial_camera()
 
                 case "h":  # hide/show side menu and toolbar
                     self.ui.maximize_scene = bool(self.ui._scene_not_maximized)  # toggle value
@@ -548,7 +654,7 @@ class ScenePlotting:
                     self.ui.plotting_type = ptypes[(ptypes.index(self.ui.plotting_type) + 1) % len(ptypes)]
 
                 case "d":  # render DetectorImage
-                    self.ui.show_detector_image()
+                    self.ui.detector_image()
 
                 case "n":  # reselect and replot rays
                     self.scene.disable_render = True
@@ -564,12 +670,12 @@ class ScenePlotting:
 
     def init_crosshair(self) -> None:
         """init a crosshair for the picker"""
-        self._crosshair = self.scene.mlab.points3d([0.], [0.], [0.], mode="axes", color=self._crosshair_color)
-        self._crosshair.parent.parent.name = "Crosshair"
-        self._crosshair.actor.actor.property.trait_set(lighting=False)
-        self._crosshair.actor.actor.pickable = False
-        self._crosshair.glyph.glyph.scale_factor = 1.5
+        self.scene.engine.add_source(ParametricSurface(name="Crosshair"), self.scene)
+        self._crosshair = self.scene.mlab.text(x=0, y=0, z=0, text="+", name="Label")
+        self._crosshair.actor.text_scale_mode = 'none'
         self._crosshair.visible = False
+        self._crosshair.property.trait_set(font_size=32, justification="center", vertical_justification="center", 
+                                orientation=0, bold=True, font_family="times", color=self._crosshair_color, use_tight_bounding_box=True)
 
     def init_ray_info(self) -> None:
         """init detection of ray point clicks and the info display"""
@@ -672,17 +778,26 @@ class ScenePlotting:
 
         # update misc color
         for color, objs in zip([self._lens_color, self._detector_color, self._aperture_color, self._marker_color,
-                                self._line_marker_color, self._crosshair_color, self._outline_color],
+                                self._line_marker_color, self._outline_color],
                                [self._lens_plots, self._detector_plots, self._aperture_plots,
-                                self._marker_plots, self._line_marker_plots, [[self._crosshair]], 
-                                [[self._outline]]]):
+                                self._marker_plots, self._line_marker_plots, [[self._outline]]]):
             for obj in objs:
                 for el in obj[:3]:
                     if el is not None:
                         el.actor.property.trait_set(color=color)
-                        if high_contrast and el not in [self._crosshair, self._outline]:
+                        if high_contrast and el is not self._outline:
                             el.actor.property.trait_set(specular_color=(0.15, 0.15, 0.15),
                                                         diffuse_color=(0.12, 0.12, 0.12))
+
+        # update background colors of labels
+        for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots, 
+                     self._marker_plots, self._line_marker_plots, self._volume_plots, self._ray_source_plots]:
+            for obj in objs:
+                if len(obj) > 3 and obj[3] is not None:
+                    obj[3].property.background_color = self.scene.background
+
+        if self._crosshair is not None:
+            self._crosshair.property.color = self._crosshair_color
 
         # change lens cylinder visibility
         for lens in self._lens_plots:
@@ -707,6 +822,9 @@ class ScenePlotting:
 
         # reassign ray source colors
         self.color_ray_sources()
+
+        if self._ray_highlight_plot is not None:
+            self._ray_highlight_plot.actor.property.color = self._crosshair_color
 
         # in coloring type Plain the ray color is changed from white to a bright orange
         if self.ui.coloring_type == "Plain" and self._ray_plot is not None:
@@ -770,7 +888,8 @@ class ScenePlotting:
                 "SourceImage": "Rendering Source Image",
                 "SourceSpectrum": "Rendering Source Spectrum",
                 "DetectorSpectrum": "Rendering Detector Spectrum",
-                "Drawing": "Updating Scene"}
+                "Drawing": "Updating Scene",
+                "Screenshot": "Saving a Screenshot"}
        
         # print messages to scene
         if not _status["InitScene"] and self._status_text is not None:
@@ -882,7 +1001,7 @@ class ScenePlotting:
 
         # lut visibility and title
         lutm.scalar_bar.trait_set(title=title, unconstrained_font_size=True)
-        lutm.label_text_property.trait_set(**self.TEXT_STYLE)
+        lutm.label_text_property.trait_set(**self.LABEL_STYLE)
         lutm.title_text_property.trait_set(**self.INFO_STYLE)
 
         # lut position and size
@@ -1040,7 +1159,9 @@ class ScenePlotting:
                                   f"{pos[2]:>9.6g} mm)\n"\
                                   f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)"
             if self._crosshair is not None:
-                self._crosshair.mlab_source.trait_set(x=[pos[0]], y=[pos[1]], z=[pos[2]])
+                self._crosshair.x_position = pos[0]
+                self._crosshair.y_position = pos[1]
+                self._crosshair.z_position = pos[2]
                 self._crosshair.visible = True
 
     def _on_ray_pick(self, picker_obj: tvtk.tvtk_classes.point_picker.PointPicker = None) -> None:
@@ -1061,37 +1182,37 @@ class ScenePlotting:
             a = self._ray_property_dict["p"].shape[1]  # number of points per ray plotted
             b = picker_obj.point_id  # point id of the ray point
 
-            n_, n2_ = np.divmod(b, 2*a)
-            n2_ = min(1 + (n2_-1)//2, a - 1)
+            i0, i1 = np.divmod(b, 2*a)
+            i1 = min(1 + (i1-1)//2, a - 1)
 
             # get properties of this ray section
             rp = self._ray_property_dict
-            p_, s_, pols_, pw_, wv, snum, n_, index, l, ol = rp["p"][n_], rp["s"][n_], rp["pol"][n_], rp["w"][n_],\
-                rp["wl"][n_], rp["snum"][n_], rp["n"][n_], rp["index"][n_], rp["l"][n_], rp["ol"][n_]
+            p_, s_, pols_, pw_, wv, snum, n_, index, l, ol = rp["p"][i0], rp["s"][i0], rp["pol"][i0], rp["w"][i0],\
+                rp["wl"][i0], rp["snum"][i0], rp["n"][i0], rp["index"][i0], rp["l"][i0], rp["ol"][i0]
 
-            p, s, pols, pw = p_[n2_], s_[n2_], pols_[n2_], pw_[n2_]
+            p, s, pols, pw = p_[i1], s_[i1], pols_[i1], pw_[i1]
 
-            pw0 = pw_[n2_-1] if n2_ else None
-            s0 = s_[n2_-1] if n2_ else None
-            pols0 = pols_[n2_-1] if n2_ else None
-            pl = ((pw0-pw)/pw0 if pw0 else 0) if n2_ else None  # power loss
+            pw0 = pw_[i1-1] if i1 else None
+            s0 = s_[i1-1] if i1 else None
+            pols0 = pols_[i1-1] if i1 else None
+            pl = ((pw0-pw)/pw0 if pw0 else 0) if i1 else None  # power loss
 
             def to_sph_coords(s):
                 return np.array([np.rad2deg(np.arccos(s[2])), np.rad2deg(np.arctan2(s[1], s[0]))])  # theta, phi
 
             s_sph = to_sph_coords(s)
-            s0_sph = to_sph_coords(s0) if n2_ else None
+            s0_sph = to_sph_coords(s0) if i1 else None
             pols_sph = to_sph_coords(pols)
-            pols0_sph = to_sph_coords(pols0) if n2_ else None
+            pols0_sph = to_sph_coords(pols0) if i1 else None
 
-            n = n_[n2_]
-            n0 = n_[n2_-1] if n2_ else None
+            n = n_[i1]
+            n0 = n_[i1-1] if i1 else None
 
             surfs = self.raytracer.tracing_surfaces
 
-            if 0 < n2_ <= len(surfs):
-                surf = surfs[n2_-1]
-            elif not n2_:
+            if 0 < i1 <= len(surfs):
+                surf = surfs[i1-1]
+            elif not i1:
                 surf = self.raytracer.ray_sources[snum].front
             else:
                 surf = None
@@ -1103,26 +1224,26 @@ class ScenePlotting:
                 normal = surf.normals(np.array([p[0]]), np.array([p[1]]))[0]
                 normal_sph = to_sph_coords(normal)
 
-            l0 = l[n2_ - 1] if n2_ > 0 else None
-            l1 = l[n2_] if n2_ < l.shape[0] else None
-            ol0 = ol[n2_ - 1] if n2_ > 0 else None
-            ol1 = ol[n2_] if n2_ < ol.shape[0] else None
+            l0 = l[i1 - 1] if i1 > 0 else None
+            l1 = l[i1] if i1 < l.shape[0] else None
+            ol0 = ol[i1 - 1] if i1 > 0 else None
+            ol1 = ol[i1] if i1 < ol.shape[0] else None
 
             # differentiate between Click and Shift+Click
             if self.scene.interactor.shift_key:
                 text = f"Ray {index}" +  \
                     f" from RS{snum}" +  \
-                    (f" at surface {n2_}\n\n" if n2_ else " at ray source\n\n") + \
+                    (f" at surface {i1}\n\n" if i1 else " at ray source\n\n") + \
                     f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n" + \
                     "Vectors:                        Cartesian (x, y, z)                   " + \
                     "Spherical (theta, phi)\n" + \
-                    (f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})" if n2_ else "") + \
-                    (f"         ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°)\n" if n2_ else "") + \
+                    (f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})" if i1 else "") + \
+                    (f"         ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°)\n" if i1 else "") + \
                     f"Direction After:       ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})" + \
                     f"         ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°)\n" + \
-                    (f"Polarization Before:   ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})" if n2_
+                    (f"Polarization Before:   ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})" if i1
                     else "") + \
-                    (f"         ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°)\n" if n2_
+                    (f"         ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°)\n" if i1
                     else "") + \
                     f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})" + \
                     f"         ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°)\n" + \
@@ -1131,21 +1252,21 @@ class ScenePlotting:
                     (f"         ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°)\n\n"
                     if pw > 0 and is_surf and surf_hit else "\n") + \
                     f"Wavelength:               {wv:>10.2f} nm" + \
-                    (f"\nRefraction Index Before:  {n0:>10.4f}" if n2_ else "") + \
+                    (f"\nRefraction Index Before:  {n0:>10.4f}" if i1 else "") + \
                     (f"           Distance to Last Intersection:          {l0:>10.5g} mm" if l0 else "") + \
                     f"\nRefraction Index After:   {n:>10.4f}" + \
                     (f"           Distance to Next Intersection:          {l1:>10.5g} mm" if l1 else "") + \
-                    (f"\nRay Power Before:         {pw0*1e6:>10.5g} µW" if n2_ else "") + \
+                    (f"\nRay Power Before:         {pw0*1e6:>10.5g} µW" if i1 else "") + \
                     (f"        Optical Distance to Last Intersection:  {ol0:>10.5g} mm" if ol0 else "") + \
                     f"\nRay Power After:          {pw*1e6:>10.5g} µW" + \
                     (f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm" if ol1 else "") + \
-                    (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if n2_ else "") + \
+                    (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if i1 else "") + \
                     ("\n\nSurface Information:\n" if is_surf and surf_hit else "") + \
                     (surf.info if is_surf and surf_hit else "")
             else:
                 text = f"Ray {index}" +  \
                     f" from Source {snum}" +  \
-                    (f" at surface {n2_}\n" if n2_ else " at ray source\n") + \
+                    (f" at surface {i1}\n" if i1 else " at ray source\n") + \
                     f"Intersection Position: ({p[0]:>10.5g} mm, {p[1]:>10.5g} mm, {p[2]:>10.5g} mm)\n" + \
                     f"Direction After:       ({s[0]:>10.5f},    {s[1]:>10.5f},    {s[2]:>10.5f}   )\n" + \
                     f"Polarization After:    ({pols[0]:>10.5f},    {pols[1]:>10.5f},    {pols[2]:>10.5f}   )\n" + \
@@ -1157,10 +1278,20 @@ class ScenePlotting:
             self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
                                               opacity=1, color=self.scene.foreground)
             if self._crosshair:
-                self._crosshair.mlab_source.trait_set(x=[p[0]], y=[p[1]], z=[p[2]])
+                self._crosshair.x_position = p[0]
+                self._crosshair.y_position = p[1]
+                self._crosshair.z_position = p[2]
                 self._crosshair.visible = True
+
+            with self.constant_camera():
+                self.set_ray_highlight(i0)
+                self._ray_highlight_plot.visible = True
+
         else:
             self._ray_text.text = ""
+            if self._ray_highlight_plot:
+                self._ray_highlight_plot.visible = False
+
             if self._crosshair:
                 self._crosshair.visible = False
 

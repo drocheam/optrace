@@ -393,31 +393,21 @@ class RImage(BaseClass):
         """reapplies image filtering with the current limit setting"""
         self.rescale(self.N)
 
-    def save(self,
-             path:       str,
-             save_32bit: bool = True,
-             overwrite:  bool = False)\
-            -> str:
+    def save(self, path: str) -> None:
         """
         Save the RImage as .npz archive.
+        Files are overridden. Throws IOError if the file could not been saved.
 
         :param path: path to save to
-        :param save_32bit: save image data in 32bit instead 64bit.
-            Looses information in some darker regions of the image
-        :param overwrite: if file can be overwritten. If no, it is saved in a fallback path
-        :return: path of saved file
         """
-        # save in float32 to save some space
-        _img = np.array(self._img, dtype=np.float32) if save_32bit else self._img
         limit = self.limit if self.limit is not None else np.nan
 
-        sdict = dict(_img=_img, extent=self.extent, N=min(*self.img.shape[:2]), limit=limit,
+        sdict = dict(_img=self._img, extent=self.extent, N=min(*self.img.shape[:2]), limit=limit,
                      desc=self.desc, long_desc=self.long_desc, proj=str(self.projection))
 
-        def sfunc(path_: str):
-            np.savez_compressed(path_, **sdict)
-
-        return misc.save_with_fallback(path, sfunc, "RImage", ".npz", overwrite, self.silent)
+        # add file type and save
+        path_ = path if path[-4:] == ".npz" else path + ".npz"
+        np.savez_compressed(path_, **sdict)
 
     def export_png(self,
                    path:         str,
@@ -427,9 +417,8 @@ class RImage(BaseClass):
                    log:          bool = False,
                    flip:         bool = False,
                    L_th:         float = 0.,
-                   sat_scale:    float = None,
-                   overwrite:    bool = False)\
-            -> str:
+                   sat_scale:    float = None)\
+            -> None:
         """
         Export the RImage in a given display mode as png.
         The image is rescaled (and therefore interpolated) so we have square pixels before the export.
@@ -438,6 +427,8 @@ class RImage(BaseClass):
 
         Note that "size" specifies the image resolution of the saved image.
         The RImage itself is not rescaled, but interpolated.
+        
+        Files are overridden. Throws IOError if the file could not been saved.
 
         :param path: path to save to
         :param mode: display mode for getByDisplayMode()
@@ -447,8 +438,7 @@ class RImage(BaseClass):
         :param log: logarithmic image (bool), only for sRGB modes
         :param flip: rotate image by 180 degrees
         :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
-        :param overwrite: file if it exists, otherwise saved in a fallback path
-        :return: path of saved file
+        :return: 
         """
         im = self.get(mode, log, L_th, sat_scale=sat_scale)
         if flip:
@@ -474,10 +464,9 @@ class RImage(BaseClass):
         imp = Image.fromarray(im, mode=mode)
         imp = imp.resize(siz, resample=resample)  # rescale so pixels are square
 
-        def sfunc(path_: str):
-            imp.save(path_)
-
-        return misc.save_with_fallback(path, sfunc, "Image", ".png", overwrite, self.silent)
+        # add file type and save
+        path_ = path if path[-4:] == ".png" else path + ".png"
+        imp.save(path_)
 
     @staticmethod
     def load(path: str) -> RImage:
@@ -490,7 +479,7 @@ class RImage(BaseClass):
 
         im.limit = io["limit"][()] if not np.isnan(io["limit"]) else None
 
-        im._img = np.array(io["_img"], dtype=np.float64)
+        im._img = io["_img"]
         im.projection = None if im.projection == "None" else im.projection  # None has been saved as string
 
         # create Im from _Im

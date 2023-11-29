@@ -35,6 +35,12 @@ from ..__metadata__ import __version__
 
 # TODO don't retrace when init and already rays included in raytracer?
 
+# TODO rename debug() to control()
+
+
+# TODO add extent parameter to source_image, detector_image functions
+
+
 class TraceGUI(HasTraits):
 
     scene: Instance = Instance(MlabSceneModel, args=())
@@ -50,7 +56,7 @@ class TraceGUI(HasTraits):
                              auto_set=False, label="Limit (µm)", mode='text')
     """gaussian filter constant standard deviation"""
 
-    rays_visible: Range = Range(1, 10000, 2000, desc='the number of rays which is drawn', enter_set=False,
+    rays_visible: Range = Range(1, 50000, 2000, desc='the number of rays which is drawn', enter_set=False,
                                 auto_set=False, label="Count", mode='logslider')
     """Number of rays shown in mayavi scene"""
 
@@ -374,20 +380,26 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Class constructor
 
-    def __init__(self, raytracer: Raytracer, silent: bool = False, ui_style: str = None, **kwargs) -> None:
+    def __init__(self, 
+                 raytracer:         Raytracer, 
+                 silent:            bool = False, 
+                 ui_style:          str = None, 
+                 initial_camera:    dict = None,
+                 **kwargs) -> None:
         """
         Create a new TraceGUI with the assigned Raytracer.
 
         :param RT: raytracer
         :param silent: if standard output shouldn't be omitted
         :param ui_style: UI style string for Qt
+        :param initial_camera: parameter dictionary for set_camera
         :param kwargs: additional arguments, options, traits and parameters
         """
         # set UI theme. Unfortunately this does not work dynamically (yet)
         if ui_style is not None:
             QtGui.QApplication.setStyle(ui_style)
       
-        self._plot = ScenePlotting(self, raytracer)
+        self._plot = ScenePlotting(self, raytracer, initial_camera)
 
         # lock object for multithreading
         self.__detector_lock = Lock()  # when detector is changed, moved or used for rendering
@@ -449,7 +461,7 @@ class TraceGUI(HasTraits):
             # define Status dict
             self._status.update(dict(InitScene=1, DisplayingGUI=1, Tracing=0, Drawing=0, Focussing=0,
                                      DetectorImage=0, SourceImage=0, ChangingDetector=0, SourceSpectrum=0,
-                                     DetectorSpectrum=0, RunningCommand=0))
+                                     DetectorSpectrum=0, RunningCommand=0, Screenshot=0))
 
             super().__init__(**kwargs)
 
@@ -547,6 +559,43 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Interface functions
     ####################################################################################################################
+
+    def screenshot(self, *args, **kwargs):
+        """
+        Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
+        See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
+        """
+        self._status["Screenshot"] += 1
+        self._plot.screenshot(*args, **kwargs)
+        self._status["Screenshot"] -= 1
+
+    def set_camera(self, 
+                   center:      np.ndarray = None, 
+                   height:      float = None, 
+                   direction:   list = None,
+                   roll:        float = None):
+        """
+        Sets the camera view.
+        Not all parameters must be defined, setting single properties is also allowed.
+        
+        :param focal_point: 3D position of camera focal point, also defines the center of the view
+        :param parallel_scale: view scaling. Defines half the size of the view in vertical direction.
+        :param center: 3D coordinates of center of view
+        :param height: half of vertical height in mm
+        :param direction: camera view direction vector (direction of vector perpendicular to your monitor and in your viewing direction)
+        :param roll: absolute camera roll angle
+        """
+        self._status["Drawing"] += 1
+        self._plot.set_camera(center, height, direction, roll)
+        self._status["Drawing"] -= 1
+    
+    def get_camera(self) -> tuple[np.ndarray, float, np.ndarray, float]:
+        """
+        Get the camera parameters that can be passed down to set_camera()
+
+        :return: Return the current camera parameters (center, height, direction, roll)
+        """
+        return self._plot.get_camera()
 
     def replot(self, change: dict = None) -> None:
         """
@@ -662,7 +711,6 @@ class TraceGUI(HasTraits):
         """
         Run in debugging mode
 
-        :param silent: if all standard output should be muted
         :param _exit: if exit directly after initializing and plotting the GUI
         :param _func: thread function to execute while the GUI is active
         :param _args: arguments for _func
@@ -678,8 +726,6 @@ class TraceGUI(HasTraits):
     def run(self) -> None:
         """
         Run the TraceGUI
-
-        :param silent: if all standard output should be muted
         """
         self.configure_traits()
 
@@ -690,7 +736,7 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
-        pyface_gui.invoke_later(plt.close, "all")  # close plots
+        # pyface_gui.invoke_later(plt.close, "all")  # close plots
         pyface_gui.invoke_later(QtGui.QApplication.closeAllWindows)  # close Qt windows
 
     ####################################################################################################################
@@ -871,7 +917,7 @@ class TraceGUI(HasTraits):
     @observe('z_det', dispatch="ui")
     def _move_detector(self, event=None) -> None:
         """
-        move chosen detector.
+        Move current detector.
 
         :param event: optional event from traits observe decorator
         """
@@ -902,21 +948,24 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    def show_detector_cut(self) -> None:
+    @observe('_detector_cut_button', dispatch="ui")
+    def detector_cut(self, event = None, **kwargs) -> None:
         """
         Plot a detector image cut.
 
         :param event: optional event from traits observe decorator
+        :param kwargs: additional keyword arguments for r_image_cut_plot
         """
-        self.show_detector_image(cut=True)
+        self.detector_image(event, cut=True, **kwargs)
 
-    @observe('_detector_image_button, _detector_cut_button', dispatch="ui")
-    def show_detector_image(self, event=None, cut=False) -> None:
+    @observe('_detector_image_button', dispatch="ui")
+    def detector_image(self, event=None, cut=False, **kwargs) -> None:
         """
-        render a detector image at the chosen Detector, uses a separate thread.
+        Render a detector image at the chosen Detector, uses a separate thread.
 
         :param event: optional event from traits observe decorator
         :param cut: if a RImage cut image is plotted
+        :param kwargs: additional keyword arguments for r_image_plot
         """
 
         if self.raytracer.detectors and self.raytracer.rays.N:
@@ -964,9 +1013,9 @@ class TraceGUI(HasTraits):
                         with self._try():
                             if (event is None and not cut) or (event is not None\
                                     and event.name == "_detector_image_button"):
-                                r_image_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc)
+                                r_image_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **kwargs)
                             else:
-                                r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **cut_args)
+                                r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **cut_args, **kwargs)
 
                     self._status["DetectorImage"] -= 1
 
@@ -976,10 +1025,12 @@ class TraceGUI(HasTraits):
             action.start()
 
     @observe('_detector_spectrum_button', dispatch="ui")
-    def show_detector_spectrum(self, event=None) -> None:
+    def detector_spectrum(self, event=None, **kwargs) -> None:
         """
-        render a Detector Spectrum for the chosen Source, uses a separate thread.
+        Render a Detector Spectrum for the chosen Source, uses a separate thread.
+
         :param event: optional event from traits observe decorator
+        :param kwargs: additional keyword arguments for spectrum_plot
         """
 
         if self.raytracer.detectors and self.raytracer.rays.N:
@@ -1001,7 +1052,7 @@ class TraceGUI(HasTraits):
                 def on_finish() -> None:
                     if not error:
                         with self._try():
-                            spectrum_plot(Det_Spec)
+                            spectrum_plot(Det_Spec, **kwargs)
                         self._spectrum_information = self._get_spectrum_information(Det_Spec)
 
                     self._status["DetectorSpectrum"] -= 1
@@ -1011,9 +1062,15 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    def show_source_cut(self) -> None:
-        """show a source image cut plot"""
-        self.show_source_image(cut=True)
+    @observe('_source_cut_button', dispatch="ui")
+    def source_cut(self, event = None, **kwargs) -> None:
+        """
+        Plot a source image cut.
+
+        :param event: optional event from traits observe decorator
+        :param kwargs: additional keyword arguments for r_image_cut_plot
+        """
+        self.source_image(event, cut=True, **kwargs)
     
     def _get_spectrum_information(self, spec) -> str:
 
@@ -1034,10 +1091,12 @@ class TraceGUI(HasTraits):
         return stats
 
     @observe('_source_spectrum_button', dispatch="ui")
-    def show_source_spectrum(self, event=None) -> None:
+    def source_spectrum(self, event=None, **kwargs) -> None:
         """
         render a Source Spectrum for the chosen Source, uses a separate thread.
+
         :param event: optional event from traits observe decorator
+        :param kwargs: additional keyword arguments for spectrum_plot
         """
 
         if self.raytracer.ray_sources and self.raytracer.rays.N:
@@ -1056,7 +1115,7 @@ class TraceGUI(HasTraits):
                 def on_finish() -> None:
                     if not error:
                         with self._try():
-                            spectrum_plot(RS_Spec)
+                            spectrum_plot(RS_Spec, **kwargs)
                         self._spectrum_information = self._get_spectrum_information(RS_Spec)
 
                     self._status["SourceSpectrum"] -= 1
@@ -1066,12 +1125,14 @@ class TraceGUI(HasTraits):
             action = Thread(target=background, daemon=True)
             action.start()
 
-    @observe('_source_image_button, _source_cut_button', dispatch="ui")
-    def show_source_image(self, event=None, cut=False) -> None:
+    @observe('_source_image_button', dispatch="ui")
+    def source_image(self, event = None, cut: bool = False, **kwargs) -> None:
         """
-        render a source image for the chosen Source, uses a separate thread
+        Render a source image for the chosen Source, uses a separate thread
+
         :param event: optional event from traits observe decorator
         :param cut: if an RImage cut plot is plotted
+        :param kwargs: additional keyword arguments for r_image_plot
         """
 
         if self.raytracer.ray_sources and self.raytracer.rays.N:
@@ -1115,9 +1176,9 @@ class TraceGUI(HasTraits):
                         with self._try():
                             if (event is None and not cut) or \
                                     (event is not None and event.name == "_source_image_button"):
-                                r_image_plot(SImg, log=log, mode=mode, imc=Imc)
+                                r_image_plot(SImg, log=log, mode=mode, imc=Imc, **kwargs)
                             else:
-                                r_image_cut_plot(SImg, log=log, mode=mode, imc=Imc, **cut_args)
+                                r_image_cut_plot(SImg, log=log, mode=mode, imc=Imc, **cut_args, **kwargs)
 
                     self._status["SourceImage"] -= 1
 
@@ -1127,7 +1188,7 @@ class TraceGUI(HasTraits):
             action.start()
 
     @observe('_auto_focus_button', dispatch="ui")
-    def move_to_focus(self, event=None) -> None:
+    def move_to_focus(self, event=None, **kwargs) -> None:
         """
         Find a Focus.
         The chosen Detector defines the search range for focus finding.
@@ -1135,6 +1196,7 @@ class TraceGUI(HasTraits):
         Search takes place in a separate thread, after that the Detector is moved to the focus
 
         :param event: optional event from traits observe decorator
+        :param kwargs: additional keyword arguments for autofocus_cost_plot
         """
 
         if self.raytracer.detectors and self.raytracer.ray_sources and self.raytracer.rays.N:
@@ -1172,7 +1234,8 @@ class TraceGUI(HasTraits):
 
                         if self.focus_cost_plot:
                             with self._try():
-                                autofocus_cost_plot(res, afdict, f"{mode} Cost Function\nMinimum at z={res.x:.5g}mm")
+                                autofocus_cost_plot(res, afdict, f"{mode} Cost Function\nMinimum at z={res.x:.5g}mm",
+                                                    **kwargs)
 
                         self._autofocus_information = \
                             f"Found 3D position: [{pos[0]:.7g}mm, {pos[1]:.7g}mm, {pos[2]:.7g}mm]\n"\
@@ -1202,7 +1265,7 @@ class TraceGUI(HasTraits):
 
         self._plot.plot_orientation_axes()
         self.replot()
-        self._plot.default_camera_view()  # this needs to be called after replot, which defines the visual scope
+        self._plot.set_initial_camera()  # this needs to be called after replot, which defines the visual scope
         self._status["InitScene"] = 0
         
     @observe('_status:items', dispatch="ui")

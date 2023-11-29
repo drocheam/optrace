@@ -21,7 +21,9 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
                         title:   str = "Autofocus Cost Function",
                         fargs:   dict = None,
                         block:   bool = False,
-                        silent:  bool = False)\
+                        silent:  bool = False,
+                        path:    str = None,
+                        sargs:   dict = None)\
         -> None:
     """
     Plot a cost function plot for the autofocus results.
@@ -32,6 +34,9 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param block: if the plot should be blocking the execution of the program
     :param silent: if all standard output should be muted
+    :param path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+    :param sargs: option dictionary for pyplot.savefig
     """
 
     # type checking
@@ -66,8 +71,7 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.legend(["cost estimation", "cost values", "found minimum"])
     plt.title(title)
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
+    _save_or_show(block, path, sargs)
 
 
 def image_plot(img:     np.ndarray | RImage | str, 
@@ -75,7 +79,9 @@ def image_plot(img:     np.ndarray | RImage | str,
                flip:    bool = False,
                fargs:   dict = None,
                title:   str = "",
-               block:   bool = False)\
+               block:   bool = False,
+               path:    str = None,
+               sargs:   dict = None)\
         -> None:
     """
     Plot an image (array or path).
@@ -90,6 +96,9 @@ def image_plot(img:     np.ndarray | RImage | str,
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: optional title of the plot
     :param block: if the plot window should be blocking
+    :param path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+    :param sargs: option dictionary for pyplot.savefig
     """
     pc.check_type("img", img, np.ndarray | str | RImage)
     pc.check_type("s", s, list | tuple)
@@ -133,16 +142,17 @@ def image_plot(img:     np.ndarray | RImage | str,
     plt.imshow(img_, extent=extent, zorder=10, aspect="equal", origin="lower")
 
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
+    _save_or_show(block, path, sargs)
 
 
 def abbe_plot(ri:     list[RefractionIndex],
               title:  str = "Abbe Diagram",
               lines:  list = None,
-              fargs:   dict = None,
+              fargs:  dict = None,
               block:  bool = False,
-              silent: bool = False)\
+              silent: bool = False,
+              path:   str = None,
+              sargs:  dict = None)\
         -> None:
     """
     Create an Abbe Plot for different refractive media.
@@ -153,6 +163,9 @@ def abbe_plot(ri:     list[RefractionIndex],
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param block: if the plot should block the execution of the program
     :param silent: if all standard output of this function should be muted
+    :param path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+    :param sargs: option dictionary for pyplot.savefig
     """
 
     # type checking
@@ -190,8 +203,7 @@ def abbe_plot(ri:     list[RefractionIndex],
     plt.ylabel(r"Refraction Index n ($\lambda$" + f" = {lines[1]}nm)")
     plt.title(title)
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
+    _save_or_show(block, path, sargs)
 
 
 def surface_profile_plot(surface:          Surface | list[Surface],
@@ -201,7 +213,9 @@ def surface_profile_plot(surface:          Surface | list[Surface],
                          fargs:            dict = None,
                          title:            str = "Surface Profile",
                          silent:           bool = False,
-                         block:            bool = False)\
+                         block:            bool = False,
+                         path:             str = None,
+                         sargs:            dict = None)\
         -> None:
     """
     Plot surface profiles in x direction
@@ -217,6 +231,9 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     :param title: title of the plot
     :param silent: if all standard output of this function should be muted
     :param block: if the plot should block the execution of the program
+    :param path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+    :param sargs: option dictionary for pyplot.savefig
     """
 
     # type checking
@@ -266,8 +283,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     plt.title(title)
     plt.legend(legends)
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
+    _save_or_show(block, path, sargs)
 
 
 def _show_grid(what=plt) -> None:
@@ -275,4 +291,17 @@ def _show_grid(what=plt) -> None:
     what.grid(visible=True, which='major')
     what.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
     what.minorticks_on()
+
+
+def _save_or_show(block: bool, path: str = None, sargs: dict = None):
+    """show a plot (path is None) or store the image of a plot at file given as 'path'"""
+    pc.check_type("path", path, str | None)
+
+    if path is None:
+        plt.show(block=block)
+        plt.pause(0.1)
+
+    else:
+        sargs = sargs or dict() 
+        plt.savefig(path, **sargs)
 

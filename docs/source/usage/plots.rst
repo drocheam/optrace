@@ -8,6 +8,10 @@ Plotting
   :class: highlight
 
 
+.. TODO part on figure saving (path, sargs and so on)
+.. TODO part on fargs
+
+
 Namespace
 _____________
 

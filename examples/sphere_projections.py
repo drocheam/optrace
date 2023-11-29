@@ -21,7 +21,7 @@ for theta, num in zip([0, 25, 50, 75], [1, 6, 12, 12]):
         RT.add(RS0)
     
 # add Detector
-DETS = ot.SphericalSurface(r=(1-1e-6)*R, R=-R)
+DETS = ot.SphericalSurface(r=(1-1e-9)*R, R=-R)
 DET = ot.Detector(DETS, pos=[0, 0, R])
 RT.add(DET)
 
@@ -34,6 +34,7 @@ for proj in ot.SphericalSurface.sphere_projection_methods:
     otp.r_image_plot(img, "Irradiance", block=False)
 
 # run the simulator
-sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance")
+sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance", 
+               initial_camera=dict(center=[-50, -50, 0], direction=[-1, -1, -1], height=150, roll=-120))
 sim.run()
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt  # actual plotting
 
 import numpy as np  # calculations
 
-from .misc_plots import _show_grid
+from .misc_plots import _show_grid, _save_or_show
 
 from ..tracer.r_image import RImage  # RImage type and RImage displaying
 from ..tracer.misc import PropertyChecker as pc  # check types and values
@@ -17,7 +17,9 @@ def r_image_plot(im:       RImage,
                  log:      bool = False,
                  flip:     bool = False,
                  fargs:    dict = None,
-                 title:    str = None)\
+                 title:    str = None,
+                 path:     str = None,
+                 sargs:    dict = None)\
         -> None:
     """
 
@@ -29,6 +31,9 @@ def r_image_plot(im:       RImage,
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: title of the plot
     :param imc: precalculated RImage (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
+    :param path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+    :param sargs: option dictionary for pyplot.savefig
     """
     _check_types(im, imc, block, log, flip, title, mode)
 
@@ -96,8 +101,7 @@ def r_image_plot(im:       RImage,
 
     # show image
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
+    _save_or_show(block, path, sargs)
 
 
 def r_image_cut_plot(im:       RImage,
@@ -108,19 +112,24 @@ def r_image_cut_plot(im:       RImage,
                      flip:     bool = False,
                      fargs:    dict = None,
                      title:    str = None,
+                     path:     str = None,
+                     sargs:    dict = None,
                      **kwargs)\
         -> None:
     """
 
     :param im: RImage to plot
     :param imc: optional precalculated cut image
-    :param kwargs: arguments for RImage.cut
     :param block: if the plot should be blocking the execution of the program
     :param log: if logarithmic values are shown
     :param flip: if the image should be flipped
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: title of the plot
     :param mode: display_mode from RImage.display_modes
+    :param path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+    :param sargs: option dictionary for pyplot.savefig
+    :param kwargs: arguments for RImage.cut
     """
     _check_types(im, imc, block, log, flip, title, mode)
 
@@ -173,7 +182,6 @@ def r_image_cut_plot(im:       RImage,
     if im.projection not in ["Equidistant", None, "Orthographic"]:
         fig.axes[0].set_xticklabels([])
 
-
     # toggle log mode
     if log and any(np.any(Imdi > 0) for Imdi in Imd) and len(Imd) == 1:
         plt.yscale('log')
@@ -187,8 +195,7 @@ def r_image_cut_plot(im:       RImage,
 
     # show image
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
+    _save_or_show(block, path, sargs)
 
 
 def _check_types(im, imc, block, log, flip, title, mode) -> None:

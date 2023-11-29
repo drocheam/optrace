@@ -462,12 +462,7 @@ An RImage can be saved on the disk for later use in `optrace`. In the simplest c
 
    img.save("RImage_12345")
 
-If the path is invalid, the object is saved under a fallback name in the current directory. If the file already exists, this is also the case. Otherwise you can specify :python:`overwrite=True` to force an overwrite.
-There is an additional parameter :python:`save_32bit` that lowers the bit depth, loosing some information but saving disk space.
-
-.. code-block:: python
-
-   img.save("RImage_12345", save_32bit=True, overwrite=True)
+The file ending should be `.npz`, but gets added automatically. This function overrides files and throws an exception when saving failed.
 
 
 **Loading**
@@ -494,11 +489,13 @@ An exemplary function call could be:
 
    img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=400)
 
-As for the image modes, one can specify the parameters :python:`log` and :python:`flip`. And as for the RImage export the parameter :python:`overwrite` to force an overwrite.
+As for the image modes, one can specify the parameters :python:`log` and :python:`flip`. 
+As for :meth:`RImage.save <optrace.tracer.r_image.save>` this function overrides files and throws an exception when saving failed.
+
 
 .. code-block:: python
 
-   img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=389, log=True, flip=True, overwrite=True)
+   img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=389, log=True, flip=True)
 
 The image rescaling is done with methods from the `Pillow <https://pillow.readthedocs.io/en/stable/>`__ python library. By default, nearest neighbor interpolation is applied if the export resolution is higher than the RImage resolution and bilinear interpolation otherwise.
 

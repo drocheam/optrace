@@ -9,6 +9,8 @@ from ..tracer.r_image import RImage
 from ..tracer.spectrum import LightSpectrum
 from ..tracer import color  # color conversions for chromaticity plots
 from ..tracer.misc import PropertyChecker as pc
+from .misc_plots import _save_or_show
+
 
 chromaticity_norms: list[str, str, str] = ["Largest", "Sum"]
 """possible norms for the chromaticity diagrams"""
@@ -40,6 +42,9 @@ def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[
     :param kwargs: additional plotting parameters, including:
         block: if the plot should block the execution of the program
         norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
+        path: if provided, the plot is saved at this location instead of displaying a plot. 
+              Specify a path with file ending.
+        sargs: option dictionary for pyplot.savefig
     """
 
     # coordinates of whitepoint and sRGB primaries in chromaticity diagram coordinates (xy)
@@ -77,6 +82,9 @@ def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[
     :param kwargs: additional plotting parameters, including:
         block: if the plot should block the execution of the program
         norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
+        path: if provided, the plot is saved at this location instead of displaying a plot. 
+              Specify a path with file ending.
+        sargs: option dictionary for pyplot.savefig
     """
 
     # coordinates of whitepoint and sRGB primaries in chromaticity diagram coordinates (u'v')
@@ -116,7 +124,9 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
                        yl:                      str,
                        block:                   bool = False,
                        fargs:                   dict = None,
-                       norm:                    str = "Sum")\
+                       norm:                    str = "Sum",
+                       path:                    str = None,
+                       sargs:                   dict = None)\
         -> None:
     """Lower level plotting function. Don't use directly"""
 
@@ -260,6 +270,4 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     plt.title(title)
     plt.legend(["sRGB Gamut", "Whitepoint D65", legend3])
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
-
+    _save_or_show(block, path, sargs)

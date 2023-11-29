@@ -6,6 +6,7 @@ sys.path.append('.')
 import numpy as np
 from scipy.optimize import OptimizeResult
 
+import os
 import pytest
 import unittest
 
@@ -22,7 +23,6 @@ import matplotlib.pyplot as plt
 #######
 # set PlotTests.manual = True for manual mode, where each window needs to controlled and closed by hand 
 
-# TODO source selection in plot title ("from RS0" etc.?)
 
 class PlotTests(unittest.TestCase):
 
@@ -210,12 +210,7 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], args[1], block=2)  # invalid block type
 
         # dummy data
-        z = np.linspace(-2.5, 501, 200)
-        cost = (z-250)**2 / 250**2
-        afdict = dict(z=z, cost=cost)
-        sci = OptimizeResult()
-        sci.x = 250
-        sci.fun = 0
+        sci, afdict = self.af_dummy()
 
         # calls
         otp.autofocus_cost_plot(sci, afdict, block=self.manual)
@@ -311,6 +306,78 @@ class PlotTests(unittest.TestCase):
         arr = np.zeros((100, 100))
         otp.image_plot(arr, [3, 3])
 
+    def af_dummy(self):
+        # dummy data for autofocus_cost_plot
+        z = np.linspace(-2.5, 501, 200)
+        cost = (z-250)**2 / 250**2
+        af_dict = dict(z=z, cost=cost)
+        af_sci = OptimizeResult()
+        af_sci.x = 250
+        af_sci.fun = 0
+
+        return af_sci, af_dict
+
+    @pytest.mark.os
+    def test_saving(self) -> None:
+
+        # test different file types (and file type detection)
+        for path in ["figure.png", "figure.jpg", "figure.pdf", "figure.svg", "figure.tiff"]:
+            assert not os.path.exists(path)
+               
+            otp.chromaticities_cie_1976([], path=path)
+            self.assertTrue(os.path.exists(path))
+            os.remove(path)
+
+        # dummy RImage
+        RIm = ot.RImage(extent=[-1, 1, -1, 1])
+        RIm.render()
+
+        # test different functions, they all must include a saving option and correctly handle the sargs parameter
+        path = "figure.jpg"
+        sargs = dict(pad_inches=10, dpi=120)
+        for plot, args, kwargs in zip([otp.chromaticities_cie_1931, otp.chromaticities_cie_1976, otp.spectrum_plot, 
+                                       otp.refraction_index_plot, otp.abbe_plot, otp.surface_profile_plot,
+                                       otp.r_image_plot, otp.r_image_cut_plot, otp.image_plot, otp.autofocus_cost_plot], 
+                                      [[[]], [[]], [[]], [[]], [[]], [[]], [RIm], [RIm], [ot.presets.image.color_checker, 
+                                                                                          [1, 2]], self.af_dummy()], 
+                                      [{}, {}, {}, {}, {}, {}, {}, dict(x=0), {}, {}]):
+            assert not os.path.exists(path)
+
+            kwargs.update(sargs=sargs, path=path)
+            plot(*args, **kwargs)
+
+            self.assertTrue(os.path.exists(path))
+            os.remove(path)
+
+        # type error for path parameter
+        self.assertRaises(TypeError, otp.chromaticities_cie_1976, [], path=2)
+
+        # IOError if file could not be saved
+        self.assertRaises(IOError, otp.chromaticities_cie_1976, [], path="./hjkhjkhkhjk/hjkhjkhk/jk")
+       
+    def test_fargs(self) -> None:
+        """check fargs handling in all plotting functions"""
+
+        # dummy RImage
+        RIm = ot.RImage(extent=[-1, 1, -1, 1])
+        RIm.render()
+
+        fargs = dict(figsize=(3, 3), dpi=120)
+        for plot, args, kwargs in zip([otp.chromaticities_cie_1931, otp.chromaticities_cie_1976, otp.spectrum_plot, 
+                                       otp.refraction_index_plot, otp.abbe_plot, otp.surface_profile_plot,
+                                       otp.r_image_plot, otp.r_image_cut_plot, otp.image_plot, otp.autofocus_cost_plot], 
+                                      [[[]], [[]], [[]], [[]], [[]], [[]], [RIm], [RIm], [ot.presets.image.color_checker, 
+                                                                                          [1, 2]], self.af_dummy()], 
+                                      [{}, {}, {}, {}, {}, {}, {}, dict(x=0), {}, {}]):
+
+            kwargs.update(fargs=fargs)
+            plot(block=False, *args, **kwargs)
+
+            # check if properties were applied
+            self.assertTrue(np.allclose(fargs["figsize"], plt.gcf().get_size_inches()))
+            self.assertEqual(fargs["dpi"], plt.gcf().dpi)
+
+        plt.close("all")
 
 if __name__ == '__main__':
     unittest.main()

@@ -12,6 +12,8 @@ Using the GUI
   :class: highlight
 
 
+.. TODO information on set_camera, screenshot and parameter passdown to plotting functions (path, sargs, fargs)
+
 
 Loading the GUI
 ____________________

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt  # actual plotting
 from ..tracer import color as mcolor  # color conversions for chromaticity plots
 from ..tracer.spectrum import Spectrum, LightSpectrum
 from ..tracer.refraction_index import RefractionIndex
-from .misc_plots import _show_grid
+from .misc_plots import _show_grid, _save_or_show
 
 from ..tracer.misc import PropertyChecker as pc
 
@@ -26,6 +26,9 @@ def refraction_index_plot(ri:         RefractionIndex | list[RefractionIndex],
         legend_off: if the legend should be turned off
         label_off: if the labels should be turned off
         color: a single or a list of colors
+        path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+        sargs: option dictionary for pyplot.savefig
     """
     spectrum_plot(ri, title=title, fargs=fargs, **kwargs)
 
@@ -46,6 +49,9 @@ def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
         legend_off: if the legend should be turned off
         label_off: if the labels should be turned off
         color: a single or a list of colors
+        path: if provided, the plot is saved at this location instead of displaying a plot. 
+                 Specify a path with file ending.
+        sargs: option dictionary for pyplot.savefig
     """
     pc.check_type("title", title, str)
     pc.check_type("spectrum", spectrum, Spectrum | list)
@@ -66,7 +72,9 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
                    labels_off:   bool = False,
                    color:        str | list[str] = None,
                    fargs:        dict = None,
-                   block:        bool = False)\
+                   block:        bool = False,
+                   path:         str = None,
+                   sargs:        dict = None)\
         -> None:
     """Lower level plotting function. Don't use directly"""
 
@@ -155,5 +163,4 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     ax2.set(xlabel=xlabel)
     ax2.get_yaxis().set_visible(False)
     plt.tight_layout()
-    plt.show(block=block)
-    plt.pause(0.1)
+    _save_or_show(block, path, sargs)

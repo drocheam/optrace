@@ -32,5 +32,6 @@ geom = ot.presets.geometry.arizona_eye(adaptation=A, pupil=P)
 RT.add(geom)
 
 # Instantiate the class and configure its traits.
-TG = TraceGUI(RT, ray_count=1000000, flip_det_image=True, ray_opacity=0.01)
+TG = TraceGUI(RT, ray_count=1000000, flip_det_image=True, ray_opacity=0.01, vertical_labels=True, 
+              initial_camera=dict(center=[0, 0, 7.3], height=20))
 TG.run()

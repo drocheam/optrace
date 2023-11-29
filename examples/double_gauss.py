@@ -104,5 +104,6 @@ sim = TraceGUI(RT,
                det_image_one_source=True, 
                minimalistic_view=True, 
                ray_opacity=0.05,
-               coloring_type="Source")
+               coloring_type="Source",
+               initial_camera=dict(center=[0, 0, 60], height=110))
 sim.run()

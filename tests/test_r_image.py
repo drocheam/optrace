@@ -199,7 +199,6 @@ class RImageTests(unittest.TestCase):
         img.render(N_px, p, w, wl)
         return img, np.sum(w), np.sum(w * color.y_observer(wl) * 683)  # 683 lm/W conversion factor
 
-    @pytest.mark.slow
     @pytest.mark.os
     def test_r_image_saving_loading(self):
        
@@ -208,41 +207,32 @@ class RImageTests(unittest.TestCase):
 
         # saving and loading for valid path
         path = "test_img.npz"
-        for silent in [False, True]:
-            img.silent = silent
-            path_ = img.save(path)
-            img = ot.RImage.load(path)
-        self.assertTrue(img.limit is None)  # None limit is None after loading
-        os.remove(path_)
+        img.save(path)
+        img2 = ot.RImage.load(path)
+        os.remove(path)
 
-        # saving and loading for valid path, overwrite file
-        img.limit = 5
-        path0 = img.save(path, overwrite=True)
-        img = ot.RImage.load(path0)
-        img.silent = True
-        self.assertEqual(path, path0)
-        self.assertEqual(img.limit, 5)  # limit is loaded correctly
-        
-        # saving and loading for valid path, don't overwrite file
-        path1 = img.save(path, overwrite=False)
-        img = ot.RImage.load(path1)
-        img.silent = True
-        self.assertNotEqual(path, path1)
-        os.remove(path0)
-        os.remove(path1)
-        
-        # saving and loading for invalid path
-        for silent in [False, True]:
-            img.silent = silent
-            path2 = img.save(str(Path("hjkhjkljk") / "test_img.npz"))
-            img = ot.RImage.load(path2)
-            os.remove(path2)
+        # test if saved and loaded images are equal
+        self.assertTrue(img2.limit is None)  # None limit is None after loading
+        self.assertTrue(np.all(img2._img == img._img))
+        self.assertTrue(img2.N == img.N)
+        self.assertTrue(img2.sx == img.sx)
+        self.assertTrue(img2.sy == img.sy)
+        self.assertTrue(img2.projection is None)
+
+        # coverage: don't provide file type ending
+        path2 = "test_img"
+        img.save(path2)
+        os.remove(path)
+
+        # throw IOError if invalid file path
+        self.assertRaises(IOError, img.save, "./hsajkfhajkfhjk/hajfhsajkfhajksfhjk/ashjsafhkj")
 
     @pytest.mark.slow
     @pytest.mark.os
     def test_r_image_export(self):
 
-        path = "export_image"
+        path = "export_image.png"
+        path2 = "export_image"
 
         # check display modes and channels
         for ratio in [0.746, 1, 2.45]:
@@ -251,13 +241,16 @@ class RImageTests(unittest.TestCase):
             img.rescale(90)
                 
             for imm in ot.RImage.display_modes:
-                path3 = img.export_png(path, imm, log=True, overwrite=True, flip=False)
-                path3 = img.export_png(path, imm, log=False, overwrite=True, flip=True)
-                im3 = np.asarray(PILImage.open(path3), dtype=np.float64)  # load from disc
+                img.export_png(path, imm, log=True, flip=False)
+                img.export_png(path, imm, log=False, flip=True)
+                im3 = np.asarray(PILImage.open(path), dtype=np.float64)  # load from disk
                 self.assertTrue(im3.ndim == (2 if not imm.startswith("sRGB") else 3))  # check number of channels
 
         # coverage: non-default resample parameter
-        path3 = img.export_png(path, imm, log=True, overwrite=True, flip=False, resample=0)
+        img.export_png(path, imm, log=True, flip=False, resample=0)
+
+        # coverage: file ending not provided
+        img.export_png(path2, imm, log=True, flip=False)
 
         # check shapes
         for ratio in [0.746, 1, 2.45]:
@@ -269,11 +262,11 @@ class RImageTests(unittest.TestCase):
                 img.rescale(Npx)
                 
                 for Ns in [256, 512, 984]:
-                    path3 = img.export_png(path, imm, log=False, overwrite=True, flip=True, size=Ns)
-                    im3 = np.asarray(PILImage.open(path3), dtype=np.float64)  # load from disc
+                    img.export_png(path, imm, log=False, flip=True, size=Ns)
+                    im3 = np.asarray(PILImage.open(path), dtype=np.float64)  # load from disc
                     self.assertAlmostEqual(ratio, im3.shape[0]/im3.shape[1], delta=2/Ns)  # check ratio
 
-        os.remove(path3)
+        os.remove(path)
 
     def test_r_image_filter(self):
     
