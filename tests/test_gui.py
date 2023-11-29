@@ -1770,7 +1770,6 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
-        input()
 
 if __name__ == '__main__':
     unittest.main()

@@ -490,7 +490,7 @@ An exemplary function call could be:
    img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=400)
 
 As for the image modes, one can specify the parameters :python:`log` and :python:`flip`. 
-As for :meth:`RImage.save <optrace.tracer.r_image.save>` this function overrides files and throws an exception when saving failed.
+As for :meth:`RImage.save <optrace.tracer.r_image.RImage.save>` this function overrides files and throws an exception when saving failed.
 
 
 .. code-block:: python

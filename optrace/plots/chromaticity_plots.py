@@ -40,11 +40,10 @@ def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[
     :param title: title of the plot
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting parameters, including:
-        block: if the plot should block the execution of the program
-        norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
-        path: if provided, the plot is saved at this location instead of displaying a plot. 
-              Specify a path with file ending.
-        sargs: option dictionary for pyplot.savefig
+     block: if the plot should block the execution of the program
+     norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
+     path: if provided, the plot is saved at this location instead of displaying a plot. Specify with file ending.
+     sargs: option dictionary for pyplot.savefig
     """
 
     # coordinates of whitepoint and sRGB primaries in chromaticity diagram coordinates (xy)
@@ -80,11 +79,10 @@ def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[
     :param title: title of the plot
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting parameters, including:
-        block: if the plot should block the execution of the program
-        norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
-        path: if provided, the plot is saved at this location instead of displaying a plot. 
-              Specify a path with file ending.
-        sargs: option dictionary for pyplot.savefig
+     block: if the plot should block the execution of the program
+     norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
+     path: if provided, the plot is saved at this location instead of displaying a plot. Specify with file ending.
+     sargs: option dictionary for pyplot.savefig
     """
 
     # coordinates of whitepoint and sRGB primaries in chromaticity diagram coordinates (u'v')

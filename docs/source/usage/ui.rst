@@ -360,11 +360,11 @@ Image Tab
      - :python:`True` or :python:`False`
      - if only the selected ray source should contribute to the image
    * - Source Image
-     - :meth:`show_source_image() <optrace.gui.trace_gui.TraceGUI.show_source_image>`
+     - :meth:`source_image() <optrace.gui.trace_gui.TraceGUI.source_image>`
      -
      - render a source image with the given settings
    * - Detector Image 
-     - :meth:`show_detector_image() <optrace.gui.trace_gui.TraceGUI.show_detector_image>`
+     - :meth:`detector_image() <optrace.gui.trace_gui.TraceGUI.detector_image>`
      -
      - render a detector image with the given settings
    * - Cut at
@@ -376,11 +376,11 @@ Image Tab
      - float
      - image cut value for the chosen dimension
    * - Source Image Cut
-     - :meth:`show_source_cut() <optrace.gui.trace_gui.TraceGUI.show_source_cut>`
+     - :meth:`source_cut() <optrace.gui.trace_gui.TraceGUI.source_cut>`
      -
      - render a source image cut
    * - Detector Image Cut
-     - :meth:`show_detector_cut() <optrace.gui.trace_gui.TraceGUI.show_detector_cut>`
+     - :`detector_cut() <optrace.gui.trace_gui.TraceGUI.detector_cut>`
      -
      - render a detector image cut
    * - Activate Filter 
@@ -416,7 +416,7 @@ Spectrum Tab
      - float
      - position of the selected detector
    * -  Source Spectrum
-     - :meth:`show_source_spectrum() <optrace.gui.trace_gui.TraceGUI.show_source_spectrum>`
+     - :meth:`source_spectrum() <optrace.gui.trace_gui.TraceGUI.source_spectrum>`
      - 
      - render a source spectrum for the chosen source
    * - Rays from Selected Source Only 
@@ -424,7 +424,7 @@ Spectrum Tab
      - :python:`True` or :python:`False`
      - if only the selected ray source should contribute to the detector image
    * -  Detector Spectrum
-     - :meth:`show_detector_spectrum() <optrace.gui.trace_gui.TraceGUI.show_detector_spectrum>`
+     - :meth:`detector_spectrum() <optrace.gui.trace_gui.TraceGUI.detector_spectrum>`
      - 
      - render a detector image
    * - Spectrum Properties

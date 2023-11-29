@@ -22,13 +22,12 @@ def refraction_index_plot(ri:         RefractionIndex | list[RefractionIndex],
     :param title: title of the plot
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting arguments, including:
-        block: if the plot should be blocking
-        legend_off: if the legend should be turned off
-        label_off: if the labels should be turned off
-        color: a single or a list of colors
-        path: if provided, the plot is saved at this location instead of displaying a plot. 
-                 Specify a path with file ending.
-        sargs: option dictionary for pyplot.savefig
+     block: if the plot should be blocking
+     legend_off: if the legend should be turned off
+     label_off: if the labels should be turned off
+     color: a single or a list of colors
+     path: if provided, the plot is saved at this location instead of displaying a plot. Specify with file ending.
+     sargs: option dictionary for pyplot.savefig
     """
     spectrum_plot(ri, title=title, fargs=fargs, **kwargs)
 
@@ -45,13 +44,12 @@ def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
     :param title: title of the plot
     :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting arguments, including:
-        block: if the plot should be blocking
-        legend_off: if the legend should be turned off
-        label_off: if the labels should be turned off
-        color: a single or a list of colors
-        path: if provided, the plot is saved at this location instead of displaying a plot. 
-                 Specify a path with file ending.
-        sargs: option dictionary for pyplot.savefig
+     block: if the plot should be blocking
+     legend_off: if the legend should be turned off
+     label_off: if the labels should be turned off
+     color: a single or a list of colors
+     path: if provided, the plot is saved at this location instead of displaying a plot. Specify with file ending.
+     sargs: option dictionary for pyplot.savefig
     """
     pc.check_type("title", title, str)
     pc.check_type("spectrum", spectrum, Spectrum | list)
