@@ -1,9 +1,17 @@
 Overview
 ------------------------------------------------------------------------
 
-.. testsetup:: *
+.. testcode:: 
+   :hide:
 
+   print("Placeholder:    ")
    import optrace as ot
+   from optrace.gui import TraceGUI
+
+.. testoutput::
+   :hide:
+    
+   Placeholder: ...
 
 .. role:: python(code)
   :language: python
@@ -73,3 +81,4 @@ Since the :class:`optrace.gui.TraceGUI <optrace.gui.trace_gui.TraceGUI>` is the 
 .. testcode::
 
    from optrace.gui import TraceGUI
+

@@ -6,7 +6,10 @@ import pathlib  # handling file paths
 import os  # deleting files
 
 import pytest  # testing framework
+
 import requests  # downloading web ressources
+from requests.adapters import HTTPAdapter
+
 import unittest  # testing framework
 
 import optrace as ot
@@ -24,8 +27,12 @@ class LoadTests(unittest.TestCase):
         """
 
         try:
+            # get web ressource with 5 retries and Firefox User Agent
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
-            r = requests.get(source, headers=headers)
+            adapter = HTTPAdapter(max_retries=5)
+            http = requests.Session()
+            http.mount("http://", adapter)
+            r = http.get(source, headers=headers)
 
             # save to file
             with open(path,'wb') as f:

@@ -129,7 +129,7 @@ Tracing some geometry:
 .. testcode::
 
     # create raytracer
-    RT = ot.Raytracer(outline=[-15, 15, -15, 15, -15, 30])
+    RT = ot.Raytracer(outline=[-15, 15, -15, 15, -15, 30], silent=True)
 
     # add RaySource
     RSS = ot.CircularSurface(r=2)
@@ -141,7 +141,7 @@ Tracing some geometry:
     RT.add(eye)
 
     # trace
-    RT.trace(2000)
+    RT.trace(100000)
 
 
 Access positions of third ray section

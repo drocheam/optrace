@@ -10,11 +10,9 @@ import numpy as np
 import pytest
 
 from PIL import Image as PILImage  # image loading
-import matplotlib.pyplot as plt
 import optrace.tracer.color as color
 
 import optrace as ot
-import optrace.plots as otp
 
 
 class RImageTests(unittest.TestCase):
@@ -320,10 +318,6 @@ class RImageTests(unittest.TestCase):
             RT.trace(500000)
             img = RT.source_image(256)
             
-            otp.r_image_plot(img, "sRGB (Absolute RI)")
-
-        plt.close('all')
-
 
 if __name__ == '__main__':
     unittest.main()

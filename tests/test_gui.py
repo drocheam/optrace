@@ -137,7 +137,8 @@ class GUITests(unittest.TestCase):
             sim._do_in_main(sim.close)
             time.sleep(2)
 
-    @pytest.mark.slow 
+    @pytest.mark.slow
+    @pytest.mark.gui1
     def test_gui_inits(self) -> None:
 
         Image = ot.presets.image.tv_testcard1
@@ -203,6 +204,7 @@ class GUITests(unittest.TestCase):
         self.assertRaises(RuntimeError, TraceGUI, RT, z_det=0)
 
     @pytest.mark.slow
+    @pytest.mark.gui2
     def test_interaction1(self) -> None:
 
         def interact(sim):
@@ -327,6 +329,7 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui2
     def test_interaction2(self) -> None:
 
         def interact2(sim):
@@ -399,6 +402,7 @@ class GUITests(unittest.TestCase):
         plt.close('all')
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui2
     def test_interaction3(self) -> None:
 
         def interact3(sim):
@@ -458,6 +462,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.os
+    @pytest.mark.gui2
     def test_interaction4(self) -> None:
 
         def interact4(sim):
@@ -482,6 +487,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
+    @pytest.mark.gui1
     def test_missing(self) -> None:
         """test TraceGUI operation when Filter, Lenses, Detectors or Sources are missing"""
 
@@ -605,6 +611,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
+    @pytest.mark.gui3
     def test_replot_combinations(self):
         """check replotting by setting random combinations inside the change dictionary for replot()"""
 
@@ -720,6 +727,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
    
+    @pytest.mark.gui3
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
@@ -807,6 +815,7 @@ class GUITests(unittest.TestCase):
    
     # os test because clipboard is system dependent
     @pytest.mark.os
+    @pytest.mark.gui3
     def test_send_cmd(self):
         """test command setting and sending as well as automatic replotting"""
 
@@ -905,6 +914,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui2
     def test_resize(self):
         """
         this test checks if
@@ -981,6 +991,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
         
+    @pytest.mark.gui2
     def test_non_2d(self):
         """
         initially there were problems with non-plotable "surfaces" like Line and Point
@@ -1017,6 +1028,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
+    @pytest.mark.gui3
     def test_additional_coverage_1(self):
         """additionial coverage tests"""
 
@@ -1079,6 +1091,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
     
+    @pytest.mark.gui3
     def test_additional_coverage_2(self):
         """additionial coverage tests"""
 
@@ -1202,12 +1215,14 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui2
     def test_run(self):
         RT = rt_example()
         sim = TraceGUI(RT)
         sim._exit = True  # leads to run() exiting directly after load
         sim.run()
 
+    @pytest.mark.gui2
     def test_rt_fault_no_rays(self):
         """check handling of functionality when there is an geometry fault in the raytracer 
         and therefore no rays are simulated and plotted"""
@@ -1283,6 +1298,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui1
     def test_point_marker(self):
         """test marker plotting, replotting, removal and properties in scene"""
 
@@ -1336,6 +1352,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
     
+    @pytest.mark.gui1
     def test_line_marker(self):
         """test marker plotting, replotting, removal and properties in scene"""
 
@@ -1379,6 +1396,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui2
     def test_picker(self):
         """
         test picker interaction in the scene
@@ -1517,6 +1535,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui3
     def test_picker_coverage(self):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10], silent=True)
@@ -1569,6 +1588,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui3
     def test_volumes(self):
         """plot volume plotting and handling"""
 
@@ -1626,6 +1646,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.gui2
     def test_set_get_camera(self) -> None:
         
         RT = rt_example()
@@ -1706,6 +1727,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.os
+    @pytest.mark.gui2
     def test_screenshot(self) -> None:
         
         RT = rt_example()
@@ -1737,6 +1759,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.os
+    @pytest.mark.gui3
     def test_plots_passdown(self) -> None:
         
         RT = rt_example()

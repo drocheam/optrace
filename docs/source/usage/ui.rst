@@ -3,9 +3,17 @@
 Using the GUI
 ---------------
 
-.. testsetup:: *
+.. testcode:: 
+   :hide:
 
+   print("Placeholder:    ")
    import optrace as ot
+   from optrace.gui import TraceGUI
+
+.. testoutput::
+   :hide:
+    
+   Placeholder: ...
 
 .. role:: python(code)
   :language: python
@@ -27,11 +35,13 @@ As always, import the main optrace namespace:
 
    import optrace as ot
 
+
 To import the TraceGUI into the current namespace write:
 
 .. testcode::
 
    from optrace.gui.trace_gui import TraceGUI
+
 
 Let's create some exemplary geometry:
 

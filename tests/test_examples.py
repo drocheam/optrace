@@ -75,7 +75,6 @@ class ExampleTests(unittest.TestCase):
         self.execute("achromat.py")
     
     @pytest.mark.slow
-    @pytest.mark.skip(reason="Runner gives exit code 143, whatever that means")
     def test_microscope(self):
         self.execute("microscope.py", 30)
     
