@@ -10,9 +10,8 @@ from mayavi.sources.parametric_surface import ParametricSurface  # provides outl
 from ..tracer.geometry import Surface, Element
 from ..tracer import *
 
-# TODO remove crosshair when rays have been replotted
-# TODO don't remove crosshair and info text, when the info shows spatial information
 # TODO pick function that takes a ray number
+# TODO select rays function, where ray_selection can be set manually
 
 
 class ScenePlotting:
@@ -28,7 +27,7 @@ class ScenePlotting:
     MAX_RAYS_SHOWN: int = 10000
     """Maximum of rays shown in visualization"""
 
-    LABEL_STYLE: dict = dict(font_size=11, bold=True, font_family="courier", shadow=True)
+    LABEL_STYLE: dict = dict(font_size=11, bold=True, font_family="courier", shadow=True, italic=False)
     """Standard Text Style. Used for object labels, legends and axes"""
 
     INFO_STYLE: dict = dict(font_size=13, bold=True, font_family="courier", shadow=True, italic=False)
@@ -66,11 +65,12 @@ class ScenePlotting:
         self._orientation_axes = None
         self._ray_highlight_plot = None
 
+        # initial camera settings
         self._initial_camera = initial_camera
 
         # texts 
         self._status_text = None
-        self._ray_text = None  # textbox for ray information
+        self._ray_text = None
 
         # ray properties
         self.__ray_property_dict = {}  # properties of shown rays, set while tracing
@@ -103,16 +103,16 @@ class ScenePlotting:
     @contextmanager
     def constant_camera(self, *args, **kwargs) -> None:
         """context manager the saves and restores the camera view"""
-
         cc_traits_org = {}
-        if self.scene and self.scene.camera:
+
+        if self.scene is not None and self.scene.camera is not None:
             cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
                                                         "clipping_range", "parallel_scale")
         try:
             yield
 
         finally:
-            if self.scene and self.scene.camera:
+            if self.scene is not None and self.scene.camera is not None:
                 self.scene.camera.trait_set(**cc_traits_org)
     
     def screenshot(self, *args, **kwargs):
@@ -221,8 +221,10 @@ class ScenePlotting:
         self.__remove_objects(self._filter_plots)
 
         for num, F in enumerate(self.raytracer.filters):
+
             fcolor = F.color()
             alpha = 0.1 + 0.899*fcolor[3]  # offset in both directions, ensures visibility and see-through
+
             t = self.plot_element(F, num, fcolor[:3] if not self.ui.high_contrast else self.scene.foreground, alpha)
             self._filter_plots.append(t)
 
@@ -244,6 +246,7 @@ class ScenePlotting:
 
     def plot_outline(self) -> None:
         """replot the raytracer outline"""
+
         if self._outline is not None:
             self._outline.remove()
 
@@ -267,9 +270,10 @@ class ScenePlotting:
         self._orientation_axes.widgets[0].viewport = [0, 0, 0.1, 0.15]
 
         # turn of text scaling of orientation_axes
-        self._orientation_axes.widgets[0].orientation_marker.x_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
-        self._orientation_axes.widgets[0].orientation_marker.y_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
-        self._orientation_axes.widgets[0].orientation_marker.z_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
+        mark = self._orientation_axes.widgets[0].orientation_marker
+        mark.x_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
+        mark.y_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
+        mark.z_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
 
     def plot_axes(self) -> None:
         """plot cartesian axes"""
@@ -283,6 +287,7 @@ class ScenePlotting:
         # or any of [0.25, 0.5, 0.75, 1.25, 2.5]*10^k with k being an integer
         # label number needs to be in range [min_s, max_s]
         def get_label_num(num: float, min_s: int, max_s: int) -> int:
+
             norm = 10 ** -np.floor(np.log10(num)-1)
             num_norm = num*norm  # normalize num so that 10 <= num < 100
 
@@ -305,10 +310,10 @@ class ScenePlotting:
             a.axes.trait_set(font_factor=ff_old, fly_mode='none', label_format=lform, x_label=label,
                              y_label=label, z_label=label, layer_number=1)
 
-            a.title_text_property.trait_set(**self.LABEL_STYLE, italic=False, color=self._axis_color, opacity=self._axis_alpha)
-            a.label_text_property.trait_set(**self.LABEL_STYLE, italic=False, color=self._axis_color, opacity=self._axis_alpha)
-            a.actors[0].pickable = False
+            a.title_text_property.trait_set(**self.LABEL_STYLE, color=self._axis_color, opacity=self._axis_alpha)
+            a.label_text_property.trait_set(**self.LABEL_STYLE, color=self._axis_color, opacity=self._axis_alpha)
             a.visible = not bool(self.ui.minimalistic_view)
+            a.actors[0].pickable = False
 
             objs.append((a,))
 
@@ -342,8 +347,8 @@ class ScenePlotting:
         # create n list and z-boundary list
         nList = [self.raytracer.n0] + [element.n2 for element in Lenses] + [self.raytracer.n0]
         BoundList = [self.raytracer.outline[[4, 4]]] +\
-                    [(np.mean(element.front.extent[4:]), np.mean(element.back.extent[4:])) for element in Lenses]\
-                    + [self.raytracer.outline[[5, 5]]]
+                    [(np.mean(element.front.extent[4:]), np.mean(element.back.extent[4:])) for element in Lenses] +\
+                    [self.raytracer.outline[[5, 5]]]
 
         # replace None values of Lenses n2 with the ambient n0
         nList = [self.raytracer.n0 if ni is None else ni for ni in nList]
@@ -386,12 +391,12 @@ class ScenePlotting:
             z_pos = np.mean([BoundList[i][1], BoundList[i+1][0]])
 
             # plot label
-            label = nList[i].get_desc()
-            text_ = f"ambient\nn={label}" if not self.ui.minimalistic_view else f"n={label}"
-            text = self.scene.mlab.text(x_pos, y_pos, z=z_pos, text=text_, name="Label")
+            label = (f"ambient\n" if not self.ui.minimalistic_view else "")  + "n=" + nList[i].get_desc()
+            text = self.scene.mlab.text(x_pos, y_pos, z=z_pos, text=label, name="Label")
             text.actor.text_scale_mode = 'none'
             text.property.trait_set(**self.LABEL_STYLE, frame=True, frame_color=self._subtle_color, 
                                     color=self._axis_color, opacity=self._axis_alpha)
+
             if not self.ui.vertical_labels:
                 text.property.trait_set(justification="center", bold=False)
             else:
@@ -465,16 +470,19 @@ class ScenePlotting:
         if not no_label:
             # object label
             label = f"{obj.abbr}{num}"
+
             # add description if any exists. But only if we are not in "minimalistic_view" displaying mode
             label = label if obj.desc == "" or bool(self.ui.minimalistic_view) else label + ": " + obj.desc
             text = self.scene.mlab.text(x=obj.extent[1], y=obj.pos[1], z=zl, text=label, name="Label")
             text.actor.text_scale_mode = 'none'
+
             if not self.ui.vertical_labels:
                 text.property.trait_set(**self.LABEL_STYLE, justification="center", vertical_justification="bottom", 
                                         orientation=0, background_opacity=0.5, background_color=self.scene.background)
             else:
                 text.property.trait_set(**self.LABEL_STYLE, justification="left", orientation=90, 
-                                        vertical_justification="center", background_opacity=0.5, background_color=self.scene.background)
+                                        vertical_justification="center", background_opacity=0.5, 
+                                        background_color=self.scene.background)
         else:
             text = None
 
@@ -493,12 +501,15 @@ class ScenePlotting:
 
         self._ray_plot = self.scene.mlab.quiver3d(x, y, z, u, v, w, scalars=s,
                                                   scale_mode="vector", scale_factor=1, colormap="Greys", mode="2ddash")
-        self._ray_plot.glyph.trait_set(color_mode="color_by_scalar")
+
         self._ray_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True,
                                                       opacity=self.ui.ray_opacity)
+
         self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width,
                                                 point_size=self.ui.ray_width if self.ui.plotting_type == "Points"
-                                                           else 0.1)
+                                                                             else 0.1)
+
+        self._ray_plot.glyph.color_mode = "color_by_scalar"
         self._ray_plot.parent.parent.name = "Rays"
         self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
@@ -517,12 +528,16 @@ class ScenePlotting:
             self._ray_highlight_plot.parent.parent.remove()
 
         self._ray_highlight_plot = self.scene.mlab.quiver3d(x, y, z, u, v, w,
-                                                  scale_mode="vector", scale_factor=1, colormap="Reds", mode="2ddash", line_width=2)
-        self._ray_highlight_plot.glyph.trait_set(color_mode="color_by_scalar")
-        self._ray_highlight_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True)
-        self._ray_highlight_plot.parent.parent.name = "Ray Highlight"
-        self._ray_highlight_plot.actor.property.color = self._crosshair_color
+                                                            scale_mode="vector", scale_factor=1, 
+                                                            colormap="Reds", mode="2ddash", line_width=2)
+        
         self._ray_highlight_plot.actor.actor.pickable = False  # only rays should be pickable
+        self._ray_highlight_plot.actor.property.color = self._crosshair_color
+        self._ray_highlight_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True)
+
+        self._ray_highlight_plot.glyph.color_mode = "color_by_scalar"
+        self._ray_highlight_plot.parent.parent.name = "Ray Highlight"
+        self._ray_highlight_plot.visible = True
 
     def plot_point_markers(self) -> None:
         """plot point markers inside the scene"""
@@ -530,23 +545,27 @@ class ScenePlotting:
 
         for num, mark in enumerate(self.raytracer.markers):
             if isinstance(mark, PointMarker):
+
                 dx, dy = 0.2 * mark.marker_factor, 0
+
                 m = self.scene.mlab.points3d(*mark.pos, mode="axes", color=self._marker_color)
-                m.visible = not mark.label_only
-                m.glyph.glyph.scale_factor = dx
                 m.actor.actor.property.trait_set(lighting=False, line_width=5, representation="wireframe")
 
+                m.visible = not mark.label_only
+                m.glyph.glyph.scale_factor = dx
                 m.parent.parent.name = f"Marker {num}"
                 m.actor.actor.trait_set(pickable=False, force_translucent=True)
             
                 text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
                                             text=mark.desc, name="Label")
-                text.actor.text_scale_mode = 'none'
+
                 tprop = dict(justification="center") if not self.ui.vertical_labels\
                         else dict(justification="left", orientation=90, vertical_justification="center")
+
                 text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
                                         background_color=self.scene.background, **tprop)
                 text.property.font_size = int(8 * mark.text_factor)
+                text.actor.text_scale_mode = 'none'
 
                 self._marker_plots.append((m, None, None, text, mark))
     
@@ -556,25 +575,29 @@ class ScenePlotting:
 
         for num, mark in enumerate(self.raytracer.markers):
             if isinstance(mark, LineMarker):
-                drx = mark.front.r*np.cos(np.radians(mark.front.angle))
-                dry = mark.front.r*np.sin(np.radians(mark.front.angle))
+
+                drx = mark.front.r * np.cos(np.radians(mark.front.angle))
+                dry = mark.front.r * np.sin(np.radians(mark.front.angle))
+
                 dx, dy = mark.pos[0]+drx, mark.pos[1]+dry
                 m = self.scene.mlab.plot3d([mark.pos[0]-drx, mark.pos[0]+drx], [mark.pos[1]-dry, mark.pos[1]+dry],
                                            [mark.pos[2], mark.pos[2]], tube_radius=0, color=self._line_marker_color)
 
-                m.actor.actor.property.trait_set(lighting=False, line_width=mark.line_factor,
-                                                 representation="wireframe")
                 m.parent.parent.parent.parent.name = f"Marker {num}"
                 m.actor.actor.trait_set(pickable=False, force_translucent=True)
+                m.actor.actor.property.trait_set(lighting=False, line_width=mark.line_factor,
+                                                 representation="wireframe")
             
                 text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
                                             text=mark.desc, name="Label")
-                text.actor.text_scale_mode = 'none'
+
                 tprop = dict(justification="center") if not self.ui.vertical_labels\
                         else dict(justification="left", orientation=90, vertical_justification="center")
+
                 text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
                                         background_color=self.scene.background, **tprop)
                 text.property.font_size = int(8 * mark.text_factor)
+                text.actor.text_scale_mode = 'none'
 
                 self._line_marker_plots.append((m, None, None, text, mark))
 
@@ -595,26 +618,25 @@ class ScenePlotting:
 
         high_contrast = self.ui.high_contrast
 
-        self.scene.background = (0.205, 0.19, 0.19) if not high_contrast else (1, 1, 1)
-        self.scene.foreground = (1, 1, 1) if not high_contrast else (0, 0, 0)
-
-        self._lens_color = (0.63, 0.79, 1.00) if not high_contrast else self.scene.foreground
-        self._lens_alpha = 0.35
-        self._aperture_color = (0, 0, 0)
-        self._detector_color = (0, 0, 0) if not high_contrast else self.scene.foreground
-        self._detector_alpha = 0.9
-        self._subtle_color = (0.3, 0.3, 0.3) if not high_contrast else (0.7, 0.7, 0.7)
-        self._crosshair_color = (1, 0, 0)
-        self._marker_color = (0, 1, 0) if not high_contrast else self.scene.foreground
-        self._line_marker_color = (0.8, 0, 0.8) if not high_contrast else self.scene.foreground
-        self._outline_color = (0, 0, 0) if not high_contrast else (0.8, 0.8, 0.8)
-        self._raysource_alpha = 0.55
-        self._axis_color = (1, 1, 1) if not high_contrast else (0.5, 0.5, 0.5)
-        self._axis_alpha = 0.55 if not high_contrast else 0.35
-        self._info_frame_color = (0, 0, 0) if not high_contrast else (1, 1, 1)
-        self._info_opacity = 0.2
-        self._volume_color = (0.45, 0.45, 0.45) if not high_contrast else (1, 1, 1)
-        self._cylinder_opacity = self._lens_alpha if not high_contrast else 0.6
+        self._lens_alpha =          0.35
+        self._detector_alpha =      0.9
+        self._raysource_alpha =     0.55
+        self._info_opacity =        0.2
+        self._aperture_color =      (0, 0, 0)
+        self._crosshair_color =     (1, 0, 0)
+        self.scene.background =     (0.205, 0.19, 0.19)  if not high_contrast else (1, 1, 1)
+        self.scene.foreground =     (1, 1, 1)            if not high_contrast else (0, 0, 0)
+        self._lens_color =          (0.63, 0.79, 1.00)   if not high_contrast else self.scene.foreground
+        self._detector_color =      (0, 0, 0)            if not high_contrast else self.scene.foreground
+        self._subtle_color =        (0.3, 0.3, 0.3)      if not high_contrast else (0.7, 0.7, 0.7)
+        self._marker_color =        (0, 1, 0)            if not high_contrast else self.scene.foreground
+        self._line_marker_color =   (0.8, 0, 0.8)        if not high_contrast else self.scene.foreground
+        self._outline_color =       (0, 0, 0)            if not high_contrast else (0.8, 0.8, 0.8)
+        self._axis_color =          (1, 1, 1)            if not high_contrast else (0.5, 0.5, 0.5)
+        self._info_frame_color =    (0, 0, 0)            if not high_contrast else (1, 1, 1)
+        self._volume_color =        (0.45, 0.45, 0.45)   if not high_contrast else (1, 1, 1)
+        self._axis_alpha =          0.55                 if not high_contrast else 0.35
+        self._cylinder_opacity =    self._lens_alpha     if not high_contrast else 0.6
 
     def init_keyboard_shortcuts(self) -> None:
         """init keyboard shortcut detection inside the scene"""
@@ -670,25 +692,29 @@ class ScenePlotting:
 
     def init_crosshair(self) -> None:
         """init a crosshair for the picker"""
+
         self.scene.engine.add_source(ParametricSurface(name="Crosshair"), self.scene)
+
         self._crosshair = self.scene.mlab.text(x=0, y=0, z=0, text="+", name="Label")
         self._crosshair.actor.text_scale_mode = 'none'
         self._crosshair.visible = False
         self._crosshair.property.trait_set(font_size=32, justification="center", vertical_justification="center", 
-                                orientation=0, bold=True, font_family="times", color=self._crosshair_color, use_tight_bounding_box=True)
+                                           orientation=0, bold=True, font_family="times", 
+                                           color=self._crosshair_color, use_tight_bounding_box=True)
 
     def init_ray_info(self) -> None:
         """init detection of ray point clicks and the info display"""
+
         self._ray_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_ray_pick, button='Left')
 
         # add ray info text
         self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
         self._ray_text = self.scene.mlab.text(0.02, 0.97, "")
+        self._ray_text.actor.text_scale_mode = 'none'
+        self._ray_text.text = ""
         self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
                                           opacity=1, color=self.scene.foreground, vertical_justification="top",
                                           background_color=self._info_frame_color)
-        self._ray_text.actor.text_scale_mode = 'none'
-        self._ray_text.text = ""
 
     def init_status_info(self) -> None:
         """init GUI status text display"""
@@ -697,8 +723,8 @@ class ScenePlotting:
         # add status text
         self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
         self._status_text = self.scene.mlab.text(0.97, 0.01, "Status Text")
-        self._status_text.property.trait_set(**self.INFO_STYLE, justification="right")
         self._status_text.actor.text_scale_mode = 'none'
+        self._status_text.property.trait_set(**self.INFO_STYLE, justification="right")
 
     # Scene Changes
     ###################################################################################################################
@@ -710,6 +736,7 @@ class ScenePlotting:
 
         for obj in [*self._ray_source_plots, *self._lens_plots, *self._volume_plots,
                     *self._filter_plots, *self._aperture_plots, *self._detector_plots]:
+
             for obji in obj[:3]:
                 # don't change mode of object side if it has no back (in this case wireframe
                 # even without wireframe mode) or the z-extent is too small
@@ -727,6 +754,7 @@ class ScenePlotting:
 
         for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
                      self._marker_plots, self._line_marker_plots, self._index_box_plots, self._ray_source_plots]:
+
             for obj in objs:
                 for obji in obj:
                     if isinstance(obji, mayavi.modules.text.Text):
@@ -814,9 +842,11 @@ class ScenePlotting:
 
         # change index plot objects
         for obj in self._index_box_plots:
+
             if obj[1] is not None:
                 obj[1].property.color = self._axis_color
                 obj[1].property.frame_color = self._subtle_color
+
             if obj[0] is not None:
                 obj[0].actor.property.color = self._outline_color
 
@@ -864,17 +894,17 @@ class ScenePlotting:
 
     def set_ray_opacity(self) -> None:
         """change the ray opacity"""
-        if self._ray_plot:
+        if self._ray_plot is not None:
             self._ray_plot.actor.property.opacity = self.ui.ray_opacity
     
     def set_ray_representation(self) -> None:
         """change the ray representation between 'points' and 'surface'"""
-        if self._ray_plot:
+        if self._ray_plot is not None:
             self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
     def set_ray_width(self) -> None:
         """change the ray width"""
-        if self._ray_plot:
+        if self._ray_plot is not None:
             self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width, point_size=self.ui.ray_width)
 
     def set_status(self, _status: dict[str]) -> None:
@@ -894,6 +924,7 @@ class ScenePlotting:
         # print messages to scene
         if not _status["InitScene"] and self._status_text is not None:
             self._status_text.text = ""
+
             for key, val in msgs.items():
                 if _status[key]:
                     self._status_text.text += msgs[key] + "...\n"
@@ -910,8 +941,7 @@ class ScenePlotting:
 
             self.raytracer.remove(self._fault_markers)
             self._fault_markers = [PointMarker("COLLISION", pos=pfault[ind], text_factor=1.5, 
-                                               marker_factor=1.5)\
-                                  for ind in f_ind]
+                                               marker_factor=1.5) for ind in f_ind]
             self.raytracer.add(self._fault_markers)
             self.plot_point_markers()
 
@@ -924,6 +954,7 @@ class ScenePlotting:
 
     def move_detector_diff(self, ind: int, diff: float) -> None:
         """move the detector plot with index ind differentially"""
+
         if ind < len(self._detector_plots):
             self._detector_plots[ind][0].mlab_source.z += diff
             self._detector_plots[ind][1].mlab_source.z += diff
@@ -933,17 +964,30 @@ class ScenePlotting:
         """clear the ray info text"""
         self._ray_text.text = ""
 
+    def hide_crosshair(self) -> None:
+        if self._crosshair is not None:
+            self._crosshair.visible = False
+
+    def hide_ray_highlight(self) -> None:
+        if self._ray_highlight_plot is not None:
+            self._ray_highlight_plot.visible = False
+
+    def set_crosshair(self, pos: np.ndarray) -> None:
+        if self._crosshair is not None:
+            self._crosshair.trait_set(x_position=pos[0], y_position=pos[1], 
+                                      z_position=pos[2], visible=True)
+
     # Ray and RaySource plotting
     ###################################################################################################################
 
     def color_rays(self) -> None:
         """color the ray representation and the ray source"""
 
-        if not self._ray_plot:
+        if self._ray_plot is None:
             return
 
-        pol_, w_, wl_, snum_, n_ = self._ray_property_dict["pol"], self._ray_property_dict["w"], \
-            self._ray_property_dict["wl"], self._ray_property_dict["snum"], self._ray_property_dict["n"]
+        rp = self._ray_property_dict
+        pol_, w_, wl_, snum_, n_ = rp["pol"], rp["w"], rp["wl"], rp["snum"], rp["n"]
         N, nt, nc = pol_.shape
 
         # set plotting properties depending on plotting mode
@@ -970,6 +1014,7 @@ class ScenePlotting:
                 title = "Refractive\nIndex"
 
             case ('Polarization xz' | 'Polarization yz'):
+
                 if self.raytracer.no_pol:
                     if not self.ui.silent:
                         print("WARNING: Polarization calculation turned off in raytracer, "
@@ -977,14 +1022,17 @@ class ScenePlotting:
 
                     self.ui.coloring_type = "Power"
                     return
+
                 if self.ui.coloring_type == "Polarization yz":
                     # projection of unity vector onto yz plane is the pythagorean sum of the y and z component
                     s = np.hypot(pol_[:, :, 1], pol_[:, :, 2]).ravel()
                     title = "Polarization\n projection\n on yz-plane"
+
                 else:
                     # projection of unity vector onto xz plane is the pythagorean sum of the x and z component
                     s = np.hypot(pol_[:, :, 0], pol_[:, :, 2]).ravel()
                     title = "Polarization\n projection\n on xz-plane"
+
                 cm = "gnuplot"
 
             case _:  # Plain
@@ -1008,9 +1056,11 @@ class ScenePlotting:
         hr, vr = tuple(self._scene_size0/self._scene_size)  # horizontal and vertical size ratio
         lutm.scalar_bar_representation.position = np.array([0.92, (1-0.6*vr)/2])
         lutm.scalar_bar_representation.position2 = np.array([0.06*hr, 0.6*vr])
-        lutm.scalar_bar_widget.process_events = False  # make non-interactive
-        lutm.scalar_bar_representation.border_thickness = 0  # no ugly borders
+
+        # misc lutm props
         lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-#6.3g"
+        lutm.scalar_bar_representation.border_thickness = 0  # no ugly borders
+        lutm.scalar_bar_widget.process_events = False  # make non-interactive
         lutm.number_of_labels = 11
 
         match self.ui.coloring_type:
@@ -1035,7 +1085,7 @@ class ScenePlotting:
     def color_ray_sources(self) -> None:
         """sets colors of ray sources"""
 
-        if not self._ray_plot:
+        if self._ray_plot is None:
             return
 
         lutm = self._ray_plot.parent.scalar_lut_manager
@@ -1102,7 +1152,7 @@ class ScenePlotting:
         ol_ = self.raytracer.rays.optical_lengths(ray_selection)
         
         _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(ray_selection, normalize=False,
-                                                               ret=[0, 1, 0, 0, 0, 0, 0])
+                                                                  ret=[0, 1, 0, 0, 0, 0, 0])
 
         # force copies
         self.__ray_property_dict.update(p=p_.copy(), s=s_.copy(), pol=pol_.copy(), w=w_.copy(), wl=wl_.copy(),
@@ -1125,7 +1175,8 @@ class ScenePlotting:
     def remove_rays(self) -> None:
         """remove ray properties and ray plot object"""
         self._ray_property_dict = {}
-        if self._ray_plot:
+
+        if self._ray_plot is not None:
             with self.constant_camera():
                 self._ray_plot.parent.parent.remove()
                 self._ray_plot = None
@@ -1150,19 +1201,15 @@ class ScenePlotting:
                 pos_z = min(self.raytracer.outline[5], pos_z)
 
                 self.ui.z_det = pos_z  # move detector
-                self._ray_text.text = ""  # reset info text
-                if self._crosshair is not None:
-                    self._crosshair.visible = False  # hide crosshair
+                self.clear_ray_text()
+                self.hide_crosshair()
         else:
             r, ang = np.hypot(pos[0], pos[1]), np.rad2deg(np.arctan2(pos[1], pos[0]))
             self._ray_text.text = f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, "\
                                   f"{pos[2]:>9.6g} mm)\n"\
                                   f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)"
-            if self._crosshair is not None:
-                self._crosshair.x_position = pos[0]
-                self._crosshair.y_position = pos[1]
-                self._crosshair.z_position = pos[2]
-                self._crosshair.visible = True
+
+        self.set_crosshair(pos)
 
     def _on_ray_pick(self, picker_obj: tvtk.tvtk_classes.point_picker.PointPicker = None) -> None:
         """
@@ -1182,116 +1229,108 @@ class ScenePlotting:
             a = self._ray_property_dict["p"].shape[1]  # number of points per ray plotted
             b = picker_obj.point_id  # point id of the ray point
 
+            # calculate ray index (i0) and section index (i1)
             i0, i1 = np.divmod(b, 2*a)
             i1 = min(1 + (i1-1)//2, a - 1)
 
             # get properties of this ray section
             rp = self._ray_property_dict
-            p_, s_, pols_, pw_, wv, snum, n_, index, l, ol = rp["p"][i0], rp["s"][i0], rp["pol"][i0], rp["w"][i0],\
-                rp["wl"][i0], rp["snum"][i0], rp["n"][i0], rp["index"][i0], rp["l"][i0], rp["ol"][i0]
 
-            p, s, pols, pw = p_[i1], s_[i1], pols_[i1], pw_[i1]
+            # choose surface of intersection. Surface undefined (=None) for last absorption at outline
+            surfs = [self.raytracer.ray_sources[rp["snum"][i0]].front] + self.raytracer.tracing_surfaces + [None]
+            surf = surfs[i1]
 
-            pw0 = pw_[i1-1] if i1 else None
-            s0 = s_[i1-1] if i1 else None
-            pols0 = pols_[i1-1] if i1 else None
-            pl = ((pw0-pw)/pw0 if pw0 else 0) if i1 else None  # power loss
+            # show surface properties?
+            surf_props = isinstance(surf, Surface) and surf.mask(rp["p"][i0, i1, 0, None], rp["p"][i0, i1, 1, None])[0]
+
+            # assign properties, nan means not defined/applicable
+            p     = rp["p"][i0, i1]
+            s     = rp["s"][i0, i1]                if i1 < len(surfs)-1  else [np.nan, np.nan, np.nan]
+            pw    = rp["w"][i0, i1]
+            pols  = rp["pol"][i0, i1]              if i1 < len(surfs)-1  else [np.nan, np.nan, np.nan]
+            n     = rp["n"][i0, i1]                if i1 < len(surfs)-1  else np.nan
+            wv    = rp["wl"][i0]
+            snum  = rp["snum"][i0]
+            index = rp["index"][i0]
+            pw0   = rp["w"][i0, i1-1]              if i1                 else np.nan
+            s0    = rp["s"][i0, i1-1]              if i1                 else [np.nan, np.nan, np.nan]
+            pols0 = rp["pol"][i0, i1-1]            if i1                 else [np.nan, np.nan, np.nan]
+            l0    = rp["l"][i0, i1 - 1]            if i1                 else np.nan
+            l1    = rp["l"][i0, i1]                if i1 < len(surfs)-1  else np.nan
+            ol0   = rp["ol"][i0, i1 - 1]           if i1                 else np.nan
+            ol1   = rp["ol"][i0, i1]               if i1 < len(surfs)-1  else np.nan
+            n0    = rp["n"][i0, i1-1]              if i1                 else np.nan
+            pl    = (pw0-pw)/pw0                   if i1 and pw0         else np.nan
+            normal = surf.normals(p[0, None], 
+                                  p[1, None])[0]   if surf_props         else [np.nan, np.nan, np.nan]
 
             def to_sph_coords(s):
-                return np.array([np.rad2deg(np.arccos(s[2])), np.rad2deg(np.arctan2(s[1], s[0]))])  # theta, phi
+                theta = np.rad2deg(np.arccos(s[2]))
+                phi = np.rad2deg(np.arctan2(s[1], s[0]))
+                return np.array([theta, phi])
 
+            # coordinates in spherical coordinates
             s_sph = to_sph_coords(s)
-            s0_sph = to_sph_coords(s0) if i1 else None
+            s0_sph = to_sph_coords(s0)
             pols_sph = to_sph_coords(pols)
-            pols0_sph = to_sph_coords(pols0) if i1 else None
-
-            n = n_[i1]
-            n0 = n_[i1-1] if i1 else None
-
-            surfs = self.raytracer.tracing_surfaces
-
-            if 0 < i1 <= len(surfs):
-                surf = surfs[i1-1]
-            elif not i1:
-                surf = self.raytracer.ray_sources[snum].front
-            else:
-                surf = None
-
-            is_surf = isinstance(surf, Surface)
-            surf_hit = is_surf and surf.mask(np.array([p[0]]), np.array([p[1]]))[0]
-            
-            if is_surf and surf_hit:
-                normal = surf.normals(np.array([p[0]]), np.array([p[1]]))[0]
-                normal_sph = to_sph_coords(normal)
-
-            l0 = l[i1 - 1] if i1 > 0 else None
-            l1 = l[i1] if i1 < l.shape[0] else None
-            ol0 = ol[i1 - 1] if i1 > 0 else None
-            ol1 = ol[i1] if i1 < ol.shape[0] else None
+            pols0_sph = to_sph_coords(pols0)
+            normal_sph = to_sph_coords(normal)
 
             # differentiate between Click and Shift+Click
             if self.scene.interactor.shift_key:
-                text = f"Ray {index}" +  \
-                    f" from RS{snum}" +  \
-                    (f" at surface {i1}\n\n" if i1 else " at ray source\n\n") + \
-                    f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n" + \
-                    "Vectors:                        Cartesian (x, y, z)                   " + \
-                    "Spherical (theta, phi)\n" + \
-                    (f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})" if i1 else "") + \
-                    (f"         ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°)\n" if i1 else "") + \
-                    f"Direction After:       ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})" + \
-                    f"         ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°)\n" + \
-                    (f"Polarization Before:   ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})" if i1
-                    else "") + \
-                    (f"         ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°)\n" if i1
-                    else "") + \
-                    f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})" + \
-                    f"         ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°)\n" + \
-                    (f"Surface Normal:        ({normal[0]:>10.5f}, {normal[1]:>10.5f}, {normal[2]:>10.5f})"
-                    if pw > 0  and is_surf and surf_hit else "") + \
-                    (f"         ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°)\n\n"
-                    if pw > 0 and is_surf and surf_hit else "\n") + \
-                    f"Wavelength:               {wv:>10.2f} nm" + \
-                    (f"\nRefraction Index Before:  {n0:>10.4f}" if i1 else "") + \
-                    (f"           Distance to Last Intersection:          {l0:>10.5g} mm" if l0 else "") + \
-                    f"\nRefraction Index After:   {n:>10.4f}" + \
-                    (f"           Distance to Next Intersection:          {l1:>10.5g} mm" if l1 else "") + \
-                    (f"\nRay Power Before:         {pw0*1e6:>10.5g} µW" if i1 else "") + \
-                    (f"        Optical Distance to Last Intersection:  {ol0:>10.5g} mm" if ol0 else "") + \
-                    f"\nRay Power After:          {pw*1e6:>10.5g} µW" + \
-                    (f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm" if ol1 else "") + \
-                    (f"\nPower Loss on Surface:    {pl*100:>10.5g} %" if i1 else "") + \
-                    ("\n\nSurface Information:\n" if is_surf and surf_hit else "") + \
-                    (surf.info if is_surf and surf_hit else "")
-            else:
-                text = f"Ray {index}" +  \
-                    f" from Source {snum}" +  \
-                    (f" at surface {i1}\n" if i1 else " at ray source\n") + \
-                    f"Intersection Position: ({p[0]:>10.5g} mm, {p[1]:>10.5g} mm, {p[2]:>10.5g} mm)\n" + \
-                    f"Direction After:       ({s[0]:>10.5f},    {s[1]:>10.5f},    {s[2]:>10.5f}   )\n" + \
-                    f"Polarization After:    ({pols[0]:>10.5f},    {pols[1]:>10.5f},    {pols[2]:>10.5f}   )\n" + \
-                    f"Wavelength:             {wv:>10.2f} nm\n" + \
-                    f"Ray Power After:        {pw*1e6:>10.5g} µW\n" + \
-                    "Pick using Shift+Left Mouse Button for more info"
 
-            self._ray_text.text = text
+                text =  f"Ray {index} from RS{snum} "
+                text += f"at surface {i1}\n\n" if i1 else "at ray source\n\n"
+
+                text += f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n"
+
+                text += f"Vectors:                        Cartesian (x, y, z)                   "\
+                         "Spherical (theta, phi)\n"
+                text += f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})"\
+                        f"         ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°)\n"
+                text += f"Direction After:       ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})"\
+                        f"         ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°)\n"
+                text += f"Polarization Before:   ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})"\
+                        f"         ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°)\n"
+                text += f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})"\
+                        f"         ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°)\n"
+                text += f"Surface Normal:        ({normal[0]:>10.5f}, {normal[1]:>10.5f}, {normal[2]:>10.5f})"\
+                        f"         ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°)\n\n"
+
+                text += f"Wavelength:               {wv:>10.2f} nm\n"
+                text += f"Refraction Index Before:  {n0:>10.4f}"\
+                        f"           Distance to Last Intersection:          {l0:>10.5g} mm\n"
+                text += f"Refraction Index After:   {n:>10.4f}"\
+                        f"           Distance to Next Intersection:          {l1:>10.5g} mm\n"
+                text += f"Ray Power Before:         {pw0*1e6:>10.5g} µW"\
+                        f"        Optical Distance to Last Intersection:  {ol0:>10.5g} mm\n"
+                text += f"Ray Power After:          {pw*1e6:>10.5g} µW"\
+                        f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm\n"
+                text += f"Power Loss on Surface:    {pl*100:>10.5g} %\n\n"
+
+                if surf_props:
+                    text += "Surface Information:\n" + surf.info
+
+            else:
+                text =  f"Ray {index} from Source {snum} "
+                text += f"at surface {i1}\n" if i1 else "at ray source\n"
+                text += f"Intersection Position: ({p[0]:>10.5g} mm, {p[1]:>10.5g} mm, {p[2]:>10.5g} mm)\n"
+                text += f"Direction After:       ({s[0]:>10.5f},    {s[1]:>10.5f},    {s[2]:>10.5f}   )\n"
+                text += f"Polarization After:    ({pols[0]:>10.5f},    {pols[1]:>10.5f},    {pols[2]:>10.5f}   )\n"
+                text += f"Wavelength:             {wv:>10.2f} nm\n"
+                text += f"Ray Power After:        {pw*1e6:>10.5g} µW\n"
+                text += f"Pick using Shift+Left Mouse Button for more info"
+
+            self._ray_text.text = text.replace("nan", " - ")
             self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
                                               opacity=1, color=self.scene.foreground)
-            if self._crosshair:
-                self._crosshair.x_position = p[0]
-                self._crosshair.y_position = p[1]
-                self._crosshair.z_position = p[2]
-                self._crosshair.visible = True
 
+            self.set_crosshair(p)
             with self.constant_camera():
                 self.set_ray_highlight(i0)
-                self._ray_highlight_plot.visible = True
 
         else:
-            self._ray_text.text = ""
-            if self._ray_highlight_plot:
-                self._ray_highlight_plot.visible = False
-
-            if self._crosshair:
-                self._crosshair.visible = False
+            self.clear_ray_text()
+            self.hide_ray_highlight()
+            self.hide_crosshair()
 

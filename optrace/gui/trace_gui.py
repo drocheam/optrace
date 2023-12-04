@@ -21,7 +21,6 @@ from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeE
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool
 
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
-import matplotlib.pyplot as plt  # closing plot windows
 
 # provides types and plotting functionality, most of these are also imported for the TCP protocol scope
 from ..tracer import *
@@ -36,7 +35,6 @@ from ..__metadata__ import __version__
 # TODO don't retrace when init and already rays included in raytracer?
 
 # TODO rename debug() to control()
-
 
 # TODO add extent parameter to source_image, detector_image functions
 
@@ -736,7 +734,6 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
-        # pyface_gui.invoke_later(plt.close, "all")  # close plots
         pyface_gui.invoke_later(QtGui.QApplication.closeAllWindows)  # close Qt windows
 
     ####################################################################################################################
@@ -784,8 +781,10 @@ class TraceGUI(HasTraits):
                         self._plot.plot_rays(*res)
                         self._change_ray_and_source_colors()
 
-                    # reset picker text
+                    # reset picker text, highlight plot and crosshair
                     self._plot.clear_ray_text()
+                    self._plot.hide_crosshair()
+                    self._plot.hide_ray_highlight()
 
                     self._status["Drawing"] -= 1
 
