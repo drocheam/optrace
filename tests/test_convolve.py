@@ -230,6 +230,7 @@ class ConvolutionTests(unittest.TestCase):
             # plt.show(block=False)
 
     @pytest.mark.slow
+    @pytest.mark.timeout(600)
     def test_tracing_consistency(self):
         """
         checks that psf convolution produces the same result as tracing.
@@ -309,7 +310,7 @@ class ConvolutionTests(unittest.TestCase):
             # print(np.mean(np.abs(im_diff)))
             delta = 0.0075 if i not in [1, 3] else 0.03  # larger errors for bright colored color checker image due too not enough rays
             self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=delta)
-    3 
+     
             # import optrace.plots as otp
             # otp.image_plot(img_ren, s_img_ren, flip=True)
             # otp.image_plot(img_conv, s_img_conv)
