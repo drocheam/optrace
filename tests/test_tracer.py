@@ -368,7 +368,6 @@ class TracerTests(unittest.TestCase):
         RT.add(ot.Aperture(ot.CircularSurface(r=3), pos=[0, 0, 0]))
         RT.autofocus("Position Variance", z_start=10) # no rays here
 
-    @pytest.mark.slow
     def test_uniform_emittance(self):
         """test that surfaces in ray source emit uniformly"""
 
@@ -411,7 +410,6 @@ class TracerTests(unittest.TestCase):
             
             RT.remove(RS)
 
-    @pytest.mark.slow
     def test_ray_source_convergence(self):
     
         RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True, no_pol=True)
@@ -560,7 +558,6 @@ class TracerTests(unittest.TestCase):
         Z = img / ( 1 + np.sqrt(np.arctan(r/10)))/np.cos(np.arctan(r/10))**3
         self.assertTrue(np.std(Z/np.max(Z)) < 0.05)
   
-    @pytest.mark.slow
     def test_sphere_projections(self):
 
         # make raytracer
@@ -778,7 +775,6 @@ class TracerTests(unittest.TestCase):
         RT.ray_sources[1].power = 1
         RT.trace(10000)
 
-    @pytest.mark.slow
     def test_raytracer_output_threading_nopol(self):
         RT = rt_example()
         RT.threading = False  # on by default, therefore test only off case

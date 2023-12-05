@@ -658,7 +658,6 @@ class SurfaceTests(unittest.TestCase):
 
 
     @pytest.mark.os
-    @pytest.mark.slow
     def test_surface_numerical_precision(self):
 
         # this function checks the numerical precision

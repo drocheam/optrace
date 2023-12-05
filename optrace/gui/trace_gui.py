@@ -1,8 +1,6 @@
 
 import time  # provides sleeping
-import warnings  # show warnings
 import traceback  # traceback printing
-import gc  # garbage collector stats
 from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context manager for _no_trait_action()
@@ -116,10 +114,6 @@ class TraceGUI(HasTraits):
                                          desc="if Detector Spectrum only uses currently selected source")
     """Use only rays from selected source for the detector spectrum"""
 
-    show_all_warnings: List = List(editor=CheckListEditor(values=['Show All Warnings'], format_func=lambda x: x),
-                                   desc="if all warnings are shown")
-    """show debugging messages"""
-
     vertical_labels: List = List(editor=CheckListEditor(values=['Vertical Labels'], format_func=lambda x: x),
                                    desc="if element labels are displayed vertically in scene")
     """in geometries with tight geometry and long descriptions one could want to display the labels vertically"""
@@ -127,32 +121,6 @@ class TraceGUI(HasTraits):
     activate_filter: List = List(editor=CheckListEditor(values=['Activate Filter'], format_func=lambda x: x),
                                    desc="if gaussian filter is applied")
     """gaussian blur filter estimating resolution limit"""
-
-    wireframe_surfaces: \
-        List = List(editor=CheckListEditor(values=['Show Surfaces as Wireframe'], format_func=lambda x: x),
-                    desc="if surfaces are shown as wireframe")
-    """Sets the surface representation to normal or wireframe view"""
-
-    garbage_collector_stats: \
-        List = List(editor=CheckListEditor(values=['Show Garbage Collector Stats'], format_func=lambda x: x),
-                    desc="if stats from garbage collector are shown")
-    """Show stats from garbage collector"""
-
-    raytracer_single_thread: \
-        List = List(editor=CheckListEditor(values=['No Raytracer Multithreading'], format_func=lambda x: x),
-                    desc="if raytracer backend uses only one thread")
-    """limit raytracer backend operation to one thread (excludes the TraceGUI)"""
-    
-    command_dont_skip: \
-        List = List(editor=CheckListEditor(values=["Don't Wait for Idle State"], format_func=lambda x: x),
-                    desc="don't skip when other actions are running. Can lead to race conditions.")
-    """Run command even if background tasks are active..
-    Useful for debugging, but can lead to race conditions"""
-    
-    command_dont_replot: \
-        List = List(editor=CheckListEditor(values=["No Automatic Scene Replotting"], format_func=lambda x: x),
-                    desc="Don't replot scene after geometry change")
-    """don't replot scene after raytracer geometry change"""
 
     maximize_scene: \
         List = List(editor=CheckListEditor(values=["Maximize Scene (Press h in Scene)"], format_func=lambda x: x),
@@ -179,7 +147,7 @@ class TraceGUI(HasTraits):
     image_type: Enum = Enum(*RImage.display_modes, desc="Image Type Presented")
     """Image Type"""
    
-    projection_method_enabled: Bool = False  #: if projection method is selectable, only the case for spherical detectors
+    projection_method_enabled: Bool = False  #: if method is selectable, only the case for spherical detectors
     projection_method: Enum = Enum(*SphericalSurface.sphere_projection_methods,
                                    desc="Projection Method for spherical detectors")
     """sphere surface projection method"""
@@ -220,8 +188,6 @@ class TraceGUI(HasTraits):
 
     _autofocus_information:      Str = Str()
     _spectrum_information:       Str = Str()
-    _debug_options_label:        Str = Str('Debugging Options:')
-    _debug_command_label:        Str = Str('Command Running Options:')
     _spectrum_label:             Str = Str('Generate Spectrum:')
     _image_label:                Str = Str('Render Image:')
     _geometry_label:             Str = Str('Geometry:')
@@ -350,28 +316,13 @@ class TraceGUI(HasTraits):
                             _separator,
                             label="Focus",
                             ),
-                        HSplit(  # hsplit with whitespace group so we have a left margin in this tab
-                            TGroup(Item("_whitespace_label", style='readonly', show_label=False, width=50)),
-                            TGroup(
-                                _separator, _separator, _separator,
-                                Item("_debug_options_label", style='readonly', show_label=False, emphasized=True),
-                                Item('raytracer_single_thread', style="custom", show_label=False),
-                                Item('show_all_warnings', style="custom", show_label=False),
-                                Item('garbage_collector_stats', style="custom", show_label=False),
-                                Item('wireframe_surfaces', style="custom", show_label=False),
-                                _separator, _separator, _separator,
-                                Item("_debug_command_label", style='readonly', show_label=False, emphasized=True),
-                                Item('command_dont_replot', style="custom", show_label=False),
-                                Item('command_dont_skip', style="custom", show_label=False),
-                                _separator),
-                            label="Debug",
-                            ),
                         layout="tabbed",
                         visible_when="_scene_not_maximized",
                         ),
                     ),
                 resizable=True,
-                title=f"Optrace {__version__}"
+                title=f"Optrace {__version__}",
+                # icon=""  # TODO create an icon and set the path here and in sub-windows
                 )
     """the UI view"""
 
@@ -580,7 +531,8 @@ class TraceGUI(HasTraits):
         :param parallel_scale: view scaling. Defines half the size of the view in vertical direction.
         :param center: 3D coordinates of center of view
         :param height: half of vertical height in mm
-        :param direction: camera view direction vector (direction of vector perpendicular to your monitor and in your viewing direction)
+        :param direction: camera view direction vector
+        (direction of vector perpendicular to your monitor and in your viewing direction)
         :param roll: absolute camera roll angle
         """
         self._status["Drawing"] += 1
@@ -730,8 +682,8 @@ class TraceGUI(HasTraits):
     @observe('scene:closing', dispatch="ui")  # needed so this gets also called when clicking x on main window
     def close(self, event=None) -> None:
         """
-        close the whole application, including plot windows
-
+        Close the whole application.
+        
         :param event: optional event from traits observe decorator
         """
         pyface_gui.invoke_later(QtGui.QApplication.closeAllWindows)  # close Qt windows
@@ -1328,36 +1280,6 @@ class TraceGUI(HasTraits):
         if self.raytracer.ray_sources:
             self._source_ind = int(self.source_selection.split(":", 1)[0].split("RS")[1])
 
-    @observe('raytracer_single_thread', dispatch="ui")
-    def _change_raytracer_threading(self, event=None) -> None:
-        """
-        change the raytracer multithreading option. Useful for debugging.
-
-        :param event: optional event from traits observe decorator
-        """
-        self.raytracer.threading = not bool(self.raytracer_single_thread)
-
-    @observe('garbage_collector_stats', dispatch="ui")
-    def _change_garbage_collector_stats(self, event=None) -> None:
-        """
-        show garbage collector stats
-
-        :param event: optional event from traits observe decorator
-        """
-        gc.set_debug(gc.DEBUG_STATS if self.garbage_collector_stats else 0)
-
-    @observe('show_all_warnings', dispatch="ui")
-    def _change_warnings(self, event=None) -> None:
-        """
-        change warning visibility.
-
-        :param event: optional event from traits observe decorator
-        """
-        if bool(self.show_all_warnings):
-            warnings.simplefilter("always")
-        else:
-            warnings.resetwarnings()
-    
     @observe('_command_window_button', dispatch="ui")
     def open_command_window(self, event=None) -> None:
         """
@@ -1379,17 +1301,6 @@ class TraceGUI(HasTraits):
         gdb = PropertyBrowser(self)
         gdb.edit_traits()
 
-    @observe('wireframe_surfaces', dispatch="ui")
-    def _change_surface_mode(self, event=None) -> None:
-        """
-        change surface representation to normal or wireframe view.
-
-        :param event: optional event from traits observe decorator
-        """
-        self._status["Drawing"] += 1
-        self._plot.change_surface_mode()
-        self._status["Drawing"] -= 1
-
     def send_cmd(self, cmd: str) -> None:
         """
         send/execute a command
@@ -1397,7 +1308,7 @@ class TraceGUI(HasTraits):
 
         if cmd != "":
             
-            if self.busy and not self.command_dont_skip:
+            if self.busy:
                 if not self.silent:
                     print("Other actions running, try again when the program is idle.")
                 return False
@@ -1420,10 +1331,9 @@ class TraceGUI(HasTraits):
 
                 exec(cmd, locals() | dict_, globals())
         
-                if not self.command_dont_replot:
-                    hs2 = self.raytracer.property_snapshot()
-                    cmp = self.raytracer.compare_property_snapshot(hs, hs2)
-                    self.replot(cmp)
+                hs2 = self.raytracer.property_snapshot()
+                cmp = self.raytracer.compare_property_snapshot(hs, hs2)
+                self.replot(cmp)
 
             self._status["RunningCommand"] -= 1
             return True

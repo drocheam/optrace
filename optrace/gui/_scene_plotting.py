@@ -424,7 +424,7 @@ class ScenePlotting:
 
             # make non-pickable, so it does not interfere with our ray picker
             a.actor.actor.pickable = False
-            a.actor.property.representation = "wireframe" if self.ui.wireframe_surfaces else "surface"
+            a.actor.property.representation = "surface"
 
             a.actor.actor.property.lighting = light
             if spec:
@@ -711,7 +711,6 @@ class ScenePlotting:
         self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
         self._ray_text = self.scene.mlab.text(0.02, 0.97, "")
         self._ray_text.actor.text_scale_mode = 'none'
-        self._ray_text.text = ""
         self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
                                           opacity=1, color=self.scene.foreground, vertical_justification="top",
                                           background_color=self._info_frame_color)
@@ -722,27 +721,12 @@ class ScenePlotting:
 
         # add status text
         self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
-        self._status_text = self.scene.mlab.text(0.97, 0.01, "Status Text")
+        self._status_text = self.scene.mlab.text(0.97, 0.01, "")
         self._status_text.actor.text_scale_mode = 'none'
         self._status_text.property.trait_set(**self.INFO_STYLE, justification="right")
 
     # Scene Changes
     ###################################################################################################################
-
-    def change_surface_mode(self) -> None:
-        """
-        """
-        repr_ = "wireframe" if bool(self.ui.wireframe_surfaces) else "surface"
-
-        for obj in [*self._ray_source_plots, *self._lens_plots, *self._volume_plots,
-                    *self._filter_plots, *self._aperture_plots, *self._detector_plots]:
-
-            for obji in obj[:3]:
-                # don't change mode of object side if it has no back (in this case wireframe
-                # even without wireframe mode) or the z-extent is too small
-                if obji is not None and not (obji is obj[1] and\
-                        (obj[2] is None or (obj[4].extent[5] - obj[4].extent[4] < 0.05))):
-                    obji.actor.property.representation = repr_
 
     def change_label_orientation(self) -> None:
         """

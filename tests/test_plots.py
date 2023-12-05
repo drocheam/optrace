@@ -243,6 +243,7 @@ class PlotTests(unittest.TestCase):
                     otp.abbe_plot(ri, fargs=dict(figsize=(5, 5)), **args, block=self.manual)
             plt.close("all")
 
+    @pytest.mark.slow
     def test_surface_profile_plot(self) -> None:
 
         SPP = otp.surface_profile_plot

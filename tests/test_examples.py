@@ -59,7 +59,7 @@ class ExampleTests(unittest.TestCase):
         self.execute("astigmatism.py")
     
     @pytest.mark.slow
-    def test_quickstart(self):
+    def test_spherical_aberration(self):
         self.execute("spherical_aberration.py")
     
     @pytest.mark.slow

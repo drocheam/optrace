@@ -37,4 +37,4 @@ jobs:
     # actual tests
     - name: OS tests with tox
       run: |        
-        tox -e os -- -v 
+        tox -e os 

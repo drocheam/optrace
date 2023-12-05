@@ -937,7 +937,6 @@ class GeometryTests(unittest.TestCase):
         self.assertAlmostEqual(boxv.extent[4], 3)
         self.assertAlmostEqual(boxv.extent[5], 9)
     
-    @pytest.mark.slow
     def test_geometry_eye_presets(self):
 
         def base_RT():

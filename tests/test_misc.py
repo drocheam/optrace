@@ -7,6 +7,7 @@ import contextlib  # redirect stdout
 import time
 import doctest
 import unittest
+import pytest
 
 import numpy as np
 import optrace.tracer.misc as misc
@@ -166,6 +167,7 @@ class TracerMiscTests(unittest.TestCase):
         rand = misc.random_from_distribution(x, f, 0)
         self.assertEqual(rand.shape, (0, ))
 
+    @pytest.mark.slow
     def test_misc_uniform(self):
 
         # test uniform

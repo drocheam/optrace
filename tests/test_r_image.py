@@ -17,7 +17,6 @@ import optrace as ot
 
 class RImageTests(unittest.TestCase):
 
-    @pytest.mark.slow
     def test_r_image_misc(self):
 
         # init exceptions
@@ -225,7 +224,6 @@ class RImageTests(unittest.TestCase):
         # throw IOError if invalid file path
         self.assertRaises(IOError, img.save, "./hsajkfhajkfhjk/hajfhsajkfhajksfhjk/ashjsafhkj")
 
-    @pytest.mark.slow
     @pytest.mark.os
     def test_r_image_export(self):
 
@@ -307,7 +305,6 @@ class RImageTests(unittest.TestCase):
         self.assertRaises(RuntimeError, img.rescale, 315)
 
     @pytest.mark.os
-    @pytest.mark.slow
     def test_image_presets(self) -> None:
 
         for imgi in ot.presets.image.all_presets:

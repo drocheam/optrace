@@ -50,4 +50,4 @@ jobs:
     # actual tests
     - name: Test with tox
       run: |        
-        tox -- -v 
+        tox 

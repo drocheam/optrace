@@ -85,6 +85,7 @@ class LoadTests(unittest.TestCase):
             self.assertEqual(len(ns), 1)  # one valid, two invalid
 
     @pytest.mark.os
+    @pytest.mark.slow
     def test_agf_valid_files(self):
         """load different agf catalogues and check if everything is handled correctly"""
 

@@ -135,10 +135,10 @@ class GUITests(unittest.TestCase):
         finally:
             sim._wait_for_idle()
             sim._do_in_main(sim.close)
-            time.sleep(2)
+            # time.sleep(2)
 
-    @pytest.mark.slow
     @pytest.mark.gui1
+    @pytest.mark.slow
     def test_gui_inits(self) -> None:
 
         Image = ot.presets.image.tv_testcard1
@@ -185,7 +185,6 @@ class GUITests(unittest.TestCase):
         trace_gui_run(absorb_missing=False)
         trace_gui_run(minimalistic_view=True)
         trace_gui_run(high_contrast=True)
-        trace_gui_run(raytracer_single_thread=True)
         trace_gui_run(ray_opacity=0.15)
         trace_gui_run(ray_width=5)
         trace_gui_run(vertical_labels=True)
@@ -196,15 +195,15 @@ class GUITests(unittest.TestCase):
         # many parameters
         trace_gui_run(ray_count=100000, rays_visible=1500, absorb_missing=False, ray_opacity=0.1, ray_width=5,
                       coloring_type="Wavelength", plotting_type="Points", minimalistic_view=True, 
-                      raytracer_single_thread=True, vertical_labels=True, ui_style="Windows")
+                      vertical_labels=True, ui_style="Windows")
 
         # this attributes can't bet set initially
         self.assertRaises(RuntimeError, TraceGUI, RT, detector_selection="DET1")
         self.assertRaises(RuntimeError, TraceGUI, RT, source_selection="RS1")
         self.assertRaises(RuntimeError, TraceGUI, RT, z_det=0)
 
-    @pytest.mark.slow
     @pytest.mark.gui2
+    @pytest.mark.slow
     def test_interaction1(self) -> None:
 
         def interact(sim):
@@ -330,6 +329,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.gui2
+    @pytest.mark.slow
     def test_interaction2(self) -> None:
 
         def interact2(sim):
@@ -391,7 +391,7 @@ class GUITests(unittest.TestCase):
                     sim._wait_for_idle()
                     self.assertEqual(sim.last_det_image.projection, pm)
                 
-                # open browsers
+                # open browser
                 sim._do_in_main(sim.open_property_browser)
                 sim._wait_for_idle()
                 time.sleep(2)  # wait some time so windows can be seen by a human user
@@ -403,10 +403,20 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
     @pytest.mark.gui2
+    @pytest.mark.slow
     def test_interaction3(self) -> None:
 
         def interact3(sim):
             with self._try(sim):
+                
+                # test source and detector spectrum
+                sim._do_in_main(sim.source_spectrum)
+                sim._wait_for_idle()
+                sim._do_in_main(sim.detector_spectrum)
+                sim._wait_for_idle()
+                sim._set_in_main("det_spectrum_one_source", True)
+                sim._do_in_main(sim.detector_spectrum)
+                sim._wait_for_idle()
 
                 # test image cuts
                 sim._do_in_main(sim.source_cut)
@@ -427,67 +437,15 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("cut_value", 100)  # does not exist inside image
                 sim._do_in_main(sim.detector_cut)
                 sim._wait_for_idle()
-                plt.close('all')
 
-                # tracing with only one thread
-                sim._set_in_main("raytracer_single_thread", True)
-                sim._wait_for_idle()
-                self.assertEqual(sim.raytracer.threading, False)
-                sim._set_in_main("raytracer_single_thread", False)
-                sim._wait_for_idle()
-                self.assertEqual(sim.raytracer.threading, True)
-                sim._wait_for_idle()
-               
-                sim._set_in_main("wireframe_surfaces", True)
-                sim._wait_for_idle()
-                sim._set_in_main("wireframe_surfaces", False)
-                sim._wait_for_idle()
-                
-                # activate/deactivate all warning. How to check this?
-                sim._set_in_main("show_all_warnings", True)
-                sim._wait_for_idle()
-                sim._set_in_main("show_all_warnings", False)
-                sim._wait_for_idle()
-
-                # activate/deactivate all warning. How to check this?
-                sim._set_in_main("garbage_collector_stats", True)
-                sim._wait_for_idle()
-                sim._set_in_main("garbage_collector_stats", False)
-                sim._wait_for_idle()
-                
         RT = rt_example()
         sim = TraceGUI(RT, silent=True)
         sim.debug(_func=interact3, _args=(sim,))
         plt.close('all')
         self.raise_thread_exceptions()
 
-    @pytest.mark.os
-    @pytest.mark.gui2
-    def test_interaction4(self) -> None:
-
-        def interact4(sim):
-            with self._try(sim):
-                # test source and detector spectrum
-                sim._do_in_main(sim.source_spectrum)
-                sim._wait_for_idle()
-                sim._do_in_main(sim.detector_spectrum)
-                sim._wait_for_idle()
-                sim._set_in_main("det_spectrum_one_source", True)
-                sim._do_in_main(sim.detector_spectrum)
-                sim._wait_for_idle()
-
-                # open property browser
-                sim._do_in_main(sim.open_property_browser)
-                time.sleep(2)
-                sim._wait_for_idle()
-                
-        RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact4, _args=(sim,))
-        self.raise_thread_exceptions()
-
-    @pytest.mark.slow
     @pytest.mark.gui1
+    @pytest.mark.slow
     def test_missing(self) -> None:
         """test TraceGUI operation when Filter, Lenses, Detectors or Sources are missing"""
 
@@ -674,9 +632,7 @@ class GUITests(unittest.TestCase):
                          ('af_one_source', False), ('af_one_source', True), ('det_image_one_source', False),
                          ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), 
                          ('flip_det_image', False), ('det_spectrum_one_source', True), ('det_image_one_source', False),
-                         ('log_image', False), ('log_image', True), ('raytracer_single_thread', False),
-                         ('raytracer_single_thread', True), ('wireframe_surfaces', True), 
-                         ('wireframe_surfaces', False), ('focus_cost_plot', True), ('focus_cost_plot', False), 
+                         ('log_image', False), ('log_image', True),  ('focus_cost_plot', True), ('focus_cost_plot', False), 
                          ('maximize_scene', False), ('maximize_scene', True), ('vertical_labels', False), 
                          ('vertical_labels', True), ('activate_filter', False), ('activate_filter', True), 
                          ('high_contrast', False), ('high_contrast', True)]
@@ -727,6 +683,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
    
+    @pytest.mark.slow
     @pytest.mark.gui3
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
@@ -815,6 +772,7 @@ class GUITests(unittest.TestCase):
    
     # os test because clipboard is system dependent
     @pytest.mark.os
+    @pytest.mark.slow
     @pytest.mark.gui3
     def test_send_cmd(self):
         """test command setting and sending as well as automatic replotting"""
@@ -1091,6 +1049,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
     
+    @pytest.mark.slow
     @pytest.mark.gui3
     def test_additional_coverage_2(self):
         """additionial coverage tests"""
@@ -1166,19 +1125,6 @@ class GUITests(unittest.TestCase):
                 sim._det_ind = 0
                 sim._source_ind = 0
 
-                # command debugging options
-                sim._set_in_main("command_dont_skip", True)
-                sim._wait_for_idle()
-                sim._set_in_main("command_dont_skip", False)
-                sim._wait_for_idle()
-                sim._set_in_main("command_dont_replot", True)
-                sim._wait_for_idle()
-                sim._do_in_main(sim.send_cmd, "RT.remove(APL[0])")
-                sim._wait_for_idle()
-                self.assertEqual(len(sim._plot._aperture_plots), 1)  # plot object still there, not replotted
-                sim._set_in_main("command_dont_replot", False)
-                sim._wait_for_idle()
-
                 # check waiting timeout, while InitScene is set GUI.busy is always true
                 # timeout ensures we return back from waiting
                 sim._status["InitScene"] = 1
@@ -1222,6 +1168,7 @@ class GUITests(unittest.TestCase):
         sim._exit = True  # leads to run() exiting directly after load
         sim.run()
 
+    @pytest.mark.slow
     @pytest.mark.gui2
     def test_rt_fault_no_rays(self):
         """check handling of functionality when there is an geometry fault in the raytracer 
@@ -1352,6 +1299,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
     
+    @pytest.mark.slow
     @pytest.mark.gui1
     def test_line_marker(self):
         """test marker plotting, replotting, removal and properties in scene"""
@@ -1396,6 +1344,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.slow
     @pytest.mark.gui2
     def test_picker(self):
         """
@@ -1535,6 +1484,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.slow
     @pytest.mark.gui3
     def test_picker_coverage(self):
 
@@ -1646,6 +1596,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.slow
     @pytest.mark.gui2
     def test_set_get_camera(self) -> None:
         
@@ -1726,6 +1677,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.slow
     @pytest.mark.os
     @pytest.mark.gui2
     def test_screenshot(self) -> None:
@@ -1758,6 +1710,7 @@ class GUITests(unittest.TestCase):
         sim.debug(_func=interact, _args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.slow
     @pytest.mark.os
     @pytest.mark.gui3
     def test_plots_passdown(self) -> None:

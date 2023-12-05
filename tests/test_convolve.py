@@ -306,10 +306,10 @@ class ConvolutionTests(unittest.TestCase):
 
             # check that mean difference is small
             # we still have some deviations due to noise, incorrect magnification and not-linear aberrations
-            print(np.mean(np.abs(im_diff)))
-            delta = 0.0075 if i not in [1, 3] else 0.025  # larger errors for bright colored color checker image due too not enough rays
-            # self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=delta)
-            
+            # print(np.mean(np.abs(im_diff)))
+            delta = 0.0075 if i not in [1, 3] else 0.03  # larger errors for bright colored color checker image due too not enough rays
+            self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=delta)
+    3 
             # import optrace.plots as otp
             # otp.image_plot(img_ren, s_img_ren, flip=True)
             # otp.image_plot(img_conv, s_img_conv)

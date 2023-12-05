@@ -18,7 +18,6 @@ from test_gui import rt_example
 
 class TracerSpecialTests(unittest.TestCase):
 
-    @pytest.mark.slow
     def test_sphere_detector_range_hits(self):
         """
         this function checks if the detector hit finding correctly handles:
@@ -333,7 +332,6 @@ class TracerSpecialTests(unittest.TestCase):
             self.assertAlmostEqual(np.mean(s[:, -2, 2]), 1)  # still straight
             self.assertTrue(np.allclose(p[:, -2, 0] - p[:, -3, 0], -0.0531867, atol=0.00001, rtol=0))  # parallel shift
 
-    @pytest.mark.slow
     def test_non_sequental_surface_extent(self):
         """
         one surface has a larger z-extent and second surface starts at a lower z-value
