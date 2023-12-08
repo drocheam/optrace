@@ -22,7 +22,7 @@ class ExampleTests(unittest.TestCase):
         path = str(Path.cwd() / "examples" / name)
 
         # start process. ignore warnings and redirect stdout to null
-        process = subprocess.Popen(["python", "-W", "ignore", path], stdout=subprocess.DEVNULL, env=os.environ)
+        process = subprocess.Popen(["python", "-W", "ignore", path], stdout=subprocess.DEVNULL, env=os.environ, shell=True)
         try:
             process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
