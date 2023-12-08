@@ -3,8 +3,6 @@
 from pathlib import Path  # path of this file
 import os  # environment variables
 
-import sys
-sys.path.append(".")
 
 import unittest  # testing framework
 import subprocess  # running processes
@@ -13,7 +11,7 @@ import pytest # testing framework
 
 # add PYTHONPATH to env, so the examples can find optrace
 if "TOX_ENV_DIR" not in os.environ:
-    os.environ["PYTHONPATH"] = "."
+    os.environ["PYTHONPATH"] = str(Path.cwd())
 
 class ExampleTests(unittest.TestCase):
 
