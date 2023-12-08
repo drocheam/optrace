@@ -2,7 +2,7 @@
 
 from pathlib import Path  # path of this file
 import os  # environment variables
-
+import sys
 
 import unittest  # testing framework
 import subprocess  # running processes
@@ -17,8 +17,14 @@ class ExampleTests(unittest.TestCase):
         env = os.environ.copy()
 
         # add PYTHONPATH to env, so the examples can find optrace
-        # if "TOX_ENV_DIR" not in os.environ:
-        env["PYTHONPATH"] = str(Path.cwd())
+        if "TOX_ENV_DIR" not in os.environ:
+            env["PYTHONPATH"] = str(Path.cwd())
+
+        else:    
+            version = sys.version_info[0:2]
+            version_string = "python" + '.'.join(map(str, versions))
+
+            env["PYTHONPATH"] = str(Path(env["TOX_ENV_DIR"]) / "lib" / version_string / "site-packages")
             
         self.env = env
 
