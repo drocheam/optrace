@@ -22,7 +22,7 @@ class ExampleTests(unittest.TestCase):
 
         else:    
             version = sys.version_info[0:2]
-            version_string = "python" + '.'.join(map(str, versions))
+            version_string = "python" + '.'.join(map(str, version))
 
             env["PYTHONPATH"] = str(Path(env["TOX_ENV_DIR"]) / "lib" / version_string / "site-packages")
             
