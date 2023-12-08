@@ -4,14 +4,6 @@ import numpy as np
 import pathlib
 import warnings
 
-
-import os
-import warnings
-
-import numexpr
-
-warnings.warn(str(os.environ))
-
 import optrace as ot
 from optrace.gui import TraceGUI
 
