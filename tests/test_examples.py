@@ -17,8 +17,8 @@ class ExampleTests(unittest.TestCase):
         env = os.environ.copy()
 
         # add PYTHONPATH to env, so the examples can find optrace
-        if "TOX_ENV_DIR" not in os.environ:
-            env["PYTHONPATH"] = str(Path.cwd())
+        # if "TOX_ENV_DIR" not in os.environ:
+        env["PYTHONPATH"] = str(Path.cwd())
             
         self.env = env
 
