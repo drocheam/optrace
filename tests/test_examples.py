@@ -3,6 +3,9 @@
 from pathlib import Path  # path of this file
 import os  # environment variables
 
+import sys
+sys.path.append(".")
+
 import unittest  # testing framework
 import subprocess  # running processes
 import pytest # testing framework
