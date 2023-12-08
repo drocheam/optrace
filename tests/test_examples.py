@@ -9,11 +9,20 @@ import subprocess  # running processes
 import pytest # testing framework
 
 
-# add PYTHONPATH to env, so the examples can find optrace
-if "TOX_ENV_DIR" not in os.environ:
-    os.environ["PYTHONPATH"] = str(Path.cwd())
 
 class ExampleTests(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+
+        env = os.environ.copy()
+
+        # add PYTHONPATH to env, so the examples can find optrace
+        if "TOX_ENV_DIR" not in os.environ:
+            env["PYTHONPATH"] = str(Path.cwd())
+            
+        self.env = env
+
+        super().__init__(*args, **kwargs)
 
     # execute, but kill after timeout, since everything should be automated
     # higher timeout for a human viewer to see if everything is working
@@ -22,7 +31,7 @@ class ExampleTests(unittest.TestCase):
         path = str(Path.cwd() / "examples" / name)
 
         # start process. ignore warnings and redirect stdout to null
-        process = subprocess.Popen(["python", "-W", "ignore", path], stdout=subprocess.DEVNULL, env=os.environ, shell=True)
+        process = subprocess.Popen(["python", "-W", "ignore", path], stdout=subprocess.DEVNULL, env=self.env)
         try:
             process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
