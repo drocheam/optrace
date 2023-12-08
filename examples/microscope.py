@@ -7,7 +7,7 @@ import warnings
 
 import os
 
-raise str(os.environ)
+raise RuntimeError(str(os.environ))
 
 import optrace as ot
 from optrace.gui import TraceGUI
