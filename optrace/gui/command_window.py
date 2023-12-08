@@ -4,6 +4,8 @@ from traitsui.api import View, Item, ValueEditor, Group, CodeEditor, ListStrEdit
 from traits.api import HasTraits, observe, Button, Dict, Str, List
 from pyface.qt import QtGui  # copying to clipboard 
 
+import warnings
+
 
 class CommandWindow(HasTraits):
 
@@ -43,15 +45,13 @@ class CommandWindow(HasTraits):
                 height=800,
                 title="Command Window")
 
-    def __init__(self, gui, silent: bool = False) -> None:
+    def __init__(self, gui) -> None:
         """
         Initialize the command window from a gui
 
         :param gui: parent TraceGUI
-        :param silent: if standard output should be omitted
         """
         self.gui = gui
-        self.silent = silent
         super().__init__()
 
     @observe('_clear_button')
@@ -79,10 +79,7 @@ class CommandWindow(HasTraits):
         # check if actually copied
         if clipboard.text(mode=clipboard.Clipboard) != output:  
             # can't test these, because it seems to fail only on Windows
-            if not self.silent:  # pragma: no cover
-                print(output + "\n\n")  # pragma: no cover
-                print("Copying to clipboard failed. This can be an library or system issue.\n"  # pragma: no cover
-                      "The history was instead output to the terminal, you can copy it from there.")  # pragma: no cover
+            warnings.warn("Copying to clipboard failed. This can be an library or system issue.\n")  # pragma: no cover
 
     @observe('_run_button')
     def send_cmd(self, event=None) -> None:

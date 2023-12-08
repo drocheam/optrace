@@ -28,7 +28,7 @@ class RImageTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.RImage, [5, 6, 8, 9], limit=[5])  # invalid limit type
         self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 9], limit=-1)  # invalid limit value
 
-        img = ot.RImage([-1, 1, -2, 2], silent=True)
+        img = ot.RImage([-1, 1, -2, 2])
         self.assertFalse(img.has_image())  # no image yet
         
         # create some image
@@ -114,7 +114,8 @@ class RImageTests(unittest.TestCase):
 
             for i, ratio in enumerate([1/6, 0.38, 1, 5]):  # different side ratios
 
-                img, P, L = self.gen_r_image(ratio=ratio, limit=limit, threading=bool(i % 2))  # toggle threading
+                ot.global_options.multithreading = bool(i % 2)  # toggle threading
+                img, P, L = self.gen_r_image(ratio=ratio, limit=limit)
 
                 # check power sum
                 P0 = img.power()
@@ -140,6 +141,8 @@ class RImageTests(unittest.TestCase):
                     self.assertEqual(sx0, img.sx)  # side length stayed the same
                     self.assertEqual(sy0, img.sy)  # side length stayed the same
                     self.assertAlmostEqual(img.sx*img.sy/img.Nx/img.Ny, img.Apx)  # check pixel area
+
+        ot.global_options.multithreading = True
 
         # test exceptions render
         self.assertRaises(ValueError, img.render, N=ot.RImage.MAX_IMAGE_SIDE*1.2)  # pixel number too large
@@ -185,9 +188,9 @@ class RImageTests(unittest.TestCase):
         RIm = ot.RImage(extent=ext)
         RIm.render(_dont_rescale=True)
 
-    def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1, limit=None, threading=True):
+    def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1, limit=None):
         # create some image
-        img = ot.RImage([-1, 1, -1*ratio, 1*ratio], silent=True, limit=limit, threading=threading)
+        img = ot.RImage([-1, 1, -1*ratio, 1*ratio], limit=limit)
         p = np.zeros((N, 2))
         p[:, 0] = np.random.uniform(img.extent[0], img.extent[1], N)
         p[:, 1] = np.random.uniform(img.extent[2], img.extent[3], N)
@@ -233,7 +236,6 @@ class RImageTests(unittest.TestCase):
         # check display modes and channels
         for ratio in [0.746, 1, 2.45]:
             img = self.gen_r_image(ratio=ratio)[0]
-            img.silent = True
             img.rescale(90)
                 
             for imm in ot.RImage.display_modes:
@@ -251,7 +253,6 @@ class RImageTests(unittest.TestCase):
         # check shapes
         for ratio in [0.746, 1, 2.45]:
             img = self.gen_r_image(ratio=ratio)[0]
-            img.silent = True
 
             for Npx in [9, 90, 1000]:
 
@@ -308,7 +309,7 @@ class RImageTests(unittest.TestCase):
     def test_image_presets(self) -> None:
 
         for imgi in ot.presets.image.all_presets:
-            RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], silent=True)
+            RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6])
             RSS = ot.RectangularSurface(dim=[6, 6])
             RS = ot.RaySource(RSS, pos=[0, 0, 0], image=imgi)
             RT.add(RS)

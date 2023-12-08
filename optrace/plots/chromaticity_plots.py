@@ -29,7 +29,6 @@ _CONV_XYZ_NORM = color.xyz_to_srgb_linear(_red_xyz, normalize=False)[0, 0, 0]  #
 def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[LightSpectrum] = None,
                             rendering_intent:     str = "Ignore",
                             title:                str = "CIE 1931 Chromaticity Diagram",
-                            fargs:                dict = None,
                             **kwargs)\
         -> None:
     """
@@ -38,7 +37,6 @@ def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[
     :param img: RImage, LightSpectrum or a list of LightSpectrum
     :param rendering_intent: rendering_intent for the sRGB conversion
     :param title: title of the plot
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting parameters, including:
      block: if the plot should block the execution of the program
      norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
@@ -62,13 +60,12 @@ def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[
 
     ext = [0, 0.83, 0, 0.9]  # extent of diagram
     _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
-                       title, "x", "y", fargs=fargs, **kwargs)
+                       title, "x", "y", **kwargs)
 
 
 def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[LightSpectrum] = None,
                             rendering_intent:     str = "Ignore",
                             title:                str = "CIE 1976 UCS Diagram",
-                            fargs:                dict = None,
                             **kwargs)\
         -> None:
     """
@@ -77,7 +74,6 @@ def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[
     :param img: RImage, LightSpectrum or a list of LightSpectrum
     :param rendering_intent: rendering_intent for the sRGB conversion
     :param title: title of the plot
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param kwargs: additional plotting parameters, including:
      block: if the plot should block the execution of the program
      norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
@@ -105,7 +101,7 @@ def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[
 
     ext = [0, 0.7, 0, 0.7]  # extent of diagram
     _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
-                       title, "u'", "v'", fargs=fargs, **kwargs)
+                       title, "u'", "v'", **kwargs)
 
 
 def _chromaticity_plot(img:                     RImage | LightSpectrum | list[LightSpectrum],
@@ -121,10 +117,9 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
                        xl:                      str,
                        yl:                      str,
                        block:                   bool = False,
-                       fargs:                   dict = None,
                        norm:                    str = "Sum",
                        path:                    str = None,
-                       sargs:                   dict = None)\
+                       sargs:                   dict = {})\
         -> None:
     """Lower level plotting function. Don't use directly"""
 
@@ -214,8 +209,7 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     # convert to sRGB
     sRGB = color.srgb_linear_to_srgb(RGB)
 
-    fargs = dict() if fargs is None else fargs
-    plt.figure(**fargs)
+    plt.figure()
     plt.xlim(ext[0], ext[1])
     plt.ylim(ext[2], ext[3])
     plt.minorticks_on()

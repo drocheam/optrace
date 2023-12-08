@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Any  # Any type
+import warnings
 
 import numpy as np  # calculations
 
@@ -220,8 +221,8 @@ class Group(BaseClass):
         """
 
         if not isinstance(el, list) and self.has(el):
-            self.print(f"Element {self.get_desc(hex(id(self)))} already included in geometry. "
-                       "Make a copy to include it another time.")
+            warnings.warn(f"Element {self.get_desc(hex(id(self)))} already included in geometry. "
+                           "Make a copy to include it another time.")
             return
 
         match el:
@@ -249,7 +250,7 @@ class Group(BaseClass):
             case Group():
 
                 if self.n0 != el.n0:
-                    self.print("Overwriting ambient index with index from new Group.")
+                    warnings.warn("Overwriting ambient index with index from new Group.")
                     self.n0 = el.n0
 
                 for eli in el.elements:

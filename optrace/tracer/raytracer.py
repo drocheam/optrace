@@ -7,6 +7,7 @@ from enum import IntEnum  # integer enum
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations and core count
 import scipy.optimize  # numerical optimization methods
+import warnings
 from progressbar import progressbar, ProgressBar  # fancy progressbars
 
 # needed for raytracing geometry and functionality
@@ -18,6 +19,8 @@ from .refraction_index import RefractionIndex
 from .ray_storage import RayStorage
 from .r_image import RImage
 from .transfer_matrix_analysis import TMA
+
+from .. import global_options
 
 from . import misc  # calculations
 from .misc import PropertyChecker as pc  # check types and values
@@ -70,8 +73,6 @@ class Raytracer(Group):
         :param n0: refraction index of the raytracer enviroment (RefractionIndex object)
         :param absorb_missing: if rays missing a lens are absorbed at the lens (bool)
         :param no_pol: if polarization should be neglected to speed things up
-        :param silent: if all standard output should be muted
-        :param threading: if multithreading or creating threads at all is allowed
         """
 
         self.outline = outline  #: geometrical raytracer outline
@@ -188,42 +189,42 @@ class Raytracer(Group):
                 if count := self._msgs[type_, surf]:
                     match type_:
                         case self.INFOS.TIR:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"with total inner reflection at surface {surf}, treating as absorbed.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                          f"with total inner reflection at surface {surf}, treating as absorbed.")
 
                         case self.INFOS.ABSORB_MISSING:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"missing surface {surf}, "
-                                       "set to absorbed because of parameter absorb_missing=True.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                          f"missing surface {surf}, "
+                                           "set to absorbed because of parameter absorb_missing=True.")
                        
                         case self.INFOS.ABSORB_MEDIA_TRANS:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"at refractive media transition at surface {surf} but outside the lens, "
-                                       "set to absorbed.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                          f"at refractive media transition at surface {surf} but outside the lens, "
+                                           "set to absorbed.")
 
                         case self.INFOS.OUTLINE_INTERSECTION:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"hitting outline after surface {surf}, set to absorbed.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                          f"hitting outline after surface {surf}, set to absorbed.")
 
                         case self.INFOS.T_BELOW_TTH:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"with transmittivity at filter surface {surf} below threshold of "
-                                       f"{self.T_TH*100:.3g}%, setting to absorbed.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                          f"with transmittivity at filter surface {surf} below threshold of "
+                                          f"{self.T_TH*100:.3g}%, setting to absorbed.")
 
                         case self.INFOS.ONLY_HIT_FRONT:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"hitting lens front but missing back (lens with surface {surf}), "
-                                       "setting to absorbed.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                          f"hitting lens front but missing back (lens with surface {surf}), "
+                                           "setting to absorbed.")
 
                         case self.INFOS.ONLY_HIT_BACK:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                       f"missing lens front but hitting back (lens with surface {surf}), "
-                                       "setting to absorbed.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                          f"missing lens front but hitting back (lens with surface {surf}), "
+                                           "setting to absorbed.")
                         
                         case self.INFOS.ILL_COND:
-                            self.print(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
-                                       f"numerical hit finding at surface {surf}. "
-                                       f"Their hit position will certainly be wrong.")
+                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
+                                          f"numerical hit finding at surface {surf}. "
+                                          f"Their hit position will certainly be wrong.")
 
     def trace(self, N: int) -> None:
         """
@@ -243,7 +244,7 @@ class Raytracer(Group):
         elements = self.__make_tracing_element_list()
         self.__geometry_checks(elements)
         if self.geometry_error and not self._ignore_geometry_error:
-            self.print("ABORTED TRACING")
+            warnings.warn("ABORTED TRACING")
             return
 
         # reserve space for all tracing surface intersections, +1 for invisible aperture at the outline z-end
@@ -251,7 +252,7 @@ class Raytracer(Group):
         nt = len(self.tracing_surfaces) + 2
 
         cores = ne.detect_number_of_cores()
-        N_threads = cores if N/cores >= 10000 and self.threading else 1
+        N_threads = cores if N/cores >= 10000 and global_options.multithreading else 1
         N_threads = self._force_threads if self._force_threads is not None else N_threads  # overwrite if forced
 
         # will hold info messages from each thread
@@ -259,7 +260,7 @@ class Raytracer(Group):
 
         # start a progressbar
         bar = ProgressBar(fd=sys.stdout, prefix="Raytracing: ", max_value=nt).start()\
-            if not self.silent else None
+            if global_options.show_progressbar else None
 
         # create rays from RaySources
         self.rays.init(self.ray_sources, N, nt, self.no_pol)
@@ -267,7 +268,7 @@ class Raytracer(Group):
         def sub_trace(N_threads: int, N_t: int) -> None:
 
             p, s, pols, weights, wavelengths, ns = self.rays.thread_rays(N_threads, N_t)
-            if not self.silent and N_t == 0:
+            if global_options.show_progressbar  and N_t == 0:
                 bar.update(1)
 
             msg = msgs[N_t]
@@ -303,7 +304,7 @@ class Raytracer(Group):
                         self.__outline_intersection(p, s, weights, hwnh, i, msg)
 
                         i += 1
-                        if not self.silent and N_t == 0:
+                        if global_options.show_progressbar and N_t == 0:
                             bar.update(i+1)
                         p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
                         ns[:, i], ns[:, i+1] = n_l, n2_l
@@ -362,7 +363,7 @@ class Raytracer(Group):
                     ns[:, i+1] = ns[:, i]
 
                 i += 1
-                if not self.silent and N_t == 0:
+                if global_options.show_progressbar and N_t == 0:
                     bar.update(i+1)
 
         if N_threads > 1:
@@ -377,7 +378,7 @@ class Raytracer(Group):
         self.rays.lock()
 
         # show info messages from tracing
-        if not self.silent:
+        if global_options.show_progressbar:
             bar.finish()
 
         self._set_messages(msgs)
@@ -414,14 +415,14 @@ class Raytracer(Group):
             return o[0] <= e[0] and e[1] <= o[1] and o[2] <= e[2] and e[3] <= o[3] and o[4] <= e[4] and e[5] <= o[5]
 
         if not self.ray_sources:
-            self.print("RaySource Missing.")
+            warnings.warn("RaySource Missing.")
             self.geometry_error = True
             return
 
         coll = False
         for i, el in enumerate(elements):
             if not is_inside(el.extent):
-                self.print(f"Element{i} {el} with extent {el.extent} outside outline {self.outline}.")
+                warnings.warn(f"Element{i} {el} with extent {el.extent} outside outline {self.outline}.")
                 self.geometry_error = True
                 return
 
@@ -444,7 +445,7 @@ class Raytracer(Group):
             for rs in self.ray_sources:
 
                 if not is_inside(rs.extent):
-                    self.print(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
+                    warnings.warn(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
                     self.geometry_error = True
                     return
 
@@ -455,8 +456,8 @@ class Raytracer(Group):
                     break
 
         if coll:
-            self.print(f"Collision between two Surfaces at {xc[0], yc[0], zc[0]}"
-                       f" and {xc.shape[0]} other positions.")
+            warnings.warn(f"Collision between two Surfaces at {xc[0], yc[0], zc[0]}"
+                          f" and {xc.shape[0]} other positions.")
             self.geometry_error = True
             self.fault_pos = np.column_stack((xc, yc, zc))
             return
@@ -894,15 +895,13 @@ class Raytracer(Group):
             raise IndexError("Invalid detector_index.")
 
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=4).start()\
-            if not self.silent else None
+            if global_options.show_progressbar else None
 
         # range for selected rays in RayStorage
         Ns, Ne = self.rays.B_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
 
-        dsurf = self.detectors[detector_index].surface  # detector surface
-        silent = dsurf.silent  # backup silent parameter
-        dsurf.silent = True  # force silent, ignores warnings that are intended for tracing
-        
+        dsurf = self.detectors[detector_index].surface
+
         def threaded(Ns, Ne, list_, list_i, bar):
 
             # current rays for loop iteration, this rays are used in hit finding for the next section
@@ -977,7 +976,7 @@ class Raytracer(Group):
 
             list_[list_i] = [ph, w, wl, ish]
 
-        N_th = ne.detect_number_of_cores() if self.threading and Ne-Ns > 100000 else 1
+        N_th = ne.detect_number_of_cores() if global_options.multithreading and Ne-Ns > 100000 else 1
         N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
 
         threads = []
@@ -997,8 +996,6 @@ class Raytracer(Group):
             [thread.join() for thread in threads]
         else:
             threaded(Ns, Ne, list_, 0, bar)
-
-        dsurf.silent = silent  # restore silent state
 
         # make arrays from thread data
         # it would be more efficient to have them assigned to their destination in the thread
@@ -1075,8 +1072,7 @@ class Raytracer(Group):
             = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
 
         # init image and extent, these are the default values when no rays hit the detector
-        img = RImage(long_desc=desc, extent=extent_out, projection=projection,
-                     threading=self.threading, silent=self.silent, limit=limit)
+        img = RImage(long_desc=desc, extent=extent_out, projection=projection, limit=limit)
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
@@ -1223,16 +1219,12 @@ class Raytracer(Group):
         rays_step = self.ITER_RAYS_STEP
         iterations = max(1, int(N_rays / rays_step))
 
-        # turn off messages for raytracing iterations
-        silent_old = self.silent
-        self.silent = True
-
         # image list
         DIm_res = []
         SIm_res = []
 
         iter_ = range(iterations)
-        iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if not silent_old\
+        iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if global_options.show_progressbar\
             else iter_
 
         # for all render iterations
@@ -1242,7 +1234,11 @@ class Raytracer(Group):
             if i == iterations - 1:
                 rays_step += int(N_rays - iterations*rays_step)  # additional rays for last iteration
 
-            self.trace(N=rays_step)
+            # turn off warnings and progess bar for the subtracing
+            global_options.show_progressbar = False
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore')
+                self.trace(N=rays_step)
 
             if self.detectors:
                 # for all detector positions
@@ -1270,14 +1266,13 @@ class Raytracer(Group):
                         SIm_res.append(Imi)
                     else:
                         SIm_res[j]._img += Imi._img
+            
+            global_options.show_progressbar = True
 
         # rescale images to update Im.Im, we only added Im._Im each
         # force rescaling even if Im has the same size as _Im, since only _Im holds the sum image of all iterations
         [SIm.rescale(N_px_S[i]) for i, SIm in enumerate(SIm_res)]
         [DIm.rescale(N_px_D[i]) for i, DIm in enumerate(DIm_res)]
-
-        # revert silent to its state
-        self.silent = silent_old
 
         return SIm_res, DIm_res
 
@@ -1301,7 +1296,7 @@ class Raytracer(Group):
             raise IndexError("Invalid source_index.")
 
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=2).start()\
-            if not self.silent else None
+            if global_options.show_progressbar else None
 
         extent = self.ray_sources[source_index].extent[:4]
         p, _, _, w, wl = self.rays.source_sections(source_index)
@@ -1346,8 +1341,8 @@ class Raytracer(Group):
 
         p, w, wl, extent, desc, bar = self._hit_source("Source Image", source_index)
 
-        img = RImage(long_desc=desc, extent=extent, projection=None, limit=limit,
-                    threading=self.threading, silent=self.silent)
+        img = RImage(long_desc=desc, extent=extent, projection=None, limit=limit)
+
         img.render(N, p, w, wl, **kwargs)
         if bar is not None:
             bar.finish()
@@ -1503,18 +1498,18 @@ class Raytracer(Group):
         # show filter warning
         for filter_ in (self.filters + self.apertures):
             if bounds[0] <= filter_.pos[2] <= bounds[1]:
-                self.print("WARNING: The influence of the filters/apertures in the autofocus range will be ignored.")
+                warnings.warn("WARNING: The influence of the filters/apertures in the autofocus range will be ignored.")
 
         # start progress bar
         ################################################################################################################
 
         Nt = 1024  # cost function sampling points, divisible by 2, 4, 8, 16, 32 threads
-        N_th = ne.detect_number_of_cores() if self.threading else 1
+        N_th = ne.detect_number_of_cores() if global_options.multithreading else 1
         N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
         steps = int(Nt/64)
         steps += 2  # progressbas steps
         bar = ProgressBar(fd=sys.stdout, prefix="Finding Focus: ", max_value=steps).start()\
-            if not self.silent else None
+            if global_options.show_progressbar else None
 
         # get rays and properties
         ################################################################################################################
@@ -1529,7 +1524,7 @@ class Raytracer(Group):
         z = bounds[0] + self.N_EPS
         pos[Ns:Ne] = np.argmax(z < self.rays.p_list[rays_pos, :, 2], axis=1) - 1
         
-        if not self.silent:
+        if global_options.show_progressbar:
             bar.update(1)
 
         # exclude already absorbed rays
@@ -1539,7 +1534,7 @@ class Raytracer(Group):
         N_act = np.count_nonzero(rays_pos)
         N_use = min(N, N_act) if method in ["Position Variance", "Airy Disc Weighting"] else N_act
         if N_use < 1000:  # throw error when no rays are present
-            self.print(f"WARNING: Less than 1000 rays for autofocus ({N_use}).")
+            warnings.warn(f"WARNING: Less than 1000 rays for autofocus ({N_use}).")
 
         # no rays are used, return placeholder variables
         if N_use == 0:
@@ -1559,7 +1554,7 @@ class Raytracer(Group):
         # get Ray parts
         p, s, _, weights, _, _, _ = self.rays.rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0, 0])
 
-        if not self.silent:
+        if global_options.show_progressbar:
             bar.update(2)
 
         # find focus
@@ -1595,7 +1590,7 @@ class Raytracer(Group):
                 div = int(Nt / (steps - 2) / N_th)
 
                 for i, Ni in enumerate(np.arange(Ns, Ne)):
-                    if i % div == div-1 and not self.silent and not N_is:
+                    if i % div == div-1 and global_options.show_progressbar and not N_is:
                         bar.update(2+int(i/div + 1))
                     vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
 
@@ -1619,7 +1614,7 @@ class Raytracer(Group):
                                           options={'maxiter': 300}, bounds=[bounds])
             res.x = res.x[0]
 
-        if not self.silent:
+        if global_options.show_progressbar:
             bar.finish()
 
         # print warning if result is near bounds
@@ -1628,8 +1623,8 @@ class Raytracer(Group):
         rrl = (res.x - bounds[0]) < 10*(bounds[1] - bounds[0]) / Nt
         rrr = (bounds[1] - res.x) < 10*(bounds[1] - bounds[0]) / Nt
         if rrl or rrr:
-            self.print("WARNING: Found minimum near search bounds, "
-                       "this can mean the focus is outside of the search range.")
+            warnings.warn("Found minimum near search bounds, "
+                          "this can mean the focus is outside of the search range.")
 
         pos = self.__autofocus_cost_func(res.x, method, pa, sb, weights, r0, ret_pos=True)[1]
         return res, dict(pos=pos, bounds=bounds, z=r, cost=vals, N=N_use)

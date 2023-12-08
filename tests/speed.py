@@ -9,8 +9,7 @@ from optrace import *
 
 def func2(N2):
     # make raytracer
-    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60], absorb_missing=True,
-                   silent=True, no_pol=False, threading=True)
+    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60], absorb_missing=True, no_pol=False)
 
     # add Raysource
     RSS = CircularSurface(r=1)

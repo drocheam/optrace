@@ -1,0 +1,8 @@
+From  "Comparative analysis of imaging configurations and objectives for Fourier microscopy"
+By Jonathan A. Kurvits, Mingming Jiang, and Rashid Zia 
+
+Publication URL:
+https://opg.optica.org/josaa/abstract.cfm?uri=josaa-32-11-2082
+
+ZMX files:
+https://figshare.com/articles/dataset/Zemax_optical_design_files_of_microscope_objectives_tube_lenses_and_Fourier_imaging_setups/1481270

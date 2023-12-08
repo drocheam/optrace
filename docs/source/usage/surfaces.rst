@@ -187,10 +187,6 @@ For :math:`a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}` the surface is cr
 
    asph = ot.AsphericSurface(r=2.5, R=12.37, k=2.03, coeff=[0, 1e-5, 3.2e-7])
 
-.. testoutput::
-   :hide:
-
-   AsphericSurface: ...
 
 Generally there is no limit on the number of coefficients, however after a dozen one should ask oneself if they are worth the additional computational effort.
 
@@ -220,10 +216,6 @@ As an example we want to create an axicon surface. In the simplest case the heig
 
    func = ot.FunctionSurface1D(r=3, func=lambda r: r)
 
-.. testoutput::
-   :hide:
-
-   FunctionSurface1D: ...
 
 We can use a FunctionSurface2D with rotational symmetry, which is called FunctionSurface1D.
 The user defined function must take r-values (as numpy array), return a numpy array and is provided as the :python:`func` parameter.
@@ -245,11 +237,6 @@ The derivative function is passed with the :python:`deriv_func`-parameter.
 
    func = ot.FunctionSurface1D(r=3, func=lambda r: r, deriv_func=axicon_deriv)
 
-.. testoutput::
-   :hide:
-
-   FunctionSurface1D: ...
-
 
 **Function parameters**
 
@@ -268,11 +255,6 @@ For the :python:`func` argument the matching parameter would be :python:`func_ar
        return dr
 
    func = ot.FunctionSurface1D(r=3, func=axicon, func_args=dict(a=-0.3), deriv_func=axicon_deriv, deriv_args=dict(a=-0.3))
-
-.. testoutput::
-   :hide:
-
-   FunctionSurface1D: ...
 
 
 **z-Range**
@@ -315,10 +297,6 @@ To define a half circular aperture with radius :math:`r=0.1`, one can write:
 
    func = ot.FunctionSurface2D(r=3, func=lambda x, y: np.zeros_like(x), mask_func=mask, mask_args=dict(r=0.1))
 
-.. testoutput::
-   :hide:
-
-   FunctionSurface2D: ...
 
 In this case the :python:`func`-parameter is just a plane. Note that we need to use the FunctionSurface2D class, as there is not rotational symmetry anymore.
 
@@ -346,10 +324,6 @@ Here is and example of a lens with direction dependent curvature and a little no
 
    data2d = ot.DataSurface2D(r=r0, data=H)
 
-.. testoutput::
-   :hide:
-
-   DataSurface2D: ...
 
 Note that we can also add the parameters :python:`z_min=...`, :python:`z_max=`, :python:`parax_roc` as for the FunctionSurface class.
 
@@ -367,10 +341,6 @@ For a surface with rotational symmetry one radial vector is sufficient, for this
 
    data1d = ot.DataSurface1D(r=r0, data=h)
 
-.. testoutput::
-   :hide:
-
-   DataSurface1D: ...
 
 
 Additional Geometrical Quantities

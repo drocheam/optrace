@@ -19,6 +19,10 @@ from optrace.tracer.ray_storage import RayStorage as RayStorage
 
 class TracerMiscTests(unittest.TestCase):
 
+    def test_global_options(self):
+        ot.global_options.show_progressbar = False
+        ot.global_options.multithreading = False
+
     def test_ray_storage(self):
 
         RS = RayStorage()
@@ -32,8 +36,6 @@ class TracerMiscTests(unittest.TestCase):
 
         self.assertRaises(TypeError, BaseClass, desc=1)  # desc not a string 
         self.assertRaises(TypeError, BaseClass, long_desc=1)  # long_desc not a string 
-        self.assertRaises(TypeError, BaseClass, threading=1)  # threading not bool
-        self.assertRaises(TypeError, BaseClass, silent=1)  # silent not bool
     
         BC = BaseClass(desc="a")
         BC.a = 1
@@ -52,12 +54,6 @@ class TracerMiscTests(unittest.TestCase):
         self.assertEqual(BC.get_desc(), BC.desc)
         BC = BaseClass()
         self.assertEqual(BC.get_long_desc(fallback="abc"), "abc")
-
-        # printing
-        BC.silent = False
-        BC.print("Test Message")
-        BC.silent = True
-        BC.print("Test Message")
 
         # coverage: crepr of different member types
         L = ot.presets.geometry.arizona_eye().lenses[0]

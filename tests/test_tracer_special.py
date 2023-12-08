@@ -27,7 +27,7 @@ class TracerSpecialTests(unittest.TestCase):
         for different number of threads
         """
 
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -100, 100], silent=True)
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -100, 100])
         RS = ot.RaySource(ot.CircularSurface(r=0.5), pos=[0, 0, 0], divergence="None")
         RT.add(RS)
 
@@ -71,7 +71,7 @@ class TracerSpecialTests(unittest.TestCase):
             x0, y0, z0 = (*pos0,)
             pos0 = np.array(pos0)
             
-            RT = ot.Raytracer(outline=[-5+x0, 5+x0, -5+y0, 5+y0, -10+z0, 50+z0], silent=True)
+            RT = ot.Raytracer(outline=[-5+x0, 5+x0, -5+y0, 5+y0, -10+z0, 50+z0])
 
             RSS = ot.CircularSurface(r=0.2)
             RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), 
@@ -85,7 +85,6 @@ class TracerSpecialTests(unittest.TestCase):
 
             front = ot.FunctionSurface1D(r=3,
                                          func=lambda r: r**2/50 + r**2/5000,
-                                         silent=True,
                                          parax_roc=25)
             back = ot.CircularSurface(r=2)
             L1 = ot.Lens(front, back, n=ot.presets.refraction_index.SF10, pos=pos0+[0, 0.01, 10])
@@ -93,7 +92,7 @@ class TracerSpecialTests(unittest.TestCase):
 
             Y, X = np.mgrid[-1:1:100j, -1:1:100j]
             data = 3 - (X**2 + Y**2)
-            front = ot.DataSurface2D(data=data, r=4, silent=True)
+            front = ot.DataSurface2D(data=data, r=4)
             back = ot.TiltedSurface(r=4, normal=[0, 0.01, 1])
             L2 = ot.Lens(front, back, n=ot.presets.refraction_index.K5, pos=pos0+[0, 0, 20])
             RT.add(L2)
@@ -172,7 +171,7 @@ class TracerSpecialTests(unittest.TestCase):
     def test_same_surface_behavior(self):
         """check if different surface modes describing the same surface shape actually behave the same"""
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500], absorb_missing=False, silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500], absorb_missing=False)
 
         RSS = ot.CircularSurface(r=0.2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
@@ -194,11 +193,11 @@ class TracerSpecialTests(unittest.TestCase):
                 func = lambda x, y, R: 1/2/R*(x**2 + y**2)
                 func2 = lambda x, y: 0.78785 + 1/2/R_*(x**2 + y**2)  # some offset that needs to be removed
 
-                surff1 = ot.FunctionSurface2D(func=func2, r=r, silent=True)
-                surff2 = ot.FunctionSurface2D(func=func, r=r, z_min=0, z_max=func(0, r, R_), silent=True, func_args=dict(R=R_))
+                surff1 = ot.FunctionSurface2D(func=func2, r=r)
+                surff2 = ot.FunctionSurface2D(func=func, r=r, z_min=0, z_max=func(0, r, R_), func_args=dict(R=R_))
 
-                asph1 = ot.AsphericSurface(R=R_, r=r, k=-1, coeff=[0.], silent=True)  # same as conic
-                asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_], silent=True)  # conic can be neglected, only polynomial part
+                asph1 = ot.AsphericSurface(R=R_, r=r, k=-1, coeff=[0.])  # same as conic
+                asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_])  # conic can be neglected, only polynomial part
 
                 # type "Data" with different resolutions and offsets
                 # and odd number defines a point in the center of the lens,
@@ -208,13 +207,13 @@ class TracerSpecialTests(unittest.TestCase):
                     # 2D surface
                     Y, X = np.mgrid[-r:r:N*1j, -r:r:N*1j]
                     data = 4.657165 + 1/2/R_ * (X**2 + Y**2)  # some random offset
-                    surf_ = ot.DataSurface2D(silent=True, r=r, data=data)
+                    surf_ = ot.DataSurface2D(r=r, data=data)
                     surfs.append(surf_)
 
                     # 1D surface
                     r_ = np.linspace(0, r, N)
                     data = 4.657165 + 1/2/R_ * r_**2  # some random offset
-                    surf_ = ot.DataSurface1D(silent=True, r=r, data=data)
+                    surf_ = ot.DataSurface1D(r=r, data=data)
                     surfs.append(surf_)
 
                 surf_circ = ot.CircularSurface(r=r)
@@ -254,7 +253,7 @@ class TracerSpecialTests(unittest.TestCase):
         case 2: ray misses front, but hits back
         """
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
 
         RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
@@ -293,7 +292,7 @@ class TracerSpecialTests(unittest.TestCase):
         n = ot.RefractionIndex("Constant", n=1.55)
         b_ang = np.arctan(1.55/1)
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12])
 
         # source parameters
         RSS = ot.CircularSurface(r=0.05)
@@ -312,13 +311,13 @@ class TracerSpecialTests(unittest.TestCase):
         RT.add(RS2)
 
         surf_f = lambda x, y: np.tan(b_ang)*x
-        surf1 = ot.FunctionSurface2D(func=surf_f, r=0.7, silent=True)
+        surf1 = ot.FunctionSurface2D(func=surf_f, r=0.7)
 
         surf2 = ot.TiltedSurface(r=0.7, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
 
         Y, X = np.mgrid[-0.7:0.7:100j, -0.7:0.7:100j]
         Z = np.tan(b_ang)*Y
-        surf3 = ot.DataSurface2D(r=0.7, data=Z, silent=True)
+        surf3 = ot.DataSurface2D(r=0.7, data=Z)
 
         for surf in [surf1, surf2, surf3]:
             L = ot.Lens(surf, surf, d=0.2, pos=[0, 0, 0.5], n=n)
@@ -339,7 +338,7 @@ class TracerSpecialTests(unittest.TestCase):
         make sure we get no tracing or geometry check errors and cylinder ray detection works
         """
 
-        RT = ot.Raytracer(outline=[-15, 15, -15, 15, -20, 50], silent=True)
+        RT = ot.Raytracer(outline=[-15, 15, -15, 15, -20, 50])
 
         RSS = ot.CircularSurface(r=4)
         RS = ot.RaySource(RSS, pos=[0, 0, -20])

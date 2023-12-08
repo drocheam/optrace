@@ -5,6 +5,7 @@ from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context manager for _no_trait_action()
 import numpy as np
+import warnings
 
 # enforce qt backend  
 from traits.etsconfig.api import ETSConfig
@@ -98,6 +99,10 @@ class TraceGUI(HasTraits):
     minimalistic_view: List = List(editor=CheckListEditor(values=['More Minimalistic Scene'], format_func=lambda x: x),
                                    desc="if some scene elements should be hidden")
     """More minimalistic scene view. Axes are hidden and labels shortened."""
+    
+    hide_labels: List = List(editor=CheckListEditor(values=['Hide Labels'], format_func=lambda x: x),
+                                   desc="if object labels should be hidden")
+    """Shows or hides object labels"""
 
     af_one_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
                                                       format_func=lambda x: x),
@@ -246,6 +251,7 @@ class TraceGUI(HasTraits):
                             Item('maximize_scene', style="custom", show_label=False),
                             Item('high_contrast', style="custom", show_label=False),
                             Item('vertical_labels', style="custom", show_label=False),
+                            Item('hide_labels', style="custom", show_label=False),
                             _separator, _separator,
                             Item("_property_label", style='readonly', show_label=False, emphasized=True),
                             Item('_property_browser_button', show_label=False),
@@ -331,7 +337,6 @@ class TraceGUI(HasTraits):
 
     def __init__(self, 
                  raytracer:         Raytracer, 
-                 silent:            bool = False, 
                  ui_style:          str = None, 
                  initial_camera:    dict = None,
                  **kwargs) -> None:
@@ -339,7 +344,6 @@ class TraceGUI(HasTraits):
         Create a new TraceGUI with the assigned Raytracer.
 
         :param RT: raytracer
-        :param silent: if standard output shouldn't be omitted
         :param ui_style: UI style string for Qt
         :param initial_camera: parameter dictionary for set_camera
         :param kwargs: additional arguments, options, traits and parameters
@@ -370,8 +374,6 @@ class TraceGUI(HasTraits):
             self.z_det = self.raytracer.detectors[self._det_ind].pos[2]
         self._source_ind = 0
 
-        self.silent = silent
-        self.raytracer.silent = silent
         self._exit = False
 
         self._last_det_snap = None
@@ -468,9 +470,7 @@ class TraceGUI(HasTraits):
 
         except Exception as err:
 
-            if not self.silent:
-                traceback.print_exc()  # print traceback
-
+            warnings.warn(traceback.print_exc())  # print traceback
             error[:] = [True]  # change reference, now evals to true
     
     def _do_in_main(self, f: Callable, *args, **kw) -> None:
@@ -532,7 +532,7 @@ class TraceGUI(HasTraits):
         :param center: 3D coordinates of center of view
         :param height: half of vertical height in mm
         :param direction: camera view direction vector
-        (direction of vector perpendicular to your monitor and in your viewing direction)
+         (direction of vector perpendicular to your monitor and in your viewing direction)
         :param roll: absolute camera roll angle
         """
         self._status["Drawing"] += 1
@@ -657,19 +657,16 @@ class TraceGUI(HasTraits):
         # it could also be in some trait_handlers or functions from other classes
         return self.scene.busy or any(val > 0 for val in self._status.values())
 
-    def debug(self, _exit: bool = False, _func: Callable = None, _args: tuple = None) -> None:
+    def control(self, func: Callable, args: tuple = (), kwargs: dict = {}) -> None:
         """
-        Run in debugging mode
+        Control the GUI from a separate thread.
 
-        :param _exit: if exit directly after initializing and plotting the GUI
-        :param _func: thread function to execute while the GUI is active
-        :param _args: arguments for _func
+        :param func: thread function to execute while the GUI is active
+        :param args: positional arguments for func
+        :param kwargs: keyword arguments for func
         """
-        self._exit = _exit
-
-        if _func is not None:
-            th = Thread(target=_func, args=_args, daemon=True)
-            th.start()
+        th = Thread(target=func, args=args, kwargs=kwargs, daemon=True)
+        th.start()
 
         self.configure_traits()
 
@@ -1240,6 +1237,18 @@ class TraceGUI(HasTraits):
             self._plot.change_minimalistic_view()
             self._status["Drawing"] -= 1
     
+    @observe('hide_labels', dispatch="ui")
+    def _change_hide_labels(self, event=None) -> None:
+        """
+        Hide or show object labels.
+
+        :param event: optional event from traits observe decorator
+        """
+        if not self._status["InitScene"]:
+            self._status["Drawing"] += 1
+            self._plot.change_label_visibility()
+            self._status["Drawing"] -= 1
+    
     @observe('vertical_labels', dispatch="ui")
     def change_label_orientation(self, event=None):
         """
@@ -1288,7 +1297,7 @@ class TraceGUI(HasTraits):
         :param event: optional event from traits observe decorator
         """
         if self._cdb is None:
-            self._cdb = CommandWindow(self, self.silent)
+            self._cdb = CommandWindow(self)
         self._cdb.edit_traits()
 
     @observe('_property_browser_button', dispatch="ui")
@@ -1309,8 +1318,7 @@ class TraceGUI(HasTraits):
         if cmd != "":
             
             if self.busy:
-                if not self.silent:
-                    print("Other actions running, try again when the program is idle.")
+                warnings.warn("Other actions running, try again when the program is idle.")
                 return False
 
             self._status["RunningCommand"] += 1

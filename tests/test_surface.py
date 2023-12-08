@@ -69,21 +69,21 @@ class SurfaceTests(unittest.TestCase):
         # SurfaceFunction with all funcs defined
         sfunc =  ot.FunctionSurface2D(func = lambda x, y: np.ones_like(x),
                                       deriv_func=lambda x, y: (np.zeros_like(x), np.zeros_like(x)),
-                                      mask_func=lambda x, y: x+y < 2, r=3, silent=True)
+                                      mask_func=lambda x, y: x+y < 2, r=3)
 
         S = [ot.CircularSurface(r=4),
              ot.SphericalSurface(r=5, R=10),
              ot.ConicSurface(r=3.2, R=-7, k=2),
-             ot.AsphericSurface(r=3, R=-20, k=1, coeff=[0.02, 0.0034, 1e-5, 2e-5, 3e-5, 4e-5, 5e-5, 6e-5], silent=True),
+             ot.AsphericSurface(r=3, R=-20, k=1, coeff=[0.02, 0.0034, 1e-5, 2e-5, 3e-5, 4e-5, 5e-5, 6e-5]),
              ot.RectangularSurface(dim=[5, 6]),
-             ot.FunctionSurface2D(func=lambda x, y: x, r=2, silent=True),
-             ot.FunctionSurface2D(func=lambda x, y: -x, r=2, silent=True),
-             ot.FunctionSurface1D(func=lambda r: r**2, r=2, silent=True),
-             ot.FunctionSurface1D(func=lambda r: r**2 + 0.001*r**4, r=3, silent=True),
+             ot.FunctionSurface2D(func=lambda x, y: x, r=2),
+             ot.FunctionSurface2D(func=lambda x, y: -x, r=2),
+             ot.FunctionSurface1D(func=lambda r: r**2, r=2),
+             ot.FunctionSurface1D(func=lambda r: r**2 + 0.001*r**4, r=3),
              sfunc,
              ot.TiltedSurface(r=4, normal=[0.5, 0, np.sqrt(1-0.5**2)]),
-             ot.DataSurface2D(r=2, data=1+np.random.sample((50, 50)), silent=True),
-             ot.DataSurface1D(r=2, data=1+np.random.sample(50), silent=True),
+             ot.DataSurface2D(r=2, data=1+np.random.sample((50, 50))),
+             ot.DataSurface1D(r=2, data=1+np.random.sample(50)),
              ot.RingSurface(r=3, ri=0.2),  # ring with ri < 0.5r
              ot.RingSurface(r=3, ri=2)]  # ring with ri > 0.5r gets plotted differently
 
@@ -689,7 +689,7 @@ class SurfaceTests(unittest.TestCase):
                         r = fr*R
 
                         # compare estimated normals with actual, FunctionSurface2D
-                        surf1 = ot.FunctionSurface2D(func=surf_f, r=r, silent=True)
+                        surf1 = ot.FunctionSurface2D(func=surf_f, r=r)
                         x = np.linspace(0, r, 100)
                         y = np.zeros_like(x)
                         n_is = surf1.normals(x, y)
@@ -697,7 +697,7 @@ class SurfaceTests(unittest.TestCase):
                         self.assertTrue(np.allclose(n_is - n_should, 0, atol=1e-7, rtol=0))
                         
                         # compare estimated normals with actual, FunctionSurface1D
-                        surf11 = ot.FunctionSurface1D(func=lambda r: surf_f(r, np.zeros_like(r)), r=r, silent=True)
+                        surf11 = ot.FunctionSurface1D(func=lambda r: surf_f(r, np.zeros_like(r)), r=r,)
                         x = np.linspace(0, r, 100)
                         y = np.zeros_like(x)
                         n_is = surf11.normals(x, y)
@@ -710,12 +710,12 @@ class SurfaceTests(unittest.TestCase):
                                 if not i:  # 2D data surface
                                     Y, X = np.mgrid[-r:r:N*1j, -r:r:N*1j]
                                     data = surf_f(X.flatten(), Y.flatten()).reshape(X.shape)
-                                    surf2 = ot.DataSurface2D(data=data, r=r, silent=True)
+                                    surf2 = ot.DataSurface2D(data=data, r=r)
                                 else:  # 1D data surface
                                     x2 = np.linspace(0, r, N)
                                     y2 = np.zeros_like(x2)
                                     data = surf_f(x2, y2)
-                                    surf2 = ot.DataSurface1D(data=data, r=r, silent=True)
+                                    surf2 = ot.DataSurface1D(data=data, r=r)
                            
                                 # compare numeric normals to actual ones
                                 # data normals are more unprecise, since enough samples are needed to define the shape

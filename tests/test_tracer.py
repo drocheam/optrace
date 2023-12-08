@@ -28,8 +28,6 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.Raytracer, outline=5)  # incorrect outline
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, absorb_missing=1)  # incorrect bool parameter
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, no_pol=1)  # incorrect bool parameter
-        self.assertRaises(TypeError, ot.Raytracer, outline=o0, threading=1)  # incorrect bool parameter
-        self.assertRaises(TypeError, ot.Raytracer, outline=o0, silent=1)  # incorrect bool parameter
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, n0=1)  # incorrect Refractionindex
     
         # value errors
@@ -134,7 +132,7 @@ class TracerTests(unittest.TestCase):
         L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3),
                        n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10])
 
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 30], silent=True)
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 30])
         RS0 = RS.copy()
         RS0.move_to([0, 0, RT.outline[4]])
         RT.add(RS0)
@@ -176,7 +174,7 @@ class TracerTests(unittest.TestCase):
 
         # additional ray source geometry checks
 
-        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 30], silent=True)
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 30])
         RS = ot.RaySource(ot.Point(), pos=[0, 0, -10])
         RT.add(RS)
 
@@ -293,7 +291,7 @@ class TracerTests(unittest.TestCase):
     @pytest.mark.slow
     def test_focus(self):
         
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 40], silent=True, n0=ot.RefractionIndex("Constant", n=1.1))
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 40], n0=ot.RefractionIndex("Constant", n=1.1))
         RSS = ot.CircularSurface(r=0.5)
         RS = ot.RaySource(RSS, pos=[0, 0, -3])
         RT.add(RS)
@@ -360,9 +358,9 @@ class TracerTests(unittest.TestCase):
         RT.autofocus("Irradiance Variance", z_start=RT.outline[5])  
         # leads to a warning, that minimum may not be found
         
-        RT.silent = False
-        RT.threading = False
+        ot.global_options.multithreading = False
         RT.autofocus("Irradiance Variance", z_start=RT.outline[5])  
+        ot.global_options.multithreading = True
 
         # aperture blocks all light
         RT.add(ot.Aperture(ot.CircularSurface(r=3), pos=[0, 0, 0]))
@@ -371,7 +369,7 @@ class TracerTests(unittest.TestCase):
     def test_uniform_emittance(self):
         """test that surfaces in ray source emit uniformly"""
 
-        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 10], silent=True, n0=ot.RefractionIndex("Constant", n=1))
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 10], n0=ot.RefractionIndex("Constant", n=1))
 
         for surf in [ot.CircularSurface(r=2), 
                     ot.RectangularSurface(dim=[1, 1]), 
@@ -412,7 +410,7 @@ class TracerTests(unittest.TestCase):
 
     def test_ray_source_convergence(self):
     
-        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True, no_pol=True)
+        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], no_pol=True)
 
         conv_pos = [30, -25, 25]
 
@@ -451,7 +449,7 @@ class TracerTests(unittest.TestCase):
         # since the projection is not equidistant and equal-area at the same time
 
         # make raytracer
-        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True, no_pol=True)
+        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], no_pol=True)
 
         RSS0 = ot.RectangularSurface(dim=[0.02, 0.02])
         RS0 = ot.RaySource(RSS0, divergence="Isotropic", div_2d=True,
@@ -561,7 +559,7 @@ class TracerTests(unittest.TestCase):
     def test_sphere_projections(self):
 
         # make raytracer
-        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100], silent=True)
+        RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100])
 
         # add Detector
         R = 90
@@ -777,8 +775,8 @@ class TracerTests(unittest.TestCase):
 
     def test_raytracer_output_threading_nopol(self):
         RT = rt_example()
-        RT.threading = False  # on by default, therefore test only off case
-        RT.silent = False
+        ot.global_options.multithreading = False
+        ot.global_options.show_progressbar = False
 
         # raytracer not silent -> outputs messages and progress bar for actions
         RT.trace(10000)
@@ -803,11 +801,14 @@ class TracerTests(unittest.TestCase):
         # simulate with no_pol
         RT.no_pol = True
         RT.trace(10000)
+        
+        ot.global_options.multithreading = True
+        ot.global_options.show_progressbar = True
 
     def test_numeric_tracing(self):
         """checks RT.find_hit for a numeric surface and DataSurface """
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
 
         x = np.linspace(-2, 2, 100)
         y = np.linspace(-2, 2, 100)
@@ -819,8 +820,8 @@ class TracerTests(unittest.TestCase):
 
         n = ot.RefractionIndex("Constant", n=1.5)
 
-        front = ot.DataSurface2D(data=Z, r=2, silent=True)
-        back = ot.DataSurface2D(data=-Z, r=2, silent=True)
+        front = ot.DataSurface2D(data=Z, r=2)
+        back = ot.DataSurface2D(data=-Z, r=2)
         L = ot.Lens(front, back, n, pos=[0, 0, 0], d=0.4)
         RT.add(L)
 
@@ -840,7 +841,7 @@ class TracerTests(unittest.TestCase):
         infinitely small lens -> almost all rays miss and are set to absorbed (due to absorb_missing = True)
         """
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
 
         RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
@@ -867,7 +868,7 @@ class TracerTests(unittest.TestCase):
         infinitely small lens -> almost all rays miss and are set to absorbed because a media transition
         """
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False, silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
 
         RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
@@ -890,7 +891,7 @@ class TracerTests(unittest.TestCase):
         -> almost all rays are absorbed by outline 
         """
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 5000], absorb_missing=False, silent=True)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 5000], absorb_missing=False)
 
         RSS = ot.Point()
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="Isotropic", 
@@ -906,7 +907,7 @@ class TracerTests(unittest.TestCase):
         unrealistically high refractive index, a slight angle leads to TIR at the next surface
         """
 
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False, silent=True, 
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False, 
                           n0=ot.RefractionIndex("Constant", 100))
 
         RSS = ot.CircularSurface(r=2)
@@ -928,7 +929,7 @@ class TracerTests(unittest.TestCase):
         to avoid ghost rays, small transmission factors are set to 0
         """
 
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False, silent=True)
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False)
 
         RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Constant"), divergence="None",
@@ -951,7 +952,7 @@ class TracerTests(unittest.TestCase):
     def test_object_collision(self):
 
         # make raytracer
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60], silent=True)
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
 
         # add Raysource
         RSS = ot.Point()
@@ -1011,7 +1012,6 @@ class TracerTests(unittest.TestCase):
     def test_iterative_render(self):
         RT = rt_example()
         RT.no_pol = True
-        RT.silent = True
 
         # testing only makes sense with multiple sources and detectors
         assert len(RT.ray_sources) > 1
@@ -1120,7 +1120,6 @@ class TracerTests(unittest.TestCase):
         sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2)
 
         # do multiple iterative steps with an un-full last iteration
-        RT.silent = False  # turn on pogressbar
         sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2+100)
         
         # render without detectors
@@ -1137,7 +1136,7 @@ class TracerTests(unittest.TestCase):
         test polarization and transmission for a setup with brewster angle
         """
 
-        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 10], silent=True)
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 10])
 
         # source parameters
         n = ot.RefractionIndex("Constant", n=1.55)

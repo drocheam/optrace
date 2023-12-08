@@ -65,11 +65,11 @@ You can call :python:`convolve` like this:
 
 The function returns the convolved sRGB image :python:`img2`, the new image side lengths :python:`s2`.
 
-Additional parameters for this function include :python:`silent`, which omits all text output like a progressbar and informational messages. :python:`threading=False` disables multithreading and :python:`rendering_intent` defines the used intent for the sRGB conversion.
+The additional parameter :python:`rendering_intent` defines the used intent for the sRGB conversion.
 
 .. testcode::
 
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf, silent=True, threading=False, rendering_intent="Perceptual")
+   img2, s2 = ot.convolve(img, s_img, psf, s_psf, rendering_intent="Perceptual")
 
 
 **Restrictions**

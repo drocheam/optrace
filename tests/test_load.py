@@ -80,9 +80,8 @@ class LoadTests(unittest.TestCase):
         """load a file with materials with invalid formula mode number"""
         path = pathlib.Path(__file__).resolve().parent / "test_files" / "error.agf"
 
-        for sil in [False, True]:  # muted and unmuted mode
-            ns = ot.load.agf(str(path), silent=sil)
-            self.assertEqual(len(ns), 1)  # one valid, two invalid
+        ns = ot.load.agf(str(path))
+        self.assertEqual(len(ns), 1)  # one valid, two invalid
 
     @pytest.mark.os
     @pytest.mark.slow
@@ -118,9 +117,8 @@ class LoadTests(unittest.TestCase):
             ncount = len(lins)
 
             # process file
-            for sil in [False, True]:  # unmuted and muted mode
-                ns = ot.load.agf(temp_file, silent=sil)
-                self.assertTrue(len(ns)/ncount > 0.95)  # more than 95% detected
+            ns = ot.load.agf(temp_file)
+            self.assertTrue(len(ns)/ncount > 0.95)  # more than 95% detected
             # sometimes the files have media with the same name or media with invalid n below 1
 
             # delete file
@@ -140,7 +138,7 @@ class LoadTests(unittest.TestCase):
     def test_zmx_endoscope(self):
         """load an endoscope example"""
 
-        RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 200], silent=True)
+        RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 200])
 
         RS = ot.RaySource(ot.CircularSurface(r=0.05), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
@@ -161,7 +159,7 @@ class LoadTests(unittest.TestCase):
     def test_zmx_portrait_lens(self):
         """load an potrait lens example"""
 
-        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
+        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
@@ -181,7 +179,7 @@ class LoadTests(unittest.TestCase):
     def test_zmx_camera_lens(self):
         """load a camera lens example"""
 
-        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
+        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=0.7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
@@ -202,7 +200,7 @@ class LoadTests(unittest.TestCase):
     def test_zmx_smith_tessar(self):
         """load a tessar example"""
 
-        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
+        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
@@ -226,7 +224,7 @@ class LoadTests(unittest.TestCase):
     def test_zmx_achromat(self):
         """load an achromat example"""
 
-        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
+        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=10), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
@@ -234,8 +232,7 @@ class LoadTests(unittest.TestCase):
 
         n_schott = ot.load.agf("schott.agf")
 
-        for silent in [False, True]:
-            G = ot.load.zmx("temp.zmx", n_schott, silent=silent)
+        G = ot.load.zmx("temp.zmx", n_schott)
 
         RT.add(G)
         RT.trace(10000)
@@ -253,7 +250,7 @@ class LoadTests(unittest.TestCase):
     def test_zmx_microscope_objective(self):
         """load an objective example"""
 
-        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
+        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=0.8), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
@@ -275,7 +272,7 @@ class LoadTests(unittest.TestCase):
     def test_zmx_plan_concave(self):
         """zmx of a single lens, so only two surfaces"""
 
-        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200], silent=True)
+        RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=1.2), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
@@ -298,6 +295,50 @@ class LoadTests(unittest.TestCase):
 
         os.remove("temp.zmx")
 
+    def test_zmx_nikon_100x_objective(self):
+        """this example tests:
+        1) handling of multiple material dictionaries
+        2) an ambient medium before a setup
+        3) surfaces without diameter
+        4) a long list of surfaces
+        5) __BLANK materials, but with index and abbe number
+        """
+
+        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/ohara.agf", "ohara.agf")
+        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/hikari.agf", "hikari.agf")
+        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/hoya.agf", "hoya.agf")
+
+        n_dict = ot.load.agf("schott.agf")
+        n_dict = n_dict | ot.load.agf("ohara.agf")
+        n_dict = n_dict | ot.load.agf("hikari.agf")
+        n_dict = n_dict | ot.load.agf("hoya.agf")
+        n_dict["H-ZF7L"] = ot.RefractionIndex("Abbe", n=1.805180, V=25.46)
+
+        # create tracer
+        RT = ot.Raytracer(outline=[-2000, 2000, -2000, 2000, -50, 1200])
+
+        # object
+        RSS = ot.RectangularSurface(dim=[20e-3, 20e-3])
+        RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.cell,
+                          pos=[0, 0, -0.00001], s=[0, 0, 1], div_angle=60, desc="Cell")
+        RT.add(RS)
+
+        self.save_file("https://figshare.com/ndownloader/files/2259958", "temp.zmx") 
+        G = ot.load.zmx("temp.zmx", n_dict=n_dict)
+        RT.add(G)
+        
+        det = ot.Detector(ot.RectangularSurface([200, 200]), pos=[0, 0, 1000])
+
+        RT.trace(100000)
+
+        img = RT.detector_image(200)
+        self.assertTrue(img.power() > 0.35)
+
+        os.remove("temp.zmx")
+        os.remove("hikari.agf")
+        os.remove("hoya.agf")
+        os.remove("ohara.agf")
+        
     @pytest.mark.os
     def test_zmx_minimal(self):
         """

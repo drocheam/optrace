@@ -143,16 +143,16 @@ The following keyboard shortcuts are available inside the scene:
 
    * - Shortcut
      - Function
-   * - ``y``
-     - set scene view to default y view
+   * - ``i``
+     - sets the scene view to default view set by GUI parameter `initial_camera` or the y-side view if not provided
    * - ``h``
      - maximize scene (hide toolbar and sidebar)
    * - ``v``
      - toggle minimalistic view option
    * - ``c``
      - toggle high contrast mode
-   * - ``r``
-     - toggle plotting type of rays (points or beams)
+   * - ``b``
+     - toggle label visibility
    * - ``d``
      - render detector image with the current settings
    * - ``n``
@@ -311,6 +311,10 @@ Main Tab
      - :attr:`vertical_labels <optrace.gui.trace_gui.TraceGUI.vertical_labels>`
      - :python:`True` or :python:`False`
      - if object labels are justified vertically (in lateral direction)
+   * - Hide Labels
+     - :attr:`hide_labels <optrace.gui.trace_gui.TraceGUI.hide_labels>`
+     - :python:`True` or :python:`False`
+     - if object labels should be hidden
    * - Open Property Browser
      - :meth:`open_property_browser() <optrace.gui.trace_gui.TraceGUI.open_property_browser>`
      -

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from contextlib import contextmanager  # context manager for _no_trait_action()
+import warnings
 
 import numpy as np  # calculations
 import copy
@@ -21,7 +22,7 @@ class ScenePlotting:
     It uses properties and settings from a TraceGUI.
     """
 
-    SURFACE_RES: int = 150
+    SURFACE_RES: int = 120
     """Surface sampling count in each dimension"""
 
     MAX_RAYS_SHOWN: int = 10000
@@ -394,6 +395,7 @@ class ScenePlotting:
             label = (f"ambient\n" if not self.ui.minimalistic_view else "")  + "n=" + nList[i].get_desc()
             text = self.scene.mlab.text(x_pos, y_pos, z=z_pos, text=label, name="Label")
             text.actor.text_scale_mode = 'none'
+            text.visible = not bool(self.ui.hide_labels)
             text.property.trait_set(**self.LABEL_STYLE, frame=True, frame_color=self._subtle_color, 
                                     color=self._axis_color, opacity=self._axis_alpha)
 
@@ -475,6 +477,7 @@ class ScenePlotting:
             label = label if obj.desc == "" or bool(self.ui.minimalistic_view) else label + ": " + obj.desc
             text = self.scene.mlab.text(x=obj.extent[1], y=obj.pos[1], z=zl, text=label, name="Label")
             text.actor.text_scale_mode = 'none'
+            text.visible = not bool(self.ui.hide_labels)
 
             if not self.ui.vertical_labels:
                 text.property.trait_set(**self.LABEL_STYLE, justification="center", vertical_justification="bottom", 
@@ -566,6 +569,7 @@ class ScenePlotting:
                                         background_color=self.scene.background, **tprop)
                 text.property.font_size = int(8 * mark.text_factor)
                 text.actor.text_scale_mode = 'none'
+                text.visible = not bool(self.ui.hide_labels)
 
                 self._marker_plots.append((m, None, None, text, mark))
     
@@ -598,6 +602,7 @@ class ScenePlotting:
                                         background_color=self.scene.background, **tprop)
                 text.property.font_size = int(8 * mark.text_factor)
                 text.actor.text_scale_mode = 'none'
+                text.visible = not bool(self.ui.hide_labels)
 
                 self._line_marker_plots.append((m, None, None, text, mark))
 
@@ -652,12 +657,10 @@ class ScenePlotting:
                 #  although i can't find any documentation on this
                 # a side effect is deactivating the mouse pickers, to reactivate we need to press "m" another time
                 case "m":
-                    if not self.ui.silent:
-                        print("Avoid pressing 'm' in the scene because it interferes with mouse picking handlers.")
+                    warnings.warn("Avoid pressing 'm' in the scene because it interferes with mouse picking handlers.")
                 
                 case "a":
-                    if not self.ui.silent:
-                        print("Avoid pressing 'a' as it is a mayavi shortcut for actor mode, where rays can be moved.")
+                    warnings.warn("Avoid pressing 'a' as it is a mayavi shortcut for actor mode, where rays can be moved.")
 
                 case "i":  # reset view
                     self.set_initial_camera()
@@ -675,6 +678,9 @@ class ScenePlotting:
                     ptypes = self.ui.plotting_types
                     self.ui.plotting_type = ptypes[(ptypes.index(self.ui.plotting_type) + 1) % len(ptypes)]
 
+                case "b":  # toggle label visibility
+                    self.ui.hide_labels = not bool(self.ui.hide_labels)
+                
                 case "d":  # render DetectorImage
                     self.ui.detector_image()
 
@@ -758,8 +764,8 @@ class ScenePlotting:
                 rio[1].text = rio[1].text.replace("ambient\n", "") if not show else ("ambient\n" + rio[1].text)
 
         # remove descriptions from labels in minimalistic_view
-        for Objects in [self._ray_source_plots, self._lens_plots,
-                        self._filter_plots, self._aperture_plots, self._detector_plots]:
+        for Objects in [self._ray_source_plots, self._lens_plots, self._marker_plots, self._volume_plots, 
+                        self._line_marker_plots, self._filter_plots, self._aperture_plots, self._detector_plots]:
             for num, obj in enumerate(Objects):
                 if obj[3] is not None and obj[4] is not None:
                     label = f"{obj[4].abbr}{num}"
@@ -769,7 +775,26 @@ class ScenePlotting:
         for ax in self._axis_plots:
             if ax[0] is not None:
                 ax[0].visible = show
-            
+           
+
+    def change_label_visibility(self) -> None:
+        """
+        """
+        
+        show = not bool(self.ui.hide_labels)
+
+        for rio in self._index_box_plots:
+            if rio[1] is not None:
+                rio[1].visible = show
+        
+        # remove descriptions from labels in minimalistic_view
+        for Objects in [self._ray_source_plots, self._lens_plots, self._marker_plots, self._volume_plots, 
+                        self._line_marker_plots, self._filter_plots, self._aperture_plots, self._detector_plots]:
+            for num, obj in enumerate(Objects):
+                if obj[3] is not None:
+                    obj[3].visible = show
+
+
     def change_contrast(self) -> None:
         """
         """
@@ -1000,9 +1025,8 @@ class ScenePlotting:
             case ('Polarization xz' | 'Polarization yz'):
 
                 if self.raytracer.no_pol:
-                    if not self.ui.silent:
-                        print("WARNING: Polarization calculation turned off in raytracer, "
-                              "reverting to a different mode")
+                    warnings.warn("Polarization calculation turned off in raytracer, "
+                                  "reverting to a different mode")
 
                     self.ui.coloring_type = "Power"
                     return
@@ -1116,9 +1140,8 @@ class ScenePlotting:
                     if RSpi is not None:
                         RSpi.actor.actor.property.trait_set(color=tuple(color))
         else:
-            if not self.ui.silent:
-                print("Number of RaySourcePlots differs from actual Sources. "
-                      "Maybe the GUI was not updated properly?")
+            warnings.warn("Number of RaySourcePlots differs from actual Sources. "
+                          "Maybe the GUI was not updated properly?")
 
     def get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """assign traced and selected rays into a ray dictionary"""

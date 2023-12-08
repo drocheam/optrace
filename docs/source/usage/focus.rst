@@ -11,7 +11,9 @@ Focus Finding
 .. testsetup:: *
 
    import optrace as ot
-   RT = ot.Raytracer(outline=[-1, 1, -1, 1, 0, 60], silent=True)
+   ot.global_options.show_progressbar = False
+
+   RT = ot.Raytracer(outline=[-1, 1, -1, 1, 0, 60])
    RS = ot.RaySource(ot.Point(), pos=[0, 0, 1])
    RT.add(RS)
    RS = ot.RaySource(ot.Point(), pos=[0, 0, 1])

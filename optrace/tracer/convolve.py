@@ -1,5 +1,6 @@
 import sys
 from threading import Thread
+import warnings
 
 import numexpr as ne
 import numpy as np
@@ -14,6 +15,7 @@ from ..tracer import misc as misc
 from ..tracer.misc import PropertyChecker as pc
 from ..tracer.r_image import RImage
 
+from .. import global_options
 
 
 def _color_variation(img: np.ndarray, th: float = 1e-3) -> bool:
@@ -82,9 +84,7 @@ def convolve(img:                np.ndarray | str,
              rendering_intent:   str =  "Absolute",
              normalize:          bool = True,
              L_th:               float = 0,
-             sat_scale:          float = None,
-             silent:             bool = False, 
-             threading:          bool = True)\
+             sat_scale:          float = None)\
         -> tuple[np.ndarray, list[float]]:
     """
     Convolve an image with a point spread function.
@@ -106,8 +106,6 @@ def convolve(img:                np.ndarray | str,
     :param normalize: if output image should be normalized to range [0-1] (input images are normalized by default)
     :param L_th: lightness threshold for function color.xyz_to_srgb and rendering_intent = "Perceptual"
     :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
-    :param silent: if text output should be silenced
-    :param threading: turn multithreading on and off
     :return: convoled image (3D sRGB numpy array) and new image side lengths list
     """
     # Init
@@ -125,18 +123,16 @@ def convolve(img:                np.ndarray | str,
     pc.check_type("m", m, int | float)
     pc.check_above("abs(m)", abs(m), 0)
     pc.check_type("rendering_intent", rendering_intent, str)
-    pc.check_type("silent", silent, bool)
-    pc.check_type("threading", threading, bool)
 
     # function for raising the exception and finishing the progress bar
     def raise_(excp):
-        if not silent:
+        if global_options.show_progressbar:
             bar.finish()
         raise excp
     
     # create progress bar
     bar = ProgressBar(fd=sys.stdout, prefix="Convolving: ", 
-                      max_value=5).start() if not silent else None
+                      max_value=5).start() if global_options.show_progressbar else None
 
     # Load image
     ###################################################################################################################
@@ -157,7 +153,7 @@ def convolve(img:                np.ndarray | str,
 
     img_lin = color.srgb_to_srgb_linear(img_srgb)  # linear sRGB version
 
-    if not silent:
+    if global_options.show_progressbar:
         bar.update(1)
 
     # Load PSF
@@ -168,10 +164,10 @@ def convolve(img:                np.ndarray | str,
     if isinstance(psf, RImage):
 
         img_color = _color_variation(img_lin)  # if it has color information
-        if img_color and not silent:
-            print("WARNING: Using an image with color variation in combination with a colored PSF. "
-                  "As there many possible results depending on the spectral and local distributions on the object, "
-                  "the scene will be rendered as one seen on a sRGB monitor.")
+        if img_color:
+            warnings.warn("Using an image with color variation in combination with a colored PSF. "
+                          "As there many possible results depending on the spectral and local distributions on the object, "
+                          "the scene will be rendered as one seen on a sRGB monitor.")
 
         # use srgb with negative values
         psf_lin = color.xyz_to_srgb_linear(psf.xyz(), rendering_intent="Ignore")
@@ -190,7 +186,7 @@ def convolve(img:                np.ndarray | str,
         # repeat intensities
         psf_lin = np.repeat(psf_lin[..., np.newaxis], 3, axis=2)
 
-    if not silent:
+    if global_options.show_progressbar:
         bar.update(2)
 
     # Shape Checks
@@ -222,9 +218,8 @@ def convolve(img:                np.ndarray | str,
         raise_(ValueError("Image needs to be smaller than 4MP"))
 
     if ppx > ipx or ppy > ipy:
-        if not silent:
-            print(f"WARNING: PSF pixel sizes [{ppx:.5g}, {ppy:.5g}] larger than image pixel sizes"
-                  f" [{ipx:.5g}, {ipy:.5g}], generally you want a PSF in a higher resolution")
+        warnings.warn(f"WARNING: PSF pixel sizes [{ppx:.5g}, {ppy:.5g}] larger than image pixel sizes"
+                      f" [{ipx:.5g}, {ipy:.5g}], generally you want a PSF in a higher resolution")
 
     if pnx < 50 or pny < 50:
         raise_(ValueError(f"PSF too small with shape {psf.shape}, "
@@ -235,20 +230,16 @@ def convolve(img:                np.ndarray | str,
                           "needs to have at least 50 values in each dimension."))
     
     if inx*iny < 2e4:
-        if not silent:
-            print(f"WARNING: Low resolution image.")
+        warnings.warn(f"WARNING: Low resolution image.")
 
     if pnx*pny < 2e4:
-        if not silent:
-            print(f"WARNING: Low resolution PSF.")
+        warnings.warn(f"WARNING: Low resolution PSF.")
 
     if not (0.2 < ppx/ppy < 5):
-        if not silent:
-            print(f"WARNING: Pixels of PSF are strongly non-square with side lengths [{ppx}mm, {ppy}mm]")
+        warnings.warn(f"WARNING: Pixels of PSF are strongly non-square with side lengths [{ppx}mm, {ppy}mm]")
     
     if not (0.2 < ipx/ipy < 5):
-        if not silent:
-            print(f"WARNING: Pixels of image are strongly non-square with side lengths [{ipx}mm, {ipy}mm]")
+        warnings.warn(f"WARNING: Pixels of image are strongly non-square with side lengths [{ipx}mm, {ipy}mm]")
 
     # Convolution
     ###################################################################################################################
@@ -265,10 +256,10 @@ def convolve(img:                np.ndarray | str,
     # output image
     img2 = np.zeros((iny + pny_ - 1, inx + pnx_ - 1, 3), dtype=np.float64)
 
-    if not silent:
+    if global_options.show_progressbar:
         bar.update(3)
 
-    if not threading:
+    if not global_options.multithreading:
         for i in range(3):
             _threaded(img_lin[:, :, i], psf_lin[:, :, i], i, img2, scx, pnx, scy, pny)
    
@@ -282,7 +273,7 @@ def convolve(img:                np.ndarray | str,
         [thread.start() for thread in thread_list]
         [thread.join() for thread in thread_list]
     
-    if not silent:
+    if global_options.show_progressbar:
         bar.update(4)
 
     # Output Conversion
@@ -305,7 +296,7 @@ def convolve(img:                np.ndarray | str,
     if m < 0:
         img2 = np.fliplr(np.flipud(img2))
 
-    if not silent:
+    if global_options.show_progressbar:
         bar.finish()
 
     return img2, s2

@@ -1,120 +1,107 @@
 #!/usr/bin/env python3
 
+import numpy as np
+import pathlib
+import warnings
+
 import optrace as ot
 from optrace.gui import TraceGUI
-import numpy as np
 
 
-# make raytracer
-RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 300])
+# path for needed resources (materials and eyepiece, objective files)
+# we could use a path string for ot.load.agf() and ot.load.zmx(), but using pathlib makes it platform-independent
+ressource_dir = pathlib.Path(__file__).resolve().parent / "ressources"
 
-# object
-RSS = ot.RectangularSurface(dim=[200e-3, 200e-3])
+# create tracer
+RT = ot.Raytracer(outline=[-50, 50, -50, 50, -30, 430])
+
+# cell image
+RSS = ot.RectangularSurface(dim=[100e-3, 100e-3])
 RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.cell,
-                  pos=[0, 0, 0], s=[0, 0, 1], div_angle=27, desc="Cell")
+                  pos=[0, 0, -0.00000001], s=[0, 0, 1], div_angle=50, desc="Cell")
 RT.add(RS)
 
-# objective doublet properties
-n1 = ot.presets.refraction_index.LAK8
-n2 = ot.presets.refraction_index.SF10
-R1 = 7.74
-R2 = -7.29
+# load material files (ignore import warnings)
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore')
+    schott = ot.load.agf(str(ressource_dir / "materials" / "schott.agf"))
+    ohara = ot.load.agf(str(ressource_dir / "materials" / "ohara.agf"))
+    hikari = ot.load.agf(str(ressource_dir / "materials" / "hikari.agf"))
+    hoya = ot.load.agf(str(ressource_dir / "materials" / "hoya.agf"))
 
-# objective group
-objective = ot.Group(desc="Objective")
+# join to one material dictionary
+n_dict = schott | ohara | hikari | hoya
 
-# Lens 1 of doublet
-front = ot.CircularSurface(r=5.5)
-back = ot.SphericalSurface(r=5.5, R=-R2)
-L01 = ot.Lens(front, back, d1=0.5, d2=0, pos=[0, 0, 0], n=n2, n2=n2)
-objective.add(L01)
+# load microscope setup
+G = ot.load.zmx(str(ressource_dir / "microscope" / "Nikon_1p25NA_60x_US7889433B2_MultiConfig_v2.zmx"), n_dict=n_dict)
 
-# Lens 2 of doublet
-front = ot.SphericalSurface(r=5.5, R=-R2)
-back = ot.ConicSurface(r=5.5, R=-R1, k=-0.55)
-L02 = ot.Lens(front, back, d1=0, d2=5.3, pos=[0, 0, 0.0001], n=n1)
-objective.add(L02)
-
-# move objective lens so that its focal point is 0.6mm behind object
-L0f0 = objective.tma().focal_points[0]
-objective.move_to([0, 0, L01.pos[2] - (L0f0 - RS.pos[2] - 0.6)])
-
-# add group to raytracer
+# create objective group
+objective = ot.Group(G.lenses[:18])
 RT.add(objective)
 
-# position of image inside microscope
-# this had to be finetuned, since paraxial case was not precise enough
-z_img0 = 225
+# create tube group
+tube = ot.Group(G.lenses[20:24])
+tube.move_to(G.lenses[20].pos-[0, 0, 150])  # lower the distance to the tube lenses
+RT.add(tube)
 
-# detector for tubus image
-square = ot.RectangularSurface(dim=[6, 6])
-det = ot.Detector(square, pos=[0, 0, z_img0], desc="Tubus Image")
-RT.add(det)
+# load eyepiece
+eyepiece = ot.load.zmx(str( ressource_dir / "eyepiece" / "UK565851-1.zmx"), n_dict=n_dict)
+eyepiece.remove(eyepiece.detectors)
 
-# Eyepiece doublet curvatures
-# see the achromat example
-R1 = 9.82
-R2 = -9.25
+# position of intermediate image
+tma = ot.TMA(objective.lenses + tube.lenses, n0=G.n0)
+z_img0 = tma.image_position(RS.pos[2])
 
-# create Eyepiece Group
-eyepiece = ot.Group(desc="Eyepiece")
-
-# Eyepiece doublet lens 1
-front = ot.ConicSurface(r=4, R=R1, k=-0.55)
-back = ot.SphericalSurface(r=4, R=R2)
-L11 = ot.Lens(front, back, de=0.5, pos=[0, 0, 0], n=n1, n2=n1)
-eyepiece.add(L11)
-
-# Eyepiece doublet lens 2
-front = ot.SphericalSurface(r=4, R=R2)
-back = ot.CircularSurface(r=4)
-L12 = ot.Lens(front, back, d1=0, d2=0.5, pos=[0, 0, L11.extent[5]+0.0001], n=n2)
-eyepiece.add(L12)
-
-# move eyepiece so first image is in front focal point
-L1f0 = eyepiece.tma().focal_points[0]
-eyepiece.move_to([0, 0, L11.pos[2]-(L1f0-z_img0)])
-L1f1 = eyepiece.tma().focal_points[1]
-
-# add group to raytracer
+# move eyepiece so intermediate image is in front focal point of eyepiece
+eyep_f0 = eyepiece.tma().focal_points[0]
+eyepiece.move_to([0, 0, eyepiece.lenses[0].pos[2] - (eyep_f0 - z_img0)])
 RT.add(eyepiece)
 
+# detector for intermediate image
+det = ot.Detector(ot.RectangularSurface([20, 20]), pos=[0, 0, z_img0], desc="Intermediate Image")
+RT.add(det)
+
+# load eye geometry
+eye = ot.presets.geometry.arizona_eye()
+
+# exit pupil of the microscope and entrance pupil of the eye should be the same
+
+# calculate the exit pupil from first surface of objective
+exit_pupil_microscope = RT.tma().pupil_position(0.38)[1]
+
+# entrance pupil of the eye
+entrance_pupil_eye = eye.tma().pupil_position(eye.apertures[0].pos[2])[0]
+
+# move the eye so both match
+eye.move_to([0, 0, exit_pupil_microscope + (eye.pos[2] - entrance_pupil_eye)])
+
 # add eye geometry
-eye = ot.presets.geometry.arizona_eye(pos=[0, 0, L1f1+12], pupil=5)
-# eye = ot.presets.geometry.ideal_camera(z_g=-np.inf, cam_pos=[0, 0,  L1f1+12], r=5, r_det=5, b=30)
 RT.add(eye)
 
-# add cylinder for displaying the microscope
-vol = ot.CylinderVolume(r=6, length=eye.extent[4]-objective.extent[4]-3, 
-                        pos=[0, 0, objective.extent[4]-3], color=(0.0, 0.0, 0.0))
-RT.add(vol)
+# add all groups to raytracer
+RT.n0 = G.n0
 
-# calculate magnification
-tma_ok = eyepiece.tma()
+# add markers for focal points
 tma_obj = objective.tma()
-L = tma_ok.focal_points[0] - tma_obj.focal_points[1]
-f_ok = tma_ok.focal_lengths[1]
-f_obj = tma_ok.focal_lengths[1]
-mu = L/f_ok * 254/f_obj
-print(f"Approximate Magnification: {mu:.1f}x")
-
-# add markers focal points
+tma_ok = eyepiece.tma()
+tma_tube = tube.tma()
 RT.add(ot.PointMarker("F_obj", [0, 0, tma_obj.focal_points[0]]))
 RT.add(ot.PointMarker("F_obj", [0, 0, tma_obj.focal_points[1]]))
 RT.add(ot.PointMarker("F_ok", [0, 0, tma_ok.focal_points[0]]))
-RT.add(ot.PointMarker("F_ok", [0, 0, tma_ok.focal_points[1]]))
+RT.add(ot.PointMarker("F_tube", [0, 0, tma_tube.focal_points[1]]))
 
-# add misc markers
-RT.add(ot.PointMarker("Objective", [-14, 0, L01.pos[2]+2], label_only=True, text_factor=1.2))
-RT.add(ot.PointMarker("Body Tube", [-14, 0, (L02.pos[2] + L12.pos[2])/2], label_only=True, text_factor=1.2))
-RT.add(ot.PointMarker("Eyepiece", [-14, 0, L11.pos[2]], label_only=True, text_factor=1.2))
-RT.add(ot.PointMarker(eye.long_desc, [-14, 0, RT.lenses[-1].pos[2] + 10], label_only=True, text_factor=1.2))
+# add group description markers
+RT.add(ot.PointMarker("Objective", [-50, 0, np.mean(objective.extent[4:])], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Tube Lens", [-50, 0, np.mean(tube.extent[4:])], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Eyepiece", [-50, 0, np.mean(eyepiece.extent[4:])], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Eye", [-50, 0, np.mean(eye.extent[4:])], label_only=True, text_factor=1.2))
 
-# add line markers
-RT.add(ot.LineMarker(r=5, pos=[0, 0, RS.pos[2]], desc="Object\nPlane"))
-RT.add(ot.LineMarker(r=5, pos=[0, 0, tma_ok.focal_points[0]], desc="Intermed.\nImage"))
-RT.add(ot.LineMarker(r=7, pos=[0, 0, RT.detectors[-1].pos[2]], desc="Image\nPlane"))
+# add cylinder volume around microscope
+vol = ot.CylinderVolume(r=15.9, length=eyepiece.extent[5]-objective.extent[4]-1.3, 
+                        pos=[0, 0, objective.extent[4]+1.3], color=(0.0, 0.0, 0.0))
+RT.add(vol)
 
-# start GUI.
-sim = TraceGUI(RT, minimalistic_view=True, ray_count=2000000)
+
+# run the simulator
+sim = TraceGUI(RT, ray_count=1000000, vertical_labels=True, minimalistic_view=True)
 sim.run()

@@ -23,7 +23,7 @@ import pytest
 
 class ScopeTests(unittest.TestCase):
 
-    def _run_command(self, command, timeout=20):
+    def _run_command(self, command, timeout=40):
         """run a subprocess and get exit code"""
 
         # we need to run a seperate process so that the script is in a default state without libraries loaded

@@ -37,7 +37,7 @@ class Spectrum(BaseClass):
                  sig:               float = 50.,
                  unit:              str = None,
                  quantity:          str = None,
-                 func_args:         dict = None,
+                 func_args:         dict = {},
                  **kwargs):
         """
         Create a Spectrum object. 
@@ -64,7 +64,7 @@ class Spectrum(BaseClass):
         self.spectrum_type = spectrum_type
         self.lines = lines
         self.line_vals = line_vals
-        self.func_args = func_args if func_args is not None else {}
+        self.func_args = func_args
         self.func = func  # make sure this comes after func_args, so func is called correctly
 
         self.wl, self.wl0, self.wl1 = wl, wl0, wl1

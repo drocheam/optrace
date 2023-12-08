@@ -9,7 +9,6 @@ Plotting
 
 
 .. TODO part on figure saving (path, sargs and so on)
-.. TODO part on fargs
 
 
 Namespace
@@ -52,11 +51,6 @@ Most methods also include a :python:`title` argument that lets the user define a
 
    some_plotting_function(..., title="Name of plot")
 
-Functions outputting messages to the standard output (usually the terminal) can be muted with :python:`silent=True`.
-
-.. code-block:: python
-
-   some_loud_plotting_function(..., silent=True)
 
 Legends and labels inside the figures are generated from descriptions from the objects. Make sure the create your objects with a :python:`desc=".."` or :python:`long_desc="..."` parameter so they feature some expressive name.
 
@@ -68,9 +62,12 @@ Legends and labels inside the figures are generated from descriptions from the o
    some_plotting_function([obj, obj2], ...)
 
 
-Additionally a parameter dictionary :python:`fargs` can be passed to the function that holds options for :func:`matplotlib.pyplot.figure`.
-For instance, to provide a custom figure size, one might use:
+Figure settings like size and dpi can be set globally using the :obj:`matplotlib.rcParams`:
 
-.. code-block:: python
+.. testcode::
    
-   some_plotting_function([obj, obj2], fargs=dict(figsize=(8, 5)))
+   import matplotlib
+   matplotlib.rcParams["figure.figsize"] = (5, 5)
+   matplotlib.rcParams["figure.dpi"] = 100
+
+

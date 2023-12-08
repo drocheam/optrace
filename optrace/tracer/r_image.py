@@ -15,6 +15,7 @@ from . import misc  # interpolation and calculation methods
 from .base_class import BaseClass  # parent class
 from .misc import PropertyChecker as pc  # check types and values
 
+from .. import global_options
 
 # odd number of pixels per side, so we have a center pixel, which is useful in images with rotational symmetry
 # otherwise a pixel at the center would fall in one of the neighboring pixel due to numeric errors
@@ -381,7 +382,7 @@ class RImage(BaseClass):
 
             self.img = np.zeros((Ny // fact, Nx // fact, Nz))
 
-            if self.threading:
+            if global_options.multithreading:
                 threads = [Thread(target=threaded, args=(i, self._img, self.img)) for i in range(Nz)]
                 [th.start() for th in threads]
                 [th.join() for th in threads]
@@ -571,7 +572,7 @@ class RImage(BaseClass):
                                                       range=self.extent.reshape((2,2)))
 
             # multithreading
-            if self.threading: 
+            if global_options.multithreading: 
 
                 threads = [Thread(target=func, args=(self._img, i)) for i in np.arange(4)]
                 [thread.start() for thread in threads]

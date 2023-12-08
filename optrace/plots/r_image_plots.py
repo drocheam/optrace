@@ -16,10 +16,9 @@ def r_image_plot(im:       RImage,
                  block:    bool = False,
                  log:      bool = False,
                  flip:     bool = False,
-                 fargs:    dict = None,
                  title:    str = None,
                  path:     str = None,
-                 sargs:    dict = None)\
+                 sargs:    dict = {})\
         -> None:
     """
 
@@ -28,7 +27,6 @@ def r_image_plot(im:       RImage,
     :param flip: if the image should be flipped
     :param block: if the plot should block the execution of the program
     :param log: if logarithmic values are shown
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: title of the plot
     :param imc: precalculated RImage (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
@@ -76,8 +74,7 @@ def r_image_plot(im:       RImage,
         vmin = 0
 
     # plot image
-    fargs = dict() if fargs is None else fargs
-    fig = plt.figure(**fargs)
+    fig = plt.figure()
     _show_grid()
     plt.imshow(Imd, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, 
                vmin=vmin, vmax=vmax, origin="lower", zorder=10)
@@ -110,10 +107,9 @@ def r_image_cut_plot(im:       RImage,
                      block:    bool = False,
                      log:      bool = False,
                      flip:     bool = False,
-                     fargs:    dict = None,
                      title:    str = None,
                      path:     str = None,
-                     sargs:    dict = None,
+                     sargs:    dict = {},
                      **kwargs)\
         -> None:
     """
@@ -123,7 +119,6 @@ def r_image_cut_plot(im:       RImage,
     :param block: if the plot should be blocking the execution of the program
     :param log: if logarithmic values are shown
     :param flip: if the image should be flipped
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: title of the plot
     :param mode: display_mode from RImage.display_modes
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
@@ -160,8 +155,7 @@ def r_image_cut_plot(im:       RImage,
         s = np.rad2deg(s)
 
     # new figure
-    fargs = dict() if fargs is None else fargs
-    fig = plt.figure(**fargs)
+    fig = plt.figure()
     _show_grid()
 
     # enforce rgb colors for rgb modes
@@ -210,7 +204,8 @@ def _check_types(im, imc, block, log, flip, title, mode) -> None:
     pc.check_if_element("mode", mode, RImage.display_modes)
 
 
-def _get_labels(im: RImage, mode: str, log: bool, cut: str = None) -> tuple[str, str, str, str, str, str, str, str, str, str]:
+def _get_labels(im: RImage, mode: str, log: bool, cut: str = None)\
+        -> tuple[str, str, str, str, str, str, str, str, str, str]:
     """get plot labels and title"""
 
     text = im.get_long_desc(fallback="")

@@ -11,6 +11,7 @@ Base Geometries
 .. testsetup:: *
 
    import optrace as ot
+   ot.global_options.show_progressbar = False
 
 .. role:: python(code)
   :language: python
@@ -291,10 +292,6 @@ A point source is added at the retina and the geometry is traced.
    # trace
    RT.trace(100000)
 
-.. testoutput::
-   :hide:
-
-   Raytracer: ...
 
 Loading ZEMAX Geometries (.zmx)
 __________________________________

@@ -94,8 +94,8 @@ def arizona_eye(adaptation:  float = 0.,
 
     # add Pupil
     ap = RingSurface(r=5.45, ri=pupil/2, desc="Pupil")
-    # the pupil position would be closer to something like 3.6, but for large A we would have surface collisions
-    AP = Aperture(ap, pos=pos0+[0, 0, 3.3], desc="Pupil")
+    # place the pupil directly in front of the lens
+    AP = Aperture(ap, pos=pos0+[0, 0, L0.back.pos[2]+d_Aq-1e-9], desc="Pupil")
     geom.add(AP)
 
     # add Lens

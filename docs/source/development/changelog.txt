@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.5.0   |   2023-11-29   |   TraceGUI has now set_camera, get_camera and screenshot functions. Picked ray is highlighted in the scene. All plots in optrace.plots now can be saved by providing a path. 
   1.4.7   |   2023-08-17   |   New 'converging' ray source orientation mode. 
   1.4.6   |   2023-08-16   |   New Siemens Star and TV test card image presets. 
   1.4.5   |   2023-08-06   |   Replaced image presets with better ones. 

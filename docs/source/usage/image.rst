@@ -17,6 +17,7 @@ Image and Spectrum Rendering
    sys.modules['progressbar'] = mock.MagicMock()
 
    import optrace as ot
+   ot.global_options.show_progressbar = False
 
 
 .. _rimage_overview:
@@ -247,7 +248,7 @@ The below snippet generates a geometry with multiple sources and detectors. The 
 .. testcode::
 
     # make raytracer
-    RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60], silent=True)
+    RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
     # add Raysources
     RSS = ot.CircularSurface(r=1)

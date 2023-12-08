@@ -31,8 +31,6 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.convolve, img, s_img, psf, 5)  # invalid s_psf
         self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, rendering_intent=[])  
         # ^-- invalid rendering_intent
-        self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, silent=[])  # invalid silent
-        self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, threading=[])  # invalid threading
         self.assertRaises(TypeError, ot.convolve, img, s_img, psf, s_psf, m=[])  # invalid magnification
         
         # value errors
@@ -106,8 +104,9 @@ class ConvolutionTests(unittest.TestCase):
         s_psf = [0.1, 0.3]
         
         # check that call is correct, also tests threading
-        for threading in [True, False]:
-            ot.convolve(img, s_img, psf, s_psf, silent=True, threading=threading)
+        for threading in [False, True]:
+            ot.global_options.multithreading = threading
+            ot.convolve(img, s_img, psf, s_psf)
 
         # color test
         #############################################
@@ -121,18 +120,18 @@ class ConvolutionTests(unittest.TestCase):
       
         # pixels are strongly non-square
         for sil in [True, False]:
-            ot.convolve(img, s_img, psf, [1e-9, 1e-8], silent=sil)
-            ot.convolve(img, [1, 10], psf, s_psf, silent=sil)
+            ot.convolve(img, s_img, psf, [1e-9, 1e-8])
+            ot.convolve(img, [1, 10], psf, s_psf)
         
         # low resolution psf warning
         psf2 = np.ones((90, 90))
         for sil in [True, False]:
-            ot.convolve(img, s_img, psf2, s_psf, silent=sil)
+            ot.convolve(img, s_img, psf2, s_psf)
         
         # low resolution image warning
         img2 = np.ones((90, 90, 3))
         for sil in [True, False]:
-            ot.convolve(img2, s_img, psf, s_psf, silent=sil)
+            ot.convolve(img2, s_img, psf, s_psf)
         
     def test_point_psf(self):
         """test if convolution with a point produces the same image"""
@@ -147,7 +146,7 @@ class ConvolutionTests(unittest.TestCase):
         for psf_s in [(200, 200), (201, 201)]:
             psf = np.ones(psf_s)
 
-            img2, s2 = ot.convolve(image, s_img, psf, s_psf, silent=True)
+            img2, s2 = ot.convolve(image, s_img, psf, s_psf)
 
             # compare
             img = misc.load_image(image)
@@ -244,7 +243,7 @@ class ConvolutionTests(unittest.TestCase):
         for i in range(4):
 
             # raytracer and raysource
-            RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], no_pol=True, silent=False)
+            RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], no_pol=True)
             RS = ot.RaySource(ot.Point(), divergence="Lambertian", div_angle=2, s=[0, 0, 1], pos=[0, 0, 0])
             RT.add(RS)
 
@@ -287,7 +286,7 @@ class ConvolutionTests(unittest.TestCase):
             # convolution image
             mag = 2.232751
             mag = 2.222751
-            img_conv, s_img_conv = ot.convolve(img, [s_img[0]*mag, s_img[1]*mag], psf, s_psf, silent=True)
+            img_conv, s_img_conv = ot.convolve(img, [s_img[0]*mag, s_img[1]*mag], psf, s_psf)
 
             # spacing vectors
             x = np.linspace(-s_img_conv[0]/2, s_img_conv[0]/2, img_conv.shape[1])
@@ -377,7 +376,7 @@ class ConvolutionTests(unittest.TestCase):
                 for i, res in enumerate([2000, 1999, 400, 399, 52, 51]):
 
                     psf, _ = psf_func()
-                    img2, s = ot.convolve(img, s_img, psf, s_psf, silent=True)
+                    img2, s = ot.convolve(img, s_img, psf, s_psf)
 
                     if i == 0:
                         img2o = img2.copy()
@@ -412,7 +411,7 @@ class ConvolutionTests(unittest.TestCase):
             self.assertAlmostEqual(np.max(pst[0]), 1)
 
             # convolution doesn't fail
-            ot.convolve(img, ilen, *pst, silent=True)
+            ot.convolve(img, ilen, *pst)
 
     def test_presets_exceptions(self):
         """check handling of incorrect parameters to psf presets"""

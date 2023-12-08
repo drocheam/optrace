@@ -15,7 +15,7 @@ b_ang = np.arctan(1.55/1)
 # transmission s-polarized: 83.0%
 # mean transmission unpolarized: 91.5%
 
-RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], threading=True, absorb_missing=False)
+RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], absorb_missing=False)
 
 # source parameters
 RSS = ot.CircularSurface(r=0.05)

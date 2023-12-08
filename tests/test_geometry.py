@@ -940,7 +940,7 @@ class GeometryTests(unittest.TestCase):
     def test_geometry_eye_presets(self):
 
         def base_RT():
-            RT = ot.Raytracer(outline=[-30, 30, -30, 30, -50, 200], silent=True)
+            RT = ot.Raytracer(outline=[-30, 30, -30, 30, -50, 200])
             RSS = ot.CircularSurface(r=0.5)
             RS = ot.RaySource(RSS, pos=[0, 0, -50], spectrum=ot.presets.light_spectrum.d65)
             RT.add(RS)
@@ -984,7 +984,7 @@ class GeometryTests(unittest.TestCase):
     def test_geometry_camera_preset(self):
         """check that ideal camera preset gets calculated correctly"""
 
-        RT = ot.Raytracer(outline=[-20, 20, -20, 20, -2000, 2000], silent=True)
+        RT = ot.Raytracer(outline=[-20, 20, -20, 20, -2000, 2000])
 
         for z_g in [-1000, -52, -3.59]:  # different object distances
             for b in [2, 125, 369]:  # different image distances

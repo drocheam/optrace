@@ -1,5 +1,6 @@
 
 from typing import Any  # Any type
+import warnings
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
@@ -466,8 +467,8 @@ class Surface(BaseClass):
         if np.any(brok):
             brokc = np.count_nonzero(brok)
             # TODO handle differently (return indices and let it handle by main thread?)
-            self.print(f"WARNING: Broken sequentiality. {brokc} rays start behind the current surface. "
-                       "The simulation results for these rays are most likely wrong. Check the geometry.")
+            warnings.warn(f"Broken sequentiality. {brokc} rays start behind the current surface. "
+                           "The simulation results for these rays are most likely wrong. Check the geometry.")
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

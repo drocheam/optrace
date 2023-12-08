@@ -1,11 +1,13 @@
 import os.path  # working with paths
 import numpy as np  # np.ndarray type
 import chardet  # detection of text file encoding
+import warnings
+
 
 # media
 from .refraction_index import RefractionIndex
 
-# needed geometrise
+# needed geometries
 from .geometry.group import Group
 from .geometry import Lens, PointMarker, Detector, Aperture
 from .geometry.surface import CircularSurface, ConicSurface, SphericalSurface,\
@@ -47,12 +49,11 @@ def _read_lines(path: str) -> list[str]:
         return f.readlines()
 
 
-def agf(path: str, silent: bool = True) -> dict:
+def agf(path: str) -> dict:
     """
     Load an .agf material catalogue
 
     :param path: filepath
-    :param silent: mute all messages from this function
     :return: dictionary of refractive media, keys are names, values are RefractionIndex objects
     """
 
@@ -80,8 +81,7 @@ def agf(path: str, silent: bool = True) -> dict:
             # check if valid mode. According to documentation mode numbers go from 1-12
             ind = int(float(linw[2]))-1
             if ind < 0 or ind > len(_agf_modes) - 1:
-                if not silent:
-                    print(f"Unknown index formula mode number {ind+1}, skipping material {name}.")
+                warnings.warn(f"Unknown index formula mode number {ind+1}, skipping material {name}.")
                 skip = True  # skip further steps, since we don't know what to do with this material
                 continue
             
@@ -109,9 +109,8 @@ def agf(path: str, silent: bool = True) -> dict:
 
                 # for infrared materials there is no overlap with the visible range
                 if wl0 > WL_BOUNDS[1] or wl1 < WL_BOUNDS[0]:
-                    if not silent:
-                        print(f"WARNING: Wavelength range for material {name} (in nm) [{wl0}, {wl1}] has no overlap "
-                              f"with raytracer range {WL_BOUNDS}.")
+                    warnings.warn(f"Wavelength range for material {name} (in nm) [{wl0}, {wl1}] has no overlap "
+                                  f"with raytracer range {WL_BOUNDS}.")
                 
                 else:
                     nc1 = n(spectral_lines.d)
@@ -119,30 +118,27 @@ def agf(path: str, silent: bool = True) -> dict:
 
                     # index deviation
                     if np.abs(nc1 - nc) > 1e-4:
-                        if not silent:
-                            print(f"WARNING: Index from file is {nc} while index of the loaded material is {nc1}"
-                                  f" for material {name}. "
-                                  "This can be due to different probe wavelengths or no data in those regions.")
+                        warnings.warn(f"Index from file is {nc} while index of the loaded material is {nc1}"
+                                      f" for material {name}. "
+                                       "This can be due to different probe wavelengths or no data in those regions.")
 
                     # abbe number deviation
                     elif np.abs(V1 - V) > 0.3:
-                        if not silent:
-                            print(f"WARNING: The Abbe number from file is {V} while that of the loaded material is {V1}"
-                                  f" for material {name}. "
-                                  "This can be due to different probe wavelengths or no data in those regions.")
+                        warnings.warn(f"The Abbe number from file is {V} while that of the loaded material is {V1}"
+                                      f" for material {name}. "
+                                      "This can be due to different probe wavelengths or no data in those regions.")
 
                 # assign to material dict
                 n_dict[name] = n
 
             # some exception occurred, e.g. index is < 1 somewhere
             except Exception as err:
-                if not silent:
-                    print(f"Error for material {name}: ", err)
+                warnings.warn(f"Error for material {name}: " + str(err))
 
     return n_dict
 
 
-def zmx(filename: str, n_dict: dict = None, no_marker: bool = False, silent: bool = False) -> Group:
+def zmx(filename: str, n_dict: dict = None, no_marker: bool = False) -> Group:
     """
     Load a ZEMAX geometry from a .zmx into a Group.
     See the documentation on the limitations of the import.
@@ -150,7 +146,6 @@ def zmx(filename: str, n_dict: dict = None, no_marker: bool = False, silent: boo
     :param filename: filepath
     :param n_dict: dictionary of RefractiveIndex in the geometry
     :param no_marker: if there should be no marker created for the .zmx description
-    :param silent: if all standard output from this function should be muted
     :return: Group including the geometry from the .zmx
     """
 
@@ -159,9 +154,9 @@ def zmx(filename: str, n_dict: dict = None, no_marker: bool = False, silent: boo
     lines = _read_lines(filename)
     n_dict = n_dict or {}
 
-    Surfaces, dds, long_desc = _zmx_to_surface_dicts(lines, n_dict, silent)
+    Surfaces, dds, n0, long_desc = _zmx_to_surface_dicts(lines, n_dict)
 
-    G = _surface_dicts_to_geometry(Surfaces, dds, long_desc, no_marker)
+    G = _surface_dicts_to_geometry(Surfaces, dds, n0, long_desc, no_marker)
 
     return G
 
@@ -193,20 +188,19 @@ def _make_surface(surf: dict) -> AsphericSurface | ConicSurface | CircularSurfac
 
 
 def _zmx_to_surface_dicts(lines:  list[str], 
-                          n_dict: dict[RefractionIndex], 
-                          silent: bool)\
-        -> tuple[list, list, str]:
+                          n_dict: dict[RefractionIndex])\
+        -> tuple[list, list, RefractionIndex | None, str]:
     """
     Process the file lines into a list of Surfaces and distances.
 
     :param lines: list of lines from the loaded file
     :param n_dict: dictionary of RefractionIndex
-    :param silent: if all standard output from this function should be muted
-    :return: Surface dictionary list, distance list, zmx file description
+    :return: Surface dictionary list, distance list, ambient index n0 before first surface, zmx file description
     """
     Surfaces = []
     dds = []
     long_desc = ""
+    n0 = None
 
     for i, l in enumerate(lines):  # never exits normally # pragma: no branch
 
@@ -227,13 +221,14 @@ def _zmx_to_surface_dicts(lines:  list[str],
             break
 
     i += 1
+    surf_i = 0
     while i < len(lines):
         
         parm = [0.]*10
         dd = 0
         surf = dict(stype="STANDARD", desc="", k=0, R=np.inf)
 
-        while i + 1 < len(lines) and lines[i+1][:4] != "SURF":
+        while i + 1 < len(lines) and lines[i][:4] != "SURF":
         
             l = lines[i]
         
@@ -243,7 +238,7 @@ def _zmx_to_surface_dicts(lines:  list[str],
 
             # diameter
             elif l[2:6] == "DIAM":
-                surf["r"] = float(l.split()[1])
+                surf["r"] = max(float(l.split()[1]), 1e-9)
 
             # conic constant
             elif l[2:6] == "CONI":
@@ -255,8 +250,7 @@ def _zmx_to_surface_dicts(lines:  list[str],
             
             # coating
             elif l[2:6] == "COAT":
-                if not silent:
-                    print(f"Ignoring coating '{l[7:-1]}'")
+                warnings.warn(f"Coatings not supported. Ignoring coating '{l[7:-1]}'.")
             
             # aperture stop
             elif l[2:6] == "STOP":
@@ -279,40 +273,58 @@ def _zmx_to_surface_dicts(lines:  list[str],
             elif l[2:6] == "GLAS":
 
                 material = l.split()[1]
+                   
+                nc, V = [float(a) for a in l.split()[4:6]] if len(l.split()) > 6 else [None, None]
 
                 if material == "___BLANK":
                     # materials missing in n_dict can be approximated if n and V are provided instead and name is __BLANK
-                    nc, V = [float(a) for a in l.split()[4:6]]
                     surf["n"] = RefractionIndex("Abbe", n=nc, V=V)
 
                 elif material not in n_dict.keys():
-                    raise RuntimeError(f"Material {material} missing in n_dict parameter.")
+
+                    if nc is not None and V is not None and nc > 1 and V > 0:
+                        surf["n"] = RefractionIndex("Abbe", n=nc, V=V)
+
+                    else:
+                        raise RuntimeError(f"Material {material} missing in n_dict parameter.")
 
                 else:
                     surf["n"] = n_dict[material]
 
             i += 1
 
-        # add surface to list
-        surf["parm"] = parm
-        Surfaces.append(surf)
-        # print(surf)
-        dds.append(dd)
-        i += 2
+        # zeroth surface has a DIST of infinity -> definition of ambient index before lenses
+        if surf_i == 0 and not np.isfinite(dd):
+            n0 = surf["n"] if "n" in surf else RefractionIndex("Constant", n=1)
 
-    return Surfaces, dds, long_desc
+        else:
+            # add surface to list
+            surf["parm"] = parm
+            Surfaces.append(surf)
+            dds.append(dd)
+        
+        surf_i += 1
+        i += 1
 
-def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_marker: bool) -> Group:
+    return Surfaces, dds, n0, long_desc
+
+def _surface_dicts_to_geometry(Surfaces:    list, 
+                               dds:         list, 
+                               n0:          RefractionIndex | None, 
+                               long_desc:   str,
+                               no_marker:   bool)\
+        -> Group:
     """
     Convert the list of Surfaces dictionary and distances into a Group
     
     :param Surfaces: list of Surface dictionaries from _zmx_to_surface_dicts
     :param dds: list of distances in mm
+    :param n0: ambient index before first surface
     :param long_desc: description of geometry from zmx files
     :param no_marker: if no description marker should be set
     :return: Group containing the geometry
     """
-    G = Group(long_desc=long_desc)
+    G = Group(long_desc=long_desc, n0=n0)
 
     # find first surface with refraction index, all surfaces before that are irrelevant
     i = 0
@@ -320,6 +332,18 @@ def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_mar
         i += 1
 
     z = 0
+
+    # calculate largest radius
+    rmax = 0
+    for s in Surfaces:
+        if "r" in s and s["r"] > rmax:
+            rmax = s["r"]
+
+    # set largest radius to undefined radii
+    # (radii are undefined, when the material reaches indefinitely in lateral direction)
+    for s in Surfaces:
+        if "r" not in s:
+            s["r"] = rmax
 
     while i < len(Surfaces):
 
@@ -329,8 +353,8 @@ def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_mar
             if i + 1 == len(Surfaces) and "r" in Surfaces[i]:
                 # add square detector
                 r = Surfaces[i]["r"]
-                surf = RectangularSurface(dim=[2*r, 2*r], desc=Surfaces[i]["desc"])
-                DET = Detector(surf, pos=[0, 0, z])
+                surf = RectangularSurface(dim=[2*r, 2*r])
+                DET = Detector(surf, pos=[0, 0, z], desc=Surfaces[i]["desc"])
                 G.add(DET)
             
             elif "STOP" in Surfaces[i]:
@@ -338,8 +362,8 @@ def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_mar
                 r = max(G.extent[1] - G.extent[0], G.extent[3] - G.extent[2]) / 2
                 r = max(surf["r"] + 1, r)
 
-                surf = RingSurface(ri=surf["r"], r=r, desc=surf["desc"])
-                ap = Aperture(surf, pos=[0, 0, z])
+                surf = RingSurface(ri=surf["r"], r=r)
+                ap = Aperture(surf, pos=[0, 0, z], desc=Surfaces[i]["desc"])
                 G.add(ap)
 
             z += dds[i]
@@ -356,10 +380,10 @@ def _surface_dicts_to_geometry(Surfaces: list, dds: list, long_desc: str, no_mar
         # Surface 1 with index, Surface 2 with index -> Surface 1 and 2 form a lens, next lens starts with surface 2
         # for that we offset the start position of the next lens by a small value.
         # The gap is filled with the medium of the last element.
-        n2 = Surfaces[i]["n"] if "n" in Surfaces[i+1] else None
+        n2 = Surfaces[i]["n"] if "n" in Surfaces[i+1] else RefractionIndex("Constant", n=1)
 
         # create lens
-        L = Lens(surf1, surf2, n=Surfaces[i]["n"], pos=[0, 0, z], d1=0, d2=dds[i], n2=n2)
+        L = Lens(surf1, surf2, n=Surfaces[i]["n"], pos=[0, 0, z], d1=0, d2=dds[i], n2=n2, desc=Surfaces[i]["desc"])
         G.add(L)
 
         # see NOTE above

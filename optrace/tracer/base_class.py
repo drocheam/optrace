@@ -11,26 +11,20 @@ class BaseClass:
 
     def __init__(self,
                  desc:      str = "",
-                 long_desc: str = "",
-                 silent:    bool = False,
-                 threading: bool = True):
+                 long_desc: str = ""):
         """
         common parent class for almost all `optrace.tracer` classes.
-        Features description properties, print and threading options as well
+        Features description properties as well
         as methods for making the object read-only (kind of)
 
         :param desc: compact description
         :param long_desc: verbose description
-        :param silent: if the object can emit messages
-        :param threading: if multithreading and creating threads is allowed
         """
         self._lock = False
         self._new_lock = False
 
         self.desc = desc
         self.long_desc = long_desc
-        self.silent = silent
-        self.threading = threading
 
     def crepr(self) -> list:
         """
@@ -48,7 +42,7 @@ class BaseClass:
 
         for key, val in self.__dict__.items():
 
-            if key not in ["silent", "threading", "_lock"]:
+            if key != "_lock":
 
                 if isinstance(val, list):
                     cl.append(tuple(val))
@@ -97,14 +91,6 @@ class BaseClass:
         self._lock = True
         self._new_lock = True
 
-    def print(self, message: str) -> None:
-        """
-        prints the message if `BaseClass.silent` is False
-        :param message: string to print
-        """
-        if not self.silent:
-            print(f"{type(self).__name__}: {message}")
-
     def __str__(self) -> str:
         """gets called when print(obj) or repr(obj) gets called"""
         d = {x: val for x, val in self.__dict__.items() if not x.startswith("_")}
@@ -120,14 +106,11 @@ class BaseClass:
             if "_new_lock" in self.__dict__ and self._new_lock and key not in self.__dict__:
                 raise AttributeError(f"Invalid property {key}.")
 
-            if "_lock" in self.__dict__ and self._lock and key not in ["silent", "threading", "desc", "long_desc"]:
+            if "_lock" in self.__dict__ and self._lock and key not in ["desc", "long_desc"]:
                 raise RuntimeError("Object is currently read-only. Create a new object with new properties "
                                    "or use class methods to change its properties.")
 
         if key in ["desc", "long_desc"]:
             pc.check_type(key, val, str)
-
-        if key in ["silent", "threading"]:
-            pc.check_type(key, val, bool)
 
         self.__dict__[key] = val

@@ -48,7 +48,7 @@ class RaySource(Element):
                  div_2d:            bool = False,
                  div_axis_angle:    float = 0,
                  div_func:          Callable[[np.ndarray], np.ndarray] = None,
-                 div_args:        dict = None,
+                 div_args:          dict = {},
 
                  # Light Parameters
                  spectrum:          LightSpectrum = None,
@@ -61,7 +61,7 @@ class RaySource(Element):
                  orientation:       str = "Constant",
                  conv_pos:          list[float] | np.ndarray = None,
                  or_func:           Callable[[np.ndarray, np.ndarray], np.ndarray] = None,
-                 or_args:           dict = None,
+                 or_args:           dict = {},
 
                  # Polarization Parameters
                  polarization:      str = "Uniform",
@@ -69,7 +69,7 @@ class RaySource(Element):
                  pol_angles:        list[float] = None,
                  pol_probs:         list[float] = None,
                  pol_func:          Callable[[np.ndarray], np.ndarray] = None,
-                 pol_args:          dict = None,
+                 pol_args:          dict = {},
 
                  **kwargs)\
             -> None:
@@ -124,7 +124,7 @@ class RaySource(Element):
         self.pol_func = pol_func
         self.pol_angles = pol_angles
         self.pol_probs = pol_probs
-        self.pol_args = pol_args if pol_args is not None else {}
+        self.pol_args = pol_args
 
         # orientation and divergence
         self.divergence = divergence
@@ -132,7 +132,7 @@ class RaySource(Element):
         self.orientation = orientation
         self.conv_pos = conv_pos if conv_pos is not None else [0, 0, 0]
         self.or_func = or_func
-        self.or_args = or_args if or_args is not None else {}
+        self.or_args = or_args
 
         if s_sph is None:
             self.s = s if s is not None else [0, 0, 1]
@@ -144,7 +144,7 @@ class RaySource(Element):
         self.div_axis_angle = div_axis_angle
         self.div_func = div_func
         self.div_2d = div_2d
-        self.div_args = div_args if div_args is not None else {}
+        self.div_args = div_args
 
         # lock assignment of new properties. New properties throw an error.
         self._new_lock = True

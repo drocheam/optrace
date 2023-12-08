@@ -26,7 +26,7 @@ def rt_example() -> ot.Raytracer:
     # as well as a filter, aperture and a marker and regions with different ambient n
 
     # make raytracer
-    RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60], silent=True)
+    RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
     # add Raysource
     RSS = ot.CircularSurface(r=1)
@@ -144,7 +144,7 @@ class GUITests(unittest.TestCase):
         Image = ot.presets.image.tv_testcard1
 
         # make raytracer
-        RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], silent=True)
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
         # add Raysource
         RSS = ot.RectangularSurface(dim=[4, 4])
@@ -164,12 +164,17 @@ class GUITests(unittest.TestCase):
         Det = ot.Detector(DetS, pos=[0, 0, 36])
         RT.add(Det)
 
+        def exit_on_finish(sim):
+            sim._wait_for_idle()
+            sim._do_in_main(sim.close)
+
         # subtest function with count and args output
         def trace_gui_run(**kwargs):
             trace_gui_run.i += 1
             with self.subTest(i=trace_gui_run.i, args=kwargs):
-                sim = TraceGUI(RT, silent=True, **kwargs)
-                sim.debug(_exit=True)
+                sim = TraceGUI(RT, **kwargs)
+                sim.control(exit_on_finish, args=(sim,))
+
         trace_gui_run.i = 0
 
         trace_gui_run()  # default init
@@ -184,6 +189,7 @@ class GUITests(unittest.TestCase):
         trace_gui_run(rays_visible=200)
         trace_gui_run(absorb_missing=False)
         trace_gui_run(minimalistic_view=True)
+        trace_gui_run(hide_labels=True)
         trace_gui_run(high_contrast=True)
         trace_gui_run(ray_opacity=0.15)
         trace_gui_run(ray_width=5)
@@ -194,7 +200,7 @@ class GUITests(unittest.TestCase):
 
         # many parameters
         trace_gui_run(ray_count=100000, rays_visible=1500, absorb_missing=False, ray_opacity=0.1, ray_width=5,
-                      coloring_type="Wavelength", plotting_type="Points", minimalistic_view=True, 
+                      coloring_type="Wavelength", plotting_type="Points", minimalistic_view=True, hide_labels=True, 
                       vertical_labels=True, ui_style="Windows")
 
         # this attributes can't bet set initially
@@ -323,8 +329,8 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("rays_visible", 500)
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         plt.close('all')
         self.raise_thread_exceptions()
 
@@ -397,8 +403,8 @@ class GUITests(unittest.TestCase):
                 time.sleep(2)  # wait some time so windows can be seen by a human user
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact2, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(func=interact2, args=(sim,))
         plt.close('all')
         self.raise_thread_exceptions()
 
@@ -439,8 +445,8 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact3, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact3, args=(sim,))
         plt.close('all')
         self.raise_thread_exceptions()
 
@@ -450,7 +456,7 @@ class GUITests(unittest.TestCase):
         """test TraceGUI operation when Filter, Lenses, Detectors or Sources are missing"""
 
         def test_features(RT):
-            sim = TraceGUI(RT, silent=True)
+            sim = TraceGUI(RT)
 
             def interact(sim):
                 with self._try(sim):
@@ -476,6 +482,8 @@ class GUITests(unittest.TestCase):
                     sim._wait_for_idle()
                     sim._set_in_main("coloring_type", "Power")
                     sim._wait_for_idle()
+                    sim._set_in_main("hide_labels", True)
+                    sim._wait_for_idle()
                     sim._set_in_main("plotting_type", "Points")
 
                     sim._set_in_main("high_contrast", True)
@@ -493,7 +501,7 @@ class GUITests(unittest.TestCase):
 
                     sim._do_in_main(sim.replot)
 
-            sim.debug(_func=interact, _args=(sim,))
+            sim.control(interact, args=(sim,))
             self.raise_thread_exceptions()
             time.sleep(1)
 
@@ -527,7 +535,7 @@ class GUITests(unittest.TestCase):
         # TODO add screenshot() and set_camera() ?
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def interact(sim):
             
@@ -565,7 +573,7 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(sim.ray_count, 1000000)
                 self.assertEqual(sim.raytracer.rays.N, 1000000)
 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -574,7 +582,7 @@ class GUITests(unittest.TestCase):
         """check replotting by setting random combinations inside the change dictionary for replot()"""
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def interact(sim):
             with self._try(sim):
@@ -606,7 +614,7 @@ class GUITests(unittest.TestCase):
                     sim._do_in_main(sim.replot, cmp)
                     sim._wait_for_idle()
 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -616,7 +624,7 @@ class GUITests(unittest.TestCase):
 
         RT = rt_example()
 
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def interact(sim):
             with self._try(sim):
@@ -628,7 +636,7 @@ class GUITests(unittest.TestCase):
                          ('minimalistic_view', False), ('plotting_type', "Rays"), ('plotting_type', "Points"),
                          ('absorb_missing', True), ('absorb_missing', False), ('ray_opacity', 0.06), ('ray_width', 12),
                          ('ray_opacity', 0.8), ('ray_width', 2), ('cut_value', 0), ('cut_dimension', 'x'), 
-                         ('cut_dimension', 'y'),
+                         ('cut_dimension', 'y'), ('hide_labels', True), ('hide_labels', False),
                          ('af_one_source', False), ('af_one_source', True), ('det_image_one_source', False),
                          ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), 
                          ('flip_det_image', False), ('det_spectrum_one_source', True), ('det_image_one_source', False),
@@ -680,7 +688,7 @@ class GUITests(unittest.TestCase):
                     if i % 20 == 0:
                         plt.close('all')
         
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
    
     @pytest.mark.slow
@@ -689,7 +697,7 @@ class GUITests(unittest.TestCase):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def send_key(sim, key):
             sim._do_in_main(sim.scene.scene_editor._content.setFocus)
@@ -710,11 +718,11 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 self.assertTrue(len(sim.high_contrast) != 0)
                 
-                # check Ray-Point toggle shortcut
-                self.assertTrue(sim.plotting_type == "Rays")
-                send_key(sim, "r")
+                # check hide_labels shortcut
+                self.assertTrue(len(sim.hide_labels) == 0)
+                send_key(sim, "b")
                 sim._wait_for_idle()
-                self.assertTrue(sim.plotting_type == "Points")
+                self.assertTrue(len(sim.hide_labels) != 0)
                 
                 # set camera to initial view /y plus view by default)
                 sim._do_in_main(sim.scene.mlab.view, 0, 1, 0)
@@ -734,23 +742,19 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(sim._scene_not_maximized)
 
                 # don't press m warning
-                sim.silent = False
                 send_key(sim, "m")
                 sim._wait_for_idle()
-                sim.silent = True
                 send_key(sim, "m")
                 sim._wait_for_idle()
                 
                 # don't press a warning
-                sim.silent = False
                 send_key(sim, "a")
                 sim._wait_for_idle()
-                sim.silent = True
                 send_key(sim, "a")
                 sim._wait_for_idle()
                
                 # key without shortcut
-                send_key(sim, "b")
+                send_key(sim, "q")
                 sim._wait_for_idle()
                 
                 # replot rays
@@ -767,7 +771,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 self.assertTrue(sim.last_det_image is not None)
 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
    
     # os test because clipboard is system dependent
@@ -778,7 +782,7 @@ class GUITests(unittest.TestCase):
         """test command setting and sending as well as automatic replotting"""
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def send(cmd):
             sim._do_in_main(sim.send_cmd, cmd)
@@ -818,10 +822,6 @@ class GUITests(unittest.TestCase):
                 
                 send("")  # check empty command
 
-                send("throw RuntimeError()")  # check if exceptions are handled
-
-                # this time with output
-                sim.silent = False
                 send("throw RuntimeError()")  # check if exceptions are handled
 
                 # send empty command using command window
@@ -869,7 +869,7 @@ class GUITests(unittest.TestCase):
                     sim._wait_for_idle()
                     self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.gui2
@@ -882,7 +882,7 @@ class GUITests(unittest.TestCase):
         """
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def interact(sim):
             with self._try(sim):
@@ -946,7 +946,7 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(0.5)
                 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
         
     @pytest.mark.gui2
@@ -958,7 +958,7 @@ class GUITests(unittest.TestCase):
         """
        
        # make raytracer
-        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60], silent=True)
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
         # add Raysource
         RSS = ot.Point()
@@ -972,7 +972,7 @@ class GUITests(unittest.TestCase):
                            pos=[0, 0, 0], s=[0, 0, 1])
         RT.add(RS2)
 
-        sim = TraceGUI(RT, ColoringType="Wavelength", silent=True)
+        sim = TraceGUI(RT, ColoringType="Wavelength")
 
         def interact(sim):
             with self._try(sim):
@@ -982,7 +982,7 @@ class GUITests(unittest.TestCase):
                 sim._wait_for_idle()
                 sim._do_in_main(sim.replot)
 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -991,7 +991,7 @@ class GUITests(unittest.TestCase):
         """additionial coverage tests"""
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def interact(sim):
             with self._try(sim):
@@ -1000,13 +1000,6 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.source_cut)
                 sim._wait_for_idle()
                 sim._do_in_main(sim.source_cut)
-                sim._wait_for_idle()
-
-                # same with output messages
-                sim.silent = False
-                sim._do_in_main(sim.source_cut)
-                sim._wait_for_idle()
-                sim._do_in_main(sim.detector_cut)
                 sim._wait_for_idle()
 
                 # refraction index box replotting with vertical labels
@@ -1019,11 +1012,6 @@ class GUITests(unittest.TestCase):
                 sim._set_in_main("coloring_type", "Polarization yz")
                 sim._wait_for_idle()
 
-                # same but without messages
-                sim.silent = True
-                sim._set_in_main("coloring_type", "Polarization yz")
-                sim._wait_for_idle()
-             
                 # make sure x polarization gets plotted at least once
                 RT.no_pol = False
                 RT.ray_sources[0].polarization = "x"
@@ -1046,7 +1034,7 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(sim._plot._ray_plot is None)
                 self.assertFalse(sim._plot._ray_property_dict)
 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
     
     @pytest.mark.slow
@@ -1055,20 +1043,15 @@ class GUITests(unittest.TestCase):
         """additionial coverage tests"""
 
         RT = rt_example()
-        sim = TraceGUI(RT, silent=True)
+        sim = TraceGUI(RT)
 
         def interact(sim):
             with self._try(sim):
 
                 # delete one raysource plot but still try to color it
-                # do with silent = True and False
                 sim._plot._ray_source_plots = sim._plot._ray_source_plots[:-1]
                 sim._do_in_main(sim.retrace)
                 sim._wait_for_idle()
-                sim.silent = False
-                sim._do_in_main(sim.retrace)
-                sim._wait_for_idle()
-                sim.silent = True
 
                 # only time replotting the orientation axes, since normally they don't need to change
                 sim._do_in_main(sim._plot.plot_orientation_axes)
@@ -1133,10 +1116,6 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(time.time() - start < 6)
 
                 # running the action is skipped because a different action (InitScene) is running
-                sim._set_in_main("silent", True)
-                sim._do_in_main(sim.send_cmd, "self.replot()")
-                sim._wait_for_idle(timeout=2)
-                sim._set_in_main("silent", False)
                 sim._do_in_main(sim.send_cmd, "self.replot()")
                 sim._wait_for_idle(timeout=2)
 
@@ -1158,7 +1137,7 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim._change_minimalistic_view)
                 sim._wait_for_idle()
 
-        sim.debug(_func=interact, _args=(sim,))
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.gui2
@@ -1175,7 +1154,7 @@ class GUITests(unittest.TestCase):
         and therefore no rays are simulated and plotted"""
 
         # make raytracer
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60], silent=True)
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
 
         # add Raysource
         RSS = ot.Point()
@@ -1196,7 +1175,6 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(len(RT.markers) > 0)  # fault markers in RT
 
                 # retrace and print error message
-                sim.silent = False
                 sim._do_in_main(sim.retrace)
                 sim._wait_for_idle()
 
@@ -1241,8 +1219,8 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(len(sim._plot._fault_markers), 0)  # no fault_marker in GUI
                 self.assertEqual(len(RT.markers), 0)  # no fault markers in RT
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.gui1
@@ -1295,8 +1273,8 @@ class GUITests(unittest.TestCase):
                 a = sim._plot._marker_plots[0]
                 self.assertFalse(a[0].visible)
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
     
     @pytest.mark.slow
@@ -1340,8 +1318,8 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
                 self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was removed in scene
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -1480,15 +1458,15 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim._plot._on_ray_pick)
                 sim._wait_for_idle()
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.gui3
     def test_picker_coverage(self):
 
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10], silent=True)
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10])
         
         def interact(sim):
             def pick():    
@@ -1534,8 +1512,8 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.replot)
                 pick_shift_combs()
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.gui3
@@ -1592,8 +1570,8 @@ class GUITests(unittest.TestCase):
                 # check that custom color gets set again without high contrast
                 self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sphv.color)
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -1673,8 +1651,8 @@ class GUITests(unittest.TestCase):
                 sim._do_in_main(sim.set_camera, center=[10, -5, 2], height=250, roll=20, direction=[0, 0, -1])
                 sim._wait_for_idle()
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -1706,8 +1684,8 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(os.path.exists(pathj))
                 os.remove(pathj)
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
     @pytest.mark.slow
@@ -1735,15 +1713,15 @@ class GUITests(unittest.TestCase):
 
                         assert not os.path.exists(path)
                         
-                        sim._do_in_main(plot, fargs=dict(figsize=(3, 3)), path=path, sargs=dict(dpi=120))
+                        sim._do_in_main(plot, path=path, sargs=dict(dpi=120))
                         sim._wait_for_idle()
 
                         # check if file was saved
                         self.assertTrue(os.path.exists(path))
                         os.remove(path)
 
-        sim = TraceGUI(RT, silent=True)
-        sim.debug(_func=interact, _args=(sim,))
+        sim = TraceGUI(RT)
+        sim.control(interact, args=(sim,))
         self.raise_thread_exceptions()
 
 

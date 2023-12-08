@@ -1,5 +1,6 @@
 
 import copy
+import warnings
 
 import numpy as np  # calculations
 import scipy.optimize  # optimize result type
@@ -19,11 +20,9 @@ from ..tracer import RImage
 def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
                         afdict:  dict,
                         title:   str = "Autofocus Cost Function",
-                        fargs:   dict = None,
                         block:   bool = False,
-                        silent:  bool = False,
                         path:    str = None,
-                        sargs:   dict = None)\
+                        sargs:   dict = {})\
         -> None:
     """
     Plot a cost function plot for the autofocus results.
@@ -31,9 +30,7 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     :param res: optimize result from Raytracer.autofocus()
     :param afdict: dictionary from Raytracer.autofocus()
     :param title: title of the plot
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param block: if the plot should be blocking the execution of the program
-    :param silent: if all standard output should be muted
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
@@ -46,16 +43,14 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     pc.check_type("block", block, bool)
 
     if afdict["z"] is None or afdict["cost"] is None:
-        if not silent:
-            print('Parameters missing in focus dict. For mode "Position Variance" set '
-                  'autofocus("Position Variance", ..., return_cost=True) when'
-                  ' wanting to plot the debug plot.')
+        warnings.warn('Parameters missing in focus dict. For mode "Position Variance" set '
+                      'autofocus("Position Variance", ..., return_cost=True) when'
+                      ' wanting to plot the debug plot.')
         return
 
     r, vals = afdict["z"], afdict["cost"]
 
-    fargs = dict() if fargs is None else fargs
-    plt.figure(**fargs)
+    plt.figure()
 
     # evaluation points and connection line of cost function
     plt.plot(r, vals)
@@ -77,11 +72,10 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
 def image_plot(img:     np.ndarray | RImage | str, 
                s:       list[float, float],
                flip:    bool = False,
-               fargs:   dict = None,
                title:   str = "",
                block:   bool = False,
                path:    str = None,
-               sargs:   dict = None)\
+               sargs:   dict = {})\
         -> None:
     """
     Plot an image (array or path).
@@ -93,7 +87,6 @@ def image_plot(img:     np.ndarray | RImage | str,
     :param img: image path or image array
     :param s: image side lengths in mms (list of two elements, with first element being the x-length)
     :param flip: flip the image (rotate by 180 degrees)
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: optional title of the plot
     :param block: if the plot window should be blocking
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
@@ -131,8 +124,7 @@ def image_plot(img:     np.ndarray | RImage | str,
         img_ = np.fliplr(np.flipud(img_))
         extent = extent[[1, 0, 3, 2]]
     
-    fargs = dict() if fargs is None else fargs
-    plt.figure(**fargs)
+    plt.figure()
     
     _show_grid()
     plt.title(title)
@@ -148,11 +140,9 @@ def image_plot(img:     np.ndarray | RImage | str,
 def abbe_plot(ri:     list[RefractionIndex],
               title:  str = "Abbe Diagram",
               lines:  list = None,
-              fargs:  dict = None,
               block:  bool = False,
-              silent: bool = False,
               path:   str = None,
-              sargs:  dict = None)\
+              sargs:  dict = {})\
         -> None:
     """
     Create an Abbe Plot for different refractive media.
@@ -160,9 +150,7 @@ def abbe_plot(ri:     list[RefractionIndex],
     :param ri: list of RefractionIndex
     :param title: title of the plot
     :param lines: spectral lines to use for the Abbe number calculation
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param block: if the plot should block the execution of the program
-    :param silent: if all standard output of this function should be muted
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
@@ -170,15 +158,13 @@ def abbe_plot(ri:     list[RefractionIndex],
 
     # type checking
     pc.check_type("block", block, bool)
-    pc.check_type("silent", silent, bool)
     pc.check_type("title", title, str)
     pc.check_type("lines", lines, list | None)
     pc.check_type("ri", ri, list)
 
     lines = Lines.FdC if lines is None else lines
    
-    fargs = dict() if fargs is None else fargs
-    plt.figure(**fargs)
+    plt.figure()
     _show_grid()
 
     for i, RIi in enumerate(ri):
@@ -189,8 +175,7 @@ def abbe_plot(ri:     list[RefractionIndex],
 
         # check if dispersive
         if not np.isfinite(Vd):
-            if not silent:
-                print(f"Ignoring non dispersive material '{RIi.get_desc()}'")
+            warnings.warn(f"Ignoring non dispersive material '{RIi.get_desc()}'")
             continue  # skip plotting
 
         # plot point and label
@@ -210,12 +195,10 @@ def surface_profile_plot(surface:          Surface | list[Surface],
                          x0:               float = None,
                          xe:               float = None,
                          remove_offset:    bool = False,
-                         fargs:            dict = None,
                          title:            str = "Surface Profile",
-                         silent:           bool = False,
                          block:            bool = False,
                          path:             str = None,
-                         sargs:            dict = None)\
+                         sargs:            dict = {})\
         -> None:
     """
     Plot surface profiles in x direction
@@ -227,9 +210,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     :param x0: x start value for the plot, defaults to the beginning of the surface
     :param xe: x end value for the plot, defaults to the end of the surface
     :param remove_offset: remove the height offset for each surface
-    :param fargs: keyword argument dictionary for pyplot.figure() (e.g. figsize)
     :param title: title of the plot
-    :param silent: if all standard output of this function should be muted
     :param block: if the plot should block the execution of the program
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
@@ -243,13 +224,11 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     pc.check_type("title", title, str)
     pc.check_type("remove_offset", remove_offset, bool)
     pc.check_type("block", block, bool)
-    pc.check_type("silent", silent, bool)
 
     Surf_list = [surface] if isinstance(surface, Surface) else surface  # enforce list even for one element
     legends = []  # legend entries
 
-    fargs = dict() if fargs is None else fargs
-    plt.figure(**fargs)
+    plt.figure()
 
     plottable = False  # if at least one plot is plottable
 
@@ -274,8 +253,8 @@ def surface_profile_plot(surface:          Surface | list[Surface],
         legends.append(Surfi.get_long_desc(fallback=f"Surface {i}"))
 
     # print info message
-    if Surf_list and not plottable and not silent:
-        print("no plottable surface for this x region")
+    if Surf_list and not plottable:
+        warnings.warn("no plottable surface for this x region")
 
     _show_grid()
     plt.xlabel("x in mm")
@@ -293,7 +272,7 @@ def _show_grid(what=plt) -> None:
     what.minorticks_on()
 
 
-def _save_or_show(block: bool, path: str = None, sargs: dict = None):
+def _save_or_show(block: bool, path: str = None, sargs: dict = {}):
     """show a plot (path is None) or store the image of a plot at file given as 'path'"""
     pc.check_type("path", path, str | None)
 
@@ -302,6 +281,5 @@ def _save_or_show(block: bool, path: str = None, sargs: dict = None):
         plt.pause(0.1)
 
     else:
-        sargs = sargs or dict() 
         plt.savefig(path, **sargs)
 
