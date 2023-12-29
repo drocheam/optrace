@@ -15,14 +15,14 @@ class RefractionIndex(Spectrum):
     # Refraction Index Models:
     # see https://doc.comsol.com/5.5/doc/com.comsol.help.roptics/roptics_ug_optics.6.46.html
 
-    coeff_count = {"Cauchy": 4, "Conrady": 3, "Sellmeier1": 6, "Sellmeier2": 5, "Sellmeier3": 8, 
-                    "Sellmeier4": 5, "Sellmeier5": 10, "Herzberger": 6, "Extended": 8, "Extended2": 8, 
+    coeff_count = {"Cauchy": 4, "Conrady": 3, "Sellmeier1": 6, "Sellmeier2": 5, "Sellmeier3": 8,
+                    "Sellmeier4": 5, "Sellmeier5": 10, "Herzberger": 6, "Extended": 8, "Extended2": 8,
                     "Handbook of Optics 1": 4, "Handbook of Optics 2": 4, "Schott": 6, "Extended3": 9}
     """number of coefficients for the different refractive index models"""
     
-    n_types: list[str] = ["Abbe", "Cauchy", "Conrady", "Constant", "Data", "Extended", "Extended2", 
-                          "Extended3", "Function", "Handbook of Optics 1", "Handbook of Optics 2", 
-                          "Sellmeier1", "Sellmeier2", "Sellmeier3", "Sellmeier4", 
+    n_types: list[str] = ["Abbe", "Cauchy", "Conrady", "Constant", "Data", "Extended", "Extended2",
+                          "Extended3", "Function", "Handbook of Optics 1", "Handbook of Optics 2",
+                          "Sellmeier1", "Sellmeier2", "Sellmeier3", "Sellmeier4",
                           "Sellmeier5", "Herzberger", "Schott"]
     """possible refractive index types"""
 
@@ -116,7 +116,7 @@ class RefractionIndex(Spectrum):
                 ns = ne.evaluate("sqrt(1 + c0 + c1*wl2/(wl2-c2**2) + c3/(wl2-c4**2))", local_dict=locals() | coeff_dict)
             
             case "Sellmeier3":
-                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5) + c6*wl2/(wl2-c7))", 
+                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5) + c6*wl2/(wl2-c7))",
                                  local_dict=locals() | coeff_dict)
             
             case "Sellmeier4":
@@ -127,12 +127,12 @@ class RefractionIndex(Spectrum):
                                  " + c6*wl2/(wl2-c7)+ c8*wl2/(wl2-c9))", local_dict=locals() | coeff_dict)
 
             case "Schott":
-                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3 + c5/wl2**4)", 
+                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3 + c5/wl2**4)",
                                  local_dict=locals() | coeff_dict)
             
             case "Herzberger":
                 L = 1/(wl2 - 0.028)
-                ns = ne.evaluate("c0 + c1*L + c2*L**2 + c3*wl2 + c4*wl2**2 + c5*wl2**3", 
+                ns = ne.evaluate("c0 + c1*L + c2*L**2 + c3*wl2 + c4*wl2**2 + c5*wl2**3",
                                  local_dict=locals() | coeff_dict)
 
             case "Handbook of Optics 1":

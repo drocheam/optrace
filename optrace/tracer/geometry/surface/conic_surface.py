@@ -125,7 +125,7 @@ class ConicSurface(Surface):
 
         with np.errstate(invalid='ignore'):  # suppresses nan warnings for now
 
-            A = ne.evaluate("1 + k*sz**2")
+            A = ne.evaluate("1 + k*sz**2") if k else 1.0
             B = ne.evaluate("sx*ox + sy*oy + sz*(oz*(k+1) - 1/rho)")
             C = ne.evaluate("oy**2 + ox**2 + oz*(oz*(k+1) - 2/rho)")
 

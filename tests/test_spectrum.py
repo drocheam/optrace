@@ -255,7 +255,7 @@ class SpectrumTests(unittest.TestCase):
         self.assertTrue(np.all(wl == wl0))  # only one valid value
 
         # Constant
-        wl0, wl1 = color.WL_BOUNDS
+        wl0, wl1 = ot.global_options.wavelength_range
         wl = ot.LightSpectrum("Constant").random_wavelengths(100000)
         self.assertAlmostEqual(np.mean(wl), (wl0+wl1)/2, delta=0.001)  # mean correct
         self.assertAlmostEqual(np.var(wl), (wl1-wl0)**2/12, delta=0.005)  # standard deviation correct
@@ -315,7 +315,7 @@ class SpectrumTests(unittest.TestCase):
         
         # gaussian function right truncated
         mu, sig = 732.568, 65.123
-        wlm0, wlm1 = color.WL_BOUNDS
+        wlm0, wlm1 = ot.global_options.wavelength_range
         spec = ot.LightSpectrum("Gaussian", mu=mu, sig=sig)
         wl = spec.random_wavelengths(100000)
         self.assertAlmostEqual(mean(mu, sig, wlm0, wlm1), np.mean(wl), delta=0.005)
@@ -367,7 +367,7 @@ class SpectrumTests(unittest.TestCase):
     @pytest.mark.os
     def test_light_spectrum_render(self):
         # check render
-        wl = np.random.uniform(*color.WL_BOUNDS, 10000)
+        wl = np.random.uniform(*ot.global_options.wavelength_range, 10000)
         w = np.random.uniform(0, 1, 10000)
         P, N, desc = np.sum(w), 100, "ABC"
         spec = ot.LightSpectrum.render(wl, w, desc=desc)
@@ -381,12 +381,12 @@ class SpectrumTests(unittest.TestCase):
         self.assertFalse(spec._wls[0] == spec._wls[-1])
         
         # special case: minimal wavelength
-        spec = ot.LightSpectrum.render(np.array([color.WL_BOUNDS[0]]), np.array([1.]))
-        self.assertFalse(spec._wls[0] < color.WL_BOUNDS[0])
+        spec = ot.LightSpectrum.render(np.array([ot.global_options.wavelength_range[0]]), np.array([1.]))
+        self.assertFalse(spec._wls[0] < ot.global_options.wavelength_range[0])
         
         # special case: maximal wavelength
-        spec = ot.LightSpectrum.render(np.array([color.WL_BOUNDS[1]]), np.array([1.]))
-        self.assertFalse(spec._wls[-1] > color.WL_BOUNDS[1])
+        spec = ot.LightSpectrum.render(np.array([ot.global_options.wavelength_range[1]]), np.array([1.]))
+        self.assertFalse(spec._wls[-1] > ot.global_options.wavelength_range[1])
         
         # special case: empty arrays
         spec = ot.LightSpectrum.render(np.array([]), np.array([]))
@@ -404,7 +404,7 @@ class SpectrumTests(unittest.TestCase):
         
         # check if spectrum is rendered correctly
         for N in [3000, 30000, 3000000]:
-            wlr = misc.uniform(*color.WL_BOUNDS, N)
+            wlr = misc.uniform(*ot.global_options.wavelength_range, N)
             w = color.d65_illuminant(wlr)
             spec = ot.LightSpectrum.render(wlr, w)
 
@@ -417,7 +417,7 @@ class SpectrumTests(unittest.TestCase):
             self.assertAlmostEqual(np.std(m)/np.mean(m), 0, delta=delta/2) 
             
             # check values at arbitrary positions 
-            wl = np.linspace(*color.WL_BOUNDS, 1000)
+            wl = np.linspace(*ot.global_options.wavelength_range, 1000)
             m = spec(wl)/color.d65_illuminant(wl)
             wl, m = wl[1:-1], m[1:-1]
             self.assertAlmostEqual(np.std(m)/np.mean(m), 0, delta=delta) 
@@ -453,7 +453,7 @@ class SpectrumTests(unittest.TestCase):
 
         # Constant
         spec = ot.LightSpectrum("Constant")
-        self.assertAlmostEqual(spec.fwhm(), color.WL_BOUNDS[1] - color.WL_BOUNDS[0])
+        self.assertAlmostEqual(spec.fwhm(), ot.global_options.wavelength_range[1] - ot.global_options.wavelength_range[0])
         
         # gaussian 
         spec = ot.LightSpectrum("Gaussian", mu=546.7, sig=5.3)
@@ -469,21 +469,21 @@ class SpectrumTests(unittest.TestCase):
         
         # constant function
         spec = ot.LightSpectrum("Function", func=lambda wl: 1 + wl*0)
-        self.assertAlmostEqual(spec.fwhm(), color.WL_BOUNDS[1] - color.WL_BOUNDS[0], delta=0.01) 
+        self.assertAlmostEqual(spec.fwhm(), ot.global_options.wavelength_range[1] - ot.global_options.wavelength_range[0], delta=0.01) 
         
         # only first value
-        spec = ot.LightSpectrum("Function", func=lambda wl: 0 + wl==color.WL_BOUNDS[0])
+        spec = ot.LightSpectrum("Function", func=lambda wl: 0 + wl==ot.global_options.wavelength_range[0])
         self.assertAlmostEqual(spec.fwhm(), 0, delta=0.01)
         
         # only last value
-        spec = ot.LightSpectrum("Function", func=lambda wl: 0 + wl==color.WL_BOUNDS[1])
+        spec = ot.LightSpectrum("Function", func=lambda wl: 0 + wl==ot.global_options.wavelength_range[1])
         self.assertAlmostEqual(spec.fwhm(), 0, delta=0.01) 
         
         # empty spectrum
-        wl = np.random.uniform(*color.WL_BOUNDS, 10000)
+        wl = np.random.uniform(*ot.global_options.wavelength_range, 10000)
         w = np.zeros(10000)
         spec = ot.LightSpectrum.render(wl, w)
-        self.assertAlmostEqual(spec.fwhm(), color.WL_BOUNDS[1] - color.WL_BOUNDS[0], delta=0.01) 
+        self.assertAlmostEqual(spec.fwhm(), ot.global_options.wavelength_range[1] - ot.global_options.wavelength_range[0], delta=0.01) 
         
         # two gaussian, fwhm is at the larger one
         spec = ot.LightSpectrum("Function", func=lambda wl: np.exp(-(wl-450)**2 / 2 / 5.3**2)\
@@ -514,7 +514,7 @@ class SpectrumTests(unittest.TestCase):
 
         # Constant
         spec = ot.LightSpectrum("Constant")
-        self.assertAlmostEqual(spec.peak_wavelength(), color.WL_BOUNDS[0])
+        self.assertAlmostEqual(spec.peak_wavelength(), ot.global_options.wavelength_range[0])
         
         # gaussian 
         spec = ot.LightSpectrum("Gaussian", mu=546.7, sig=5.3)
@@ -526,13 +526,13 @@ class SpectrumTests(unittest.TestCase):
         
         # constant function
         spec = ot.LightSpectrum("Function", func=lambda wl: 1 + wl*0)
-        self.assertAlmostEqual(spec.peak_wavelength(), color.WL_BOUNDS[0], delta=0.01) 
+        self.assertAlmostEqual(spec.peak_wavelength(), ot.global_options.wavelength_range[0], delta=0.01) 
         
         # empty spectrum
-        wl = np.random.uniform(*color.WL_BOUNDS, 10000)
+        wl = np.random.uniform(*ot.global_options.wavelength_range, 10000)
         w = np.zeros(10000)
         spec = ot.LightSpectrum.render(wl, w)
-        self.assertAlmostEqual(spec.peak_wavelength(), color.WL_BOUNDS[0], delta=0.01) 
+        self.assertAlmostEqual(spec.peak_wavelength(), ot.global_options.wavelength_range[0], delta=0.01) 
         
         # two gaussian, fwhm is at the larger one
         spec = ot.LightSpectrum("Function", func=lambda wl: np.exp(-(wl-450)**2 / 2 / 5.3**2)\
@@ -556,7 +556,7 @@ class SpectrumTests(unittest.TestCase):
 
         # Constant
         spec = ot.LightSpectrum("Constant")
-        self.assertAlmostEqual(spec.centroid_wavelength(), np.mean(color.WL_BOUNDS))
+        self.assertAlmostEqual(spec.centroid_wavelength(), np.mean(ot.global_options.wavelength_range))
         
         # gaussian 
         spec = ot.LightSpectrum("Gaussian", mu=546.7, sig=5.3)
@@ -568,13 +568,13 @@ class SpectrumTests(unittest.TestCase):
         
         # constant function
         spec = ot.LightSpectrum("Function", func=lambda wl: 1 + wl*0)
-        self.assertAlmostEqual(spec.centroid_wavelength(), np.mean(color.WL_BOUNDS), delta=0.01) 
+        self.assertAlmostEqual(spec.centroid_wavelength(), np.mean(ot.global_options.wavelength_range), delta=0.01) 
         
         # empty spectrum
-        wl = np.random.uniform(*color.WL_BOUNDS, 10000)
+        wl = np.random.uniform(*ot.global_options.wavelength_range, 10000)
         w = np.zeros(10000)
         spec = ot.LightSpectrum.render(wl, w)
-        self.assertAlmostEqual(spec.centroid_wavelength(), np.mean(color.WL_BOUNDS), delta=0.01) 
+        self.assertAlmostEqual(spec.centroid_wavelength(), np.mean(ot.global_options.wavelength_range), delta=0.01) 
         
         # two same gaussian, centroid should be in the middle
         spec = ot.LightSpectrum("Function", func=lambda wl: np.exp(-(wl-450)**2 / 2 / 10.3**2)\
@@ -663,7 +663,7 @@ class SpectrumTests(unittest.TestCase):
         self.assertAlmostEqual(spec.luminous_power(), 683*np.sum(color.y_observer(wl)*spec(wl))*(wl[1]-wl[0]), delta=1e-3)
         
         # constant function
-        spec = ot.LightSpectrum("Function", func=lambda x: 1/(color.WL_BOUNDS[1] - color.WL_BOUNDS[0]))
+        spec = ot.LightSpectrum("Function", func=lambda x: 1/(ot.global_options.wavelength_range[1] - ot.global_options.wavelength_range[0]))
         self.assertAlmostEqual(spec.power(), 1, delta=1e-5)
         
         # histogram
@@ -689,7 +689,8 @@ class SpectrumTests(unittest.TestCase):
         wl = color.wavelengths(50)  # every bin gets a ray
         w = np.ones_like(wl)
         spec = ot.LightSpectrum.render(wl, w)
-        self.assertAlmostEqual(spec.peak(), 1 / (color.WL_BOUNDS[1] - color.WL_BOUNDS[0]) * (len(spec._wls)-1))
+        self.assertAlmostEqual(spec.peak(), 1 / (ot.global_options.wavelength_range[1]\
+                               - ot.global_options.wavelength_range[0]) * (len(spec._wls)-1))
     
     @pytest.mark.os
     def test_light_spectrum_presets(self):

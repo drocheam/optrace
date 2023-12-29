@@ -9,23 +9,20 @@
 #
 import os
 import sys
+import importlib.metadata
+import datetime
+
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
 
 
 # -- Project information -----------------------------------------------------
 
-# load from file
-path = os.path.join("..", "..", "optrace", "__metadata__.py")
-with open(path) as f:
-    exec(f.read())
-
-# assign
-project = __name__
-copyright = __copyright__.replace("Copyright ", "")
-author = __author__
-release = __version__
-
+# assign metadata
+project = "optrace"
+release = importlib.metadata.metadata(project)["Version"]
+author = importlib.metadata.metadata(project)["Author"]
+copyright = f"{datetime.date.today().year}, {author}"
 
 # -- General configuration ---------------------------------------------------
 
@@ -95,8 +92,7 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/', None),
                        'traits': ('https://docs.enthought.com/traits/', None),
                        'matplotlib': ('http://matplotlib.org/stable', None),
-                       'mayavi': ('https://docs.enthought.com/mayavi/mayavi', None),
-                       'PIL': ('https://pillow.readthedocs.io/en/stable/', None)}
+                       'mayavi': ('https://docs.enthought.com/mayavi/mayavi', None)}
 
 autodoc_default_options = {
 	'members': True,

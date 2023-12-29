@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Any  # Any type
-import warnings
 
 import numpy as np  # calculations
 
@@ -12,6 +11,7 @@ from ..base_class import BaseClass  # parent class
 from ..transfer_matrix_analysis import TMA  # paraxial analysis
 from ..refraction_index import RefractionIndex  # ambient media
 from ..misc import PropertyChecker as pc  # check types and values
+from ...warnings import warning
 
 
 
@@ -221,8 +221,8 @@ class Group(BaseClass):
         """
 
         if not isinstance(el, list) and self.has(el):
-            warnings.warn(f"Element {self.get_desc(hex(id(self)))} already included in geometry. "
-                           "Make a copy to include it another time.")
+            warning(f"Element {self.get_desc(hex(id(self)))} already included in geometry. "
+                     "Make a copy to include it another time.")
             return
 
         match el:
@@ -250,7 +250,7 @@ class Group(BaseClass):
             case Group():
 
                 if self.n0 != el.n0:
-                    warnings.warn("Overwriting ambient index with index from new Group.")
+                    warning("Overwriting ambient index with index from new Group.")
                     self.n0 = el.n0
 
                 for eli in el.elements:

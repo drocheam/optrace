@@ -27,6 +27,7 @@ else:
     n1 = n2 = ot.presets.refraction_index.SF10
     n1_ = n2_ = n1(ot.presets.spectral_lines.e)
     V1 = V2 = n1.abbe_number(lines=ot.presets.spectral_lines.F_eC_)
+
     # this choice of D1, D2 leads to a similar R ratio as the achromatic case
     D1 = 2*D
     D2 = -1*D
@@ -49,12 +50,12 @@ RT = ot.Raytracer(outline=[-5, 5, -5, 5, -15, 60])
 # Source 1
 RSS1 = ot.CircularSurface(r=0.05)
 RS1 = ot.RaySource(RSS1, divergence="None", spectrum=ot.presets.light_spectrum.F_eC_,
-                  pos=[3, 0, -10], s=[0, 0, 1])
+                  pos=[0, 3, -10], s=[0, 0, 1])
 RT.add(RS1)
 
 # Source 2, same properties, but different position
 RS2 = RS1.copy()
-RS2.move_to([-3, 0, -10])
+RS2.move_to([0, -3, -10])
 RT.add(RS2)
 
 # Lens 1 of doublet
@@ -76,8 +77,8 @@ DETS = ot.RectangularSurface(dim=[10, 10])
 DET = ot.Detector(DETS, pos=[0, 0, 60])
 RT.add(DET)
 
-print("\nDoublet Powers:")
 F_, e, C_ = ot.presets.spectral_lines.F_eC_
+print("\nDoublet Powers:")
 print(f"{RT.tma(F_).powers[1]:.2f} dpt ({F_:.2f} nm)")
 print(f"{RT.tma(e).powers[1]:.2f} dpt ({e:.2f} nm)")
 print(f"{RT.tma(C_).powers[1]:.2f} dpt ({C_:.2f} nm)\n")

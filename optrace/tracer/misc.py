@@ -1,12 +1,8 @@
 
-from datetime import datetime  # date for fallback file naming
-from pathlib import Path  # path handling for image saving
-
 from typing import Callable, Any  # Callable and Any types
 from functools import wraps  # wrapping of functions
 import time  # timing
 
-from PIL import Image as PILImage
 import scipy.interpolate  # linear interpolation
 import scipy.integrate
 import numpy as np  # calculations
@@ -16,16 +12,6 @@ import numexpr as ne  # faster calculations
 def random():
     """less secure (= lower quality of randomness), but faster random number generator"""
     return np.random.Generator(np.random.SFC64())
-
-def load_image(path: str) -> np.ndarray:
-    """
-    Loads an image file and converts it into a numpy array.
-    
-    :param path: path to the file
-    :return: image numpy array, three dimensions, three channels, value range 0-1
-    """
-    img =  np.asarray(PILImage.open(path).convert("RGB"), dtype=float) / 2**8
-    return np.flipud(img)
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function
@@ -112,7 +98,6 @@ def uniform(a: float, b: float, N: int) -> np.ndarray:
 
     random().shuffle(x)
     return x
-
 
 def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.ndarray, np.ndarray]:
     """
@@ -295,7 +280,6 @@ def part_mask(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     wc = np.zeros_like(cond1)
     wc[cond1] = cond2
     return wc
-
 
 def normalize(a: np.ndarray) -> np.ndarray:
     """

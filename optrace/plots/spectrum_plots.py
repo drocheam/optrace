@@ -8,6 +8,7 @@ from ..tracer.refraction_index import RefractionIndex
 from .misc_plots import _show_grid, _save_or_show
 
 from ..tracer.misc import PropertyChecker as pc
+from ..global_options import global_options as go
 
 
 def refraction_index_plot(ri:         RefractionIndex | list[RefractionIndex],
@@ -20,7 +21,6 @@ def refraction_index_plot(ri:         RefractionIndex | list[RefractionIndex],
     :param ri: RefractionIndex or list of RefractionIndex
     :param title: title of the plot
     :param kwargs: additional plotting arguments, including:
-     block: if the plot should be blocking
      legend_off: if the legend should be turned off
      label_off: if the labels should be turned off
      color: a single or a list of colors
@@ -40,7 +40,6 @@ def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
     :param spectrum: spectrum or a list of spectra
     :param title: title of the plot
     :param kwargs: additional plotting arguments, including:
-     block: if the plot should be blocking
      legend_off: if the legend should be turned off
      label_off: if the labels should be turned off
      color: a single or a list of colors
@@ -65,7 +64,6 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
                    legend_off:   bool = False,
                    labels_off:   bool = False,
                    color:        str | list[str] = None,
-                   block:        bool = False,
                    path:         str = None,
                    sargs:        dict = {})\
         -> None:
@@ -78,11 +76,10 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     pc.check_type("steps", steps, int)
     pc.check_type("legend_off", legend_off, bool)
     pc.check_type("labels_off", labels_off, bool)
-    pc.check_type("block", block, bool)
     pc.check_type("color", color, str | list | None)
 
     # wavelength range
-    wl0, wl1 = mcolor.WL_BOUNDS
+    wl0, wl1 = go.wavelength_range
 
     fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [15, 1]})
 
@@ -148,11 +145,12 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # add wavelength color bar
     # enforce image extent of 1:10 for every wavelength range,
     # otherwise the color bar size changes for different wavelength ranges
-    colors = np.array([mcolor.spectral_colormap(wl0=plt.xlim()[0], wl1=plt.xlim()[1], N=500)[:, :3]]) / 255
+    spectral_colormap = go.spectral_colormap if go.spectral_colormap is not None else mcolor.spectral_colormap
+    colors = np.array([spectral_colormap(np.linspace(plt.xlim()[0], plt.xlim()[1], 500))[:, :3]])
     ax2.imshow(colors, extent=[*plt.xlim(), 0.1*plt.xlim()[0], 0.1*plt.xlim()[1]], aspect="auto", interpolation="gaussian")
 
     ax1.set(ylabel=ylabel)
     ax2.set(xlabel=xlabel)
     ax2.get_yaxis().set_visible(False)
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)

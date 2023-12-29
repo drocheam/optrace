@@ -1,6 +1,6 @@
 import pathlib  # loading files in relative path
-import numpy as np  # np.ndarray type
-
+import numpy as np  # np.ndarray | list type
+from ..image import Image
 
 # path of the image library folder
 image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "images"
@@ -9,31 +9,73 @@ image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources"
 # Scene Images
 #######################################################################################################################
 
-cell: str = str(image_dir / "cell.webp")
-"""Stable Diffusion image from https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064"""
+def cell(s: np.ndarray | list) -> Image:
+    """
+    Stable Diffusion image from https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064
 
-documents: str = str(image_dir / "documents.webp")
-"""Photo of a keyboard and documents on a desk. 
-Source: https://www.pexels.com/photo/documents-on-wooden-surface-95916/ """
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "cell.webp"), s, desc="Cell")
 
-fruits: str = str(image_dir / "fruits.webp")
-"""Photo of different fruits on a tray. Source: https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/ """
+def documents(s: np.ndarray | list) -> Image:
+    """
+    Photo of a keyboard and documents on a desk. 
+    Source: https://www.pexels.com/photo/documents-on-wooden-surface-95916/ 
 
-group_photo: str = str(image_dir / "group_photo.webp")
-"""Photo of a group of people in front of a blackboard. 
-Source: https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/ """
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "documents.webp"), s, desc="Documents")
 
-hong_kong: str = str(image_dir / "hong_kong.webp")
-"""Photo of a Hong Kong street at night. 
-Source: https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/ """
+def fruits(s: np.ndarray | list) -> Image:
+    """
+    Photo of different fruits on a tray. Source: https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/ 
 
-interior: str = str(image_dir / "interior.webp")
-"""Green sofa in an interior room. 
-Source: https://www.pexels.com/photo/green-2-seat-sofa-1918291/ """
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "fruits.webp"), s, desc="Fruits")
 
-landscape: str = str(image_dir / "landscape.webp")
-"""Landscape image of a mountain and water scene. 
-Source: https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/ """
+def group_photo(s: np.ndarray | list) -> Image:
+    """
+    Photo of a group of people in front of a blackboard. 
+    Source: https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/ 
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "group_photo.webp"), s, desc="Group Photo")
+
+def hong_kong(s: np.ndarray | list) -> Image:
+    """
+    Photo of a Hong Kong street at night. 
+    Source: https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/ 
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "hong_kong.webp"), s, desc="Hong Kong")
+
+def interior(s: np.ndarray | list) -> Image:
+    """
+    Green sofa in an interior room. 
+    Source: https://www.pexels.com/photo/green-2-seat-sofa-1918291/ 
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "interior.webp"), s, desc="Interior")
+
+def landscape(s: np.ndarray | list) -> Image:
+    """
+    Landscape image of a mountain and water scene. 
+    Source: https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/ 
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "landscape.webp"), s, desc="Landscape")
 
 scenes: list = [cell, documents, fruits, group_photo, hong_kong, interior, landscape]
 """photography-like images for viewing natural scenes"""
@@ -42,41 +84,91 @@ scenes: list = [cell, documents, fruits, group_photo, hong_kong, interior, lands
 # Test Images
 #######################################################################################################################
 
-checkerboard: np.ndarray = np.zeros((8, 8, 3), dtype=np.float64)
-"""black and white checkerboard pattern image with 8 boxes in each dimension"""
-checkerboard[::2, 1::2] = 1.0
-checkerboard[1::2, ::2] = 1.0
+def color_checker(s: np.ndarray | list) -> Image:
+    """
+    Color checker chart
+    Public domain image from
+    https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg 
 
-color_checker: str = str(image_dir / "color_checker.webp")
-"""Color checker chart
-Public domain image from
-https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg """
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "color_checker.webp"), s, desc="Color Checker Chart")
 
-ETDRS_chart: str = str(image_dir / "ETDRS_chart.png")
-"""ETDRS Chart standard
-Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
+def ETDRS_chart(s: np.ndarray | list) -> Image:
+    """
+    ETDRS Chart standard
+    Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg 
 
-ETDRS_chart_inverted: str = str(image_dir / "ETDRS_chart_inverted.png")
-"""ETDRS Chart inverted
-edited version of Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg """
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "ETDRS_chart.png"), s, desc="ETDRS Chart")
 
-eye_test_vintage: str = str(image_dir / "eye_test_vintage.webp")
-"""Photo of a vintage eye test chart. 
-Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage """
+def ETDRS_chart_inverted(s: np.ndarray | list) -> Image:
+    """
+    ETDRS Chart inverted
+    edited version of Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg 
 
-siemens_star: str = str(image_dir / "siemens_star.webp")
-"""Siemens Star Image. Own creation"""
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "ETDRS_chart_inverted.png"), s, desc="ETDRS Chart Inverted")
 
-tv_testcard1: str = str(image_dir / "tv_testcard1.png")
-"""TV test card
-Public Domain Image from  https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg """
+def eye_test_vintage(s: np.ndarray | list) -> Image:
+    """
+    Photo of a vintage eye test chart. 
+    Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage 
 
-tv_testcard2: str = str(image_dir / "tv_testcard2.png")
-"""TV test card
-Public Domain Image from https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png """
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "eye_test_vintage.webp"), s, desc="Eye Test Vintage")
 
-test_images: list = [checkerboard, color_checker, ETDRS_chart, ETDRS_chart_inverted, 
-                     eye_test_vintage, siemens_star, tv_testcard1, tv_testcard2]
+def grid(s: np.ndarray | list) -> Image:
+    """
+    White grid on black background with 10x10 cells.
+    Useful for distortion characterization.
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    grid = np.zeros((301, 301, 3))
+    grid[::30] = 1
+    grid[:, ::30] = 1
+    return Image(grid, s, desc="Grid")
+
+def siemens_star(s: np.ndarray | list) -> Image:
+    """
+    Siemens Star Image. Own creation
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "siemens_star.webp"), s, desc="Siemens Star")
+
+def tv_testcard1(s: np.ndarray | list) -> Image:
+    """
+    TV test card
+    Public Domain Image from  https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg 
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "tv_testcard1.png"), s, desc="TV Testcard 1")
+
+def tv_testcard2(s: np.ndarray | list) -> Image:
+    """
+    TV test card
+    Public Domain Image from https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png 
+
+    :param s: image side lengths list in mm (x length, y length)
+    :return: Image object
+    """
+    return Image(str(image_dir / "tv_testcard2.png"), s, desc="TV Testcard 2")
+
+test_images: list = [color_checker, ETDRS_chart, ETDRS_chart_inverted, 
+                     eye_test_vintage, grid, siemens_star, tv_testcard1, tv_testcard2]
 """test images for color, resolution or distortion"""
 
 

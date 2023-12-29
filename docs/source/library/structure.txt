@@ -7,7 +7,6 @@
 │   ├── _scene_plotting.py
 │   └── trace_gui.py
 ├── __init__.py
-├── __metadata__.py
 ├── plots
 │   ├── chromaticity_plots.py
 │   ├── __init__.py
@@ -32,74 +31,76 @@
 │   │   ├── tv_testcard1.png
 │   │   └── tv_testcard2.png
 │   └── observers.csv
-└── tracer
-    ├── base_class.py
-    ├── color
-    │   ├── illuminants.py
-    │   ├── __init__.py
-    │   ├── luv.py
-    │   ├── observers.py
-    │   ├── srgb.py
-    │   ├── tools.py
-    │   └── xyz.py
-    ├── convolve.py
-    ├── geometry
-    │   ├── aperture.py
-    │   ├── detector.py
-    │   ├── element.py
-    │   ├── filter.py
-    │   ├── group.py
-    │   ├── ideal_lens.py
-    │   ├── __init__.py
-    │   ├── lens.py
-    │   ├── line.py
-    │   ├── marker
-    │   │   ├── __init__.py
-    │   │   ├── line_marker.py
-    │   │   └── point_marker.py
-    │   ├── point.py
-    │   ├── ray_source.py
-    │   ├── surface
-    │   │   ├── aspheric_surface.py
-    │   │   ├── circular_surface.py
-    │   │   ├── conic_surface.py
-    │   │   ├── data_surface_1d.py
-    │   │   ├── data_surface_2d.py
-    │   │   ├── function_surface_1d.py
-    │   │   ├── function_surface_2d.py
-    │   │   ├── __init__.py
-    │   │   ├── rectangular_surface.py
-    │   │   ├── ring_surface.py
-    │   │   ├── spherical_surface.py
-    │   │   ├── surface.py
-    │   │   └── tilted_surface.py
-    │   └── volume
-    │       ├── box_volume.py
-    │       ├── cylinder_volume.py
-    │       ├── __init__.py
-    │       ├── sphere_volume.py
-    │       └── volume.py
-    ├── __init__.py
-    ├── load.py
-    ├── misc.py
-    ├── presets
-    │   ├── geometry.py
-    │   ├── image.py
-    │   ├── __init__.py
-    │   ├── light_spectrum.py
-    │   ├── psf.py
-    │   ├── refraction_index.py
-    │   ├── spectral_lines.py
-    │   └── spectrum.py
-    ├── ray_storage.py
-    ├── raytracer.py
-    ├── refraction_index.py
-    ├── r_image.py
-    ├── spectrum
-    │   ├── __init__.py
-    │   ├── light_spectrum.py
-    │   ├── spectrum.py
-    │   └── transmission_spectrum.py
-    └── transfer_matrix_analysis.py
+├── tracer
+│   ├── base_class.py
+│   ├── color
+│   │   ├── illuminants.py
+│   │   ├── __init__.py
+│   │   ├── luv.py
+│   │   ├── observers.py
+│   │   ├── srgb.py
+│   │   ├── tools.py
+│   │   └── xyz.py
+│   ├── convolve.py
+│   ├── geometry
+│   │   ├── aperture.py
+│   │   ├── detector.py
+│   │   ├── element.py
+│   │   ├── filter.py
+│   │   ├── group.py
+│   │   ├── ideal_lens.py
+│   │   ├── __init__.py
+│   │   ├── lens.py
+│   │   ├── line.py
+│   │   ├── marker
+│   │   │   ├── __init__.py
+│   │   │   ├── line_marker.py
+│   │   │   └── point_marker.py
+│   │   ├── point.py
+│   │   ├── ray_source.py
+│   │   ├── surface
+│   │   │   ├── aspheric_surface.py
+│   │   │   ├── circular_surface.py
+│   │   │   ├── conic_surface.py
+│   │   │   ├── data_surface_1d.py
+│   │   │   ├── data_surface_2d.py
+│   │   │   ├── function_surface_1d.py
+│   │   │   ├── function_surface_2d.py
+│   │   │   ├── __init__.py
+│   │   │   ├── rectangular_surface.py
+│   │   │   ├── ring_surface.py
+│   │   │   ├── spherical_surface.py
+│   │   │   ├── surface.py
+│   │   │   └── tilted_surface.py
+│   │   └── volume
+│   │       ├── box_volume.py
+│   │       ├── cylinder_volume.py
+│   │       ├── __init__.py
+│   │       ├── sphere_volume.py
+│   │       └── volume.py
+│   ├── image.py
+│   ├── __init__.py
+│   ├── load.py
+│   ├── misc.py
+│   ├── presets
+│   │   ├── geometry.py
+│   │   ├── image.py
+│   │   ├── __init__.py
+│   │   ├── light_spectrum.py
+│   │   ├── psf.py
+│   │   ├── refraction_index.py
+│   │   ├── spectral_lines.py
+│   │   └── spectrum.py
+│   ├── ray_storage.py
+│   ├── raytracer.py
+│   ├── refraction_index.py
+│   ├── r_image.py
+│   ├── spectrum
+│   │   ├── __init__.py
+│   │   ├── light_spectrum.py
+│   │   ├── spectrum.py
+│   │   └── transmission_spectrum.py
+│   └── transfer_matrix_analysis.py
+└── warnings.py
 
-13 directories, 90 files
+13 directories, 91 files

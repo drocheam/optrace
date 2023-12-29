@@ -74,6 +74,7 @@ class ScopeTests(unittest.TestCase):
         """test that external or standard libraries don't get loaded into the global namespace"""
         
         self.assertRaises(NameError, eval, "numpy", loc)
+        self.assertRaises(NameError, eval, "np", loc)
         self.assertRaises(NameError, eval, "scipy", loc)
         self.assertRaises(NameError, eval, "chardet", loc)
         self.assertRaises(NameError, eval, "numexpr", loc)
@@ -93,8 +94,9 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(NameError, eval, "threading", loc)
         self.assertRaises(NameError, eval, "enum", loc)
         self.assertRaises(NameError, eval, "progressbar", loc)
-        self.assertRaises(NameError, eval, "PIL", loc)
+        self.assertRaises(NameError, eval, "cv2", loc)
         self.assertRaises(NameError, eval, "pathlib", loc)
+        self.assertRaises(NameError, eval, "signal", loc)
     
     def test_scope_plots(self):
         """test that internal/unneeded things in optrace.plots are not loaded"""
@@ -114,12 +116,8 @@ class ScopeTests(unittest.TestCase):
 
         import optrace.gui as otg
         self.assertRaises(AttributeError, eval, "otg.PropertyBrowser", locals())
+        self.assertRaises(AttributeError, eval, "otg.CommandWindow", locals())
         self._test_scope_ext_libs(locals())
-
-    def test_scope_WL_BOUNDS(self):
-        """tests that WL_BOUNDS are exposed to optrace namespace"""
-        import optrace as ot
-        print(ot.WL_BOUNDS)
 
 if __name__ == '__main__':
     unittest.main()

@@ -38,8 +38,8 @@ After this, `optrace` should be installed on your system.
      - sped-up and optimized calculations
    * - `numpy <https://numpy.org/doc/stable/user/index.html#user>`_
      - matrix calculations
-   * - `Pillow <https://pillow.readthedocs.io/en/stable/>`_
-     - image loading and converting
+   * - `OpenCV headless <https://pypi.org/project/opencv-python-headless/>`_
+     - image loading, saving and resizing
    * - `progressbar2 <https://pypi.org/project/progressbar2/>`_
      - animated progressbar in standard output (terminal)
    * - `PyQt5 <https://pypi.org/project/PyQt5/>`_

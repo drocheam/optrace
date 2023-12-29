@@ -2,9 +2,9 @@ import numpy as np  # matrix calculations
 
 from .refraction_index import RefractionIndex  # media of and media between lenses
 from .base_class import BaseClass  # parent class
-from . import color  # for wavelength bounds
-from .misc import PropertyChecker as pc  # type checking
 
+from .misc import PropertyChecker as pc  # type checking
+from ..global_options import global_options as go
 
 # Some Sources
 # https://www.edmundoptics.de/knowledge-center/application-notes/optics/understanding-optical-lens-geometries/
@@ -37,8 +37,8 @@ class TMA(BaseClass):
         pc.check_type("lenses", lenses, list)
         pc.check_type("n0", n0, RefractionIndex | None)
         pc.check_type("wl", wl, float | int)
-        pc.check_not_below("wl", wl, color.WL_BOUNDS[0])
-        pc.check_not_above("wl", wl, color.WL_BOUNDS[1])
+        pc.check_not_below("wl", wl, go.wavelength_range[0])
+        pc.check_not_above("wl", wl, go.wavelength_range[1])
 
         self.wl = wl
         """wavelength for the analysis"""
@@ -188,7 +188,7 @@ class TMA(BaseClass):
 
     @staticmethod
     def _obj_dist(abcd: np.ndarray, z1: float, rev: bool = False) -> float:
-        """ 
+        """
         Calculates the image distance from a ABCD matrix and object distance (rev=False)
         or object distance from image distance (rev=True)
 

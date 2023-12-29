@@ -7,8 +7,7 @@ import doctest
 import unittest
 import numpy as np
 import pytest
-import colour
-from PIL import Image as PILImage  # image loading
+import colour  # TODO maybe use cv2 instead
 
 import optrace as ot
 import optrace.tracer.color as color
@@ -359,20 +358,19 @@ class ColorTests(unittest.TestCase):
 
     @pytest.mark.slow
     def test_image_color_rendering(self):
-        # return
+       
+        # assign colored image to RaySource
+        Image = np.array([[[0, 1, 0], [1, 1, 1], [1, 0, 0], [0, 0, 1], [0, 0, 0]],
+                         [[1, 1, 0], [1, 0, 1], [0, 1, 1], [0.1, 0.1, 0.1], [0, 0, 0]],
+                         [[0, 0, 0], [0.2, 0.5, 1], [0.01, 1, 1], [0.01, 0.01, 0.01], [0, 0, 0]],
+                         [[0.2, 0.5, 0.1], [0, 0.8, 1.0], [0.5, 0.3, 0.5], [0.1, 0., 0.7], [0, 0, 0]],
+                         [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]], dtype=np.float32)
+        RSS = ot.Image(Image, [6, 6])
+        
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], no_pol=True)
-        RSS = ot.RectangularSurface(dim=[6, 6])
         RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65)
         RT.add(RS)
-       
-        # TODO should we flip image arrays inside a ray source?
-
-        # assign colored image to RaySource
-        RS.image = Image = np.array([[[0, 1, 0], [1, 1, 1], [1, 0, 0], [0, 0, 1], [0, 0, 0]],
-                                    [[1, 1, 0], [1, 0, 1], [0, 1, 1], [0.1, 0.1, 0.1], [0, 0, 0]],
-                                    [[0, 0, 0], [0.2, 0.5, 1], [0.01, 1, 1], [0.01, 0.01, 0.01], [0, 0, 0]],
-                                    [[0.2, 0.5, 0.1], [0, 0.8, 1.0], [0.5, 0.3, 0.5], [0.1, 0., 0.7], [0, 0, 0]],
-                                    [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]], dtype=np.float32)
+        
         SIm, _ = RT.iterative_render(100000000, N_px_S=5)
 
         # get Source Image
@@ -391,14 +389,14 @@ class ColorTests(unittest.TestCase):
 
     def test_non_default_wavelength_range(self):
         # change wavelength range
-        wl0, wl1 = color.WL_BOUNDS
-        color.WL_BOUNDS[:] = [200, 700]  # we need to 
+        wl0, wl1 = ot.global_options.wavelength_range
+        ot.global_options.wavelength_range[:] = [200, 700]  # we need to 
         wl = color.wavelengths(2)
         self.assertEqual(wl[0], 200.)
         self.assertEqual(wl[1], 700.)
 
         # reset range
-        color.WL_BOUNDS[:] = [wl0, wl1]
+        ot.global_options.wavelength_range[:] = [wl0, wl1]
         wl = color.wavelengths(2)
         self.assertEqual(wl[0], wl0)
         self.assertEqual(wl[1], wl1)
@@ -408,26 +406,25 @@ class ColorTests(unittest.TestCase):
         # check if random_wavelengths_from_srgb correctly handles wavelength range changes
 
         # some rgb image from presets
-        im = ot.presets.image.landscape
-        rgb = np.asarray_chkfinite(PILImage.open(im).convert("RGB"), dtype=np.float64) / 255
+        rgb = ot.presets.image.landscape([1, 1]).data
         rgb = rgb.reshape((rgb.shape[0]*rgb.shape[1], 3))
 
         # initial bounds
-        wl0b, wl1b = color.WL_BOUNDS
+        wl0b, wl1b = ot.global_options.wavelength_range
         
         # upper bound too low
-        color.WL_BOUNDS[1] = wl1b - 10
+        ot.global_options.wavelength_range[1] = wl1b - 10
         self.assertRaises(RuntimeError, color.random_wavelengths_from_srgb, rgb)
 
         # lower bound too high
-        color.WL_BOUNDS[1] = wl1b
-        color.WL_BOUNDS[0] = wl0b + 10
+        ot.global_options.wavelength_range[1] = wl1b
+        ot.global_options.wavelength_range[0] = wl0b + 10
         self.assertRaises(RuntimeError, color.random_wavelengths_from_srgb, rgb)
    
         # larger range, but this is valid
-        color.WL_BOUNDS[:] = [wl0b - 10, wl1b + 10]
+        ot.global_options.wavelength_range[:] = [wl0b - 10, wl1b + 10]
         color.random_wavelengths_from_srgb(rgb)
-        color.WL_BOUNDS[:] = [wl0b, wl1b]
+        ot.global_options.wavelength_range[:] = [wl0b, wl1b]
 
         # zero images
         Img0 = np.zeros((10, 10, 3), dtype=np.float64)
@@ -654,6 +651,29 @@ class ColorTests(unittest.TestCase):
         luv = color.xyz_to_luv(xyz2)
         sf = color.get_saturation_scale(luv)
         self.assertAlmostEqual(sf, 2*0.3236, delta=1e-4)  # twice the value from case #1
+
+    def test_spectral_color_map(self):
+
+        # wl = np.linspace(100, 1000, 1000)
+        wl = color.wavelengths(1000)
+        rgba = color.spectral_colormap(wl)
+
+        # check data range
+        self.assertAlmostEqual(np.max(rgba[:, :3]), 1, delta=0.01)  # highest color is around 1
+        self.assertAlmostEqual(np.min(rgba[:, :3]), 0, delta=0.00001)  # lowest color around 0
+        self.assertTrue(np.allclose(rgba[:, 3], 1))  # alpha 100% everywhere
+
+        # calculate hue
+        srgb = np.array([rgba[:, :3]])
+        srgbl = color.srgb_to_srgb_linear(srgb)
+        xyz = color.srgb_linear_to_xyz(srgbl)
+        luv = color.xyz_to_luv(xyz)
+        hue = color.luv_hue(luv)
+
+        # check hue range and direction
+        mstep = np.mean(np.diff(hue[0, :]))
+        self.assertTrue(mstep < 0)  # quotient below 0, as hue decreases
+        self.assertAlmostEqual(np.abs(mstep)*wl.size/360, 0.75, delta=0.1)  # roughly covers 75% of the hue range
         
 if __name__ == '__main__':
     unittest.main()

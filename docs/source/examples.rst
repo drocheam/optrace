@@ -161,6 +161,25 @@ Double Prism
    :width: 500
    :align: center
 
+GUI Automation
+----------------------
+
+**File**: ``examples/gui_automation.py``
+
+**Description**: An example on how to automate the GUI. Varies the position and size of a line source that illuminates a sphere lens.
+
+**Screenshots**:
+
+.. list-table::
+
+   * - .. figure:: ./images/example_gui_automation_1.png
+          :align: center
+          :width: 400
+
+     - .. figure:: ./images/example_gui_automation_2.png
+          :align: center
+          :width: 400
+     
 
 LeGrand Eye Model
 ----------------------
@@ -238,17 +257,46 @@ Image Render Many Rays
           :align: center
           :width: 400
 
+Keratoconus
+----------------------
+
+**File**: ``examples/keratoconus.py``
+
+**Description**: A simulation of vision through a patient's eye with progressing levels of keratoconus.
+  Models are taken from the work of `Tan et al. (2008) <https://jov.arvojournals.org/article.aspx?articleid=2158188>`__.
+
+
+**Screenshots**:
+
+.. list-table::
+
+   * - .. figure:: ./images/example_keratoconus_1.svg
+          :align: center
+          :width: 400
+
+     - .. figure:: ./images/example_keratoconus_2.svg
+          :align: center
+          :width: 400
+     
+   * - .. figure:: ./images/example_keratoconus_3.svg
+          :align: center
+          :width: 400
+    
+     - .. figure:: ./images/example_keratoconus_4.svg
+          :align: center
+          :width: 400
 
 Microscope
 ----------------------
 
 **File**: ``examples/microscope.py``
 
-**Description**: A more complex setup with a objective and eyepiece group as well as the human eye as imaging system. Both microscope groups are carried out as achromatic doublets with aspheric surfaces. The ray source consists of a cell image and two detectors (for a tubus image and a retina image).
- 
+**Description**: A more complex setup with a objective, tubus and eyepiece group as well as the human eye as imaging system. 
+The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files that are were built from patent data.
+
 **Screenshots**:
 
-.. figure:: images/raytracer_geometry_example.png
+.. figure:: images/example_microscope0.png
    :width: 100%
    :align: center
 
@@ -261,6 +309,7 @@ Microscope
      - .. figure:: images/example_microscope2.svg
           :width: 400
           :align: center
+
 
 
 PSF Imaging

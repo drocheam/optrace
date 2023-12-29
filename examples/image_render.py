@@ -4,14 +4,14 @@ import optrace as ot
 from optrace.gui import TraceGUI
 
 # test image
-image = ot.presets.image.tv_testcard1
+image = ot.presets.image.tv_testcard1([4, 4])
+# image = ot.presets.image.grid([4, 4])
 
 # make raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
 # add Raysource
-RSS = ot.RectangularSurface(dim=[4, 4])
-RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8, image=image, s=[0, 0, 1], pos=[0, 0, 0])
+RS = ot.RaySource(image, divergence="Lambertian", div_angle=8, s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 
 # add Lens 1

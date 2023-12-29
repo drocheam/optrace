@@ -8,8 +8,8 @@ import os
 import unittest
 import numpy as np
 import pytest
+import cv2
 
-from PIL import Image as PILImage  # image loading
 import optrace.tracer.color as color
 
 import optrace as ot
@@ -25,8 +25,8 @@ class RImageTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 7])  # invalid extent
         self.assertRaises(ValueError, ot.RImage, [5, 6, 8, np.inf])  # invalid extent
         self.assertRaises(TypeError, ot.RImage, [5, 6, 8, 9], 5)  # invalid projection type
-        self.assertRaises(TypeError, ot.RImage, [5, 6, 8, 9], limit=[5])  # invalid limit type
-        self.assertRaises(ValueError, ot.RImage, [5, 6, 8, 9], limit=-1)  # invalid limit value
+        self.assertRaises(TypeError, ot.RImage([5, 6, 7, 8]).render, limit=[5])  # invalid limit type
+        self.assertRaises(ValueError, ot.RImage([5, 6, 7, 8]).render, limit=-1)  # invalid limit value
 
         img = ot.RImage([-1, 1, -2, 2])
         self.assertFalse(img.has_image())  # no image yet
@@ -56,10 +56,6 @@ class RImageTests(unittest.TestCase):
                 im = img.rgb(log=log, rendering_intent=ri)
                 self.assertTrue(np.min(im) > 0-1e-9)
                 self.assertTrue(np.max(im) < 1+1e-9)
-
-        # test refilter
-        img.limit = 5
-        img.refilter()
 
         # check if empty image throws
         RIm = ot.RImage(extent=[-1, 1, -1, 1])
@@ -100,12 +96,19 @@ class RImageTests(unittest.TestCase):
 
                                 # make cut through image, multiply with 1-1e-12 so p = 1 gets mapped into last bin
                                 if cut_ == "x":
-                                    img_ = img.get(dm)[:, int(p * (1 - 1e-12) * img.Nx)]
+                                    img_ = img.get(dm)[:, int(p * (1 - 1e-12) * img.shape[1])]
                                 else:
-                                    img_ = img.get(dm)[int(p * (1 - 1e-12) * img.Ny), :]
+                                    img_ = img.get(dm)[int(p * (1 - 1e-12) * img.shape[0]), :]
 
                                 # compare with cut from before
                                 self.assertTrue(np.allclose(img_ - vals, 0))
+
+
+        # coverage: x and y not provided
+        self.assertRaises(ValueError, img.cut, "Irradiance")
+
+        # coverage: additional kwargs
+        img.cut("sRGB (Perceptual RI)", x=0.5, L_th=0.01, log=True)
 
     @pytest.mark.slow
     def test_r_image_render_and_rescaling(self):
@@ -120,27 +123,27 @@ class RImageTests(unittest.TestCase):
                 # check power sum
                 P0 = img.power()
                 L0 = img.luminous_power()
-                self.assertAlmostEqual(P0, P)
-                self.assertAlmostEqual(L0, L)
+                self.assertAlmostEqual(P0/P, 1, places=6)
+                self.assertAlmostEqual(L0/L, 1, places=6)
 
-                ratio_act = img.Nx / img.Ny
-                sx0, sy0 = img.sx, img.sy
+                ratio_act = img.shape[1] / img.shape[0]
+                sx0, sy0 = img.s
 
                 for i, Npx in enumerate([*ot.RImage.SIZES, *np.random.randint(1, 2*ot.RImage.SIZES[-1], 3)]):  # different side lengths
                     img.rescale(Npx)
-                    self.assertEqual(img.N, min(img.Nx, img.Ny))
+                    self.assertEqual(img.N, min(*img.shape))
 
                     # check that nearest matching side length was chosen
                     siz = ot.RImage.SIZES
                     near_siz = siz[np.argmin(np.abs(Npx - np.array(siz)))]
-                    cmp_siz1 = img.Nx if ratio_act < 1 else img.Ny
+                    cmp_siz1 = img.shape[1] if ratio_act < 1 else img.shape[0]
                     self.assertEqual(near_siz, cmp_siz1)
 
-                    self.assertAlmostEqual(P0, img.power())  # overall power stays the same even after rescaling
-                    self.assertAlmostEqual(ratio_act, img.Nx/img.Ny)  # ratio stayed the same
-                    self.assertEqual(sx0, img.sx)  # side length stayed the same
-                    self.assertEqual(sy0, img.sy)  # side length stayed the same
-                    self.assertAlmostEqual(img.sx*img.sy/img.Nx/img.Ny, img.Apx)  # check pixel area
+                    self.assertAlmostEqual(P0/img.power(), 1, places=6)  # overall power stays the same even after rescaling
+                    self.assertAlmostEqual(ratio_act, img.shape[1]/img.shape[0])  # ratio stayed the same
+                    self.assertEqual(sx0, img.s[0])  # side length stayed the same
+                    self.assertEqual(sy0, img.s[1])  # side length stayed the same
+                    self.assertAlmostEqual(img.s[0]*img.s[1]/img.shape[0]/img.shape[1], img.Apx)  # check pixel area
 
         ot.global_options.multithreading = True
 
@@ -157,31 +160,22 @@ class RImageTests(unittest.TestCase):
         zero_ext = [0, ot.RImage.EPS/2, 0, ot.RImage.EPS/2]
         RIm = ot.RImage(extent=zero_ext)
         Im_zero_ext = RIm.extent.copy()
-        RIm.render(keep_extent=False)
+        RIm.render()
         self.assertFalse(np.all(RIm.extent == Im_zero_ext))
-        RIm = ot.RImage(extent=zero_ext)
-        RIm.render(keep_extent=True)
-        self.assertTrue(np.all(RIm.extent == Im_zero_ext))
         
         # image with high aspect ratio in y 
         hasp_ext = [0, 1, 0, 1.2*ot.RImage.MAX_IMAGE_RATIO]
         RIm = ot.RImage(extent=hasp_ext)
         Im_hasp_ext = RIm.extent.copy()
-        RIm.render(keep_extent=False)
+        RIm.render()
         self.assertFalse(np.all(RIm.extent == Im_hasp_ext))
-        RIm = ot.RImage(extent=hasp_ext)
-        RIm.render(keep_extent=True)
-        self.assertTrue(np.all(RIm.extent == Im_hasp_ext))
         
         # image with high aspect ratio in x
         hasp_ext = [0, 1.2*ot.RImage.MAX_IMAGE_RATIO, 0, 1]
         RIm = ot.RImage(extent=hasp_ext)
         Im_hasp_ext = RIm.extent.copy()
-        RIm.render(keep_extent=False)
+        RIm.render()
         self.assertFalse(np.all(RIm.extent == Im_hasp_ext))
-        RIm = ot.RImage(extent=hasp_ext)
-        RIm.render(keep_extent=True)
-        self.assertTrue(np.all(RIm.extent == Im_hasp_ext))
 
         # coverage: _dont_rescale = True
         ext = [0, 1, 0, 1]
@@ -190,13 +184,13 @@ class RImageTests(unittest.TestCase):
 
     def gen_r_image(self, N=10000, N_px=ot.RImage.SIZES[6], ratio=1, limit=None):
         # create some image
-        img = ot.RImage([-1, 1, -1*ratio, 1*ratio], limit=limit)
+        img = ot.RImage([-1, 1, -1*ratio, 1*ratio])
         p = np.zeros((N, 2))
         p[:, 0] = np.random.uniform(img.extent[0], img.extent[1], N)
         p[:, 1] = np.random.uniform(img.extent[2], img.extent[3], N)
         w = np.random.uniform(1e-9, 1, N)
-        wl = np.random.uniform(*color.WL_BOUNDS, N)
-        img.render(N_px, p, w, wl)
+        wl = np.random.uniform(*ot.global_options.wavelength_range, N)
+        img.render(N_px, p, w, wl, limit=limit)
         return img, np.sum(w), np.sum(w * color.y_observer(wl) * 683)  # 683 lm/W conversion factor
 
     @pytest.mark.os
@@ -215,8 +209,8 @@ class RImageTests(unittest.TestCase):
         self.assertTrue(img2.limit is None)  # None limit is None after loading
         self.assertTrue(np.all(img2._img == img._img))
         self.assertTrue(img2.N == img.N)
-        self.assertTrue(img2.sx == img.sx)
-        self.assertTrue(img2.sy == img.sy)
+        self.assertTrue(img2.s[0] == img.s[0])
+        self.assertTrue(img2.s[1] == img.s[1])
         self.assertTrue(img2.projection is None)
 
         # coverage: don't provide file type ending
@@ -231,7 +225,7 @@ class RImageTests(unittest.TestCase):
     def test_r_image_export(self):
 
         path = "export_image.png"
-        path2 = "export_image"
+        path2 = "export_image.jpg"
 
         # check display modes and channels
         for ratio in [0.746, 1, 2.45]:
@@ -239,31 +233,30 @@ class RImageTests(unittest.TestCase):
             img.rescale(90)
                 
             for imm in ot.RImage.display_modes:
-                img.export_png(path, imm, log=True, flip=False)
-                img.export_png(path, imm, log=False, flip=True)
-                im3 = np.asarray(PILImage.open(path), dtype=np.float64)  # load from disk
-                self.assertTrue(im3.ndim == (2 if not imm.startswith("sRGB") else 3))  # check number of channels
-
-        # coverage: non-default resample parameter
-        img.export_png(path, imm, log=True, flip=False, resample=0)
-
-        # coverage: file ending not provided
-        img.export_png(path2, imm, log=True, flip=False)
+                img.export(path, imm, log=True, flip=False)
+                img.export(path, imm, log=False, flip=True)
+                im3 = ot.Image(path, [1, 1]).data  # load from disk
 
         # check shapes
         for ratio in [0.746, 1, 2.45]:
             img = self.gen_r_image(ratio=ratio)[0]
 
-            for Npx in [9, 90, 1000]:
+            for Npx in [1, 9, 90, 1000]:
 
                 img.rescale(Npx)
-                
-                for Ns in [256, 512, 984]:
-                    img.export_png(path, imm, log=False, flip=True, size=Ns)
-                    im3 = np.asarray(PILImage.open(path), dtype=np.float64)  # load from disc
-                    self.assertAlmostEqual(ratio, im3.shape[0]/im3.shape[1], delta=2/Ns)  # check ratio
+                img.export(path, imm, log=False, flip=True)
+                im3 = ot.Image(path, [1, 1]).data  # load from disk
+                self.assertAlmostEqual(ratio, im3.shape[0]/im3.shape[1], delta=2/Npx)  # check ratio
+        
+        # check cv2 imwrite parameters and export as jpg
+        img.export(path2, "Lightness (CIELUV)", [cv2.IMWRITE_JPEG_QUALITY, 3])
+        
+        # check handling of incorrect path
+        self.assertRaises(IOError, img.export, "hjkhjkhjkhjk.pg", "Irradiance")  # invalid format
+        self.assertRaises(IOError, img.export, str(Path("hjkhjk") / Path("hjkhjkhjkhjk.png")), "Irradiance")  # invalid path
 
         os.remove(path)
+        os.remove(path2)
 
     def test_r_image_filter(self):
     
@@ -283,8 +276,7 @@ class RImageTests(unittest.TestCase):
 
             for limit in [0.3, 20]:  # different limits
 
-                img.limit = limit
-                img.render(900, p, w, wl)
+                img.render(900, p, w, wl, limit=limit)
                 irr = img.img[:, :, 3]  # irradiance image
 
                 # radial distance in image
@@ -300,22 +292,137 @@ class RImageTests(unittest.TestCase):
                 self.assertAlmostEqual(centroid/1.10861, limit/1000, delta=0.0002)
    
         # coverage: RuntimeError when image is a projection and filter is applied
-        img = ot.RImage([-1, 1, -1, 1], projection="abc", limit=1)
-        self.assertRaises(RuntimeError, img.render)
-        self.assertRaises(RuntimeError, img.refilter)
-        self.assertRaises(RuntimeError, img.rescale, 315)
+        img = ot.RImage([-1, 1, -1, 1], projection="abc")
+        self.assertRaises(RuntimeError, img.render, limit=1)
 
     @pytest.mark.os
     def test_image_presets(self) -> None:
 
         for imgi in ot.presets.image.all_presets:
             RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6])
-            RSS = ot.RectangularSurface(dim=[6, 6])
-            RS = ot.RaySource(RSS, pos=[0, 0, 0], image=imgi)
+            RSS = imgi([6, 6])
+            RS = ot.RaySource(RSS, pos=[0, 0, 0])
             RT.add(RS)
             RT.trace(500000)
             img = RT.source_image(256)
-            
+
+    def test_rimage_to_image(self) -> None:
+
+        rimg, P, L = self.gen_r_image()
+
+        for mode in ot.RImage.display_modes:
+            for size in [1, 9, 25, 1000]:
+                rimg.rescale(size)
+
+                rimg_mode = rimg.get(mode)
+                if (max_ := np.max(rimg_mode)):
+                    rimg_mode /= max_
+
+                if rimg_mode.ndim == 2:
+                    rimg_mode = np.repeat(rimg_mode[:, :, np.newaxis], 3, axis=2)
+
+                img = rimg.to_image(mode)
+
+                self.assertTrue(np.allclose(rimg_mode - img.data, 0))
+                self.assertTrue(np.all(img.s == rimg.s))
+                
+        # coverage: black image
+
+        rimg.img *= 0 
+        rimg_mode = rimg.get("Irradiance")
+
+        if (max_ := np.max(rimg_mode)):
+            rimg_mode /= max_
+
+        if rimg_mode.ndim == 2:
+            rimg_mode = np.repeat(rimg_mode[:, :, np.newaxis], 3, axis=2)
+
+        img = rimg.to_image(mode)
+        self.assertTrue(np.allclose(rimg_mode - img.data, 0))
+        self.assertTrue(np.all(img.s == rimg.s))
+
+    @pytest.mark.os
+    def test_image_inits(self):
+
+        # type errors
+        self.assertRaises(TypeError, ot.Image, 1, [2, 2])  # invalid image type
+        self.assertRaises(TypeError, ot.Image, np.ones((100, 100, 3)), 2)  # invalid s type
+
+        # value errors
+        self.assertRaises(ValueError, ot.Image, np.ones((100, 100, 3)), [2, 2, 2])  # invalid s length
+        self.assertRaises(ValueError, ot.Image, np.ones((100, 100)), [2, 2])  # invalid data shape
+        self.assertRaises(ValueError, ot.Image, np.ones((100, 100, 3))*1.001, [2, 2])  # data above 1
+        self.assertRaises(ValueError, ot.Image, -np.ones((100, 100, 3))*0.001, [2, 2])  # data below 0
+        self.assertRaises(ValueError, ot.Image, np.full((100, 100, 3), np.nan), [2, 2])  # data not finite
+        self.assertRaises(ValueError, ot.Image, np.full((100, 100, 3), np.inf), [2, 2])  # data not finite
+
+        # IOError
+        self.assertRaises(IOError, ot.Image, "hjkhjkhjkhjk.png", [2, 2])  # invalid path
+        assert os.path.exists("setup.py")
+        self.assertRaises(IOError, ot.Image, "setup.py", [2, 2])  # invalid format
+    
+    @pytest.mark.os
+    def test_image_saving_loading(self):
+
+        for path in ["test.png", "test.jpg", "test.bmp"]:
+            for i, img in enumerate([ot.presets.image.cell([1, 1]), 
+                                     ot.Image(np.random.sample((30, 30, 3)), [2, 3]),
+                                     ot.Image(np.random.sample((1, 1, 3)), [5, 1])]):
+
+                img.save(path)
+                img2 = ot.Image(path, [1, 1])  # check if loads correctly
+                os.remove(path)
+                
+                if not i:  # only check for first, square image. 
+                    # Otherwise we can't compare because interpolation took place
+                    self.assertEqual(img.data[0, 0, 0], img2.data[0, 0, 0]) # check if nothing has been flipped
+
+        # coverage: cv2.imwrite params and flip option
+        img.save("test.png", [cv2.IMWRITE_PNG_COMPRESSION, 1], flip=True)
+        os.remove("test.png")
+
+        # IOError, invalid type
+        self.assertRaises(IOError, img.save, "hjkhjkhjkhjk.ggg")  # invalid format
+        self.assertRaises(IOError, img.save, str(Path("hjkhjk") / Path("hjkhjkhjkhjk.png")))  # invalid path
+
+    def test_0image_orientation(self):
+        """check that pixel and image positions are consistent for image, rendered image and ray starting positions"""
+
+        # create image with single bright pixel of all
+        im_data = np.zeros((5, 5, 3))
+        im_data[0, 0] = 1
+        img = ot.Image(im_data, [1, 1])
+
+        RT = ot.Raytracer([-2, 2, -2, 2, -10, 10])
+
+        RS = ot.RaySource(img, pos=[0, 0, 0], s=[0, 0, 1], divergence="None")
+        RT.add(RS)
+
+        det = ot.Detector(ot.RectangularSurface([1, 1, ]), pos=[0, 0, 1])
+        RT.add(det)
+
+        RT.trace(10000)
+
+        # render source and detector images. image pixels should map 1:1
+        simg = RT.source_image(5).get("sRGB (Absolute RI)")
+        dimg = RT.detector_image(5, extent=img.extent).get("sRGB (Absolute RI)")
+
+        # white element stayed in the same place for source and detector image
+        self.assertAlmostEqual(np.mean(simg[0, 0]), 1, delta=0.001)
+        self.assertAlmostEqual(np.mean(dimg[0, 0]), 1, delta=0.001)
+
+        # recreating the image from rendered data still produces the element at the same position
+        self.assertAlmostEqual(np.mean(ot.Image(dimg, [1, 1]).data[0, 0]), 1, delta=0.001)
+
+        # saving and loading produces the same pixel value
+        img.save("test.png")
+        img2 = ot.Image("test.png", [1, 1])
+        os.remove("test.png")
+        self.assertAlmostEqual(np.mean(img2.data[0, 0]), 1, delta=0.01)
+
+        # check that rays start at negative x, y, corner
+        self.assertAlmostEqual(np.mean(RT.rays.p_list[:, 0, 0]), -0.5 + 1/5/2, delta=0.0001)
+        self.assertAlmostEqual(np.mean(RT.rays.p_list[:, 0, 1]), -0.5 + 1/5/2, delta=0.0001)
 
 if __name__ == '__main__':
     unittest.main()

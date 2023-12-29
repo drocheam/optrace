@@ -5,7 +5,6 @@ sys.path.append('.')
 
 import unittest
 import numpy as np
-import numexpr as ne
 import pytest
 
 import optrace.tracer.misc as misc
@@ -157,7 +156,7 @@ class GeometryTests(unittest.TestCase):
         self.assertEqual(F.color(), F.spectrum.color())  # filter color is just spectrum color
 
         # test call
-        wl = np.random.uniform(*color.WL_BOUNDS, 1000)
+        wl = np.random.uniform(*ot.global_options.wavelength_range, 1000)
         self.assertTrue(np.all(F(wl) == F.spectrum(wl)))  # call to filter is just call to its spectrum
 
         # _new_lock active after init
@@ -492,7 +491,7 @@ class GeometryTests(unittest.TestCase):
                      pol_func=lambda x: x, pol_angles=[10, 30], pol_probs=[1, 2], conv_pos=[1, 2, 10])
        
         # possible surface types
-        Surfaces = [ot.Point(), ot.Line(), ot.CircularSurface(r=2), 
+        Surfaces = [ot.Point(), ot.Line(), ot.CircularSurface(r=2), ot.presets.image.color_checker([2, 2]), 
                     ot.RectangularSurface(dim=[2, 2]), ot.RingSurface(r=2, ri=0.2)]
 
         # check most RaySource combinations
@@ -504,57 +503,50 @@ class GeometryTests(unittest.TestCase):
                 for div_2d in [False, True]:
                     for or_type in ot.RaySource.orientations:
                         for pol_type in ot.RaySource.polarizations:
-                            for Im in [None, ot.presets.image.color_checker]:
 
-                                # only check RectangleSurface with Image being active/set
-                                if Im is not None and (not isinstance(Surf, Surface)\
-                                        or not isinstance(Surf, ot.RectangularSurface)):
-                                    continue
+                            RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, div_2d=div_2d,
+                                              polarization=pol_type, **rargs)
+                            RS.color()
+                            p, s, pols, weights, wavelengths = RS.create_rays(8000)
 
-                                RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, div_2d=div_2d,
-                                                  polarization=pol_type, image=Im, **rargs)
-                                RS.color()
-                                p, s, pols, weights, wavelengths = RS.create_rays(8000)
+                            self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
+                            self.assertGreater(np.min(weights), 0)  # no zero weight rays
+                            self.assertAlmostEqual(np.sum(weights), rargs["power"])  # rays amount to power
+                            self.assertGreaterEqual(np.min(wavelengths), ot.global_options.wavelength_range[0])  # inside visible range
+                            self.assertLessEqual(np.max(wavelengths), ot.global_options.wavelength_range[1])  # inside visible range
 
-                                self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
-                                self.assertGreater(np.min(weights), 0)  # no zero weight rays
-                                self.assertAlmostEqual(np.sum(weights), rargs["power"])  # rays amount to power
-                                self.assertGreaterEqual(np.min(wavelengths), color.WL_BOUNDS[0])  # inside visible range
-                                self.assertLessEqual(np.max(wavelengths), color.WL_BOUNDS[1])  # inside visible range
+                            # check positions
+                            self.assertTrue(np.all(p[:, 2] == rargs["pos"][2]))  # rays start at correct z-position
+                            self.assertGreaterEqual(np.min(p[:, 0]), RS.surface.extent[0])
+                            self.assertLessEqual(np.max(p[:, 0]), RS.surface.extent[1])
+                            self.assertGreaterEqual(np.min(p[:, 1]), RS.surface.extent[2])
+                            self.assertLessEqual(np.max(p[:, 1]), RS.surface.extent[3])
 
-                                # check positions
-                                self.assertTrue(np.all(p[:, 2] == rargs["pos"][2]))  # rays start at correct z-position
-                                self.assertGreaterEqual(np.min(p[:, 0]), RS.surface.extent[0])
-                                self.assertLessEqual(np.max(p[:, 0]), RS.surface.extent[1])
-                                self.assertGreaterEqual(np.min(p[:, 1]), RS.surface.extent[2])
-                                self.assertLessEqual(np.max(p[:, 1]), RS.surface.extent[3])
+                            # s needs to be a unity vector
+                            ss = s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2
+                            self.assertTrue(np.allclose(ss, 1, atol=0.00002, rtol=0))
 
-                                # s needs to be a unity vector
-                                ss = s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2
-                                self.assertTrue(np.allclose(ss, 1, atol=0.00002, rtol=0))
-
-                                # pol needs to be a unity vector
-                                polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
-                                self.assertTrue(np.allclose(polss, 1, atol=0.00002, rtol=0))
+                            # pol needs to be a unity vector
+                            polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
+                            self.assertTrue(np.allclose(polss, 1, atol=0.00002, rtol=0))
 
         # special image shapes
 
         # ray source with one pixel image
-        image = np.array([[[0., 1., 0.]]])
-        RSS = ot.RectangularSurface(dim=[2, 2])
-        RS = ot.RaySource(RSS, divergence="Lambertian", image=image,
+        RSS = ot.Image(np.array([[[0., 1., 0.]]]), [2, 2])
+        RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RS.create_rays(10000)
 
         # ray source with one width pixel image
-        image = np.array([[[0., 1., 0.], [1., 1., 0.]]])
-        RS = ot.RaySource(RSS, divergence="Lambertian", image=image,
+        RSS = ot.Image(np.array([[[0., 1., 0.], [1., 1., 0.]]]), [2, 2])
+        RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RS.create_rays(10000)
         
         # ray source with one height pixel image
-        image = np.array([[[0., 1., 0.]], [[1., 1., 0.]]])
-        RS = ot.RaySource(RSS, divergence="Lambertian", image=image,
+        RS = ot.Image(np.array([[[0., 1., 0.]], [[1., 1., 0.]]]), [2, 2])
+        RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RS.create_rays(10000)
 
@@ -591,19 +583,8 @@ class GeometryTests(unittest.TestCase):
         # ^-- currently only planar surfaces are supported
         
         # image error handling
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, image=1)  # invalid image type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, image=[1, 2])  # invalid image type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, image=[[1, 2], [3, 4]])  # invalid image type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, image=np.ones((2, 2, 3, 2)))  # invalid image type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, image=np.ones((0, 2, 3)))  # invalid image type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, image=np.ones((2, 0, 3)))  # invalid image type
-        self.assertRaises(TypeError, ot.RaySource, *rsargs, image=np.ones((2, 2, 2)))  # invalid image type
-        self.assertRaises(ValueError, ot.RaySource, *rsargs, image=np.zeros((2, 2, 3)))  # image completely black
-        self.assertRaises(ValueError, ot.RaySource, *rsargs, image=-np.ones((2, 2, 3)))  # invalid image values
-        self.assertRaises(ValueError, ot.RaySource, *rsargs, image=2*np.ones((2, 2, 3)))  # invalid image values
-        self.assertRaises(ValueError, ot.RaySource, *rsargs, image=np.nan*np.ones((2, 2, 3)))  # invalid image values
-        self.assertRaises(RuntimeError, ot.RaySource, *rsargs, 
-                          image=np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3)))  # image too large
+        self.assertRaises(RuntimeError, ot.RaySource, ot.Image(np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3)),
+                                                               [2, 2]))  # image too large
 
     def test_ray_source_polarization(self):
             
@@ -646,10 +627,6 @@ class GeometryTests(unittest.TestCase):
         RS = ot.RaySource(ot.RectangularSurface(dim=[2, 2]), [0, 0, 0])
 
         self.assertRaises(AttributeError, RS.__setattr__, "aaa", 2)  # _new_lock active
-
-        # image can only be used with rectangle Surface
-        self.assertRaises(RuntimeError, ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0],
-                                                     image=ot.presets.image.ETDRS_chart_inverted).create_rays, 10000)
 
         # no or_func specified
         self.assertRaises(TypeError, ot.RaySource(ot.CircularSurface(r=3), pos=[0, 0, 0], 

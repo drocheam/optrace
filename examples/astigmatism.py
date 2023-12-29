@@ -5,19 +5,19 @@ import optrace as ot
 from optrace.gui import TraceGUI
 
 # make raytracer
-RT = ot.Raytracer(outline=[-15, 15, -10, 10, -40, 30])
+RT = ot.Raytracer(outline=[-10, 10, -15, 15, -40, 30])
 
 oa_angle=20
 z0 = -30
 
-x0 = np.tan(np.radians(oa_angle)) * z0
+y0 = np.tan(np.radians(oa_angle)) * z0
 RSS = ot.Point()
 RS0 = ot.RaySource(RSS, divergence="Isotropic", div_2d=True, spectrum=ot.presets.light_spectrum.d65,
-                  pos=[x0, 0, z0], s_sph=[oa_angle, 0], div_angle=2, div_axis_angle=90, desc="Sagittal\n")
+                  pos=[0, y0, z0], s_sph=[oa_angle, 90], div_angle=2, div_axis_angle=0, desc="Sagittal\n")
 RT.add(RS0)
 
 RS1 = ot.RaySource(RSS, divergence="Isotropic", div_2d=True, spectrum=ot.presets.light_spectrum.d65,
-                  pos=[x0, 0, z0], s_sph=[oa_angle, 0], div_angle=2, div_axis_angle=0, desc="Meridional")
+                  pos=[0, y0, z0], s_sph=[oa_angle, 90], div_angle=2, div_axis_angle=90, desc="Meridional")
 RT.add(RS1)
 
 n = ot.RefractionIndex("Constant", n=1.5)

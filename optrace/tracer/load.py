@@ -1,7 +1,6 @@
 import os.path  # working with paths
 import numpy as np  # np.ndarray type
 import chardet  # detection of text file encoding
-import warnings
 
 
 # media
@@ -14,7 +13,8 @@ from .geometry.surface import CircularSurface, ConicSurface, SphericalSurface,\
                               RingSurface, AsphericSurface, Surface, RectangularSurface
 
 from .presets import spectral_lines  # lines for Abbe number checking
-from .color.tools import WL_BOUNDS  # wavelength bounds
+from ..global_options import global_options as go
+from ..warnings import warning
 
 
 _agf_modes = ["Schott", "Sellmeier1", "Herzberger", "Sellmeier2", "Conrady", "Sellmeier3", "Handbook of Optics 1",
@@ -81,7 +81,7 @@ def agf(path: str) -> dict:
             # check if valid mode. According to documentation mode numbers go from 1-12
             ind = int(float(linw[2]))-1
             if ind < 0 or ind > len(_agf_modes) - 1:
-                warnings.warn(f"Unknown index formula mode number {ind+1}, skipping material {name}.")
+                warning(f"Unknown index formula mode number {ind+1}, skipping material {name}.")
                 skip = True  # skip further steps, since we don't know what to do with this material
                 continue
             
@@ -108,9 +108,9 @@ def agf(path: str) -> dict:
                 wl1 = float(linw[1])*1000
 
                 # for infrared materials there is no overlap with the visible range
-                if wl0 > WL_BOUNDS[1] or wl1 < WL_BOUNDS[0]:
-                    warnings.warn(f"Wavelength range for material {name} (in nm) [{wl0}, {wl1}] has no overlap "
-                                  f"with raytracer range {WL_BOUNDS}.")
+                if wl0 > go.wavelength_range[1] or wl1 < go.wavelength_range[0]:
+                    warning(f"Wavelength range for material {name} (in nm) [{wl0}, {wl1}] has no overlap "
+                                  f"with raytracer range {go.wavelength_range}.")
                 
                 else:
                     nc1 = n(spectral_lines.d)
@@ -118,13 +118,13 @@ def agf(path: str) -> dict:
 
                     # index deviation
                     if np.abs(nc1 - nc) > 1e-4:
-                        warnings.warn(f"Index from file is {nc} while index of the loaded material is {nc1}"
+                        warning(f"Index from file is {nc} while index of the loaded material is {nc1}"
                                       f" for material {name}. "
                                        "This can be due to different probe wavelengths or no data in those regions.")
 
                     # abbe number deviation
                     elif np.abs(V1 - V) > 0.3:
-                        warnings.warn(f"The Abbe number from file is {V} while that of the loaded material is {V1}"
+                        warning(f"The Abbe number from file is {V} while that of the loaded material is {V1}"
                                       f" for material {name}. "
                                       "This can be due to different probe wavelengths or no data in those regions.")
 
@@ -133,7 +133,7 @@ def agf(path: str) -> dict:
 
             # some exception occurred, e.g. index is < 1 somewhere
             except Exception as err:
-                warnings.warn(f"Error for material {name}: " + str(err))
+                warning(f"Error for material {name}: " + str(err))
 
     return n_dict
 
@@ -250,7 +250,7 @@ def _zmx_to_surface_dicts(lines:  list[str],
             
             # coating
             elif l[2:6] == "COAT":
-                warnings.warn(f"Coatings not supported. Ignoring coating '{l[7:-1]}'.")
+                warning(f"Coatings are not supported. Ignoring coating '{l[7:-1]}'.")
             
             # aperture stop
             elif l[2:6] == "STOP":

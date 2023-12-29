@@ -8,7 +8,7 @@ from .spectrum import Spectrum  # parent class
 from .. import color # color conversions
 from .. import misc  # random_from_distribution
 from ..misc import PropertyChecker as pc  # check types and values
-
+from ...global_options import global_options as go
 
 class LightSpectrum(Spectrum):
 
@@ -69,7 +69,7 @@ class LightSpectrum(Spectrum):
 
             # add +-1nm to range, but make sure it is inside visible range
             if np.abs(wl0 - wl1) < 1:
-                wl0, wl1 = max(wl0-1, color.WL_BOUNDS[0]), min(wl0+1, color.WL_BOUNDS[1])
+                wl0, wl1 = max(wl0-1, go.wavelength_range[0]), min(wl0+1, go.wavelength_range[1])
 
             spec._vals, spec._wls = np.histogram(wl, bins=N, weights=w, range=[wl0, wl1])
             spec._vals /= (spec._wls[1] - spec._wls[0])  # scale by delta lambda for W/nm
@@ -90,8 +90,8 @@ class LightSpectrum(Spectrum):
                 wl = np.full(N, self.wl, dtype=np.float32)
 
             case ("Constant" | "Rectangle"):
-                wl0 = color.WL_BOUNDS[0] if self.spectrum_type == "Constant" else self.wl0
-                wl1 = color.WL_BOUNDS[1] if self.spectrum_type == "Constant" else self.wl1
+                wl0 = go.wavelength_range[0] if self.spectrum_type == "Constant" else self.wl0
+                wl1 = go.wavelength_range[1] if self.spectrum_type == "Constant" else self.wl1
 
                 wl = misc.uniform(wl0, wl1, N)
 
@@ -112,8 +112,8 @@ class LightSpectrum(Spectrum):
                 # don't use the whole [0, 1] range for our random variable,
                 # since we only simulate wavelengths in [380, 780], but gaussian pdf is unbound
                 # therefore calculate minimal and maximal bound for the new random variable interval
-                Xl = (1 + scipy.special.erf((color.WL_BOUNDS[0] - self.mu)/(np.sqrt(2)*self.sig)))/2
-                Xr = (1 + scipy.special.erf((color.WL_BOUNDS[1] - self.mu)/(np.sqrt(2)*self.sig)))/2
+                Xl = (1 + scipy.special.erf((go.wavelength_range[0] - self.mu)/(np.sqrt(2)*self.sig)))/2
+                Xr = (1 + scipy.special.erf((go.wavelength_range[1] - self.mu)/(np.sqrt(2)*self.sig)))/2
                 X = misc.uniform(Xl, Xr, N)
 
                 # icdf of gaussian pdf
@@ -238,13 +238,13 @@ class LightSpectrum(Spectrum):
                 return np.mean([self.wl0, self.wl1])
             
             case "Constant":
-                return np.mean(color.WL_BOUNDS)
+                return np.mean(go.wavelength_range)
 
             # Blackbody, Function, Data, Gaussian
             case _ :
                 wl = color.wavelengths(100000)
                 s = self(wl)
-                return np.trapz(wl*s) / np.trapz(s) if np.any(s > 0) else np.mean(color.WL_BOUNDS)
+                return np.trapz(wl*s) / np.trapz(s) if np.any(s > 0) else np.mean(go.wavelength_range)
 
     def peak(self) -> float:
         """
@@ -271,11 +271,11 @@ class LightSpectrum(Spectrum):
     def peak_wavelength(self) -> float:
         """
         Peak wavelength of the spectrum. 
-        For a spectrum with a constant maximum region (Constant, Rectangle) or multiple maxima the first one is returned.
+        For a spectrum with a constant maximum region (Constant, Rectangle)
+        or multiple maxima the first one is returned.
 
         :return: peak wavelength in nm
         """
-       
         match self.spectrum_type:
 
             case "Monochromatic":
@@ -288,7 +288,7 @@ class LightSpectrum(Spectrum):
                 return self.wl0
 
             case "Constant":
-                return color.WL_BOUNDS[0]
+                return go.wavelength_range[0]
 
             case "Gaussian":
                 return self.mu  # True because it is enforced that mu is inside the visible range
@@ -314,7 +314,7 @@ class LightSpectrum(Spectrum):
                 return self.wl1 - self.wl0
 
             case "Constant":
-                return color.WL_BOUNDS[1] - color.WL_BOUNDS[0]
+                return go.wavelength_range[1] - go.wavelength_range[0]
 
             # default case (Function, Data, Histogram, Gaussian)
             # Gaussian is included here because it could be truncated

@@ -12,6 +12,10 @@ tracer.convolve
 _________________________________
 .. automodule:: optrace.tracer.convolve
 
+tracer.image
+______________________________
+.. automodule:: optrace.tracer.image
+
 tracer.load
 _________________________________
 .. automodule:: optrace.tracer.load

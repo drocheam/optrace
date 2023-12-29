@@ -22,9 +22,9 @@ RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], absorb_missing=True, no_po
 # add RaySource
 # light is converging towards eye vertex at [0, 0, 0]
 # source area emits light according to an image light distribution and with lambertian divergence
-RSS = ot.RectangularSurface(dim=[2*G, 2*G])
-RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=sr_angle, image=ot.presets.image.ETDRS_chart_inverted, 
-               pos=[0, 0, -g], orientation="Converging", conv_pos=[0, 0, 0], desc="USAF Chart")
+RSS = ot.presets.image.ETDRS_chart_inverted([2*G, 2*G])
+RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=sr_angle,
+                  pos=[0, 0, -g], orientation="Converging", conv_pos=[0, 0, 0], desc="USAF Chart")
 RT.add(RS)
 
 # load Arizona Eye model

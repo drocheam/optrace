@@ -17,7 +17,7 @@ import optrace as ot
 
 class LoadTests(unittest.TestCase):
     
-    # down sort tests randomly
+    # don't sort tests randomly
     pytestmark = pytest.mark.random_order(disabled=True)
 
     def save_file(self, source: str, path: str) -> bool:
@@ -318,8 +318,8 @@ class LoadTests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-2000, 2000, -2000, 2000, -50, 1200])
 
         # object
-        RSS = ot.RectangularSurface(dim=[20e-3, 20e-3])
-        RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.cell,
+        RSS = ot.presets.image.cell([20e-3, 20e-3])
+        RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, -0.00001], s=[0, 0, 1], div_angle=60, desc="Cell")
         RT.add(RS)
 

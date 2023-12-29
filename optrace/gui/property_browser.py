@@ -88,7 +88,6 @@ class PropertyBrowser(HasTraits):
         self.raytracer = gui.raytracer
 
         super().__init__()
-        self.update_dict()
 
     @observe('update_button')
     def update_dict(self, event=None) -> None:

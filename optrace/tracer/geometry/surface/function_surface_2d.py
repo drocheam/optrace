@@ -4,11 +4,11 @@ import copy  # for
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
-import warnings
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
+from ....warnings import warning
 
 
 class FunctionSurface2D(Surface):
@@ -98,33 +98,33 @@ class FunctionSurface2D(Surface):
             z_range_provided = z_max - z_min
             
             if z_range_probed and z_range_provided + self.N_EPS < z_range_probed:
-                warnings.warn(f"Provided a z-extent of {z_range_provided} for surface {self.get_desc(hex(id(self)))},"
-                              f"but measured range is at least {z_range_probed}, an increase of at "
-                              f"least {100*(z_range_probed - z_range_provided)/z_range_probed:.5g}."
-                              f" I will use the measured values for now.")
+                warning(f"Provided a z-extent of {z_range_provided} for surface {self.get_desc(hex(id(self)))},"
+                        f"but measured range is at least {z_range_probed}, an increase of at "
+                        f"least {100*(z_range_probed - z_range_provided)/z_range_probed:.5g}."
+                        f" I will use the measured values for now.")
             else:
 
                 range_factor = 1.2
                 if z_range_provided > range_factor*z_range_probed:
-                    warnings.warn(f"Provided z-range is more than {(range_factor-1)*100:.5g}% "
-                                  f"larger than measured z-range")
+                    warning(f"Provided z-range is more than {(range_factor-1)*100:.5g}% "
+                            f"larger than measured z-range")
 
                 z_max_ = self.z_max + self._offset
                 z_min_ = self.z_min + self._offset
 
                 if z_max + self.N_EPS < z_max_:
-                    warnings.warn(f"Provided z_max={z_max} lower than measured value of {z_max_}."
-                                  f" Using the measured values for now")
+                    warning(f"Provided z_max={z_max} lower than measured value of {z_max_}."
+                            f" Using the measured values for now")
                 
                 elif z_min - self.N_EPS > z_min_:
-                    warnings.warn(f"Provided z_min={z_min} higher than measured value of {z_min_}."
-                                  f" Using the measured values for now")
+                    warning(f"Provided z_min={z_min} higher than measured value of {z_min_}."
+                            f" Using the measured values for now")
                 else:
                     self.z_min, self.z_max = z_min - self._offset, z_max - self._offset
 
         elif z_max is None and z_min is None:
-            warnings.warn(f"Estimated z-bounds of surface {self.get_desc(hex(id(self)))}: [{self._offset+self.z_min:.9g}, "
-                          f"{self._offset+self.z_max:.9g}], provide actual values to make it more exact.")
+            warning(f"Estimated z-bounds of surface {self.get_desc(hex(id(self)))}: [{self._offset+self.z_min:.9g}, "
+                    f"{self._offset+self.z_max:.9g}], provide actual values to make it more exact.")
         
         else:
             raise ValueError(f"z_max and z_min need to be both None or both need a value")

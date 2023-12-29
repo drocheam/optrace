@@ -1,6 +1,5 @@
 
 from typing import Any  # Any type
-import warnings
 
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
@@ -8,6 +7,7 @@ import numexpr as ne  # faster calculations
 from ... import misc  # calculations
 from ...base_class import BaseClass  # parent class
 from ...misc import PropertyChecker as pc  # check types and values
+from ....warnings import warning
 
 # NOTE for classes Surface, Point, Line, reverse returns a reversed version at [0, 0, 0]
 # for higher classes like Element and Marker the objects itself maintains its position
@@ -467,8 +467,8 @@ class Surface(BaseClass):
         if np.any(brok):
             brokc = np.count_nonzero(brok)
             # TODO handle differently (return indices and let it handle by main thread?)
-            warnings.warn(f"Broken sequentiality. {brokc} rays start behind the current surface. "
-                           "The simulation results for these rays are most likely wrong. Check the geometry.")
+            warning(f"Broken sequentiality. {brokc} rays start behind the current surface. "
+                     "The simulation results for these rays are most likely wrong. Check the geometry.")
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

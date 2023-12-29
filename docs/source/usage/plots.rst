@@ -39,13 +39,7 @@ Surface plots (:numref:`surface_plotting`), spectrum plots (:numref:`spectrum_pl
 Parameters
 ______________
 
-All methods work with a :python:`block` parameter that gets passed down to the :python:`plt.show()` with :python:`plt` being :mod:`matplotlib.pyplot` from the :mod:`matplotlib` plotting library. With :python:`block=True` the rest of the program gets halted.
-
-.. code-block:: python
-
-   some_plotting_function(..., block=True)
-
-Most methods also include a :python:`title` argument that lets the user define a different plot title.
+Most methods include a :python:`title` argument that lets the user define a different plot title.
 
 .. code-block:: python
 
@@ -71,3 +65,20 @@ Figure settings like size and dpi can be set globally using the :obj:`matplotlib
    matplotlib.rcParams["figure.dpi"] = 100
 
 
+Block/Pause Plots
+___________________
+
+By default the plots are displayed and the rest of the program is run.
+When halting the execution is required, :func:`optrace.plots.block <optrace.plots.misc_plots.block>` can be called.
+
+.. code-block:: python
+
+   import optrace.plots as otp
+
+   # do some plotting
+   ...
+
+   # make blocking
+   otp.block()
+
+Doing so, all generated plots are interactive and can be interacted with.

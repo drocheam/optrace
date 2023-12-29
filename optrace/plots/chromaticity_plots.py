@@ -38,7 +38,6 @@ def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[
     :param rendering_intent: rendering_intent for the sRGB conversion
     :param title: title of the plot
     :param kwargs: additional plotting parameters, including:
-     block: if the plot should block the execution of the program
      norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
      path: if provided, the plot is saved at this location instead of displaying a plot. Specify with file ending.
      sargs: option dictionary for pyplot.savefig
@@ -75,7 +74,6 @@ def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[
     :param rendering_intent: rendering_intent for the sRGB conversion
     :param title: title of the plot
     :param kwargs: additional plotting parameters, including:
-     block: if the plot should block the execution of the program
      norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
      path: if provided, the plot is saved at this location instead of displaying a plot. Specify with file ending.
      sargs: option dictionary for pyplot.savefig
@@ -116,7 +114,6 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
                        title:                   str,
                        xl:                      str,
                        yl:                      str,
-                       block:                   bool = False,
                        norm:                    str = "Sum",
                        path:                    str = None,
                        sargs:                   dict = {})\
@@ -124,7 +121,6 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     """Lower level plotting function. Don't use directly"""
 
     pc.check_type("title", title, str)
-    pc.check_type("block", block, bool)
     pc.check_if_element("rendering_intent", rendering_intent, color.srgb.SRGB_RENDERING_INTENTS)
     pc.check_if_element("norm", norm, chromaticity_norms)
     
@@ -262,4 +258,4 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     plt.title(title)
     plt.legend(["sRGB Gamut", "Whitepoint D65", legend3])
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)

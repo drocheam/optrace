@@ -48,10 +48,9 @@ Parameters :python:`s_img` and :python:`s_psf` describe the side lengths of both
 
 .. testcode::
 
-   img = ot.presets.image.ETDRS_chart_inverted
-   s_img = [0.5, 0.5]
+   img = ot.presets.image.ETDRS_chart_inverted([0.5, 0.5])
 
-   psf, s_psf = ot.presets.psf.halo()
+   psf = ot.presets.psf.halo()
 
 
 Typically the imaging system has a magnification factor :python:`m` that is also needed to scale the input object size.
@@ -61,18 +60,24 @@ You can call :python:`convolve` like this:
 
 .. testcode::
 
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=0.5)
+   img2 = ot.convolve(img, psf, m=0.5)
 
-The function returns the convolved sRGB image :python:`img2`, the new image side lengths :python:`s2`.
+The function returns the convolved image object :python:`img2`.
+
+.. TODO explain cargs
+
+.. TODO explain slice_, padding
 
 The additional parameter :python:`rendering_intent` defines the used intent for the sRGB conversion.
 
 .. testcode::
 
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf, rendering_intent="Perceptual")
+   img2 = ot.convolve(img, psf, cargs=dict(rendering_intent="Perceptual"))
 
 
 **Restrictions**
+
+.. TODO update
 
 * object image is a (Ny, Nx, 3) sRGB array or filepath to a sRGB image
 * PSF is either an intensity array or an RImage object
@@ -111,20 +116,17 @@ The following example loads an image preset and convolves it with a square PSF t
    import numpy as np
 
    # load image preset
-   img = ot.presets.image.ETDRS_chart_inverted
+   img = ot.presets.image.ETDRS_chart_inverted([0.9, 0.9])
 
-   # image size
-   s_img = [0.9, 0.9]
   
    # square psf
-   psf = np.zeros((200, 200))
-   psf[50:150, 50:150] = 1
+   psf_data = np.zeros((200, 200))
+   psf_data[50:150, 50:150] = 1
 
-   # psf size
-   s_psf = [0.1, 0.08]
+   psf = ot.Image(psf_data, [0.1, 0.08])
 
    # convolution
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=-1.75)
+   img2 = ot.convolve(img, psf, m=-1.75)
 
 
 Image Plotting
@@ -149,14 +151,13 @@ Then call the plot with:
 
 .. testcode::
 
-   otp.image_plot(img, s_img)
+   otp.image_plot(img)
 
 A user title is provided with the :python:`title` parameter, additionally the image can be flipped (rotated 180 degrees) with :python:`flip=True`.
-Like all other plotting function the window can block the execution of the rest of the program with :python:`block=True`.
 
 .. testcode::
 
-   otp.image_plot(img, s_img, title="Input Image", flip=True, block=False)
+   otp.image_plot(img, title="Input Image", flip=True)
 
 
 
@@ -173,7 +174,7 @@ A circle PSF is defined using the :python:`d` parameter that defines the circle 
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.circle(d=3.5) 
+   psf = ot.presets.psf.circle(d=3.5) 
 
 **Gaussian**
 
@@ -182,7 +183,7 @@ The shape parameter `sig` defines the gaussian's standard deviation.
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.gaussian(sig=2.0) 
+   psf = ot.presets.psf.gaussian(sig=2.0) 
 
 **Airy**
 
@@ -190,7 +191,7 @@ An Airy PSF also include higher order diffraction and is also characterized by t
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.airy(r=2.0) 
+   psf = ot.presets.psf.airy(r=2.0) 
 
 **Glare**
 
@@ -198,7 +199,7 @@ The glare consists of two gaussians, the first with parameter :python:`sig1`, th
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.glare(sig1=2.0, sig2=3.5, a=0.05) 
+   psf = ot.presets.psf.glare(sig1=2.0, sig2=3.5, a=0.05) 
 
 
 **Halo**
@@ -207,7 +208,7 @@ A halo consists of a center gaussian with :python:`sig1` and intensity 1, as wel
 
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.halo(sig1=0.5, sig2=0.25, r=3.5, a=0.05) 
+   psf = ot.presets.psf.halo(sig1=0.5, sig2=0.25, r=3.5, a=0.05) 
 
 
 

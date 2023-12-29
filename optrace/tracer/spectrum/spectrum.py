@@ -8,6 +8,7 @@ import numexpr as ne  # faster calculations
 from .. import color  # color conversions
 from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
+from ...global_options import global_options as go
 
 
 class Spectrum(BaseClass):
@@ -148,10 +149,10 @@ class Spectrum(BaseClass):
                 if val2.shape[0] == 0:
                     raise ValueError(f"'{key}' can't be empty.")
 
-                if key == "lines" and ((wlo := np.min(val2)) < color.WL_BOUNDS[0]
-                                       or (wlo := np.max(val2)) > color.WL_BOUNDS[1]):
-                    raise ValueError(f"'lines' need to be inside visible range [{color.WL_BOUNDS[0]}nm, "
-                                     f"{color.WL_BOUNDS[1]}nm]"
+                if key == "lines" and ((wlo := np.min(val2)) < go.wavelength_range[0]
+                                       or (wlo := np.max(val2)) > go.wavelength_range[1]):
+                    raise ValueError(f"'lines' need to be inside visible range [{go.wavelength_range[0]}nm, "
+                                     f"{go.wavelength_range[1]}nm]"
                                      f", but got a value of {wlo}nm.")
 
                 if key == "line_vals" and (lmin := np.min(val2)) < 0:
@@ -185,8 +186,8 @@ class Spectrum(BaseClass):
                 val2 = np.asarray_chkfinite(val, dtype=np.float64)
 
                 if key == "_wls":
-                    pc.check_not_below("wls[0]", val[0], color.WL_BOUNDS[0])
-                    pc.check_not_above("wls[-1]", val[-1], color.WL_BOUNDS[1])
+                    pc.check_not_below("wls[0]", val[0], go.wavelength_range[0])
+                    pc.check_not_above("wls[-1]", val[-1], go.wavelength_range[1])
 
                     if np.std(np.diff(val2)) > 1e-4 or np.any(np.diff(val2) <= 0) or (val[1]-val[0] < 1e-6):
                         raise ValueError("wls needs to be monotonically increasing with the same step size.")
@@ -202,8 +203,8 @@ class Spectrum(BaseClass):
                 val = float(val)
 
                 if key in ["wl", "wl0", "wl1", "mu"]:
-                    pc.check_not_below(key, val, color.WL_BOUNDS[0])
-                    pc.check_not_above(key, val, color.WL_BOUNDS[1])
+                    pc.check_not_below(key, val, go.wavelength_range[0])
+                    pc.check_not_above(key, val, go.wavelength_range[1])
 
                 if key in ["val"]:
                     pc.check_above(key, val, 0)

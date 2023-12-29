@@ -8,6 +8,8 @@ from .xyz import xyz_to_xyY, WP_D65_XY
 from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV
 from .observers import x_observer, y_observer, z_observer
 
+from ...global_options import global_options as go
+
 
 SRGB_RENDERING_INTENTS: list[str, str, str] = ["Ignore", "Absolute", "Perceptual"]
 """Rendering intents for XYZ to sRGB conversion"""
@@ -513,8 +515,8 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     # For the RGB intensities we convert the gamma corrected sRGB values to RGBLinear
     RGBL = srgb_to_srgb_linear(rgb)
 
-    if tools._WL_MIN0 < tools.WL_BOUNDS[0] or tools._WL_MAX0 > tools.WL_BOUNDS[1]:
-        raise RuntimeError(f"Wavelength range {tools.WL_BOUNDS} does not include range "
+    if tools._WL_MIN0 < go.wavelength_range[0] or tools._WL_MAX0 > go.wavelength_range[1]:
+        raise RuntimeError(f"Wavelength range {go.wavelength_range} does not include range "
                            f"[{tools._WL_MIN0}, {tools._WL_MAX0}] needed for this feature.")
 
     wl = np.linspace(tools._WL_MIN0, tools._WL_MAX0, 10000)
@@ -561,35 +563,23 @@ def _power_from_srgb(rgb: np.ndarray) -> np.ndarray:
 
 ########################################################################################################################
 
-def spectral_colormap(N:    int,
-                      wl0:  float = None,
-                      wl1:  float = None) \
+def spectral_colormap(wl: np.ndarray) \
         -> np.ndarray:
     """
-    Get a spectral colormap with N steps in sRGB.
+    Get a spectral colormap in sRGB for wavelength values.
     The Hue is rendered physically correct, however the lightness and saturation are set to be visually pleasing
 
-    :param wl0: lower wavelength
-    :param wl1: upper wavelength
-    :param N: number of steps (int)
-    :return: sRGBA array (numpy 2D array, shape (N, 4))
-
-    >>> spectral_colormap(3, 400, 600)
-    array([[ 3.81626224e+01, 9.30946428e+00, 7.20900561e+01, 2.55000000e+02],
-           [ 1.23039547e-04, 2.52697905e+02, 2.13400035e+02, 2.55000000e+02],
-           [ 2.41139375e+02, 1.07694239e+02, 7.92225936e+01, 2.55000000e+02]])
+    :param wl: wavelength array. Values must be inside global_options.wavelength_ramge
+    :return: sRGBA array (numpy 2D array, shape (N, 4)) with values ranging 0-1
     """
     # wavelengths to XYZ color
-    wl0 = wl0 if wl0 is not None else tools.WL_BOUNDS[0]
-    wl1 = wl1 if wl1 is not None else tools.WL_BOUNDS[1]
-    wl = np.linspace(wl0, wl1, N, dtype=np.float32)  # wavelength vector
     XYZ = np.column_stack((x_observer(wl), y_observer(wl), z_observer(wl)))
 
     # we want a colorful spectrum with smooth gradients like in reality
     # unfortunately this isn't really possible with sRGB
     # so make a compromise by mixing rendering intents Absolute (=colorful) with Perceptual (=smooth gradients)
 
-    # absolure RI
+    # absolute RI
     RGBa = xyz_to_srgb_linear(np.array([XYZ]), rendering_intent="Absolute")[0]
     nzero = np.any(RGBa != 0, axis=1)
     RGBa[nzero] /= np.max(RGBa[nzero], axis=1)[:, np.newaxis]  # normalize brightness
@@ -600,7 +590,7 @@ def spectral_colormap(N:    int,
     RGBp[nzero] /= np.max(RGBp[nzero], axis=1)[:, np.newaxis]  # normalize brightness
    
     # mix those two
-    RGB = 0.7*RGBa + 0.3*RGBp
+    RGB = 0.5*RGBa + 0.5*RGBp
 
     # some smoothed rectangle function for brightness fall-off for low and large wavelengths
     # this is for visualization only, there is no physical or perceptual truth behind this
@@ -610,5 +600,5 @@ def spectral_colormap(N:    int,
     RGB = srgb_linear_to_srgb(RGB[:, :3])
 
     # add alpha channel and rescale to range [0, 255]
-    return 255*np.column_stack((RGB, np.ones_like(wl)))
+    return np.column_stack((RGB, np.ones_like(wl)))
 

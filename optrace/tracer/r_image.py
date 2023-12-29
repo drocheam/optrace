@@ -3,19 +3,20 @@ from typing import Any  # Callable and Any type
 from threading import Thread  # multithreading
 
 import numpy as np  # calculations
-from PIL import Image  # saving as png
+import cv2
 import scipy.interpolate  # interpolation
 import scipy.constants  # for luminous efficacy
 import scipy.special  # bessel functions
-import numexpr as ne  # accelerated calculations
+import os
 
 from . import color  # xyz_observers curves and sRGB conversions
-from . import misc  # interpolation and calculation methods
 
 from .base_class import BaseClass  # parent class
 from .misc import PropertyChecker as pc  # check types and values
+from .image import Image
 
-from .. import global_options
+from ..global_options import global_options
+from ..warnings import warning
 
 # odd number of pixels per side, so we have a center pixel, which is useful in images with rotational symmetry
 # otherwise a pixel at the center would fall in one of the neighboring pixel due to numeric errors
@@ -53,7 +54,6 @@ class RImage(BaseClass):
     def __init__(self,
                  extent:            (list | numpy.ndarray),
                  projection:        str = None,
-                 limit:             float = None,
                  **kwargs)\
             -> None:
         """
@@ -65,7 +65,7 @@ class RImage(BaseClass):
 
         :param extent: image extent in the form [xs, xe, ys, ye]
         :param projection: string containing information about the sphere projection method, if any
-        :param limit: rayleigh limit, used to approximate wave optics using a airy disc kernel
+        :param kwargs: additional keyword arguments for the BaseClass, like for instance desc and long_desc
         """
         self._new_lock = False
 
@@ -79,13 +79,13 @@ class RImage(BaseClass):
         self._img = None
 
         self.projection = projection
-        self.limit = limit
+        self._limit = None
 
         super().__init__(**kwargs)
         self._new_lock = True
 
     def has_image(self) -> bool:
-        """Check Image objects contains an calculated image."""
+        """Check Image object contains an calculated image."""
         return self.img is not None
 
     def __check_for_image(self) -> None:
@@ -94,136 +94,31 @@ class RImage(BaseClass):
             raise RuntimeError("Image was not calculated.")
 
     @property
-    def sx(self) -> float:
-        """ geometric size of image in x direction """
-        return self.extent[1] - self.extent[0]
+    def s(self) -> list[float, float]:
+        """ geometric side lengths of image in direction (x, y)"""
+        return [self.extent[1] - self.extent[0], self.extent[3] - self.extent[2]]
 
     @property
-    def sy(self) -> float:
-        """ geometric size of image in y direction """
-        return self.extent[3] - self.extent[2]
-
-    @property
-    def Nx(self) -> int:
-        """ number of image pixels in x direction """
+    def shape(self) -> list[float, float]:
+        """data image shape (y, x)"""
         self.__check_for_image()
-        return self.img.shape[1]
-
-    @property
-    def Ny(self) -> int:
-        """number of image pixels in y direction """
-        self.__check_for_image()
-        return self.img.shape[0]
+        return self.img.shape[:2]
 
     @property
     def N(self) -> int:
-        """returns smaller side pixel length of Nx, Ny"""
-        return min(self.Nx, self.Ny)
+        """returns smaller pixel shape of image"""
+        return min(*self.shape)
 
     @property
     def Apx(self) -> float:
         """ area per pixel """
         self.__check_for_image()
-        return self.sx * self.sy / (self.Nx * self.Ny)
+        return self.s[0] * self.s[1] / (self.shape[1] * self.shape[0])
 
-    def cut(self,
-            mode:   str,
-            x:      float = None,
-            y:      float = None,
-            log:    bool = False,
-            imc:    np.ndarray = None)\
-            \
-            -> tuple[np.ndarray, list[np.ndarray]]:
-        """
-        Create an image cut/profile.
-        Only specify one of parameters x, y 
-        
-        :param mode: RImage mode
-        :param x: x-value to cut at
-        :param y: y-value to cut at
-        :param log: flag for sRGB modes, if the values should be logarithmic
-        :param imc: precomputed image (as np.ndarray) for speeding things up
-        :return: bin edge array, list of image cuts
-        """
-        if (x is not None and not self.extent[0] - self.EPS <= x <= self.extent[1] + self.EPS)\
-           or (y is not None and not self.extent[2] - self.EPS <= y <= self.extent[3] + self.EPS):
-            raise ValueError("Position outside image.")
-        
-        # bin edges for histogram
-        bins_x = np.linspace(self.extent[0], self.extent[1], self.Nx+1)
-        bins_y = np.linspace(self.extent[2], self.extent[3], self.Ny+1)
-
-        # sampling points with positions in the center of the bins
-        xp = bins_x[:-1] + (bins_x[1]-bins_x[0])/2
-        yp = bins_y[:-1] + (bins_y[1]-bins_y[0])/2
-        
-        # get image
-        img = self.get(mode, log) if imc is None else imc
-
-        # assign bins and sampling positions
-        sp, xs, ys = (bins_y, np.full(self.Ny, x), yp) if x is not None else (bins_x, xp, np.full(self.Nx, y))
-
-        # nearest neighbor interpolation, so we use actual pixel values
-        iml = [img] if img.ndim == 2 else [img[:, :, 0], img[:, :, 1], img[:, :, 2]]
-        ims = [scipy.interpolate.RegularGridInterpolator((xp, yp), imi.T, method="nearest", 
-                                                         bounds_error=False, fill_value=None)((xs, ys))\
-               for imi in iml]
-
-        return sp, ims
-
-    def get(self, mode: str, log: bool = False, L_th: float = 0, sat_scale: float = None) -> np.ndarray:
-        """
-        Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ
-
-        :param mode: one of "display_modes"
-        :param log: logarithmic image (sRGB modes only)
-        :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
-        :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
-        :return: image as np.ndarray, shape depends on mode
-        """
-
-        self.__check_for_image()
-
-        match mode:
-
-            case "Irradiance":
-                return 1 / self.Apx * self.img[:, :, 3]
-
-            case "Illuminance":
-                # the Illuminance is just the unnormalized Y scaled by K = 683 lm/W and the inverse pixel area
-                return self.K / self.Apx * self.img[:, :, 1]
-
-            case "sRGB (Absolute RI)":
-                # return
-                rgb = self.rgb(log=log, rendering_intent="Absolute")
-
-                return rgb
-
-            case "sRGB (Perceptual RI)":
-                return self.rgb(log=log, rendering_intent="Perceptual", L_th=L_th, sat_scale=sat_scale)
-
-            case "Outside sRGB Gamut":
-                # force conversion from bool to int so further algorithms work correctly
-                return np.array(color.outside_srgb_gamut(self.xyz()), dtype=int)
-
-            case "Lightness (CIELUV)":
-                return self.luv()[:, :, 0]
-
-            case "Hue (CIELUV)":
-                Luv = self.luv()
-                return color.luv_hue(Luv)
-
-            case "Chroma (CIELUV)":
-                Luv = self.luv()
-                return color.luv_chroma(Luv)
-
-            case "Saturation (CIELUV)":
-                Luv = self.luv()
-                return color.luv_saturation(Luv)
-
-            case _:
-                raise ValueError(f"Invalid display_mode {mode}, should be one of {self.display_modes}.")
-
+    @property
+    def limit(self) -> float:
+        return self._limit
+    
     def power(self) -> float:
         """:return: calculated total image power"""
         self.__check_for_image()
@@ -263,136 +158,214 @@ class RImage(BaseClass):
         img = np.clip(img, 0, 1)
         return color.srgb_linear_to_srgb(img)
 
+    def get(self, mode: str, log: bool = False, L_th: float = 0, sat_scale: float = None) -> np.ndarray:
+        """
+        Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ
+
+        :param mode: one of "display_modes"
+        :param log: logarithmic image (sRGB modes only)
+        :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
+        :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
+        :return: image as np.ndarray, shape depends on mode
+        """
+        self.__check_for_image()
+
+        match mode:
+
+            case "Irradiance":
+                return 1 / self.Apx * self.img[:, :, 3]
+
+            case "Illuminance":
+                # the Illuminance is just the unnormalized Y scaled by K = 683 lm/W and the inverse pixel area
+                return self.K / self.Apx * self.img[:, :, 1]
+
+            case "sRGB (Absolute RI)":
+                return self.rgb(log=log, rendering_intent="Absolute")
+
+            case "sRGB (Perceptual RI)":
+                return self.rgb(log=log, rendering_intent="Perceptual", L_th=L_th, sat_scale=sat_scale)
+
+            case "Outside sRGB Gamut":
+                # force conversion from bool to float64 so further algorithms work correctly
+                return np.array(color.outside_srgb_gamut(self.xyz()), dtype=np.float64)
+
+            case "Lightness (CIELUV)":
+                return self.luv()[:, :, 0]
+
+            case "Hue (CIELUV)":
+                return color.luv_hue(self.luv())
+
+            case "Chroma (CIELUV)":
+                return color.luv_chroma(self.luv())
+
+            case "Saturation (CIELUV)":
+                return color.luv_saturation(self.luv())
+
+            case _:
+                raise ValueError(f"Invalid display_mode {mode}, should be one of {self.display_modes}.")
+
+    def to_image(self, mode, **kwargs) -> Image:
+        """
+        Convert an RImage to an Image object.
+
+        This looses:
+        * The raw histogram data, therefore rescaling and other image modes won't be available
+        * Information on the resolution limit and projection method
+        * For non-sRGB modes unit and scaling information (images are normalized)
+        * Geometrical extent information (image center will be (0, 0))
+
+        Uses the current image size. 
+        Call RImage.rescale to apply a different size.
+
+        :param mode: image mode from RImage.display_modes
+        :param kwargs: additional keyword parameters for RImage.get
+        :return: Image object
+        """
+        if mode in self.display_modes and mode[:4] != "sRGB":
+            warning(f"Converting {mode} to an Image object looses the unit and scaling information.")
+
+        data = self.get(mode, **kwargs)
+
+        # normalize
+        if (max_ := np.max(data)):
+            data /= max_
+
+        # make three channels
+        if data.ndim == 2:
+            data = np.repeat(data[:, :, np.newaxis], 3, axis=2)
+
+        return Image(data, self.s, desc=self.desc, long_desc=self.long_desc)
+    
+    def cut(self,
+            mode:   str,
+            x:      float = None,
+            y:      float = None,
+            **kwargs)\
+            \
+            -> tuple[np.ndarray, list[np.ndarray]]:
+        """
+        Create an image cut/profile.
+        Only specify one of parameters x, y 
+        
+        :param mode: RImage mode from display_modes
+        :param x: x-value to cut at
+        :param y: y-value to cut at
+        :param kwargs: additional keyword arguments for RImage.get()
+        :return: bin edge array, list of image cuts
+        """
+        img = self.get(mode, **kwargs)
+
+        if x is not None:
+
+            if not self.extent[0] <= x <= self.extent[1]:
+                raise ValueError(f"Position x={x} is outside the image x-extent of {self.extent[:2]}")
+
+            bins = np.linspace(self.extent[2], self.extent[3], self.shape[0]+1)
+            ind = int((x - self.extent[0]) / self.s[0] * self.shape[1] * (1 - 1e-12))
+            iml = [img[:, ind]] if img.ndim == 2 else [img[:, ind, 0], img[:, ind, 1], img[:, ind, 2]]
+        
+        elif y is not None:
+
+            if not self.extent[2] <= y <= self.extent[3]:
+                raise ValueError(f"Position y={y} is outside the image y-extent of {self.extent[2:]}")
+            
+            bins = np.linspace(self.extent[0], self.extent[1], self.shape[1]+1)
+            ind = int((y - self.extent[2]) / self.s[1] * self.shape[0] * (1 - 1e-12))
+            iml = [img[ind]] if img.ndim == 2 else [img[ind, :, 0], img[ind, :, 1], img[ind, :, 2]]
+        
+        else:
+            raise ValueError("Either x or y parameter must be provided.")
+
+        return bins, iml
+
     def __fix_extent(self) -> None:
         """
         Fix image extent. Point images are given a valid 2D extent.
         Line images or images with a large side-to-side ratio are adapted.
         """
 
-        sx, sy = self.sx, self.sy  # use copies since extent changes along the way
+        sx, sy = self.s  # use copies since extent changes along the way
         MR = self.MAX_IMAGE_RATIO  # alias for more readability
+        self.extent = self._extent0.copy()
 
         # point image => make minimal dimensions
         if sx < 2*self.EPS and sy < 2*self.EPS:
-            self.extent = self._extent0 + self.EPS * np.array([-1, 1, -1, 1])
+            self.extent += self.EPS * np.array([-1, 1, -1, 1])
 
         # x side too small, expand
         elif not sx or sy/sx > MR:
-            xm = (self.extent[0] + self.extent[1])/2  # center x position
+            xm = (self._extent0[0] + self._extent0[1])/2  # center x position
             self.extent[0] = xm - sy/MR/2
             self.extent[1] = xm + sy/MR/2
 
         # y side too small, expand
         elif not sy or sx/sy > MR:
-            ym = (self.extent[2] + self.extent[3])/2  # center y position
+            ym = (self._extent0[2] + self._extent0[3])/2  # center y position
             self.extent[2] = ym - sx/MR/2
             self.extent[3] = ym + sx/MR/2
 
-        # when filtering is active, add 4 limit to the edges
-        if self.limit is not None:
-            self.extent = self._extent0 + np.array([-1.0, 1.0, -1.0, 1.0]) * 3 * self.limit/1000.0
+        # when filtering is active, add edges
+        if self._limit is not None:
+            # third zero would be at 2.655.. not 2.7
+            self.extent += np.array([-1.0, 1.0, -1.0, 1.0]) * 2.7 * self._limit/1000.0
 
     def rescale(self, N: int) -> None:
         """
         Rescale the image to a new resolution without loosing or guessing information.
-        Only sizes from SIZES are supported, for other values the nearest from SIZES is applied.
+        This is done by joining bins form the internally saved high resolution version of the image.
+        Only sizes from RImage.SIZES are supported, for other values the nearest from SIZES is selected.
 
-        This function also applies the resolution filter.
-
-        :param N: pixel size of smaller image size
+        :param N: pixel size of smaller image side
         """
         N = int(N)  # enforce int
         if N < 1:
             raise ValueError("N needs to be an integer >= 1.")
 
-        Ny, Nx, Nz = self._img.shape
-
         # get downscaling factor
+        Ny, Nx, Nz = self._img.shape
         Na  = self.SIZES[np.argmin(np.abs(N - np.array(self.SIZES)))]
-        Nm = self.MAX_IMAGE_SIDE
         fact = int(self.MAX_IMAGE_SIDE/Na)
-                
-        if self.limit is not None and self.projection is not None:
+
+        # rescale by joining bins
+        self.img = cv2.resize(self._img, [Nx // fact, Ny // fact], interpolation=cv2.INTER_AREA) * fact**2
+        
+    def _apply_rayleigh_filter(self):
+        """applies the rayleigh filter"""
+
+        if self._limit is not None and self.projection is not None:
             raise RuntimeError("Resolution limit filter is not applicable for a projected image.")
+            
+        # limit size in pixels
+        px = self._limit / 1000.0 / (self.s[0]/self._img.shape[1])
+        py = self._limit / 1000.0 / (self.s[1]/self._img.shape[0])
 
-        # for each of the XYZW channels:
-        def threaded(ind, in_, out):
+        # larger of two sizes
+        # third zero would be at 2.655.. not 2.7
+        ps = int(np.ceil(2.7*max(px, py)))
+        ps = ps+1 if ps % 2 else ps  # enforce even number, so we can use odd number for psf image
 
-            # filter, if sigma provided
-            if self.limit is not None:
+        # psf coordinates
+        Y, X = np.mgrid[-ps:ps:(2*ps+1)*1j, -ps:ps:(2*ps+1)*1j]
+        R = np.sqrt((X/px)**2 + (Y/py)**2) * 3.8317
+        Rnz = R[R!=0]
+        
+        # psf
+        psf = np.ones((2*ps+1, 2*ps+1), dtype=np.float64)
+        psf[R != 0] = (2*scipy.special.j1(Rnz) / Rnz) ** 2
+        psf[R > 10.1735] = 0  # only use up to third zero at 10.1735
+        psf /= np.sum(psf)
 
-                # limit size in pixels
-                px = self.limit / 1000.0 / (self.sx/Nx)
-                py = self.limit / 1000.0 / (self.sy/Ny)
+        if global_options.multithreading:
+            # for each of the XYZW channels:
+            def threaded(ind, in_, psf):
+                in_[:, :, ind] = scipy.signal.fftconvolve(in_[:, :, ind], psf, mode="same")
 
-                # larger of two sizes
-                ps = 4*int(np.ceil(max(px, py)))
-                ps = ps+1 if ps % 2 else ps  # enforce even number, so we can use odd number for psf image
-
-                # psf coordinates
-                Y, X = np.mgrid[-ps:ps:(2*ps+1)*1j, -ps:ps:(2*ps+1)*1j]
-                R = ne.evaluate("sqrt((X/px)**2 + (Y/py)**2) * 3.8317")
-                Rnz = R[R!=0]
-                
-                # psf
-                psf = np.ones((2*ps+1, 2*ps+1), dtype=np.float64)
-                j1 = scipy.special.j1(Rnz)
-                psf[R != 0] = ne.evaluate("(2*j1 / Rnz) ** 2")
-                psf[R > 10.1735] = 0  # only use up to third zero at 10.1735
-                psf /= np.sum(psf)
-
-                # resulting image
-                in_2 = scipy.signal.fftconvolve(in_[:, :, ind], psf, mode="same")
-                
-            else:
-                in_2 = in_[:, :, ind]
-
-            # this code basically sums up all pixel values that go into a new pixel value
-            # this is done by only two sums and reshaping
-
-            # example:
-            # in_ = [[A0, A1, B0, B1], [A2, A3, B2, B3], [C0, C1, D0, D1], [ C2, C3, D2, D3]]
-            # where each letter should be joined into one pixel => [[A, B], [C, D]] (Nx=4, Ny=4, fact=2)
-
-            # reshape and sum such that all horizontal pixels that are joined together are in each line
-            # => [[A0, A1], [B0, B1], [A2, A3], [B2, B3], [C0, C1], [D0, D1], [C2, C3], [D2, D3]]
-            B2 = in_2.reshape((Ny*Nx//fact, fact))
-
-            # sum over rows,
-            # => [[A0+A1], [B0+B1], [A2+A3], [B2+B3], [C0+C1], [D0+D1], [C2+C3], [D2+D3]]
-            B3 = B2.sum(axis=1)
-
-            # reshape such that same pixel letters are in rows
-            # [[A0+A1, A2+A3], [B0+B1, B2+B3], [C0+C1, C2+C3], [D0+D1, D2+D3]]
-            B4 = B3.reshape((Nx//fact, Ny), order='F').reshape((Nx*Ny//fact**2, fact))
-
-            # sum over rows
-            # [[A0+A1+A2+A3], [B0+B1+B2+B3], [C0+C1+C2+C3], [D0+D1+D2+D3]]
-            B5 = B4.sum(axis=1)
-
-            # reshape to correct shape
-            # out = [[A0+A1+A2+A3, B0+B1+B2+B3], [C0+C1+C2+C3, D0+D1+D2+D3]]
-            out[:, :, ind] = B5.reshape((Ny//fact, Nx//fact), order='F')
-
-
-        if fact <= 1 and self.limit is None:
-            self.img = self._img
+            threads = [Thread(target=threaded, args=(i, self._img, psf)) for i in range(self._img.shape[2])]
+            [th.start() for th in threads]
+            [th.join() for th in threads]
 
         else:
-
-            self.img = np.zeros((Ny // fact, Nx // fact, Nz))
-
-            if global_options.multithreading:
-                threads = [Thread(target=threaded, args=(i, self._img, self.img)) for i in range(Nz)]
-                [th.start() for th in threads]
-                [th.join() for th in threads]
-            else:
-                for i in range(Nz):
-                    threaded(i, self._img, self.img)
-
-    def refilter(self) -> None:
-        """reapplies image filtering with the current limit setting"""
-        self.rescale(self.N)
+            self._img = scipy.signal.fftconvolve(self._img, psf[:, :, np.newaxis], mode="same", axes=(0, 1))
 
     def save(self, path: str) -> None:
         """
@@ -401,7 +374,7 @@ class RImage(BaseClass):
 
         :param path: path to save to
         """
-        limit = self.limit if self.limit is not None else np.nan
+        limit = self._limit if self._limit is not None else np.nan
 
         sdict = dict(_img=self._img, extent=self.extent, N=min(*self.img.shape[:2]), limit=limit,
                      desc=self.desc, long_desc=self.long_desc, proj=str(self.projection))
@@ -410,82 +383,81 @@ class RImage(BaseClass):
         path_ = path if path[-4:] == ".npz" else path + ".npz"
         np.savez_compressed(path_, **sdict)
 
-    def export_png(self,
-                   path:         str,
-                   mode:         str,
-                   size:         int = 512,
-                   resample:     int = -1,
-                   log:          bool = False,
-                   flip:         bool = False,
-                   L_th:         float = 0.,
-                   sat_scale:    float = None)\
+    def export(self,
+               path:         str,
+               mode:         str,
+               params:       list = [],
+               flip:         bool = False,
+               **kwargs)\
             -> None:
         """
-        Export the RImage in a given display mode as png.
+        Export the RImage as an image file to disk.
         The image is rescaled (and therefore interpolated) so we have square pixels before the export.
         Note that the side ratio slightly changes, since only integer side lengths are valid for the output,
         but the RImage side lengths can be of arbitrary precision.
 
-        Note that "size" specifies the image resolution of the saved image.
-        The RImage itself is not rescaled, but interpolated.
+        RImage.get() is called in this function, so make sure to provide the "mode" parameter and if needed,
+        any additional keyword arguments for this function.
         
         Files are overridden. Throws IOError if the file could not been saved.
 
+        For instance, one call could look like this:
+        img.export("test.png", "Lightness (CIELUV)", [cv2.IMWRITE_PNG_COMPRESSION, 1])
+
         :param path: path to save to
-        :param mode: display mode for getByDisplayMode()
-        :param size: resolution of smaller size of image
-        :param resample: resample mode from PIL.Image.Resampling, defaults to nearest neighbor interpolation for 
-                         scaling up relative to RImage resolution and bilinear interpolation for scaling down
-        :param log: logarithmic image (bool), only for sRGB modes
-        :param flip: rotate image by 180 degrees
-        :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
-        :return: 
+        :param mode: display mode for RImage.get()
+        :param params: additional parameters for cv2.imwrite, see cv ImwriteFlags
+        :param flip: if image should be flipped (rotated 180 degrees)
+        :param kwargs: additional keyword arguments for RImage.get()
         """
-        im = self.get(mode, log, L_th, sat_scale=sat_scale)
+        # check if folder of path exists and check if valid format
+        folder = os.path.split(path)[0]
+        if not (folder == "" or os.path.isdir(folder)) or not cv2.haveImageWriter(path):
+            raise IOError(f"Can't create/write file {path}")
+        
+        im = self.get(mode, **kwargs)
+
         if flip:
             im = np.fliplr(np.flipud(im))
 
         # approximate size we need to rescale to to make square pixels
-        if self.sx > self.sy:
-            siz = (int(size*self.sx/self.sy), size)  # specified as width, height
+        if self.s[0] > self.s[1]:
+            siz = (int(self.shape[0]*self.s[0]/self.s[1]), self.shape[0])  # specified as width, height
         else:
-            siz = (size, int(size*self.sy/self.sx))
-       
-        # convert to 8bit
-        maxi = np.max(im)
-        im = im/maxi*255 if maxi else im
-        im = im.astype(np.uint8)
-
-        # resampling option
-        if resample == -1:
-            resample = Image.Resampling.NEAREST if min(*siz) > self.N else Image.Resampling.BILINEAR
+            siz = (self.shape[1], int(self.shape[1]*self.s[1]/self.s[0]))
         
-        # convert to image and resize
-        mode = "L" if im.ndim == 2 else "RGB"  # greyscale or rgb
-        imp = Image.fromarray(im, mode=mode)
-        imp = imp.resize(siz, resample=resample)  # rescale so pixels are square
+        # resize in sRGB linear color space
+        img_rgb_lin = color.srgb_to_srgb_linear(im)
+        img_r = cv2.resize(img_rgb_lin, siz, interpolation=cv2.INTER_LINEAR)
+        img_r_rgb = color.srgb_linear_to_srgb(img_r)
+       
+        # normalize and rescale to range 0-255
+        maxi = np.max(img_r_rgb)
+        img2 = img_r_rgb/maxi*255 if maxi else im
 
-        # add file type and save
-        path_ = path if path[-4:] == ".png" else path + ".png"
-        imp.save(path_)
+        # convert to 8 bit output format
+        img2 = cv2.cvtColor(img2.astype(np.uint8), cv2.COLOR_RGB2BGR)
+
+        # save
+        cv2.imwrite(path, img2, params)
 
     @staticmethod
     def load(path: str) -> RImage:
-        """:return: a saved image object from numpy archive to a image object"""
+        """
+        Load a saved RImage (.npz) from disk.
 
-        # load npz archive
+        :param path: path of the RImage archive
+        :return: a saved image object from numpy archive to a image object
+        """
         io = np.load(path)
 
         im = RImage(io["extent"], long_desc=io["long_desc"][()], desc=io["desc"][()], projection=io["proj"][()])
-
-        im.limit = io["limit"][()] if not np.isnan(io["limit"]) else None
-
-        im._img = io["_img"]
+        im._limit = io["limit"][()] if not np.isnan(io["limit"]) else None
         im.projection = None if im.projection == "None" else im.projection  # None has been saved as string
+        im._img = io["_img"]
 
         # create Im from _Im
-        N = int(io["N"][()])
-        im.rescale(N)
+        im.rescale(int(io["N"][()]))
 
         return im
 
@@ -510,7 +482,7 @@ class RImage(BaseClass):
                 super().__setattr__(key, val2)
                 return
            
-            case "limit" if val is not None:
+            case "_limit" if val is not None:
                 pc.check_type(key, val, float | int)
                 pc.check_above(key, val, 0)
                 val = float(val)
@@ -525,27 +497,27 @@ class RImage(BaseClass):
                p:             np.ndarray = None,
                w:             np.ndarray = None,
                wl:            np.ndarray = None,
-               keep_extent:   bool = False,
+               limit:         float = None,
                _dont_rescale: bool = False)\
             \
             -> None:
         """
         Creates an pixel image from ray positions on the detector.
-        The image is saved in self.Im
+        The image is saved in self.img
 
         :param N: number of image pixels in smallest dimension (int)
         :param p: ray position matrix, xyz components in columns, (numpy 1D array)
         :param w: ray weight array (numpy 1D array)
         :param wl: ray wavelength array (numpy 1D array)
-        :param keep_extent: True if RImage.__fix_extent() shouldn't be called before image calculation
+        :param limit: rayleigh limit, used to approximate wave optics using a airy disc kernel
         :param _dont_rescale:
         """
+        self._limit = limit
 
         # fix point and line images as well as ones with a too large side ratio
-        if not keep_extent:
-            self.__fix_extent()
+        self.__fix_extent()
 
-        if N > self.MAX_IMAGE_SIDE or N < 1:
+        if not 1 <= N <= self.MAX_IMAGE_SIDE:
             raise ValueError(f"N needs to be between 1 and {self.MAX_IMAGE_SIDE}")
 
         # calculate image size. Smaller side is MAX_IMAGE_SIDE, larger MAX_IMAGE_SIDE*[1, 3, 5, ..., MAX_IMAGE_RATIO]
@@ -553,8 +525,8 @@ class RImage(BaseClass):
         Nrs = self.MAX_IMAGE_SIDE
         nf = lambda a: min(self.MAX_IMAGE_RATIO, 1 + 2*int(a/2))  
         # ^-- calculates nearest factor for a from [1, 3, 5, ..] below MAX_IMAGE_RATIO
-        Nx = Nrs if self.sx <= self.sy else Nrs*nf(self.sx/self.sy)
-        Ny = Nrs if self.sx > self.sy else Nrs*nf(self.sy/self.sx) 
+        Nx = Nrs if self.s[0] <= self.s[1] else Nrs*nf(self.s[0]/self.s[1])
+        Ny = Nrs if self.s[0] > self.s[1] else Nrs*nf(self.s[1]/self.s[0]) 
 
         # init image
         # x in first, y in second since np.histogram2d needs it that way
@@ -569,7 +541,7 @@ class RImage(BaseClass):
                 w_ = tri[ind](wl) * w if ind < 3 else w
 
                 img[:, :, ind], _, _ = np.histogram2d(p[:, 0], p[:, 1], weights=w_, bins=[Nx, Ny], 
-                                                      range=self.extent.reshape((2,2)))
+                                                      range=self.extent.reshape((2, 2)))
 
             # multithreading
             if global_options.multithreading: 
@@ -586,4 +558,6 @@ class RImage(BaseClass):
         self._img = np.transpose(self._img, (1, 0, 2))
 
         if not _dont_rescale:
+            if self._limit is not None:
+                self._apply_rayleigh_filter()  # apply resolution filter
             self.rescale(N)  # create rescaled Image self.img

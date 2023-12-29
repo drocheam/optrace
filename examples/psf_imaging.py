@@ -4,22 +4,24 @@ import optrace as ot
 import optrace.plots as otp
 
 
-# load a test image
-img = ot.presets.image.ETDRS_chart
-# img = ot.presets.image.siemens_star
-# img = ot.presets.image.color_checker
-
-# define the image lengths in mm
-s_img = [1.5, 1.2]
+# load a test image and define the image side lengths in mm
+img = ot.presets.image.ETDRS_chart([1.5, 1.2])
+# img = ot.presets.image.siemens_star([1.5, 1.5])
+# img = ot.presets.image.color_checker([1.5, 1.2])
 
 # halo preset, returns the psf and the side lengths
 # sizes d1, d2, ... are in micrometers
-psf, s_psf = ot.presets.psf.halo(sig1=6, sig2=2, a=0.2, r=40)
+psf = ot.presets.psf.halo(sig1=4, sig2=4, a=0.1, r=30)
+# psf = ot.presets.psf.gaussian(sig=4)
 
 # convolve
-img2, s2 = ot.convolve(img, s_img, psf, s_psf, m=0.75)
+# use constant padding with white color, as the background is white
+# slice_ slices the output back to the original image size
+img_conv = ot.convolve(img, psf, m=0.75, 
+                       padding_mode="constant", padding_value=[1, 1, 1], slice_=True)
 
 # plot images
-otp.image_plot(img, s_img, title="Initial Image")
-otp.image_plot(psf, s_psf, title="PSF")
-otp.image_plot(img2, s2, title="Convoluted Image", block=True)
+otp.image_plot(img, title="Initial Image")
+otp.image_plot(psf, title="PSF")
+otp.image_plot(img_conv, title="Convoluted Image")
+otp.block()

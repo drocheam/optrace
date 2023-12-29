@@ -146,11 +146,11 @@ It requires the :python:`res, afdict` parameters from before.
    autofocus_cost_plot(res, afdict)
 
 
-Optionally one can overwrite the :python:`title` and make the plot window blocking by setting :python:`block=True`.
+Optionally one can overwrite the :python:`title`.
 
 .. code-block:: python
 
-   autofocus_cost_plot(res, afdict, title="abcd", block=True)
+   autofocus_cost_plot(res, afdict, title="abcd")
 
 
 Below you can find examples for cost plots.

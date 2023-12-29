@@ -1,18 +1,16 @@
 import numpy as np
-import numexpr as ne
 import scipy.special
 
 from ..misc import PropertyChecker as pc
-from .. import color
+from ..image import Image
 
 
-
-def circle(d: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
+def circle(d: float = 1.0) -> Image:
     """
     Two dimensional circle kernel with diameter d.
 
     :param d: circle diameter in µm
-    :return: kernel image array, image side lengths (mm)
+    :return: image object
     """
     pc.check_above("d", d, 0)
    
@@ -21,7 +19,7 @@ def circle(d: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
 
     # calculate radial data
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
-    R2 = ne.evaluate("X**2 + Y**2")
+    R2 = X**2 + Y**2
 
     Z = np.zeros((sz, sz), dtype=np.float64)
     Z[R2 <= (0.5 + ds/Y.shape[0])**2] = 0.25  # smoother edge
@@ -29,17 +27,18 @@ def circle(d: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
     Z[R2 <= (0.5 - ds/Y.shape[0])**2] = 1.0  # smoother edge
 
     s = [2*ds*d/1000, 2*ds*d/1000]  # scale size with d
+    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Z, s
+    return Image(Z, s)
 
 
-def gaussian(sig: float = 0.5) -> tuple[np.ndarray, list[float, float]]:
+def gaussian(sig: float = 0.5) -> Image:
     """
     Two dimensional gaussian kernel.
     d describes the diameter in µm of the function that approximately matches the zeroth order of an airy disk.
 
     :param sig: gaussian sigma in µm
-    :return: kernel image array, image side lengths (mm)
+    :return: image object
     """
     pc.check_above("sig", sig, 0)
 
@@ -47,19 +46,20 @@ def gaussian(sig: float = 0.5) -> tuple[np.ndarray, list[float, float]]:
     sz = 401
 
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
-    Z = ne.evaluate("exp(-(X**2 + Y**2) / 2 / sig**2)")
+    Z = np.exp(-(X**2 + Y**2) / 2 / sig**2)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
+    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Z, s
+    return Image(Z, s)
 
 
-def airy(r: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
+def airy(r: float = 1.0) -> Image:
     """
     Airy disk kernel, where d is the diameter of the zeroth order.
 
     :param r: resolution limit in µm (half the core airy disk diameter) in µm
-    :return: kernel image array, image side lengths (mm)
+    :return: image object
     """
     pc.check_above("r", r, 0)
 
@@ -70,21 +70,21 @@ def airy(r: float = 1.0) -> tuple[np.ndarray, list[float, float]]:
 
     # normalized r
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
-    R = ne.evaluate("sqrt(X**2 + Y**2) * 3.8317")
+    R = np.sqrt(X**2 + Y**2) * 3.8317
 
     Rnz = R[R!=0]
 
     # calculate airy function intensity
-    j1 = scipy.special.j1(Rnz)
-    Z[R != 0] = ne.evaluate("(2*j1 / Rnz) ** 2")
+    Z[R != 0] = (2*scipy.special.j1(Rnz) / Rnz) ** 2
     Z[R > 10.1735] = 0  # deleted values after third zero crossing
 
     s = [2*ds*r/1000, 2*ds*r/1000]  # scale size with d
+    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Z, s
+    return Image(Z, s)
 
 
-def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15):
+def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15) -> Image:
     """
     Glare kernel. This glare consists of two gaussian kernels.
     See gaussian() for details on the diameter.
@@ -93,7 +93,7 @@ def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15):
     :param sig1: sigma in µm of first gaussian, the focus
     :param sig2: sigma in µm of second gaussian, the glare
     :param a: relative brightness of the second one compared to the first one
-    :return: kernel image array, image side lengths (mm)
+    :return: image object
     """
     pc.check_above("sig1", sig1, 0)
     pc.check_above("sig2", sig2, 0)
@@ -107,16 +107,16 @@ def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15):
     sz = 801
 
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
-    R2 = ne.evaluate("X**2 + Y**2")
-    Z = ne.evaluate("a*exp(-R2 / 2 / sig2**2) +"
-                    "(1-a)*exp(-R2 / 2 / sig1**2)")
+    R2 = X**2 + Y**2
+    Z = a*np.exp(-R2 / 2 / sig2**2) + (1-a)*np.exp(-R2 / 2 / sig1**2)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
+    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Z, s
+    return Image(Z, s)
 
 
-def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3):
+def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3) -> Image:
     """
     Halo kernel. It consists of a central 2D gaussian and an outer gaussian ring.
 
@@ -124,7 +124,7 @@ def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3):
     :param sig2: sigma of radial ring in µm
     :param r: radial position of ring center in µm
     :param a: relative brightness of ring compared to focus
-    :return: kernel image array, image side lengths (mm)
+    :return: image object
     """
     pc.check_above("sig1", sig1, 0)
     pc.check_above("sig2", sig2, 0)
@@ -136,10 +136,12 @@ def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3):
     sz = 801
 
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
-    R = ne.evaluate("sqrt(X**2 + Y**2)")
-    Z = ne.evaluate("exp(-R**2 / 2 / sig1**2) + a*exp(-(R - r)**2 / 2 / sig2**2)")
+    R = np.sqrt(X**2 + Y**2)
+    Z = np.exp(-R**2 / 2 / sig1**2) + a*np.exp(-(R - r)**2 / 2 / sig2**2)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
+    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
+    Z /= np.max(Z)  # normalize since halo and center could overlap
 
-    return Z, s
+    return Image(Z, s)
 

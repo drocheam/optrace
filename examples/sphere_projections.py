@@ -31,7 +31,7 @@ RT.trace(200000)
 # plot detector images for different projection types
 for proj in ot.SphericalSurface.sphere_projection_methods:
     img = RT.detector_image(189, projection_method=proj)
-    otp.r_image_plot(img, "Irradiance", block=False)
+    otp.r_image_plot(img, "Irradiance")
 
 # run the simulator
 sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance", 

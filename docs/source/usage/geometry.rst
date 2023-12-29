@@ -205,7 +205,7 @@ The |Raytracer| class provides the functionality for tracing, geometry checking,
 Since the |Raytracer| is a subclass of a |Group|, elements can be changed or added in the same way.
 
 
-.. figure:: ../images/raytracer_geometry_example.png
+.. figure:: ../images/example_legrand1.png
    :width: 100%
    :align: center
 

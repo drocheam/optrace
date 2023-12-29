@@ -2,11 +2,11 @@
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations
 import scipy.interpolate  # interpolation
-import warnings
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
+from ....warnings import warning
 
 
 class DataSurface2D(Surface):
@@ -53,8 +53,8 @@ class DataSurface2D(Surface):
 
         # too few values warning
         if nx < 200:
-            warnings.warn(f"At least 200 values per dimension are advised for a 'data' matrix, "
-                          f"but got {nx} values for surface {self.get_desc(hex(id(self)))}.")
+            warning(f"At least 200 values per dimension are advised for a 'data' matrix, "
+                    f"but got {nx} values for surface {self.get_desc(hex(id(self)))}.")
 
         if self._1D:
             
@@ -119,9 +119,9 @@ class DataSurface2D(Surface):
             add_warning = "WARNING: Deviations this high can be due to noise or abrupt changes in the data."\
                           " DO NOT USE SUCH SURFACES HERE." if z_change > 0.05 else ""
 
-            warnings.warn(f"Due to biquadratic interpolation the z_range of the surface {self.get_desc(hex(id(self)))}"
-                          f" has increased from {z_range0:.9g} to {z_range1:.9g},"
-                          f" a change of {z_change*100:.5g}%. {add_warning}")
+            warning(f"Due to biquadratic interpolation the z_range of the surface {self.get_desc(hex(id(self)))}"
+                    f" has increased from {z_range0:.9g} to {z_range1:.9g},"
+                    f" a change of {z_change*100:.5g}%. {add_warning}")
 
         # lock properties
         self.lock()

@@ -20,23 +20,23 @@ RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], absorb_missing=False)
 # source parameters
 RSS = ot.CircularSurface(r=0.05)
 spectrum = ot.LightSpectrum("Monochromatic", wl=550.)
-s = [0, np.sin(b_ang), np.cos(b_ang)]
+s = [np.sin(b_ang), 0, np.cos(b_ang)]
 
 # create sources
-RS0 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0.5, 0, -4], 
+RS0 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, 0.5, -4], 
                   polarization="x", desc=" x-pol")
-RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, 0, -4], 
-                  polarization="y", desc=" y-pol")
-RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[-0.5, 0, -4],
+RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, 0, -4],
                   polarization="Uniform", desc="no pol")
+RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, -0.5, -4], 
+                  polarization="y", desc=" y-pol")
 RT.add(RS0)
 RT.add(RS1)
 RT.add(RS2)
 
 # add refraction index steps
-surf = ot.TiltedSurface(r=2, normal=[-np.sin(b_ang), 0, np.cos(b_ang)])
+surf = ot.TiltedSurface(r=2, normal=[0, -np.sin(b_ang), np.cos(b_ang)])
 for i in np.arange(12):
-    L = ot.Lens(surf, surf, d=0.2, pos=[-0.4, 0, 2*i*0.25], n=n)
+    L = ot.Lens(surf, surf, d=0.2, pos=[0, -0.4, 2*i*0.25], n=n)
     RT.add(L)
 
 # add Detector

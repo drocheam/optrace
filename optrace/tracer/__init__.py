@@ -6,6 +6,7 @@ from . import presets
 from .refraction_index import RefractionIndex
 from .ray_storage import RaySource
 from .r_image import RImage
+from .image import Image
 from .raytracer import Raytracer
 from .transfer_matrix_analysis import TMA
 
@@ -53,6 +54,5 @@ from .geometry.group import Group
 
 # tools
 from . import load
-from .color.tools import WL_BOUNDS
 from .convolve import convolve
 from . import color

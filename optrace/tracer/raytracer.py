@@ -7,7 +7,6 @@ from enum import IntEnum  # integer enum
 import numpy as np  # calculations
 import numexpr as ne  # faster calculations and core count
 import scipy.optimize  # numerical optimization methods
-import warnings
 from progressbar import progressbar, ProgressBar  # fancy progressbars
 
 # needed for raytracing geometry and functionality
@@ -18,9 +17,9 @@ from .spectrum import LightSpectrum
 from .refraction_index import RefractionIndex
 from .ray_storage import RayStorage
 from .r_image import RImage
-from .transfer_matrix_analysis import TMA
 
-from .. import global_options
+from ..global_options import global_options
+from ..warnings import warning
 
 from . import misc  # calculations
 from .misc import PropertyChecker as pc  # check types and values
@@ -189,63 +188,75 @@ class Raytracer(Group):
                 if count := self._msgs[type_, surf]:
                     match type_:
                         case self.INFOS.TIR:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                          f"with total inner reflection at surface {surf}, treating as absorbed.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"with total inner reflection at surface {surf}, treating as absorbed.")
 
                         case self.INFOS.ABSORB_MISSING:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                          f"missing surface {surf}, "
-                                           "set to absorbed because of parameter absorb_missing=True.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"missing surface {surf}, "
+                                     "set to absorbed because of parameter absorb_missing=True.")
                        
                         case self.INFOS.ABSORB_MEDIA_TRANS:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                          f"at refractive media transition at surface {surf} but outside the lens, "
-                                           "set to absorbed.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"at refractive media transition at surface {surf} but outside the lens, "
+                                     "set to absorbed.")
 
                         case self.INFOS.OUTLINE_INTERSECTION:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                          f"hitting outline after surface {surf}, set to absorbed.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"hitting outline after surface {surf}, set to absorbed.")
 
                         case self.INFOS.T_BELOW_TTH:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                          f"with transmittivity at filter surface {surf} below threshold of "
-                                          f"{self.T_TH*100:.3g}%, setting to absorbed.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"with transmittivity at filter surface {surf} below threshold of "
+                                    f"{self.T_TH*100:.3g}%, setting to absorbed.")
 
                         case self.INFOS.ONLY_HIT_FRONT:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                          f"hitting lens front but missing back (lens with surface {surf}), "
-                                           "setting to absorbed.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"hitting lens front but missing back (lens with surface {surf}), "
+                                     "setting to absorbed.")
 
                         case self.INFOS.ONLY_HIT_BACK:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                          f"missing lens front but hitting back (lens with surface {surf}), "
-                                           "setting to absorbed.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"missing lens front but hitting back (lens with surface {surf}), "
+                                     "setting to absorbed.")
                         
                         case self.INFOS.ILL_COND:
-                            warnings.warn(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
-                                          f"numerical hit finding at surface {surf}. "
-                                          f"Their hit position will certainly be wrong.")
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
+                                    f"numerical hit finding at surface {surf}. "
+                                    f"Their hit position will certainly be wrong.")
 
-    def trace(self, N: int) -> None:
-        """
-        Execute raytracing for the current geometry
+    def _pretrace_check(self, N: int) -> bool:
+        """checks the geometry and N parameter. Returns if tracing is possible"""
 
-        :param N: number of rays (int)
-        """
+        pc.check_type("N", N, int)
 
-        if (N := int(N)) < 1:
+        if N < 1:
             raise ValueError(f"Ray number N needs to be at least 1, but is {N}.")
 
         if N > self.MAX_RAYS:
             raise ValueError(f"Ray number exceeds maximum of {self.MAX_RAYS}")
 
         # make element list and check geometry
-        self.fault_pos = np.array([])
-        elements = self.__make_tracing_element_list()
-        self.__geometry_checks(elements)
+        self.__geometry_checks()
         if self.geometry_error and not self._ignore_geometry_error:
-            warnings.warn("ABORTED TRACING")
+            warning("ABORTED TRACING")
+            return True
+
+        return False
+
+    def trace(self, N: int) -> None:
+        """
+        Execute raytracing for the current geometry
+
+        Shows a warning on geometry errors, but does not throw an exception.
+        This is useful in the TraceGUI, as the broken geometry can be displayed.
+
+        :param N: number of rays (int)
+        """
+        if (dont_trace := self._pretrace_check(N)):
             return
+        
+        elements = self.__make_tracing_element_list()
 
         # reserve space for all tracing surface intersections, +1 for invisible aperture at the outline z-end
         # and +1 for the ray starting points
@@ -336,7 +347,7 @@ class Raytracer(Group):
                             p[miss_mask, i+1] = p[miss_mask, i]
 
                         # assign to correct message
-                        msgtype = self.INFOS.ABSORB_MISSING if self.absorb_missing else self.INFOS.ABSORB_MEDIA_TRANS    
+                        msgtype = self.INFOS.ABSORB_MISSING if self.absorb_missing else self.INFOS.ABSORB_MEDIA_TRANS
                         msg[msgtype, i] += miss_count
 
                     # # treat rays that go outside outline
@@ -402,7 +413,7 @@ class Raytracer(Group):
         # add end filter
         return elements + [end_filter]
 
-    def __geometry_checks(self, elements: list[Lens | Filter | Aperture]) -> None:
+    def __geometry_checks(self) -> None:
         """
         Checks geometry in raytracer for errors.
         Markers and Detectors can be outside the tracing outline, Filters, Apertures, Lenses and Sources not
@@ -410,19 +421,21 @@ class Raytracer(Group):
         :param elements: element list from __make_element_list()
         """
 
+        elements = self.__make_tracing_element_list()
+
         def is_inside(e: tuple | list) -> bool:
             o = self.outline + self.N_EPS*np.array([-1, 1, -1, 1, -1, 1])  # add eps because of finite float precision
             return o[0] <= e[0] and e[1] <= o[1] and o[2] <= e[2] and e[3] <= o[3] and o[4] <= e[4] and e[5] <= o[5]
 
         if not self.ray_sources:
-            warnings.warn("RaySource Missing.")
+            warning("RaySource Missing.")
             self.geometry_error = True
             return
 
         coll = False
         for i, el in enumerate(elements):
             if not is_inside(el.extent):
-                warnings.warn(f"Element{i} {el} with extent {el.extent} outside outline {self.outline}.")
+                warning(f"Element{i} {el} with extent {el.extent} outside outline {self.outline}.")
                 self.geometry_error = True
                 return
 
@@ -445,7 +458,7 @@ class Raytracer(Group):
             for rs in self.ray_sources:
 
                 if not is_inside(rs.extent):
-                    warnings.warn(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
+                    warning(f"RaySource {rs} with extent {rs.extent} outside outline {self.outline}.")
                     self.geometry_error = True
                     return
 
@@ -456,8 +469,8 @@ class Raytracer(Group):
                     break
 
         if coll:
-            warnings.warn(f"Collision between two Surfaces at {xc[0], yc[0], zc[0]}"
-                          f" and {xc.shape[0]} other positions.")
+            warning(f"Detected collision between two Surfaces at {xc[0], yc[0], zc[0]}"
+                    f" and at least {xc.shape[0]} other positions.")
             self.geometry_error = True
             self.fault_pos = np.column_stack((xc, yc, zc))
             return
@@ -475,7 +488,7 @@ class Raytracer(Group):
         :param front: first object (in regards to z-position)
         :param back: second object
         :param res: resolution measure, increase for better detection
-        :return: bool value if there is a collision, collision x-value array, 
+        :return: bool value if there is a collision, collision x-value array,
             collision y-value array, collision z-value array
         """
 
@@ -771,12 +784,12 @@ class Raytracer(Group):
         weights[hwh, i+1] = weights[hwh, i]*T
         s[hwh] = s_
 
-    def __compute_polarization(self, 
-                              s:        np.ndarray, 
-                              s_:       np.ndarray, 
-                              n:        np.ndarray, 
-                              pols:     np.ndarray, 
-                              i:        int, 
+    def __compute_polarization(self,
+                              s:        np.ndarray,
+                              s_:       np.ndarray,
+                              n:        np.ndarray,
+                              pols:     np.ndarray,
+                              i:        int,
                               hwh:      np.ndarray)\
             -> tuple[np.ndarray | float, np.ndarray | float]:
         """
@@ -877,7 +890,7 @@ class Raytracer(Group):
         :param info: information about the detector
         :param detector_index: detector index
         :param source_index: ray source index, optional. Defaults to None, meaning all sources
-        :param extent: extent to detect the intersections in as [x0, x1, y0, y1]. 
+        :param extent: extent to detect the intersections in as [x0, x1, y0, y1].
                 Defaults to None, meaning the whole detector are is used
         :param projection_method: sphere projection method for a SphericalSurface detector
         :return: hit, weights, wavelengths, actual extent, description, projection method, progressbar
@@ -1057,7 +1070,7 @@ class Raytracer(Group):
         :param N: number of pixels for smaller image size
         :param detector_index: index/number of the detector
         :param source_index: index/number of the source. By default all sources are used.
-        :param extent: rectangular extent [x0, x1, y0, y1] to detect to intersections in. 
+        :param extent: rectangular extent [x0, x1, y0, y1] to detect to intersections in.
                 By default the whole detector are is used.
         :param projection_method: sphere projection method for a SphericalSurface detector
         :param kwargs: keyword arguments for creating the RImage
@@ -1072,8 +1085,8 @@ class Raytracer(Group):
             = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
 
         # init image and extent, these are the default values when no rays hit the detector
-        img = RImage(long_desc=desc, extent=extent_out, projection=projection, limit=limit)
-        img.render(N, p, w, wl, **kwargs)
+        img = RImage(long_desc=desc, extent=extent_out, projection=projection)
+        img.render(N, p, w, wl, limit=limit, **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1089,7 +1102,7 @@ class Raytracer(Group):
 
         :param detector_index: index/number of the detector
         :param source_index: index/number of the source. By default all sources are used.
-        :param extent: rectangular extent [x0, x1, y0, y1] to detect to intersections in. 
+        :param extent: rectangular extent [x0, x1, y0, y1] to detect to intersections in.
                 By default the whole detector are is used.
         :param kwargs: optional keyword arguments for the created LightSpectrum
         :return: rendered LightSpectrum
@@ -1120,22 +1133,24 @@ class Raytracer(Group):
 
         If pos is not provided,
         a single detector image is rendered at the position of the detector specified by detector_index.
-        >> RT.iterative_render(N_rays=10000, detector_index=1) 
+        >> RT.iterative_render(N_rays=10000, detector_index=1)
         
         If pos is provided as coordinate, the detector is moved beforehand.
-        >> RT.iterative_render(N_rays=10000, pos=[0, 1, 0], detector_index=1) 
+        >> RT.iterative_render(N_rays=10000, pos=[0, 1, 0], detector_index=1)
         
         If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically
         repeated len(pos) times or can be specified as list with the same length as pos.
         Exemplary calls:
-        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256]) 
-        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
+        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256])
+        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], limit=[None, 2], extent=[None, [-2, 2, -2, 2]])
 
-        N_px_S can also be provided as list, note however, that when provided as list it needs 
+        N_px_S can also be provided as list, note however, that when provided as list it needs
         to have the same length as the number of sources.
 
-        By default, source images are also rendered. Providing no_sources=True skips source rendering 
+        By default, source images are also rendered. Providing no_sources=True skips source rendering
         and simply returns an empty list.
+
+        This functions raises an exception if the geometry is incorrect.
 
         :param N_rays: number of rays
         :param N_px_D: number/list of detector image pixels for smaller image size
@@ -1226,6 +1241,14 @@ class Raytracer(Group):
         iter_ = range(iterations)
         iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if global_options.show_progressbar\
             else iter_
+     
+        # check geometry
+        if (status := self._pretrace_check(rays_step)):
+            raise RuntimeError("Geometry checks failed. Tracing aborted. Check the warnings.")
+
+        # init cumulative warning messages
+        nt = len(self.tracing_surfaces) + 2
+        msgs_cum = np.zeros((len(self.INFOS), nt), dtype=int)
 
         # for all render iterations
         for i in iterator:
@@ -1234,19 +1257,23 @@ class Raytracer(Group):
             if i == iterations - 1:
                 rays_step += int(N_rays - iterations*rays_step)  # additional rays for last iteration
 
-            # turn off warnings and progess bar for the subtracing
-            global_options.show_progressbar = False
-            with warnings.catch_warnings():
-                warnings.filterwarnings('ignore')
-                self.trace(N=rays_step)
+            # turn off warnings and progress bar for the subtracing
+            with global_options.no_warnings():
+                with global_options.no_progressbar():
+                    self.trace(N=rays_step)
+                    msgs_cum += self._msgs  # add to cumulative warnings
 
             if self.detectors:
                 # for all detector positions
                 for j in np.arange(len(pos)):
+                   
                     self.detectors[detector_index[j]].move_to(pos[j])
-                    Imi = self.detector_image(N=N_px_D[j], detector_index=detector_index[j], 
-                                              extent=extentc[j], _dont_rescale=True, limit=limit[j], 
-                                              projection_method=projection_method[j])
+                
+                    with global_options.no_progressbar():
+                        Imi = self.detector_image(N=N_px_D[j], detector_index=detector_index[j],
+                                                  extent=extentc[j], _dont_rescale=True, limit=limit[j],
+                                                  projection_method=projection_method[j])
+                   
                     Imi._img *= rays_step / N_rays
 
                     # append image to list in first iteration, after that just add image content
@@ -1266,13 +1293,23 @@ class Raytracer(Group):
                         SIm_res.append(Imi)
                     else:
                         SIm_res[j]._img += Imi._img
-            
+           
             global_options.show_progressbar = True
 
-        # rescale images to update Im.Im, we only added Im._Im each
-        # force rescaling even if Im has the same size as _Im, since only _Im holds the sum image of all iterations
-        [SIm.rescale(N_px_S[i]) for i, SIm in enumerate(SIm_res)]
-        [DIm.rescale(N_px_D[i]) for i, DIm in enumerate(DIm_res)]
+        # rescale images to update img, we only added _img each
+        # also apply the rayleigh filtering if a limit value is supplied
+
+        for i, SIm in enumerate(SIm_res):
+            SIm.rescale(N_px_S[i])
+        
+        for i, DIm in enumerate(DIm_res):
+            if limit[i] is not None:
+                DIm._apply_rayleigh_filter()
+            DIm.rescale(N_px_D[i])
+
+        # show cumulative warnings
+        self._msgs = msgs_cum
+        self._show_messages(N_rays)
 
         return SIm_res, DIm_res
 
@@ -1341,9 +1378,9 @@ class Raytracer(Group):
 
         p, w, wl, extent, desc, bar = self._hit_source("Source Image", source_index)
 
-        img = RImage(long_desc=desc, extent=extent, projection=None, limit=limit)
+        img = RImage(long_desc=desc, extent=extent, projection=None)
 
-        img.render(N, p, w, wl, **kwargs)
+        img.render(N, p, w, wl, limit=limit, **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1400,9 +1437,9 @@ class Raytracer(Group):
                 # but can see more image details and information for a larger number of rays
                 # N rays are distributed on a square area,
                 # scale default number by (1 + sqrt(N))
-                # this equals 75 pixels per image side for a low amount of rays
-                # and around 260 pixel for 4 million rays
-                N_px = 75*int(1 + np.sqrt(w.shape[0])/800)
+                # this equals 100 pixels per image side for a low amount of rays
+                # and 350 pixel for 4 million rays
+                N_px = 100*int(1 + np.sqrt(w.shape[0])/800)
                 N_px = N_px if N_px % 2 else N_px + 1  # enforce odd number
             
                 # render power image
@@ -1498,7 +1535,7 @@ class Raytracer(Group):
         # show filter warning
         for filter_ in (self.filters + self.apertures):
             if bounds[0] <= filter_.pos[2] <= bounds[1]:
-                warnings.warn("WARNING: The influence of the filters/apertures in the autofocus range will be ignored.")
+                warning("WARNING: The influence of the filters/apertures in the autofocus range will be ignored.")
 
         # start progress bar
         ################################################################################################################
@@ -1534,7 +1571,7 @@ class Raytracer(Group):
         N_act = np.count_nonzero(rays_pos)
         N_use = min(N, N_act) if method in ["Position Variance", "Airy Disc Weighting"] else N_act
         if N_use < 1000:  # throw error when no rays are present
-            warnings.warn(f"WARNING: Less than 1000 rays for autofocus ({N_use}).")
+            warning(f"WARNING: Less than 1000 rays for autofocus ({N_use}).")
 
         # no rays are used, return placeholder variables
         if N_use == 0:
@@ -1623,8 +1660,9 @@ class Raytracer(Group):
         rrl = (res.x - bounds[0]) < 10*(bounds[1] - bounds[0]) / Nt
         rrr = (bounds[1] - res.x) < 10*(bounds[1] - bounds[0]) / Nt
         if rrl or rrr:
-            warnings.warn("Found minimum near search bounds, "
-                          "this can mean the focus is outside of the search range.")
+            warning("Found minimum near search bounds, "
+                    "this can mean the focus is outside of the search range.")
 
         pos = self.__autofocus_cost_func(res.x, method, pa, sb, weights, r0, ret_pos=True)[1]
+
         return res, dict(pos=pos, bounds=bounds, z=r, cost=vals, N=N_use)

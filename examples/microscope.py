@@ -2,11 +2,15 @@
 
 import numpy as np
 import pathlib
-import warnings
 
 import optrace as ot
 from optrace.gui import TraceGUI
 
+# A more complex setup with a objective, tubus and eyepiece group as well as the human eye as imaging system. 
+# The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files
+# that are were built from patent data.
+
+# make sure the folder examples/ressources with all subfolders and files is available, as we will need those
 
 # path for needed resources (materials and eyepiece, objective files)
 # we could use a path string for ot.load.agf() and ot.load.zmx(), but using pathlib makes it platform-independent
@@ -16,14 +20,13 @@ ressource_dir = pathlib.Path(__file__).resolve().parent / "ressources"
 RT = ot.Raytracer(outline=[-50, 50, -50, 50, -30, 430])
 
 # cell image
-RSS = ot.RectangularSurface(dim=[100e-3, 100e-3])
-RS = ot.RaySource(RSS, divergence="Lambertian", image=ot.presets.image.cell,
+RSS = ot.presets.image.cell([100e-3, 100e-3])
+RS = ot.RaySource(RSS, divergence="Lambertian",
                   pos=[0, 0, -0.00000001], s=[0, 0, 1], div_angle=50, desc="Cell")
 RT.add(RS)
 
-# load material files (ignore import warnings)
-with warnings.catch_warnings():
-    warnings.filterwarnings('ignore')
+# load material files 
+with ot.global_options.no_warnings():  # ignore import warnings
     schott = ot.load.agf(str(ressource_dir / "materials" / "schott.agf"))
     ohara = ot.load.agf(str(ressource_dir / "materials" / "ohara.agf"))
     hikari = ot.load.agf(str(ressource_dir / "materials" / "hikari.agf"))
@@ -91,10 +94,10 @@ RT.add(ot.PointMarker("F_ok", [0, 0, tma_ok.focal_points[0]]))
 RT.add(ot.PointMarker("F_tube", [0, 0, tma_tube.focal_points[1]]))
 
 # add group description markers
-RT.add(ot.PointMarker("Objective", [-50, 0, np.mean(objective.extent[4:])], label_only=True, text_factor=1.2))
-RT.add(ot.PointMarker("Tube Lens", [-50, 0, np.mean(tube.extent[4:])], label_only=True, text_factor=1.2))
-RT.add(ot.PointMarker("Eyepiece", [-50, 0, np.mean(eyepiece.extent[4:])], label_only=True, text_factor=1.2))
-RT.add(ot.PointMarker("Eye", [-50, 0, np.mean(eye.extent[4:])], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Objective", [0, -50, np.mean(objective.extent[4:])], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Tube Lens", [0, -50, np.mean(tube.extent[4:])], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Eyepiece", [0, -50, np.mean(eyepiece.extent[4:])], label_only=True, text_factor=1.2))
+RT.add(ot.PointMarker("Eye", [0, -50, np.mean(eye.extent[4:])], label_only=True, text_factor=1.2))
 
 # add cylinder volume around microscope
 vol = ot.CylinderVolume(r=15.9, length=eyepiece.extent[5]-objective.extent[4]-1.3, 

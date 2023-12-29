@@ -12,30 +12,28 @@ from ..tracer.misc import PropertyChecker as pc  # check types and values
 
 def r_image_plot(im:       RImage,
                  mode:     str = RImage.display_modes[0],
-                 imc:      np.ndarray = None,
-                 block:    bool = False,
                  log:      bool = False,
                  flip:     bool = False,
                  title:    str = None,
                  path:     str = None,
-                 sargs:    dict = {})\
+                 sargs:    dict = {},
+                 **kwargs)\
         -> None:
     """
 
     :param im: RImage to plot
     :param mode: image plotting mode, one of RImage.display_modes
     :param flip: if the image should be flipped
-    :param block: if the plot should block the execution of the program
     :param log: if logarithmic values are shown
     :param title: title of the plot
-    :param imc: precalculated RImage (np.ndarray) to display. If not specified it is calculated by parameter 'mode'
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
+    :param kwargs: additional keyword arguments for RImage.get
     """
-    _check_types(im, imc, block, log, flip, title, mode)
+    _check_types(im, log, flip, title, mode)
 
-    Imd = imc.copy() if imc is not None else im.get(mode, log=log)
+    Imd = im.get(mode, log=log, **kwargs)
 
     _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, mode, log, None)
 
@@ -98,13 +96,11 @@ def r_image_plot(im:       RImage,
 
     # show image
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)
 
 
 def r_image_cut_plot(im:       RImage,
                      mode:     str = RImage.display_modes[0],
-                     imc:      np.ndarray = None,
-                     block:    bool = False,
                      log:      bool = False,
                      flip:     bool = False,
                      title:    str = None,
@@ -115,8 +111,6 @@ def r_image_cut_plot(im:       RImage,
     """
 
     :param im: RImage to plot
-    :param imc: optional precalculated cut image
-    :param block: if the plot should be blocking the execution of the program
     :param log: if logarithmic values are shown
     :param flip: if the image should be flipped
     :param title: title of the plot
@@ -124,16 +118,12 @@ def r_image_cut_plot(im:       RImage,
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
-    :param kwargs: arguments for RImage.cut
+    :param kwargs: additional keyword arguments for RImage.cut
     """
-    _check_types(im, imc, block, log, flip, title, mode)
-
-    # check if cut parameter provided
-    if "x" not in kwargs and "y" not in kwargs:
-        raise RuntimeError("Provide an x or y parameter to the RImageCutPlot function.")
+    _check_types(im, log, flip, title, mode)
 
     # make cut
-    s, Imd = im.cut(mode, log=log, imc=imc, **kwargs)
+    s, Imd = im.cut(mode, log=log, **kwargs)
 
     # get labels
     cut_val = kwargs["x" if "x" in kwargs else "y"]
@@ -189,14 +179,12 @@ def r_image_cut_plot(im:       RImage,
 
     # show image
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)
 
 
-def _check_types(im, imc, block, log, flip, title, mode) -> None:
+def _check_types(im, log, flip, title, mode) -> None:
     """check types for r_image plots"""
     pc.check_type("im", im, RImage)
-    pc.check_type("imc", imc, np.ndarray | None)
-    pc.check_type("block", block, bool)
     pc.check_type("flip", flip, bool)
     pc.check_type("log", log, bool)
     pc.check_type("mode", mode, str)

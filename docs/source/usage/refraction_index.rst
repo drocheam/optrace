@@ -143,12 +143,11 @@ The example below plots the glass presets in one figure.
 
    otp.refraction_index_plot(ot.presets.refraction_index.glasses)
 
-The methods support a user defined :python:`title` and a blocking parameter :python:`block`, that stops the rest of the program for plotting.
 You can also enable or disable the legend and labels with :python:`legend_off` and :python:`labels_off`
 
 .. testcode::
 
-   otp.refraction_index_plot(ot.presets.refraction_index.glasses, block=False, title="Test abc",
+   otp.refraction_index_plot(ot.presets.refraction_index.glasses, title="Test abc",
                              legend_off=False, labels_off=True)
 
 Examples for an index plot are found below.
@@ -161,11 +160,11 @@ An Abbe plot is generated with :func:`abbe_plot <optrace.plots.misc_plots.abbe_p
 
    otp.abbe_plot(ot.presets.refraction_index.glasses)
 
-It also supports the parameters :python:`title` and :python:`block`. Additionally one can provide user defined :python:`lines` to calculate the index and V-number with:
+It also supports the parameter :python:`title`. Additionally one can provide user defined :python:`lines` to calculate the index and V-number with:
 
 .. testcode::
 
-   otp.abbe_plot(ot.presets.refraction_index.glasses, title="abc", lines=ot.presets.spectral_lines.FeC, block=False)
+   otp.abbe_plot(ot.presets.refraction_index.glasses, title="abc", lines=ot.presets.spectral_lines.FeC)
 
 
 Exemplary Abbe plots are shown below in the presets section.

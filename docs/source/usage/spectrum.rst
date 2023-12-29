@@ -307,12 +307,12 @@ It takes a |Spectrum|, subclasses or a list of them.
 
    otp.spectrum_plot(ot.presets.light_spectrum.standard_natural)
 
-The user can provide a user-defined :python:`title`, turn off/on labels and the legend with :python:`legend_off, labels_off` and make the plot blocking with :python:`block=True`.
+The user can provide a user-defined :python:`title`, turn off/on labels and the legend with :python:`legend_off, labels_off`. 
 
 .. testcode::
 
    ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_natural, labels_off=False, title="CIE Standard Illuminants",
-                          legend_off=False, block=False)
+                          legend_off=False)
 
 Examples for a spectrum plot are found below.
 

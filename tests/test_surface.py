@@ -5,7 +5,6 @@ sys.path.append('.')
 
 import unittest
 import numpy as np
-import numexpr as ne
 import pytest
 
 import optrace.tracer.misc as misc
@@ -669,14 +668,14 @@ class SurfaceTests(unittest.TestCase):
         def n_conic(x, y, rho, k):
             # see surface class for details on calculation
 
-            r = ne.evaluate("sqrt(x**2 + y**2)")
-            phi = ne.evaluate("arctan2(y, x)")
-            n_r = ne.evaluate("-rho * r  / sqrt(1 - k* rho**2 * r**2 )")
+            r = np.sqrt(x**2 + y**2)
+            phi = np.arctan2(y, x)
+            n_r = -rho * r  / np.sqrt(1 - k* rho**2 * r**2 )
 
             n = np.zeros((x.shape[0], 3), dtype=np.float64, order='F')
-            ne.evaluate("n_r*cos(phi)",     out=n[:, 0])
-            ne.evaluate("n_r*sin(phi)",     out=n[:, 1])
-            ne.evaluate("sqrt(1 - n_r**2)", out=n[:, 2])
+            n[:, 0] = n_r*np.cos(phi)  
+            n[:, 1] = n_r*np.sin(phi)  
+            n[:, 2] = np.sqrt(1 - n_r**2)
 
             return n
 

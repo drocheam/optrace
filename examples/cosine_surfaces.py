@@ -5,7 +5,6 @@ import optrace as ot
 from optrace.gui import TraceGUI
 import optrace.plots as otp
 
-
 # init raytracer
 RT = ot.Raytracer(outline=[-15, 15, -15, 15, 0, 80], absorb_missing=False)
 
@@ -52,9 +51,9 @@ RT.trace(600000)
 
 # plot detector images
 img = RT.detector_image(315)
-otp.r_image_plot(img, "sRGB (Absolute RI)", block=False)
+otp.r_image_plot(img, "sRGB (Absolute RI)")
 img2 = RT.detector_image(315, detector_index=1)
-otp.r_image_plot(img2, "sRGB (Absolute RI)", block=False)
+otp.r_image_plot(img2, "sRGB (Absolute RI)")
 
 # start GUI
 sim = TraceGUI(RT, ray_opacity=0.03, minimalistic_view=True)

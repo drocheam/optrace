@@ -3,10 +3,10 @@ import time  # provides sleeping
 import traceback  # traceback printing
 from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
-from contextlib import contextmanager  # context manager for _no_trait_action()
+from contextlib import contextmanager  # context managers
 import numpy as np
-import warnings
-
+import importlib.metadata
+                
 # enforce qt backend  
 from traits.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt'
@@ -29,14 +29,14 @@ from .property_browser import PropertyBrowser  # dictionary browser
 from .command_window import CommandWindow
 from ._scene_plotting import ScenePlotting
 
-from ..__metadata__ import __version__
+from ..warnings import warning
 
 # TODO don't retrace when init and already rays included in raytracer?
 
-# TODO rename debug() to control()
-
 # TODO add extent parameter to source_image, detector_image functions
 
+# TODO add pick_ray function that displays any of the traced rays. 
+# Additional parameter specifies if crosshair and picking text should be displayed at a specific intersection
 
 class TraceGUI(HasTraits):
 
@@ -327,7 +327,7 @@ class TraceGUI(HasTraits):
                         ),
                     ),
                 resizable=True,
-                title=f"Optrace {__version__}",
+                title="Optrace "+importlib.metadata.metadata("optrace")["Version"],
                 # icon=""  # TODO create an icon and set the path here and in sub-windows
                 )
     """the UI view"""
@@ -338,7 +338,7 @@ class TraceGUI(HasTraits):
     def __init__(self, 
                  raytracer:         Raytracer, 
                  ui_style:          str = None, 
-                 initial_camera:    dict = None,
+                 initial_camera:    dict = {},
                  **kwargs) -> None:
         """
         Create a new TraceGUI with the assigned Raytracer.
@@ -351,7 +351,10 @@ class TraceGUI(HasTraits):
         # set UI theme. Unfortunately this does not work dynamically (yet)
         if ui_style is not None:
             QtGui.QApplication.setStyle(ui_style)
-      
+  
+        # allow SIGINT interrupts
+        pyface_gui.allow_interrupt()
+
         self._plot = ScenePlotting(self, raytracer, initial_camera)
 
         # lock object for multithreading
@@ -363,8 +366,13 @@ class TraceGUI(HasTraits):
         self.raytracer: Raytracer = raytracer
         """reference to the raytracer"""
 
-        self._cdb = None
-
+        self.property_browser = PropertyBrowser(self)
+        self.command_window = CommandWindow(self)
+        self._property_browser_view = None
+        self._command_window_view = None
+        
+        self._sequential = False
+ 
         # minimal/maximal z-positions of Detector_obj
         self._z_det_min = self.raytracer.outline[4]
         self._z_det_max = self.raytracer.outline[5]
@@ -412,7 +420,7 @@ class TraceGUI(HasTraits):
             # define Status dict
             self._status.update(dict(InitScene=1, DisplayingGUI=1, Tracing=0, Drawing=0, Focussing=0,
                                      DetectorImage=0, SourceImage=0, ChangingDetector=0, SourceSpectrum=0,
-                                     DetectorSpectrum=0, RunningCommand=0, Screenshot=0))
+                                     DetectorSpectrum=0, Screenshot=0, RunningCommand=0))
 
             super().__init__(**kwargs)
 
@@ -440,13 +448,40 @@ class TraceGUI(HasTraits):
     # Helpers
 
     @contextmanager
-    def _no_trait_action(self, *args, **kwargs) -> None:
+    def _no_trait_action(self) -> None:
         """context manager that sets and resets the _no_trait_action_flag"""
         self._no_trait_action_flag = True
         try:
             yield
         finally:
             self._no_trait_action_flag = False
+    
+    @contextmanager
+    def smart_replot(self, automatic_replot: bool = True) -> None:
+        # TODO docstring and tests
+
+        if automatic_replot:
+            hs = self.raytracer.property_snapshot()
+        
+        try:
+            yield
+        
+        finally:
+            if automatic_replot:
+                hs2 = self.raytracer.property_snapshot()
+                cmp = self.raytracer.compare_property_snapshot(hs, hs2)
+                self.replot(cmp)
+
+    def process(self):
+        pyface_gui.process_events()
+
+    def _start_action(self, func, args = ()):
+
+        if self._sequential:
+            func(*args)
+        else:
+            action = Thread(target=func, args=args, daemon=True)
+            action.start()
 
     @contextmanager
     def _try(self, *args, **kwargs) -> bool:
@@ -470,19 +505,9 @@ class TraceGUI(HasTraits):
 
         except Exception as err:
 
-            warnings.warn(traceback.print_exc())  # print traceback
+            warning(traceback.format_exc())  # print traceback
             error[:] = [True]  # change reference, now evals to true
     
-    def _do_in_main(self, f: Callable, *args, **kw) -> None:
-        """execute a function in the GUI main thread"""
-        pyface_gui.invoke_later(f, *args, **kw)
-        pyface_gui.process_events()
-
-    def _set_in_main(self, trait: str, val: Any) -> None:
-        """assign a property in the GUI main thread"""
-        pyface_gui.set_trait_later(self, trait, val)
-        pyface_gui.process_events()
-
     def _init_source_list(self) -> None:
         """generate a descriptive list of RaySource names"""
         self.source_names = [f"{RaySource.abbr}{num}: {RS.get_desc()}"[:35]
@@ -500,10 +525,11 @@ class TraceGUI(HasTraits):
     def _set_gui_loaded(self) -> None:
         """sets GUILoaded Status. Exits GUI if self.exit set."""
 
+        pyface_gui.process_events()
         self._status["DisplayingGUI"] = 0
 
-        if self._exit:  # wait 400ms so the user has time to see the scene
-            pyface_gui.invoke_after(400, self.close)
+        if self._exit:
+            pyface_gui.invoke_later(self.close)
 
     ####################################################################################################################
     # Interface functions
@@ -632,23 +658,8 @@ class TraceGUI(HasTraits):
             pyface_gui.invoke_later(self._set_gui_loaded)
 
         self._status["Drawing"] -= 1
-
-    def _wait_for_idle(self, timeout=30) -> None:
-        """wait until the GUI is Idle. Only call this from another thread"""
-
-        def raise_timeout(keys):
-            raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
-
-        tsum = 1
-        time.sleep(1)  # wait for flags to be set, this could also be trait handlers, which could take longer
-        while self.busy:
-            time.sleep(0.05)
-            tsum += 0.05
-
-            if tsum > timeout:
-                keys = [key for key, val in self._status.items() if val]
-                pyface_gui.invoke_later(raise_timeout, keys)
-                return
+        pyface_gui.process_events()  # needed so rays are displayed in replot() 
+        # with _sequential=True (e.g. in TraceGUI.control())
 
     @property
     def busy(self) -> bool:
@@ -657,7 +668,7 @@ class TraceGUI(HasTraits):
         # it could also be in some trait_handlers or functions from other classes
         return self.scene.busy or any(val > 0 for val in self._status.values())
 
-    def control(self, func: Callable, args: tuple = (), kwargs: dict = {}) -> None:
+    def debug(self, func: Callable, args: tuple = (), kwargs: dict = {}) -> None:
         """
         Control the GUI from a separate thread.
 
@@ -666,6 +677,33 @@ class TraceGUI(HasTraits):
         :param kwargs: keyword arguments for func
         """
         th = Thread(target=func, args=args, kwargs=kwargs, daemon=True)
+        th.start()
+
+        self.configure_traits()
+    
+    def control(self, func: Callable, args: tuple = (), kwargs: dict = {}) -> None:
+        """
+        Control the GUI from a separate thread.
+
+        :param func: thread function to execute while the GUI is active
+        :param args: positional arguments for func
+        :param kwargs: keyword arguments for func
+        """
+        # in "control" mode everything is handled sequentially, so actions don't start
+        # in separate threads which could lead to runtime issues
+        def func2(*args, **kwargs):
+
+            while self.busy:
+                time.sleep(0.05)
+
+            def func3(*args, **kwargs):
+                self._sequential = True
+                func(*args, **kwargs)
+                self._sequential = False
+            
+            pyface_gui.invoke_later(func3, *args, **kwargs)
+
+        th = Thread(target=func2, args=args, kwargs=kwargs, daemon=True)
         th.start()
 
         self.configure_traits()
@@ -683,7 +721,13 @@ class TraceGUI(HasTraits):
         
         :param event: optional event from traits observe decorator
         """
-        pyface_gui.invoke_later(QtGui.QApplication.closeAllWindows)  # close Qt windows
+        if self._property_browser_view is not None and self._property_browser_view.control is not None:
+            self._property_browser_view.control.window().close()
+
+        if self._command_window_view is not None and self._command_window_view.control is not None:
+            self._command_window_view.control.window().close()
+        
+        pyface_gui.invoke_later(QtGui.QApplication.closeAllWindows)  # close remaining Qt windows
 
     ####################################################################################################################
     # Trait handlers.
@@ -742,9 +786,8 @@ class TraceGUI(HasTraits):
                         pyface_gui.invoke_later(self._set_gui_loaded)
 
                 pyface_gui.invoke_later(on_finish)
-             
-            action = Thread(target=background, daemon=True)
-            action.start()
+            
+            self._start_action(background)
 
     @observe('ray_count, absorb_missing', dispatch="ui")
     def retrace(self, event=None) -> None:
@@ -798,8 +841,7 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
         else:
             pyface_gui.invoke_later(self._set_gui_loaded)
 
@@ -859,8 +901,7 @@ class TraceGUI(HasTraits):
                 self.__detector_lock.acquire()
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
 
     @observe('z_det', dispatch="ui")
     def _move_detector(self, event=None) -> None:
@@ -893,8 +934,7 @@ class TraceGUI(HasTraits):
                 self.__detector_lock.acquire()
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
 
     @observe('_detector_cut_button', dispatch="ui")
     def detector_cut(self, event = None, **kwargs) -> None:
@@ -954,23 +994,20 @@ class TraceGUI(HasTraits):
                             DImg = self.last_det_image.copy()
                             DImg.rescale(px)
 
-                        Imc = DImg.get(mode, log=log)
-
                 def on_finish() -> None:
                     if not error:
                         with self._try():
                             if (event is None and not cut) or (event is not None\
                                     and event.name == "_detector_image_button"):
-                                r_image_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **kwargs)
+                                r_image_plot(DImg, log=log, mode=mode, flip=flip, **kwargs)
                             else:
-                                r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, imc=Imc, **cut_args, **kwargs)
+                                r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, **cut_args, **kwargs)
 
                     self._status["DetectorImage"] -= 1
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
 
     @observe('_detector_spectrum_button', dispatch="ui")
     def detector_spectrum(self, event=None, **kwargs) -> None:
@@ -1007,8 +1044,7 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
 
     @observe('_source_cut_button', dispatch="ui")
     def source_cut(self, event = None, **kwargs) -> None:
@@ -1070,8 +1106,7 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
 
     @observe('_source_image_button', dispatch="ui")
     def source_image(self, event = None, cut: bool = False, **kwargs) -> None:
@@ -1117,23 +1152,20 @@ class TraceGUI(HasTraits):
                             SImg = self.last_source_image.copy()
                             SImg.rescale(px)
 
-                        Imc = SImg.get(mode, log=log)
-
                 def on_finish() -> None:
                     if not error:
                         with self._try():
                             if (event is None and not cut) or \
                                     (event is not None and event.name == "_source_image_button"):
-                                r_image_plot(SImg, log=log, mode=mode, imc=Imc, **kwargs)
+                                r_image_plot(SImg, log=log, mode=mode, **kwargs)
                             else:
-                                r_image_cut_plot(SImg, log=log, mode=mode, imc=Imc, **cut_args, **kwargs)
+                                r_image_cut_plot(SImg, log=log, mode=mode, **cut_args, **kwargs)
 
                     self._status["SourceImage"] -= 1
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
 
     @observe('_auto_focus_button', dispatch="ui")
     def move_to_focus(self, event=None, **kwargs) -> None:
@@ -1196,8 +1228,7 @@ class TraceGUI(HasTraits):
 
                 pyface_gui.invoke_later(on_finish)
 
-            action = Thread(target=background, daemon=True)
-            action.start()
+            self._start_action(background)
 
     @observe('scene:activated', dispatch="ui")
     def _plot_scene(self, event=None) -> None:
@@ -1296,9 +1327,10 @@ class TraceGUI(HasTraits):
         
         :param event: optional event from traits observe decorator
         """
-        if self._cdb is None:
-            self._cdb = CommandWindow(self)
-        self._cdb.edit_traits()
+        if self._command_window_view is None or self._command_window_view.destroyed:
+            self._command_window_view = self.command_window.edit_traits()
+        else:
+            self._command_window_view.control.window().raise_()
 
     @observe('_property_browser_button', dispatch="ui")
     def open_property_browser(self, event=None) -> None:
@@ -1307,46 +1339,36 @@ class TraceGUI(HasTraits):
 
         :param event: optional event from traits observe decorator
         """
-        gdb = PropertyBrowser(self)
-        gdb.edit_traits()
+
+        if self._property_browser_view is None or self._property_browser_view.destroyed:
+            self._property_browser_view = self.property_browser.edit_traits()
+            self.property_browser.update_dict()
+        else:
+            self._property_browser_view.control.window().raise_()
 
     def send_cmd(self, cmd: str) -> None:
         """
         send/execute a command
         """
-
-        if cmd != "":
             
-            if self.busy:
-                warnings.warn("Other actions running, try again when the program is idle.")
-                return False
+        if self.busy:
+            warning("Other actions running, try again when the program is idle.")
+            return
 
-            self._status["RunningCommand"] += 1
-        
-            dict_ = dict(  # GUI and scene
-                         mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
-                         camera=self.scene.camera, GUI=self,
+        self._sequential = True
+        self._status["RunningCommand"] += 1
 
-                         # abbreviations for the raytracer and object lists
-                         RT=self.raytracer, LL=self.raytracer.lenses, FL=self.raytracer.filters,
-                         APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
-                         DL=self.raytracer.detectors, ML=self.raytracer.markers, VL=self.raytracer.volumes)
-            
-            pyface_gui.process_events()
+        dict_ = dict(mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
+                     camera=self.scene.camera, GUI=self, RT=self.raytracer, LL=self.raytracer.lenses, 
+                     FL=self.raytracer.filters, APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
+                     DL=self.raytracer.detectors, ML=self.raytracer.markers, VL=self.raytracer.volumes)
 
+        with self.smart_replot(self.command_window.automatic_replot):
             with self._try():
-                hs = self.raytracer.property_snapshot()
-
                 exec(cmd, locals() | dict_, globals())
-        
-                hs2 = self.raytracer.property_snapshot()
-                cmp = self.raytracer.compare_property_snapshot(hs, hs2)
-                self.replot(cmp)
 
-            self._status["RunningCommand"] -= 1
-            return True
-
-        return False
+        self._status["RunningCommand"] -= 1
+        self._sequential = False
 
     # rescale axes texts when the window was resized
     # for some reasons these are the only ones having no text_scaling_mode = 'none' option

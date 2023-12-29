@@ -1,4 +1,4 @@
-from .tools import WL_BOUNDS, wavelengths, blackbody, normalized_blackbody
+from .tools import wavelengths, blackbody, normalized_blackbody
 
 from .illuminants import a_illuminant, c_illuminant, d50_illuminant, d55_illuminant, d65_illuminant, d75_illuminant,\
     e_illuminant, fl2_illuminant, fl7_illuminant, fl11_illuminant, led_b1_illuminant, led_b2_illuminant,\

@@ -1,10 +1,8 @@
 
 import copy
-import warnings
 
 import numpy as np  # calculations
 import scipy.optimize  # optimize result type
-import matplotlib  # plotting library
 import matplotlib.pyplot as plt  # actual plotting
 
 # only needed for typing and plotting
@@ -12,15 +10,13 @@ from ..tracer.refraction_index import RefractionIndex
 from ..tracer.geometry import Surface
 from ..tracer.presets import spectral_lines as Lines  # spectral lines for AbbePlot
 from ..tracer.misc import PropertyChecker as pc
-from ..tracer import misc as misc
-from ..tracer import color as color
-from ..tracer import RImage
+from ..tracer import Image
+from ..warnings import warning
 
 
 def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
                         afdict:  dict,
                         title:   str = "Autofocus Cost Function",
-                        block:   bool = False,
                         path:    str = None,
                         sargs:   dict = {})\
         -> None:
@@ -30,7 +26,6 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     :param res: optimize result from Raytracer.autofocus()
     :param afdict: dictionary from Raytracer.autofocus()
     :param title: title of the plot
-    :param block: if the plot should be blocking the execution of the program
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
@@ -40,12 +35,11 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     pc.check_type("res", res, scipy.optimize.OptimizeResult)
     pc.check_type("afdict", afdict, dict)
     pc.check_type("title", title, str)
-    pc.check_type("block", block, bool)
 
     if afdict["z"] is None or afdict["cost"] is None:
-        warnings.warn('Parameters missing in focus dict. For mode "Position Variance" set '
-                      'autofocus("Position Variance", ..., return_cost=True) when'
-                      ' wanting to plot the debug plot.')
+        warning('Parameters missing in focus dict. For mode "Position Variance" set '
+                'autofocus("Position Variance", ..., return_cost=True) when'
+                ' wanting to plot the debug plot.')
         return
 
     r, vals = afdict["z"], afdict["cost"]
@@ -66,53 +60,32 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.legend(["cost estimation", "cost values", "found minimum"])
     plt.title(title)
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)
 
 
-def image_plot(img:     np.ndarray | RImage | str, 
-               s:       list[float, float],
+def image_plot(img:     Image, 
                flip:    bool = False,
                title:   str = "",
-               block:   bool = False,
                path:    str = None,
                sargs:   dict = {})\
         -> None:
     """
-    Plot an image (array or path).
+    Plot an Image object
 
-    img needs to be a valid path or a sRGB numpy array with value range [0, 1].
-    Note that image arrays will get normalized to use the whole range.
-    There will be always a sRGB image shown and not values linear to the intensity.
 
-    :param img: image path or image array
-    :param s: image side lengths in mms (list of two elements, with first element being the x-length)
+    :param img: image object
     :param flip: flip the image (rotate by 180 degrees)
     :param title: optional title of the plot
-    :param block: if the plot window should be blocking
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
     """
-    pc.check_type("img", img, np.ndarray | str | RImage)
-    pc.check_type("s", s, list | tuple)
+    pc.check_type("img", img, Image)
     pc.check_type("title", title, str)
     pc.check_type("flip", flip, bool)
-    pc.check_type("block", block, bool)
 
-    if isinstance(img, str):
-        img_ = misc.load_image(img)
-    elif isinstance(img, RImage):
-        img_ = img.get("sRGB (Absolute RI)")
-    else:
-        img_ = img.copy()
-
-        if img_.ndim == 2:
-            img_ = np.repeat(img_[:, :, np.newaxis], 3, axis=2)
-            
-            if (imax := np.max(img_)):
-                img_ /= imax
-
-            img_ = color.srgb_linear_to_srgb(img_)
+    s = img.s
+    img_ = img.data
 
     # adapt extent so the coordinates are at the center of pixels
     extent = np.array([-s[0]/2, s[0]/2, -s[1]/2, s[1]/2])
@@ -134,13 +107,12 @@ def image_plot(img:     np.ndarray | RImage | str,
     plt.imshow(img_, extent=extent, zorder=10, aspect="equal", origin="lower")
 
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)
 
 
 def abbe_plot(ri:     list[RefractionIndex],
               title:  str = "Abbe Diagram",
               lines:  list = None,
-              block:  bool = False,
               path:   str = None,
               sargs:  dict = {})\
         -> None:
@@ -150,14 +122,12 @@ def abbe_plot(ri:     list[RefractionIndex],
     :param ri: list of RefractionIndex
     :param title: title of the plot
     :param lines: spectral lines to use for the Abbe number calculation
-    :param block: if the plot should block the execution of the program
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
     """
 
     # type checking
-    pc.check_type("block", block, bool)
     pc.check_type("title", title, str)
     pc.check_type("lines", lines, list | None)
     pc.check_type("ri", ri, list)
@@ -175,7 +145,7 @@ def abbe_plot(ri:     list[RefractionIndex],
 
         # check if dispersive
         if not np.isfinite(Vd):
-            warnings.warn(f"Ignoring non dispersive material '{RIi.get_desc()}'")
+            warning(f"Ignoring non dispersive material '{RIi.get_desc()}'")
             continue  # skip plotting
 
         # plot point and label
@@ -188,7 +158,7 @@ def abbe_plot(ri:     list[RefractionIndex],
     plt.ylabel(r"Refraction Index n ($\lambda$" + f" = {lines[1]}nm)")
     plt.title(title)
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)
 
 
 def surface_profile_plot(surface:          Surface | list[Surface],
@@ -196,7 +166,6 @@ def surface_profile_plot(surface:          Surface | list[Surface],
                          xe:               float = None,
                          remove_offset:    bool = False,
                          title:            str = "Surface Profile",
-                         block:            bool = False,
                          path:             str = None,
                          sargs:            dict = {})\
         -> None:
@@ -211,7 +180,6 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     :param xe: x end value for the plot, defaults to the end of the surface
     :param remove_offset: remove the height offset for each surface
     :param title: title of the plot
-    :param block: if the plot should block the execution of the program
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
@@ -223,7 +191,6 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     pc.check_type("xe", xe, float | int | None)
     pc.check_type("title", title, str)
     pc.check_type("remove_offset", remove_offset, bool)
-    pc.check_type("block", block, bool)
 
     Surf_list = [surface] if isinstance(surface, Surface) else surface  # enforce list even for one element
     legends = []  # legend entries
@@ -254,7 +221,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
 
     # print info message
     if Surf_list and not plottable:
-        warnings.warn("no plottable surface for this x region")
+        warning("no plottable surface for this x region")
 
     _show_grid()
     plt.xlabel("x in mm")
@@ -262,8 +229,12 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     plt.title(title)
     plt.legend(legends)
     plt.tight_layout()
-    _save_or_show(block, path, sargs)
+    _save_or_show(path, sargs)
 
+
+def block() -> None:
+    """show all plots and block application"""
+    plt.show(block=True)
 
 def _show_grid(what=plt) -> None:
     """active major and minor grid lines, while minor are dashed and less visible"""
@@ -272,12 +243,12 @@ def _show_grid(what=plt) -> None:
     what.minorticks_on()
 
 
-def _save_or_show(block: bool, path: str = None, sargs: dict = {}):
+def _save_or_show(path: str = None, sargs: dict = {}):
     """show a plot (path is None) or store the image of a plot at file given as 'path'"""
     pc.check_type("path", path, str | None)
 
     if path is None:
-        plt.show(block=block)
+        plt.show(block=False)
         plt.pause(0.1)
 
     else:

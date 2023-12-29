@@ -383,7 +383,7 @@ Optionally a :python:`title` parameter can be provided. You can plot only part o
 
 .. testcode::
 
-   otp.surface_profile_plot([L0.front, L0.back], block=False, remove_offset=True, x0=-0.5, xe=1.2, title="Cornea Surfaces")
+   otp.surface_profile_plot([L0.front, L0.back], remove_offset=True, x0=-0.5, xe=1.2, title="Cornea Surfaces")
 
 This produces the following plot:
 

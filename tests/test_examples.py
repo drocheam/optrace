@@ -38,15 +38,15 @@ class ExampleTests(unittest.TestCase):
             process.kill()
 
         # examples return exit code 0 or nothing (= None) since they are killed
+        # in cases of errors the exit code differs
         self.assertTrue(process.returncode in [None, 0])
 
     @pytest.mark.slow
     def test_image_render_many_rays(self):
-        self.execute("image_render_many_rays.py", 70)
+        self.execute("image_render_many_rays.py", 75)
 
-    @pytest.mark.slow
     def test_presets_refraction_index(self):
-        self.execute("refraction_index_presets.py")
+        self.execute("refraction_index_presets.py", 10)
     
     @pytest.mark.slow
     def test_custom_surfaces(self):
@@ -72,9 +72,8 @@ class ExampleTests(unittest.TestCase):
     def test_spherical_aberration(self):
         self.execute("spherical_aberration.py")
     
-    @pytest.mark.slow
     def test_convolve(self):
-        self.execute("psf_imaging.py")
+        self.execute("psf_imaging.py", 10)
     
     @pytest.mark.slow
     def test_double_gauss(self):
@@ -89,17 +88,24 @@ class ExampleTests(unittest.TestCase):
     def test_microscope(self):
         self.execute("microscope.py", 60)
     
-    @pytest.mark.slow
     def test_presets_spectrum(self):
-        self.execute("spectrum_presets.py")
+        self.execute("spectrum_presets.py", 10)
     
     @pytest.mark.slow
     def test_image_render(self):
         self.execute("image_render.py")
+    
+    @pytest.mark.slow
+    def test_keratoconus(self):
+        self.execute("keratoconus.py", 25)
 
     @pytest.mark.slow
     def test_prism(self):
         self.execute("double_prism.py")
+    
+    @pytest.mark.slow
+    def test_gui_automation(self):
+        self.execute("gui_automation.py", 30)
 
     @pytest.mark.slow
     def test_brewster(self):

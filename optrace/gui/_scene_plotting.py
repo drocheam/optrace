@@ -1,16 +1,16 @@
 from __future__ import annotations
 from contextlib import contextmanager  # context manager for _no_trait_action()
-import warnings
 
 import numpy as np  # calculations
 import copy
-
+import matplotlib.pyplot as plt 
 import mayavi.modules.text  # Text type
 from mayavi.sources.parametric_surface import ParametricSurface  # provides outline and axes
 
 from ..tracer.geometry import Surface, Element
 from ..tracer import *
-
+from ..warnings import warning
+from ..global_options import global_options as go
 # TODO pick function that takes a ray number
 # TODO select rays function, where ray_selection can be set manually
 
@@ -22,7 +22,7 @@ class ScenePlotting:
     It uses properties and settings from a TraceGUI.
     """
 
-    SURFACE_RES: int = 120
+    SURFACE_RES: int = 150
     """Surface sampling count in each dimension"""
 
     MAX_RAYS_SHOWN: int = 10000
@@ -39,7 +39,7 @@ class ScenePlotting:
     def __init__(self, 
                  ui:                TraceGUI, 
                  raytracer:         Raytracer,
-                 initial_camera:    dict = None)\
+                 initial_camera:    dict = {})\
             -> None:
 
         self.ui = ui
@@ -67,7 +67,7 @@ class ScenePlotting:
         self._ray_highlight_plot = None
 
         # initial camera settings
-        self._initial_camera = initial_camera
+        self._initial_camera = dict(direction=[1, 0, 0]) | initial_camera
 
         # texts 
         self._status_text = None
@@ -121,7 +121,9 @@ class ScenePlotting:
         Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
         See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
         """
+        self._status_text.visible = False  # temporarily hide status text so it won't be on the screenshot
         self.scene.mlab.savefig(*args, **kwargs)
+        self._status_text.visible = True
 
     def get_camera(self) -> tuple[np.ndarray, float, np.ndarray, float]:
         """
@@ -162,6 +164,9 @@ class ScenePlotting:
         normal = np.asarray(direction) if direction is not None else (cam.focal_point - cam.position) / cam.distance 
         dist_vec = cam.distance * normal / (np.linalg.norm(normal) + 1e-12) 
 
+        # old cross product of direction and view_up
+        rev = np.cross(cam.focal_point - cam.position, cam.view_up)
+
         if center is not None:
             cam.focal_point = center
 
@@ -170,6 +175,9 @@ class ScenePlotting:
 
         # set/update camera position (since either/both focal_point or direction changed)
         cam.position = cam.focal_point - dist_vec
+
+        # update view_up from new normal and old cross product of direction and view_up 
+        cam.view_up = np.cross(cam.focal_point - cam.position, -rev)
 
         # absolute roll angle
         if roll is not None:
@@ -192,11 +200,9 @@ class ScenePlotting:
         self.scene.parallel_projection = True
         self.scene._def_pos = 1  # for some reason it is set to None
         self.scene.y_plus_view()
+        self.scene.scene_editor.camera.parallel_scale *= 0.85
         
-        if self._initial_camera is not None:
-            self.set_camera(**self._initial_camera)
-        else:
-            self.scene.scene_editor.camera.parallel_scale *= 0.85
+        self.set_camera(**self._initial_camera)
 
     # Element Plotting
     ###################################################################################################################
@@ -387,8 +393,8 @@ class ScenePlotting:
             outline.outline_filter.corner_factor = 0.1
 
             # label position
-            x_pos = self.raytracer.outline[0] + (self.raytracer.outline[1] - self.raytracer.outline[0]) * 0.05
-            y_pos = np.mean(self.raytracer.outline[2:4])
+            y_pos = self.raytracer.outline[2] + (self.raytracer.outline[3] - self.raytracer.outline[2]) * 0.05
+            x_pos = np.mean(self.raytracer.outline[:2])
             z_pos = np.mean([BoundList[i][1], BoundList[i+1][0]])
 
             # plot label
@@ -463,11 +469,11 @@ class ScenePlotting:
 
         # calculate middle center z-position
         if obj.has_back():
-            zl = (obj.front.values(np.array([obj.front.extent[1]]), np.array([obj.front.pos[1]]))[0] \
-                  + obj.back.values(np.array([obj.back.extent[1]]), np.array([obj.back.pos[1]]))[0]) / 2
+            zl = (obj.front.values(np.array([obj.front.pos[0]]), np.array([obj.front.extent[3]]))[0] \
+                  + obj.back.values(np.array([obj.back.pos[0]]), np.array([obj.back.extent[3]]))[0]) / 2
         else:
-            # 10/40 values in [0, 2pi] -> z - value at 90 deg relative to x axis in xy plane
-            zl = obj.front.edge(40)[2][10] if isinstance(obj.front, Surface) else obj.pos[2]
+            # 0/40 values in [0, 2pi] -> z - value at 0 deg relative to x axis in xy plane
+            zl = obj.front.edge(40)[2][0] if isinstance(obj.front, Surface) else obj.pos[2]
 
         if not no_label:
             # object label
@@ -475,7 +481,7 @@ class ScenePlotting:
 
             # add description if any exists. But only if we are not in "minimalistic_view" displaying mode
             label = label if obj.desc == "" or bool(self.ui.minimalistic_view) else label + ": " + obj.desc
-            text = self.scene.mlab.text(x=obj.extent[1], y=obj.pos[1], z=zl, text=label, name="Label")
+            text = self.scene.mlab.text(x=obj.pos[0], y=obj.extent[3], z=zl, text=label, name="Label")
             text.actor.text_scale_mode = 'none'
             text.visible = not bool(self.ui.hide_labels)
 
@@ -549,13 +555,13 @@ class ScenePlotting:
         for num, mark in enumerate(self.raytracer.markers):
             if isinstance(mark, PointMarker):
 
-                dx, dy = 0.2 * mark.marker_factor, 0
+                dy, dx = 0.2 * mark.marker_factor, 0
 
                 m = self.scene.mlab.points3d(*mark.pos, mode="axes", color=self._marker_color)
                 m.actor.actor.property.trait_set(lighting=False, line_width=5, representation="wireframe")
 
                 m.visible = not mark.label_only
-                m.glyph.glyph.scale_factor = dx
+                m.glyph.glyph.scale_factor = dy
                 m.parent.parent.name = f"Marker {num}"
                 m.actor.actor.trait_set(pickable=False, force_translucent=True)
             
@@ -657,10 +663,10 @@ class ScenePlotting:
                 #  although i can't find any documentation on this
                 # a side effect is deactivating the mouse pickers, to reactivate we need to press "m" another time
                 case "m":
-                    warnings.warn("Avoid pressing 'm' in the scene because it interferes with mouse picking handlers.")
+                    warning("Avoid pressing 'm' in the scene because it interferes with mouse picking handlers.")
                 
                 case "a":
-                    warnings.warn("Avoid pressing 'a' as it is a mayavi shortcut for actor mode, where rays can be moved.")
+                    warning("Avoid pressing 'a' as it is a mayavi shortcut for actor mode, where rays can be moved.")
 
                 case "i":  # reset view
                     self.set_initial_camera()
@@ -683,6 +689,9 @@ class ScenePlotting:
                 
                 case "d":  # render DetectorImage
                     self.ui.detector_image()
+                
+                case "q":  # close all pyplots
+                    plt.close("all")
 
                 case "n":  # reselect and replot rays
                     self.scene.disable_render = True
@@ -712,6 +721,7 @@ class ScenePlotting:
         """init detection of ray point clicks and the info display"""
 
         self._ray_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_ray_pick, button='Left')
+        self._ray_picker.tolerance = 0.0025  # it seems tolerance can only be set for all pickers at once
 
         # add ray info text
         self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
@@ -724,6 +734,7 @@ class ScenePlotting:
     def init_status_info(self) -> None:
         """init GUI status text display"""
         self._space_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_space_pick, button='Right')
+        self._space_picker.tolerance = 0.0025  # it seems tolerance can only be set for all pickers at once
 
         # add status text
         self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
@@ -764,8 +775,8 @@ class ScenePlotting:
                 rio[1].text = rio[1].text.replace("ambient\n", "") if not show else ("ambient\n" + rio[1].text)
 
         # remove descriptions from labels in minimalistic_view
-        for Objects in [self._ray_source_plots, self._lens_plots, self._marker_plots, self._volume_plots, 
-                        self._line_marker_plots, self._filter_plots, self._aperture_plots, self._detector_plots]:
+        for Objects in [self._ray_source_plots, self._lens_plots, self._volume_plots, 
+                        self._filter_plots, self._aperture_plots, self._detector_plots]:
             for num, obj in enumerate(Objects):
                 if obj[3] is not None and obj[4] is not None:
                     label = f"{obj[4].abbr}{num}"
@@ -1025,8 +1036,8 @@ class ScenePlotting:
             case ('Polarization xz' | 'Polarization yz'):
 
                 if self.raytracer.no_pol:
-                    warnings.warn("Polarization calculation turned off in raytracer, "
-                                  "reverting to a different mode")
+                    warning("Polarization calculation turned off in raytracer, "
+                            "reverting to a different mode")
 
                     self.ui.coloring_type = "Power"
                     return
@@ -1071,11 +1082,14 @@ class ScenePlotting:
         lutm.scalar_bar_widget.process_events = False  # make non-interactive
         lutm.number_of_labels = 11
 
+
         match self.ui.coloring_type:
 
             case 'Wavelength':
-                lutm.lut.table = color.spectral_colormap(255)
-                lutm.data_range = color.WL_BOUNDS 
+                spectral_colormap = go.spectral_colormap if go.spectral_colormap is not None\
+                                    else color.spectral_colormap
+                lutm.lut.table = 255*spectral_colormap(color.wavelengths(255))
+                lutm.data_range = go.wavelength_range 
                 lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-6.0f"
 
             case ('Polarization xz' | "Polarization yz"):
@@ -1085,7 +1099,7 @@ class ScenePlotting:
                 lutm.number_of_labels = len(self.raytracer.ray_sources)
                 lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-6.0f"
                 if lutm.number_of_labels > 1:  # pragma: no branch
-                    lutm.lut.table = color.spectral_colormap(lutm.number_of_labels, 440, 620)
+                    lutm.lut.table = 255*color.spectral_colormap(np.linspace(440, 620, lutm.number_of_labels))
 
             case 'Plain':
                 lutm.reverse_lut = bool(self.ui.high_contrast)
@@ -1140,8 +1154,8 @@ class ScenePlotting:
                     if RSpi is not None:
                         RSpi.actor.actor.property.trait_set(color=tuple(color))
         else:
-            warnings.warn("Number of RaySourcePlots differs from actual Sources. "
-                          "Maybe the GUI was not updated properly?")
+            warning("Number of RaySourcePlots differs from actual Sources. "
+                    "Maybe the GUI was not updated properly?")
 
     def get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """assign traced and selected rays into a ray dictionary"""
@@ -1216,7 +1230,7 @@ class ScenePlotting:
                                   f"{pos[2]:>9.6g} mm)\n"\
                                   f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)"
 
-        self.set_crosshair(pos)
+            self.set_crosshair(pos)
 
     def _on_ray_pick(self, picker_obj: tvtk.tvtk_classes.point_picker.PointPicker = None) -> None:
         """

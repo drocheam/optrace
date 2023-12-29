@@ -23,6 +23,7 @@ Using the GUI
 .. TODO information on set_camera, screenshot and parameter passdown to plotting functions (path, sargs, fargs)
 
 
+
 Loading the GUI
 ____________________
 
@@ -123,6 +124,7 @@ In the bottom left you can find orientation axes, that display the directions of
 **Picking and Clicking**
 
 When clicking on the ray intersection of ray and a surface, there is a list of properties shown for the selected ray, that is also marked with a red crosshair.
+The picked ray is highlighted in red.
 
 When using ``Shift+Click`` an advanced output is shown, showing even more properties.
 
@@ -155,6 +157,8 @@ The following keyboard shortcuts are available inside the scene:
      - toggle label visibility
    * - ``d``
      - render detector image with the current settings
+   * - ``q``
+     - close all open pyplot plots
    * - ``n``
      - randomly re-chose the plotted rays
    * - ``s``
@@ -190,8 +194,6 @@ The sidebar is positioned at the right hand side of the scene and consists of mu
      - Settings for the rendering of source or detector light spectrum histograms
    * - Focus Tab
      - Option View and result output for finding the focus in the optical setup
-   * - Debug Tab
-     - Advanced options, especially for development of optrace
 
 The following figure shows all tabs except the debug tab. 
 The UI elements will be discussed in the following sections.
@@ -394,7 +396,7 @@ Image Tab
      -
      - render a source image cut
    * - Detector Image Cut
-     - :`detector_cut() <optrace.gui.trace_gui.TraceGUI.detector_cut>`
+     - :meth:`detector_cut() <optrace.gui.trace_gui.TraceGUI.detector_cut>`
      -
      - render a detector image cut
    * - Activate Filter 
@@ -539,7 +541,8 @@ You can therefore do scripting on the GUI or change raytracer properties, like a
 After entering a command in the above text field the ``Run``-Button must be pressed.
 Note that the command is only run, if the GUI is idle, therefore not doing any other tasks.
 
-After running the command, the scene is automatically updated and if required the geometry is retraced.
+After running the command, the scene is automatically updated and, if required, the geometry is retraced if the option "Retrace and replot automatically" is set.
+But this can also be done using the button "Replot/retrace".
 
 The command gets added to the history. From the history field entries can be copied using ``Ctrl+C``
 or you can export the whole history into the clipboard by pressing the according button.
@@ -597,7 +600,7 @@ From outside the theme can either be provided by setting an environment variable
 
    env QT_STYLE_OVERRIDE=kvantum-dark python ./examples/microscope.py
 
-...Or by providing a ``style`` parameter when calling the script/intepreter.
+...Or by providing a ``style`` parameter when calling the script/interpreter.
 
 .. code-block:: bash
 

@@ -1,10 +1,10 @@
 
 import numpy as np  # calculations
-import warnings
 
 from .geometry import RaySource  # create rays
 from .base_class import BaseClass  # parent class
 from . import misc  # calculations
+from ..warnings import warning
 
 
 class RayStorage(BaseClass):
@@ -67,8 +67,8 @@ class RayStorage(BaseClass):
         np.add.at(self.N_list, index_add, np.ones(index_add.shape))
 
         if np.any(np.array(self.N_list) == 0):
-            warnings.warn("There are RaySources that have no rays assigned. "
-                          "Change the power ratio or raise the overall ray number")
+            warning("There are RaySources that have no rays assigned. "
+                    "Change the power ratio or raise the overall ray number")
 
         self.B_list = np.concatenate(([0], np.cumsum(self.N_list))).astype(int)
         self.ray_source_list = ray_source_list

@@ -164,21 +164,24 @@ Image Parameter
 
 Alternatively to a uniformly emitting area there is the possibility to provide light distributions (=images).
 
-For this the emitting surface needs to be a :python:`RectangularSurface`. The image itself can be provided as :class:`numpy.ndarray`, path or preset.
+For this the emitting surface needs to be a :python:`Image` object.
+A Rectangular surface for this image is created automatically.
+The size will be equal to the side lengths of the image.
 
 .. testcode::
 
-   rect = ot.RectangularSurface(dim=[2, 3])
-   RS = ot.RaySource(rect, image=ot.presets.image.landscape)
+   image = ot.presets.image.landscape([2, 3])
+   RS = ot.RaySource(image)
 
 .. testcode::
 
-   image = np.random.sample((300, 300, 3))
-   RS = ot.RaySource(rect, image=image)
+   image = ot.Image(np.random.sample((300, 300, 3)), [2, 3])
+   RS = ot.RaySource(image)
 
 .. code-block:: python
 
-   RS = ot.RaySource(rect, image="test_image.png")
+   image = ot.Image("some_image_path", [2, 3])
+   RS = ot.RaySource(image)
 
 Every image color generates a specific physical spectrum matching its color. This spectrum is a linear combination of the sRGB primaries in <>.
 

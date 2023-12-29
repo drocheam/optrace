@@ -28,7 +28,7 @@ from optrace.gui import TraceGUI
 # 15 S     73.839        inf      86.53         basic/air   1.000   1.000   89.30
 
 # create tracer
-RT = ot.Raytracer(outline=[-22000, 2000, -2000, 2000, -50000, 180])
+RT = ot.Raytracer(outline=[-2000, 2000, -22000, 2000, -50000, 180])
 
 # object distance
 g = 50000
@@ -38,7 +38,7 @@ for deg in [0, 5, 10, 15, 20]:
     xp = g * np.tan(deg/180*np.pi)
     RSS = ot.Point()
     RS = ot.RaySource(RSS, divergence="Isotropic", orientation="Converging", conv_pos=[0, 0, 0],
-                      div_angle=0.03, pos=[-xp, 0, -g], desc=f"{deg}°")
+                      div_angle=0.03, pos=[0, -xp, -g], desc=f"{deg}°")
     RT.add(RS)
 
 # Lens 0

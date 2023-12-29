@@ -442,14 +442,6 @@ The size should now be:
 
 Which is the nearest value in :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>`.
 
-The :python:`limit` parameter can also be changed afterwards, as internally the RImage holds the unfiltered version.
-However, after changing the member variable the image needs to be refiltered by the :meth:`refilter <optrace.tracer.r_image.RImage.refilter>` function:
-
-.. testcode::
-
-   img.limit = 5
-   img.refilter()
-
 
 Saving, Loading and Exporting an Image
 ___________________________________________
@@ -477,18 +469,15 @@ For loading the object the static method :meth:`load <optrace.tracer.r_image.RIm
 
 **Export as PNG**
 
-You can also export an image mode as .png file. The function :meth:`export_png <optrace.tracer.r_image.RImage.export_png>` takes a file path, an image mode and a side length as arguments. The size is specified to the smaller side length.
+You can also export an image mode as image file. The function :meth:`export <optrace.tracer.r_image.RImage.export>` takes a file path and an image mode as arguments. 
 
-Note that the export resolution (= export image size) and the RImage pixel count (= histogram resolution) differ.
-So saving an RImage with pixel side length 5 (:attr:`RImage.N <optrace.tracer.r_image.RImage.N>`) with a resolution of :python:`size=500` creates a larger image, but not a finer one. 
-You can therefore parametrize the histogram resolution of the RImage and the export size independently by rescaling the image beforehand.
-
+.. TODO notes on pixel interpolation, imwrite parameters etc.
 
 An exemplary function call could be:
 
 .. code-block:: python
 
-   img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=400)
+   img.export("Image_12345_sRGB", "sRGB (Absolute RI)")
 
 As for the image modes, one can specify the parameters :python:`log` and :python:`flip`. 
 As for :meth:`RImage.save <optrace.tracer.r_image.RImage.save>` this function overrides files and throws an exception when saving failed.
@@ -496,17 +485,7 @@ As for :meth:`RImage.save <optrace.tracer.r_image.RImage.save>` this function ov
 
 .. code-block:: python
 
-   img.export_png("Image_12345_sRGB", "sRGB (Absolute RI)", size=389, log=True, flip=True)
-
-The image rescaling is done with methods from the `Pillow <https://pillow.readthedocs.io/en/stable/>`__ python library. By default, nearest neighbor interpolation is applied if the export resolution is higher than the RImage resolution and bilinear interpolation otherwise.
-
-You can overwrite this behavior with the :python:`resample` parameter and the method flag from `PIL.Image.Resampling <https://pillow.readthedocs.io/en/stable/reference/Image.html#resampling-filters>`__
-
-.. `PIL.Image.Resampling <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Resampling>`__.
-
-.. code-block:: python
-
-   img.export_png(..., resample=PIL.Image.Resampling.NEAREST)
+   img.export("Image_12345_sRGB.jpg", "sRGB (Absolute RI)", log=True, flip=True)
 
 
 .. note::
@@ -544,12 +523,12 @@ Properties :python:`sx` and :python:`sy` specify the side lengths of the image i
 
 .. doctest::
 
-   >>> img.Nx
+   >>> img.shape[1]
    315
 
 .. doctest::
 
-   >>> img.sy
+   >>> img.s[1]
    1.0179999999999998
 
 .. doctest::
@@ -612,11 +591,11 @@ The plotting function takes the RImage as parameter. Next, we need to specify th
 
    otp.r_image_plot(img, "Lightness (CIELUV)")
 
-We can use the additional parameter :python:`log` to scale the image values logarithmically or provide :python:`flip=True` to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the :python:`title` parameter and we can make the plotting window blocking with :python:`block=True`.
+We can use the additional parameter :python:`log` to scale the image values logarithmically or provide :python:`flip=True` to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the :python:`title` parameter.
 
 .. testcode::
 
-   otp.r_image_plot(img, "Lightness (CIELUV)", title="Title 123", log=True, flip=True, block=False)
+   otp.r_image_plot(img, "Lightness (CIELUV)", title="Title 123", log=True, flip=True)
 
 **Image Cut**
 
@@ -630,7 +609,7 @@ Supporting all the same parameters as for :func:`r_image_plot <optrace.plots.r_i
 
 .. testcode::
 
-   otp.r_image_cut_plot(img, "Lightness (CIELUV)", y=0.2, title="Title 123", log=True, flip=True, block=False)
+   otp.r_image_cut_plot(img, "Lightness (CIELUV)", y=0.2, title="Title 123", log=True, flip=True)
 
 
 
@@ -686,14 +665,14 @@ Or a list of multiple spectra:
 
    otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard)
 
-A user defined :python:`title` can also be set. The parameter :python:`rendering_intent` is specified for the conversion of the colors into the sRGB color space, but generally the default value of "Absolute" is suited. :python:`block=True` interrupts the rest of the program and :python:`norm` specifies the brightness normalization, explained a few paragraphs below.
+A user defined :python:`title` can also be set. The parameter :python:`rendering_intent` is specified for the conversion of the colors into the sRGB color space, but generally the default value of "Absolute" is suited.  :python:`norm` specifies the brightness normalization, explained a few paragraphs below.
 
 A full function call could look like this:
 
 .. testcode::
 
    otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard, title="Standard Illuminants",\
-                               block=False, rendering_intent="Perceptual", norm="Largest")
+                               rendering_intent="Perceptual", norm="Largest")
 
 
 .. list-table:: Examples of CIE 1931 and 1976 chromaticity diagrams.
@@ -833,12 +812,12 @@ Below you can find preset images that can be used for a ray source.
           `Image Source <https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage>`__
           Usage with :obj:`ot.presets.image.eye_test_vintage <optrace.tracer.presets.image.eye_test_vintage>`.
 
-   * - .. figure:: ../images/checkerboard.png
+   * - .. figure:: ../images/grid.png
           :align: center
           :width: 300
           
-          Checkerboard image, 8x8 black and white chess-like board image.
-          Usage with :obj:`ot.presets.image.checkerboard <optrace.tracer.presets.image.checkerboard>`
+          White grid on black background with 10x10 cells. Useful for distortion characterization.
+          Usage with :obj:`ot.presets.image.grid <optrace.tracer.presets.image.grid>`
 
      - .. figure:: ../../../optrace/ressources/images/siemens_star.webp
           :align: center

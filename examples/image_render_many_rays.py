@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
-import numpy as np
 import optrace as ot
-from optrace.plots import *
+import optrace.plots as otp
 
 # same geometry as the 'image_render.py' example,
 # but different image and many more rays
 
-image = ot.presets.image.tv_testcard2
+RSS = ot.presets.image.tv_testcard2([4, 3])
 
 # make raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
 # add Raysource
-RSS = ot.RectangularSurface(dim=[4, 3])
 RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8,
-                  image=image, s=[0, 0, 1], pos=[0, 0, 0])
+                  s=[0, 0, 1], pos=[0, 0, 0])
 RT.add(RS)
 
 # add Lens 1
@@ -31,9 +29,9 @@ RT.add(Det)
 
 # render and show detector image
 pos = [[0, 0, 27.], [0, 0, 30.], [0, 0, 33.], [0, 0, 36.]]
-_, Ims = RT.iterative_render(N_rays=15e6, N_px_D=200, pos=pos, no_sources=True)
+_, Ims = RT.iterative_render(N_rays=15e6, N_px_D=300, pos=pos, no_sources=True)
 
 # show rendered images
-for i in np.arange(len(Ims)-1):
-    r_image_plot(Ims[i], "sRGB (Absolute RI)", block=False)
-r_image_plot(Ims[-1], "sRGB (Absolute RI)", block=True)
+for img in Ims:
+    otp.r_image_plot(img, "sRGB (Absolute RI)")
+otp.block()

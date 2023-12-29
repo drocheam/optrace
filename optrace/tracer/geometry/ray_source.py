@@ -19,6 +19,7 @@ from ..presets.light_spectrum import d65 as d65_spectrum  # default light spectr
 # misc
 from ..misc import PropertyChecker as pc  # check types and values
 from .. import misc  # calculations
+from ..image import Image
 
 
 class RaySource(Element):
@@ -34,12 +35,12 @@ class RaySource(Element):
 
     abbr: str = "RS"  #: object abbreviation
     _allow_non_2D: bool = True  # allow points or lines as surfaces
-    _max_image_px: float = 2e6  #: maximum number of pixels for images. Only here for performance reasons.
+    _max_image_px: float = 2e6  #: maximum number of pixels for images. Only for performance reasons.
 
     def __init__(self,
 
                  # Surface Parameters
-                 surface:           Surface | Line | Point,
+                 surface:           Surface | Line | Point | Image,
                  pos:               (list | np.ndarray) = None,
 
                  # Divergence Parameters
@@ -53,7 +54,6 @@ class RaySource(Element):
                  # Light Parameters
                  spectrum:          LightSpectrum = None,
                  power:             float = 1.,
-                 image:             (str | np.ndarray) = None,
 
                  # Ray Orientation Parameters
                  s:                 (list | np.ndarray) = None,
@@ -76,7 +76,7 @@ class RaySource(Element):
         """
         Create a RaySource with a specific area, orientation, divergence, polarization, power and spectrum
 
-        :param surface: emitting Surface object
+        :param surface: emitting Surface, Point, Line or Image object
         :param divergence: divergence type, see "divergences" list
         :param orientation: orientation type, see "orientations" list
         :param polarization: polarization type, see "polarizations" list
@@ -100,23 +100,40 @@ class RaySource(Element):
         :param or_func: orientation function,
             takes 1D array of x and y coordinates as input, returns (N, 3) numpy 2D array with orientations
         :param or_args: dictionary of additional keyword arguments for or_func
-        :param image: image for modes source_type="BW_Image" or "RGB_Image",
-                specified as path (string) or RGB array (numpy 3D array)
         :param kwargs: additional keyword arguments for parent classes
         """
 
         self._new_lock = False
 
+        # handle surface or Image
+        if isinstance(surface, Image):
+            surface_ = RectangularSurface(dim=surface.s)
+            self._image = surface
+                
+            # calculate pixel probability from relative power for each pixel
+            If = color._power_from_srgb(self._image.data).ravel()
+            Ifs = np.sum(If)
+            self._pIf = 1/Ifs*If
+
+            # calculate mean image color, needed for self.color
+            # mean color needs to calculated in a linear colorspace, hence sRGBLinear
+            sRGBL = color.srgb_to_srgb_linear(self._image.data)
+            sRGBL_mean = np.mean(sRGBL, axis=(0, 1))
+            sRGB_mean = color.srgb_linear_to_srgb(np.array([[[*sRGBL_mean]]]))
+            self._mean_img_color = sRGB_mean[0, 0]
+        else:
+            surface_ = surface
+            self._image = None
+            self._pIf = None
+            self._mean_img_color = None
+
         # geometry
         pos = pos if pos is not None else [0, 0, 0]
-        super().__init__(surface, pos, **kwargs)
+        super().__init__(surface_, pos, **kwargs)
 
         # power and spectrum
         self.power = power
         self.spectrum = spectrum if spectrum is not None else d65_spectrum
-        self.pIf = None
-        self._mean_img_color = None
-        self.image = image
 
         # polarization 
         self.polarization = polarization
@@ -151,15 +168,14 @@ class RaySource(Element):
 
     def color(self, rendering_intent: str = "Ignore", clip=False) -> tuple[float, float, float]:
         """
-        Get the mean color of the RaySource
+        Get the average color of the RaySource
 
         :param rendering_intent: rendering_intent for color calculation
         :param clip: if sRGB values are clipped
         :return: tuple of sRGB values with data range [0, 1]
         """
-        if self.image is not None:
+        if self._image is not None:
             return self._mean_img_color
-
         else:
             return self.spectrum.color(rendering_intent, clip)
 
@@ -184,40 +200,37 @@ class RaySource(Element):
         ## Generate ray wavelengths
         ################################################################################################################
 
-        if self.image is None:
+        if self._image is None:
             pc.check_type("RaySource.spectrum", self.spectrum, LightSpectrum)
             wavelengths = self.spectrum.random_wavelengths(N)
 
         ## Generate ray starting points
         ################################################################################################################
 
-        if self.image is None:
+        if self._image is None:
             p = self.surface.random_positions(N)
 
         else:
-            if not isinstance(self.surface, RectangularSurface):
-                raise RuntimeError("Images can only be used with RectangularSurface")
-
             # special case image with only one pixel
-            if self.image.shape[0] == 1 and self.image.shape[1] == 1:
+            if self._image.shape[0] == 1 and self._image.shape[1] == 1:
                 PY, PX = np.zeros(N, dtype=np.int32), np.zeros(N, dtype=np.int32)
             else:
                 # get random pixel number, the pixel brightness is the probability
-                P = misc.random_from_distribution(np.arange(self.pIf.shape[0]),
-                                                  self.pIf, N, kind="discrete").astype(int)
-                PY, PX = np.divmod(P, self.image.shape[1])  # pixel x, y position from pixel number
+                P = misc.random_from_distribution(np.arange(self._pIf.shape[0]),
+                                                  self._pIf, N, kind="discrete").astype(int)
+                PY, PX = np.divmod(P, self._image.shape[1])  # pixel x, y position from pixel number
 
             # add random position inside pixel and calculate positions in 3D space
             rx, ry = misc.uniform2(0, 1, 0, 1, N)
             xs, xe, ys, ye = self.surface.extent[:4]
-            Iy, Ix = self.image.shape[:2]
+            Iy, Ix = self._image.shape[:2]
 
             p = np.zeros((N, 3), dtype=np.float64, order='F')
             ne.evaluate("(xe-xs)/Ix * (PX + rx) + xs", out=p[:, 0])
             ne.evaluate("(ye-ys)/Iy * (PY + ry) + ys", out=p[:, 1])
             p[:, 2] = self.pos[2]
 
-            wavelengths = color.random_wavelengths_from_srgb(self.image[PY, PX])
+            wavelengths = color.random_wavelengths_from_srgb(self._image.data[PY, PX])
 
         ## Generate orientations
         ################################################################################################################
@@ -456,46 +469,17 @@ class RaySource(Element):
                 super().__setattr__(key, val2)
                 return
 
-            case "image" if val is not None:
+            case "_image" if val is not None:
 
-                pc.check_type(key, val, str | np.ndarray)
-
-                if isinstance(val, str):
-                    img = misc.load_image(val)
-                else:
-                    img = np.asarray_chkfinite(val, dtype=np.float64)
-
-                if img.shape[0]*img.shape[1] > self._max_image_px:
+                if val.shape[0]*val.shape[1] > self._max_image_px:
                     raise RuntimeError("For performance reasons only images with less than 2 megapixels are allowed.")
-
-                if img.ndim != 3 or img.shape[2] != 3 or not img.shape[0] or not img.shape[1]:
-                    raise TypeError("Image array needs to be three dimensional with three values in third dimension,"
-                                    f"but shape is {img.shape}.")
-
-                if np.min(img) < 0 or np.max(img) > 1:
-                    raise ValueError("Image values need to be inside range [0, 1]")
-
-                # calculate pixel probability from relative power for each pixel
-                If = color._power_from_srgb(img).ravel()
-                Ifs = np.sum(If)
-
-                if Ifs == 0:
+                
+                if np.sum(val._data) <= 0:
                     raise ValueError("Image can not be completely black")
 
-                self.pIf = 1/Ifs*If
-
-                # calculate mean image color, needed for self.color
-                # mean color needs to calculated in a linear colorspace, hence sRGBLinear
-                sRGBL = color.srgb_to_srgb_linear(img)
-                sRGBL_mean = np.mean(sRGBL, axis=(0, 1))
-                sRGB_mean = color.srgb_linear_to_srgb(np.array([[[*sRGBL_mean]]]))
-                self._mean_img_color = sRGB_mean[0, 0]
-
-                super().__setattr__(key, img)
-                return
-
             case "front":
-                if not (isinstance(val, Point | Line) or (isinstance(val, Surface) and val.is_flat())):
+                if not (isinstance(val, Point | Line)\
+                        or (isinstance(val, Surface) and val.is_flat()) or isinstance(val, Image)):
                     raise ValueError("Currently only planar surfaces are supported for RaySources.")
 
         super().__setattr__(key, val)

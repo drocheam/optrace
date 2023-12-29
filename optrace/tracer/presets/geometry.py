@@ -2,7 +2,7 @@
 import numpy as np  # np.ndarray type
 
 from ..geometry import Aperture, Detector, Lens, IdealLens, SphericalSurface,\
-    RectangularSurface, ConicSurface, RingSurface, Group, SphereVolume, BoxVolume, Volume 
+    RectangularSurface, ConicSurface, RingSurface, Group, BoxVolume, Volume
     # Elements and Surfaces in the preset geometries
 from ..refraction_index import RefractionIndex  # media in the geometries
 

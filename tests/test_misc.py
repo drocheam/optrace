@@ -9,7 +9,10 @@ import doctest
 import unittest
 import pytest
 
+from scipy.stats import qmc
 import numpy as np
+import matplotlib.pyplot as plt
+
 import optrace.tracer.misc as misc
 
 import optrace as ot
@@ -20,8 +23,56 @@ from optrace.tracer.ray_storage import RayStorage as RayStorage
 class TracerMiscTests(unittest.TestCase):
 
     def test_global_options(self):
+        
+        # test settings of options
         ot.global_options.show_progressbar = False
+        ot.global_options.show_progressbar = True
         ot.global_options.multithreading = False
+        ot.global_options.multithreading = True
+        ot.global_options.show_warnings = False
+        ot.global_options.show_warnings = True
+        ot.global_options.wavelength_range = [300, 800]
+        ot.global_options.wavelength_range[0] = 380
+        ot.global_options.wavelength_range[1] = 780
+        ot.global_options.spectral_colormap = lambda wl: 255*plt.cm*viridis(wl/780)
+        ot.global_options.spectral_colormap = None
+
+        # Type Errors
+        self.assertRaises(TypeError, ot.global_options.__setattr__, "multithreading", [])
+        self.assertRaises(TypeError, ot.global_options.__setattr__, "show_progressbar", [])
+        self.assertRaises(TypeError, ot.global_options.__setattr__, "show_warnings", [])
+        self.assertRaises(TypeError, ot.global_options.__setattr__, "wavelength_range", 2)
+
+        # Value Errors
+        self.assertRaises(ValueError, ot.global_options.__setattr__, "wavelength_range", [380, 870, 1000])
+        self.assertRaises(ValueError, ot.global_options.__setattr__, "wavelength_range", [381, 780])
+        self.assertRaises(ValueError, ot.global_options.__setattr__, "wavelength_range", [380, 779])
+
+    def test_global_options_context_managers(self):
+
+        # context manager for no warnings. Case 1: True before
+        ot.global_options.show_warnings = True
+        with ot.global_options.no_warnings():
+            self.assertFalse(ot.global_options.show_warnings)
+        self.assertTrue(ot.global_options.show_warnings)
+        
+        # context manager for no warnings. Case 2: False before
+        ot.global_options.show_warnings = False
+        with ot.global_options.no_warnings():
+            self.assertFalse(ot.global_options.show_warnings)
+        self.assertFalse(ot.global_options.show_warnings)
+        
+        # context manager for no progressbar. Case 1: True before
+        ot.global_options.show_progressbar = True
+        with ot.global_options.no_progressbar():
+            self.assertFalse(ot.global_options.show_progressbar)
+        self.assertTrue(ot.global_options.show_progressbar)
+        
+        # context manager for no progressbar. Case 2: False before
+        ot.global_options.show_progressbar = False
+        with ot.global_options.no_progressbar():
+            self.assertFalse(ot.global_options.show_progressbar)
+        self.assertFalse(ot.global_options.show_progressbar)
 
     def test_ray_storage(self):
 
@@ -258,7 +309,6 @@ class TracerMiscTests(unittest.TestCase):
         # test discrepancy
 
         N = 50000
-        from scipy.stats import qmc
 
         # sampling from latin hypercube
         lhc = qmc.LatinHypercube(d=2)

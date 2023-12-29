@@ -169,7 +169,7 @@ class TracerTests(unittest.TestCase):
         
         RT.add(ot.RaySource(ot.Point(), pos=[0, 0, 0]))
         self.assertRaises(ValueError, RT.trace, 0)  # too few rays
-        self.assertRaises(ValueError, RT.trace, 1e10)  # too many rays
+        self.assertRaises(ValueError, RT.trace, 100000000000)  # too many rays
 
 
         # additional ray source geometry checks
@@ -1011,7 +1011,7 @@ class TracerTests(unittest.TestCase):
     @pytest.mark.slow
     def test_iterative_render(self):
         RT = rt_example()
-        RT.no_pol = True
+        # RT.no_pol = True
 
         # testing only makes sense with multiple sources and detectors
         assert len(RT.ray_sources) > 1
@@ -1071,7 +1071,7 @@ class TracerTests(unittest.TestCase):
         # call with multiple positions and detector pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
                                        N_px_D=[5, 500])
-        self.assertNotEqual(dim[0].Nx, dim[1].Nx) 
+        self.assertNotEqual(dim[0].shape[1], dim[1].shape[1]) 
         
         # call with multiple positions and projection_methods
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
@@ -1087,7 +1087,7 @@ class TracerTests(unittest.TestCase):
         
         # call with multiple source pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), N_px_S=[5, 500])
-        self.assertNotEqual(sim[0].Nx, sim[1].Nx) 
+        self.assertNotEqual(sim[0].shape[1], sim[1].shape[0]) 
         
         # call with multiple positions and detector pixel numbers
         sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]],
@@ -1130,6 +1130,28 @@ class TracerTests(unittest.TestCase):
 
         RT.ray_sources = []
         self.assertRaises(RuntimeError, RT.iterative_render, 10000)  # no ray_sources
+
+        # raise on geometry error
+        RT = rt_example()
+        RT.lenses[0].move_to(RT.lenses[1].pos)  # collision
+        self.assertRaises(RuntimeError, RT.iterative_render, 1000)
+       
+        # check if warnings are aggregated between iterations
+        # the following code is the same as in test_abnormal_rays in test_tracer_special
+
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
+        RSS = ot.CircularSurface(r=2)
+        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
+        RT.add(RS)
+
+        surf1 = ot.CircularSurface(r=3)
+        surf2 = ot.CircularSurface(r=1e-6)
+        L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        RT.add(L)
+
+        N = 2*RT.ITER_RAYS_STEP
+        RT.iterative_render(N)
+        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_BACK, 2] / N, places=3)
 
     def test_brewster_and_fresnel_transmission(self):
         """
@@ -1219,14 +1241,12 @@ class TracerTests(unittest.TestCase):
         # this image is exactly the same as the input image, as all rays from each pixel are mapped into the same output pixel
         # check if the images are the same
 
-        Image = ot.presets.image.tv_testcard1
-
         # make raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 
         # add Raysource
-        RSS = ot.RectangularSurface(dim=[4, 4])
-        RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8, image=Image, s=[0, 0, 1], pos=[0, 0, 0])
+        RSS = ot.presets.image.tv_testcard1([4, 4])
+        RS = ot.RaySource(RSS, divergence="Lambertian", div_angle=8, s=[0, 0, 1], pos=[0, 0, 0])
         RT.add(RS)
 
         # add Lens 1

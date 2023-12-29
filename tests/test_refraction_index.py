@@ -108,15 +108,15 @@ class RefractionIndexTests(unittest.TestCase):
         # n < 1 on runtime
         
         # check exceptions when wavelengths are outside data range
-        wl0, wl1 = color.WL_BOUNDS
-        color.WL_BOUNDS[1] = wl1 + 100
+        wl0, wl1 = ot.global_options.wavelength_range
+        ot.global_options.wavelength_range[1] = wl1 + 100
         self.assertRaises(RuntimeError, ot.presets.refraction_index.PET, color.wavelengths(1000))
-        color.WL_BOUNDS[0] = wl0-100
-        color.WL_BOUNDS[1] = wl1
+        ot.global_options.wavelength_range[0] = wl0-100
+        ot.global_options.wavelength_range[1] = wl1
         self.assertRaises(RuntimeError, ot.presets.refraction_index.PET, color.wavelengths(1000))
 
         # reset color bounds
-        color.WL_BOUNDS[:] = [wl0, wl1]
+        ot.global_options.wavelength_range[:] = [wl0, wl1]
 
     def test_refraction_index_equality(self):
         # equal operator

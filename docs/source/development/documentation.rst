@@ -45,7 +45,6 @@ Documentation
    * `intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`_ for linking documentation of other packages
    * `mathjax <https://www.sphinx-doc.org/en/master/usage/extensions/math.html>`_ for LaTeX equations
    * `sphinxcontrib.bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ for a bibliography
-* author and version get automatically loaded from ``./optrace/__metadata__.py``
 * `pyramid <https://sphinx-themes.org/sample-sites/default-pyramid/>`_ Sphinx theme, however we overwrite the text font family by including the  ``./docs/sources/_static/custom.css`` file. This also centrally aligns the equation label vertically.
 
 
