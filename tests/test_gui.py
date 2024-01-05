@@ -691,8 +691,9 @@ class GUITests(unittest.TestCase):
 
         def send_key(sim, key):
             self._do_in_main(sim, sim.scene.scene_editor._content.setFocus)
+            time.sleep(0.5)
             pyautogui.press(key)
-            time.sleep(0.2)
+            time.sleep(0.5)
 
         def interact(sim):
             with self._try(sim):
