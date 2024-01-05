@@ -682,9 +682,9 @@ class GUITests(unittest.TestCase):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
         # open a pyplot window that will be closed from the gui
-        # plt.figure()
-        # plt.show(block=False)
-
+        plt.figure()
+        plt.show(block=False)
+        plt.pause(2)
 
         RT = rt_example()
         sim = TraceGUI(RT)
@@ -762,7 +762,7 @@ class GUITests(unittest.TestCase):
                 send_key(sim, "q")
                 self._wait_for_idle(sim)
                 wlen2 = len(plt.get_fignums())
-                # self.assertNotEqual(wlen, wlen2)
+                self.assertNotEqual(wlen, wlen2)
                 
                 # do this one last, since it raises another window
                 # and I don't know how to focus the scene after this

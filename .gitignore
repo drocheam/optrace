@@ -17,6 +17,7 @@ bak
 # testing and CI
 .hypothesis
 .coverage
+.coverage*
 .tox
 .pytest_cache
 htmlcov
