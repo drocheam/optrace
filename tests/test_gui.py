@@ -681,19 +681,19 @@ class GUITests(unittest.TestCase):
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
-        # open a pyplot window that will be closed from the gui
+        # create a pyplot window that will be closed from the gui
+        # for the list of get_fignums it makes no difference, if they are shown or not
+        # but showing would lead to window focus issues in test automation
         plt.figure()
-        plt.show(block=False)
-        plt.pause(2)
 
         RT = rt_example()
         sim = TraceGUI(RT)
 
         def send_key(sim, key):
             self._do_in_main(sim, sim.scene.scene_editor._content.setFocus)
-            time.sleep(0.2)
+            time.sleep(0.1)
             pyautogui.press(key)
-            time.sleep(0.2)
+            time.sleep(0.1)
 
         def interact(sim):
             with self._try(sim):
