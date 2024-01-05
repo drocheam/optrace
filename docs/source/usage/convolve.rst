@@ -41,7 +41,7 @@ Also see the section :numref:`psf_color_handling` on this.
 
 
 The image is a sRGB numpy array with dimensions (Ny, Nx, 3) with value range 0-1. Alternatively a filepath to an image file can be provided.
-In contrast, the PSF holds linear power/intensity information and is there a simpler (Ny2, Nx2) shape. Alternatively an :class:`RImage <optrace.tracer.r_image.RImage>` object can be used to apply a colored PSF.
+In contrast, the PSF holds linear power/intensity information and is there a simpler (Ny2, Nx2) shape. Alternatively an :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` object can be used to apply a colored PSF.
 
 Parameters :python:`s_img` and :python:`s_psf` describe the side lengths of both images in millimeters, specified as list of two floats.
 
@@ -80,7 +80,7 @@ The additional parameter :python:`rendering_intent` defines the used intent for 
 .. TODO update
 
 * object image is a (Ny, Nx, 3) sRGB array or filepath to a sRGB image
-* PSF is either an intensity array or an RImage object
+* PSF is either an intensity array or an RenderImage object
 * resolutions must be between 50x50 pixels and 4 megapixels
 * the size of the PSF can't be much larger than the image scaled by the magnification factor
 * as side lengths of PSF and object can be otherwise arbitrary the pixels are generally non-square
@@ -132,7 +132,7 @@ The following example loads an image preset and convolves it with a square PSF t
 Image Plotting
 ________________
 
-Images, whether they are numpy arrays or paths to image files, are plotted with the :func:`image_plot <optrace.plots.misc_plots.image_plot>` function.
+Images, whether they are numpy arrays or paths to image files, are plotted with the :func:`image_plot <optrace.plots.image_plots.image_plot>` function.
 Additionally a tuple of image side lengths is required.
 
 Import the plotting functionality:

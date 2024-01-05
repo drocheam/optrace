@@ -29,9 +29,10 @@ RT.add(Det)
 
 # render and show detector image
 pos = [[0, 0, 27.], [0, 0, 30.], [0, 0, 33.], [0, 0, 36.]]
-_, Ims = RT.iterative_render(N_rays=15e6, N_px_D=300, pos=pos, no_sources=True)
+Ims = RT.iterative_render(N=15e6, pos=pos)
 
 # show rendered images
-for img in Ims:
-    otp.r_image_plot(img, "sRGB (Absolute RI)")
+for dimg in Ims:
+    img = dimg.get("sRGB (Absolute RI)", 315)
+    otp.image_plot(img)
 otp.block()

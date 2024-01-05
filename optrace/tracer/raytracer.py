@@ -16,7 +16,7 @@ from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface,\
 from .spectrum import LightSpectrum
 from .refraction_index import RefractionIndex
 from .ray_storage import RayStorage
-from .r_image import RImage
+from .image.render_image import RenderImage
 
 from ..global_options import global_options
 from ..warnings import warning
@@ -1035,7 +1035,7 @@ class Raytracer(Group):
             inside = (extent[0] <= ph[:, 0]) & (ph[:, 0] <= extent[1]) \
                     & (extent[2] <= ph[:, 1]) & (ph[:, 1] <= extent[3])
 
-            extent_out = np.asarray_chkfinite(extent.copy())
+            extent_out = np.asarray_chkfinite(extent.copy(), dtype=np.float64)
             ph, w, wl = ph[inside], w[inside], wl[inside]
 
         elif extent is None:
@@ -1057,36 +1057,30 @@ class Raytracer(Group):
         return ph, w, wl, extent_out, desc, projection, bar
 
     def detector_image(self,
-                       N:                 int,
                        detector_index:    int = 0,
                        source_index:      int = None,
                        extent:            list | np.ndarray = None,
                        limit:             float = None,
                        projection_method: str = "Equidistant",
-                       **kwargs) -> RImage:
+                       **kwargs) -> RenderImage:
         """
         Render a detector image for a traced geometry
 
-        :param N: number of pixels for smaller image size
         :param detector_index: index/number of the detector
         :param source_index: index/number of the source. By default all sources are used.
         :param extent: rectangular extent [x0, x1, y0, y1] to detect to intersections in.
                 By default the whole detector are is used.
         :param projection_method: sphere projection method for a SphericalSurface detector
-        :param kwargs: keyword arguments for creating the RImage
         :param limit: resolution limit filter constant, see the documentation. Defaults to no filter.
-        :return: rendered RImage
+        :param kwargs: keyword arguments for creating the RenderImage
+        :return: rendered RenderImage
         """
-        N = int(N)
-        if N <= 0:
-            raise ValueError(f"Pixel number N needs to be a positive int, but is {N}")
-
         p, w, wl, extent_out, desc, projection, bar\
             = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
 
         # init image and extent, these are the default values when no rays hit the detector
-        img = RImage(long_desc=desc, extent=extent_out, projection=projection)
-        img.render(N, p, w, wl, limit=limit, **kwargs)
+        img = RenderImage(long_desc=desc, extent=extent_out, projection=projection)
+        img.render(p, w, wl, limit=limit, **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1117,126 +1111,96 @@ class Raytracer(Group):
         return spec
 
     def iterative_render(self,
-                         N_rays:            int | float,
-                         N_px_D:            int | list = 400,
-                         N_px_S:            int | list = 400,
+                         N:                 int | float,
                          detector_index:    int | list = 0,
-                         projection_method: str | list = "Equidistant",
                          limit:             float | list = None,
+                         projection_method: str | list = "Equidistant",
                          pos:               int | list = None,
-                         no_sources:        bool = False,
                          extent:            list | np.ndarray = None)\
-            -> tuple[list[RImage], list[RImage]]:
+            -> list[RenderImage]:
         """
         Image render with N_rays rays.
         First returned value is a list of rendered sources, the second a list of rendered detector images.
 
         If pos is not provided,
         a single detector image is rendered at the position of the detector specified by detector_index.
-        >> RT.iterative_render(N_rays=10000, detector_index=1)
+        >> RT.iterative_render(N=10000, detector_index=1)
         
         If pos is provided as coordinate, the detector is moved beforehand.
-        >> RT.iterative_render(N_rays=10000, pos=[0, 1, 0], detector_index=1)
+        >> RT.iterative_render(N=10000, pos=[0, 1, 0], detector_index=1)
         
         If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically
         repeated len(pos) times or can be specified as list with the same length as pos.
         Exemplary calls:
-        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1, N_px_D=[128, 256])
-        >> RT.iterative_render(N_rays=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], limit=[None, 2], extent=[None, [-2, 2, -2, 2]])
+        >> RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1)
+        >> RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], extent=[None, [-2, 2, -2, 2]])
 
         N_px_S can also be provided as list, note however, that when provided as list it needs
         to have the same length as the number of sources.
 
-        By default, source images are also rendered. Providing no_sources=True skips source rendering
-        and simply returns an empty list.
-
         This functions raises an exception if the geometry is incorrect.
 
-        :param N_rays: number of rays
-        :param N_px_D: number/list of detector image pixels for smaller image size
-        :param N_px_S: number/list of source image pixels for smaller image size
+        :param N: number of rays
         :param detector_index: number/list of detector indices
         :param pos: 3D position(s) of the detector(s)
-        :param projection_method: type/list of projection methods for SphericalSurface
         :param limit: list/resolution limits for detector images
-        :param no_sources: don't render sources, speeds things up a little
+        :param projection_method: type/list of projection methods for SphericalSurface
         :param extent: list/value for the extent of the detector images
-        :return: list of rendered source images, list of rendered detector images
+        :return: list of rendered detector images
         """
        
         if not self.ray_sources:
-            raise RuntimeError("Ray Sources Missing.")
+            raise RuntimeError("Ray Source(s) Missing.")
         
-        if (N_rays := int(N_rays)) <= 0:
-            raise ValueError(f"Ray number N_rays needs to be a positive int, but is {N_rays}.")
+        if not self.detectors:
+            raise RuntimeError("Detector(s) Missing.")
+        
+        if (N := int(N)) <= 0:
+            raise ValueError(f"Ray number N_rays needs to be a positive int, but is {N}.")
 
         if not self.detectors and pos is not None:
             raise RuntimeError("No detectors in geometry.")
 
-        # if there are detectors
-        if self.detectors:
-
-            # use current detector position if pos is empty
-            if pos is None:
-                if isinstance(detector_index, list):
-                    raise ValueError("detector_index list needs to have the same length as pos list")
-                pos = [self.detectors[detector_index].pos]
-
-            elif isinstance(pos, list) and not isinstance(pos[0], list | np.ndarray):
-                pos = [pos]
-
-            if not isinstance(N_px_D, list):
-                N_px_D = [N_px_D] * len(pos)
-
-            elif len(N_px_D) != len(pos):
-                raise ValueError("list of N_px_D needs to have the same length as pos list")
-
-            if not isinstance(detector_index, list):
-                detector_index = [detector_index] * len(pos)
-            
-            elif len(detector_index) != len(pos):
+        # use current detector position if pos is empty
+        if pos is None:
+            if isinstance(detector_index, list):
                 raise ValueError("detector_index list needs to have the same length as pos list")
+            pos = [self.detectors[detector_index].pos]
 
-            if not isinstance(projection_method, list):
-                projection_method = [projection_method] * len(pos)
+        elif isinstance(pos, list) and not isinstance(pos[0], list | np.ndarray):
+            pos = [pos]
 
-            elif len(projection_method) != len(pos):
-                raise ValueError("projection_method list needs to have the same length as pos list")
-            
-            if not isinstance(limit, list):
-                limit = [limit] * len(pos)
-
-            elif len(limit) != len(pos):
-                raise ValueError("limit list needs to have the same length as pos list")
-
-            if not isinstance(extent, list) or isinstance(extent[0], int | float):
-                extent = [extent] * len(pos)
-
-            elif len(extent) != len(pos):
-                raise ValueError("extent list needs to have the same length as pos list")
-            
-            for npxdi in N_px_D:
-                if not isinstance(npxdi, int) or npxdi <= 0:
-                    raise ValueError(f"Pixel number N_px_D needs to be a positive int, but is {npxdi}.")
+        if not isinstance(detector_index, list):
+            detector_index = [detector_index] * len(pos)
         
-            extentc = extent.copy()
+        elif len(detector_index) != len(pos):
+            raise ValueError("detector_index list needs to have the same length as pos list")
+            
+        if not isinstance(limit, list):
+            limit = [limit] * len(pos)
 
-        if not isinstance(N_px_S, list):
-            N_px_S = [N_px_S] * len(self.ray_sources)
+        elif len(limit) != len(pos):
+            raise ValueError("limit list needs to have the same length as pos list")
 
-        elif len(N_px_S) != len(self.ray_sources):
-            raise ValueError("N_px_S list needs to have the same length as ray_sources")
+        if not isinstance(projection_method, list):
+            projection_method = [projection_method] * len(pos)
 
-        for npxsi in N_px_S:
-            if not isinstance(npxsi, int) or npxsi <= 0:
-                raise ValueError(f"Pixel number N_px_S needs to be a positive int, but is {npxsi}.")
+        elif len(projection_method) != len(pos):
+            raise ValueError("projection_method list needs to have the same length as pos list")
+        
+        if not isinstance(extent, list) or isinstance(extent[0], int | float):
+            extent = [extent] * len(pos)
+
+        elif len(extent) != len(pos):
+            raise ValueError("extent list needs to have the same length as pos list")
+        
+        extentc = extent.copy()
 
         rays_step = self.ITER_RAYS_STEP
-        iterations = max(1, int(N_rays / rays_step))
+        iterations = max(1, int(N / rays_step))
 
         # image list
         DIm_res = []
-        SIm_res = []
 
         iter_ = range(iterations)
         iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if global_options.show_progressbar\
@@ -1255,7 +1219,7 @@ class Raytracer(Group):
 
             # add remaining rays in last step
             if i == iterations - 1:
-                rays_step += int(N_rays - iterations*rays_step)  # additional rays for last iteration
+                rays_step += int(N - iterations*rays_step)  # additional rays for last iteration
 
             # turn off warnings and progress bar for the subtracing
             with global_options.no_warnings():
@@ -1270,48 +1234,31 @@ class Raytracer(Group):
                     self.detectors[detector_index[j]].move_to(pos[j])
                 
                     with global_options.no_progressbar():
-                        Imi = self.detector_image(N=N_px_D[j], detector_index=detector_index[j],
-                                                  extent=extentc[j], _dont_rescale=True, limit=limit[j],
+                        Imi = self.detector_image(detector_index=detector_index[j],
+                                                  extent=extentc[j], limit=limit[j], _dont_filter=True,
                                                   projection_method=projection_method[j])
                    
-                    Imi._img *= rays_step / N_rays
+                    Imi._data *= rays_step / N
 
                     # append image to list in first iteration, after that just add image content
                     if i == 0:
                         DIm_res.append(Imi)
                         extentc[j] = Imi._extent0  # assign actual extent in case it was "auto"
                     else:
-                        DIm_res[j]._img += Imi._img
+                        DIm_res[j]._data += Imi._data
 
-            if not no_sources:
-                for j, _ in enumerate(self.ray_sources):
-                    Imi = self.source_image(N=N_px_S[j], source_index=j, _dont_rescale=True)
-                    Imi._img *= rays_step / N_rays
-
-                    # append image to list in first iteration, after that just add image content
-                    if i == 0:
-                        SIm_res.append(Imi)
-                    else:
-                        SIm_res[j]._img += Imi._img
-           
             global_options.show_progressbar = True
-
-        # rescale images to update img, we only added _img each
-        # also apply the rayleigh filtering if a limit value is supplied
-
-        for i, SIm in enumerate(SIm_res):
-            SIm.rescale(N_px_S[i])
-        
+       
+        # we didn't filter the images yet, as doing it with the finished image is faster (than doing it for each step)
         for i, DIm in enumerate(DIm_res):
             if limit[i] is not None:
                 DIm._apply_rayleigh_filter()
-            DIm.rescale(N_px_D[i])
 
         # show cumulative warnings
         self._msgs = msgs_cum
-        self._show_messages(N_rays)
+        self._show_messages(N)
 
-        return SIm_res, DIm_res
+        return DIm_res
 
     def _hit_source(self, info: str, source_index: int = 0)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
@@ -1362,25 +1309,20 @@ class Raytracer(Group):
 
         return spec
 
-    def source_image(self, N: int, source_index: int = 0, limit: float = None, **kwargs) -> RImage:
+    def source_image(self, source_index: int = 0, limit: float = None, **kwargs) -> RenderImage:
         """
         Render a source image for a source in a traced geometry.
 
-        :param N: number of image pixels in smaller dimension
         :param source_index: source number, defaults to 0
         :param limit: resolution filter limit constant, see the documentation. Defaults to not filter
-        :param kwargs: optional keyword arguments for creating the RImage
-        :return: rendered RImage
+        :param kwargs: optional keyword arguments for creating the RenderImage
+        :return: rendered RenderImage
         """
-
-        if (N := int(N)) <= 0:
-            raise ValueError(f"Pixel number N needs to be a positive int, but is {N}.")
-
         p, w, wl, extent, desc, bar = self._hit_source("Source Image", source_index)
 
-        img = RImage(long_desc=desc, extent=extent, projection=None)
+        img = RenderImage(long_desc=desc, extent=extent, projection=None)
 
-        img.render(N, p, w, wl, limit=limit, **kwargs)
+        img.render(p, w, wl, limit=limit, **kwargs)
         if bar is not None:
             bar.finish()
 

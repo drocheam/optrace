@@ -6,12 +6,13 @@ sys.path.append('.')
 import pytest
 import unittest
 import numpy as np
+import cv2
 
 import optrace as ot
 from optrace.tracer import misc
 from optrace.tracer.geometry.surface import Surface
 
-from test_gui import rt_example
+from rt_example import rt_example
 
 
 # lens maker equation
@@ -385,8 +386,8 @@ class TracerTests(unittest.TestCase):
             RT.add(RS)
             RT.trace(200000)
 
-            im = RT.source_image(35)
-            L = im.get("Irradiance")
+            im = RT.source_image()
+            L = im.get("Irradiance", 35).data
             L /= np.max(L)
 
             if isinstance(surf, Surface):
@@ -464,16 +465,16 @@ class TracerTests(unittest.TestCase):
         # Parallel Illumination 2D
         RS0.divergence = "None"
         RT.trace(2000000)
-        img = RT.detector_image(63)
-        x, y = img.cut(y=0, mode="Irradiance")
+        img = RT.detector_image()
+        x, y = img.get("Irradiance", 63).cut(y=0)
         y = y[0]
         self.assertTrue(np.std(y/np.max(y)) < 0.025)
 
         # Equal divergence in 2D, leads to 1/cos(e)**2 on detector
         RS0.divergence = "Isotropic"
         RT.trace(2000000)
-        img = RT.detector_image(63)
-        x, y = img.cut(y=0, mode="Irradiance")
+        img = RT.detector_image()
+        x, y = img.get("Irradiance", 63).cut(y=0)
         x = x[:-1] + (x[1] - x[0])/2  # bin edge to bin center position
         y = y[0]/np.cos(np.arctan(x/10))**2
         self.assertTrue(np.std(y/np.max(y)) < 0.05)
@@ -481,8 +482,8 @@ class TracerTests(unittest.TestCase):
         # Equal divergence in 2D, leads to 1/cos(e)**3 on detector
         RS0.divergence = "Lambertian"
         RT.trace(2000000)
-        img = RT.detector_image(63)
-        x, y = img.cut(y=0, mode="Irradiance")
+        img = RT.detector_image()
+        x, y = img.get("Irradiance", 63).cut(y=0)
         x = x[:-1] + (x[1] - x[0])/2  # bin edge to bin center position
         y = y[0]/np.cos(np.arctan(x/10))**3
         self.assertTrue(np.std(y/np.max(y)) < 0.05)
@@ -491,8 +492,8 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1/np.cos(e)**2
         RT.trace(2000000)
-        img = RT.detector_image(63)
-        x, y = img.cut(y=0, mode="Irradiance")
+        img = RT.detector_image()
+        x, y = img.get("Irradiance", 63).cut(y=0)
         y = y[0]
         self.assertTrue(np.std(y/np.max(y)) < 0.025)
 
@@ -500,8 +501,8 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1+np.sqrt(e)
         RT.trace(2000000)
-        img = RT.detector_image(63)
-        x, y = img.cut(y=0, mode="Irradiance")
+        img = RT.detector_image()
+        x, y = img.get("Irradiance", 63).cut(y=0)
         x = x[:-1] + (x[1] - x[0])/2  # bin edge to bin center position
         y = y[0]/( 1 + np.sqrt(np.arctan(np.abs(x)/10)))/np.cos(np.arctan(x/10))**2
         self.assertTrue(np.std(y/np.max(y)) < 0.025)
@@ -512,15 +513,15 @@ class TracerTests(unittest.TestCase):
         # Parallel Illumination 3D
         RS0.divergence = "None"
         RT.trace(2000000)
-        img = RT.detector_image(63)
-        img = img.get("Irradiance")
+        img = RT.detector_image()
+        img = img.get("Irradiance", 63).data
         self.assertTrue(np.std(img/np.max(img)) < 0.025)
 
         # Equal divergence in 3D, leads to 1/cos(e)**3 on detector
         RS0.divergence = "Isotropic"
         RT.trace(2000000)
-        img0 = RT.detector_image(63)
-        img = img0.get("Irradiance")
+        img0 = RT.detector_image()
+        img = img0.get("Irradiance", 63).data
         x0, x1, y0, y1 = img0.extent
         Y, X = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**3
@@ -529,8 +530,8 @@ class TracerTests(unittest.TestCase):
         # Lambertian divergence in 3D, leads to 1/cos(e)**4 on detector
         RS0.divergence = "Lambertian"
         RT.trace(4000000)
-        img0 = RT.detector_image(63)
-        img = img0.get("Irradiance")
+        img0 = RT.detector_image()
+        img = img0.get("Irradiance", 63).data
         x0, x1, y0, y1 = img0.extent
         Y, X = np.mgrid[x0:x1:63j, y0:y1:63j]
         Z = img / np.cos(np.arctan(np.sqrt(X**2 + Y**2)/10))**4
@@ -540,16 +541,16 @@ class TracerTests(unittest.TestCase):
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1/np.cos(e)**3
         RT.trace(2000000)
-        img0 = RT.detector_image(63)
-        Z = img0.get("Irradiance")
+        img0 = RT.detector_image()
+        Z = img0.get("Irradiance", 63).data
         self.assertTrue(np.std(Z/np.max(Z)) < 0.075)
 
         # Function mode, needs to be rescaled by 1/function and 1/cos(e)**3 for uniform curve on detector
         RS0.divergence = "Function"
         RS0.div_func = lambda e: 1+np.sqrt(e)
         RT.trace(2000000)
-        img0 = RT.detector_image(63)
-        img = img0.get("Irradiance")
+        img0 = RT.detector_image()
+        img = img0.get("Irradiance", 63).data
         x0, x1, y0, y1 = img0.extent
         Y, X = np.mgrid[x0:x1:63j, y0:y1:63j]
         r = np.sqrt(X**2 + Y**2)
@@ -576,8 +577,8 @@ class TracerTests(unittest.TestCase):
                 pos=[0, 0, 0], s=[0, 0, 1], div_angle=89)
         RT.add(RS0)
         RT.trace(2000000)
-        img0 = RT.detector_image(63, projection_method="Equal-Area")
-        Z = img0.get("Irradiance")
+        img0 = RT.detector_image(projection_method="Equal-Area")
+        Z = img0.get("Irradiance", 63).data
         # mask out area outside disc, leave 3 pixels margin
         Y, X = np.mgrid[-32:32:63j, -32:32:63j]
         mask = np.sqrt(X**2 + Y**2) < 29
@@ -597,8 +598,8 @@ class TracerTests(unittest.TestCase):
         # check that hits are equally spaced in projection
         # leave one pixel margin, because of pixel positions
         RT.trace(20000)
-        img0 = RT.detector_image(256, projection_method="Equidistant")
-        z = img0.cut(y=0, mode="Irradiance")[1][0]
+        img0 = RT.detector_image(projection_method="Equidistant")
+        z = img0.get("Irradiance", 256).cut(y=0)[1][0]
         fact = z.shape[0] / 6  # divide range by number of theta spacings
         zp = (z > 0).nonzero()[0]  # find hits
         zp_diff = zp/fact - np.round(zp/fact)  # difference between pixel pos and correct pos
@@ -624,7 +625,7 @@ class TracerTests(unittest.TestCase):
 
                 # make detector image and get extent
                 RT.trace(40000)
-                img0 = RT.detector_image(256, projection_method="Stereographic")
+                img0 = RT.detector_image(projection_method="Stereographic")
                 x0, x1, y0, y1 = img0.extent
                 RT.remove(RS0)
 
@@ -644,12 +645,16 @@ class TracerTests(unittest.TestCase):
         RT.add([RS, det0, det1])
         RT.trace(100000)
 
-        img0 = RT.detector_image(100, detector_index=0)
-        img1 = RT.detector_image(100, detector_index=1, projection_method="Orthographic")
+        img0_ = RT.detector_image(detector_index=0)
+        img1_ = RT.detector_image(detector_index=1, projection_method="Orthographic")
+           
+        # resize so minor differences average out
+        img0 = cv2.resize(img0_._data, [105, 105], interpolation=cv2.INTER_AREA)
+        img1 = cv2.resize(img0_._data, [105, 105], interpolation=cv2.INTER_AREA)
 
         # check that images on both detectors are equal
-        ma = np.max(img0._img)
-        mdev = np.mean(np.abs(img0._img - img1._img)/ma)
+        ma = np.max(img0)
+        mdev = np.mean(np.abs(img0 - img1)/ma)
         self.assertAlmostEqual(mdev, 0, delta=1e-7)
 
     @pytest.mark.slow
@@ -781,8 +786,8 @@ class TracerTests(unittest.TestCase):
         # raytracer not silent -> outputs messages and progress bar for actions
         RT.trace(10000)
         RT.autofocus(RT.autofocus_methods[0], 12)
-        RT.source_image(100)
-        RT.detector_image(100)
+        RT.source_image()
+        RT.detector_image()
         RT.source_spectrum()
         RT.detector_spectrum()
         RT.iterative_render(100000)
@@ -972,40 +977,36 @@ class TracerTests(unittest.TestCase):
 
         RT = rt_example()
 
-        self.assertRaises(RuntimeError, RT.detector_image, 500)  # no rays traced
+        self.assertRaises(RuntimeError, RT.detector_image)  # no rays traced
         self.assertRaises(RuntimeError, RT.detector_spectrum)  # no rays traced
-        self.assertRaises(RuntimeError, RT.source_image, 500)  # no rays traced
+        self.assertRaises(RuntimeError, RT.source_image)  # no rays traced
         self.assertRaises(RuntimeError, RT.source_spectrum)  # no rays traced
 
         RT.trace(10000)
 
-        self.assertRaises(ValueError, RT.detector_image, -5)  # negative number of pixels
-        self.assertRaises(ValueError, RT.detector_image, 0)  # zero number of pixels
-        self.assertRaises(ValueError, RT.source_image, -5)  # negative number of pixels
-        self.assertRaises(ValueError, RT.source_image, 0)  # zero number of pixels
-        self.assertRaises(IndexError, RT.detector_image, 500, detector_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, detector_index=3)  # invalid index
         self.assertRaises(IndexError, RT.detector_spectrum, detector_index=3)  # invalid index
-        self.assertRaises(IndexError, RT.detector_image, 500, detector_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, detector_index=-3)  # invalid index
         self.assertRaises(IndexError, RT.detector_spectrum, detector_index=-3)  # invalid index
-        self.assertRaises(IndexError, RT.detector_image, 500, source_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, source_index=3)  # invalid index
         self.assertRaises(IndexError, RT.detector_spectrum, source_index=3)  # invalid index
-        self.assertRaises(IndexError, RT.detector_image, 500, source_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.detector_image, source_index=-3)  # invalid index
         self.assertRaises(IndexError, RT.detector_spectrum, source_index=-3)  # invalid index
-        self.assertRaises(IndexError, RT.source_image, 500, source_index=3)  # invalid index
+        self.assertRaises(IndexError, RT.source_image, source_index=3)  # invalid index
         self.assertRaises(IndexError, RT.source_spectrum, source_index=3)  # invalid index
-        self.assertRaises(IndexError, RT.source_image, 500, source_index=-3)  # invalid index
+        self.assertRaises(IndexError, RT.source_image, source_index=-3)  # invalid index
         self.assertRaises(IndexError, RT.source_spectrum, source_index=-3)  # invalid index
 
-        self.assertRaises(ValueError, RT.detector_image, 500, extent="abc")  # invalid extent
-        self.assertRaises(ValueError, RT.detector_image, 500, extent=[1, 2, 1, np.inf])  # invalid extent
+        self.assertRaises(ValueError, RT.detector_image, extent="abc")  # invalid extent
+        self.assertRaises(ValueError, RT.detector_image, extent=[1, 2, 1, np.inf])  # invalid extent
         self.assertRaises(ValueError, RT.detector_spectrum, extent="abc")  # invalid extent
         self.assertRaises(ValueError, RT.detector_spectrum, extent=[1, 2, 1, np.inf])  # invalid extent
 
         RT.detectors = []
-        self.assertRaises(RuntimeError, RT.detector_image, 200)  # no detectors
+        self.assertRaises(RuntimeError, RT.detector_image)  # no detectors
         self.assertRaises(RuntimeError, RT.detector_spectrum)  # no detectors
         RT.ray_sources = []
-        self.assertRaises(RuntimeError, RT.source_image, 200)  # no sources
+        self.assertRaises(RuntimeError, RT.source_image)  # no sources
         self.assertRaises(RuntimeError, RT.source_spectrum)  # no sources
 
     @pytest.mark.slow
@@ -1020,90 +1021,54 @@ class TracerTests(unittest.TestCase):
         N_rays = int(RT.ITER_RAYS_STEP/10)
         
         # default call
-        sim, dim = RT.iterative_render(N_rays)
-        self.assertEqual(len(sim), len(RT.ray_sources))
+        dim = RT.iterative_render(N_rays)
         self.assertEqual(len(dim), 1)
         self.assertTrue(dim[0].limit is None)
         
-        # default call with no sources
-        sim, dim = RT.iterative_render(N_rays, no_sources=True)
-        self.assertEqual(len(sim), 0)
-
         # call with explicit position
-        sim, dim = RT.iterative_render(N_rays, pos=[0, 0, 13.3])
+        dim = RT.iterative_render(N_rays, pos=[0, 0, 13.3])
         
         # call with explicit extent = [...]
         ext2 = [0, *RT.detectors[0].extent[1:4]]
-        sim, dim = RT.iterative_render(N_rays, extent=ext2)
+        dim = RT.iterative_render(N_rays, extent=ext2)
         self.assertTrue(np.all(dim[0].extent == ext2))
         
         # call with explicit detector_index
-        sim, dim = RT.iterative_render(N_rays, detector_index=1)
-        
-        # call with explicit detector pixel number
-        sim, dim = RT.iterative_render(N_rays, N_px_D=315)
-        self.assertEqual(dim[0].N, 315)
-        
-        # call with explicit source pixel number
-        sim, dim = RT.iterative_render(N_rays, N_px_S=315)
-        self.assertEqual(sim[0].N, 315)
+        dim = RT.iterative_render(N_rays, detector_index=1)
         
         # call with explicit projection_method
-        sim, dim = RT.iterative_render(N_rays, N_px_S=400, detector_index=1, 
-                                       projection_method="Stereographic")
+        dim = RT.iterative_render(N_rays, detector_index=1, 
+                                  projection_method="Stereographic")
         self.assertEqual(dim[0].projection, "Stereographic")
         
         # call with explicit limit
-        sim, dim = RT.iterative_render(N_rays, N_px_S=400, detector_index=0, limit=5)
+        dim = RT.iterative_render(N_rays, detector_index=0, limit=5)
         self.assertEqual(dim[0].limit, 5)
         
         # call with multiple positions
-        sim, dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]])
+        dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]])
         self.assertEqual(len(dim), 2)
         
         # call with multiple positions and detector_indices
-        sim, dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]], 
-                                       detector_index=[0, 1])
+        dim = RT.iterative_render(N_rays, pos=[[0, 0, 0], [0, 0, 5]], 
+                                  detector_index=[0, 1])
         self.assertEqual(len(dim), 2)
         self.assertNotEqual(dim[0].projection, dim[1].projection) 
         # the detectors have different coordinate types
 
-        # call with multiple positions and detector pixel numbers
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
-                                       N_px_D=[5, 500])
-        self.assertNotEqual(dim[0].shape[1], dim[1].shape[1]) 
-        
         # call with multiple positions and projection_methods
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
-                                       N_px_D=500, detector_index=1,
-                                       projection_method=["Equidistant", "Equal-Area"])
+        dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
+                                   detector_index=1, projection_method=["Equidistant", "Equal-Area"])
         self.assertNotEqual(dim[0].projection, dim[1].projection) 
         
         # call with multiple positions and limits
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
-                                       N_px_D=500, detector_index=0,
-                                       limit=[10, 12])
+        dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]], 
+                                  detector_index=0, limit=[10, 12])
         self.assertNotEqual(dim[0].limit, dim[1].limit) 
-        
-        # call with multiple source pixel numbers
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), N_px_S=[5, 500])
-        self.assertNotEqual(sim[0].shape[1], sim[1].shape[0]) 
-        
-        # call with multiple positions and detector pixel numbers
-        sim, dim = RT.iterative_render(int(RT.ITER_RAYS_STEP/4), pos=[[0, 0, 0], [0, 0, 5]],
-                                       extent=[None, [-1, 1, 2, 3]])
-        self.assertFalse(np.all(dim[0].extent == dim[1].extent)) 
         
         self.assertRaises(ValueError, RT.iterative_render, 0)  # zero ray number
         self.assertRaises(ValueError, RT.iterative_render, -10)  # negative ray number
-        self.assertRaises(ValueError, RT.iterative_render, 10000, -2)  # negative pixel number
-        self.assertRaises(ValueError, RT.iterative_render, 10000, 0)  # zero pixel number
-        self.assertRaises(ValueError, RT.iterative_render, 10000, 400, -2)  # negative pixel number
-        self.assertRaises(ValueError, RT.iterative_render, 10000, 400, 0)  # zero pixel number
         
-        self.assertRaises(ValueError, RT.iterative_render, 10000, N_px_D=[2, 500])  # len(N_px_D) != len(pos)
-        self.assertRaises(ValueError, RT.iterative_render, 10000, N_px_S=[2, 500, 600])  
-        # len(N_px_S) != len(RT.ray_sources)
         self.assertRaises(ValueError, RT.iterative_render, 10000, extent=[None, None])  # len(extent) != len(pos)
         self.assertRaises(ValueError, RT.iterative_render, 10000, projection_method=["Equidistant", "Equal-Area"])
         # ^--  len(projection_method) != len(pos)
@@ -1117,19 +1082,20 @@ class TracerTests(unittest.TestCase):
         # coverage tests:
 
         # do multiple iterative steps
-        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2)
+        dim = RT.iterative_render(RT.ITER_RAYS_STEP*2)
 
         # do multiple iterative steps with an un-full last iteration
-        sim, dim = RT.iterative_render(RT.ITER_RAYS_STEP*2+100)
+        dim = RT.iterative_render(RT.ITER_RAYS_STEP*2+100)
         
         # render without detectors
-        RT.detectors = []
-        sim, dim = RT.iterative_render(N_rays)
+        det_backup = RT.detectors.copy()
+        RT.remove(RT.detectors)
+        self.assertRaises(RuntimeError, RT.iterative_render, N_rays)
 
-        self.assertRaises(RuntimeError, RT.iterative_render, 10000, pos=[0, 0, 0])  # no detectors to move
-
-        RT.ray_sources = []
-        self.assertRaises(RuntimeError, RT.iterative_render, 10000)  # no ray_sources
+        # no ray sources
+        RT.add(det_backup)
+        RT.remove(RT.ray_sources)
+        self.assertRaises(RuntimeError, RT.iterative_render, 10000)
 
         # raise on geometry error
         RT = rt_example()
@@ -1148,6 +1114,8 @@ class TracerTests(unittest.TestCase):
         surf2 = ot.CircularSurface(r=1e-6)
         L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
         RT.add(L)
+
+        RT.add(det_backup)
 
         N = 2*RT.ITER_RAYS_STEP
         RT.iterative_render(N)
@@ -1267,12 +1235,16 @@ class TracerTests(unittest.TestCase):
         beta = -RT.tma().matrix_at(0, zi)[0, 0]
         dimg_ext = np.array(RSS.extent[:4]) * beta
 
-        simg = RT.source_image(500)
-        dimg = RT.detector_image(500, extent=dimg_ext)
+        simg_ = RT.source_image()
+        dimg_ = RT.detector_image(extent=dimg_ext)
+
+        # resize so some things average out
+        simg = cv2.resize(simg_._data, [315, 315], interpolation=cv2.INTER_AREA)
+        dimg = cv2.resize(dimg_._data, [315, 315], interpolation=cv2.INTER_AREA)
 
         # get pixel power image, detector image must be flipped
-        diff = simg.img[:, :, 3] - np.flipud(np.fliplr(dimg.img[:, :, 3]))
-        diffm = np.max(simg.img[:, :, 3])
+        diff = simg[:, :, 3] - np.flipud(np.fliplr(dimg[:, :, 3]))
+        diffm = np.max(simg[:, :, 3])
 
         # calculate maximum deviation
         dev = np.max(np.abs(diff/diffm))
@@ -1340,6 +1312,47 @@ class TracerTests(unittest.TestCase):
         polpol = np.sum(pol*pol, axis=2)
         m = ~np.isnan(polpol)
         self.assertTrue(np.allclose(polpol[m], 1))  # length is 1
+
+    def test_linear_image_source(self):
+        """
+        test that the LinearImage as source is treated linearly, the spectrum is applied correctly
+        and the resulting emittance matches the distribution inside the Image
+        """
+
+        # create some LinearImage
+        X, Y = np.mgrid[-1:1:63j, -1:1:63j]
+        Z = np.sin(5*X+Y)**2
+        img = ot.LinearImage(Z, [1, 1])
+
+        # test different spectra
+        for spec in [ot.presets.light_spectrum.d65, ot.LightSpectrum("Monochromatic", wl=540),
+                     ot.presets.light_spectrum.led_b1]:
+
+            # create raysource
+            RT = ot.Raytracer([-10, 10, -10, 10, -10, 200])
+            RS = ot.RaySource(img, divergence="None", pos=[0, 0, 0], spectrum=spec)
+            RT.add(RS)
+
+            # add detector
+            dets = ot.RectangularSurface(img.s)
+            Det = ot.Detector(dets, pos=[0, 0, 1])
+            RT.add(Det)
+
+            # trace
+            RT.trace(5000000)
+
+            # detector image
+            dimg = RT.detector_image()
+            img2 = dimg.get("Irradiance", 63)
+
+            # normalize images
+            img2_data = img2.data / np.max(img2.data)
+            img_data = img.data / np.max(img.data)
+
+            # mean absolute deviation should be very small
+            mad = np.mean(np.abs(img2_data - img_data))
+            self.assertAlmostEqual(mad, 0, delta=0.003)
+
 
 if __name__ == '__main__':
     unittest.main()

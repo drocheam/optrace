@@ -385,40 +385,42 @@ def xyz_to_srgb(xyz:                np.ndarray,
     return RGB
 
 
-def log_srgb_linear(img: np.ndarray, exp: float = 1.0) -> np.ndarray:
+def log_srgb(img: np.ndarray) -> np.ndarray:
     """
-    Logarithmically scale linear sRGB components and additionally exponentiate by 'exp'
+    Logarithmically scale sRGB values.
+    This is done by rescaling the lightness of the colors (in CIELUV) while keeping the chromaticities the same.
 
-    :param img: input image, shape (Ny, Nx, 3) in linear sRGB
-    :param exp: scaling exponent, optional
-    :return: logarithmically scaled and exponated linear sRGB values
+    :param img: input image, shape (Ny, Nx, 3) in sRGB
+    :return: logarithmically scaled sRGB values
     """
-
-    # addition, multiplication etc. only work correctly in the linear color space
-    # otherwise we would change the color ratios, but we only want the brightness to change
-    if np.any(img > 0):
-        rgbs = np.sum(img, axis=2)  # assume RGB channel sum as brightness
-        nz = rgbs > 0
-        rgbsnz = rgbs[nz]
-        wmin = np.min(rgbsnz)  # minimum nonzero brightness
-        wmax = np.max(rgbsnz)  # minimum brightness
-
-        # constant image or image differences due to numerical errors
-        if wmin > (1 - 1e-6)*wmax:
-            return img.copy()
-
-        maxrgb = np.max(img, axis=2)  # highest rgb value for each pixel
-
-        # normalize pixel so highest channel value is 1, then rescale logarithmically.
-        # Highest value is 1, lowest 0. Exclude all zero channels (maxrgb = 0) for calculation
-        mrgb, exp_ = maxrgb[nz], exp
-        fact = np.zeros(img.shape[:2])
-        fact[nz] = ne.evaluate("1/mrgb * (1 - 0.995*log(rgbsnz/ wmax) / log(wmin / wmax)) ** exp_")
-
-        return img * fact[:, :, np.newaxis]
-
-    else:
+    if not np.any(img > 0):
         return img.copy()
+
+    # convert to luv
+    xyz = srgb_to_xyz(img)
+    luv = xyz_to_luv(xyz)
+       
+    # get lightness bounds (except zero)
+    L = luv[:, :, 0]
+    L0 = L[L > 0]
+    lmax = np.max(L0)
+    lmin = np.min(L0)
+
+    if lmin == lmax:
+        return img.copy()
+   
+    # rescale lightness logarithmically
+    luv2 = luv.copy()
+    luv2[L > 0, 0] = L02 = ne.evaluate("100 - 99.5*log(L0/ lmax) / log(lmin / lmax)")
+    
+    # rescale uv so chromaticity stays the same
+    sat_scale = L02 / L0
+    luv2[L > 0, 1] *= sat_scale
+    luv2[L > 0, 2] *= sat_scale
+
+    # convert back to srgb
+    xyz = luv_to_xyz(luv2)
+    return xyz_to_srgb(xyz)
 
 
 def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:

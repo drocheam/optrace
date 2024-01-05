@@ -58,7 +58,7 @@ The pixel sizes for the smaller side are limited to:
    >>> ot.RImage.SIZES
    [1, 3, 5, 7, 9, 15, 21, 27, 35, 45, 63, 105, 135, 189, 315, 945]
 
-Whereas the larger side is larger by a factor with elements of :attr:`ot.RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>` up to:
+Whereas the larger side is larger by a factor with elements of :attr:`ot.RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` up to:
 
 .. doctest::
 
@@ -202,7 +202,7 @@ Available methods are:
 Resolution Limit Filter
 ___________________________
 
-Unfortunately, `optrace` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RImage <optrace.tracer.r_image.RImage>` class provides a limit parameter. 
+Unfortunately, `optrace` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` class provides a limit parameter. 
 For a limit value a corresponding airy disc is created, that is convolved with the image.
 This parameter describes the Rayleigh limit, being half the size of the airy disc core (zeroth order), known from the equation:
 Only the first two diffraction orders (core + 2 rings) are used.
@@ -284,7 +284,7 @@ The below snippet generates a geometry with multiple sources and detectors. The 
 Rendering a source image is done with the :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` method of the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` class. Note that it expects, that scene has already been traced and rays were calculated.
 
 The function takes a pixel size parameter, that determines the pixel count for the smaller image size.
-Note that only image sizes of :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>` are valid, when different values are specified the nearest values is chosen.
+Note that only image sizes of :attr:`RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` are valid, when different values are specified the nearest values is chosen.
 
 Example for the function call:
 
@@ -418,30 +418,6 @@ As for :python:`get` there is a :python:`log` parameter:
 The function returns a tuple of the histogram bin edges and the histogram values, both one dimensional numpy arrays. Note that the bin arrays is larger by one element.
 
 
-Rescaling and Filtering an Image
-_____________________________________
-
-
-As discussed before, internally the RImage data is saved in a higher resolution. After generating such an RImage you can rescale it afterwards.
-Note that no interpolation takes place, the histogram bins just get joined together without distorting or guessing any information.
-
-Rescaling is done with the :meth:`rescale <optrace.tracer.r_image.RImage.rescale>` function and a size parameter:
-
-.. testcode::
-
-   img.rescale(400)
-
-The size doesn't need to be one of :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>`, but the nearest one of these values gets chosen automatically.
-
-The size should now be:
-
-.. doctest::
-
-   >>> img.N
-   315
-
-Which is the nearest value in :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>`.
-
 
 Saving, Loading and Exporting an Image
 ___________________________________________
@@ -460,33 +436,14 @@ The file ending should be `.npz`, but gets added automatically. This function ov
 
 **Loading**
 
-For loading the object the static method :meth:`load <optrace.tracer.r_image.RImage.load>` of the RImage class is used. It takes a path and returns the RImage object.
+For loading the object the static method :meth:`load <optrace.tracer.image.render_image.RenderImage.load>` of the RImage class is used. It takes a path and returns the RImage object.
 
 .. code-block:: python
 
    img = ot.RImage.load("RImage_12345")
 
 
-**Export as PNG**
-
-You can also export an image mode as image file. The function :meth:`export <optrace.tracer.r_image.RImage.export>` takes a file path and an image mode as arguments. 
-
-.. TODO notes on pixel interpolation, imwrite parameters etc.
-
-An exemplary function call could be:
-
-.. code-block:: python
-
-   img.export("Image_12345_sRGB", "sRGB (Absolute RI)")
-
-As for the image modes, one can specify the parameters :python:`log` and :python:`flip`. 
-As for :meth:`RImage.save <optrace.tracer.r_image.RImage.save>` this function overrides files and throws an exception when saving failed.
-
-
-.. code-block:: python
-
-   img.export("Image_12345_sRGB.jpg", "sRGB (Absolute RI)", log=True, flip=True)
-
+.. TODO image saving part
 
 .. note::
 
@@ -578,7 +535,7 @@ More on plotting spectra is found in :numref:`spectrum_plots`.
 
 **Image**
 
-With a RImage object an image plot is created with the function :func:`r_image_plot <optrace.plots.r_image_plots.r_image_plot>`. But first, the plotting namespace needs to be imported:
+With a RImage object an image plot is created with the function :func:`image_plot <optrace.plots.image_plots.image_plot>`. But first, the plotting namespace needs to be imported:
 
 .. testcode::
    
@@ -589,27 +546,27 @@ The plotting function takes the RImage as parameter. Next, we need to specify th
 
 .. testcode::
 
-   otp.r_image_plot(img, "Lightness (CIELUV)")
+   otp.image_plot(img, "Lightness (CIELUV)")
 
 We can use the additional parameter :python:`log` to scale the image values logarithmically or provide :python:`flip=True` to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the :python:`title` parameter.
 
 .. testcode::
 
-   otp.r_image_plot(img, "Lightness (CIELUV)", title="Title 123", log=True, flip=True)
+   otp.image_plot(img, "Lightness (CIELUV)", title="Title 123", log=True, flip=True)
 
 **Image Cut**
 
-For plotting an image cut the analogous function :func:`r_image_cut_plot <optrace.plots.r_image_plots.r_image_cut_plot>` is applied. It takes the same arguments, but needs a cut parameter :python:`x` or :python:`y`. These are the same parameters as for the function :meth:`RImage.cut <optrace.tracer.r_image.RImage.cut>`, so setting a value for :python:`x` creates a profile in y-direction for the given x value and vice versa.
+For plotting an image cut the analogous function :func:`image_cut_plot <optrace.plots.image_plots.image_cut_plot>` is applied. It takes the same arguments, but needs a cut parameter :python:`x` or :python:`y`. 
 
 .. testcode::
 
-   otp.r_image_cut_plot(img, "Lightness (CIELUV)", x=0)
+   otp.image_cut_plot(img, "Lightness (CIELUV)", x=0)
 
-Supporting all the same parameters as for :func:`r_image_plot <optrace.plots.r_image_plots.r_image_plot>`, the following call is also valid:
+Supporting all the same parameters as for :func:`image_plot <optrace.plots.image_plots.image_plot>`, the following call is also valid:
 
 .. testcode::
 
-   otp.r_image_cut_plot(img, "Lightness (CIELUV)", y=0.2, title="Title 123", log=True, flip=True)
+   otp.image_cut_plot(img, "Lightness (CIELUV)", y=0.2, title="Title 123", log=True, flip=True)
 
 
 

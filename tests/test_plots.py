@@ -19,10 +19,8 @@ from optrace.tracer import misc as misc
 
 import matplotlib.pyplot as plt
 
-# Things that need to be checked by hand
+# Things that need to be checked by hand/eye:
 # applying of title and labels
-#######
-# set PlotTests.manual = True for manual mode, where each window needs to controlled and closed by hand 
 
 
 class PlotTests(unittest.TestCase):
@@ -32,7 +30,7 @@ class PlotTests(unittest.TestCase):
         plt.close('all')
 
     @pytest.mark.slow
-    def test_r_image_plots(self) -> None:
+    def test_image_plots(self) -> None:
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6])
         RSS = ot.presets.image.color_checker([6, 6])
@@ -41,7 +39,7 @@ class PlotTests(unittest.TestCase):
 
         RT.trace(200000)
 
-        def check_plots(img):
+        def check_plots(rimg):
 
             for i in np.arange(2):
 
@@ -49,53 +47,48 @@ class PlotTests(unittest.TestCase):
                 flip = random.choice([True, False])
                 
                 # image plots
-                for modei in ot.RImage.display_modes:
-                    otp.r_image_plot(img, mode=modei, log=log, flip=flip)
-                    otp.r_image_cut_plot(img, modei, log=log, flip=flip, x=0.1)
-                    otp.r_image_cut_plot(img, modei, log=log, flip=flip, y=-0.156)
+                for modei in ot.RenderImage.image_modes:
+                    img = rimg.get(modei, 200)
+                    img.limit = None if random.choice([True, False]) else 5 
+                    otp.image_plot(img, log=log, flip=flip)
+                    otp.image_cut_plot(img, log=log, flip=flip, x=0.1)
+                    otp.image_cut_plot(img, log=log, flip=flip, y=-0.156)
                     plt.close('all')
 
                 # make image empty and check if plots can handle this
-                img.img *= 0
+                rimg._data *= 0
 
         # cartesian plots
-        img = RT.source_image(200)
+        img = RT.source_image()
         check_plots(img)
 
         # polar plots with different projections
         RT.add(ot.Detector(ot.SphericalSurface(r=3, R=-10), pos=[0, 0, 3]))
         for proj in ot.SphericalSurface.sphere_projection_methods:
-            img = RT.detector_image(200, projection_method=proj)
+            img = RT.detector_image(projection_method=proj)
             check_plots(img)
 
         # check if user title gets applied
-        otp.r_image_plot(img, mode=ot.RImage.display_modes[0], flip=True, title="Test title")
-        otp.r_image_cut_plot(img, mode=ot.RImage.display_modes[0], flip=True, x=0.15, title="Test title")
+        otp.image_plot(img.get(ot.RenderImage.image_modes[0]), flip=True, title="Test title")
+        otp.image_cut_plot(img.get(ot.RenderImage.image_modes[0]), flip=True, x=0.15, title="Test title")
 
-        # check if 'limit' label works
-        img._limit = 1
-        otp.r_image_plot(img, mode=ot.RImage.display_modes[0], flip=True)
-        
         # exception tests
-        self.assertRaises(TypeError, otp.r_image_plot, [5, 5])  # invalid RImage
-        self.assertRaises(TypeError, otp.r_image_cut_plot, [5, 5])  # invalid RImage
-        self.assertRaises(ValueError, otp.r_image_plot, img, mode="4564")  # invalid RImage mode
-        self.assertRaises(ValueError, otp.r_image_cut_plot, img, mode="4564")  # invalid RImage mode
-        self.assertRaises(TypeError, otp.r_image_cut_plot, img, mode=2)  # invalid mode type
-        self.assertRaises(TypeError, otp.r_image_cut_plot, img, flip=2)  # invalid flip type
-        self.assertRaises(TypeError, otp.r_image_cut_plot, img, title=2)  # invalid title type
-        self.assertRaises(TypeError, otp.r_image_cut_plot, img, log=2)  # invalid log type
-        self.assertRaises(TypeError, otp.r_image_plot, img, mode=2)  # invalid mode type
-        self.assertRaises(TypeError, otp.r_image_plot, img, flip=2)  # invalid flip type
-        self.assertRaises(TypeError, otp.r_image_plot, img, title=2)  # invalid title type
-        self.assertRaises(TypeError, otp.r_image_plot, img, log=2)  # invalid log type
-        self.assertRaises(ValueError, otp.r_image_cut_plot, img)  # x and y missing
+        img = img.get("sRGB (Absolute RI)")
+        self.assertRaises(TypeError, otp.image_plot, [5, 5])  # invalid Image
+        self.assertRaises(TypeError, otp.image_cut_plot, [5, 5])  # invalid Image
+        self.assertRaises(TypeError, otp.image_cut_plot, img, flip=2)  # invalid flip type
+        self.assertRaises(TypeError, otp.image_cut_plot, img, title=2)  # invalid title type
+        self.assertRaises(TypeError, otp.image_cut_plot, img, log=2)  # invalid log type
+        self.assertRaises(TypeError, otp.image_plot, img, flip=2)  # invalid flip type
+        self.assertRaises(TypeError, otp.image_plot, img, title=2)  # invalid title type
+        self.assertRaises(TypeError, otp.image_plot, img, log=2)  # invalid log type
+        self.assertRaises(ValueError, otp.image_cut_plot, img)  # x and y missing
 
         # check zero image log plot
-        RIm = ot.RImage(extent=[-1, 1, -1, 1])
+        RIm = ot.RenderImage(extent=[-1, 1, -1, 1])
         RIm.render()
-        otp.r_image_cut_plot(RIm, x=0, log=True)  # log mode but zero image
-        otp.r_image_plot(RIm, log=True)  # log mode but zero image
+        otp.image_cut_plot(RIm.get("Irradiance"), x=0, log=True)  # log mode but zero image
+        otp.image_plot(RIm.get("Irradiance"), log=True)  # log mode but zero image
 
     @pytest.mark.slow
     def test_chromaticity_plots(self) -> None:
@@ -105,19 +98,18 @@ class PlotTests(unittest.TestCase):
         RS = ot.RaySource(RSS, pos=[0, 0, 0])
         RT.add(RS)
         RT.trace(200000)
-        img = RT.source_image(200)
+        img = RT.source_image()
         
-        # ChromaticityPlots
-        # different paramter combinations
-        for el in [ot.presets.light_spectrum.d65, ot.presets.light_spectrum.standard, img, []]:
+        # different parameter combinations
+        for el in [ot.presets.light_spectrum.d65, ot.presets.light_spectrum.standard, img,\
+                   ot.presets.image.cell([1, 1]), []]:
             for i, cie in enumerate([otp.chromaticities_cie_1931, otp.chromaticities_cie_1976]):
                 for normi in otp.chromaticity_norms:
                     title = None if not i else "Test title"  # sometimes set a different title
                     cie(el, norm=normi)
-                    if isinstance(el, ot.RImage):
-                        for RIi in color.SRGB_RENDERING_INTENTS:
-                            args = dict(title=title) if title is not None else {}
-                            cie(el, norm=normi, rendering_intent=RIi, **args)
+                    if isinstance(el, ot.RenderImage):
+                        args = dict(title=title) if title is not None else {}
+                        cie(el, norm=normi, **args)
                 plt.close("all")
 
 
@@ -134,7 +126,6 @@ class PlotTests(unittest.TestCase):
                                                                    ot.Point()])  # invalid type in list
         self.assertRaises(TypeError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, title=[])  # invalid title type
         self.assertRaises(ValueError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, norm="abc")  # invalid norm
-        self.assertRaises(ValueError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, rendering_intent="abc")  # invalid rendering_intent
         
     @pytest.mark.slow
     def test_spectrum_plots(self):
@@ -252,25 +243,6 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, SPP, L.front, xe=[])
         self.assertRaises(TypeError, SPP, 5)
 
-    def test_image_plot(self):
-
-        # check different images, extents and titles
-        for flip in [True, False]:
-            for s in [[3, 2], [1, 3]]:
-                for title in ["", "abc"]:
-                    otp.image_plot(ot.presets.image.color_checker(s), title=title, flip=flip)
-
-        # check types
-        self.assertRaises(TypeError, otp.image_plot, ot.presets.image.color_checker(s), title=5)  # invalid title
-        self.assertRaises(TypeError, otp.image_plot, s)  # invalid img
-
-        # coverage
-        ########################################
-
-        # plot empty array
-        arr = np.zeros((100, 100, 3))
-        otp.image_plot(ot.Image(arr, [3, 3]))
-
     def af_dummy(self):
         # dummy data for autofocus_cost_plot
         z = np.linspace(-2.5, 501, 200)
@@ -293,8 +265,8 @@ class PlotTests(unittest.TestCase):
             self.assertTrue(os.path.exists(path))
             os.remove(path)
 
-        # dummy RImage
-        RIm = ot.RImage(extent=[-1, 1, -1, 1])
+        # dummy RenderImage
+        RIm = ot.RenderImage(extent=[-1, 1, -1, 1])
         RIm.render()
 
         # test different functions, they all must include a saving option and correctly handle the sargs parameter
@@ -302,10 +274,10 @@ class PlotTests(unittest.TestCase):
         sargs = dict(pad_inches=10, dpi=120)
         for plot, args, kwargs in zip([otp.chromaticities_cie_1931, otp.chromaticities_cie_1976, otp.spectrum_plot, 
                                        otp.refraction_index_plot, otp.abbe_plot, otp.surface_profile_plot,
-                                       otp.r_image_plot, otp.r_image_cut_plot, otp.image_plot, otp.autofocus_cost_plot], 
-                                      [[[]], [[]], [[]], [[]], [[]], [[]], [RIm], [RIm], [ot.presets.image.color_checker(
-                                                                                          [1, 2])], self.af_dummy()], 
-                                      [{}, {}, {}, {}, {}, {}, {}, dict(x=0), {}, {}]):
+                                       otp.image_plot, otp.image_cut_plot, otp.autofocus_cost_plot], 
+                                      [[[]], [[]], [[]], [[]], [[]], [[]], [RIm.get("Irradiance")],
+                                        [RIm.get("sRGB (Absolute RI)")], self.af_dummy()], 
+                                      [{}, {}, {}, {}, {}, {}, {}, dict(x=0), {}]):
             assert not os.path.exists(path)
 
             kwargs.update(sargs=sargs, path=path)

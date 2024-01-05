@@ -1,22 +1,29 @@
 from setuptools import setup
+import os
 
 # older vtk wheels:
 # https://github.com/pyvista/pyvista-wheels
 
 if __name__ == '__main__':
+    
+    # load package information
+    metadata = {}
+    path = os.path.join("optrace", "metadata.py")
+    with open(path, "r") as f:
+        exec(f.read(), metadata)
 
-    setup(name = "optrace",
-          author = "Damian Mendroch",
-          credits = [],
-          license = "not specified yet",
-          version = "1.5.1",
-          maintainer = "Damian Mendroch",
-          email = "damian.mendroch@th-koeln.de",
-          status = "Beta",
-          url = "http://github.com/drocheam/optrace/",
-          description = "An optics simulation package with sequential raytracing,"
-                            " image rendering and a gui frontend",
-          keywords = ["simulation", "optics", "raytracing"],
+    # setup options
+    setup(name = metadata["name"],
+          author = metadata["author"],
+          credits = metadata["credits"],
+          license = metadata["license"],
+          version = metadata["version"],
+          maintainer = metadata["maintainer"],
+          email = metadata["email"],
+          status = metadata["status"],
+          url = metadata["url"],
+          description = metadata["description"],
+          keywords = metadata["keywords"],
           #
           classifiers=["Development Status :: 4 - Beta",
                        "Intended Audience :: Developers",

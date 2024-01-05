@@ -5,7 +5,8 @@ import numpy as np  # calculations
 import matplotlib.pyplot as plt  # actual plotting
 import matplotlib.patheffects as path_effects  # path effects for plot lines
 
-from ..tracer.r_image import RImage
+from ..tracer.image.render_image import RenderImage
+from ..tracer.image.rgb_image import RGBImage
 from ..tracer.spectrum import LightSpectrum
 from ..tracer import color  # color conversions for chromaticity plots
 from ..tracer.misc import PropertyChecker as pc
@@ -26,16 +27,15 @@ _red_xyz = np.array([[[*color.SRGB_R_XY, 1 - color.SRGB_R_XY[0] - color.SRGB_R_X
 _CONV_XYZ_NORM = color.xyz_to_srgb_linear(_red_xyz, normalize=False)[0, 0, 0]  # srgb linear red channel primary
 
 
-def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[LightSpectrum] = None,
-                            rendering_intent:     str = "Ignore",
+
+def chromaticities_cie_1931(img:                  RenderImage | RGBImage | LightSpectrum | list[LightSpectrum] = None,
                             title:                str = "CIE 1931 Chromaticity Diagram",
                             **kwargs)\
         -> None:
     """
     Draw a CIE 1931 xy chromaticity diagram and mark spectrum/image colors inside of it.
 
-    :param img: RImage, LightSpectrum or a list of LightSpectrum
-    :param rendering_intent: rendering_intent for the sRGB conversion
+    :param img: RenderImage, RGBImage, LightSpectrum or a list of LightSpectrum
     :param title: title of the plot
     :param kwargs: additional plotting parameters, including:
      norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
@@ -58,20 +58,17 @@ def chromaticities_cie_1931(img:                  RImage | LightSpectrum | list[
         return 1/_CONV_XYZ_NORM * color.xyY_to_xyz(xyY)
 
     ext = [0, 0.83, 0, 0.9]  # extent of diagram
-    _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
-                       title, "x", "y", **kwargs)
+    _chromaticity_plot(img, conv, i_conv, r, g, b, w, ext, title, "x", "y", **kwargs)
 
 
-def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[LightSpectrum] = None,
-                            rendering_intent:     str = "Ignore",
+def chromaticities_cie_1976(img:                  RenderImage | RGBImage | LightSpectrum | list[LightSpectrum] = None,
                             title:                str = "CIE 1976 UCS Diagram",
                             **kwargs)\
         -> None:
     """
     Draw a CIE 1976 xy chromaticity diagram and mark spectrum/image colors inside of it.
 
-    :param img: RImage, LightSpectrum or a list of LightSpectrum
-    :param rendering_intent: rendering_intent for the sRGB conversion
+    :param img: RenderImage, RGBImage, LightSpectrum or a list of LightSpectrum
     :param title: title of the plot
     :param kwargs: additional plotting parameters, including:
      norm: brightness norm for the chromaticity diagram, one of "chromaticity_norms"
@@ -98,14 +95,12 @@ def chromaticities_cie_1976(img:                  RImage | LightSpectrum | list[
         return 1/_CONV_XYZ_NORM * np.dstack((xg, yg, zg))
 
     ext = [0, 0.7, 0, 0.7]  # extent of diagram
-    _chromaticity_plot(img, conv, i_conv, rendering_intent, r, g, b, w, ext,
-                       title, "u'", "v'", **kwargs)
+    _chromaticity_plot(img, conv, i_conv, r, g, b, w, ext, title, "u'", "v'", **kwargs)
 
 
-def _chromaticity_plot(img:                     RImage | LightSpectrum | list[LightSpectrum],
+def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSpectrum | list[LightSpectrum],
                        conv:                    Callable,
                        i_conv:                  Callable,
-                       rendering_intent:        str,
                        r:                       list,
                        g:                       list,
                        b:                       list,
@@ -121,13 +116,11 @@ def _chromaticity_plot(img:                     RImage | LightSpectrum | list[Li
     """Lower level plotting function. Don't use directly"""
 
     pc.check_type("title", title, str)
-    pc.check_if_element("rendering_intent", rendering_intent, color.srgb.SRGB_RENDERING_INTENTS)
     pc.check_if_element("norm", norm, chromaticity_norms)
     
-    # RImage -> plot Pixel colors (RI != "Ignore" means sRGB conversion with said rendering intent)
-    if isinstance(img, RImage):
-        XYZ = img.xyz() if rendering_intent == "Ignore" \
-            else color.srgb_to_xyz(img.rgb(rendering_intent=rendering_intent))
+    # RenderImage -> plot Pixel colors (RI != "Ignore" means sRGB conversion with said rendering intent)
+    if isinstance(img, RenderImage | RGBImage):
+        XYZ = img._data[:, :, :3] if isinstance(img, RenderImage) else color.srgb_to_xyz(img.data)
         labels = []  # no labels, otherwise many labels would cover the whole diagram
         legend3 = "Image Colors"
         point_alpha = 0.1  # low alpha since we have a lot of pixels

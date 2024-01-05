@@ -7,6 +7,7 @@ from optrace.gui import TraceGUI
 image = ot.presets.image.tv_testcard1([4, 4])
 # image = ot.presets.image.grid([4, 4])
 
+
 # make raytracer
 RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
 

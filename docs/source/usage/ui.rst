@@ -353,7 +353,7 @@ Image Tab
      - position of the currently chosen detector
    * - Image Mode
      - :attr:`image_type <optrace.gui.trace_gui.TraceGUI.image_type>`
-     - string, one of :attr:`RImage.display_modes <optrace.tracer.r_image.RImage.display_modes>`
+     - string, one of :attr:`RenderImage.image_modes <optrace.tracer.image.render_image.RenderImage.image_modes>`
      - image mode for rendering
    * - Projection Method
      - :attr:`projection_method <optrace.gui.trace_gui.TraceGUI.projection_method>`
@@ -361,7 +361,7 @@ Image Tab
      - sphere projection method for spherical detectors
    * - Pixels_xy
      - :attr:`image_pixels <optrace.gui.trace_gui.TraceGUI.image_pixels>`
-     - integer, one of :attr:`RImage.SIZES <optrace.tracer.r_image.RImage.SIZES>`
+     - integer, one of :attr:`RImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>`
      - number of pixels in smaller image dimension
    * - Logarithmic Scaling 
      - :attr:`log_image <optrace.gui.trace_gui.TraceGUI.log_image>`

@@ -7,11 +7,12 @@
 │   ├── _scene_plotting.py
 │   └── trace_gui.py
 ├── __init__.py
+├── metadata.py
 ├── plots
 │   ├── chromaticity_plots.py
+│   ├── image_plots.py
 │   ├── __init__.py
 │   ├── misc_plots.py
-│   ├── r_image_plots.py
 │   └── spectrum_plots.py
 ├── ressources
 │   ├── illuminants.csv
@@ -78,7 +79,12 @@
 │   │       ├── __init__.py
 │   │       ├── sphere_volume.py
 │   │       └── volume.py
-│   ├── image.py
+│   ├── image
+│   │   ├── base_image.py
+│   │   ├── __init__.py
+│   │   ├── linear_image.py
+│   │   ├── render_image.py
+│   │   └── rgb_image.py
 │   ├── __init__.py
 │   ├── load.py
 │   ├── misc.py
@@ -94,7 +100,6 @@
 │   ├── ray_storage.py
 │   ├── raytracer.py
 │   ├── refraction_index.py
-│   ├── r_image.py
 │   ├── spectrum
 │   │   ├── __init__.py
 │   │   ├── light_spectrum.py
@@ -103,4 +108,4 @@
 │   └── transfer_matrix_analysis.py
 └── warnings.py
 
-13 directories, 91 files
+14 directories, 95 files

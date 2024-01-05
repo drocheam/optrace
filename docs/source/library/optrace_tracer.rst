@@ -28,10 +28,6 @@ tracer.ray_storage
 _________________________________
 .. automodule:: optrace.tracer.ray_storage
 
-tracer.r_image
-_________________________________
-.. automodule:: optrace.tracer.r_image
-
 tracer.raytracer
 _________________________________
 .. automodule:: optrace.tracer.raytracer

@@ -49,7 +49,7 @@ def _read_lines(path: str) -> list[str]:
         return f.readlines()
 
 
-def agf(path: str) -> dict:
+def load_agf(path: str) -> dict:
     """
     Load an .agf material catalogue
 
@@ -138,7 +138,7 @@ def agf(path: str) -> dict:
     return n_dict
 
 
-def zmx(filename: str, n_dict: dict = None, no_marker: bool = False) -> Group:
+def load_zmx(filename: str, n_dict: dict = None, no_marker: bool = False) -> Group:
     """
     Load a ZEMAX geometry from a .zmx into a Group.
     See the documentation on the limitations of the import.

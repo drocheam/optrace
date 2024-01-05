@@ -153,7 +153,8 @@ class ScenePlotting:
         :param parallel_scale: view scaling. Defines half the size of the view in vertical direction.
         :param center: 3D coordinates of center of view
         :param height: half of vertical height in mm
-        :param direction: camera view direction vector (direction of vector perpendicular to your monitor and in your viewing direction)
+        :param direction: camera view direction vector 
+        (direction of vector perpendicular to your monitor and in your viewing direction)
         :param roll: absolute camera roll angle
         """
         # force parallel projection
@@ -161,7 +162,8 @@ class ScenePlotting:
        
         # calculate vector between camera and focal point
         cam = self.scene.scene.camera
-        normal = np.asarray(direction) if direction is not None else (cam.focal_point - cam.position) / cam.distance 
+        normal = np.asarray(direction, dtype=np.float64) if direction is not None\
+                else (cam.focal_point - cam.position) / cam.distance
         dist_vec = cam.distance * normal / (np.linalg.norm(normal) + 1e-12) 
 
         # old cross product of direction and view_up

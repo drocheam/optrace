@@ -2,10 +2,10 @@ import numpy as np
 import scipy.special
 
 from ..misc import PropertyChecker as pc
-from ..image import Image
+from ..image.linear_image import LinearImage
 
 
-def circle(d: float = 1.0) -> Image:
+def circle(d: float = 1.0) -> LinearImage:
     """
     Two dimensional circle kernel with diameter d.
 
@@ -27,12 +27,11 @@ def circle(d: float = 1.0) -> Image:
     Z[R2 <= (0.5 - ds/Y.shape[0])**2] = 1.0  # smoother edge
 
     s = [2*ds*d/1000, 2*ds*d/1000]  # scale size with d
-    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Image(Z, s)
+    return LinearImage(Z, s)
 
 
-def gaussian(sig: float = 0.5) -> Image:
+def gaussian(sig: float = 0.5) -> LinearImage:
     """
     Two dimensional gaussian kernel.
     d describes the diameter in µm of the function that approximately matches the zeroth order of an airy disk.
@@ -49,12 +48,11 @@ def gaussian(sig: float = 0.5) -> Image:
     Z = np.exp(-(X**2 + Y**2) / 2 / sig**2)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
-    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Image(Z, s)
+    return LinearImage(Z, s)
 
 
-def airy(r: float = 1.0) -> Image:
+def airy(r: float = 1.0) -> LinearImage:
     """
     Airy disk kernel, where d is the diameter of the zeroth order.
 
@@ -79,12 +77,11 @@ def airy(r: float = 1.0) -> Image:
     Z[R > 10.1735] = 0  # deleted values after third zero crossing
 
     s = [2*ds*r/1000, 2*ds*r/1000]  # scale size with d
-    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Image(Z, s)
+    return LinearImage(Z, s)
 
 
-def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15) -> Image:
+def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15) -> LinearImage:
     """
     Glare kernel. This glare consists of two gaussian kernels.
     See gaussian() for details on the diameter.
@@ -111,12 +108,11 @@ def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15) -> Image:
     Z = a*np.exp(-R2 / 2 / sig2**2) + (1-a)*np.exp(-R2 / 2 / sig1**2)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
-    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
 
-    return Image(Z, s)
+    return LinearImage(Z, s)
 
 
-def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3) -> Image:
+def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3) -> LinearImage:
     """
     Halo kernel. It consists of a central 2D gaussian and an outer gaussian ring.
 
@@ -140,8 +136,6 @@ def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3) 
     Z = np.exp(-R**2 / 2 / sig1**2) + a*np.exp(-(R - r)**2 / 2 / sig2**2)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
-    Z = np.repeat(Z[:, :, np.newaxis], 3, axis=2)
-    Z /= np.max(Z)  # normalize since halo and center could overlap
 
-    return Image(Z, s)
+    return LinearImage(Z, s)
 

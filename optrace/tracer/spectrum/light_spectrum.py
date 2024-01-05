@@ -395,11 +395,15 @@ class LightSpectrum(Spectrum):
 
         # a user defined data spectrum can't be constantly zero
         if key == "_vals" and val is not None and self.spectrum_type != "Histogram":
-            vals = np.asarray_chkfinite(val)
+            vals = np.asarray_chkfinite(val, dtype=np.float64)
+
             if np.any(vals < 0):
                 raise ValueError("Values below zero in LightSpectrum.")
 
             if not np.any(vals > 0):
                 raise ValueError("LightSpectrum can't be constantly zero.")
+        
+            super().__setattr__(key, vals)
+            return
 
         super().__setattr__(key, val)

@@ -10,7 +10,6 @@ from ..tracer.refraction_index import RefractionIndex
 from ..tracer.geometry import Surface
 from ..tracer.presets import spectral_lines as Lines  # spectral lines for AbbePlot
 from ..tracer.misc import PropertyChecker as pc
-from ..tracer import Image
 from ..warnings import warning
 
 
@@ -61,54 +60,6 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.title(title)
     plt.tight_layout()
     _save_or_show(path, sargs)
-
-
-def image_plot(img:     Image, 
-               flip:    bool = False,
-               title:   str = "",
-               path:    str = None,
-               sargs:   dict = {})\
-        -> None:
-    """
-    Plot an Image object
-
-
-    :param img: image object
-    :param flip: flip the image (rotate by 180 degrees)
-    :param title: optional title of the plot
-    :param path: if provided, the plot is saved at this location instead of displaying a plot. 
-                 Specify a path with file ending.
-    :param sargs: option dictionary for pyplot.savefig
-    """
-    pc.check_type("img", img, Image)
-    pc.check_type("title", title, str)
-    pc.check_type("flip", flip, bool)
-
-    s = img.s
-    img_ = img.data
-
-    # adapt extent so the coordinates are at the center of pixels
-    extent = np.array([-s[0]/2, s[0]/2, -s[1]/2, s[1]/2])
-    dy, dx = s[1] / img_.shape[0], s[0] / img_.shape[1]
-    extent += [-dx/2, dx/2, -dy/2, dy/2]
-
-    # rotate 180 deg
-    if flip:
-        img_ = np.fliplr(np.flipud(img_))
-        extent = extent[[1, 0, 3, 2]]
-    
-    plt.figure()
-    
-    _show_grid()
-    plt.title(title)
-    plt.xlabel("x in mm")
-    plt.ylabel("y in mm")
-
-    plt.imshow(img_, extent=extent, zorder=10, aspect="equal", origin="lower")
-
-    plt.tight_layout()
-    _save_or_show(path, sargs)
-
 
 def abbe_plot(ri:     list[RefractionIndex],
               title:  str = "Abbe Diagram",

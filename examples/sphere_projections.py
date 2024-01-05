@@ -2,8 +2,8 @@
 
 import numpy as np
 import optrace as ot
-from optrace.gui import TraceGUI
 import optrace.plots as otp
+from optrace.gui import TraceGUI
 
 # create Tissot’s indicatrix and compare projection methods
 
@@ -30,11 +30,12 @@ RT.trace(200000)
 
 # plot detector images for different projection types
 for proj in ot.SphericalSurface.sphere_projection_methods:
-    img = RT.detector_image(189, projection_method=proj)
-    otp.r_image_plot(img, "Irradiance")
+    dimg = RT.detector_image(projection_method=proj)
+    img = dimg.get("Irradiance", 189)
+    otp.image_plot(img)
 
 # run the simulator
-sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance", 
+sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance", hide_labels=True, minimalistic_view=True, 
                initial_camera=dict(center=[-50, -50, 0], direction=[-1, -1, -1], height=150, roll=-120))
 sim.run()
 

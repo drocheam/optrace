@@ -42,7 +42,7 @@ ___________________
 
    * - General Geometrical Optics and Image Simulation
      - Sequential Raytracing and of optical setups. Analysis of ray paths, simulation of detector images and spectra, focus finding.
-     - :class:`optrace.Raytracer <optrace.tracer.raytracer.Raytracer>`, :class:`optrace.RImage <optrace.tracer.r_image.RImage>`
+     - :class:`optrace.Raytracer <optrace.tracer.raytracer.Raytracer>`, :class:`optrace.RenderImage <optrace.tracer.image.render_image.RenderImage>`
      - :ref:`Raytracer <usage_raytracer>`, :ref:`usage_image`, :ref:`usage_focus`, :ref:`usage_ray_access`
 
    * - Image color conversion and displaying

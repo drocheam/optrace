@@ -3,9 +3,9 @@ plots Submodule
 
 .. automodule:: optrace.plots
 
-plots.r_image_plots
+plots.image_plots
 __________________________
-.. automodule:: optrace.plots.r_image_plots
+.. automodule:: optrace.plots.image_plots
 
 plots.spectrum_plots
 __________________________

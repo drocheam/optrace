@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.5.2   |   2023-12-29   |   Replaced Pillow by cv. New GUI automation and keratoconus example. Convolution now supports slicing and padding. New Image class. Options are now defined in optrace.global_options. 
   1.5.1   |   2023-12-08   |   Output texts are now warnings. Threading, warning and figure parameters are now set globally. Hide_labels property in TraceGUI. Improved microscope example. 
   1.5.0   |   2023-11-29   |   TraceGUI has now set_camera, get_camera and screenshot functions. Picked ray is highlighted in the scene. All plots in optrace.plots now can be saved by providing a path. 
   1.4.7   |   2023-08-17   |   New 'converging' ray source orientation mode. 

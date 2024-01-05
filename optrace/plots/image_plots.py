@@ -6,38 +6,38 @@ import numpy as np  # calculations
 
 from .misc_plots import _show_grid, _save_or_show
 
-from ..tracer.r_image import RImage  # RImage type and RImage displaying
+from ..tracer.image import RGBImage, LinearImage
 from ..tracer.misc import PropertyChecker as pc  # check types and values
+from ..tracer import color
 
 
-def r_image_plot(im:       RImage,
-                 mode:     str = RImage.display_modes[0],
-                 log:      bool = False,
-                 flip:     bool = False,
-                 title:    str = None,
-                 path:     str = None,
-                 sargs:    dict = {},
-                 **kwargs)\
+def image_plot(im:       LinearImage | RGBImage,
+               log:      bool = False,
+               flip:     bool = False,
+               title:    str = None,
+               path:     str = None,
+               sargs:    dict = {})\
         -> None:
     """
 
-    :param im: RImage to plot
-    :param mode: image plotting mode, one of RImage.display_modes
+    :param im: Image to plot
     :param flip: if the image should be flipped
     :param log: if logarithmic values are shown
     :param title: title of the plot
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
-    :param kwargs: additional keyword arguments for RImage.get
     """
-    _check_types(im, log, flip, title, mode)
+    _check_types(im, log, flip, title)
 
-    Imd = im.get(mode, log=log, **kwargs)
+    if isinstance(im, RGBImage) and log:
+        Imd = color.log_srgb(im.data)
+    else:
+        Imd = im.data
 
-    _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, mode, log, None)
+    _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, im.quantity, log, None)
 
-    if im.projection not in ["Equal-Area", None] and mode in ["Irradiance", "Illuminance"]:
+    if im.projection not in ["Equal-Area", None] and im.quantity in ["Irradiance", "Illuminance"]:
         imax = np.max(Imd)
         if imax:
             Imd /= imax
@@ -46,7 +46,7 @@ def r_image_plot(im:       RImage,
         text = title
 
     # fall back to linear values when all pixels have the same value
-    if log and (np.max(Imd) == np.min(Imd) or mode == "Outside sRGB Gamut"):
+    if log and (np.max(Imd) == np.min(Imd) or im.quantity == "Outside sRGB Gamut"):
         log = False
 
     # get extent. Convert to degrees with projection "equidistant"
@@ -68,7 +68,7 @@ def r_image_plot(im:       RImage,
     vmin, vmax = None, None
     if np.max(Imd) == np.min(Imd) == 0:
         vmin, vmax = 0, 1e-16
-    elif not log and not mode.startswith("sRGB"):
+    elif not log and not im.quantity.startswith("sRGB"):
         vmin = 0
 
     # plot image
@@ -87,7 +87,8 @@ def r_image_plot(im:       RImage,
         fig.axes[0].set_yticklabels([])
 
     # add colorbar for some modes
-    if mode.find("sRGB") == -1 and mode != "Lightness (CIELUV)":
+    if not isinstance(im, RGBImage) and im.quantity not in ["Lightness (CIELUV)", "Outside sRGB Gamut"]\
+            and im.quantity != "":
         clb = plt.colorbar(orientation='horizontal', shrink=0.6)
         clb.ax.set_xlabel(zlabel)
    
@@ -99,39 +100,41 @@ def r_image_plot(im:       RImage,
     _save_or_show(path, sargs)
 
 
-def r_image_cut_plot(im:       RImage,
-                     mode:     str = RImage.display_modes[0],
-                     log:      bool = False,
-                     flip:     bool = False,
-                     title:    str = None,
-                     path:     str = None,
-                     sargs:    dict = {},
-                     **kwargs)\
+def image_cut_plot(im:       RGBImage | LinearImage,
+                   log:      bool = False,
+                   flip:     bool = False,
+                   title:    str = None,
+                   path:     str = None,
+                   sargs:    dict = {},
+                   **kwargs)\
         -> None:
     """
 
-    :param im: RImage to plot
+    :param im: Rmage to plot
     :param log: if logarithmic values are shown
     :param flip: if the image should be flipped
     :param title: title of the plot
-    :param mode: display_mode from RImage.display_modes
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
-    :param kwargs: additional keyword arguments for RImage.cut
+    :param kwargs: additional keyword arguments for Image.cut
     """
-    _check_types(im, log, flip, title, mode)
-
+    _check_types(im, log, flip, title)
+    
     # make cut
-    s, Imd = im.cut(mode, log=log, **kwargs)
+    if isinstance(im, RGBImage) and log:
+        im2 = RGBImage(color.log_srgb(im.data), extent=im.extent)
+        s, Imd = im2.cut(**kwargs)
+    else:
+        s, Imd = im.cut(**kwargs)
 
     # get labels
     cut_val = kwargs["x" if "x" in kwargs else "y"]
-    xname, xunit, xlabel, yname, yunit, ylabel, _, _, zlabel, text = _get_labels(im, mode, log, cut_val)
+    xname, xunit, xlabel, yname, yunit, ylabel, _, _, zlabel, text = _get_labels(im, im.quantity, log, cut_val)
 
     # normalize values for sphere projections that are not Equal-Area
     # (since the values are incorrect anyway)
-    if im.projection not in ["Equal-Area", None] and mode in ["Irradiance", "Illuminance"]:
+    if im.projection not in ["Equal-Area", None] and im.quantity in ["Irradiance", "Illuminance"]:
         imax = np.max(Imd)
         if imax:
             Imd /= imax
@@ -149,7 +152,7 @@ def r_image_cut_plot(im:       RImage,
     _show_grid()
 
     # enforce rgb colors for rgb modes
-    colors = ["r", "g", "b"] if mode.startswith("sRGB") else [None, None, None]
+    colors = ["r", "g", "b"] if isinstance(im, RGBImage) else [None, None, None]
 
     # plot curve(s)
     [plt.stairs(Imd[i], s, color=colors[i]) for i, _ in enumerate(Imd)]
@@ -171,7 +174,7 @@ def r_image_cut_plot(im:       RImage,
         plt.yscale('log')
 
     # add RGB legend if needed
-    if mode.startswith("sRGB"):
+    if isinstance(im, RGBImage):
         plt.legend(["R", "G", "B"])
 
     # set title
@@ -182,17 +185,15 @@ def r_image_cut_plot(im:       RImage,
     _save_or_show(path, sargs)
 
 
-def _check_types(im, log, flip, title, mode) -> None:
+def _check_types(im, log, flip, title) -> None:
     """check types for r_image plots"""
-    pc.check_type("im", im, RImage)
+    pc.check_type("im", im, LinearImage | RGBImage)
     pc.check_type("flip", flip, bool)
     pc.check_type("log", log, bool)
-    pc.check_type("mode", mode, str)
     pc.check_type("title", title, str | None)
-    pc.check_if_element("mode", mode, RImage.display_modes)
 
 
-def _get_labels(im: RImage, mode: str, log: bool, cut: str = None)\
+def _get_labels(im: RGBImage | LinearImage, mode: str, log: bool, cut: str = None)\
         -> tuple[str, str, str, str, str, str, str, str, str, str]:
     """get plot labels and title"""
 
@@ -215,17 +216,21 @@ def _get_labels(im: RImage, mode: str, log: bool, cut: str = None)\
     
     zname, zunit, zlabel = mode, "", mode
     zlabel += ", Logarithmic" if log and mode.startswith("sRGB") else ""
-    text += f"\nMode: {zlabel}"
+
+    if zlabel != "":
+        text += f"\nMode: {zlabel}"
+        if im.projection is not None:
+            text += ", " 
 
     if im.projection is not None:
-        text += f", {im.projection} Projection"
+        text += f"{im.projection} Projection"
     
     if im.limit is not None:
         text += f", {im.limit:.2f}µm Resolution Filter"
 
     if mode in ["Irradiance", "Illuminance"]:
-        punit, aname, srname, p = ("W", "Irradiance", "Radiant", im.power()) if mode == "Irradiance"\
-                                  else ("lm", "Illuminance", "Luminous", im.luminous_power())
+        punit, aname, srname, p = ("W", "Irradiance", "Radiant", np.sum(im.data)*im.Apx) if mode == "Irradiance"\
+                                  else ("lm", "Illuminance", "Luminous", np.sum(im.data)*im.Apx)
     
         match im.projection:
             case "Equal-Area":

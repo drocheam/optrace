@@ -9,7 +9,6 @@
 #
 import os
 import sys
-import importlib.metadata
 import datetime
 
 sys.path.insert(0, os.path.abspath('..'))
@@ -18,10 +17,16 @@ sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
 
 # -- Project information -----------------------------------------------------
 
+# load package information
+metadata = {}
+path = os.path.join("..", "..", "optrace", "metadata.py")
+with open(path, "r") as f:
+    exec(f.read(), metadata)
+
 # assign metadata
-project = "optrace"
-release = importlib.metadata.metadata(project)["Version"]
-author = importlib.metadata.metadata(project)["Author"]
+project = metadata["name"]
+release = metadata["version"]
+author = metadata["author"]
 copyright = f"{datetime.date.today().year}, {author}"
 
 # -- General configuration ---------------------------------------------------
@@ -122,6 +127,7 @@ linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.rop
                     'https://www.pexels.com/photo/green-2-seat-sofa-1918291/',
                     'https://www.pexels.com/photo/documents-on-wooden-surface-95916/',
                     'https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/',
+                    'https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/',
                     'https://doi.org/10.1080/713818864',
                     'https://doi.org/10.1080/10867651.1997.10487479']
 

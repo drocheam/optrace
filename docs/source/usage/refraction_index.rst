@@ -176,13 +176,13 @@ _________________________________________
 
 
 `optrace`  can also load .agf catalogue files containing different materials.
-The function :func:`ot.load.agf <optrace.tracer.load.agf>` takes a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
+The function :func:`ot.load_agf <optrace.tracer.load.load_agf>` takes a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
 
 For instance, loading the Schott catalogue and accessing the material ``N-LAF21`` can be done as follows:
 
 .. code-block:: python
 
-   n_schott = ot.load.agf("schott.agf")
+   n_schott = ot.load_agf("schott.agf")
    n_laf21 = n_schott["N-LAF21"]
 
 

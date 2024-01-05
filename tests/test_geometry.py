@@ -492,7 +492,7 @@ class GeometryTests(unittest.TestCase):
        
         # possible surface types
         Surfaces = [ot.Point(), ot.Line(), ot.CircularSurface(r=2), ot.presets.image.color_checker([2, 2]), 
-                    ot.RectangularSurface(dim=[2, 2]), ot.RingSurface(r=2, ri=0.2)]
+                    ot.RectangularSurface(dim=[2, 2]), ot.RingSurface(r=2, ri=0.2), ot.presets.psf.airy(1000)]
 
         # check most RaySource combinations
         # also checks validity of createRays()
@@ -533,19 +533,19 @@ class GeometryTests(unittest.TestCase):
         # special image shapes
 
         # ray source with one pixel image
-        RSS = ot.Image(np.array([[[0., 1., 0.]]]), [2, 2])
+        RSS = ot.RGBImage(np.array([[[0., 1., 0.]]]), [2, 2])
         RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RS.create_rays(10000)
 
         # ray source with one width pixel image
-        RSS = ot.Image(np.array([[[0., 1., 0.], [1., 1., 0.]]]), [2, 2])
+        RSS = ot.RGBImage(np.array([[[0., 1., 0.], [1., 1., 0.]]]), [2, 2])
         RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RS.create_rays(10000)
         
         # ray source with one height pixel image
-        RS = ot.Image(np.array([[[0., 1., 0.]], [[1., 1., 0.]]]), [2, 2])
+        RS = ot.RGBImage(np.array([[[0., 1., 0.]], [[1., 1., 0.]]]), [2, 2])
         RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
         RS.create_rays(10000)
@@ -583,7 +583,7 @@ class GeometryTests(unittest.TestCase):
         # ^-- currently only planar surfaces are supported
         
         # image error handling
-        self.assertRaises(RuntimeError, ot.RaySource, ot.Image(np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3)),
+        self.assertRaises(RuntimeError, ot.RaySource, ot.RGBImage(np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3)),
                                                                [2, 2]))  # image too large
 
     def test_ray_source_polarization(self):

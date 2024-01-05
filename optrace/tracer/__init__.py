@@ -5,8 +5,6 @@ from . import presets
 # tracer classes
 from .refraction_index import RefractionIndex
 from .ray_storage import RaySource
-from .r_image import RImage
-from .image import Image
 from .raytracer import Raytracer
 from .transfer_matrix_analysis import TMA
 
@@ -53,6 +51,11 @@ from .geometry.volume.volume import Volume
 from .geometry.group import Group
 
 # tools
-from . import load
+from .load import load_agf, load_zmx
 from .convolve import convolve
 from . import color
+
+# images
+from .image.rgb_image import RGBImage
+from .image.linear_image import LinearImage
+from .image.render_image import RenderImage

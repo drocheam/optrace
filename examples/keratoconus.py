@@ -38,15 +38,14 @@ gauss_param =\
 # Figure 1 of Tan et. al (2008) (https://jov.arvojournals.org/article.aspx?articleid=2158188)
 positions = {"axis": [0., 0.], "average": [0.4, -0.9], "far": [1.1, -1.4]}
 
-# ray and pixel settings
+# ray settings
 N_rays = 3e5
-N_px = 315
 
 # resulting properties
 A = 1/g*1000  + delta_A # adaption in dpt for given g
 G = g*np.tan(G_alpha/180*np.pi) # half object size
 OL = max(G, 8)  # half of x, y, outline size
-sr_angle = np.arctan(1.25*P/2/g)/np.pi*180  # ray divergence angle
+sr_angle = np.arctan(1.4*P/2/g)/np.pi*180  # ray divergence angle
 G_size = g*np.tan(G_alpha/180*np.pi)  # object size from angle
 
 # create raytracer
@@ -93,11 +92,9 @@ for num in cases:
     # cornea = ot.Lens(cfront, cback, d1=0, d2=0.55, pos=[0, 0, 0], n=old_cornea.n, n2=old_cornea.n2)
     cornea = ot.Lens(cfront, old_cornea.back, d1=0, d2=0.55, pos=[0, 0, 0], n=old_cornea.n, n2=old_cornea.n2)
     RT.add(cornea)
-     
-    # otg.TraceGUI(RT).run()
-
+    
     # render PSF
-    _, det_im = RT.iterative_render(N_rays, N_px, detector_index=1, no_sources=True, limit=4)
+    det_im = RT.iterative_render(N_rays, detector_index=1, limit=4)
 
     psf = det_im[0]
     img = image([2*G_size, 2*G_size])
@@ -105,9 +102,9 @@ for num in cases:
     # calculate image magnification
     m = ot.presets.geometry.arizona_eye().tma().image_magnification(RS.pos[2])
 
-    # convolve
+    # convolve with PSF
     img_conv = ot.convolve(img, psf, m=m, slice_=True)
-
+    
     # show image
     otp.image_plot(img_conv, flip=True)
 

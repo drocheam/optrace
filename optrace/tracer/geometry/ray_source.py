@@ -19,7 +19,9 @@ from ..presets.light_spectrum import d65 as d65_spectrum  # default light spectr
 # misc
 from ..misc import PropertyChecker as pc  # check types and values
 from .. import misc  # calculations
-from ..image import Image
+from ..image.rgb_image import RGBImage
+from ..image.linear_image import LinearImage
+
 
 
 class RaySource(Element):
@@ -37,10 +39,11 @@ class RaySource(Element):
     _allow_non_2D: bool = True  # allow points or lines as surfaces
     _max_image_px: float = 2e6  #: maximum number of pixels for images. Only for performance reasons.
 
+
     def __init__(self,
 
                  # Surface Parameters
-                 surface:           Surface | Line | Point | Image,
+                 surface:           Surface | Line | Point | LinearImage | RGBImage,
                  pos:               (list | np.ndarray) = None,
 
                  # Divergence Parameters
@@ -74,9 +77,16 @@ class RaySource(Element):
                  **kwargs)\
             -> None:
         """
-        Create a RaySource with a specific area, orientation, divergence, polarization, power and spectrum
+        Create a RaySource with a specific area, orientation, divergence, polarization, power and spectrum.
 
-        :param surface: emitting Surface, Point, Line or Image object
+        * When a 'surface' is provided as Surface (RectangularSurface, RingSurface, Point, Line, CircularSurface),
+          there will be uniform emittance over the surface and the spectrum can be set by the 'spectrum' parameter.
+        * When 'surface' is provided as LinearImage, the emittance follows the image intensity distribution,
+          the spectrum can be set by the 'spectrum' parameter.
+        * When 'surface' is provided as RGBImage,
+          the spectrum and brightness for each pixel is generated from three primaries so it matches the pixel color.
+
+        :param surface: emitting Surface, Point, Line, RGBImage or LinearImage object
         :param divergence: divergence type, see "divergences" list
         :param orientation: orientation type, see "orientations" list
         :param polarization: polarization type, see "polarizations" list
@@ -105,8 +115,8 @@ class RaySource(Element):
 
         self._new_lock = False
 
-        # handle surface or Image
-        if isinstance(surface, Image):
+        # RGBImage -> color and distribution according to image
+        if isinstance(surface, RGBImage):
             surface_ = RectangularSurface(dim=surface.s)
             self._image = surface
                 
@@ -121,6 +131,17 @@ class RaySource(Element):
             sRGBL_mean = np.mean(sRGBL, axis=(0, 1))
             sRGB_mean = color.srgb_linear_to_srgb(np.array([[[*sRGBL_mean]]]))
             self._mean_img_color = sRGB_mean[0, 0]
+        
+        # LinearImage -> distribution according to values, spectrum user-defined
+        elif isinstance(surface, LinearImage):
+            surface_ = RectangularSurface(dim=surface.s)
+            self._image = surface
+            self._mean_img_color = None
+            
+            If = surface.data.ravel()
+            Ifs = np.sum(If)
+            self._pIf = 1/Ifs*If
+        
         else:
             surface_ = surface
             self._image = None
@@ -174,7 +195,7 @@ class RaySource(Element):
         :param clip: if sRGB values are clipped
         :return: tuple of sRGB values with data range [0, 1]
         """
-        if self._image is not None:
+        if isinstance(self._image, RGBImage):
             return self._mean_img_color
         else:
             return self.spectrum.color(rendering_intent, clip)
@@ -200,7 +221,8 @@ class RaySource(Element):
         ## Generate ray wavelengths
         ################################################################################################################
 
-        if self._image is None:
+        # generate wavelengths from LightSpectrum, except for RGBImage
+        if not isinstance(self._image, RGBImage):
             pc.check_type("RaySource.spectrum", self.spectrum, LightSpectrum)
             wavelengths = self.spectrum.random_wavelengths(N)
 
@@ -210,6 +232,7 @@ class RaySource(Element):
         if self._image is None:
             p = self.surface.random_positions(N)
 
+        # RGBImage or LinearImage
         else:
             # special case image with only one pixel
             if self._image.shape[0] == 1 and self._image.shape[1] == 1:
@@ -230,7 +253,9 @@ class RaySource(Element):
             ne.evaluate("(ye-ys)/Iy * (PY + ry) + ys", out=p[:, 1])
             p[:, 2] = self.pos[2]
 
-            wavelengths = color.random_wavelengths_from_srgb(self._image.data[PY, PX])
+            if isinstance(self._image, RGBImage):
+                wavelengths = color.random_wavelengths_from_srgb(self._image.data[PY, PX])
+            # for LinearImage the wavelengths were already generated from the LightSpectrum
 
         ## Generate orientations
         ################################################################################################################
@@ -259,7 +284,7 @@ class RaySource(Element):
         # for 2D divergence theta has only two values, angle and angle + pi
         if self.div_2d:
             t = np.radians(self.div_axis_angle).repeat(2) + [0, np.pi]
-            P = np.array([1., 1.])
+            P = np.array([1., 1.], dtype=np.float64)
             alpha = misc.random_from_distribution(t, P, N, kind="discrete")
 
         if self.divergence == "Function":
@@ -479,7 +504,7 @@ class RaySource(Element):
 
             case "front":
                 if not (isinstance(val, Point | Line)\
-                        or (isinstance(val, Surface) and val.is_flat()) or isinstance(val, Image)):
+                        or (isinstance(val, Surface) and val.is_flat()) or isinstance(val, RGBImage)):
                     raise ValueError("Currently only planar surfaces are supported for RaySources.")
 
         super().__setattr__(key, val)

@@ -119,6 +119,24 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "otg.CommandWindow", locals())
         self._test_scope_ext_libs(locals())
 
+    def test_init_order(self):
+
+        eval_str = "import optrace as ot; import optrace.plots as otp; import optrace.gui as otg"
+        code = self._run_command(eval_str)
+        self.assertEqual(code, 0)
+        
+        eval_str = "import optrace as ot; import optrace.gui as otg; import optrace.plots as otp"
+        code = self._run_command(eval_str)
+        self.assertEqual(code, 0)
+        
+        eval_str = "import optrace.gui as otg; import optrace.plots as otp; import optrace as ot"
+        code = self._run_command(eval_str)
+        self.assertEqual(code, 0)
+        
+        eval_str = "import optrace.plots as otp; import optrace.gui as otg; import optrace as ot"
+        code = self._run_command(eval_str)
+        self.assertEqual(code, 0)
+
 if __name__ == '__main__':
     unittest.main()
 

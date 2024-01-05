@@ -306,8 +306,8 @@ It is possible to load ``.zmx`` geometries into `optrace`. For instance, the fol
    RS = ot.RaySource(ot.CircularSurface(r=0.05), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
    RT.add(RS)
 
-   n_schott = ot.load.agf("schott.agf")
-   G = ot.load.zmx("setup.zmx", n_dict=n_schott)
+   n_schott = ot.load_agf("schott.agf")
+   G = ot.load_zmx("setup.zmx", n_dict=n_schott)
    RT.add(G)
 
    RT.trace(10000)

@@ -50,10 +50,12 @@ RT.add(Det2)
 RT.trace(600000)
 
 # plot detector images
-img = RT.detector_image(315)
-otp.r_image_plot(img, "sRGB (Absolute RI)")
-img2 = RT.detector_image(315, detector_index=1)
-otp.r_image_plot(img2, "sRGB (Absolute RI)")
+dimg = RT.detector_image(detector_index=0)
+dimg2 = RT.detector_image(detector_index=1)
+img = dimg.get("sRGB (Absolute RI)", 315)
+img2 = dimg2.get("sRGB (Absolute RI)", 315)
+otp.image_plot(img)
+otp.image_plot(img2)
 
 # start GUI
 sim = TraceGUI(RT, ray_opacity=0.03, minimalistic_view=True)

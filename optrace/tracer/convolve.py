@@ -10,47 +10,28 @@ from progressbar import progressbar, ProgressBar
 from . import color
 
 from ..tracer.misc import PropertyChecker as pc
-from ..tracer.r_image import RImage
-from ..tracer.image import Image
+from ..tracer.image import RGBImage, LinearImage, RenderImage
 
 from .. import global_options
 from ..warnings import warning
 
 
-def _color_variation(img: np.ndarray, th: float = 1e-3) -> bool:
-    """
-    Check if an image has color variation. 
-    If any channel pixel is above th over the channel mean this function returns True.
+# TODO allow LinearImage for img parameter
 
-    :param img: img to check
-    :param th: sRGB value threshold
-    :return:  if image has color variation
-    """
-    i0, i1, i2 = img[:, :, 0], img[:, :, 1], img[:, :, 2]
-
-    return np.any(np.abs(i0-i1) > th) or np.any(np.abs(i1-i2) > th) or np.any(np.abs(i2-i0) > th)
-
-
-def _safe_normalize(img: np.ndarray) -> np.ndarray:
-    """normalize array by its maximum and handle the case of a zero array"""
-    img_max = np.max(img)
-    return img / img_max if img_max else img.copy()
-
-
-def convolve(img:                Image, 
-             psf:                Image | RImage, 
+def convolve(img:                RGBImage, 
+             psf:                LinearImage | RenderImage, 
              m:                  float = 1,
              slice_:             bool = False,
              padding_mode:       str = "constant",
              padding_value:      list = [0, 0, 0],
              cargs:              dict = {})\
-        -> Image:
+        -> RGBImage:
     """
     Convolve an image with a point spread function.
     The system magnification factor m scales the image.
 
     Image data should be a sRGB array (therefore non-linear, gamma corrected values). 
-    The PSF is treated as either a linear intensity image (when provided as array) or a colored one (when the type is RImage).
+    The PSF is treated as either a linear intensity image (when provided as array) or a colored one (when the type is RenderImage).
 
     Note that in the case that both are colored the convolution is only one possible solution of many.
 
@@ -61,7 +42,7 @@ def convolve(img:                Image,
     With normalize=False the psf is set to a power sum of 1, so theis provided in argument cargs, the normalization is turned off and the psf
 
     :param img: image. 3D sRGB numpy array (value range 0-1) or path string
-    :param psf: point spread function, Image or RImage.
+    :param psf: point spread function, Image or RenderImage.
     :param m: magnification factor, abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
               m < 0 image flipping, m > 0 an upright image
     :param padding_mode: padding mode (from numpy.pad) for image padding before convolution.
@@ -76,8 +57,8 @@ def convolve(img:                Image,
     ###################################################################################################################
     ###################################################################################################################
 
-    pc.check_type("img", img, Image)
-    pc.check_type("psf", psf, Image | RImage)
+    pc.check_type("img", img, RGBImage)
+    pc.check_type("psf", psf, LinearImage | RenderImage)
     pc.check_type("m", m, int | float)
     pc.check_type("cargs", cargs, dict)
     pc.check_above("abs(m)", abs(m), 0)
@@ -95,31 +76,28 @@ def convolve(img:                Image,
     # create progress bar
     bar = ProgressBar(fd=sys.stdout, redirect_stderr=True, prefix="Convolving: ", 
                       max_value=5).start() if global_options.show_progressbar else None
-    
+   
     # Load PSF
     ###################################################################################################################
     ###################################################################################################################
 
     # rendered image with color information
-    if isinstance(psf, RImage):
+    if isinstance(psf, RenderImage):
 
         psf_color = True
 
         # use srgb with negative values
-        psf_lin = color.xyz_to_srgb_linear(psf.xyz(), rendering_intent="Ignore")
+        psf_lin = color.xyz_to_srgb_linear(psf._data[:, :, :3], rendering_intent="Ignore")
 
         # normalize
-        psf_lin = _safe_normalize(psf_lin)
+        if (maxi := np.max(psf_lin)):
+            psf_lin /= maxi
 
-    # intensity array
+    # linear intensity image
     else:
-        psf_lin = psf.data
-        # TODO document that values are treated linearly
+        psf_lin = np.repeat(psf.data[:, :, np.newaxis], 3, axis=2)
+        psf_color = False
 
-        psf_color = _color_variation(psf_lin)  # if it has color information
-        if psf_color:
-            raise ValueError("Colored PSF are only supported when provided as RImage.")
-      
     # psf_lin /= np.sum(psf_lin)
 
     if global_options.show_progressbar:
@@ -129,9 +107,12 @@ def convolve(img:                Image,
     ###################################################################################################################
     ###################################################################################################################
 
-    img_srgb = img.data
+    # if isinstance(img, LinearImage):
+        # img_srgb = np.repeat(img.data[:, :, np.newaxis], 3, axis=2)
 
-    img_color = _color_variation(img_srgb)  # if image has color information
+    img_srgb = img.data
+    img_color = color.has_color(img_srgb)
+
     if img_color and psf_color:
         warning("Using an image with color variation in combination with a colored PSF. "
                 "As there many possible results depending on the spectral and local distributions on the object, "
@@ -217,6 +198,7 @@ def convolve(img:                Image,
     else:
         imgp = img_srgb
 
+    # if not isinstance(img, LinearImage):
     img_lin = color.srgb_to_srgb_linear(imgp)  # linear sRGB version
 
     iny_, inx_ = img_lin.shape[:2]  # image pixel count
@@ -234,13 +216,16 @@ def convolve(img:                Image,
     psf2 = cv2.resize(psf_lin, [max(round(scx*pnx), 1), max(round(scy*pny), 1)], interpolation=cv2.INTER_AREA)
 
     # normalize each channel by its sum. Doing this, the image power and power ratios stay the same
-    # psf2 /= np.sum(psf2, axis=(0, 1))[np.newaxis, np.newaxis, :]
     if np.sum(psf2):
-        psf2 /= np.sum(psf2) / 3 #[np.newaxis, np.newaxis, :]
+        psf2 /= np.sum(psf2) / 3 
 
     # pad psf
     psf2 = np.pad(psf2, ((4, 4), (4, 4), (0, 0)), mode="constant", constant_values=0)
-  
+
+    # flip image before convolution with negative magnification
+    if m < 0:
+        img_lin = np.fliplr(np.flipud(img_lin))
+
     # update progress
     if global_options.show_progressbar:
         bar.update(3)
@@ -279,7 +264,8 @@ def convolve(img:                Image,
 
     # normalize image
     if not ("normalize" in cargs and not cargs["normalize"]):
-        img2 = _safe_normalize(img2)
+        if (maxi := np.max(img2)):
+            img2 /= maxi
 
     # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
     img2 = color.srgb_linear_to_xyz(img2)
@@ -289,12 +275,14 @@ def convolve(img:                Image,
     # new image side lengths
     s2 = [(img2.shape[1]-1)*ipx, (img2.shape[0]-1)*ipy]
 
-    # rotate image by 180deg when m is negative
-    if m < 0:
-        img2 = np.fliplr(np.flipud(img2))
-
     if global_options.show_progressbar:
         bar.finish()
 
-    return Image(img2, s2)
+    # new image center is the sum of psf and old image center
+    # (can be shown easily with convolution and shifting theorem of the fourier transform)
+    xm = (img.extent[1] + img.extent[0] + psf.extent[1] + psf.extent[0])/2
+    ym = (img.extent[3] + img.extent[2] + psf.extent[3] + psf.extent[2])/2
+    extent2 = [xm-s2[0]/2, xm+s2[0]/2, ym-s2[1]/2, ym+s2[1]/2]
+
+    return RGBImage(img2, extent=extent2, quantity=img.quantity)
 

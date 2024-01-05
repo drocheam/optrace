@@ -22,7 +22,7 @@ class ConvolutionTests(unittest.TestCase):
 
         img = ot.presets.image.color_checker([5, 6])
         psf = ot.presets.psf.halo()
-        psf.s = [0.1, 0.3]
+        psf.extent = [-0.05, 0.05, -0.15, 0.15]
 
         # check invalid types
         self.assertRaises(TypeError, ot.convolve, 5, psf)  # invalid img
@@ -42,7 +42,7 @@ class ConvolutionTests(unittest.TestCase):
 
         img = ot.presets.image.color_checker([5, 6])
         psf = ot.presets.psf.halo()
-        psf.s = [0.1, 0.3]
+        psf.extent = [-0.05, 0.05, -0.15, 0.15]
         s_psf = psf.s
         s_img = img.s
 
@@ -50,59 +50,53 @@ class ConvolutionTests(unittest.TestCase):
         ###########################################
 
         # low resolution psf
-        psf2 = ot.Image(np.ones((5, 5, 3)), s_psf)
+        psf2 = ot.LinearImage(np.ones((5, 5)), s_psf)
         self.assertRaises(ValueError, ot.convolve, img, psf2)
         
         # low resolution image
-        img2 = ot.Image(np.ones((5, 5, 3)), s_img)
+        img2 = ot.RGBImage(np.ones((5, 5, 3)), s_img)
         self.assertRaises(ValueError, ot.convolve, img2, psf)
         
         # huge resolution image
-        img2 = ot.Image(np.ones((3000, 3000, 3)), s_img)
+        img2 = ot.RGBImage(np.ones((3000, 3000, 3)), s_img)
         self.assertRaises(ValueError, ot.convolve, img2, psf)
         
         # huge resolution psf
-        psf2 = ot.Image(np.ones((3000, 3000, 3)), s_psf)
+        psf2 = ot.LinearImage(np.ones((3000, 3000)), s_psf)
         self.assertRaises(ValueError, ot.convolve, img, psf2)
         
         # psf much larger than image
-        psf3 = ot.Image(psf2.data, [s_img[0]*3, s_img[1]*3])
+        psf3 = ot.LinearImage(psf2.data, [s_img[0]*3, s_img[1]*3])
         self.assertRaises(ValueError, ot.convolve, img, psf3)
        
     def test_coverage(self):
 
         img = ot.presets.image.color_checker([5, 6])
         psf = ot.presets.psf.halo()
-        psf.s = s_psf = [0.1, 0.3]
+        psf.extent = [-0.05, 0.05, -0.15, 0.15]
         s_img = img.s
+        s_psf = psf.s
         
         # check that call is correct, also tests threading
         for threading in [False, True]:
             ot.global_options.multithreading = threading
             ot.convolve(img, psf)
 
-        # color test
-        #############################################
-
-        # psf can't be a colored sRGB
-        psf2 = ot.presets.image.color_checker(s_psf)
-        self.assertRaises(ValueError, ot.convolve, img, psf2)
-       
         # coverage tests
         #############################################
         img = ot.presets.image.color_checker([1, 1]).data
 
         # pixels are strongly non-square
-        ot.convolve(ot.Image(img, s_img), ot.Image(psf.data, [1e-9, 1e-8]))
-        ot.convolve(ot.Image(img, [1, 10]), ot.Image(psf.data, s_psf))
+        ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf.data, [1e-9, 1e-8]))
+        ot.convolve(ot.RGBImage(img, [1, 10]), ot.LinearImage(psf.data, s_psf))
         
         # low resolution psf warning
-        psf2 = np.ones((90, 90, 3))
-        ot.convolve(ot.Image(img, s_img), ot.Image(psf2, s_psf))
+        psf2 = np.ones((90, 90))
+        ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf2, s_psf))
         
         # low resolution image warning
         img2 = np.ones((90, 90, 3))
-        ot.convolve(ot.Image(img2, s_img), psf)
+        ot.convolve(ot.RGBImage(img2, s_img), psf)
         
     def test_point_psf(self):
         """test if convolution with a point produces the same image"""
@@ -116,10 +110,10 @@ class ConvolutionTests(unittest.TestCase):
         # odd and even pixel size
         for padding in ["constant", "edge"]:
             for slice_ in [False, True]:
-                for psf_s in [(200, 200, 3), (201, 201, 3)]:
+                for psf_s in [(200, 200), (201, 201)]:
                     psf = np.ones(psf_s)
 
-                    img2_ = ot.convolve(image, ot.Image(psf, s_psf), slice_=slice_, padding_mode=padding)
+                    img2_ = ot.convolve(image, ot.LinearImage(psf, s_psf), slice_=slice_, padding_mode=padding)
                     img2, s2 = img2_.data, img2_.s
 
                     # compare
@@ -131,9 +125,9 @@ class ConvolutionTests(unittest.TestCase):
 
     def test_point_image_point_psf(self):
 
-        psf = np.zeros((301, 301, 3))
+        psf = np.zeros((301, 301))
         psf[151, 151] = 1
-        img = psf.copy()
+        img = np.repeat(psf[:, :, np.newaxis], 3, axis=2)
         s_img = [1, 1]
         s_psf = [1e-9, 1e-9]
 
@@ -141,7 +135,7 @@ class ConvolutionTests(unittest.TestCase):
         # with default settings ("constant" and padding_value=0) no 
         # padding takes place, as scipy.fftconvolve automatically pads with black
             for slice_ in [False, True]:
-                img2_ = ot.convolve(ot.Image(img, s_img), ot.Image(psf, s_psf), slice_=slice_, padding_mode=padding)
+                img2_ = ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf, s_psf), slice_=slice_, padding_mode=padding)
                 img2, s2 = img2_.data, img2_.s
 
                 # point stays at center
@@ -168,13 +162,14 @@ class ConvolutionTests(unittest.TestCase):
 
             # two gaussians
             psf, s_psf = _gaussian(1, sz)
+            psf = psf[:, :, 0]
             img, s_img = _gaussian(2, sz)
 
             # make sRGB image
             img = color.srgb_linear_to_srgb(img)
 
             # convolution
-            img2_ = ot.convolve(ot.Image(img, s_img), ot.Image(psf, s_psf))
+            img2_ = ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf, s_psf))
             img2, s2 = img2_.data, img2_.s
 
             # convert back to intensities
@@ -242,7 +237,7 @@ class ConvolutionTests(unittest.TestCase):
 
             # render PSF
             RT.trace(2000000)
-            img = RT.detector_image(345, extent=[-0.07, 0.07, -0.07, 0.07])
+            img = RT.detector_image(extent=[-0.07, 0.07, -0.07, 0.07])
             psf = img.copy()
 
             # image
@@ -255,9 +250,9 @@ class ConvolutionTests(unittest.TestCase):
             RT.add(RS)
 
             # rendered image
-            _, det_im = RT.iterative_render(30e6, 189, extent=[-0.12, 0.12, -0.12, 0.12],  no_sources=True)
+            det_im = RT.iterative_render(30e6, extent=[-0.12, 0.12, -0.12, 0.12])
             img_ren0 = det_im[0]
-            img_ren = img_ren0.get("sRGB (Absolute RI)")
+            img_ren = img_ren0.get("sRGB (Absolute RI)", 189).data
             s_img_ren = [img_ren0.extent[1]-img_ren0.extent[0], img_ren0.extent[3]-img_ren0.extent[2]]
 
             # convolution image
@@ -298,13 +293,13 @@ class ConvolutionTests(unittest.TestCase):
         for normalize in [True, False]:
 
             # generate color image with high frequency red components
-            rimg = ot.RImage([-1e-6, 1e-6, -1e-6, 1e-6])
-            rimg.render(945)
-            rimg._img[:, :] = 0.5
-            rimg._img[:2, :2, 2] = 1
-            rimg._img[-2:, -2:, 2] = 0
-            assert(np.std(np.mean(rimg._img[:, :, :3], axis=(0, 1))) < 1e-6)  # mean color is white
-            rimg._img[:, :, :3] = color.srgb_linear_to_xyz(rimg._img[:, :, :3])  # convert to XYZ
+            rimg = ot.RenderImage([-1e-6, 1e-6, -1e-6, 1e-6])
+            rimg.render()
+            rimg._data[:, :] = 0.5
+            rimg._data[:2, :2, 2] = 1
+            rimg._data[-2:, -2:, 2] = 0
+            assert(np.std(np.mean(rimg._data[:, :, :3], axis=(0, 1))) < 1e-6)  # mean color is white
+            rimg._data[:, :, :3] = color.srgb_linear_to_xyz(rimg._data[:, :, :3])  # convert to XYZ
 
             # convolve with white image
             s_img = [1, 1]
@@ -407,7 +402,7 @@ class ConvolutionTests(unittest.TestCase):
     def test_zero_image(self):
         """no warnings/exceptions with zero image"""
 
-        img = ot.Image(np.zeros((200, 200, 3)), [5, 5])
+        img = ot.RGBImage(np.zeros((200, 200, 3)), [5, 5])
         psf = ot.presets.psf.glare()
 
         img2 = ot.convolve(img, psf)
@@ -417,7 +412,7 @@ class ConvolutionTests(unittest.TestCase):
         """no warnings/exceptions with zero psf"""
 
         img = ot.presets.image.color_checker([5, 5])
-        psf = ot.Image(np.zeros((200, 200, 3)), [1, 1])
+        psf = ot.LinearImage(np.zeros((200, 200)), [1, 1])
 
         img2 = ot.convolve(img, psf)
         self.assertEqual(np.max(img2.data), 0)
@@ -427,7 +422,7 @@ class ConvolutionTests(unittest.TestCase):
 
         img = ot.presets.image.color_checker([5, 6])
         psf = ot.presets.psf.halo()
-        psf.s = [1, 0.3]
+        psf.extent = [-0.05, 0.05, -0.15, 0.15]
         s_psf = psf.s
         s_img = img.s
 
@@ -440,7 +435,7 @@ class ConvolutionTests(unittest.TestCase):
         self.assertTrue(np.allclose(img2 - np.fliplr(np.flipud(img2_f)), 0))
 
         # a m = 2 is the same as scaling s_img by 2
-        img2_ = ot.convolve(ot.Image(img.data, [2*s_img[0], 2*s_img[1]]), psf, m=1)
+        img2_ = ot.convolve(ot.RGBImage(img.data, [2*s_img[0], 2*s_img[1]]), psf, m=1)
         img2, s2 = img2_.data, img2_.s
         img2_s_ = ot.convolve(img, psf, m=2)
         img2_s, s2_s = img2_s_.data, img2_s_.s
@@ -454,16 +449,16 @@ class ConvolutionTests(unittest.TestCase):
         """
 
         # generate PSF with missing red component
-        rimg = ot.RImage([-1e-6, 1e-6, -1e-6, 1e-6])
-        rimg.render(945)
-        rimg._img[:, :] = 1
-        rimg._img[:, :, 0] = 0
-        rimg._img[:, :, :3] = color.srgb_linear_to_xyz(rimg._img[:, :, :3])  # convert to XYZ
+        rimg = ot.RenderImage([-1e-6, 1e-6, -1e-6, 1e-6])
+        rimg.render()
+        rimg._data[:, :] = 1
+        rimg._data[:, :, 0] = 0
+        rimg._data[:, :, :3] = color.srgb_linear_to_xyz(rimg._data[:, :, :3])  # convert to XYZ
 
         # convolve with red noise image
         img0 = np.random.sample((1000, 1000, 3))
         img0[:, :, 1:] = 0
-        img = ot.Image(img0, [1, 1])
+        img = ot.RGBImage(img0, [1, 1])
 
         # convolve while not normalizing the output values
         img2 = ot.convolve(img, rimg, cargs=dict(normalize=False))
@@ -481,8 +476,8 @@ class ConvolutionTests(unittest.TestCase):
                     
                     img0 = np.zeros((201, 201, 3))
                     img0[100:150, 120:140] = 1
-                    img = ot.Image(img0, [1, 1])
-                    psf = ot.Image(np.ones((sh0, sh1, 3)), [sp, sp])
+                    img = ot.RGBImage(img0, [1, 1])
+                    psf = ot.LinearImage(np.ones((sh0, sh1)), [sp, sp])
 
                     img2 = ot.convolve(img, psf, slice_=True, padding_mode=padding)
                     
@@ -500,7 +495,7 @@ class ConvolutionTests(unittest.TestCase):
 
         for slice_ in [True, False]:
 
-            img = ot.Image(np.ones((100, 100, 3)), [1, 1])
+            img = ot.RGBImage(np.ones((100, 100, 3)), [1, 1])
             psf = ot.presets.psf.circle(60)
 
             # padding with black leaves a decreasing edge
@@ -517,7 +512,7 @@ class ConvolutionTests(unittest.TestCase):
             
             # padding with "edge" fills color correctly
             # check with different channel values, so we now each channel gets edge padded correctly
-            img4 = ot.Image(np.full((100, 100, 3), 0.3), [1, 1])
+            img4 = ot.RGBImage(np.full((100, 100, 3), 0.3), [1, 1])
             img4._data[:, :, 0] = 0
             img5 = ot.convolve(img4, psf, slice_=slice_, padding_mode="edge", cargs=dict(normalize=False))
             val0 = (np.mean(img5.data[0, :, 0]) + np.mean(img5.data[-1, :, 0])\
@@ -534,7 +529,7 @@ class ConvolutionTests(unittest.TestCase):
 
         for rgb in [[0, 1, 0], [0.2, 0.3, 0.5], [0.1, 0.1, 0.1]]:
 
-            img4 = ot.Image(np.full((100, 100, 3), 0.3), [1, 1])
+            img4 = ot.RGBImage(np.full((100, 100, 3), 0.3), [1, 1])
             img4._data[:, :, 0] = rgb[0]
             img4._data[:, :, 1] = rgb[1]
             img4._data[:, :, 2] = rgb[2]
@@ -547,6 +542,87 @@ class ConvolutionTests(unittest.TestCase):
                 val = (np.mean(img5.data[0, :, i]) + np.mean(img5.data[-1, :, i])\
                         + np.mean(img5.data[:, 0, i]) + np.mean(img5.data[:, -1, i]))/4
                 self.assertAlmostEqual(val, rgb[i], delta=0.00001)
+
+    def test_extent_shifting(self):
+        """test that image extent/position is handled correctly when PSF or image (or both) are shifted"""
+
+        img = ot.presets.image.color_checker([2, 3])
+        psf = ot.presets.psf.airy(50)
+
+        img2 = ot.convolve(img, psf)
+
+        # image2 is centered
+        self.assertEqual(img2.extent[1] + img2.extent[0], 0)
+        self.assertEqual(img2.extent[2] + img2.extent[3], 0)
+
+        # shift image and psf in opposite directions
+        img.extent += [-6, -6, 3, 3]
+        psf.extent -= [-6, -6, 3, 3]
+        img2 = ot.convolve(img, psf)
+
+        # image2 is still centered
+        self.assertEqual(img2.extent[1] + img2.extent[0], 0)
+        self.assertEqual(img2.extent[2] + img2.extent[3], 0)
+
+        # shift psf back
+        psf.extent += [-6, -6, 3, 3]
+        img2 = ot.convolve(img, psf)
+
+        # image2 is at center of img
+        self.assertEqual((img2.extent[1] + img2.extent[0])/2, -6)
+        self.assertEqual((img2.extent[2] + img2.extent[3])/2, 3)
+
+    def test_image_flip(self):
+        """
+        check that image flip (magnification parameter m < 0) flips the image correctly.
+        
+        This is checked with an asymmetric PSF and image.
+        In the first step we compare the PSF and an image created by a Point. 
+        They should be equal and their center of mass should be in the same region.
+        Secondly, image two points. The points in the resulting image should be flipped
+        center of mass in third quadrant goes to first quadrant
+        """
+
+        RT = ot.Raytracer([-10, 10, -10, 10, -100, 400])
+
+        RS = ot.RaySource(ot.Point(), divergence="Lambertian", div_angle=3, pos=[0, 0, -20])
+        RT.add(RS)
+
+        # create a shifted sphere lens with R=5
+        n = ot.RefractionIndex("Constant", n=1.3)
+        front = ot.SphericalSurface(r=4.99999999, R=5)
+        back = ot.SphericalSurface(r=4.99999999, R=-5)
+        L = ot.Lens(front, back, d=10, pos=[0, -0.9, 0], n=n)
+        RT.add(L)
+
+        # add rectangular detector
+        DetS = ot.RectangularSurface([10, 10])
+        Det = ot.Detector(DetS, pos=[0, 0, 18.987], desc="Retina")
+        RT.add(Det)
+
+        # render psf
+        RT.trace(500000)
+        dimg = RT.detector_image()
+        
+        data = np.zeros((1001, 1001, 3))
+        data[500, 500] = 1
+        img = ot.RGBImage(data, [0.5, 0.5])
+        img2 = ot.convolve(img, dimg, m=-1, slice_=True)
+
+        # test that center of mass is above center
+        cm = np.array(scipy.ndimage.center_of_mass(img2.data[:, :, 0])) / img2.shape[0]
+        self.assertTrue(cm[0] > 0.53)
+
+        # set second bright pixel in lower left of the image
+        data[0, 0] = 1
+        img = ot.RGBImage(data, [0.5, 0.5])
+        img2 = ot.convolve(img, dimg, m=-1)
+        cm = np.array(scipy.ndimage.center_of_mass(img2.data[:, :, 0])) / img2.shape[0]
+
+        # test that center of mass is in first quadrant
+        self.assertTrue(cm[0] > 0.7)
+        self.assertTrue(cm[1] > 0.7)
+
 
 if __name__ == '__main__':
     unittest.main()

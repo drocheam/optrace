@@ -8,6 +8,7 @@ import unittest
 import numpy as np
 import pytest
 import colour  # TODO maybe use cv2 instead
+import cv2
 
 import optrace as ot
 import optrace.tracer.color as color
@@ -365,17 +366,18 @@ class ColorTests(unittest.TestCase):
                          [[0, 0, 0], [0.2, 0.5, 1], [0.01, 1, 1], [0.01, 0.01, 0.01], [0, 0, 0]],
                          [[0.2, 0.5, 0.1], [0, 0.8, 1.0], [0.5, 0.3, 0.5], [0.1, 0., 0.7], [0, 0, 0]],
                          [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]], dtype=np.float32)
-        RSS = ot.Image(Image, [6, 6])
+        RSS = ot.RGBImage(Image, [6, 6])
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, 0, 6], no_pol=True)
-        RS = ot.RaySource(RSS, pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.d65)
+        RS = ot.RaySource(RSS, pos=[0, 0, 0])
         RT.add(RS)
         
-        SIm, _ = RT.iterative_render(100000000, N_px_S=5)
+        RT.add(ot.Detector(ot.RectangularSurface([6, 6]), pos=[0, 0, 1e-9]))
 
         # get Source Image
-        # RS_XYZ = np.flipud(SIm[0].xyz())  # flip so element [0, 0] is in lower left
-        RS_XYZ = SIm[0].xyz()  # flip so element [0, 0] is in lower left
+        SIm = RT.iterative_render(100000000, extent=[-3, 3, -3, 3])[0]
+        RS_XYZ = cv2.resize(SIm._data[:, :, :3], [5, 5], interpolation=cv2.INTER_AREA)
+
         Im_px = color.srgb_to_xyz(Image).reshape((25, 3))
         RS_px = RS_XYZ.reshape((25, 3))
         Im_px /= np.max(Im_px)
@@ -457,31 +459,36 @@ class ColorTests(unittest.TestCase):
 
         # log scale some image
         arr = np.array([[[0.2, 0.2, 0.1], [0.1, 0.1, 0.1]], [[1, 1, 1], [0, 0, 0]]])
-        arr2 = color.log_srgb_linear(arr)
+        arr2 = color.log_srgb(arr)
 
         # check values
         self.assertFalse(np.all(arr2[0, 0] == arr[0, 0]))  # first value differs now
         self.assertTrue(np.all(arr2[0, 1] > 0))  # smallest value stays non-zero
-        self.assertTrue(np.all(arr[1] == arr2[1]))  # maximum and zero values stay the same
         
-        # exp > 1
-        arr3 = color.log_srgb_linear(arr, exp=2)
-        self.assertTrue(np.all(arr3[0, 1] < arr2[0, 1]))
-        
-        # exp < 1
-        arr4 = color.log_srgb_linear(arr, exp=0.5)
-        self.assertTrue(np.all(arr4[0, 1] > arr2[0, 1]))
-
         # test const image
-        const = np.ones((100, 100, 3))
-        const2 = color.log_srgb_linear(const)
+        const = np.ones((100, 100, 3), dtype=np.float64)
+        const2 = color.log_srgb(const)
         self.assertTrue(np.all(const == const2))
 
         # test zero image
         zero = np.zeros((100, 100, 3))
-        zero2 = color.log_srgb_linear(zero)
+        zero2 = color.log_srgb(zero)
         self.assertTrue(np.all(zero == zero2))
-    
+
+        # generate srgb image in standard and logarithmic mode
+        rgb = np.random.sample((1000, 1000, 3))
+        luv0 = color.xyz_to_luv(color.srgb_to_xyz(rgb))
+        lrgb = color.log_srgb(rgb)
+        luv = color.xyz_to_luv(color.srgb_to_xyz(lrgb))
+
+        # make sure logarithmic has a higher average lightness
+        self.assertTrue(np.mean(luv0[:, :, 0]) < np.mean(luv[:, :, 0]))
+
+        # make sure the saturation stayed roughly the same for all colors
+        nz = luv[:, :, 0] > 0
+        sat_quot = color.luv_saturation(luv0)[nz] / color.luv_saturation(luv)[nz]
+        self.assertTrue(np.allclose(sat_quot, 1, rtol=1e-3))
+
     @pytest.mark.os
     def test_illuminant_whitepoint(self):
 

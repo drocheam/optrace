@@ -10,10 +10,9 @@ import numpy as np
 import optrace as ot
 
 from test_tracer import lens_maker
-from test_gui import rt_example
+from rt_example import rt_example
 
 # Tests for special cases in Raytracing
-
 
 
 class TracerSpecialTests(unittest.TestCase):
@@ -49,7 +48,7 @@ class TracerSpecialTests(unittest.TestCase):
             det.move_to([0, 0, z])
             for N_th in [1, 2, 3, 4, 8, 16]:
                 RT._force_threads = N_th
-                img = RT.detector_image(16, projection_method="Equidistant")
+                img = RT.detector_image(projection_method="Equidistant")
                 
                 if RT.outline[5] > z > RS.surface.pos[2]:
                     self.assertAlmostEqual(img.power(), RS.power)  # correctly lit
@@ -103,7 +102,7 @@ class TracerSpecialTests(unittest.TestCase):
 
             # render image, so we can compare side length and power
             RT.trace(100000)
-            im2 = RT.detector_image(100)
+            im2 = RT.detector_image()
 
             # remove not symmetric element and compare abcd matrix
             RT.remove(L2)
@@ -403,8 +402,8 @@ class TracerSpecialTests(unittest.TestCase):
                 RT.trace(N)
 
                 # test renders
-                RT.source_image(289)
-                RT.detector_image(289)
+                RT.source_image()
+                RT.detector_image()
                 RT.source_spectrum()
                 RT.detector_spectrum()
                 RT.iterative_render(N)
@@ -472,25 +471,25 @@ class TracerSpecialTests(unittest.TestCase):
         RT.trace(200000)
 
         # tilted surface intersects with 4 surfaces, check if correctly renders image
-        img = RT.detector_image(500)
+        img = RT.detector_image()
         self.assertTrue(img.power() > 0.55)
 
         # check ring detector
         RT.add(ot.Detector(ot.RingSurface(r=3.5, ri=0.3), pos=[0, 0, 12]))
-        img = RT.detector_image(500, detector_index=1)
+        img = RT.detector_image(detector_index=1)
         self.assertTrue(img.power() > 0.4)
-        ny, nx = img._img.shape[:2]
-        self.assertEqual(img._img[ny//2, nx//2, 3], 0)  
+        ny, nx = img._data.shape[:2]
+        self.assertEqual(img._data[ny // 2, nx // 2, 3], 0)
         # ^-- due to hole in detector there is no light detected in its center
         
         # check circle detector
         RT.add(ot.Detector(ot.CircularSurface(r=3.5), pos=[0, 0, 12]))
-        img = RT.detector_image(500, detector_index=2)
+        img = RT.detector_image(detector_index=2)
         self.assertTrue(img.power() > 0.4)
         
         # check conic surface detector
         RT.add(ot.Detector(ot.ConicSurface(r=3.5, R=-10, k=2), pos=[0, 0, 12]))
-        img = RT.detector_image(500, detector_index=3)
+        img = RT.detector_image(detector_index=3)
         self.assertTrue(img.power() > 0.4)
 
 if __name__ == '__main__':

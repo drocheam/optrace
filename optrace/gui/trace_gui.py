@@ -5,7 +5,6 @@ from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context managers
 import numpy as np
-import importlib.metadata
                 
 # enforce qt backend  
 from traits.etsconfig.api import ETSConfig
@@ -21,15 +20,17 @@ from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, L
 
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 
-# provides types and plotting functionality, most of these are also imported for the TCP protocol scope
+# provides types and plotting functionality
 from ..tracer import *
-from ..plots import r_image_plot, r_image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
+from ..plots import image_plot, image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
+from ..tracer.presets import psf
 
 from .property_browser import PropertyBrowser  # dictionary browser
 from .command_window import CommandWindow
 from ._scene_plotting import ScenePlotting
 
 from ..warnings import warning
+from .. import metadata
 
 # TODO don't retrace when init and already rays included in raytracer?
 
@@ -149,7 +150,7 @@ class TraceGUI(HasTraits):
     coloring_type: Enum = Enum(*coloring_types, desc="Ray Property to color the Rays With")
     """Ray Coloring Mode"""
 
-    image_type: Enum = Enum(*RImage.display_modes, desc="Image Type Presented")
+    image_type: Enum = Enum(*RenderImage.image_modes, desc="Image Type Presented")
     """Image Type"""
    
     projection_method_enabled: Bool = False  #: if method is selectable, only the case for spherical detectors
@@ -171,7 +172,7 @@ class TraceGUI(HasTraits):
     detector_selection: Enum = Enum(values='detector_names', desc="Detector Selection")
     """Detector Selection. Holds the name of one of the Detectors."""
 
-    image_pixels: Enum = Enum(RImage.SIZES, label="Pixels_xy",
+    image_pixels: Enum = Enum(RenderImage.SIZES, label="Pixels_xy",
                               desc='Detector Image Pixels in Smaller of x or y Dimension')
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
@@ -327,7 +328,7 @@ class TraceGUI(HasTraits):
                         ),
                     ),
                 resizable=True,
-                title="Optrace "+importlib.metadata.metadata("optrace")["Version"],
+                title=f"Optrace {metadata.version}",
                 # icon=""  # TODO create an icon and set the path here and in sub-windows
                 )
     """the UI view"""
@@ -952,7 +953,7 @@ class TraceGUI(HasTraits):
         Render a detector image at the chosen Detector, uses a separate thread.
 
         :param event: optional event from traits observe decorator
-        :param cut: if a RImage cut image is plotted
+        :param cut: if a Image cut image is plotted
         :param kwargs: additional keyword arguments for r_image_plot
         """
 
@@ -970,21 +971,18 @@ class TraceGUI(HasTraits):
                             # only calculate Image if raytracer Snapshot, selected Source or image_pixels changed
                             # otherwise we can replot the old Image with the new visual settings
                             source_index = None if not self.det_image_one_source else self._source_ind
-                            snap = [self.raytracer.property_snapshot(), *self.detector_selection, source_index, 
-                                    *self.projection_method, *self.activate_filter, self.filter_constant]
-                            rerender = snap != self._last_det_snap or self.last_det_image is None
-
-                            log, mode, px, dindex, flip, pm = bool(self.log_image), self.image_type,\
-                                int(self.image_pixels), self._det_ind, bool(self.flip_det_image), self.projection_method
                             limit = self.filter_constant if self.activate_filter \
                                                             and not self.projection_method_enabled else None
-                            cut_args = {self.cut_dimension : self.cut_value}
+                            
+                            snap = [self.raytracer.property_snapshot(), *self.detector_selection, source_index, 
+                                    *self.projection_method, limit]
+                            rerender = snap != self._last_det_snap or self.last_det_image is None
 
                             if rerender:
                                 with self._try() as error:
-                                    DImg = self.raytracer.detector_image(N=px, detector_index=dindex,
-                                                                         source_index=source_index, 
-                                                                         projection_method=pm, limit=limit)
+                                    DImg = self.raytracer.detector_image(detector_index=self._det_ind,
+                                                                         source_index=source_index, limit=limit,
+                                                                         projection_method=self.projection_method)
                     if not error:
 
                         if rerender:
@@ -992,16 +990,23 @@ class TraceGUI(HasTraits):
                             self._last_det_snap = snap
                         else:
                             DImg = self.last_det_image.copy()
-                            DImg.rescale(px)
+
+                        img = DImg.get(self.image_type, int(self.image_pixels))
 
                 def on_finish() -> None:
+
                     if not error:
+
                         with self._try():
+
                             if (event is None and not cut) or (event is not None\
                                     and event.name == "_detector_image_button"):
-                                r_image_plot(DImg, log=log, mode=mode, flip=flip, **kwargs)
+                                image_plot(img, log=bool(self.log_image), flip=bool(self.flip_det_image), **kwargs)
+
                             else:
-                                r_image_cut_plot(DImg, log=log, mode=mode, flip=flip, **cut_args, **kwargs)
+                                cut_args = {self.cut_dimension : self.cut_value}
+                                image_cut_plot(img, log=bool(self.log_image), 
+                                               flip=bool(self.flip_det_image), **cut_args, **kwargs)
 
                     self._status["DetectorImage"] -= 1
 
@@ -1114,8 +1119,8 @@ class TraceGUI(HasTraits):
         Render a source image for the chosen Source, uses a separate thread
 
         :param event: optional event from traits observe decorator
-        :param cut: if an RImage cut plot is plotted
-        :param kwargs: additional keyword arguments for r_image_plot
+        :param cut: if an Image cut plot is plotted
+        :param kwargs: additional keyword arguments for image_plot
         """
 
         if self.raytracer.ray_sources and self.raytracer.rays.N:
@@ -1128,20 +1133,16 @@ class TraceGUI(HasTraits):
 
                 with self.__source_image_lock:
                     with self.__ray_access_lock:
+                        limit = None if not self.activate_filter else self.filter_constant
+                        
                         # only calculate Image if raytracer Snapshot, selected Source or image_pixels changed
                         # otherwise we can replot the old Image with the new visual settings
-                        snap = [self.raytracer.property_snapshot(), *self.source_selection,
-                                *self.activate_filter, self.filter_constant]
-
+                        snap = [self.raytracer.property_snapshot(), *self.source_selection, limit]
                         rerender = snap != self._last_source_snap or self.last_source_image is None
-                        log, mode, px, source_index = bool(self.log_image), self.image_type, int(self.image_pixels), \
-                            self._source_ind
-                        limit = None if not self.activate_filter else self.filter_constant
-                        cut_args = {self.cut_dimension : self.cut_value}
 
                         if rerender:
                             with self._try() as error:
-                                SImg = self.raytracer.source_image(N=px, source_index=source_index, limit=limit)
+                                SImg = self.raytracer.source_image(source_index=self._source_ind, limit=limit)
 
                     if not error:
 
@@ -1150,16 +1151,18 @@ class TraceGUI(HasTraits):
                             self._last_source_snap = snap
                         else:
                             SImg = self.last_source_image.copy()
-                            SImg.rescale(px)
+
+                        img = SImg.get(self.image_type, int(self.image_pixels))
 
                 def on_finish() -> None:
                     if not error:
                         with self._try():
                             if (event is None and not cut) or \
                                     (event is not None and event.name == "_source_image_button"):
-                                r_image_plot(SImg, log=log, mode=mode, **kwargs)
+                                image_plot(img, log=bool(self.log_image), **kwargs)
                             else:
-                                r_image_cut_plot(SImg, log=log, mode=mode, **cut_args, **kwargs)
+                                cut_args = {self.cut_dimension : self.cut_value}
+                                image_cut_plot(img, log=bool(self.log_image), **cut_args, **kwargs)
 
                     self._status["SourceImage"] -= 1
 
