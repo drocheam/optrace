@@ -23,21 +23,18 @@ from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 # provides types and plotting functionality
 from ..tracer import *
 from ..plots import image_plot, image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
-from ..tracer.presets import psf
 
 from .property_browser import PropertyBrowser  # dictionary browser
 from .command_window import CommandWindow
 from ._scene_plotting import ScenePlotting
 
+from ..tracer.misc import PropertyChecker as pc
 from ..warnings import warning
 from .. import metadata
 
 # TODO don't retrace when init and already rays included in raytracer?
 
-# TODO add extent parameter to source_image, detector_image functions
 
-# TODO add pick_ray function that displays any of the traced rays. 
-# Additional parameter specifies if crosshair and picking text should be displayed at a specific intersection
 
 class TraceGUI(HasTraits):
 
@@ -349,6 +346,10 @@ class TraceGUI(HasTraits):
         :param initial_camera: parameter dictionary for set_camera
         :param kwargs: additional arguments, options, traits and parameters
         """
+        pc.check_type("raytracer", raytracer, Raytracer)
+        pc.check_type("ui_style", ui_style, str | None)
+        pc.check_type("initial_camera", initial_camera, dict)
+
         # set UI theme. Unfortunately this does not work dynamically (yet)
         if ui_style is not None:
             QtGui.QApplication.setStyle(ui_style)
@@ -459,8 +460,12 @@ class TraceGUI(HasTraits):
     
     @contextmanager
     def smart_replot(self, automatic_replot: bool = True) -> None:
-        # TODO docstring and tests
+        """
+        This contextmanager makes a property snapshot of the raytracer before and after a specific action.
+        If changes are detected. the corresponding elements are updated.
 
+        :param automatic_replot: if automatic replotting should be executed
+        """
         if automatic_replot:
             hs = self.raytracer.property_snapshot()
         
@@ -473,11 +478,15 @@ class TraceGUI(HasTraits):
                 cmp = self.raytracer.compare_property_snapshot(hs, hs2)
                 self.replot(cmp)
 
-    def process(self):
+    def process(self) -> None:
+        """
+        Force an update to traits and unprocessed events.
+        """
+        # TODO explain in documentation
         pyface_gui.process_events()
 
-    def _start_action(self, func, args = ()):
-
+    def _start_action(self, func, args = ()) -> None:
+        """execute an action. If _sequential is set, is is run in the main thread, in a different thread otherwise"""
         if self._sequential:
             func(*args)
         else:
@@ -485,7 +494,7 @@ class TraceGUI(HasTraits):
             action.start()
 
     @contextmanager
-    def _try(self, *args, **kwargs) -> bool:
+    def _try(self) -> bool:
         """
         execute an environment in a try block, print exceptions and return if exceptions have occurred
         example usage:
@@ -536,7 +545,7 @@ class TraceGUI(HasTraits):
     # Interface functions
     ####################################################################################################################
 
-    def screenshot(self, *args, **kwargs):
+    def screenshot(self, *args, **kwargs) -> None:
         """
         Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
         See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
@@ -549,7 +558,8 @@ class TraceGUI(HasTraits):
                    center:      np.ndarray = None, 
                    height:      float = None, 
                    direction:   list = None,
-                   roll:        float = None):
+                   roll:        float = None)\
+            -> None:
         """
         Sets the camera view.
         Not all parameters must be defined, setting single properties is also allowed.
@@ -562,6 +572,14 @@ class TraceGUI(HasTraits):
          (direction of vector perpendicular to your monitor and in your viewing direction)
         :param roll: absolute camera roll angle
         """
+        pc.check_type("center", center, list | np.ndarray | None)
+        pc.check_type("height", height, float | int | None)
+        pc.check_type("direction", direction, list | np.ndarray | None)
+        pc.check_type("roll", roll, float | int | None)
+        
+        if height is not None:
+            pc.check_above("height", height, 0)
+
         self._status["Drawing"] += 1
         self._plot.set_camera(center, height, direction, roll)
         self._status["Drawing"] -= 1
@@ -573,6 +591,46 @@ class TraceGUI(HasTraits):
         :return: Return the current camera parameters (center, height, direction, roll)
         """
         return self._plot.get_camera()
+
+    def pick_ray(self, index: int) -> None:
+        """
+        Pick a ray with index 'index'.
+        The selected ray is highlighted.
+
+        :param index: is the index of the displayed rays.
+        """
+        self.pick_ray_section(index, None, False)
+
+    def pick_ray_section(self, 
+                         index:     int, 
+                         section:   int, 
+                         detailed:  bool = False)\
+            -> None:
+        """
+        Pick a ray with index 'index' at intersection number 'section'.
+        A ray highlight plot, crosshair and ray info text are shown.
+
+        :param index: is the index of the displayed rays.
+        :param section: intersection index (starting position is zero)
+        :param detailed: If 'detailed' is set, a more detailed ray info text is shown
+        """
+        pc.check_type("index", index, int | np.int64)
+        pc.check_type("section", section, int | np.int64 | None)
+
+        self._status["Drawing"] += 1
+        with self._try():
+            self._plot.pick_ray_section(index, section, detailed)
+        self._status["Drawing"] -= 1
+    
+    def reset_picking(self) -> None:
+        """
+        Hide/reset the displayed picker objects.
+        Hides the ray info text, ray highlight and crosshair that have been created
+        with TraceGUI.pick_ray or TraceGUI.pick_ray_section
+        """
+        self._status["Drawing"] += 1
+        self._plot.reset_picking()
+        self._status["Drawing"] -= 1
 
     def replot(self, change: dict = None) -> None:
         """
@@ -684,12 +742,17 @@ class TraceGUI(HasTraits):
     
     def control(self, func: Callable, args: tuple = (), kwargs: dict = {}) -> None:
         """
-        Control the GUI from a separate thread.
+        Interact with the TraceGUI.
+        Function 'func' is executed in the main thread after the TraceGUI is loaded.
 
-        :param func: thread function to execute while the GUI is active
+        :param func: function to execute
         :param args: positional arguments for func
         :param kwargs: keyword arguments for func
         """
+        pc.check_type("func", func, Callable)
+        pc.check_type("args", args, tuple)
+        pc.check_type("kwargs", kwargs, dict)
+
         # in "control" mode everything is handled sequentially, so actions don't start
         # in separate threads which could lead to runtime issues
         def func2(*args, **kwargs):
@@ -710,9 +773,7 @@ class TraceGUI(HasTraits):
         self.configure_traits()
 
     def run(self) -> None:
-        """
-        Run the TraceGUI
-        """
+        """Run the TraceGUI"""
         self.configure_traits()
 
     @observe('scene:closing', dispatch="ui")  # needed so this gets also called when clicking x on main window
@@ -938,22 +999,29 @@ class TraceGUI(HasTraits):
             self._start_action(background)
 
     @observe('_detector_cut_button', dispatch="ui")
-    def detector_cut(self, event = None, **kwargs) -> None:
+    def detector_cut(self, event = None, extent: list | np.ndarray = None, **kwargs) -> None:
         """
         Plot a detector image cut.
 
         :param event: optional event from traits observe decorator
+        :param extent: image extent, see Raytracer.detector_image()
         :param kwargs: additional keyword arguments for r_image_cut_plot
         """
-        self.detector_image(event, cut=True, **kwargs)
+        self.detector_image(event, cut=True, extent=extent, **kwargs)
 
     @observe('_detector_image_button', dispatch="ui")
-    def detector_image(self, event=None, cut=False, **kwargs) -> None:
+    def detector_image(self, 
+                       event        = None, 
+                       cut:         bool = False, 
+                       extent:      list | np.ndarray = None, 
+                       **kwargs)\
+            -> None:
         """
         Render a detector image at the chosen Detector, uses a separate thread.
 
         :param event: optional event from traits observe decorator
         :param cut: if a Image cut image is plotted
+        :param extent: image extent, see Raytracer.detector_image()
         :param kwargs: additional keyword arguments for r_image_plot
         """
 
@@ -975,12 +1043,12 @@ class TraceGUI(HasTraits):
                                                             and not self.projection_method_enabled else None
                             
                             snap = [self.raytracer.property_snapshot(), *self.detector_selection, source_index, 
-                                    *self.projection_method, limit]
+                                    *self.projection_method, limit, extent]
                             rerender = snap != self._last_det_snap or self.last_det_image is None
 
                             if rerender:
                                 with self._try() as error:
-                                    DImg = self.raytracer.detector_image(detector_index=self._det_ind,
+                                    DImg = self.raytracer.detector_image(detector_index=self._det_ind, extent=extent,
                                                                          source_index=source_index, limit=limit,
                                                                          projection_method=self.projection_method)
                     if not error:
@@ -1015,11 +1083,12 @@ class TraceGUI(HasTraits):
             self._start_action(background)
 
     @observe('_detector_spectrum_button', dispatch="ui")
-    def detector_spectrum(self, event=None, **kwargs) -> None:
+    def detector_spectrum(self, event=None, extent: list | np.ndarray = None, **kwargs) -> None:
         """
         Render a Detector Spectrum for the chosen Source, uses a separate thread.
 
         :param event: optional event from traits observe decorator
+        :param extent: image extent, see Raytracer.detector_image()
         :param kwargs: additional keyword arguments for spectrum_plot
         """
 
@@ -1036,7 +1105,7 @@ class TraceGUI(HasTraits):
                     with self.__ray_access_lock:
                         source_index = None if not self.det_spectrum_one_source else self._source_ind
                         with self._try() as error:
-                            Det_Spec = self.raytracer.detector_spectrum(detector_index=self._det_ind,
+                            Det_Spec = self.raytracer.detector_spectrum(detector_index=self._det_ind, extent=extent,
                                                                         source_index=source_index)
 
                 def on_finish() -> None:
@@ -1282,9 +1351,9 @@ class TraceGUI(HasTraits):
             self._status["Drawing"] += 1
             self._plot.change_label_visibility()
             self._status["Drawing"] -= 1
-    
+
     @observe('vertical_labels', dispatch="ui")
-    def change_label_orientation(self, event=None):
+    def _change_label_orientation(self, event=None) -> None:
         """
         Make element labels horizontal or vertical
 

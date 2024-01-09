@@ -11,7 +11,6 @@ def simplified_warning(message, category, filename, lineno, file=None, line=None
     """simplified warning formatting without filename and linenumber as would be default"""
     return "Warning: " + str(message) + "\n" 
 
-
 def warning(text: str) -> None:
     """emit a warning in a custom warning class with custom formatter and only if global_options allow it"""
        
@@ -28,3 +27,8 @@ def warning(text: str) -> None:
         
         # restore old formatter
         warnings.formatwarning = formatwarning_org
+
+# set OptraceWarnings to 'always', means that they are displayed multiple times,
+# which is non-default for warnings
+warnings.simplefilter('always', OptraceWarning)
+

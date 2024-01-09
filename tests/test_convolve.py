@@ -14,13 +14,14 @@ from optrace.tracer import color
 import optrace.tracer.misc as misc
 
 
-# test slice_ and padding properties
 
 class ConvolutionTests(unittest.TestCase):
 
     def test_exceptions(self):
+        """test value and type errors for the convolve() function"""
 
         img = ot.presets.image.color_checker([5, 6])
+        img2 = ot.presets.psf.airy(1000)
         psf = ot.presets.psf.halo()
         psf.extent = [-0.05, 0.05, -0.15, 0.15]
 
@@ -31,12 +32,15 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.convolve, img, psf, slice_=[])  # invalid slice_
         self.assertRaises(TypeError, ot.convolve, img, psf, cargs=[])  # invalid cargs
         self.assertRaises(TypeError, ot.convolve, img, psf, padding_mode=[])  # invalid padding_mode
-        self.assertRaises(TypeError, ot.convolve, img, psf, padding_value=2)  # invalid padding_value
+        self.assertRaises(TypeError, ot.convolve, img, psf, padding_value=2)  # invalid padding_value for RGBImage
+        self.assertRaises(TypeError, ot.convolve, img2, psf, padding_value=[1, 2])  # invalid padding_value for LinearImage
         
         # value errors
         self.assertRaises(ValueError, ot.convolve, img, psf, m=0)  # m can't be zero
         self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[0, 0])  # invalid padding_value shape
         self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[[0, 0, 0]])  # invalid padding_value shape
+        self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[0, 0, -1])  # invalid padding_value for RGBImage
+        self.assertRaises(ValueError, ot.convolve, img2, psf, padding_value=-2)  # invalid padding_value for LinearImage
         
     def test_resolution_exceptions(self):
 
@@ -70,6 +74,7 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.convolve, img, psf3)
        
     def test_coverage(self):
+        """Some additional coverage testing"""
 
         img = ot.presets.image.color_checker([5, 6])
         psf = ot.presets.psf.halo()
@@ -124,7 +129,10 @@ class ConvolutionTests(unittest.TestCase):
                     self.assertTrue(mdiff**2.2 < 2e-5)  # should stay the same, but small numerical errors
 
     def test_point_image_point_psf(self):
-
+        """
+        Point convolved with a point is also a point. 
+        We also use a special case, where only one pixel of psf and image is set.
+        """
         psf = np.zeros((301, 301))
         psf[151, 151] = 1
         img = np.repeat(psf[:, :, np.newaxis], 3, axis=2)
@@ -377,7 +385,7 @@ class ConvolutionTests(unittest.TestCase):
 
             # range 0-1
             self.assertAlmostEqual(np.min(pst.data), 0)
-            self.assertAlmostEqual(np.max(pst.data), 1)
+            self.assertAlmostEqual(np.sum(pst.data), 1)  # sums to one
 
             # convolution doesn't fail
             ot.convolve(img(ilen), pst)
@@ -467,65 +475,84 @@ class ConvolutionTests(unittest.TestCase):
         self.assertAlmostEqual(np.mean(img2.data), 0, delta=1e-06)
 
     def test_slicing(self):
+        """
+        Check that image is correctly sliced regardless of padding mode, shape, and image type (LinearImage, RGBImage).
+        """
+        img0 = np.zeros((201, 201, 3))
+        img0[100:150, 120:140] = 1
+        img1 = ot.RGBImage(img0, [1, 1])
+        img2 = ot.LinearImage(img0[:, :, 0], [1, 1])
 
         # regardless of the other padding option and evenness of input
         # after slicing the resulting image should have the same side lengths and shape
-        for padding in ["constant", "edge"]:
-            for sp in [1.1e-2, 1e-2]:
-                for sh0, sh1 in zip([100, 100, 101, 101], [100, 101, 100, 101]):
-                    
-                    img0 = np.zeros((201, 201, 3))
-                    img0[100:150, 120:140] = 1
-                    img = ot.RGBImage(img0, [1, 1])
-                    psf = ot.LinearImage(np.ones((sh0, sh1)), [sp, sp])
+        for img in [img1, img2]:
+            for padding in ["constant", "edge"]:
+                for sp in [1.1e-2, 1e-2]:
+                    for sh0, sh1 in zip([100, 100, 101, 101], [100, 101, 100, 101]):
+                        
+                        psf = ot.LinearImage(np.ones((sh0, sh1)), [sp, sp])
 
-                    img2 = ot.convolve(img, psf, slice_=True, padding_mode=padding)
-                    
-                    # check shape and side lengths
-                    self.assertTrue(np.all(img2.s == img.s))
-                    self.assertTrue(np.all(img2.shape == img.shape))
+                        img2 = ot.convolve(img, psf, slice_=True, padding_mode=padding)
+                        
+                        # check shape and side lengths
+                        self.assertTrue(np.all(img2.s == img.s))
+                        self.assertTrue(np.all(img2.shape == img.shape))
 
-                    # check center of mass. Shouldn't deviate by more than half a pixel in some cases
-                    cm = scipy.ndimage.center_of_mass(img.data)
-                    cm2 = scipy.ndimage.center_of_mass(img2.data)
-                    self.assertAlmostEqual(cm[0], cm2[0], delta=0.7)
-                    self.assertAlmostEqual(cm[1], cm2[1], delta=0.7)
+                        # check center of mass. Shouldn't deviate by more than half a pixel in some cases
+                        cm = scipy.ndimage.center_of_mass(img.data)
+                        cm2 = scipy.ndimage.center_of_mass(img2.data)
+                        self.assertAlmostEqual(cm[0], cm2[0], delta=0.7)
+                        self.assertAlmostEqual(cm[1], cm2[1], delta=0.7)
 
     def test_padding(self):
+        """
+        Make sure padding works. Test padding_modes and padding_value, both for LinearImage and RGBImage.
+        """ 
+        img1 = ot.RGBImage(np.ones((100, 100, 3)), [1, 1])
+        img2 = ot.LinearImage(np.ones((100, 100)), [1, 1])
+        psf = ot.presets.psf.circle(60)
 
-        for slice_ in [True, False]:
+        for img, pval1, pval2 in zip([img1, img2], [[0, 0, 0], 0], [[1, 1, 1], 1]):
+            for slice_ in [True, False]:
 
-            img = ot.RGBImage(np.ones((100, 100, 3)), [1, 1])
-            psf = ot.presets.psf.circle(60)
+                # padding with black leaves a decreasing edge
+                img2 = ot.convolve(img, psf, slice_=slice_, padding_mode="constant", padding_value=pval1)
+                val = (np.mean(img2.data[0, :]) + np.mean(img2.data[-1, :])\
+                        + np.mean(img2.data[:, 0]) + np.mean(img2.data[:, -1]))/4
+                self.assertNotAlmostEqual(val, 1, delta=0.00001)
+                
+                # padding with white keeps white edge
+                img3 = ot.convolve(img, psf, slice_=slice_, padding_mode="constant", padding_value=pval2)
+                val = (np.mean(img3.data[0, :]) + np.mean(img3.data[-1, :])\
+                        + np.mean(img3.data[:, 0]) + np.mean(img3.data[:, -1]))/4
+                self.assertAlmostEqual(val, 1, delta=0.00001)
+               
+                if isinstance(img, ot.RGBImage):
+                    # padding with "edge" fills color correctly
+                    # check with different channel values, so we now each channel gets edge padded correctly
+                    img4 = ot.RGBImage(np.full((100, 100, 3), 0.3), [1, 1])
+                    img4._data[:, :, 0] = 0
+                    img5 = ot.convolve(img4, psf, slice_=slice_, padding_mode="edge", cargs=dict(normalize=False))
+                    val0 = (np.mean(img5.data[0, :, 0]) + np.mean(img5.data[-1, :, 0])\
+                            + np.mean(img5.data[:, 0, 0]) + np.mean(img5.data[:, -1, 0]))/4
+                    self.assertAlmostEqual(val0, 0, delta=0.00001)
+                    val = (np.mean(img5.data[0, :, 1:]) + np.mean(img5.data[-1, :, 1:])\
+                            + np.mean(img5.data[:, 0, 1:]) + np.mean(img5.data[:, -1, 1:]))/4
+                    self.assertAlmostEqual(val, 0.3, delta=0.00001)
 
-            # padding with black leaves a decreasing edge
-            img2 = ot.convolve(img, psf, slice_=slice_, padding_mode="constant", padding_value=[0, 0, 0])
-            val = (np.mean(img2.data[0, :]) + np.mean(img2.data[-1, :])\
-                    + np.mean(img2.data[:, 0]) + np.mean(img2.data[:, -1]))/4
-            self.assertNotAlmostEqual(val, 1, delta=0.00001)
-            
-            # padding with white keeps white edge
-            img3 = ot.convolve(img, psf, slice_=slice_, padding_mode="constant", padding_value=[1, 1, 1])
-            val = (np.mean(img3.data[0, :]) + np.mean(img3.data[-1, :])\
-                    + np.mean(img3.data[:, 0]) + np.mean(img3.data[:, -1]))/4
-            self.assertAlmostEqual(val, 1, delta=0.00001)
-            
-            # padding with "edge" fills color correctly
-            # check with different channel values, so we now each channel gets edge padded correctly
-            img4 = ot.RGBImage(np.full((100, 100, 3), 0.3), [1, 1])
-            img4._data[:, :, 0] = 0
-            img5 = ot.convolve(img4, psf, slice_=slice_, padding_mode="edge", cargs=dict(normalize=False))
-            val0 = (np.mean(img5.data[0, :, 0]) + np.mean(img5.data[-1, :, 0])\
-                    + np.mean(img5.data[:, 0, 0]) + np.mean(img5.data[:, -1, 0]))/4
-            self.assertAlmostEqual(val0, 0, delta=0.00001)
-            val = (np.mean(img5.data[0, :, 1:]) + np.mean(img5.data[-1, :, 1:])\
-                    + np.mean(img5.data[:, 0, 1:]) + np.mean(img5.data[:, -1, 1:]))/4
-            self.assertAlmostEqual(val, 0.3, delta=0.00001)
-            
+                else:
+                    img4 = ot.LinearImage(np.full((100, 100), 0.3), [1, 1])
+                    img5 = ot.convolve(img4, psf, slice_=slice_, padding_mode="edge", cargs=dict(normalize=False))
+                    val = (np.mean(img5.data[0, :]) + np.mean(img5.data[-1, :])\
+                            + np.mean(img5.data[:, 0]) + np.mean(img5.data[:, -1]))/4
+                    self.assertAlmostEqual(val, 0.3, delta=0.00001)
+
+
     def test_color_steadiness(self):
-       
-        # test convolving without normalization of a single colored image leads to the same colored images
-        # this means that the psf is correctly normalized
+        """
+        test convolving without normalization of a single colored image leads to the same colored images
+        this means that the psf is correctly normalized
+        """
 
         for rgb in [[0, 1, 0], [0.2, 0.3, 0.5], [0.1, 0.1, 0.1]]:
 
@@ -622,6 +649,36 @@ class ConvolutionTests(unittest.TestCase):
         # test that center of mass is in first quadrant
         self.assertTrue(cm[0] > 0.7)
         self.assertTrue(cm[1] > 0.7)
+
+    def test_linear_image_power(self):
+        """
+        Make sure output image power is preserved as product of image and psf power.
+        Regardless of their values (includes zeros).
+        """
+
+        img0 = ot.LinearImage(np.ones((100, 100)), [1, 2])
+        img1 = ot.LinearImage(np.zeros((100, 100)), [2, 1])
+        img2 = ot.LinearImage(np.random.sample((100, 100)), [1, 1])
+        img3 = ot.LinearImage(np.random.uniform(1.5, 3.5, (100, 100)), [1, 2])
+
+        psf0 = ot.LinearImage(np.zeros((100, 50)), [0.5, 1.5])
+        psf1 = ot.presets.psf.airy(5)
+        psf2 = ot.LinearImage(np.ones((100, 100)), [0.1, 0.2])
+        psf3 = ot.LinearImage(np.random.sample((100, 100)), [0.01, 1])
+        psf4 = ot.LinearImage(np.random.uniform(1.5, 3.5, (100, 100)), [1, 2])
+
+        # for all example psfs and images
+        for img in [img0, img1, img2, img3]:
+            for psf in [psf0, psf1, psf2, psf3]:
+               
+                # convolve
+                img_res = ot.convolve(img, psf, slice_=False)
+
+                # test relative error
+                Pres = np.sum(img_res.data)
+                P0 = np.sum(img.data)*np.sum(psf.data)
+                Pref = max(Pres, P0, 1)  # make sure Pref as divisor can't be zero
+                self.assertAlmostEqual((P0 - Pres)/Pref, 0, delta=1e-6)
 
 
 if __name__ == '__main__':

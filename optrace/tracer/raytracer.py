@@ -176,6 +176,8 @@ class Raytracer(Group):
         for msg in msgs:
             self._msgs += msg
 
+    # TODO create a list of surface descriptions ("Source 0", "Front of Lens 0", "Outline" etc)
+    # so message would read  "xxx happened at Surface 12 (back of Lens L5)"
     def _show_messages(self, N) -> None:
         """
         Show messages from tracing
@@ -279,7 +281,7 @@ class Raytracer(Group):
         def sub_trace(N_threads: int, N_t: int) -> None:
 
             p, s, pols, weights, wavelengths, ns = self.rays.thread_rays(N_threads, N_t)
-            if global_options.show_progressbar  and N_t == 0:
+            if bar is not None and N_t == 0:
                 bar.update(1)
 
             msg = msgs[N_t]
@@ -315,7 +317,7 @@ class Raytracer(Group):
                         self.__outline_intersection(p, s, weights, hwnh, i, msg)
 
                         i += 1
-                        if global_options.show_progressbar and N_t == 0:
+                        if bar is not None and N_t == 0:
                             bar.update(i+1)
                         p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
                         ns[:, i], ns[:, i+1] = n_l, n2_l
@@ -374,7 +376,7 @@ class Raytracer(Group):
                     ns[:, i+1] = ns[:, i]
 
                 i += 1
-                if global_options.show_progressbar and N_t == 0:
+                if bar is not None and N_t == 0:
                     bar.update(i+1)
 
         if N_threads > 1:
@@ -389,7 +391,7 @@ class Raytracer(Group):
         self.rays.lock()
 
         # show info messages from tracing
-        if global_options.show_progressbar:
+        if bar is not None:
             bar.finish()
 
         self._set_messages(msgs)
@@ -1075,6 +1077,12 @@ class Raytracer(Group):
         :param kwargs: keyword arguments for creating the RenderImage
         :return: rendered RenderImage
         """
+
+        if limit is not None and extent is not None:
+            warning("Using the limit parameter in combination with a user defined extent"
+                    " will produce an incorrect detector image, as the rays outside the extent"
+                    " are not included in the convolution calculation.")
+
         p, w, wl, extent_out, desc, projection, bar\
             = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
 
@@ -1503,7 +1511,7 @@ class Raytracer(Group):
         z = bounds[0] + self.N_EPS
         pos[Ns:Ne] = np.argmax(z < self.rays.p_list[rays_pos, :, 2], axis=1) - 1
         
-        if global_options.show_progressbar:
+        if bar is not None:
             bar.update(1)
 
         # exclude already absorbed rays
@@ -1533,7 +1541,7 @@ class Raytracer(Group):
         # get Ray parts
         p, s, _, weights, _, _, _ = self.rays.rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0, 0])
 
-        if global_options.show_progressbar:
+        if bar is not None:
             bar.update(2)
 
         # find focus
@@ -1569,7 +1577,7 @@ class Raytracer(Group):
                 div = int(Nt / (steps - 2) / N_th)
 
                 for i, Ni in enumerate(np.arange(Ns, Ne)):
-                    if i % div == div-1 and global_options.show_progressbar and not N_is:
+                    if i % div == div-1 and bar is not None and not N_is:
                         bar.update(2+int(i/div + 1))
                     vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
 
@@ -1593,7 +1601,7 @@ class Raytracer(Group):
                                           options={'maxiter': 300}, bounds=[bounds])
             res.x = res.x[0]
 
-        if global_options.show_progressbar:
+        if bar is not None:
             bar.finish()
 
         # print warning if result is near bounds

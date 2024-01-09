@@ -6,7 +6,7 @@ import numpy as np
 # TODO documentation
 
 
-class class_global_options:
+class ClassGlobalOptions:
 
     multithreading: bool = True
     """enable/disable multithreading in the backend. For the GUI threading is always enabled"""
@@ -67,4 +67,4 @@ class class_global_options:
 
         self.__dict__[key] = val
 
-global_options = class_global_options()
+global_options = ClassGlobalOptions()

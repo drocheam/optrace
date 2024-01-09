@@ -1200,8 +1200,11 @@ class TracerTests(unittest.TestCase):
         # hit_detector, hit_source are tested in iterative_render
         # different plot modes and parameter pass-through (projection_method, desc, ...) is tested in test_plots
         # hit_detector special cases are tested in test_tracer_special
-        pass
 
+        # coverage: limit and extent defined, should emit a warning
+        RT = rt_example()
+        RT.trace(100000)
+        RT.detector_image(limit=4, extent=[-0.01, 0.01, -0.01, 0.01])
 
     def test_ideal_lens_imaging(self):
 

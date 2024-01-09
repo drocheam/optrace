@@ -25,6 +25,7 @@ def circle(d: float = 1.0) -> LinearImage:
     Z[R2 <= (0.5 + ds/Y.shape[0])**2] = 0.25  # smoother edge
     Z[R2 <= 0.5**2] = 0.75  # circle area
     Z[R2 <= (0.5 - ds/Y.shape[0])**2] = 1.0  # smoother edge
+    Z /= np.sum(Z)
 
     s = [2*ds*d/1000, 2*ds*d/1000]  # scale size with d
 
@@ -46,6 +47,7 @@ def gaussian(sig: float = 0.5) -> LinearImage:
 
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     Z = np.exp(-(X**2 + Y**2) / 2 / sig**2)
+    Z /= np.sum(Z)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
 
@@ -75,6 +77,7 @@ def airy(r: float = 1.0) -> LinearImage:
     # calculate airy function intensity
     Z[R != 0] = (2*scipy.special.j1(Rnz) / Rnz) ** 2
     Z[R > 10.1735] = 0  # deleted values after third zero crossing
+    Z /= np.sum(Z)
 
     s = [2*ds*r/1000, 2*ds*r/1000]  # scale size with d
 
@@ -106,6 +109,7 @@ def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15) -> LinearImage:
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R2 = X**2 + Y**2
     Z = a*np.exp(-R2 / 2 / sig2**2) + (1-a)*np.exp(-R2 / 2 / sig1**2)
+    Z /= np.sum(Z)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
 
@@ -134,6 +138,7 @@ def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3) 
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R = np.sqrt(X**2 + Y**2)
     Z = np.exp(-R**2 / 2 / sig1**2) + a*np.exp(-(R - r)**2 / 2 / sig2**2)
+    Z /= np.sum(Z)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
 

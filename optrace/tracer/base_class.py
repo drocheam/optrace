@@ -104,7 +104,7 @@ class BaseClass:
         """
         if key not in ["_lock", "_new_lock"]:
             if "_new_lock" in self.__dict__ and self._new_lock and key not in self.__dict__:
-                raise AttributeError(f"Invalid property {key}.")
+                raise AttributeError(f"Failed to set invalid/unknown property {key}.")
 
             if "_lock" in self.__dict__ and self._lock and key not in ["desc", "long_desc"]:
                 raise RuntimeError("Object is currently read-only. Create a new object with new properties "

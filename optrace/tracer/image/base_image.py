@@ -5,7 +5,6 @@ import cv2  # image loading and saving
 import numpy as np  # calculations
 import os
 
-# from .. import color  # xyz_observers curves and sRGB conversions
 from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 from ..geometry.surface import SphericalSurface

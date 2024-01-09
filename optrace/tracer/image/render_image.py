@@ -14,7 +14,6 @@ from . import RGBImage, LinearImage
 from .. import color  # xyz_observers curves and sRGB conversions
 
 from ...global_options import global_options
-from ...warnings import warning
 
 # from .image.base_image import BaseImage
 
@@ -57,11 +56,9 @@ class RenderImage(BaseClass):
                  **kwargs)\
             -> None:
         """
-        Init an Image object.
+        Init an RenderImage object.
         This class is used to calculate
         and hold an Image consisting of the channels X, Y, Z, Illuminance and Irradiance.
-        The class also includes information like extent, z-position of image,
-        an image plotting type and an index for tagging.
 
         :param extent: image extent in the form [xs, xe, ys, ye]
         :param projection: string containing information about the sphere projection method, if any
@@ -127,6 +124,7 @@ class RenderImage(BaseClass):
 
     @property
     def limit(self) -> float:
+        """the resolution limit the RenderImage was rendered with"""
         return self._limit
 
     def get(self,
@@ -136,13 +134,23 @@ class RenderImage(BaseClass):
             sat_scale:  float = None)\
             -> RGBImage | LinearImage:
         """
-        Modes only include displayable modes from self.modes, use dedicated functions for Luv and XYZ
+        Get a converted image with mode 'mode'. Must be one of RenderImage.image_modes.
+        
+        N describes the pixel count (of the smaller side) to which the image is rescaled to.
+        N should be one of RenderImage.SIZES, but the nearest value is automatically selected.
+        Rescaling is done by joining bins, so there is no interpolation.
 
-        :param mode: one of "display_modes"
-        :param N:
+        Depending on the image mode, the returned image is an RGBImage with three channels
+        or a LinearImage with one channel.
+
+        Parameters L_th and sat_scale are only needed for mode='sRGB (Perceptual RI)',
+        see function color.xyz_to_srgb_linear for more details.
+
+        :param mode: one of RenderImage.image_modes
+        :param N: pixel count of smaller side, nearest of RenderImage.SIZES is automatically selected
         :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
         :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
-        :return:
+        :return: RGBImage or LinearImage, depending on 'mode'
         """
         self.__check_for_image()
 
@@ -157,8 +165,6 @@ class RenderImage(BaseClass):
         Ny, Nx, Nz = self._data.shape
         Na  = self.SIZES[np.argmin(np.abs(N - np.array(self.SIZES)))]
         fact = int(self.MAX_IMAGE_SIDE/Na)
-
-        # TODO warning if N is not a correct size?
 
         if fact != 1:
             # rescale by joining bins
@@ -216,8 +222,9 @@ class RenderImage(BaseClass):
 
     def __fix_extent(self) -> None:
         """
-        Fix image extent. Point images are given a valid 2D extent.
+        Point images are given a valid 2D extent.
         Line images or images with a large side-to-side ratio are adapted.
+        The image is extented to fit its convoluted version (if RenderImage._limit is not None)
         """
 
         sx, sy = self.s  # use copies since extent changes along the way
@@ -363,8 +370,7 @@ class RenderImage(BaseClass):
         """
         Creates an pixel image from ray positions on the detector.
 
-        :param N: number of image pixels in smallest dimension (int)
-        :param p: ray position matrix, xyz components in columns, (numpy 1D array)
+        :param p: ray position matrix, xyz components in columns, (numpy 2D array)
         :param w: ray weight array (numpy 1D array)
         :param wl: ray wavelength array (numpy 1D array)
         :param limit: rayleigh limit, used to approximate wave optics using a airy disc kernel

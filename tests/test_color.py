@@ -7,7 +7,7 @@ import doctest
 import unittest
 import numpy as np
 import pytest
-import colour  # TODO maybe use cv2 instead
+import colour
 import cv2
 
 import optrace as ot

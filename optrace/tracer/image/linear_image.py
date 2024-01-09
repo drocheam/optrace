@@ -51,7 +51,8 @@ class LinearImage(BaseImage):
 
                 if val2.ndim == 3 and val2.shape[2] == 3:
                     if color.has_color(val2):
-                        raise ValueError("Image can't have color information. Either use a RGBImage or remove color information.")
+                        raise ValueError("Image can't have color information. "
+                                         "Either use a RGBImage or remove color information.")
                     else:
                         val2 = val2[:, :, 1]
 

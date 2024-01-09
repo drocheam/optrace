@@ -11,7 +11,9 @@ from ..tracer.geometry import Surface, Element
 from ..tracer import *
 from ..warnings import warning
 from ..global_options import global_options as go
-# TODO pick function that takes a ray number
+
+from ..tracer.misc import PropertyChecker as pc
+
 # TODO select rays function, where ray_selection can be set manually
 
 
@@ -41,7 +43,13 @@ class ScenePlotting:
                  raytracer:         Raytracer,
                  initial_camera:    dict = {})\
             -> None:
+        """
+        Init the ScenePlotting object
 
+        :param ui: TraceGUI
+        :param raytracer: raytracer (the same that the TraceGUI uses)
+        :param initial_camera: keyword dictionary for set_camer()
+        """
         self.ui = ui
         self._scene_size = np.array(ui._scene_size0)
         self._scene_size0 = self._scene_size.copy()
@@ -87,7 +95,7 @@ class ScenePlotting:
     # Helper Functions
     ###################################################################################################################
 
-    def __remove_objects(self, objs) -> None:
+    def __remove_objects(self, objs: list) -> None:
         """remove visual objects from raytracer geometry"""
 
         # try to delete objects in pipeline while iterating over its parents and grandparents
@@ -116,7 +124,7 @@ class ScenePlotting:
             if self.scene is not None and self.scene.camera is not None:
                 self.scene.camera.trait_set(**cc_traits_org)
     
-    def screenshot(self, *args, **kwargs):
+    def screenshot(self, *args, **kwargs) -> None:
         """
         Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
         See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
@@ -191,14 +199,13 @@ class ScenePlotting:
         self.scene.scene.render()
 
 
-    def set_initial_camera(self):
+    def set_initial_camera(self) -> None:
         """
         sets the initial camera view
 
         When parameter initial_camera is not set, it is a y-side view with all elements inside the viewable range
         When it is set, the camera properties are applied.
         """
-        
         self.scene.parallel_projection = True
         self.scene._def_pos = 1  # for some reason it is set to None
         self.scene.y_plus_view()
@@ -417,13 +424,13 @@ class ScenePlotting:
             self._index_box_plots.append((outline, text, None))
 
     def plot_element(self,
-                     obj:      Element,
-                     num:      int,
-                     color:    tuple,
-                     alpha:    float,
-                     spec:     bool = True,
-                     light:    bool = True,
-                     no_label: bool = False)\
+                     obj:           Element,
+                     num:           int,
+                     color:         tuple,
+                     alpha:         float,
+                     spec:          bool = True,
+                     light:         bool = True,
+                     no_label:      bool = False)\
             -> tuple:
         """plotting of a Element. Gets called from plotting for Lens, Filter, Detector, RaySource. """
 
@@ -502,8 +509,14 @@ class ScenePlotting:
 
         return a, b, c, text, obj
 
-    def plot_rays(self, x: np.ndarray, y: np.ndarray, z: np.ndarray,
-                   u: np.ndarray, v: np.ndarray, w: np.ndarray, s: np.ndarray)\
+    def plot_rays(self, 
+                  x:    np.ndarray, 
+                  y:    np.ndarray, 
+                  z:    np.ndarray,
+                  u:    np.ndarray, 
+                  v:    np.ndarray, 
+                  w:    np.ndarray, 
+                  s:    np.ndarray)\
             -> None:
         """plot a subset of traced rays"""
 
@@ -524,8 +537,11 @@ class ScenePlotting:
         self._ray_plot.parent.parent.name = "Rays"
         self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
 
-    def set_ray_highlight(self, index: int):
-
+    def set_ray_highlight(self, index: int) -> None:
+        """
+        Highlight the ray with index 'index'.
+        Assigns the positions to the _ray_highlight_plot and makes it visible
+        """
         if not len(self._ray_property_dict):
             return
     
@@ -735,6 +751,7 @@ class ScenePlotting:
 
     def init_status_info(self) -> None:
         """init GUI status text display"""
+
         self._space_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_space_pick, button='Right')
         self._space_picker.tolerance = 0.0025  # it seems tolerance can only be set for all pickers at once
 
@@ -748,8 +765,7 @@ class ScenePlotting:
     ###################################################################################################################
 
     def change_label_orientation(self) -> None:
-        """
-        """
+        """Set labels of Elements to vertical or horizontal depending on option vertical_labels"""
        
         opts = dict(justification="center", vertical_justification="bottom", orientation=0) \
             if not self.ui.vertical_labels\
@@ -764,8 +780,7 @@ class ScenePlotting:
                         obji.property.trait_set(**opts)
 
     def change_minimalistic_view(self) -> None:
-        """
-        """
+        """Hide long labels, orientation axes and normal axes depending on if option minimalistic_view is set"""
 
         show = not bool(self.ui.minimalistic_view)
 
@@ -791,8 +806,7 @@ class ScenePlotting:
            
 
     def change_label_visibility(self) -> None:
-        """
-        """
+        """Hide/show labels depending on value of option 'hide_labels'"""
         
         show = not bool(self.ui.hide_labels)
 
@@ -809,8 +823,7 @@ class ScenePlotting:
 
 
     def change_contrast(self) -> None:
-        """
-        """
+        """Normal or high contrast scene mode depending on state of option 'high_contrast'"""
 
         self.set_colors()
         high_contrast = self.ui.high_contrast
@@ -888,6 +901,8 @@ class ScenePlotting:
             
     def resize_scene_elements(self) -> None:
         """
+        When resizing the scene window, some object sizes change. This function compensates for these changes.
+        It is called from within the TraceGUI
         """
 
         if self.scene.scene_editor.busy and self.scene.scene_editor.interactor is not None:
@@ -975,8 +990,12 @@ class ScenePlotting:
             self.plot_point_markers()
 
     def move_detector_diff(self, ind: int, diff: float) -> None:
-        """move the detector plot with index ind differentially"""
+        """
+        move the detector plot with index 'ind' differentially
 
+        :param ind: detector index
+        :param movement: moving distance
+        """
         if ind < len(self._detector_plots):
             self._detector_plots[ind][0].mlab_source.z += diff
             self._detector_plots[ind][1].mlab_source.z += diff
@@ -987,14 +1006,21 @@ class ScenePlotting:
         self._ray_text.text = ""
 
     def hide_crosshair(self) -> None:
+        """Hide the crosshair if it still/already exists"""
         if self._crosshair is not None:
             self._crosshair.visible = False
 
     def hide_ray_highlight(self) -> None:
+        """Hide the ray highlight plot if it still/already exists"""
         if self._ray_highlight_plot is not None:
             self._ray_highlight_plot.visible = False
 
     def set_crosshair(self, pos: np.ndarray) -> None:
+        """
+        Set the crosshair position if it still/already exists
+        
+        :param pos: array with three elements (x, y, z)
+        """
         if self._crosshair is not None:
             self._crosshair.trait_set(x_position=pos[0], y_position=pos[1], 
                                       z_position=pos[2], visible=True)
@@ -1003,7 +1029,7 @@ class ScenePlotting:
     ###################################################################################################################
 
     def color_rays(self) -> None:
-        """color the ray representation and the ray source"""
+        """color the plotted rays in the scene depending on the coloring mode"""
 
         if self._ray_plot is None:
             return
@@ -1083,7 +1109,6 @@ class ScenePlotting:
         lutm.scalar_bar_representation.border_thickness = 0  # no ugly borders
         lutm.scalar_bar_widget.process_events = False  # make non-interactive
         lutm.number_of_labels = 11
-
 
         match self.ui.coloring_type:
 
@@ -1224,8 +1249,7 @@ class ScenePlotting:
                 pos_z = min(self.raytracer.outline[5], pos_z)
 
                 self.ui.z_det = pos_z  # move detector
-                self.clear_ray_text()
-                self.hide_crosshair()
+                self.reset_picking()
         else:
             r, ang = np.hypot(pos[0], pos[1]), np.rad2deg(np.arctan2(pos[1], pos[0]))
             self._ray_text.text = f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, "\
@@ -1256,104 +1280,142 @@ class ScenePlotting:
             i0, i1 = np.divmod(b, 2*a)
             i1 = min(1 + (i1-1)//2, a - 1)
 
-            # get properties of this ray section
-            rp = self._ray_property_dict
-
-            # choose surface of intersection. Surface undefined (=None) for last absorption at outline
-            surfs = [self.raytracer.ray_sources[rp["snum"][i0]].front] + self.raytracer.tracing_surfaces + [None]
-            surf = surfs[i1]
-
-            # show surface properties?
-            surf_props = isinstance(surf, Surface) and surf.mask(rp["p"][i0, i1, 0, None], rp["p"][i0, i1, 1, None])[0]
-
-            # assign properties, nan means not defined/applicable
-            p     = rp["p"][i0, i1]
-            s     = rp["s"][i0, i1]                if i1 < len(surfs)-1  else [np.nan, np.nan, np.nan]
-            pw    = rp["w"][i0, i1]
-            pols  = rp["pol"][i0, i1]              if i1 < len(surfs)-1  else [np.nan, np.nan, np.nan]
-            n     = rp["n"][i0, i1]                if i1 < len(surfs)-1  else np.nan
-            wv    = rp["wl"][i0]
-            snum  = rp["snum"][i0]
-            index = rp["index"][i0]
-            pw0   = rp["w"][i0, i1-1]              if i1                 else np.nan
-            s0    = rp["s"][i0, i1-1]              if i1                 else [np.nan, np.nan, np.nan]
-            pols0 = rp["pol"][i0, i1-1]            if i1                 else [np.nan, np.nan, np.nan]
-            l0    = rp["l"][i0, i1 - 1]            if i1                 else np.nan
-            l1    = rp["l"][i0, i1]                if i1 < len(surfs)-1  else np.nan
-            ol0   = rp["ol"][i0, i1 - 1]           if i1                 else np.nan
-            ol1   = rp["ol"][i0, i1]               if i1 < len(surfs)-1  else np.nan
-            n0    = rp["n"][i0, i1-1]              if i1                 else np.nan
-            pl    = (pw0-pw)/pw0                   if i1 and pw0         else np.nan
-            normal = surf.normals(p[0, None], 
-                                  p[1, None])[0]   if surf_props         else [np.nan, np.nan, np.nan]
-
-            def to_sph_coords(s):
-                theta = np.rad2deg(np.arccos(s[2]))
-                phi = np.rad2deg(np.arctan2(s[1], s[0]))
-                return np.array([theta, phi])
-
-            # coordinates in spherical coordinates
-            s_sph = to_sph_coords(s)
-            s0_sph = to_sph_coords(s0)
-            pols_sph = to_sph_coords(pols)
-            pols0_sph = to_sph_coords(pols0)
-            normal_sph = to_sph_coords(normal)
-
-            # differentiate between Click and Shift+Click
-            if self.scene.interactor.shift_key:
-
-                text =  f"Ray {index} from RS{snum} "
-                text += f"at surface {i1}\n\n" if i1 else "at ray source\n\n"
-
-                text += f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n"
-
-                text += f"Vectors:                        Cartesian (x, y, z)                   "\
-                         "Spherical (theta, phi)\n"
-                text += f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})"\
-                        f"         ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°)\n"
-                text += f"Direction After:       ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})"\
-                        f"         ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°)\n"
-                text += f"Polarization Before:   ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})"\
-                        f"         ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°)\n"
-                text += f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})"\
-                        f"         ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°)\n"
-                text += f"Surface Normal:        ({normal[0]:>10.5f}, {normal[1]:>10.5f}, {normal[2]:>10.5f})"\
-                        f"         ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°)\n\n"
-
-                text += f"Wavelength:               {wv:>10.2f} nm\n"
-                text += f"Refraction Index Before:  {n0:>10.4f}"\
-                        f"           Distance to Last Intersection:          {l0:>10.5g} mm\n"
-                text += f"Refraction Index After:   {n:>10.4f}"\
-                        f"           Distance to Next Intersection:          {l1:>10.5g} mm\n"
-                text += f"Ray Power Before:         {pw0*1e6:>10.5g} µW"\
-                        f"        Optical Distance to Last Intersection:  {ol0:>10.5g} mm\n"
-                text += f"Ray Power After:          {pw*1e6:>10.5g} µW"\
-                        f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm\n"
-                text += f"Power Loss on Surface:    {pl*100:>10.5g} %\n\n"
-
-                if surf_props:
-                    text += "Surface Information:\n" + surf.info
-
-            else:
-                text =  f"Ray {index} from Source {snum} "
-                text += f"at surface {i1}\n" if i1 else "at ray source\n"
-                text += f"Intersection Position: ({p[0]:>10.5g} mm, {p[1]:>10.5g} mm, {p[2]:>10.5g} mm)\n"
-                text += f"Direction After:       ({s[0]:>10.5f},    {s[1]:>10.5f},    {s[2]:>10.5f}   )\n"
-                text += f"Polarization After:    ({pols[0]:>10.5f},    {pols[1]:>10.5f},    {pols[2]:>10.5f}   )\n"
-                text += f"Wavelength:             {wv:>10.2f} nm\n"
-                text += f"Ray Power After:        {pw*1e6:>10.5g} µW\n"
-                text += f"Pick using Shift+Left Mouse Button for more info"
-
-            self._ray_text.text = text.replace("nan", " - ")
-            self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
-                                              opacity=1, color=self.scene.foreground)
-
-            self.set_crosshair(p)
-            with self.constant_camera():
-                self.set_ray_highlight(i0)
+            self.pick_ray_section(i0, i1, self.scene.interactor.shift_key)
 
         else:
-            self.clear_ray_text()
-            self.hide_ray_highlight()
-            self.hide_crosshair()
+            self.reset_picking()
+    
+    def reset_picking(self) -> None:
+        """hide ray text, ray highlight and crosshair""" 
+        self.clear_ray_text()
+        self.hide_ray_highlight()
+        self.hide_crosshair()
 
+    def pick_ray_section(self, 
+                         index:     int, 
+                         section:   int = None, 
+                         detailed:  bool = False)\
+            -> None:
+        """
+        From the ray index and section:
+            
+        1. Highlight the selected ray
+        2. set the crosshair to the intersection position (if 'section' is not None)
+        3. set ray info text (if 'section' is not None)
+
+        :param index: is the index of the displayed rays.
+        :param section: intersection index (starting position is zero)
+        :param detailed: If 'detailed' is set, a more detailed ray info text is shown
+        """
+        # count of displayed rays and sections
+        N = self._ray_property_dict["p"].shape[0]
+        Nt = self._ray_property_dict["p"].shape[1]
+
+        if not ( 0 <= index < N):
+            raise ValueError(f"Only {N} rays are displayed, {index} is an invalid index.")
+
+        if section is not None and not (0 <= section < Nt):
+            raise ValueError(f"Rays have only {Nt} sections, {section} is an invalid section number.")
+
+        with self.constant_camera():
+            self.set_ray_highlight(index)
+        
+        if section is None:
+            return
+        
+        i0, i1 = index, section
+
+        # get properties of this ray section
+        rp = self._ray_property_dict
+
+        # choose surface of intersection. Surface undefined (=None) for last absorption at outline
+        surfs = [self.raytracer.ray_sources[rp["snum"][i0]].front] + self.raytracer.tracing_surfaces + [None]
+        surf = surfs[i1]
+
+        # show surface properties?
+        surf_props = isinstance(surf, Surface) and surf.mask(rp["p"][i0, i1, 0, None], rp["p"][i0, i1, 1, None])[0]
+
+        # assign properties, nan means not defined/applicable
+        p     = rp["p"][i0, i1]
+        s     = rp["s"][i0, i1]                if i1 < len(surfs)-1  else [np.nan, np.nan, np.nan]
+        pw    = rp["w"][i0, i1]
+        pols  = rp["pol"][i0, i1]              if i1 < len(surfs)-1  else [np.nan, np.nan, np.nan]
+        n     = rp["n"][i0, i1]                if i1 < len(surfs)-1  else np.nan
+        wv    = rp["wl"][i0]
+        snum  = rp["snum"][i0]
+        index = rp["index"][i0]
+        pw0   = rp["w"][i0, i1-1]              if i1                 else np.nan
+        s0    = rp["s"][i0, i1-1]              if i1                 else [np.nan, np.nan, np.nan]
+        pols0 = rp["pol"][i0, i1-1]            if i1                 else [np.nan, np.nan, np.nan]
+        l0    = rp["l"][i0, i1 - 1]            if i1                 else np.nan
+        l1    = rp["l"][i0, i1]                if i1 < len(surfs)-1  else np.nan
+        ol0   = rp["ol"][i0, i1 - 1]           if i1                 else np.nan
+        ol1   = rp["ol"][i0, i1]               if i1 < len(surfs)-1  else np.nan
+        n0    = rp["n"][i0, i1-1]              if i1                 else np.nan
+        pl    = (pw0-pw)/pw0                   if i1 and pw0         else np.nan
+        normal = surf.normals(p[0, None], 
+                              p[1, None])[0]   if surf_props         else [np.nan, np.nan, np.nan]
+
+        def to_sph_coords(s):
+            theta = np.rad2deg(np.arccos(s[2]))
+            phi = np.rad2deg(np.arctan2(s[1], s[0]))
+            return np.array([theta, phi])
+
+        # coordinates in spherical coordinates
+        s_sph = to_sph_coords(s)
+        s0_sph = to_sph_coords(s0)
+        pols_sph = to_sph_coords(pols)
+        pols0_sph = to_sph_coords(pols0)
+        normal_sph = to_sph_coords(normal)
+
+        # differentiate between Click and Shift+Click
+        if detailed:
+
+            text =  f"Ray {index} from RS{snum} "
+            text += f"at surface {i1}\n\n" if i1 else "at ray source\n\n"
+
+            text += f"Intersection Position: ({p[0]:>10.6g} mm, {p[1]:>10.6g} mm, {p[2]:>10.6g} mm)\n\n"
+
+            text += f"Vectors:                        Cartesian (x, y, z)                   "\
+                     "Spherical (theta, phi)\n"
+            text += f"Direction Before:      ({s0[0]:>10.5f}, {s0[1]:>10.5f}, {s0[2]:>10.5f})"\
+                    f"         ({s0_sph[0]:>10.5f}°, {s0_sph[1]:>10.5f}°)\n"
+            text += f"Direction After:       ({s[0]:>10.5f}, {s[1]:>10.5f}, {s[2]:>10.5f})"\
+                    f"         ({s_sph[0]:>10.5f}°, {s_sph[1]:>10.5f}°)\n"
+            text += f"Polarization Before:   ({pols0[0]:>10.5f}, {pols0[1]:>10.5f}, {pols0[2]:>10.5f})"\
+                    f"         ({pols0_sph[0]:>10.5f}°, {pols0_sph[1]:>10.5f}°)\n"
+            text += f"Polarization After:    ({pols[0]:>10.5f}, {pols[1]:>10.5f}, {pols[2]:>10.5f})"\
+                    f"         ({pols_sph[0]:>10.5f}°, {pols_sph[1]:>10.5f}°)\n"
+            text += f"Surface Normal:        ({normal[0]:>10.5f}, {normal[1]:>10.5f}, {normal[2]:>10.5f})"\
+                    f"         ({normal_sph[0]:>10.5f}°, {normal_sph[1]:>10.5f}°)\n\n"
+
+            text += f"Wavelength:               {wv:>10.2f} nm\n"
+            text += f"Refraction Index Before:  {n0:>10.4f}"\
+                    f"           Distance to Last Intersection:          {l0:>10.5g} mm\n"
+            text += f"Refraction Index After:   {n:>10.4f}"\
+                    f"           Distance to Next Intersection:          {l1:>10.5g} mm\n"
+            text += f"Ray Power Before:         {pw0*1e6:>10.5g} µW"\
+                    f"        Optical Distance to Last Intersection:  {ol0:>10.5g} mm\n"
+            text += f"Ray Power After:          {pw*1e6:>10.5g} µW"\
+                    f"        Optical Distance to Next Intersection:  {ol1:>10.5g} mm\n"
+            text += f"Power Loss on Surface:    {pl*100:>10.5g} %\n\n"
+
+            if surf_props:
+                text += "Surface Information:\n" + surf.info
+
+        else:
+            text =  f"Ray {index} from Source {snum} "
+            text += f"at surface {i1}\n" if i1 else "at ray source\n"
+            text += f"Intersection Position: ({p[0]:>10.5g} mm, {p[1]:>10.5g} mm, {p[2]:>10.5g} mm)\n"
+            text += f"Direction After:       ({s[0]:>10.5f},    {s[1]:>10.5f},    {s[2]:>10.5f}   )\n"
+            text += f"Polarization After:    ({pols[0]:>10.5f},    {pols[1]:>10.5f},    {pols[2]:>10.5f}   )\n"
+            text += f"Wavelength:             {wv:>10.2f} nm\n"
+            text += f"Ray Power After:        {pw*1e6:>10.5g} µW\n"
+            text += f"Pick using Shift+Left Mouse Button for more info"
+
+        # apply text
+        self._ray_text.text = text.replace("nan", " - ")
+        self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
+                                          opacity=1, color=self.scene.foreground)
+
+        self.set_crosshair(p)

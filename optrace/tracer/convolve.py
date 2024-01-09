@@ -16,75 +16,105 @@ from .. import global_options
 from ..warnings import warning
 
 
-# TODO allow LinearImage for img parameter
 
-def convolve(img:                RGBImage, 
+def convolve(img:                RGBImage | LinearImage, 
              psf:                LinearImage | RenderImage, 
              m:                  float = 1,
              slice_:             bool = False,
              padding_mode:       str = "constant",
-             padding_value:      list = [0, 0, 0],
+             padding_value:      list | float = None,
              cargs:              dict = {})\
-        -> RGBImage:
+        -> RGBImage | LinearImage:
     """
     Convolve an image with a point spread function.
-    The system magnification factor m scales the image.
 
-    Image data should be a sRGB array (therefore non-linear, gamma corrected values). 
-    The PSF is treated as either a linear intensity image (when provided as array) or a colored one (when the type is RenderImage).
+    The system magnification factor m scales the image before convolution.
+    abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
+    m < 0 image flipping, m > 0 an upright image
+
+    Depending on types of img and psf, a RGBImage or LinearImage is created:
+    * img: LinearImage, psf: LinearImage  -> result is LinearImage
+    * img: RGBImage,    psf: LinearImage  -> result is RGBImage
+    * img: RGBImage,    psf: RenderImage  -> result is RGBImage
 
     Note that in the case that both are colored the convolution is only one possible solution of many.
+    See the documentation for more details.
 
-    TODO explain better
-    With normalize=True in dictionary cargs (the default setting) the image colors are normalized so the brightest pixel has maximum brightness.
-    Otherwise
-    By default, the image brightness is normalized after convolution.
-    With normalize=False the psf is set to a power sum of 1, so theis provided in argument cargs, the normalization is turned off and the psf
+    As the convolution requires values outside the initial image, a suitable padding method must be set.
+    By default, padding_mode='constant' and padding_value are zeros.
+    Padding modes from numpy.pad are supported. padding_value is only needed for the 'constant' mode.
+    It must have three elements if img is an RGBImage, and one otherwise.
 
-    :param img: image. 3D sRGB numpy array (value range 0-1) or path string
+    If a result with the same side lengths and pixel count as the input is desired,
+    parameter slice_ must be set to True so the image is sliced back.
+
+    In the internals of this function the convolution is done in linear sRGB values, 
+    while also using values outside the sRGB gamut.
+    To remove this out-of-gamut colors in the resulting image, color transformations are performed.
+    Parameter cargs overwrites parameters for color.xyz_to_srgb. By default these parameters are:
+    dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None).
+    For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged
+
+    When convolving two LinearImages it is recommended to normalize the PSF sum to 1, 
+    so the sum of the input image and output image is preserved (with the sum for instance corresponding to the power).
+    
+    :param img: initial image as either RGBImage or LinearImage
     :param psf: point spread function, Image or RenderImage.
-    :param m: magnification factor, abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
-              m < 0 image flipping, m > 0 an upright image
+    :param m: magnification factor
     :param padding_mode: padding mode (from numpy.pad) for image padding before convolution.
     :param padding_value: padding value for padding_mode='constant'. 
-     Must be a three element list (as it should be a sRGB color).
+     Three elements if img is a RGBImage, single element otherwise. Defaults to zeros.
     :param cargs: overwrite for parameters for color.xyz_to_srgb. By default these parameters are:
      dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None).
      For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged
-    :return: convolved image (3D sRGB numpy array) and new image side lengths list
+    :return: LinearImage or RGBImage, see above 
     """
     # Init
     ###################################################################################################################
     ###################################################################################################################
 
-    pc.check_type("img", img, RGBImage)
+    pc.check_type("img", img, RGBImage | LinearImage)
     pc.check_type("psf", psf, LinearImage | RenderImage)
     pc.check_type("m", m, int | float)
     pc.check_type("cargs", cargs, dict)
     pc.check_above("abs(m)", abs(m), 0)
-    pc.check_type("padding_value", padding_value, list | np.ndarray)
     pc.check_type("slice_", slice_, bool)
 
-    pval = np.asarray(padding_value, dtype=np.float64)
+    make_linear = isinstance(psf, LinearImage) and isinstance(img, LinearImage)
+    psf_color = isinstance(psf, RenderImage)
+
+    if isinstance(img, RGBImage):
+        pc.check_type("padding_value", padding_value, list | np.ndarray | None)
+        
+        pval = np.asarray(padding_value, dtype=np.float64) if padding_value is not None else np.array([0., 0., 0.])
+        
+        if pval.ndim != 1 or pval.shape[0] != 3:
+            raise ValueError(f"padding_value must be a 3 element array/list, but has shape {pval.shape}")
+
+        if np.any(pval < 0):
+            raise ValueError(f"value in 'padding_value' needs to be non-negative.")
+    else:
+        pc.check_type("padding_value", padding_value, int | float | None)
+        pval = float(padding_value) if padding_value is not None else 0.
+        pc.check_not_below("padding_value", pval, 0)
+
 
     # function for raising the exception and finishing the progress bar
     def raise_(excp):
-        if global_options.show_progressbar:
+        if bar is not None:
             bar.finish()
         raise excp
     
     # create progress bar
     bar = ProgressBar(fd=sys.stdout, redirect_stderr=True, prefix="Convolving: ", 
                       max_value=5).start() if global_options.show_progressbar else None
-   
+    
     # Load PSF
     ###################################################################################################################
     ###################################################################################################################
 
     # rendered image with color information
     if isinstance(psf, RenderImage):
-
-        psf_color = True
 
         # use srgb with negative values
         psf_lin = color.xyz_to_srgb_linear(psf._data[:, :, :3], rendering_intent="Ignore")
@@ -95,28 +125,30 @@ def convolve(img:                RGBImage,
 
     # linear intensity image
     else:
-        psf_lin = np.repeat(psf.data[:, :, np.newaxis], 3, axis=2)
-        psf_color = False
+        psf_lin = psf.data
+        if not make_linear:
+            psf_lin = np.repeat(psf_lin[:, :, np.newaxis], 3, axis=2)
 
-    # psf_lin /= np.sum(psf_lin)
-
-    if global_options.show_progressbar:
+    if bar is not None:
         bar.update(1)
 
     # Load image
     ###################################################################################################################
     ###################################################################################################################
 
-    # if isinstance(img, LinearImage):
-        # img_srgb = np.repeat(img.data[:, :, np.newaxis], 3, axis=2)
+    img0 = img.data
+    
+    if isinstance(img, LinearImage):
+        if not make_linear:
+            img0 = np.repeat(img0[:, :, np.newaxis], 3, axis=2)
+    
+    else:
+        img_color = color.has_color(img0)
 
-    img_srgb = img.data
-    img_color = color.has_color(img_srgb)
-
-    if img_color and psf_color:
-        warning("Using an image with color variation in combination with a colored PSF. "
-                "As there many possible results depending on the spectral and local distributions on the object, "
-                "the scene will be rendered as one seen on a sRGB monitor.")
+        if img_color and psf_color:
+            warning("Using an image with color variation in combination with a colored PSF. "
+                    "As there many possible results depending on the spectral and local distributions on the object, "
+                    "the scene will be rendered as one seen on a sRGB monitor.")
 
     # Shape Checks
     ###################################################################################################################
@@ -170,8 +202,9 @@ def convolve(img:                RGBImage,
     if not (0.2 < ipx/ipy < 5):
         warning(f"WARNING: Pixels of image are strongly non-square with side lengths [{ipx}mm, {ipy}mm]")
 
-    if pval.ndim != 1 or pval.shape[0] != 3:
-        raise_(ValueError(f"padding_value must be a 3 element array/list, but has shape {pval.shape}"))
+    if isinstance(img, RGBImage):
+        if pval.ndim != 1 or pval.shape[0] != 3:
+            raise_(ValueError(f"padding_value must be a 3 element array/list, but has shape {pval.shape}"))
 
     # Convolution Preparation
     ###################################################################################################################
@@ -184,57 +217,68 @@ def convolve(img:                RGBImage,
     # new psf pixel sizes, 8 for padding and rescaled size rounded
     pnx_ = 8 + max(round(pnx*scx), 1)
     pny_ = 8 + max(round(pny*scy), 1)
-
-    padding_needed = not (padding_mode == "constant" and padding_value == [0, 0, 0])
+    
+    padding_needed = not (padding_mode == "constant" and np.sum(pval) == 0)
     pad_x = pnx_ if padding_needed else 0
     pad_y = pny_ if padding_needed else 0
 
     if padding_needed:
-        if padding_mode == "constant":
-            imgp = np.tile(pval, (img_srgb.shape[0]+2*pad_y, img_srgb.shape[1]+2*pad_x, 1))
-            imgp[pad_y:-pad_y, pad_x:-pad_x] = img_srgb
-        else:
-            imgp = np.pad(img_srgb, ((pad_y, pad_y), (pad_x, pad_x), (0, 0)), mode=padding_mode)
-    else:
-        imgp = img_srgb
 
-    # if not isinstance(img, LinearImage):
-    img_lin = color.srgb_to_srgb_linear(imgp)  # linear sRGB version
+        if padding_mode == "constant":
+
+            if isinstance(img, RGBImage):
+                imgp = np.tile(pval, (img0.shape[0]+2*pad_y, img0.shape[1]+2*pad_x, 1))
+                imgp[pad_y:-pad_y, pad_x:-pad_x] = img0
+            else:
+                imgp = np.pad(img0, ((pad_y, pad_y), (pad_x, pad_x)), mode="constant", constant_values=pval)
+        else:
+            shape = ((pad_y, pad_y), (pad_x, pad_x), (0, 0)) if not make_linear else ((pad_y, pad_y), (pad_x, pad_x))
+            imgp = np.pad(img0, shape, mode=padding_mode)
+    else:
+        imgp = img0
+
+    img_lin = color.srgb_to_srgb_linear(imgp) if isinstance(img, RGBImage) else imgp
 
     iny_, inx_ = img_lin.shape[:2]  # image pixel count
     
     # output image
-    img2 = np.zeros((iny_ + pny_ - 1, inx_ + pnx_ - 1, 3), dtype=np.float64)
+    shape = (iny_+pny_-1, inx_+pnx_-1, 3) if not make_linear else (iny_+pny_-1, inx_+pnx_-1)
+    img2 = np.zeros(shape, dtype=np.float64)
 
-    if global_options.show_progressbar:
+    if bar is not None:
         bar.update(2)
     
     # INTER_AREA downscaling leaves the power sum unchanged (therefore the color and channel ratios should stay the same). 
     # Weighs pixels according to their area.
     # since no polynomial interpolation of higher degree takes place, the value range is limited
     # (as wouldn't be the case for instance with polynomials of degree 3 or higher)
-    psf2 = cv2.resize(psf_lin, [max(round(scx*pnx), 1), max(round(scy*pny), 1)], interpolation=cv2.INTER_AREA)
+    # rescaling by factors pny/pny2, and pnx/pnx2 is needed to leave the psf sum the same
+    pny2 = max(round(scy*pny), 1)
+    pnx2 = max(round(scx*pnx), 1)
+    psf2 = cv2.resize(psf_lin, [pnx2, pny2], interpolation=cv2.INTER_AREA) * pny / pny2 * pnx / pnx2
 
     # normalize each channel by its sum. Doing this, the image power and power ratios stay the same
-    if np.sum(psf2):
-        psf2 /= np.sum(psf2) / 3 
+    if not make_linear:
+        if np.sum(psf2):
+            psf2 /= np.sum(psf2) / 3 
 
     # pad psf
-    psf2 = np.pad(psf2, ((4, 4), (4, 4), (0, 0)), mode="constant", constant_values=0)
+    shape = ((4, 4), (4, 4)) if make_linear else ((4, 4), (4, 4), (0, 0))
+    psf2 = np.pad(psf2, shape, mode="constant", constant_values=0)
 
     # flip image before convolution with negative magnification
     if m < 0:
         img_lin = np.fliplr(np.flipud(img_lin))
 
     # update progress
-    if global_options.show_progressbar:
+    if bar is not None:
         bar.update(3)
     
     # Convolution
     ###################################################################################################################
     ###################################################################################################################
 
-    if not global_options.multithreading:
+    if not global_options.multithreading or make_linear:
         img2 = scipy.signal.fftconvolve(img_lin, psf2, mode="full", axes=(0, 1))
 
     else:
@@ -246,7 +290,7 @@ def convolve(img:                RGBImage,
         [thread.start() for thread in thread_list]
         [thread.join() for thread in thread_list]
     
-    if global_options.show_progressbar:
+    if bar is not None:
         bar.update(4)
 
     # Output Conversion
@@ -262,20 +306,24 @@ def convolve(img:                RGBImage,
         ix0 = (pnx_ - 1) // 2
         img2 = img2[iy0:iy0+iny, ix0:ix0+inx]
 
-    # normalize image
-    if not ("normalize" in cargs and not cargs["normalize"]):
-        if (maxi := np.max(img2)):
-            img2 /= maxi
+    if not make_linear:
+        # normalize image
+        if not ("normalize" in cargs and not cargs["normalize"]):
+            if (maxi := np.max(img2)):
+                img2 /= maxi
 
-    # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
-    img2 = color.srgb_linear_to_xyz(img2)
-    cargs0 = dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None)
-    img2 = color.xyz_to_srgb(img2, **(cargs0 | cargs))
-   
+        # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
+        img2 = color.srgb_linear_to_xyz(img2)
+        cargs0 = dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None)
+        img2 = color.xyz_to_srgb(img2, **(cargs0 | cargs))
+    
+    else:
+        img2 = np.clip(img2, 0, None)
+
     # new image side lengths
     s2 = [(img2.shape[1]-1)*ipx, (img2.shape[0]-1)*ipy]
 
-    if global_options.show_progressbar:
+    if bar is not None:
         bar.finish()
 
     # new image center is the sum of psf and old image center
@@ -284,5 +332,8 @@ def convolve(img:                RGBImage,
     ym = (img.extent[3] + img.extent[2] + psf.extent[3] + psf.extent[2])/2
     extent2 = [xm-s2[0]/2, xm+s2[0]/2, ym-s2[1]/2, ym+s2[1]/2]
 
-    return RGBImage(img2, extent=extent2, quantity=img.quantity)
+    if make_linear:
+        return LinearImage(img2, extent=extent2, quantity=img.quantity)
+    else:
+        return RGBImage(img2, extent=extent2, quantity=img.quantity)
 
