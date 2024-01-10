@@ -25,7 +25,7 @@ body {
 
 /*set "Section Navigation" title in side bar to normal size*/
 nav.bd-links p.bd-links__title {
-	font-size: unset;
+    font-size: unset;
 }
 
 

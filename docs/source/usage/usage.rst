@@ -18,5 +18,6 @@ Usage
    tma
    convolve
    plots
-   ui
+   gui
+   gui_automation
    advanced

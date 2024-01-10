@@ -152,33 +152,32 @@ class GUITests(unittest.TestCase):
 
         trace_gui_run()  # default init
 
-        for ctype in TraceGUI.coloring_types:
-            trace_gui_run(coloring_type=ctype)
+        for ctype in TraceGUI.coloring_modes:
+            trace_gui_run(coloring_mode=ctype)
 
-        for ptype in TraceGUI.plotting_types:
-            trace_gui_run(plotting_type=ptype)
+        for ptype in TraceGUI.plotting_modes:
+            trace_gui_run(plotting_mode=ptype)
 
         trace_gui_run(ray_count=100000)
         trace_gui_run(rays_visible=200)
-        trace_gui_run(absorb_missing=False)
         trace_gui_run(minimalistic_view=True)
         trace_gui_run(hide_labels=True)
         trace_gui_run(high_contrast=True)
         trace_gui_run(ray_opacity=0.15)
         trace_gui_run(ray_width=5)
         trace_gui_run(vertical_labels=True)
-        trace_gui_run(ui_style="Windows")
-        trace_gui_run(ui_style="Fusion")
+        trace_gui_run(ui_theme="Windows")
+        trace_gui_run(ui_theme="Fusion")
         trace_gui_run(initial_camera=dict(center=[0, 1, 0], height=5))
 
         # many parameters
-        trace_gui_run(ray_count=100000, rays_visible=1500, absorb_missing=False, ray_opacity=0.1, ray_width=5,
-                      coloring_type="Wavelength", plotting_type="Points", minimalistic_view=True, hide_labels=True, 
-                      vertical_labels=True, ui_style="Windows")
+        trace_gui_run(ray_count=100000, rays_visible=1500, ray_opacity=0.1, ray_width=5,
+                      coloring_mode="Wavelength", plotting_mode="Points", minimalistic_view=True, hide_labels=True,
+                      vertical_labels=True, ui_theme="Windows")
 
         # type errors
         self.assertRaises(TypeError, TraceGUI, 5)  # invalid raytracer
-        self.assertRaises(TypeError, TraceGUI, RT, ui_style=5)  # invalid ui_style
+        self.assertRaises(TypeError, TraceGUI, RT, ui_theme=5)  # invalid ui_theme
         self.assertRaises(TypeError, TraceGUI, RT, initial_camera=5)  # invalid initial_camera
 
         # this attributes can't bet set initially
@@ -246,7 +245,7 @@ class GUITests(unittest.TestCase):
 
                 # Image Type Tests standard
                 for mode in ot.RenderImage.image_modes:
-                    self._set_in_main(sim, "image_type", mode)
+                    self._set_in_main(sim, "image_mode", mode)
                     self._wait_for_idle(sim)
                     self._do_in_main(sim.detector_image)
                     self._wait_for_idle(sim)
@@ -271,7 +270,7 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
 
                 for mode in ot.Raytracer.autofocus_methods:
-                    self._set_in_main(sim, "focus_type", mode)
+                    self._set_in_main(sim, "autofocus_method", mode)
                     self._wait_for_idle(sim)
                     self._do_in_main(sim.move_to_focus)
                     self._wait_for_idle(sim)
@@ -279,40 +278,36 @@ class GUITests(unittest.TestCase):
                     self._wait_for_idle(sim)
 
                 # Focus Test 4, show Debug Plot
-                self._set_in_main(sim, "focus_cost_plot", True)
+                self._set_in_main(sim, "cost_function_plot", True)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.move_to_focus)
                 self._wait_for_idle(sim)
 
                 # Focus Test 5, one source only
-                self._set_in_main(sim, "focus_cost_plot", False)
+                self._set_in_main(sim, "cost_function_plot", False)
                 self._wait_for_idle(sim)
                 self._set_in_main(sim, "z_det", pos0[2])
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "af_one_source", True)
+                self._set_in_main(sim, "autofocus_single_source", True)
                 self._do_in_main(sim.move_to_focus)
                 self._wait_for_idle(sim)
                 
                 # Ray Coloring Tests
-                for type_ in sim.coloring_types:
-                    self._set_in_main(sim, "coloring_type", type_)
+                for type_ in sim.coloring_modes:
+                    self._set_in_main(sim, "coloring_mode", type_)
                     self._wait_for_idle(sim)
 
                 # special case: user defined spectral colormap
                 ot.global_options.spectral_colormap = lambda wl: plt.cm.viridis(wl/780)
-                self._set_in_main(sim, "coloring_type", "Wavelength")
+                self._set_in_main(sim, "coloring_mode", "Wavelength")
                 self._wait_for_idle(sim)
                 ot.global_options.spectral_colormap = None
 
                 # plotting_type Tests
-                for type_ in sim.plotting_types:
-                    self._set_in_main(sim, "plotting_type", type_)
+                for type_ in sim.plotting_modes:
+                    self._set_in_main(sim, "plotting_mode", type_)
                     self._wait_for_idle(sim)
               
-                # absorb_missing test
-                self._set_in_main(sim, "absorb_missing", False)
-                self._wait_for_idle(sim)
-
                 # retrace Tests
                 self._set_in_main(sim, "ray_count", 100000)
                 self._wait_for_idle(sim)
@@ -339,7 +334,7 @@ class GUITests(unittest.TestCase):
 
                 # display all image modes with log
                 for mode in ot.RenderImage.image_modes:
-                    self._set_in_main(sim, "image_type", mode)
+                    self._set_in_main(sim, "image_mode", mode)
                     self._wait_for_idle(sim)
                     self._do_in_main(sim.detector_image)
                     self._wait_for_idle(sim)
@@ -356,13 +351,13 @@ class GUITests(unittest.TestCase):
                 # Image Tests Flip
                 self._set_in_main(sim, "log_image", False)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "flip_image", True)
+                self._set_in_main(sim, "flip_detector_image", True)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.detector_image)
                 self._wait_for_idle(sim)
 
                 # one source only
-                self._set_in_main(sim, "det_image_one_source", True)
+                self._set_in_main(sim, "detector_image_single_source", True)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.detector_image)
                 self._wait_for_idle(sim)
@@ -414,14 +409,14 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.detector_spectrum)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "det_spectrum_one_source", True)
+                self._set_in_main(sim, "detector_spectrum_single_source", True)
                 self._do_in_main(sim.detector_spectrum)
                 self._wait_for_idle(sim)
 
                 # test image cuts
                 self._do_in_main(sim.source_cut)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "det_image_one_source", True)
+                self._set_in_main(sim, "detector_image_single_source", True)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.detector_cut)
                 self._wait_for_idle(sim)
@@ -468,17 +463,15 @@ class GUITests(unittest.TestCase):
                     self._wait_for_idle(sim)
                     self._set_in_main(sim, "ray_count", 100000)
                     self._wait_for_idle(sim)
-                    self._set_in_main(sim, "absorb_missing", False)
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "rays_visible", 4000)
                     self._wait_for_idle(sim)
                     self._set_in_main(sim, "minimalistic_view", True)
                     self._wait_for_idle(sim)
-                    self._set_in_main(sim, "coloring_type", "Power")
+                    self._set_in_main(sim, "coloring_mode", "Power")
                     self._wait_for_idle(sim)
                     self._set_in_main(sim, "hide_labels", True)
                     self._wait_for_idle(sim)
-                    self._set_in_main(sim, "plotting_type", "Points")
+                    self._set_in_main(sim, "plotting_mode", "Points")
 
                     self._set_in_main(sim, "high_contrast", True)
                     self._wait_for_idle(sim)
@@ -552,7 +545,7 @@ class GUITests(unittest.TestCase):
 
                 time.sleep(0.1)
                 self._do_in_main(sim.replot_rays)
-                self._do_in_main(sim.send_cmd, "GUI.replot()")
+                self._do_in_main(sim.run_command, "GUI.replot()")
                 self._do_in_main(sim.detector_image)
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
 
@@ -631,14 +624,17 @@ class GUITests(unittest.TestCase):
                          sim.detector_spectrum, sim.detector_cut, sim.source_cut, sim.replot]
 
                 props = [('rays_visible', 500), ('rays_visible', 2000), ('minimalistic_view', True),
-                         ('minimalistic_view', False), ('plotting_type', "Rays"), ('plotting_type', "Points"),
-                         ('absorb_missing', True), ('absorb_missing', False), ('ray_opacity', 0.06), ('ray_width', 12),
+                         ('minimalistic_view', False), ('plotting_mode', "Rays"), ('plotting_mode', "Points"),
+                         ('ray_opacity', 0.06), ('ray_width', 12),
                          ('ray_opacity', 0.8), ('ray_width', 2), ('cut_value', 0), ('cut_dimension', 'x'), 
                          ('cut_dimension', 'y'), ('hide_labels', True), ('hide_labels', False),
-                         ('af_one_source', False), ('af_one_source', True), ('det_image_one_source', False),
-                         ('det_image_one_source', True), ('cut_value', 0.1), ('flip_det_image', True), 
-                         ('flip_det_image', False), ('det_spectrum_one_source', True), ('det_image_one_source', False),
-                         ('log_image', False), ('log_image', True),  ('focus_cost_plot', True), ('focus_cost_plot', False), 
+                         ('autofocus_single_source', False), ('autofocus_single_source', True),
+                         ('detector_image_single_source', False),
+                         ('detector_image_single_source', True), ('cut_value', 0.1), ('flip_detector_image', True),
+                         ('flip_detector_image', False), ('detector_spectrum_single_source', True),
+                         ('detector_image_single_source', False),
+                         ('log_image', False), ('log_image', True),  ('cost_function_plot', True),
+                         ('cost_function_plot', False),
                          ('maximize_scene', False), ('maximize_scene', True), ('vertical_labels', False), 
                          ('vertical_labels', True), ('activate_filter', False), ('activate_filter', True), 
                          ('high_contrast', False), ('high_contrast', True)]
@@ -656,15 +652,15 @@ class GUITests(unittest.TestCase):
                             ch = np.random.randint(0, len(props))
                             self._set_in_main(sim, *props[ch])
                         case 2:
-                            self._set_in_main(sim, "coloring_type", np.random.choice(sim.coloring_types))
+                            self._set_in_main(sim, "coloring_mode", np.random.choice(sim.coloring_modes))
                         case 3:
                             # only every second time, otherwise this would happen to often
                             if np.random.randint(0, 2):
                                 self._set_in_main(sim, "ray_count", np.random.randint(10000, 500000))
                         case 4:
-                            self._set_in_main(sim, "focus_type", np.random.choice(RT.autofocus_methods))
+                            self._set_in_main(sim, "autofocus_method", np.random.choice(RT.autofocus_methods))
                         case 5:
-                            self._set_in_main(sim, "image_type", np.random.choice(ot.RenderImage.image_modes))
+                            self._set_in_main(sim, "image_mode", np.random.choice(ot.RenderImage.image_modes))
                         case 6:
                             self._set_in_main(sim, "detector_selection", np.random.choice(sim.detector_names))
                         case 7:
@@ -676,7 +672,7 @@ class GUITests(unittest.TestCase):
                         case 10:
                             cmds = ['GUI.replot()', 'scene.render()', 'scene.z_minus_view()']
                             cmd = np.random.choice(cmds)
-                            self._do_in_main(sim.send_cmd, cmd)
+                            self._do_in_main(sim.run_command, cmd)
                         case 12:
                             if isinstance(sim.raytracer.detectors[sim._det_ind].front, ot.SphericalSurface):
                                 self._set_in_main(sim, "projection_method", 
@@ -794,7 +790,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.os
     @pytest.mark.slow
     @pytest.mark.gui3
-    def test_send_cmd(self):
+    def test_run_command(self):
         """test command setting and sending as well as automatic replotting (also tests TraceGUI.smart_replot()"""
 
         RT = rt_example()
@@ -802,7 +798,7 @@ class GUITests(unittest.TestCase):
 
         def send(cmd):
             sim.command_window._cmd = cmd
-            self._do_in_main(sim.command_window.send_cmd)
+            self._do_in_main(sim.command_window.send_command)
             self._wait_for_idle(sim)
 
         def interact(sim):
@@ -872,16 +868,16 @@ class GUITests(unittest.TestCase):
 
                 # send empty command using command window
                 sim.command_window._cmd = ""
-                self._do_in_main(sim.command_window.send_cmd)
+                self._do_in_main(sim.command_window.send_command)
                 self._wait_for_idle(sim)
 
                 # send actual command using command window
                 sim.command_window._cmd = "self.replot()"
-                self._do_in_main(sim.command_window.send_cmd)
+                self._do_in_main(sim.command_window.send_command)
                 self._wait_for_idle(sim)
 
                 # resend command, history does not get updated with same command
-                self._do_in_main(sim.command_window.send_cmd)
+                self._do_in_main(sim.command_window.send_command)
                 self._wait_for_idle(sim)
                
                 # clear history
@@ -906,10 +902,10 @@ class GUITests(unittest.TestCase):
                    
                     # check if full history is copied
                     sim.command_window._cmd = "self.replot()"
-                    self._do_in_main(sim.command_window.send_cmd)
+                    self._do_in_main(sim.command_window.send_command)
                     self._wait_for_idle(sim)
                     sim.command_window._cmd = "a=5"
-                    self._do_in_main(sim.command_window.send_cmd)
+                    self._do_in_main(sim.command_window.send_command)
                     self._wait_for_idle(sim)
                     self._do_in_main(sim.command_window.copy_history)
                     self._wait_for_idle(sim)
@@ -933,7 +929,7 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             with self._try(sim):
 
-                self._set_in_main(sim, "coloring_type", "Power")  # shows a side bar, that also needs to be rescaled
+                self._set_in_main(sim, "coloring_mode", "Power")  # shows a side bar, that also needs to be rescaled
                 self._wait_for_idle(sim)
 
                 SceneSize0 = sim._plot._scene_size.copy()
@@ -1018,13 +1014,13 @@ class GUITests(unittest.TestCase):
                            pos=[0, 0, 0], s=[0, 0, 1])
         RT.add(RS2)
 
-        sim = TraceGUI(RT, ColoringType="Wavelength")
+        sim = TraceGUI(RT, coloring_mode="Wavelength")
 
         def interact(sim):
             with self._try(sim):
-                self._set_in_main(sim, "coloring_type", "Wavelength")
+                self._set_in_main(sim, "coloring_mode", "Wavelength")
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "plotting_type", "Points")
+                self._set_in_main(sim, "plotting_mode", "Points")
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.replot)
 
@@ -1055,13 +1051,13 @@ class GUITests(unittest.TestCase):
 
                 # mock no_pol mode, check if coloring type handles this
                 RT.no_pol = True
-                self._set_in_main(sim, "coloring_type", "Polarization yz")
+                self._set_in_main(sim, "coloring_mode", "Polarization yz")
                 self._wait_for_idle(sim)
 
                 # make sure x polarization gets plotted at least once
                 RT.no_pol = False
                 RT.ray_sources[0].polarization = "x"
-                self._set_in_main(sim, "coloring_type", "Polarization yz")
+                self._set_in_main(sim, "coloring_mode", "Polarization yz")
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.retrace)
                 self._wait_for_idle(sim)
@@ -1075,7 +1071,7 @@ class GUITests(unittest.TestCase):
 
                 # check if rays are removed correctly in replot()
                 assert len(RT.ray_sources) and RT.rays.N and sim._plot._ray_plot is not None
-                self._do_in_main(sim.send_cmd, "RT.clear()")
+                self._do_in_main(sim.run_command, "RT.clear()")
                 self._wait_for_idle(sim)
                 self.assertTrue(sim._plot._ray_plot is None)
                 self.assertFalse(sim._plot._ray_property_dict)
@@ -1135,8 +1131,8 @@ class GUITests(unittest.TestCase):
                 # where status flags are set incorrectly
                 sim._det_ind = 50
                 sim._source_ind = 50
-                self._set_in_main(sim, "af_one_source", True)
-                self._set_in_main(sim, "det_image_one_source", True)
+                self._set_in_main(sim, "autofocus_single_source", True)
+                self._set_in_main(sim, "detector_image_single_source", True)
                 self._do_in_main(sim.detector_image)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.detector_cut)
@@ -1265,15 +1261,13 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
                 self._set_in_main(sim, "ray_count", 100000)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "absorb_missing", False)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "rays_visible", 3000)
                 self._wait_for_idle(sim)
                 self._set_in_main(sim, "minimalistic_view", True)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "coloring_type", "Power")
+                self._set_in_main(sim, "coloring_mode", "Power")
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "plotting_type", "Points")
+                self._set_in_main(sim, "plotting_mode", "Points")
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.source_spectrum)
                 self._wait_for_idle(sim)
@@ -1338,7 +1332,7 @@ class GUITests(unittest.TestCase):
                 RT.markers[0].label_only = True
 
                 # check replotting of markers
-                self._do_in_main(sim.send_cmd, "RT.remove(ML[-1])") # also checks that alias ML exists
+                self._do_in_main(sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
                 self._wait_for_idle(sim)
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
                 self.assertEqual(len(sim._plot._marker_plots), 1)  # element was removed in scene
@@ -1387,7 +1381,7 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(b[3].text, "Test2")
 
                 # check replotting of markers
-                self._do_in_main(sim.send_cmd, "RT.remove(ML[-1])") # also checks that alias ML exists
+                self._do_in_main(sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
                 self._wait_for_idle(sim)
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
                 self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was removed in scene
@@ -1466,7 +1460,7 @@ class GUITests(unittest.TestCase):
                 # but I don't know how to make the Picker.pick() function pick with a right click
                 # so currently we overide the RayPicker with the onSpacePick method
                 # do via command string, so it is guaranteed to run in main thread
-                self._do_in_main(sim.send_cmd, "self._plot._ray_picker = self.scene.mlab.gcf().on_mouse_pick("
+                self._do_in_main(sim.run_command, "self._plot._ray_picker = self.scene.mlab.gcf().on_mouse_pick("
                                          "self._plot._on_space_pick, button='Left')")
                 self._wait_for_idle(sim)
 
@@ -1680,7 +1674,7 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(sim._plot._volume_plots[0][0].actor.property.opacity, sphv.opacity)
                 
                 # checks that automatic replotting works
-                self._do_in_main(sim.send_cmd, "RT.volumes[0].opacity=0.9") 
+                self._do_in_main(sim.run_command, "RT.volumes[0].opacity=0.9")
                 self._wait_for_idle(sim)
                 self.assertEqual(sim._plot._volume_plots[0][0].actor.property.opacity, 0.9)
 
@@ -1833,7 +1827,7 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
 
                 # enable autofocus cost plot
-                self._set_in_main(sim, "focus_cost_plot", True)
+                self._set_in_main(sim, "cost_function_plot", True)
                 time.sleep(0.05)
 
                 # needed for this kind of geometry, detector_cut plot fails otherwise

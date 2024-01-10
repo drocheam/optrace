@@ -20,7 +20,7 @@ ressource_dir = pathlib.Path(__file__).resolve().parent / "ressources"
 RT = ot.Raytracer(outline=[-50, 50, -50, 50, -30, 430])
 
 # cell image
-RSS = ot.presets.image.cell([50e-3, 50e-3])
+RSS = ot.presets.image.cell([100e-3, 100e-3])
 RS = ot.RaySource(RSS, divergence="Lambertian",
                   pos=[0, 0, -0.00000001], s=[0, 0, 1], div_angle=50, desc="Cell")
 RT.add(RS)

@@ -20,7 +20,7 @@ R2 = 2 * f2 * (n - 1)
 
 
 # make raytracer
-RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 800], absorb_missing=True)
+RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 800])
 
 pt = ot.Point()
 # RS0 = ot.RaySource(pt, spectrum=ot.LightSpectrum("Monochromatic", wl=550), pos=[rr, 0, -20])

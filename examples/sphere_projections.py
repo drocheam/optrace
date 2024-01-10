@@ -35,7 +35,7 @@ for proj in ot.SphericalSurface.sphere_projection_methods:
     otp.image_plot(img)
 
 # run the simulator
-sim = TraceGUI(RT, ray_opacity=0.5, image_type="Irradiance", hide_labels=True, minimalistic_view=True, 
+sim = TraceGUI(RT, ray_opacity=0.5, image_mode="Irradiance", hide_labels=True, minimalistic_view=True,
                initial_camera=dict(center=[-50, -50, 0], direction=[-1, -1, -1], height=150, roll=-120))
 sim.run()
 

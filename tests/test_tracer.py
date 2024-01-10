@@ -27,7 +27,6 @@ class TracerTests(unittest.TestCase):
 
         # type errors
         self.assertRaises(TypeError, ot.Raytracer, outline=5)  # incorrect outline
-        self.assertRaises(TypeError, ot.Raytracer, outline=o0, absorb_missing=1)  # incorrect bool parameter
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, no_pol=1)  # incorrect bool parameter
         self.assertRaises(TypeError, ot.Raytracer, outline=o0, n0=1)  # incorrect Refractionindex
     
@@ -93,15 +92,13 @@ class TracerTests(unittest.TestCase):
             self.assertTrue(cmp["Any"])
             self.assertTrue(cmp["Ambient"])
 
-        # test detection of trace settings
-        # make sure these values deviate from default ones
-        for key, val in zip(["no_pol", "absorb_missing"], [True, False]):
-            snap = RT.property_snapshot()
-            RT.__setattr__(key, val)
-            snap2 = RT.property_snapshot()
-            cmp = RT.compare_property_snapshot(snap, snap2)
-            self.assertTrue(cmp["Any"])
-            self.assertTrue(cmp["TraceSettings"])
+        # test detection of no_pol trace setting
+        snap = RT.property_snapshot()
+        RT.no_pol = True
+        snap2 = RT.property_snapshot()
+        cmp = RT.compare_property_snapshot(snap, snap2)
+        self.assertTrue(cmp["Any"])
+        self.assertTrue(cmp["TraceSettings"])
     
     def test_raytracer_misc(self):
         """checks tma, clear, extent and pos"""
@@ -843,10 +840,10 @@ class TracerTests(unittest.TestCase):
 
     def test_absorb_missing(self):
         """
-        infinitely small lens -> almost all rays miss and are set to absorbed (due to absorb_missing = True)
+        infinitely small lens -> almost all rays miss and are set to absorbed
         """
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
 
         RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
@@ -857,62 +854,16 @@ class TracerTests(unittest.TestCase):
         RT.add(L)
 
         N = 10000
-        RT.absorb_missing = True
         RT.trace(N)
         self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 1] / N, places=3)
         self.assertTrue(np.all(RT.rays.p_list[:, -1, 2] < RT.outline[5] - 1))  # absorbed before hitting outline
-        
-        # don't absorb with absorb_missing = False
-        RT.absorb_missing = False
-        RT.trace(N)
-        self.assertEqual(RT._msgs[RT.INFOS.ABSORB_MISSING, 1], 0)
-        self.assertTrue(np.allclose(RT.rays.p_list[:, -1, 2] - RT.outline[5], 0))  # hitting outline
     
-    def test_absorb_missing_different_media(self):
-        """
-        infinitely small lens -> almost all rays miss and are set to absorbed because a media transition
-        """
-
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
-
-        RSS = ot.CircularSurface(r=2)
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
-        RT.add(RS)
-
-        surf = ot.CircularSurface(r=1e-6)
-        L = ot.Lens(surf, surf, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1, n2=ot.presets.refraction_index.SF10)
-        RT.add(L)
-
-        # check if they are absorbed before reaching the outline
-        # and check message
-        N = 10000
-        RT.trace(N)
-        self.assertAlmostEqual(RT._msgs[RT.INFOS.ABSORB_MEDIA_TRANS, 1] / N, 1, places=3)
-        self.assertTrue(np.all(RT.rays.p_list[:, -1, 2] < RT.outline[5] - 1))  # absorbed before hitting outline
-
-    def test_outline_intersection(self):
-        """
-        strongly diverging rays, but tracing geometry is a long corridor
-        -> almost all rays are absorbed by outline 
-        """
-
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 5000], absorb_missing=False)
-
-        RSS = ot.Point()
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="Isotropic", 
-                          div_angle=80, pos=[0, 0, -3])
-        RT.add(RS)
-
-        N = 10000
-        RT.trace(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.OUTLINE_INTERSECTION, 0] / N, places=3)
-
     def test_tir(self):
         """
         unrealistically high refractive index, a slight angle leads to TIR at the next surface
         """
 
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False, 
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], 
                           n0=ot.RefractionIndex("Constant", 100))
 
         RSS = ot.CircularSurface(r=2)
@@ -934,7 +885,7 @@ class TracerTests(unittest.TestCase):
         to avoid ghost rays, small transmission factors are set to 0
         """
 
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], absorb_missing=False)
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50])
 
         RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Constant"), divergence="None",
@@ -953,6 +904,23 @@ class TracerTests(unittest.TestCase):
         F.spectrum = ot.TransmissionSpectrum("Constant", val=RT.T_TH/2)
         RT.trace(10000)
         self.assertFalse(RT._msgs[RT.INFOS.T_BELOW_TTH, 0] > 0)
+    
+    def test_outline_intersection(self):
+        """
+        strongly diverging rays, but tracing geometry is a long corridor
+        -> almost all rays are absorbed by outline 
+        """
+
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 5000])
+
+        RSS = ot.Point()
+        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="Isotropic", 
+                          div_angle=80, pos=[0, 0, -3])
+        RT.add(RS)
+
+        N = 10000
+        RT.trace(N)
+        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.OUTLINE_INTERSECTION, 0] / N, places=3)
 
     def test_object_collision(self):
 
@@ -1103,14 +1071,13 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(RuntimeError, RT.iterative_render, 1000)
        
         # check if warnings are aggregated between iterations
-        # the following code is the same as in test_abnormal_rays in test_tracer_special
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
         RSS = ot.CircularSurface(r=2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
         RT.add(RS)
 
-        surf1 = ot.CircularSurface(r=3)
+        surf1 = ot.CircularSurface(r=1e-6)
         surf2 = ot.CircularSurface(r=1e-6)
         L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
         RT.add(L)
@@ -1119,7 +1086,7 @@ class TracerTests(unittest.TestCase):
 
         N = 2*RT.ITER_RAYS_STEP
         RT.iterative_render(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_BACK, 2] / N, places=3)
+        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 1] / N, places=3)
 
     def test_brewster_and_fresnel_transmission(self):
         """

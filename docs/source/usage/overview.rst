@@ -82,3 +82,8 @@ Since the :class:`optrace.gui.TraceGUI <optrace.gui.trace_gui.TraceGUI>` is the 
 
    from optrace.gui import TraceGUI
 
+
+Global Options
+______________________
+
+TODO

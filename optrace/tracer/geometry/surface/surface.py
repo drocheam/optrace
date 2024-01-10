@@ -137,7 +137,8 @@ class Surface(BaseClass):
 
     def values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
-        Get surface values. Absolute coordinates. Points outside the surface are set to z_max.
+        Get surface values. Absolute coordinates. 
+        Points outside the surface are intersected with the radially continued edge.
 
         :param x: x-coordinate array (numpy 1D or 2D array)
         :param y: y-coordinate array (numpy 1D or 2D array)
@@ -453,7 +454,7 @@ class Surface(BaseClass):
         neg = p_hit[:, 2] < p[:, 2] - self.C_EPS  # hit is behind ray start
         bet = (neg | dev) & ~beh
         # ^-- rays don't hit, hit in negative direction or start after surface, but before highest surface value
-        
+       
         # "bet"-rays should intersect plane at z=z_max
         tnm = (self.z_max - p[bet, 2])/s[bet, 2]
         p_hit[bet] = p[bet] + s[bet]*tnm[:, np.newaxis]

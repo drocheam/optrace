@@ -78,20 +78,16 @@ class TraceGUI(HasTraits):
     # we need to embed a CheckListEditor in a List.
     # To assign bool values we need a workaround in __setattr__
 
-    absorb_missing: List = List(editor=CheckListEditor(values=["Absorb Rays Missing Lens"], format_func=lambda x: x),
-                                desc="if Rays are Absorbed when not Hitting a Lens")
-    """Boolean value for absorbing rays missing Lens. Packed as Checkbox into a :obj:`List`"""
-
     log_image: List = List(editor=CheckListEditor(values=['Logarithmic Scaling'], format_func=lambda x: x),
                            desc="if Logarithmic Values are Plotted")
     """Boolean value for a logarithmic image visualization. Packed as Checkbox into a :obj:`List`"""
 
-    flip_det_image: List = List(editor=CheckListEditor(values=['Flip Detector Image'], format_func=lambda x: x),
-                                desc="if detector image should be rotated by 180 degrees")
+    flip_detector_image: List = List(editor=CheckListEditor(values=['Flip Detector Image'], format_func=lambda x: x),
+                                     desc="if detector image should be rotated by 180 degrees")
     """Boolean value for flipping the image (rotating it by 180°). Packed as Checkbox into a :obj:`List`"""
 
-    focus_cost_plot: List = List(editor=CheckListEditor(values=['Plot Cost Function'], format_func=lambda x: x),
-                                 desc="if cost function is shown")
+    cost_function_plot: List = List(editor=CheckListEditor(values=['Plot Cost Function'], format_func=lambda x: x),
+                                    desc="if cost function is shown")
     """Show a plot of the optimization cost function for the focus finding"""
 
     minimalistic_view: List = List(editor=CheckListEditor(values=['More Minimalistic Scene'], format_func=lambda x: x),
@@ -102,19 +98,19 @@ class TraceGUI(HasTraits):
                                    desc="if object labels should be hidden")
     """Shows or hides object labels"""
 
-    af_one_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
-                                                      format_func=lambda x: x),
-                               desc="if autofocus only uses currently selected source")
+    autofocus_single_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
+                                                                format_func=lambda x: x),
+                                         desc="if autofocus only uses currently selected source")
     """Use only rays from selected source for focus finding"""
 
-    det_image_one_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
-                                                             format_func=lambda x: x),
-                                      desc="if DetectorImage only uses currently selected source")
+    detector_image_single_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
+                                                                     format_func=lambda x: x),
+                                              desc="if DetectorImage only uses currently selected source")
     """Use only rays from selected source for the detector image"""
 
-    det_spectrum_one_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
-                                                                format_func=lambda x: x),
-                                         desc="if Detector Spectrum only uses currently selected source")
+    detector_spectrum_single_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
+                                                                        format_func=lambda x: x),
+                                                 desc="if Detector Spectrum only uses currently selected source")
     """Use only rays from selected source for the detector spectrum"""
 
     vertical_labels: List = List(editor=CheckListEditor(values=['Vertical Labels'], format_func=lambda x: x),
@@ -137,17 +133,17 @@ class TraceGUI(HasTraits):
     
     # Enums
 
-    plotting_types: list = ['Rays', 'Points']  #: available ray representations
-    plotting_type: Enum = Enum(*plotting_types, desc="Ray Representation")
+    plotting_modes: list = ['Rays', 'Points']  #: available ray representations
+    plotting_mode: Enum = Enum(*plotting_modes, desc="Ray Representation")
     """Ray Plotting Type"""
 
-    coloring_types: list = ['Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz',\
+    coloring_modes: list = ['Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz',\
                             'Polarization yz', 'Refractive Index']  
     """available ray coloring modes"""
-    coloring_type: Enum = Enum(*coloring_types, desc="Ray Property to color the Rays With")
+    coloring_mode: Enum = Enum(*coloring_modes, desc="Ray Property to color the Rays With")
     """Ray Coloring Mode"""
 
-    image_type: Enum = Enum(*RenderImage.image_modes, desc="Image Type Presented")
+    image_mode: Enum = Enum(*RenderImage.image_modes, desc="Image Type Presented")
     """Image Type"""
    
     projection_method_enabled: Bool = False  #: if method is selectable, only the case for spherical detectors
@@ -155,7 +151,7 @@ class TraceGUI(HasTraits):
                                    desc="Projection Method for spherical detectors")
     """sphere surface projection method"""
 
-    focus_type: Enum = Enum(*Raytracer.autofocus_methods, desc="Method for Autofocus")
+    autofocus_method: Enum = Enum(*Raytracer.autofocus_methods, desc="Method for Autofocus")
     """Focus Finding Mode from raytracer.AutofocusModes"""
 
     cut_dimension: Enum = Enum(["y", "x"], desc="image cut dimension")
@@ -233,11 +229,10 @@ class TraceGUI(HasTraits):
                             _separator,
                             Item("_trace_label", style='readonly', show_label=False, emphasized=True),
                             Item('ray_count'),
-                            Item('absorb_missing', style="custom", show_label=False),
                             _separator, _separator,
                             Item("_plotting_label", style='readonly', show_label=False, emphasized=True),
-                            Item("plotting_type", label='Plotting'),
-                            Item("coloring_type", label='Coloring'),
+                            Item("plotting_mode", label='Plotting'),
+                            Item("coloring_mode", label='Coloring'),
                             _separator, _separator,
                             Item("_ray_visual_label", style='readonly', show_label=False, emphasized=True),
                             Item('rays_visible'),
@@ -265,12 +260,12 @@ class TraceGUI(HasTraits):
                             Item('z_det'),
                             _separator,
                             Item("_image_label", style='readonly', show_label=False, emphasized=True),
-                            Item('image_type', label='Mode'),
+                            Item('image_mode', label='Mode'),
                             Item('projection_method', label='Projection', enabled_when="projection_method_enabled"),
                             Item('image_pixels'),
                             Item('log_image', style="custom", show_label=False),
-                            Item('flip_det_image', style="custom", show_label=False),
-                            Item('det_image_one_source', style="custom", show_label=False),
+                            Item('flip_detector_image', style="custom", show_label=False),
+                            Item('detector_image_single_source', style="custom", show_label=False),
                             Item('_source_image_button', show_label=False),
                             Item('_detector_image_button', show_label=False),
                             _separator,
@@ -295,7 +290,7 @@ class TraceGUI(HasTraits):
                             _separator, _separator,
                             Item("_spectrum_label", style='readonly', show_label=False, emphasized=True),
                             Item('_source_spectrum_button', show_label=False),
-                            Item('det_spectrum_one_source', style="custom", show_label=False),
+                            Item('detector_spectrum_single_source', style="custom", show_label=False),
                             Item('_detector_spectrum_button', show_label=False),
                             _separator, _separator,
                             Item("_spectrum_output_label", style='readonly', show_label=False, emphasized=True),
@@ -310,9 +305,9 @@ class TraceGUI(HasTraits):
                             Item('z_det'),
                             _separator, _separator,
                             Item("_autofocus_label", style='readonly', show_label=False, emphasized=True),
-                            Item('focus_type', label='Mode'),
-                            Item('af_one_source', style="custom", show_label=False),
-                            Item('focus_cost_plot', style="custom", show_label=False),
+                            Item('autofocus_method', label='Mode'),
+                            Item('autofocus_single_source', style="custom", show_label=False),
+                            Item('cost_function_plot', style="custom", show_label=False),
                             Item('_auto_focus_button', show_label=False),
                             _separator,
                             Item("_autofocus_output_label", style='readonly', show_label=False),
@@ -335,24 +330,24 @@ class TraceGUI(HasTraits):
 
     def __init__(self, 
                  raytracer:         Raytracer, 
-                 ui_style:          str = None, 
+                 ui_theme:          str = None, 
                  initial_camera:    dict = {},
                  **kwargs) -> None:
         """
         Create a new TraceGUI with the assigned Raytracer.
 
         :param RT: raytracer
-        :param ui_style: UI style string for Qt
+        :param ui_theme: UI style string for Qt
         :param initial_camera: parameter dictionary for set_camera
         :param kwargs: additional arguments, options, traits and parameters
         """
         pc.check_type("raytracer", raytracer, Raytracer)
-        pc.check_type("ui_style", ui_style, str | None)
+        pc.check_type("ui_theme", ui_theme, str | None)
         pc.check_type("initial_camera", initial_camera, dict)
 
         # set UI theme. Unfortunately this does not work dynamically (yet)
-        if ui_style is not None:
-            QtGui.QApplication.setStyle(ui_style)
+        if ui_theme is not None:
+            QtGui.QApplication.setStyle(ui_theme)
   
         # allow SIGINT interrupts
         pyface_gui.allow_interrupt()
@@ -409,10 +404,6 @@ class TraceGUI(HasTraits):
                                     (len(self._trait(el, 0).editor.values) == 1)]
 
         with self._no_trait_action():
-
-            # add true default parameters
-            if "absorb_missing" not in kwargs:
-                kwargs["absorb_missing"] = True
 
             # convert bool values to list entries for List()
             for key, val in kwargs.items():
@@ -851,7 +842,7 @@ class TraceGUI(HasTraits):
             
             self._start_action(background)
 
-    @observe('ray_count, absorb_missing', dispatch="ui")
+    @observe('ray_count', dispatch="ui")
     def retrace(self, event=None) -> None:
         """
         raytrace in separate thread, after that call `TraceGUI.replot_rays`.
@@ -870,7 +861,6 @@ class TraceGUI(HasTraits):
             def background() -> None:
 
                 error_state = False
-                self.raytracer.absorb_missing = bool(self.absorb_missing)
 
                 with self.__ray_access_lock:
                     with self._try() as error:
@@ -916,7 +906,7 @@ class TraceGUI(HasTraits):
         """
         self._plot.set_ray_opacity()
 
-    @observe("coloring_type", dispatch="ui")
+    @observe("coloring_mode", dispatch="ui")
     def _change_ray_and_source_colors(self, event=None) -> None:
         """
         change ray coloring mode.
@@ -926,7 +916,7 @@ class TraceGUI(HasTraits):
         self._plot.color_rays()
         self._plot.color_ray_sources()
 
-    @observe("plotting_type", dispatch="ui")
+    @observe("plotting_mode", dispatch="ui")
     def _change_ray_representation(self, event=None) -> None:
         """
         change ray view to connected lines or points only.
@@ -1038,7 +1028,7 @@ class TraceGUI(HasTraits):
                         with self.__ray_access_lock:
                             # only calculate Image if raytracer Snapshot, selected Source or image_pixels changed
                             # otherwise we can replot the old Image with the new visual settings
-                            source_index = None if not self.det_image_one_source else self._source_ind
+                            source_index = None if not self.detector_image_single_source else self._source_ind
                             limit = self.filter_constant if self.activate_filter \
                                                             and not self.projection_method_enabled else None
                             
@@ -1059,7 +1049,7 @@ class TraceGUI(HasTraits):
                         else:
                             DImg = self.last_det_image.copy()
 
-                        img = DImg.get(self.image_type, int(self.image_pixels))
+                        img = DImg.get(self.image_mode, int(self.image_pixels))
 
                 def on_finish() -> None:
 
@@ -1069,12 +1059,12 @@ class TraceGUI(HasTraits):
 
                             if (event is None and not cut) or (event is not None\
                                     and event.name == "_detector_image_button"):
-                                image_plot(img, log=bool(self.log_image), flip=bool(self.flip_det_image), **kwargs)
+                                image_plot(img, log=bool(self.log_image), flip=bool(self.flip_detector_image), **kwargs)
 
                             else:
                                 cut_args = {self.cut_dimension : self.cut_value}
-                                image_cut_plot(img, log=bool(self.log_image), 
-                                               flip=bool(self.flip_det_image), **cut_args, **kwargs)
+                                image_cut_plot(img, log=bool(self.log_image),
+                                               flip=bool(self.flip_detector_image), **cut_args, **kwargs)
 
                     self._status["DetectorImage"] -= 1
 
@@ -1103,7 +1093,7 @@ class TraceGUI(HasTraits):
 
                 with self.__detector_lock:
                     with self.__ray_access_lock:
-                        source_index = None if not self.det_spectrum_one_source else self._source_ind
+                        source_index = None if not self.detector_spectrum_single_source else self._source_ind
                         with self._try() as error:
                             Det_Spec = self.raytracer.detector_spectrum(detector_index=self._det_ind, extent=extent,
                                                                         source_index=source_index)
@@ -1221,7 +1211,7 @@ class TraceGUI(HasTraits):
                         else:
                             SImg = self.last_source_image.copy()
 
-                        img = SImg.get(self.image_type, int(self.image_pixels))
+                        img = SImg.get(self.image_mode, int(self.image_pixels))
 
                 def on_finish() -> None:
                     if not error:
@@ -1260,8 +1250,8 @@ class TraceGUI(HasTraits):
 
                 error = False
 
-                source_index = None if not self.af_one_source else self._source_ind
-                mode, z_det, ret_cost, det_ind = self.focus_type, self.z_det, bool(self.focus_cost_plot), \
+                source_index = None if not self.autofocus_single_source else self._source_ind
+                mode, z_det, ret_cost, det_ind = self.autofocus_method, self.z_det, bool(self.cost_function_plot), \
                     self._det_ind
 
                 with self.__ray_access_lock:
@@ -1284,7 +1274,7 @@ class TraceGUI(HasTraits):
                         if det_ind < len(self.raytracer.detectors):  # pragma: no branch
                             self.z_det = self.raytracer.detectors[det_ind].pos[2]
 
-                        if self.focus_cost_plot:
+                        if self.cost_function_plot:
                             with self._try():
                                 autofocus_cost_plot(res, afdict, f"{mode} Cost Function\nMinimum at z={res.x:.5g}mm",
                                                     **kwargs)
@@ -1418,7 +1408,8 @@ class TraceGUI(HasTraits):
         else:
             self._property_browser_view.control.window().raise_()
 
-    def send_cmd(self, cmd: str) -> None:
+    # rename
+    def run_command(self, cmd: str) -> None:
         """
         send/execute a command
         """
@@ -1430,6 +1421,7 @@ class TraceGUI(HasTraits):
         self._sequential = True
         self._status["RunningCommand"] += 1
 
+        # make this dict also available to control()
         dict_ = dict(mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
                      camera=self.scene.camera, GUI=self, RT=self.raytracer, LL=self.raytracer.lenses, 
                      FL=self.raytracer.filters, APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,

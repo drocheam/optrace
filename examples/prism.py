@@ -13,14 +13,14 @@ from optrace.gui import TraceGUI
 #    and compare the image modes by rendering both images
 
 RS_spectrum = ot.presets.light_spectrum.d50
-n = ot.presets.refraction_index.SF10
-# n = ot.presets.refraction_index.LAK8
+# n = ot.presets.refraction_index.SF10
+n = ot.presets.refraction_index.LAK8
 
 # print the abbe number
 print(f"Abbe Number of {n.desc}: {n.abbe_number():.4g}")
 
 # make raytracer
-RT = ot.Raytracer(outline=[-5, 5, -5, 5, -1, 27.5])
+RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 25])
 
 # add Raysource
 RSS = ot.CircularSurface(r=0.05)
@@ -36,16 +36,10 @@ back.rotate(180) # back is a flipped copy of the first surface
 L1 = ot.Lens(front, back, de=0.5, pos=[0, 0, 10], n=n)
 RT.add(L1)
 
-# Prism 2 is a shifted and rotated version of the first prism
-L2 = L1.copy()
-L2.rotate(180)
-L2.move_to([0, 0, 16.5])
-RT.add(L2)
-
 # add Detector
-Det = ot.Detector(ot.RectangularSurface(dim=[5, 5]), pos=[0, 0, 23.])
+Det = ot.Detector(ot.RectangularSurface(dim=[10, 10]), pos=[0, 0, 20])
 RT.add(Det)
 
 # run the simulator
-sim = TraceGUI(RT, coloring_type="Wavelength")
+sim = TraceGUI(RT, ray_count=1000000, coloring_mode="Wavelength", image_mode="sRGB (Perceptual RI)")
 sim.run()

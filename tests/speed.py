@@ -8,8 +8,10 @@ from optrace import *
 
 
 def func2(N2):
+    global_options.show_progressbar = False
+
     # make raytracer
-    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60], absorb_missing=True, no_pol=False)
+    RT = Raytracer(outline=[-5, 5, -5, 5, 0, 60], no_pol=False)
 
     # add Raysource
     RSS = CircularSurface(r=1)

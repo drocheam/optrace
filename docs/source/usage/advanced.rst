@@ -27,25 +27,13 @@ Internally these are characterized by flags, which can be found below:
      - **Description**
     
    * - :python:`Raytracer.INFOS.ABSORB_MISSING`
-     - Rays are absorbed because they miss a lens surface. Occurs in combination with parameter :python:`absorb_missing=True` 
+     - Rays are absorbed because they miss a lens surface.
 
    * - :python:`Raytracer.INFOS.TIR`
      - Total inner reflection. Reflections are not simulated, the ray is treated as being absorbed at the surface intersection
 
-   * - :python:`Raytracer.INFOS.OUTLINE_INTERSECTION`
-     - A ray intersects the outline of the raytracer geometry and is therefore absorbed by it
-
-   * - :python:`Raytracer.INFOS.ONLY_HIT_FRONT`
-     - A ray hits the front, but misses the back. Must gone through the lens side cylinder, which isn't simulated. Absorb it, since we don't know how to handle it
-
-   * - :python:`Raytracer.INFOS.ONLY_HIT_BACK`
-     - A ray hits the back, but misses the front. Must gone through the lens side cylinder, which isn't simulated. Absorb it, since we don't know how to handle it
-   
    * - :python:`Raytracer.INFOS.T_BELOW_TTH`
      - A filter transmittivity is below the T_TH threshold of the raytracer and the ray is therefore absorbed. Avoids 'ghost rays' that need to be traced, but don't contribute to anything
-
-   * - :python:`Raytracer.INFOS.ABSORB_MEDIA_TRANS`
-     - a ray misses a lens but crosses a medium boundary. Since the medium boundary geometry is not defined (as the medium 1 ends before the lens and medium 2 starts after it) outside the lens, we absorb those rays
 
    * - :python:`Raytracer.INFOS.ILL_COND`
      -  ill-conditioned rays for hit finding of a numerical, custom surface. In almost all cases the intersection will be wrong. This can happen if the surface is badly defined numerically or geometrically, there are surface collisions or a ray hits the surface multiple times. Please check the geometry of the raytracer and the surface definition.

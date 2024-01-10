@@ -84,7 +84,7 @@ RT.add(DET)
 # for example, we want the rays to be colored according to their source number,
 # this is done by color_type="Source"
 # and we want a higher ray opacity
-sim = TraceGUI(RT, coloring_type="Source", ray_opacity=0.2)
+sim = TraceGUI(RT, coloring_mode="Source", ray_opacity=0.2)
 
 # the frontend is created, but we need to start it explicitly for it to run
 sim.run()

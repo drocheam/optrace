@@ -170,7 +170,7 @@ class TracerSpecialTests(unittest.TestCase):
     def test_same_surface_behavior(self):
         """check if different surface modes describing the same surface shape actually behave the same"""
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500], absorb_missing=False)
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500])
 
         RSS = ot.CircularSurface(r=0.2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
@@ -245,32 +245,32 @@ class TracerSpecialTests(unittest.TestCase):
                     if i + 1 < len(f_list2):
                         self.assertAlmostEqual(fl, f_list2[i+1], delta=0.001)
 
-    def test_abnormal_rays(self):
-        """
-        rays that hit the lens cylinder edge in any way are absorbed
-        case 1: ray hits lens front, but not back
-        case 2: ray misses front, but hits back
-        """
+    # def test_abnormal_rays(self):
+        # """
+        # rays that hit the lens cylinder edge in any way are absorbed
+        # case 1: ray hits lens front, but not back
+        # case 2: ray misses front, but hits back
+        # """
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50], absorb_missing=False)
+        # RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
 
-        RSS = ot.CircularSurface(r=2)
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
-        RT.add(RS)
+        # RSS = ot.CircularSurface(r=2)
+        # RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
+        # RT.add(RS)
 
-        surf1 = ot.CircularSurface(r=3)
-        surf2 = ot.CircularSurface(r=1e-6)
-        L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        RT.add(L)
+        # surf1 = ot.CircularSurface(r=3)
+        # surf2 = ot.CircularSurface(r=1e-6)
+        # L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        # RT.add(L)
 
-        N = 10000
+        # N = 10000
         
-        RT.trace(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_BACK, 2] / N, places=3)
+        # RT.trace(N)
+        # self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_BACK, 2] / N, places=3)
 
-        RT.lenses[0] = ot.Lens(surf1, surf2, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        RT.trace(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_FRONT, 1] / N, places=3)
+        # RT.lenses[0] = ot.Lens(surf1, surf2, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        # RT.trace(N)
+        # self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_FRONT, 1] / N, places=3)
        
     def test_ray_reach(self):
 

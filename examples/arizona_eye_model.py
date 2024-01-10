@@ -17,7 +17,7 @@ OL = max(G, 8)  # half of x, y, outline size
 sr_angle = np.arctan(1.25*P/2/g)/np.pi*180  # ray divergence needed for diffuse light
 
 # create raytracer
-RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], absorb_missing=True, no_pol=False)
+RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], no_pol=False)
 
 # add RaySource
 # light is converging towards eye vertex at [0, 0, 0]
@@ -32,6 +32,6 @@ geom = ot.presets.geometry.arizona_eye(adaptation=A, pupil=P)
 RT.add(geom)
 
 # Instantiate the class and configure its traits.
-TG = TraceGUI(RT, ray_count=1000000, flip_det_image=True, ray_opacity=0.01, vertical_labels=True, 
+TG = TraceGUI(RT, ray_count=1000000, flip_detector_image=True, ray_opacity=0.01, vertical_labels=True,
               initial_camera=dict(center=[0, 0, 7.3], height=20))
 TG.run()

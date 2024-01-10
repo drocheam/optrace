@@ -530,12 +530,12 @@ class ScenePlotting:
                                                       opacity=self.ui.ray_opacity)
 
         self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width,
-                                                point_size=self.ui.ray_width if self.ui.plotting_type == "Points"
+                                                point_size=self.ui.ray_width if self.ui.plotting_mode == "Points"
                                                                              else 0.1)
 
         self._ray_plot.glyph.color_mode = "color_by_scalar"
         self._ray_plot.parent.parent.name = "Rays"
-        self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
+        self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_mode == 'Points' else 'surface'
 
     def set_ray_highlight(self, index: int) -> None:
         """
@@ -700,7 +700,7 @@ class ScenePlotting:
 
                 case "r":  # cycle plotting types (Point or Rays)
                     ptypes = self.ui.plotting_types
-                    self.ui.plotting_type = ptypes[(ptypes.index(self.ui.plotting_type) + 1) % len(ptypes)]
+                    self.ui.plotting_mode = ptypes[(ptypes.index(self.ui.plotting_mode) + 1) % len(ptypes)]
 
                 case "b":  # toggle label visibility
                     self.ui.hide_labels = not bool(self.ui.hide_labels)
@@ -892,7 +892,7 @@ class ScenePlotting:
             self._ray_highlight_plot.actor.property.color = self._crosshair_color
 
         # in coloring type Plain the ray color is changed from white to a bright orange
-        if self.ui.coloring_type == "Plain" and self._ray_plot is not None:
+        if self.ui.coloring_mode == "Plain" and self._ray_plot is not None:
             self._ray_plot.parent.scalar_lut_manager.lut_mode = "Greys" if not high_contrast else "Wistia"
             self._ray_plot.parent.scalar_lut_manager.reverse_lut = bool(high_contrast)
 
@@ -937,7 +937,7 @@ class ScenePlotting:
     def set_ray_representation(self) -> None:
         """change the ray representation between 'points' and 'surface'"""
         if self._ray_plot is not None:
-            self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_type == 'Points' else 'surface'
+            self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_mode == 'Points' else 'surface'
 
     def set_ray_width(self) -> None:
         """change the ray width"""
@@ -1039,7 +1039,7 @@ class ScenePlotting:
         N, nt, nc = pol_.shape
 
         # set plotting properties depending on plotting mode
-        match self.ui.coloring_type:
+        match self.ui.coloring_mode:
 
             case 'Power':
                 s = w_.ravel()*1e6
@@ -1067,10 +1067,10 @@ class ScenePlotting:
                     warning("Polarization calculation turned off in raytracer, "
                             "reverting to a different mode")
 
-                    self.ui.coloring_type = "Power"
+                    self.ui.coloring_mode = "Power"
                     return
 
-                if self.ui.coloring_type == "Polarization yz":
+                if self.ui.coloring_mode == "Polarization yz":
                     # projection of unity vector onto yz plane is the pythagorean sum of the y and z component
                     s = np.hypot(pol_[:, :, 1], pol_[:, :, 2]).ravel()
                     title = "Polarization\n projection\n on yz-plane"
@@ -1092,7 +1092,7 @@ class ScenePlotting:
         # lut legend settings
         lutm = self._ray_plot.parent.scalar_lut_manager
         lutm.trait_set(use_default_range=True, show_scalar_bar=True, use_default_name=False,
-                       show_legend=self.ui.coloring_type != "Plain", lut_mode=cm, reverse_lut=False)
+                       show_legend=self.ui.coloring_mode != "Plain", lut_mode=cm, reverse_lut=False)
 
         # lut visibility and title
         lutm.scalar_bar.trait_set(title=title, unconstrained_font_size=True)
@@ -1110,7 +1110,7 @@ class ScenePlotting:
         lutm.scalar_bar_widget.process_events = False  # make non-interactive
         lutm.number_of_labels = 11
 
-        match self.ui.coloring_type:
+        match self.ui.coloring_mode:
 
             case 'Wavelength':
                 spectral_colormap = go.spectral_colormap if go.spectral_colormap is not None\
@@ -1139,7 +1139,7 @@ class ScenePlotting:
 
         lutm = self._ray_plot.parent.scalar_lut_manager
 
-        match self.ui.coloring_type:
+        match self.ui.coloring_mode:
 
             case ("Plain" | "Refractive Index"):
                 RSColor = [self.scene.foreground for RSp in self._ray_source_plots]
@@ -1162,7 +1162,7 @@ class ScenePlotting:
                             case "Constant":  # pragma: no branch
                                 pol_ang = np.deg2rad(RS.pol_angle)
                     
-                        proj = np.sin(pol_ang) if self.ui.coloring_type == "Polarization yz" else np.cos(pol_ang)
+                        proj = np.sin(pol_ang) if self.ui.coloring_mode == "Polarization yz" else np.cos(pol_ang)
                         col = np.array(lutm.lut.table[int(proj*255)])
                         RSColor.append(col[:3]/255.)
                     else:

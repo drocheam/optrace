@@ -105,10 +105,17 @@ class TiltedSurface(Surface):
         p_hit = p + s*t[:, np.newaxis]
         is_hit = self.mask(p_hit[:, 0], p_hit[:, 1])  # rays not hitting
 
+        # bool array for ill-conditioned rays
+        ill = np.zeros(p.shape[0], dtype=bool)
+
+        # edge is continued in radial direction -> find iteratively for non-hitting rays
+        if np.any(~is_hit):
+            p_hit[~is_hit], is_hit[~is_hit], ill[~is_hit] = super().find_hit(p[~is_hit], s[~is_hit])
+
         # handle rays that start behind surface or inside its extent 
         self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
-        return p_hit, is_hit, np.array([])
+        return p_hit, is_hit, ill
 
     def flip(self) -> None:
         """flip the surface around the x-axis"""

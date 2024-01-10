@@ -232,30 +232,6 @@ Collision checks are done by first sorting the elements and then comparing posit
 After randomly sampling many points it needs to be checked if the position order in z-direction is equal.
 While this doesn't guarantee no collisions, while raytracing the sequentiality is checked for each ray and warnings are emitted.
 
-Outline Intersection
-========================
-
-After each surface hit calculation at the current surface the rays from the last surface are checked for a collision with the outline. 
-This is done by calculating an intersection of the ray with the six faces of the outline box.
-Since the intersection of a line and plane is straightforward, the calculations are quite simple.
-Only the nearest hit in positive direction of all six intersections is used.
-If the outline is hit before the collision with the current non-outline surface, the rays are absorbed at the outline.
-
-Abnormal Lens Rays
-==========================
-
-If rays don't hit both front and back surface of a lens, they either 
-
- 1. miss the lens completely 
- 2. hit only one of these surfaces while passing through the lens cylinder, which is the surface connecting both front and back
- 3. hit the lens cylinder twice
-
-Case 1 is valid behavior that doesn't need to be adressed.
-The cylinder surface behavior is not modelled, so we are forced to absorb these rays and output a warning message in case 2.
-Currently there is no differentiation between cases 1 and 3, which for the latter is inconvient, as it is treated as passing through the lens without interaction.
-This is due to missing collision detection with the cylinder surface, clearly a bug and maybe will be fixed in the future.
-However, setting the raytracer options to ``absorb_missing=True`` absorbs both rays from cases 1 and 3.
-
 
 Hit Finding
 =============================

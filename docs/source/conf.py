@@ -133,3 +133,4 @@ linkcheck_ignore = ['https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.rop
 
 # only check doctest blocks
 doctest_test_doctest_blocks = ""
+

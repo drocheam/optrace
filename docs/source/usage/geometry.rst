@@ -246,6 +246,8 @@ The following figure shows a setup with lenses :python:`L0, L2` having a :python
    Schematic figure of a setup with a ray source, three different lenses and three different ambient media
 
 
+.. TODO update
+
 **absorb_missing**
 
 The :python:`absorb_missing` parameter, which is set to :python:`True` by default, ensures that light which does not hit a lens is absorbed. In principle, this is the typical and desired case. However, there are geometries where :python:`absorb_missing=False` could be useful. 

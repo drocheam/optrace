@@ -99,7 +99,7 @@ class RenderImage(BaseClass):
     def shape(self) -> list[float, float]:
         """data image shape (y, x)"""
         self.__check_for_image()
-        return self._data.shape[:2]
+        return self._data.shape
 
     @property
     def data(self) -> numpy.ndarray:

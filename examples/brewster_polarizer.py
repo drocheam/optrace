@@ -15,7 +15,7 @@ b_ang = np.arctan(1.55/1)
 # transmission s-polarized: 83.0%
 # mean transmission unpolarized: 91.5%
 
-RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12], absorb_missing=False)
+RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12])
 
 # source parameters
 RSS = ot.CircularSurface(r=0.05)
@@ -44,5 +44,5 @@ Det = ot.Detector(ot.RectangularSurface(dim=[6, 6]), pos=[0, 0, 12])
 RT.add(Det)
 
 # Instantiate the class and configure its traits.
-sim = TraceGUI(RT, coloring_type="Power", ray_opacity=0.9)
+sim = TraceGUI(RT, coloring_mode="Power", ray_opacity=0.9)
 sim.run()

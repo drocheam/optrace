@@ -49,10 +49,6 @@ class ExampleTests(unittest.TestCase):
         self.execute("refraction_index_presets.py", 10)
     
     @pytest.mark.slow
-    def test_custom_surfaces(self):
-        self.execute("custom_surfaces.py")
-    
-    @pytest.mark.slow
     def test_legrand_eye(self):
         self.execute("legrand_eye_model.py")
     
@@ -101,7 +97,7 @@ class ExampleTests(unittest.TestCase):
 
     @pytest.mark.slow
     def test_prism(self):
-        self.execute("double_prism.py")
+        self.execute("prism.py")
     
     @pytest.mark.slow
     def test_gui_automation(self):

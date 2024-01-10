@@ -32,7 +32,6 @@ Documentation
 * `tox <https://tox.wiki/en/latest/>`_ environment ``docs``, call from main folder using ``tox -e docs``, see the ``tox.ini`` files for details
 * this runs the following:
    * the `Sphinx <https://www.sphinx-doc.org/en/master/>`_ html documentation compilation
-   * `pydeps <https://github.com/thebjorn/pydeps>`_ that creates a graphical representation of internal and external library dependencies
    * a bash script generating the changelog
    * a bash script generating the source file toctree
 

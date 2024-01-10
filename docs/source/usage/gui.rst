@@ -6,14 +6,9 @@ Using the GUI
 .. testcode:: 
    :hide:
 
-   print("Placeholder:    ")
    import optrace as ot
    from optrace.gui import TraceGUI
-
-.. testoutput::
-   :hide:
-    
-   Placeholder: ...
+   ot.global_options.show_progressbar = False
 
 .. role:: python(code)
   :language: python
@@ -83,6 +78,18 @@ For instance, setting the scene to high contrast mode and increasing the amount 
 
 Available properties are discussed in :numref:`gui_tabs`.
 
+
+**Initial Camera**
+
+An initial camera view can be applied with the ``initial_camera`` parameter:
+
+.. testcode::
+
+   sim = TraceGUI(RT, high_contrast=True, ray_count=2000000,\
+                  initial_camera=dict(center=[-50, -50, 0], direction=[-1, -1, -1], height=150, roll=-120))
+
+Theses properties are directly passed to ``TraceGUI.set_camera``.
+You can read more about the camera settings in <>.
 
 **UI Theme**
 
@@ -260,6 +267,8 @@ Main Tab
 #######################
 
 
+.. TODO update screenshot without absorb_missing
+
 .. list-table::
    :header-rows: 1
    :align: left
@@ -273,16 +282,12 @@ Main Tab
      - :attr:`ray_count <optrace.gui.trace_gui.TraceGUI.ray_count>`
      - integer, 0 - 6000000
      - number of rays for raytracing
-   * - Absorb Rays Missing Lens
-     - :attr:`absorb_missing <optrace.gui.trace_gui.TraceGUI.absorb_missing>`
-     - :python:`True` or :python:`False`
-     - if rays are absorbed when missing a lens
    * - Plotting
-     - :attr:`plotting_type <optrace.gui.trace_gui.TraceGUI.plotting_type>`
+     - :attr:`plotting_mode <optrace.gui.trace_gui.TraceGUI.plotting_mode>`
      - :python:`'Rays'` or :python:`'Points'`
      - Visulation type of the rays
    * - Coloring
-     - :attr:`coloring_type <optrace.gui.trace_gui.TraceGUI.coloring_type>`
+     - :attr:`coloring_mode <optrace.gui.trace_gui.TraceGUI.coloring_mode>`
      - :python:`'Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz', 'Polarization yz', 'Refractive Index'`
      - Quantity determining the color of the rays/points
    * - Count
@@ -352,7 +357,7 @@ Image Tab
      - float
      - position of the currently chosen detector
    * - Image Mode
-     - :attr:`image_type <optrace.gui.trace_gui.TraceGUI.image_type>`
+     - :attr:`image_mode <optrace.gui.trace_gui.TraceGUI.image_mode>`
      - string, one of :attr:`RenderImage.image_modes <optrace.tracer.image.render_image.RenderImage.image_modes>`
      - image mode for rendering
    * - Projection Method
@@ -368,11 +373,11 @@ Image Tab
      - :python:`True` or :python:`False`
      - if image values should be scaled logarithmically
    * - Flip Detector Image
-     - :attr:`flip_det_image <optrace.gui.trace_gui.TraceGUI.flip_det_image>`
+     - :attr:`flip_detector_image <optrace.gui.trace_gui.TraceGUI.flip_detector_image>`
      - :python:`True` or :python:`False`
      - if the detector image should be flipped (rotated by 180 degrees)
    * - Rays from Selected Source Only
-     - :attr:`det_image_one_source <optrace.gui.trace_gui.TraceGUI.det_image_one_source>`
+     - :attr:`detector_image_single_source <optrace.gui.trace_gui.TraceGUI.detector_image_single_source>`
      - :python:`True` or :python:`False`
      - if only the selected ray source should contribute to the image
    * - Source Image
@@ -436,7 +441,7 @@ Spectrum Tab
      - 
      - render a source spectrum for the chosen source
    * - Rays from Selected Source Only 
-     - :attr:`det_spectrum_one_source <optrace.gui.trace_gui.TraceGUI.det_spectrum_one_source>` 
+     - :attr:`detector_spectrum_single_source <optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source>` 
      - :python:`True` or :python:`False`
      - if only the selected ray source should contribute to the detector image
    * -  Detector Spectrum
@@ -472,15 +477,15 @@ Focus Tab
      - float
      - position of the chosen detector
    * - Focus Mode     
-     - :attr:`focus_type <optrace.gui.trace_gui.TraceGUI.focus_type>`
+     - :attr:`autofocus_method <optrace.gui.trace_gui.TraceGUI.autofocus_method>`
      - string, one of :attr:`Raytracer.autofocus_methods <optrace.tracer.raytracer.Raytracer.autofocus_methods>`
      - mode for focus finding
    * - Rays From Selected Source Only
-     - :attr:`af_one_source <optrace.gui.trace_gui.TraceGUI.af_one_source>`
+     - :attr:`autofocus_single_source <optrace.gui.trace_gui.TraceGUI.autofocus_single_source>`
      - :python:`True` or :python:`False`
      - only use the rays from the selected source for focus finding
    * -  Plot Cost Function
-     - :attr:`focus_cost_plot <optrace.gui.trace_gui.TraceGUI.focus_cost_plot>`
+     - :attr:`cost_function_plot <optrace.gui.trace_gui.TraceGUI.cost_function_plot>`
      - :python:`True` or :python:`False`
      - plots the evaluated cost function value in a window
    * -  Find Focus

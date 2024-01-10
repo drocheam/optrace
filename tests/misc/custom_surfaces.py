@@ -5,7 +5,7 @@ import optrace as ot
 from optrace.gui import TraceGUI
 
 # init raytracer
-RT = ot.Raytracer(outline=[-7, 7, -7, 7, 0, 40], absorb_missing=False)
+RT = ot.Raytracer(outline=[-7, 7, -7, 7, 0, 40])
 
 # add Raysource
 RSS = ot.CircularSurface(r=2.5)

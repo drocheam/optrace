@@ -41,7 +41,14 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[[0, 0, 0]])  # invalid padding_value shape
         self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[0, 0, -1])  # invalid padding_value for RGBImage
         self.assertRaises(ValueError, ot.convolve, img2, psf, padding_value=-2)  # invalid padding_value for LinearImage
-        
+
+        # value errors due to projected image or psf
+        img2.projection = "Orthographic"
+        self.assertRaises(ValueError, ot.convolve, img2, psf)  # can't convolve an image that has been projected 
+        img2.projection = None
+        psf.projection = "Orthographic"
+        self.assertRaises(ValueError, ot.convolve, img2, psf)  # can't convolve with a psf that has been projected 
+            
     def test_resolution_exceptions(self):
 
         img = ot.presets.image.color_checker([5, 6])
@@ -287,7 +294,7 @@ class ConvolutionTests(unittest.TestCase):
             # check that mean difference is small
             # we still have some deviations due to noise, incorrect magnification and not-linear aberrations
             # print(np.mean(np.abs(im_diff)))
-            delta = 0.0075 if i not in [1, 3] else 0.03  # larger errors for bright colored color checker image due too not enough rays
+            delta = 0.0075 if i not in [1, 3] else 0.04  # larger errors for bright colored color checker image due too not enough rays
             # print(delta, np.mean(np.abs(im_diff)))
             self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=delta)
      

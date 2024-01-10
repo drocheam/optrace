@@ -1,5 +1,7 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.5.4   |   2024-01-09   |   detector_image() and detector_cut() in TraceGUI now support extent parameter. New pick_ray(), pick_ray_section() and reset_picking() functions in TraceGUI. 
+  1.5.3   |   2024-01-05   |   New LinearImage, RGBImage classes. RImage renamed to RenderImage. RaySource now supports LinearImage. 
   1.5.2   |   2023-12-29   |   Replaced Pillow by cv. New GUI automation and keratoconus example. Convolution now supports slicing and padding. New Image class. Options are now defined in optrace.global_options. 
   1.5.1   |   2023-12-08   |   Output texts are now warnings. Threading, warning and figure parameters are now set globally. Hide_labels property in TraceGUI. Improved microscope example. 
   1.5.0   |   2023-11-29   |   TraceGUI has now set_camera, get_camera and screenshot functions. Picked ray is highlighted in the scene. All plots in optrace.plots now can be saved by providing a path. 

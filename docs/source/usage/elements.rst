@@ -175,12 +175,12 @@ The size will be equal to the side lengths of the image.
 
 .. testcode::
 
-   image = ot.Image(np.random.sample((300, 300, 3)), [2, 3])
+   image = ot.RGBImage(np.random.sample((300, 300, 3)), [2, 3])
    RS = ot.RaySource(image)
 
 .. code-block:: python
 
-   image = ot.Image("some_image_path", [2, 3])
+   image = ot.RGBImage("some_image_path", [2, 3])
    RS = ot.RaySource(image)
 
 Every image color generates a specific physical spectrum matching its color. This spectrum is a linear combination of the sRGB primaries in <>.

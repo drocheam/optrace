@@ -101,9 +101,9 @@ RT.add(Det)
 # run the simulator
 sim = TraceGUI(RT, 
                high_contrast=True, 
-               det_image_one_source=True, 
+               detector_image_single_source=True,
                minimalistic_view=True, 
                ray_opacity=0.05,
-               coloring_type="Source",
+               coloring_mode="Source",
                initial_camera=dict(center=[0, 0, 60], height=110))
 sim.run()

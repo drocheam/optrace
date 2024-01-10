@@ -120,14 +120,14 @@ class CommandWindow(HasTraits):
         self.gui.replot()
 
     @observe('_run_button', dispatch="ui")
-    def send_cmd(self, event=None) -> None:
+    def send_command(self, event=None) -> None:
         """
         Execute a command in the TraceGUI
 
         :param event: optional event from traits observe decorator
         """
         if self._cmd:
-            self.gui.send_cmd(self._cmd)
+            self.gui.run_command(self._cmd)
 
             # add to history if something happened and if the command differs from the last one
             if not self._history or self._cmd != self._history[-1]:

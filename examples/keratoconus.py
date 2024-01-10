@@ -11,7 +11,7 @@ g = 0.6e3  # object distance
 G_alpha = 4  # angle of object in view
 P = 3  # pupil diameter
 image = ot.presets.image.ETDRS_chart_inverted  # test image
-position = "far"  # keratoconus cone position (see "positions" dictionary below)
+position = "average"  # keratoconus cone position (see "positions" dictionary below)
 cases = [0, 4, 7, 14]  # cases to simulate (see "gauss_params" list below)
 delta_A = 0#-1.5  # relative eye adaption / refractive error from correct focus
 
@@ -49,7 +49,7 @@ sr_angle = np.arctan(1.4*P/2/g)/np.pi*180  # ray divergence angle
 G_size = g*np.tan(G_alpha/180*np.pi)  # object size from angle
 
 # create raytracer
-RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], absorb_missing=True, no_pol=False)
+RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], no_pol=False)
 
 # Point Source
 RS = ot.RaySource(ot.Point(), divergence="Lambertian", div_angle=sr_angle, pos=[0, 0, -g])

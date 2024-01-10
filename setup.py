@@ -55,7 +55,7 @@ if __name__ == '__main__':
           # see https://github.com/enthought/mayavi/pull/1255
           # see https://github.com/enthought/mayavi/issues/1252
           #
-          tests_require=['pyautogui', 'pytest', 'colour-science', 'requests', 'mock', 'pytest-random-order'],
+          tests_require=['pyautogui', 'pytest', 'colour-science', 'requests', 'pytest-random-order'],
           package_data={"": ["*.png", "*.jpg", "*.webp", "*.csv"]},   # includes tables and images
           include_package_data=True,
         )

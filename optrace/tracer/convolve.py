@@ -46,7 +46,7 @@ def convolve(img:                RGBImage | LinearImage,
     It must have three elements if img is an RGBImage, and one otherwise.
 
     If a result with the same side lengths and pixel count as the input is desired,
-    parameter slice_ must be set to True so the image is sliced back.
+    parameter slice\_ must be set to True so the image is sliced back.
 
     In the internals of this function the convolution is done in linear sRGB values, 
     while also using values outside the sRGB gamut.
@@ -61,6 +61,7 @@ def convolve(img:                RGBImage | LinearImage,
     :param img: initial image as either RGBImage or LinearImage
     :param psf: point spread function, Image or RenderImage.
     :param m: magnification factor
+    :param slice_: if output image should be sliced to size of input image
     :param padding_mode: padding mode (from numpy.pad) for image padding before convolution.
     :param padding_value: padding value for padding_mode='constant'. 
      Three elements if img is a RGBImage, single element otherwise. Defaults to zeros.
@@ -83,6 +84,16 @@ def convolve(img:                RGBImage | LinearImage,
     make_linear = isinstance(psf, LinearImage) and isinstance(img, LinearImage)
     psf_color = isinstance(psf, RenderImage)
 
+    # check if image or psf are sphere projected
+    if img.projection is not None:
+        raise ValueError(f"Image projection is {img.projection}. "
+                         "Convolving a sphere projected image make no geometrical sense.")
+    
+    if psf.projection is not None:
+        raise ValueError(f"PSF projection is {psf.projection}. "
+                         "Convolving with a sphere projected psf make no geometrical sense.")
+
+    # check padding_values
     if isinstance(img, RGBImage):
         pc.check_type("padding_value", padding_value, list | np.ndarray | None)
         
@@ -201,10 +212,6 @@ def convolve(img:                RGBImage | LinearImage,
     
     if not (0.2 < ipx/ipy < 5):
         warning(f"WARNING: Pixels of image are strongly non-square with side lengths [{ipx}mm, {ipy}mm]")
-
-    if isinstance(img, RGBImage):
-        if pval.ndim != 1 or pval.shape[0] != 3:
-            raise_(ValueError(f"padding_value must be a 3 element array/list, but has shape {pval.shape}"))
 
     # Convolution Preparation
     ###################################################################################################################

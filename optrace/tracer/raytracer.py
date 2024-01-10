@@ -46,12 +46,9 @@ class Raytracer(Group):
     class INFOS(IntEnum):
         ABSORB_MISSING = 0
         TIR = 1
-        OUTLINE_INTERSECTION = 2
-        ONLY_HIT_FRONT = 3
-        ONLY_HIT_BACK = 4
-        T_BELOW_TTH = 5
-        ABSORB_MEDIA_TRANS = 6
-        ILL_COND = 7
+        T_BELOW_TTH = 2
+        ILL_COND = 3
+        OUTLINE_INTERSECTION = 4
     """enum for info messages in raytracing"""
 
     autofocus_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
@@ -61,7 +58,6 @@ class Raytracer(Group):
     def __init__(self,
                  outline:        (list | np.ndarray),
                  n0:              RefractionIndex = None,
-                 absorb_missing:  bool = True,
                  no_pol:          bool = False,
                  **kwargs)\
             -> None:
@@ -70,12 +66,10 @@ class Raytracer(Group):
 
         :param outline: outline of raytracer space [x1, x2, y1, y2, z1, z2] (numpy 1D array or list)
         :param n0: refraction index of the raytracer enviroment (RefractionIndex object)
-        :param absorb_missing: if rays missing a lens are absorbed at the lens (bool)
         :param no_pol: if polarization should be neglected to speed things up
         """
 
         self.outline = outline  #: geometrical raytracer outline
-        self.absorb_missing = absorb_missing  #: absorb rays missing lenses
         self.no_pol = no_pol  #: polarization calculation flag
 
         self.rays = RayStorage()  #: traced rays
@@ -107,7 +101,7 @@ class Raytracer(Group):
                 super().__setattr__(key, o)
                 return
 
-            case ("no_pol" | "absorb_missing"):
+            case "no_pol":
                 pc.check_type(key, val, bool)
 
         super().__setattr__(key, val)
@@ -139,7 +133,7 @@ class Raytracer(Group):
         """
         return dict(Rays=self.rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()],
-                    TraceSettings=[self.no_pol, self.absorb_missing],
+                    TraceSettings=[self.no_pol],
                     Lenses=[D.crepr() for D in self.lenses],
                     Filters=[D.crepr() for D in self.filters],
                     Apertures=[D.crepr() for D in self.apertures],
@@ -176,14 +170,30 @@ class Raytracer(Group):
         for msg in msgs:
             self._msgs += msg
 
-    # TODO create a list of surface descriptions ("Source 0", "Front of Lens 0", "Outline" etc)
-    # so message would read  "xxx happened at Surface 12 (back of Lens L5)"
+    # TODO test
+    def _surface_names(self) -> list[str]:
+        """Generate a list of surface names ordered by their z-position"""
+
+        names = dict()
+
+        for type_, els in zip(["Lens", "Aperture", "Filter"], [self.lenses, self.apertures, self.filters]):
+            for i, el in enumerate(els):
+                if not el.has_back():
+                    names[f"surface of {type_} {el.abbr}{i}"] = el.pos[2]
+                else:
+                    names[f"front surface of {type_} {el.abbr}{i}"] = el.front.pos[2]
+                    names[f"back surface of {type_} {el.abbr}{i}"] = el.back.pos[2]
+
+        return ["RaySource"] + sorted(names, key=lambda k: names[k]) + ["Outline"]
+
     def _show_messages(self, N) -> None:
         """
         Show messages from tracing
 
         :param N: number of rays
         """
+        surf_name = self._surface_names()
+
         # print messages
         for type_ in range(self._msgs.shape[0]):
             for surf in range(self._msgs.shape[1]):
@@ -191,41 +201,25 @@ class Raytracer(Group):
                     match type_:
                         case self.INFOS.TIR:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"with total inner reflection at surface {surf}, treating as absorbed.")
+                                    f"with total inner reflection at surface {surf} ({surf_name[surf]}), treating as absorbed.")
 
                         case self.INFOS.ABSORB_MISSING:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"missing surface {surf}, "
-                                     "set to absorbed because of parameter absorb_missing=True.")
-                       
-                        case self.INFOS.ABSORB_MEDIA_TRANS:
-                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"at refractive media transition at surface {surf} but outside the lens, "
-                                     "set to absorbed.")
-
-                        case self.INFOS.OUTLINE_INTERSECTION:
-                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"hitting outline after surface {surf}, set to absorbed.")
+                                    f"missing surface {surf} ({surf_name[surf]}), set to absorbed")
 
                         case self.INFOS.T_BELOW_TTH:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"with transmittivity at filter surface {surf} below threshold of "
+                                    f"with transmittivity at filter surface {surf}  ({surf_name[surf]}) below threshold of "
                                     f"{self.T_TH*100:.3g}%, setting to absorbed.")
-
-                        case self.INFOS.ONLY_HIT_FRONT:
-                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"hitting lens front but missing back (lens with surface {surf}), "
-                                     "setting to absorbed.")
-
-                        case self.INFOS.ONLY_HIT_BACK:
-                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"missing lens front but hitting back (lens with surface {surf}), "
-                                     "setting to absorbed.")
                         
                         case self.INFOS.ILL_COND:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
-                                    f"numerical hit finding at surface {surf}. "
+                                    f"numerical hit finding at surface {surf} ({surf_name[surf]}). "
                                     f"Their hit position will certainly be wrong.")
+                        
+                        case self.INFOS.OUTLINE_INTERSECTION:
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"hitting outline after surface {surf} ({surf_name[surf]}), set to absorbed.")
 
     def _pretrace_check(self, N: int) -> bool:
         """checks the geometry and N parameter. Returns if tracing is possible"""
@@ -258,7 +252,7 @@ class Raytracer(Group):
         if (dont_trace := self._pretrace_check(N)):
             return
         
-        elements = self.__make_tracing_element_list()
+        elements = self.__tracing_elements()
 
         # reserve space for all tracing surface intersections, +1 for invisible aperture at the outline z-end
         # and +1 for the ray starting points
@@ -296,10 +290,14 @@ class Raytracer(Group):
 
                 if isinstance(element, Lens):
 
-                    hw_front = hw.copy()
                     p[hw, i+1], hit_front, ill = element.front.find_hit(p[hw, i], s[hw])
                     hwh = misc.part_mask(hw, hit_front)  # rays having power and hitting lens front
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
+
+                    # absorb rays not hitting surface
+                    miss_mask = misc.part_mask(hw, ~hit_front)
+                    weights[miss_mask, i+1] = 0
+                    msg[self.INFOS.ABSORB_MISSING, i+1] += np.count_nonzero(miss_mask)
 
                     # index after lens
                     n2 = element.n2 or self.n0
@@ -311,7 +309,7 @@ class Raytracer(Group):
                         n_l = element.n(wavelengths)
                         
                         self.__refraction(element.front, p, s, weights, n1_l, n_l, pols, hwh, i, msg)
-
+                        
                         # treat rays that go outside outline
                         hwnh = misc.part_mask(hw, ~hit_front)  # rays having power and not hitting lens front
                         self.__outline_intersection(p, s, weights, hwnh, i, msg)
@@ -325,33 +323,21 @@ class Raytracer(Group):
                         hw = weights[:, i] > 0
                         p[hw, i+1], hit_back, ill = element.back.find_hit(p[hw, i], s[hw])
                         msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
+                    
+                        # absorb rays not hitting surface
+                        miss_mask = misc.part_mask(hw, ~hit_back)
+                        weights[miss_mask, i+1] = 0
+                        p[miss_mask, i+1] = p[miss_mask, i]  # rays should be absorbed at front surface of lens
+                        msg[self.INFOS.ABSORB_MISSING, i+1] += np.count_nonzero(miss_mask)
+                   
                         hwb = misc.part_mask(hw, hit_back)  # rays having power and hitting lens back
                         self.__refraction(element.back, p, s, weights, n_l, n2_l, pols, hwb, i, msg)
 
-                        # since we don't model the behaviour of the lens side cylinder,
-                        # we need to absorb all rays passing through the cylinder
-                        self.__absorb_cylinder_rays(p, weights, hw_front, hw, hit_front, hit_back, i, msg)
-
                     else:
-                        hit_back = hit_front
                         self.__refraction_ideal_lens(element.front, element.D, p, s, pols, hwh, i, msg)
                         ns[:, i+1] = n2_l
-
-                    # absorb rays if absorb_missing=True or if we have a media transition
-                    # but the rays hit outside the lens
-                    # absorb rays missing lens, overwrite p to last ray starting point (=end of lens front surface)
-                    if (self.absorb_missing or n1 != n2) and not np.all(hit_back):
-                        miss_mask = misc.part_mask(hw, ~hit_back)
-                        miss_count = np.count_nonzero(miss_mask)
-                        weights[miss_mask, i+1] = 0
-
-                        if not element.is_ideal:
-                            p[miss_mask, i+1] = p[miss_mask, i]
-
-                        # assign to correct message
-                        msgtype = self.INFOS.ABSORB_MISSING if self.absorb_missing else self.INFOS.ABSORB_MEDIA_TRANS
-                        msg[msgtype, i] += miss_count
-
+                        hit_back = hit_front
+                    
                     # # treat rays that go outside outline
                     hwnb = misc.part_mask(hw, ~hit_back)  # rays having power and not hitting lens back
                     self.__outline_intersection(p, s, weights, hwnb, i, msg)
@@ -372,7 +358,7 @@ class Raytracer(Group):
                     # treat rays that go outside outline
                     hwnh = misc.part_mask(hw, ~hit)  # rays having power and not hitting filter
                     self.__outline_intersection(p, s, weights, hwnh, i, msg)
-
+                    
                     ns[:, i+1] = ns[:, i]
 
                 i += 1
@@ -397,7 +383,7 @@ class Raytracer(Group):
         self._set_messages(msgs)
         self._show_messages(N)
 
-    def __make_tracing_element_list(self) -> list[Lens | Filter | Aperture]:
+    def __tracing_elements(self) -> list[Lens | Filter | Aperture]:
         """
         Creates a sorted element list from filters, apertures and lenses.
 
@@ -423,7 +409,7 @@ class Raytracer(Group):
         :param elements: element list from __make_element_list()
         """
 
-        elements = self.__make_tracing_element_list()
+        elements = self.__tracing_elements()
 
         def is_inside(e: tuple | list) -> bool:
             o = self.outline + self.N_EPS*np.array([-1, 1, -1, 1, -1, 1])  # add eps because of finite float precision
@@ -564,55 +550,6 @@ class Raytracer(Group):
 
         # return flag and collision samples
         return np.any(coll), x2v[where], y2v[where], zfv[where]
-
-    def __absorb_cylinder_rays(self,
-                               p:           np.ndarray,
-                               weights:     np.ndarray,
-                               hw_front:    np.ndarray,
-                               hw_back:     np.ndarray,
-                               hit_front:   np.ndarray,
-                               hit_back:    np.ndarray,
-                               i:           int,
-                               msg:         np.ndarray)\
-            -> None:
-        """
-        Checks if rays intersect with the lens side cylinder. Since the cylinder is not used for raytracing,
-        we need to absorb these rays before they intersect with the cylinder.
-
-        :param p: position array prior surface hit (numpy 2D array, shape (N, 3))
-        :param weights: ray weights (numpy 1D array)
-        :param i: surface number (int)
-        :param hw_front: boolean array of rays handled at front surface
-        :param hw_back: boolean array of rays handled at back surface
-        :param hit_front: boolean array of rays hitting front surface
-        :param hit_back: boolean array of rays hitting back surface
-        """
-
-        if np.all(hit_front) and np.all(hit_back):
-            return
-
-        hit_front_hw = misc.part_mask(hw_front, hit_front)
-        hit_back_hw = misc.part_mask(hw_back, hit_back)
-
-        miss_front_hw = misc.part_mask(hw_front, ~hit_front)
-        miss_back_hw = misc.part_mask(hw_back, ~hit_back)
-
-        abnormal_front = hit_front_hw & miss_back_hw
-        abnormal_back = hit_back_hw & miss_front_hw
-        ab_count_front = np.count_nonzero(abnormal_front)
-        ab_count_back = np.count_nonzero(abnormal_back)
-
-        if ab_count_front:
-            msg[self.INFOS.ONLY_HIT_FRONT, i] += ab_count_front
-            p[abnormal_front, i+1] = p[abnormal_front, i]
-            weights[abnormal_front, i] = 0
-            weights[abnormal_front, i+1] = 0
-
-        if ab_count_back:
-            msg[self.INFOS.ONLY_HIT_BACK, i + 1] += ab_count_back
-            p[abnormal_back, i+1] = p[abnormal_back, i]
-            weights[abnormal_back, i] = 0
-            weights[abnormal_back, i+1] = 0
 
     def __outline_intersection(self,
                                p:           np.ndarray,
@@ -885,7 +822,7 @@ class Raytracer(Group):
                       source_index:      int = None,
                       extent:            list | np.ndarray = None,
                       projection_method: str = "Equidistant") \
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, str, ProgressBar]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
         """
         Internal function for calculating the detector intersection positions
 
@@ -895,7 +832,7 @@ class Raytracer(Group):
         :param extent: extent to detect the intersections in as [x0, x1, y0, y1].
                 Defaults to None, meaning the whole detector are is used
         :param projection_method: sphere projection method for a SphericalSurface detector
-        :return: hit, weights, wavelengths, actual extent, description, projection method, progressbar
+        :return: hit, weights, wavelengths, actual extent, actual projection_method, progressbar
         """
         if not self.detectors:
             raise RuntimeError("Detector Missing")
@@ -1025,7 +962,7 @@ class Raytracer(Group):
         if bar is not None:
             bar.update(3)
 
-        if isinstance(dsurf, SphericalSurface):
+        if isinstance(dsurf, SphericalSurface) and projection_method is not None:
             ph = dsurf.sphere_projection(ph, projection_method)
             projection = projection_method
         else:
@@ -1049,14 +986,7 @@ class Raytracer(Group):
         else:
             raise ValueError(f"Invalid extent '{extent}'.")
 
-        # create description
-        detector = self.detectors[detector_index]
-        pname = f": {detector.desc}" if detector.desc != "" else ""
-        desc = f"{Detector.abbr}{detector_index}{pname} at z = {detector.pos[2]:.5g} mm"
-        if source_index is not None:
-            desc = f"Rays from RS{source_index} at " + desc
-
-        return ph, w, wl, extent_out, desc, projection, bar
+        return ph, w, wl, extent_out, projection, bar
 
     def detector_image(self,
                        detector_index:    int = 0,
@@ -1083,9 +1013,16 @@ class Raytracer(Group):
                     " will produce an incorrect detector image, as the rays outside the extent"
                     " are not included in the convolution calculation.")
 
-        p, w, wl, extent_out, desc, projection, bar\
-            = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
+        p, w, wl, extent_out, projection, bar  = self._hit_detector("Detector Image", detector_index, source_index,
+                                                                    extent, projection_method)
 
+        # create description
+        detector = self.detectors[detector_index]
+        pname = f": {detector.desc}" if detector.desc != "" else ""
+        desc = f"{Detector.abbr}{detector_index}{pname} at z = {detector.pos[2]:.5g} mm"
+        if source_index is not None:
+            desc = f"Rays from RS{source_index} at " + desc
+        
         # init image and extent, these are the default values when no rays hit the detector
         img = RenderImage(long_desc=desc, extent=extent_out, projection=projection)
         img.render(p, w, wl, limit=limit, **kwargs)
@@ -1109,10 +1046,16 @@ class Raytracer(Group):
         :param kwargs: optional keyword arguments for the created LightSpectrum
         :return: rendered LightSpectrum
         """
-        p, w, wl, extent, desc, _, bar\
+        p, w, wl, extent, _, bar\
             = self._hit_detector("Detector Spectrum", detector_index, source_index, extent)
+        
+        # create description
+        detector = self.detectors[detector_index]
+        pname = f": {detector.desc}" if detector.desc != "" else ""
+        desc = f"{Detector.abbr}{detector_index}{pname} at z = {detector.pos[2]:.5g} mm"
+        desc = (f"Spectrum of RS{source_index} at " if source_index is not None else "Spectrum at ") + desc
 
-        spec = LightSpectrum.render(wl, w, long_desc=f"Spectrum of {desc}", **kwargs)
+        spec = LightSpectrum.render(wl, w, long_desc=desc, **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1269,14 +1212,14 @@ class Raytracer(Group):
         return DIm_res
 
     def _hit_source(self, info: str, source_index: int = 0)\
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, ProgressBar]:
         """
         Render a source image for a traced geometry.
         Internal function.
 
         :param N: number of image pixels in the smaller dimension
         :param source_index: source number, defaults to 0
-        :return: positions, weights, wavelengths, actual extent, description, progressbar
+        :return: positions, weights, wavelengths, actual extent, progressbar
         """
         if not self.ray_sources:
             raise RuntimeError("Ray Sources Missing.")
@@ -1295,11 +1238,7 @@ class Raytracer(Group):
         if bar is not None:
             bar.update(1)
 
-        rs = self.ray_sources[source_index]
-        pname = f": {rs.desc}" if rs.desc != "" else ""
-        desc = f"{RaySource.abbr}{source_index}{pname} at z = {rs.pos[2]:.5g} mm"
-
-        return p, w, wl, extent, desc, bar
+        return p, w, wl, extent, bar
 
     def source_spectrum(self, source_index: int = 0, **kwargs) -> LightSpectrum:
         """
@@ -1309,9 +1248,14 @@ class Raytracer(Group):
         :param kwargs: optional keyword arguments for the creation of the LightSpectrum
         :return: rendered LightSpectrum
         """
-        p, w, wl, extent, desc, bar = self._hit_source("Source Spectrum", source_index)
+        p, w, wl, extent, bar = self._hit_source("Source Spectrum", source_index)
 
-        spec = LightSpectrum.render(wl, w, long_desc=f"Spectrum of {desc}", **kwargs)
+        # create description
+        rs = self.ray_sources[source_index]
+        pname = f": {rs.desc}" if rs.desc != "" else ""
+        desc = f"Spectrum of {RaySource.abbr}{source_index}{pname} at z = {rs.pos[2]:.5g} mm"
+        
+        spec = LightSpectrum.render(wl, w, long_desc=desc, **kwargs)
         if bar is not None:
             bar.finish()
 
@@ -1326,7 +1270,12 @@ class Raytracer(Group):
         :param kwargs: optional keyword arguments for creating the RenderImage
         :return: rendered RenderImage
         """
-        p, w, wl, extent, desc, bar = self._hit_source("Source Image", source_index)
+        p, w, wl, extent, bar = self._hit_source("Source Image", source_index)
+        
+        # create description
+        rs = self.ray_sources[source_index]
+        pname = f": {rs.desc}" if rs.desc != "" else ""
+        desc = f"{RaySource.abbr}{source_index}{pname} at z = {rs.pos[2]:.5g} mm"
 
         img = RenderImage(long_desc=desc, extent=extent, projection=None)
 
