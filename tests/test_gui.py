@@ -1174,7 +1174,7 @@ class GUITests(unittest.TestCase):
         sim = TraceGUI(RT)
         sim._exit = True  # leads to run() exiting directly after load
         sim.run()
-    
+   
     @pytest.mark.gui2
     @pytest.mark.timeout(30)  # for some reasons failed checks lead to AssertionErrors 
     # that aren't handled and the program is blocked. See NOTE 5 below

@@ -50,11 +50,8 @@ if __name__ == '__main__':
                     "optrace.ressources", "optrace.ressources.images", "optrace.gui", "optrace.plots"],
           install_requires=['numpy>1.21', 'numexpr', 'chardet', 'scipy>=1.10', 'pyface', 'opencv-python-headless',
                             'vtk<9.3.0', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi @ git+https://github.com/enthought/mayavi'],
-          # TODO loosen pyface restriction if ValueEditor and CodeEditor start to work again in mayavi
-          # see https://github.com/enthought/pyface/releases/tag/8.0.0
-          # see https://github.com/enthought/mayavi/pull/1255
-          # see https://github.com/enthought/mayavi/issues/1252
-          #
+          # NOTE official mayavi package hasn't been updated in a while, use git version instead
+          # NOTE issue with vtk 9.3, see https://github.com/enthought/mayavi/issues/1286
           tests_require=['pyautogui', 'pytest', 'colour-science', 'requests', 'pytest-random-order'],
           package_data={"": ["*.png", "*.jpg", "*.webp", "*.csv"]},   # includes tables and images
           include_package_data=True,

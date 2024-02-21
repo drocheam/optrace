@@ -8,10 +8,10 @@ import numpy as np
                 
 # enforce qt backend  
 from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt4'
+ETSConfig.toolkit = 'qt'
 
 from pyface.api import GUI as pyface_gui  # invoke_later() method
-from pyface.qt import QtGui  # closing UI elements
+from pyface.qt import QtGui, QtCore  # closing UI elements
 
 # traits types and UI elements
 from traitsui.api import Group as TGroup
@@ -474,7 +474,7 @@ class TraceGUI(HasTraits):
         Force an update to traits and unprocessed events.
         """
         # TODO explain in documentation
-        pyface_gui.process_events()
+        QtCore.QCoreApplication.processEvents(QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 10000)
 
     def _start_action(self, func, args = ()) -> None:
         """execute an action. If _sequential is set, is is run in the main thread, in a different thread otherwise"""
@@ -526,7 +526,7 @@ class TraceGUI(HasTraits):
     def _set_gui_loaded(self) -> None:
         """sets GUILoaded Status. Exits GUI if self.exit set."""
 
-        pyface_gui.process_events()
+        self.process()
         self._status["DisplayingGUI"] = 0
 
         if self._exit:
@@ -637,7 +637,7 @@ class TraceGUI(HasTraits):
             return
 
         self._status["Drawing"] += 1
-        pyface_gui.process_events()
+        self.process()
         self.scene.disable_render = True
 
         with self._plot.constant_camera():
@@ -701,14 +701,14 @@ class TraceGUI(HasTraits):
 
         self.scene.disable_render = False
         self.scene.render()
-        pyface_gui.process_events()
+        self.process()
 
         if rdh and self._status["DisplayingGUI"]:  # reset initial loading flag
             # this only gets invoked after raytracing, but with no sources we need to do it here
             pyface_gui.invoke_later(self._set_gui_loaded)
 
         self._status["Drawing"] -= 1
-        pyface_gui.process_events()  # needed so rays are displayed in replot() 
+        self.process()  # needed so rays are displayed in replot() 
         # with _sequential=True (e.g. in TraceGUI.control())
 
     @property
@@ -808,7 +808,7 @@ class TraceGUI(HasTraits):
             # don't do while tracing, RayStorage rays are still being generated
 
             self._status["Drawing"] += 1
-            pyface_gui.process_events()
+            self.process()
 
             if not self.raytracer.ray_sources or not self.raytracer.rays.N:
                 self._plot.remove_rays()

@@ -1,6 +1,7 @@
 # Optrace  -   Geometrical OPtics rayTRACEr and library
 
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/downloads/release/python-3100/)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
 [![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)]()
 [![GPL v3 license](https://img.shields.io/badge/License-GPLv3-blue)](https://opensource.org/licenses/GPL-3.0)
 

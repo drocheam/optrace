@@ -43,7 +43,7 @@ Testing
 **Github Workflows**
 
 * see ``.github/workflows/``
-* Actions: Main testing, OS Compatibility, Python 3.11 Compatibility
+* Actions: Main testing, OS Compatibility, Python 3.10 Compatibility
 * all get run on a push the repository or can get run manually
 
 
