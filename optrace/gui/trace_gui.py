@@ -8,7 +8,7 @@ import numpy as np
                 
 # enforce qt backend  
 from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt'
+ETSConfig.toolkit = 'qt4'
 
 from pyface.api import GUI as pyface_gui  # invoke_later() method
 from pyface.qt import QtGui  # closing UI elements

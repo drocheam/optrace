@@ -228,7 +228,7 @@ def random_from_distribution(x: np.ndarray, f: np.ndarray, S: int | np.ndarray, 
 
     # use all values, linear interpolation
     else:
-        F = scipy.integrate.cumtrapz(f, initial=0)  # much more precise than np.cumsum
+        F = scipy.integrate.cumulative_trapezoid(f, initial=0)  # much more precise than np.cumsum
 
         # make inverse of cdf
         # don't use higher orders than linear, since function could be noisy
