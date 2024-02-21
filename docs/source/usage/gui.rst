@@ -7,8 +7,9 @@ Using the GUI
    :hide:
 
    import optrace as ot
-   from optrace.gui import TraceGUI
    ot.global_options.show_progressbar = False
+   
+   from optrace.gui import TraceGUI
 
 .. role:: python(code)
   :language: python

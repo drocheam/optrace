@@ -41,7 +41,7 @@ jobs:
       run: tox -e docsbuildcheck -- -v
 
     - name: Test code snippets
-      run: tox -e doctest -- -v
+      run: tox -r -e doctest -- -v
 
     - name: Test links
       run: tox -e linkcheck -- -v 

@@ -2,6 +2,7 @@
 
 import optrace as ot
 from optrace.gui import TraceGUI
+ot.global_options.show_progressbar = False
 
 # test image
 image = ot.presets.image.tv_testcard1([4, 4])

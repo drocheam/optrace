@@ -11,9 +11,9 @@ g = 0.6e3  # object distance
 G_alpha = 4  # angle of object in view
 P = 3  # pupil diameter
 image = ot.presets.image.ETDRS_chart_inverted  # test image
-position = "average"  # keratoconus cone position (see "positions" dictionary below)
+position = "far"  # keratoconus cone position (see "positions" dictionary below)
 cases = [0, 4, 7, 14]  # cases to simulate (see "gauss_params" list below)
-delta_A = 0#-1.5  # relative eye adaption / refractive error from correct focus
+delta_A = 0 # 1.5  # relative eye adaption / refractive error from correct focus
 
 # Table 1 of Tan et. al (2008) (https://jov.arvojournals.org/article.aspx?articleid=2158188)
 #   h0     sigma_x  sigma_y  Number       Category 
