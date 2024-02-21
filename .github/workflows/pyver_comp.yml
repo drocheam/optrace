@@ -19,6 +19,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
+    # see https://stackoverflow.com/questions/72874772/pytest-core-dump-on-unbutu-22-04-lts-when-using-pyqt5-with-mayavi-and-pyvirtuald
+    - name: Install Qt5
+      run: |
+        sudo apt-get update
+        sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake
             
     # needed for the x-server to work
     - name: Setup headless display
