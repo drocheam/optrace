@@ -14,19 +14,20 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest]
         python-version: ['3.11']
+      fail-fast: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 25
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
             
     # needed for the x-server to work
     - name: Setup headless display
-      uses: pyvista/setup-headless-display-action@v1
+      uses: pyvista/setup-headless-display-action@v2
       
     # set up python and dependecies
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies

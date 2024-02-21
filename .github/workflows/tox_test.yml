@@ -18,7 +18,7 @@ jobs:
         python-version: ['3.11']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     # see https://stackoverflow.com/questions/72874772/pytest-core-dump-on-unbutu-22-04-lts-when-using-pyqt5-with-mayavi-and-pyvirtuald
     - name: Install Qt5
@@ -28,7 +28,7 @@ jobs:
         
     # needed for the x-server to work
     - name: Setup headless display
-      uses: pyvista/setup-headless-display-action@v1
+      uses: pyvista/setup-headless-display-action@v2
       
     # needed for pyautogui
     # see https://micwan88.github.io/linux/xauth/2019/10/16/create-xauthority-manually.html
@@ -39,7 +39,7 @@ jobs:
         
     # set up python and dependencies
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
