@@ -49,7 +49,7 @@ if __name__ == '__main__':
                     "optrace.tracer.geometry.volume", "optrace.tracer.spectrum", "optrace.tracer.presets", 
                     "optrace.ressources", "optrace.ressources.images", "optrace.gui", "optrace.plots"],
           install_requires=['numpy>1.21', 'numexpr', 'chardet', 'scipy>=1.10', 'pyface<8', 'opencv-python-headless',
-                            'vtk', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi @ git+https://github.com/enthought/mayavi/zipball/master'],
+                            'vtk', 'PyQt5', 'matplotlib', 'progressbar2', 'mayavi @ git+https://github.com/enthought/mayavi'],
           # TODO loosen pyface restriction if ValueEditor and CodeEditor start to work again in mayavi
           # see https://github.com/enthought/pyface/releases/tag/8.0.0
           # see https://github.com/enthought/mayavi/pull/1255
