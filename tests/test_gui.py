@@ -187,7 +187,7 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.gui2
     @pytest.mark.slow
-    def test_0interaction1(self) -> None:
+    def test_interaction1(self) -> None:
 
         def interact(sim):
             with self._try(sim):
