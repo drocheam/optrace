@@ -43,8 +43,8 @@ class TraceGUI(HasTraits):
 
     # Ranges
 
-    ray_count: Range = Range(1, Raytracer.MAX_RAYS, 200000, desc='Number of rays for Simulation', enter_set=True,
-                             auto_set=False, label="Rays", mode='text')
+    ray_count: Range = Range(1, 50000000, 200000, desc='Number of rays for Simulation', enter_set=True,
+                             auto_set=False, label="Rays", mode='spinner')
     """Number of rays for raytracing"""
     
     filter_constant: Range = Range(0.3, 50., 1., desc='filter constant', enter_set=True,
@@ -854,6 +854,16 @@ class TraceGUI(HasTraits):
             return
 
         elif self.raytracer.ray_sources:
+
+            # TODO test and better message
+            nt = len(self.raytracer.tracing_surfaces) + 2
+            if self.raytracer.rays.storage_size(self.ray_count, nt) > self.raytracer.MAX_RAY_STORAGE_RAM:
+                warning(f"Resetting the ray_count number since more than {self.raytracer.MAX_RAY_STORAGE_RAM*1e-9:.1f} GB RAM requested."
+                         " Either decrease the number of rays, surfaces or do an iterative render. "
+                         "If your system can handle"
+                         " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")
+                pyface_gui.set_trait_later(self, "ray_count", event.old)
+                return
 
             self._status["Tracing"] += 1
 

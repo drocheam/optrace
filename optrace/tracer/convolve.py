@@ -4,17 +4,13 @@ from threading import Thread
 import numpy as np
 import scipy.signal
 import cv2
-
 from progressbar import progressbar, ProgressBar  
 
 from . import color
-
 from ..tracer.misc import PropertyChecker as pc
 from ..tracer.image import RGBImage, LinearImage, RenderImage
-
 from .. import global_options
 from ..warnings import warning
-
 
 
 def convolve(img:                RGBImage | LinearImage, 

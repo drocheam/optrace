@@ -329,8 +329,8 @@ class ImageTests(unittest.TestCase):
 
             # IOError
             self.assertRaises(IOError, Image, "hjkhjkhjkhjk.png", [2, 2])  # invalid path
-            assert os.path.exists("setup.py")
-            self.assertRaises(IOError, Image, "setup.py", [2, 2])  # invalid format
+            assert os.path.exists("pyproject.toml")
+            self.assertRaises(IOError, Image, "pyproject.toml", [2, 2])  # invalid format
            
         # tests only for RGBImage
         self.assertRaises(ValueError, ot.RGBImage, np.ones((100, 100, 3))*1.001, [2, 2])  # data above 1

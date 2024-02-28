@@ -167,7 +167,7 @@ class TracerTests(unittest.TestCase):
         
         RT.add(ot.RaySource(ot.Point(), pos=[0, 0, 0]))
         self.assertRaises(ValueError, RT.trace, 0)  # too few rays
-        self.assertRaises(ValueError, RT.trace, 100000000000)  # too many rays
+        self.assertRaises(RuntimeError, RT.trace, 100000000000)  # too many rays
 
 
         # additional ray source geometry checks

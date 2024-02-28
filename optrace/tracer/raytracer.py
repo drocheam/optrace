@@ -37,8 +37,8 @@ class Raytracer(Group):
     values below this are handled as absorbed
     needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power"""
 
-    MAX_RAYS: int = 6000000
-    """ maximum number of rays. Limited by RAM usage """
+    MAX_RAY_STORAGE_RAM: int = 8000000000
+    """ Maximum available RAM for the stored rays """
 
     ITER_RAYS_STEP: int = 1000000
     """ number of rays per iteration in Raytracer.iterative_render()"""
@@ -229,9 +229,6 @@ class Raytracer(Group):
         if N < 1:
             raise ValueError(f"Ray number N needs to be at least 1, but is {N}.")
 
-        if N > self.MAX_RAYS:
-            raise ValueError(f"Ray number exceeds maximum of {self.MAX_RAYS}")
-
         # make element list and check geometry
         self.__geometry_checks()
         if self.geometry_error and not self._ignore_geometry_error:
@@ -257,9 +254,15 @@ class Raytracer(Group):
         # reserve space for all tracing surface intersections, +1 for invisible aperture at the outline z-end
         # and +1 for the ray starting points
         nt = len(self.tracing_surfaces) + 2
+       
+        # TODO test
+        if self.rays.storage_size(N, nt) > self.MAX_RAY_STORAGE_RAM:
+            raise RuntimeError(f"More than {self.MAX_RAY_STORAGE_RAM*1e-9:.1f} GB RAM requested. Either decrease"
+                                " the number of rays, surfaces or do an iterative render. If your system can handle"
+                                " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")
 
         cores = ne.detect_number_of_cores()
-        N_threads = cores if N/cores >= 10000 and global_options.multithreading else 1
+        N_threads = max(1, min(cores, int(N/30000))) if global_options.multithreading else 1
         N_threads = self._force_threads if self._force_threads is not None else N_threads  # overwrite if forced
 
         # will hold info messages from each thread
@@ -271,6 +274,7 @@ class Raytracer(Group):
 
         # create rays from RaySources
         self.rays.init(self.ray_sources, N, nt, self.no_pol)
+
 
         def sub_trace(N_threads: int, N_t: int) -> None:
 

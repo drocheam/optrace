@@ -1,0 +1,78 @@
+
+[project]
+name = "optrace"
+dynamic = ["version"]
+authors = [{name = "Damian Mendroch", email =  "damian.mendroch@th-koeln.de"}]
+maintainers = [{name = "Damian Mendroch", email = "damian.mendroch@th-koeln.de"}]
+description = "An optics simulation package with sequential raytracing, image rendering and a gui frontend" 
+keywords = ["simulation", "optics", "raytracing"]
+readme = "ReadMe.md"
+license = {text = "not specified yet"}
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "numpy>1.21", 
+    "numexpr", 
+    "chardet", 
+    "scipy>=1.10", 
+    "pyface", 
+    "opencv-python-headless",
+    "vtk<9.3.0", 
+    "PyQt5", 
+    "matplotlib", 
+    "progressbar2", 
+    "mayavi @ git+https://github.com/enthought/mayavi"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    # "License :: OSI Approved :: # TODO add license
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Programming Language :: Python ::  3.10",
+    "Programming Language :: Python ::  3.11",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries"
+]
+
+[project.urls]
+#Homepage = ""
+Repository = "https://www.github.com/drocheam/optrace"
+#Documentation = ""
+#Changelog = ""
+
+[project.optional-dependencies]
+tests = [
+    "pyautogui", 
+    "pytest",
+    "coverage",
+    "colour-science", 
+    "requests",
+    "pytest-timeout",
+    "pytest-random-order"
+]
+docs = [
+    "tox",
+    "sphinx",
+    "sphinxcontrib-bibtex",
+    "pydata-sphinx-theme"
+]
+
+[build-system]
+requires = ["setuptools >= 61.0", "numpy>1.21"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["optrace", "optrace.plots", "optrace.gui"]
+include-package-data = true
+dynamic = {version = {attr = "optrace.metadata.version"}}
+package-data = {optrace = ["*.png", "*.jpg", "*.webp", "*.csv"]}
+

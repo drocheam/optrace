@@ -85,6 +85,14 @@ class RayStorage(BaseClass):
         self.n_list = np.zeros((N, nt), dtype=np.float64, order='F')
         self.wl_list = np.zeros(N, dtype=np.float32)
 
+    # TODO document and test
+    def storage_size(self, N: int, nt: int):
+        """
+        """
+        f16, f32, f64 = 2, 4, 8
+        fpol = f32 if not self.no_pol else f16
+        return N*nt*3*f64 + N*3*f64 + N*nt*3*fpol + N*nt*f32 + N*nt*f64 + N*f32
+
     @property
     def N(self) -> int:
         """number of rays"""

@@ -8,11 +8,11 @@ Installation
   :language: python
   :class: highlight
 
-This library requires Python 3.10.
+This library requires Python 3.10 or Python 3.10.
 
 **Instructions**
 
-#. make sure you have Python 3.10 installed on your system
+#. make sure you have Python 3.10 or 3.11 installed on your system
 #. download/clone the whole project repository. This is the folder that includes the ``optrace``-folder as well as the ``setup.py`` file.
 #. open a terminal in the downloaded folder and run :python:`pip install .` :math:`\leftarrow` Note that the dot is part of the command.
 
@@ -56,9 +56,9 @@ After this, `optrace` should be installed on your system.
 
 * When mayavi fails installing vtk, try to install vtk first
 
-* When the installation of vtk fails, try to install older wheels from `this repository <https://github.com/pyvista/pyvista-wheels>`__.
+* When the installation of vtk fails, try to install from a list of other wheels from `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
 
 * Consult the `mayavi issues <https://github.com/enthought/mayavi/issues>`__, `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ or `PyQt5 issues <https://github.com/pyqt/python-qt5/issues>`__ for current problems and solutions
 
-* In many cases forcing the installation of a specific library version circumvents issues of newer releases. The syntax is shown `here <https://stackoverflow.com/a/5226504>`__. Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
+* In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. The syntax is shown `here <https://stackoverflow.com/questions/5226311/installing-specific-package-version-with-pip/5226504#5226504>`__. Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
 

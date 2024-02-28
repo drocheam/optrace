@@ -3,7 +3,6 @@
 import numpy as np
 
 import optrace as ot
-from optrace.gui import TraceGUI
 
 
 def rt_example() -> ot.Raytracer:
