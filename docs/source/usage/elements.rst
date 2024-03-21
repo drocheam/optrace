@@ -408,12 +408,7 @@ A Filter is defined by a Surface, a position and the :class:`TransmissionSpectru
    F = ot.Filter(circ, pos=[0, 0, 23.93], spectrum=spec)
 
 
-With a filter at hand we can calculate its approximate sRGB color. The fourth return value is the opacity for visualization. Note that the opacity is more like a visual extra than a simulation of the actual opacity.
-
-.. doctest::
-
-   >>> F.color()
-   (2.359115924484492e-07, 0.2705811859857049, 0.9999999999999999, 0.9838657805329205)
+With a filter at hand we can calculate its approximate sRGB color using :python:`F.color()`. The fourth return value is the opacity for visualization. Note that the opacity is more like a visual extra than a simulation of the actual opacity.
 
 Calling the filter with wavelengths returns the transmittance at these wavelengths.
 

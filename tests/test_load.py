@@ -151,6 +151,7 @@ class LoadTests(unittest.TestCase):
         
         os.remove("temp.zmx")
     
+    @pytest.mark.os
     def test_zmx_portrait_lens(self):
         """load an potrait lens example"""
 
@@ -263,7 +264,7 @@ class LoadTests(unittest.TestCase):
 
         os.remove("temp.zmx")
     
-    @pytest.mark.os
+    @pytest.mark.skip(reason="Cloudflare protection seems to be active.")
     def test_zmx_plan_concave(self):
         """zmx of a single lens, so only two surfaces"""
 
