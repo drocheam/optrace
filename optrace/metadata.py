@@ -1,6 +1,6 @@
 
 name = "optrace"
-version = "1.5.6"
+version = "1.5.7"
 author = "Damian Mendroch"
 # license = ""
 url = "https://github.com/drocheam/optrace"

@@ -8,7 +8,7 @@ description = "An optics simulation package with sequential raytracing, image re
 keywords = ["simulation", "optics", "raytracing"]
 readme = "ReadMe.md"
 license = {text = "not specified yet"}
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10,<=3.12"
 dependencies = [
     "numpy>1.21", 
     "numexpr", 
@@ -16,7 +16,7 @@ dependencies = [
     "scipy>=1.10", 
     "pyface", 
     "opencv-python-headless",
-    "vtk<9.3.0", 
+    "vtk", 
     "PyQt5", 
     "matplotlib", 
     "progressbar2", 

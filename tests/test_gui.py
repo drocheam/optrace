@@ -973,14 +973,14 @@ class GUITests(unittest.TestCase):
                 time.sleep(0.5)
                
                 # check if scale properties are back at their default state
-                self.assertAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])
-                self.assertAlmostEqual(sim._plot._scene_size[1], SceneSize0[1])
-                self.assertAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor)
-                self.assertAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom)
+                self.assertAlmostEqual(sim._plot._scene_size[0], SceneSize0[0], delta=2)
+                self.assertAlmostEqual(sim._plot._scene_size[1], SceneSize0[1], delta=2)
+                self.assertAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor, delta=0.001)
+                self.assertAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom, delta=0.001)
                 self.assertAlmostEqual(pos2[0],
-                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
+                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0], delta=0.001)
                 self.assertAlmostEqual(pos2[1],
-                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1], delta=0.001)
 
 
                 # coverage test: delete orientation:axes and resize

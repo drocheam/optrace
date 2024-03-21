@@ -70,7 +70,8 @@ html_static_path = ['_static']
 html_css_files = ['css/custom.css']
 
 html_theme_options = {
-    "secondary_sidebar_items": ["page-toc", "sidebar-nav-bs-auto"],  # add navigation to secondary sidebar
+    "secondary_sidebar_items": ["page-toc"],  # add navigation to secondary sidebar
+    "navbar_align": "content",
     "icon_links": [{"name": "GitHub",
                     "url": "https://github.com/drocheam/optrace",
                     "icon": "fa-brands fa-square-github",
@@ -83,9 +84,10 @@ html_theme_options = {
    # "default_mode": "light"  # force light mode
 # }
 
-# turn off primary side bar
+# primary side bar
 html_sidebars = {
-  "**": []
+  "**": ["sidebar-nav-bs"],
+  "index": ["sidebar-nav-bs-index", "indices"],
 }
 
 numfig = True

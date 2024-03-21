@@ -100,16 +100,16 @@ class ColorTests(unittest.TestCase):
 
     def test_outside_srgb(self):
 
-        # negative srgb values are outside the gamut
-        srgbl = np.random.uniform(-1, 1, (500, 500, 3))
+        # random xyz values 
+        xyz = np.random.uniform(-1, 1, (500, 500, 3))
 
-        # convert to xyz
-        xyz = color.srgb_linear_to_xyz(srgbl)
+        # convert to linear sRGB
+        srgbl = color.xyz_to_srgb_linear(xyz, rendering_intent="Ignore")
 
         # check which lie outside
         og = color.outside_srgb_gamut(xyz)
 
-        # check if those are true that had negative srgb values to begin with
+        # check if those are true that have negative srgb values
         self.assertTrue(np.all(og == np.any(srgbl < 0, axis=2)))
 
     def test_srgb_conversion(self):

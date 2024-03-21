@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.5.6   |   2024-02-28   |   Migrated from setup.py to pyproject.toml. There's now a ray RAM limit. 
   1.5.5   |   2024-01-10   |   Removed tracing with absorb_missing=False. Renamed multiple TraceGUI traits. 
   1.5.4   |   2024-01-09   |   detector_image() and detector_cut() in TraceGUI now support extent parameter. New pick_ray(), pick_ray_section() and reset_picking() functions in TraceGUI. 
   1.5.3   |   2024-01-05   |   New LinearImage, RGBImage classes. RImage renamed to RenderImage. RaySource now supports LinearImage. 

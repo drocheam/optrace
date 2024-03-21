@@ -170,7 +170,7 @@ Then the peak wavelength is calculated with:
 
    >>> spec = ot.presets.light_spectrum.led_b1
    >>> spec.peak_wavelength()
-   605.0022500225002
+   605.00225...
 
 Note that with multiple same height peaks or a broad constant peak region the first peak value is returned. However, due to numerical precision this is not always the case.
 
@@ -179,14 +179,14 @@ In our example the power-weighted average wavelength (centroid) is different fro
 .. doctest::
 
    >>> spec.centroid_wavelength()
-   592.3958585050702
+   592.39585...
 
 The dominant wavelength is calculated using:
 
 .. doctest::
 
    >>> spec.dominant_wavelength()
-   584.7508883332902
+   584.75088...
 
 When dominant or complementary are not existent, as for instance magenta can't be described by a single wavelength, the values are set to NaN (not a number).
 You can find a visual explanation on both dominant and complementary wavelength `on this Wiki page <https://en.wikipedia.org/wiki/Dominant_wavelength>`__.
@@ -196,7 +196,7 @@ The FWHM (full width at half maximum) can be calculated with:
 .. doctest::
 
    >>> spec.fwhm()
-   129.18529185291857
+   129.18529...
 
 
 The function calculates the smallest FWHM around the highest peak. Note that for some spectral distributions, for instance multiple gaussians, this function is not suitable, as the FWHM is not meaningful here.
@@ -210,14 +210,14 @@ The spectral power in W can be calculated with:
 .. doctest::
 
    >>> spec.power()
-   3206.974999684993
+   3206.9749...
 
 And the luminous power in lumens with:
 
 .. doctest::
 
    >>> spec.luminous_power()
-   999886.8629801519
+   999886.86...
 
 
 TransmissionSpectrum

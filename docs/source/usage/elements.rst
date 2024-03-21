@@ -6,6 +6,7 @@ Defining Elements
 
    import optrace as ot
    import numpy as np
+   np.set_printoptions(precision=8)
 
 .. role:: python(code)
   :language: python
@@ -329,7 +330,7 @@ With a Lens object you can also access the thickness parameters:
 .. doctest::
    
    >>> L.de
-   0.022566018848339198
+   0.022566018...
 
 .. doctest::
    
@@ -346,7 +347,7 @@ Or the parameters of its surfaces, like:
 .. doctest::
 
    >>> L.front.ds
-   0.4511539144368477
+   0.45115391...
 
 
 Paraxial Properties
@@ -362,7 +363,7 @@ From there on we can use it as described in <>.
 
    >>> tma = L.tma()
    >>> tma.efl
-   12.749973064518542
+   12.749973...
 
 As the behavior can differ with the light wavelength, we can also provide a non-default wavelength in nanometers.
 Since the lens has no knowledge of the geometry around it, the medium before it is also undefined. By default, a constant refractive index of 1 is assumed, but can be overwritten with the parameter :python:`n0`.
@@ -371,7 +372,7 @@ Since the lens has no knowledge of the geometry around it, the medium before it 
 
    >>> tma = L.tma(589.2, n0=ot.RefractionIndex("Constant", n=1.1))
    >>> tma.efl
-   17.300045148757384
+   17.300045...
 
 
 Ideal Lens

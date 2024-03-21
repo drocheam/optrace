@@ -3,7 +3,7 @@
 html {
 	/*--pst-header-height: 2rem;*/
     /*--pst-font-family-base-system: "Times New Roman", serif;*/
-	/*--pst-font-size-base: 16px;*/
+    --pst-font-size-base: 14px;
 	--pst-font-size-h1: 26px;
 	--pst-font-size-h2: 24px;
 	--pst-font-size-h3: 22px;
@@ -19,14 +19,14 @@ body {
 }
 
 /*increase page size*/
-/*.bd-page-width {*/
-    /*max-width: 95rem;*/
-/*}*/
+.bd-page-width {
+    max-width: 100%;
+}
 
 /*set "Section Navigation" title in side bar to normal size*/
-nav.bd-links p.bd-links__title {
-    font-size: unset;
-}
+/*nav.bd-links p.bd-links__title {*/
+    /*font-size: unset;*/
+/*}*/
 
 
 /**additional padding from pydata-sphinx theme cuts parts off the mathjax box**/
@@ -37,7 +37,12 @@ div.math mjx-container {
 
 /*increase size of article content from 60rem to 80rem*/
 .bd-main .bd-content .bd-article-container {
-   max-width: 80rem;
+   max-width: 100%;
+}
+
+/*lower primary sidebar size*/
+.bd-sidebar-primary {
+    max-width: 20rem;
 }
 
 /*unset "width 100%" for a table so width gets adjusted automatically*/
@@ -45,13 +50,17 @@ div.math mjx-container {
 	width: unset;
 	margin-top: 1rem;
 	margin-bottom: 2rem;
-	color: unset;
 }
 
 /*lower row padding in tables*/
 .table td, .table th {
     padding: 0.1rem;
 	/*vertical-align: middle;*/
+}
+
+/*fixes lists inside table cells*/
+.table dt, .table dd {
+    color: var(--pst-color-text-base);
 }
 
 /**move "back to top" button down**/
