@@ -473,7 +473,6 @@ class TraceGUI(HasTraits):
         """
         Force an update to traits and unprocessed events.
         """
-        # TODO explain in documentation
         QtCore.QCoreApplication.processEvents(QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 10000)
 
     def _start_action(self, func, args = ()) -> None:
@@ -536,13 +535,13 @@ class TraceGUI(HasTraits):
     # Interface functions
     ####################################################################################################################
 
-    def screenshot(self, *args, **kwargs) -> None:
+    def screenshot(self, path: str, **kwargs) -> None:
         """
         Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
         See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
         """
         self._status["Screenshot"] += 1
-        self._plot.screenshot(*args, **kwargs)
+        self._plot.screenshot(path, **kwargs)
         self._status["Screenshot"] -= 1
 
     def set_camera(self, 
@@ -855,13 +854,13 @@ class TraceGUI(HasTraits):
 
         elif self.raytracer.ray_sources:
 
-            # TODO test and better message
             nt = len(self.raytracer.tracing_surfaces) + 2
-            if self.raytracer.rays.storage_size(self.ray_count, nt) > self.raytracer.MAX_RAY_STORAGE_RAM:
-                warning(f"Resetting the ray_count number since more than {self.raytracer.MAX_RAY_STORAGE_RAM*1e-9:.1f} GB RAM requested."
-                         " Either decrease the number of rays, surfaces or do an iterative render. "
-                         "If your system can handle"
-                         " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")
+            if self.raytracer.rays.storage_size(self.ray_count, nt, self.raytracer.rays.no_pol)\
+                    > self.raytracer.MAX_RAY_STORAGE_RAM:
+                warning(f"Resetting the ray_count number since more than {self.raytracer.MAX_RAY_STORAGE_RAM*1e-9:.1f}"
+                        " GB RAM requested. Either decrease the number of rays, surfaces or do an iterative render. "
+                        "If your system can handle"
+                        " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")
                 pyface_gui.set_trait_later(self, "ray_count", event.old)
                 return
 

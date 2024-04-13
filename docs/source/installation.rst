@@ -8,11 +8,11 @@ Installation
   :language: python
   :class: highlight
 
-This library requires Python 3.10 or Python 3.10.
+This library requires Python 3.10, 3.11 or 3.12.
 
 **Instructions**
 
-#. make sure you have Python 3.10 or 3.11 installed on your system
+#. make sure you have Python 3.10, 3.11 or 3.12 installed on your system
 #. download/clone the whole project repository. This is the folder that includes the ``optrace``-folder as well as the ``setup.py`` file.
 #. open a terminal in the downloaded folder and run :python:`pip install .` :math:`\leftarrow` Note that the dot is part of the command.
 

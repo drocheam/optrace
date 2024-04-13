@@ -6,7 +6,7 @@ Code Reference
    :maxdepth: 2
    
    structure
-   optrace_global_options
+   optrace_global_module
    optrace_tracer
    optrace_tracer_color
    optrace_tracer_geometry

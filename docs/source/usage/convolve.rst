@@ -177,7 +177,6 @@ _____________________
 
 `optrace` features presets for different PSF shapes.
 In the next section a gallery of point spread function presets can be found.
-Alternatively a more mathematical description is featured in section :numref:`math_psf_presets`.
 
 All presets are normalized such that the image sum is 1.
 
@@ -194,11 +193,29 @@ A circle PSF is defined using the :python:`d` parameter that defines the circle 
 A gaussian function can model the zeroth order shape of an airy disc.
 The shape parameter `sig` defines the gaussian's standard deviation.
 
+A simple gaussian intensity distribution is described as:
+
+.. math::
+
+   I_{\sigma}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)
+
 .. testcode::
 
    psf = ot.presets.psf.gaussian(sig=2.0) 
 
 **Airy**
+
+The Airy function is:
+
+.. math::
+
+   I_{d}(x, y) = \left( \frac{2 J_1(r_d)}{r_d} \right)^2
+
+.. math::
+
+   r_d = 3.8317 \frac{\sqrt{x^2 + y^2}}{r}
+
+The resolution limit is described as distance from the center to the first function zero, so the diameter describes the distance between the zero on one and the other side.
 
 An Airy PSF also include higher order diffraction and is also characterized by the resolution limit which is the first zero crossing position relative to its core.
 
@@ -207,6 +224,12 @@ An Airy PSF also include higher order diffraction and is also characterized by t
    psf = ot.presets.psf.airy(r=2.0) 
 
 **Glare**
+
+A glare consists of two different gaussians. Parameter :math:`a` describes the relative intensity of the larger one.
+
+.. math::
+
+  I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
 
 The glare consists of two gaussians, the first with parameter :python:`sig1`, the other with larger :python:`sig2` and relative intensity :python:`a`.
 
@@ -217,12 +240,19 @@ The glare consists of two gaussians, the first with parameter :python:`sig1`, th
 
 **Halo**
 
+A halo consists of a central gaussian and annular gaussian function around :math:`r`.
+:math:`\sigma_1, \sigma_2` describe the standard deviations of the gaussians.
+:math:`a` describes the intensity of the ring.
+
+.. math::
+
+   I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
+
 A halo consists of a center gaussian with :python:`sig1` and intensity 1, as well as a ring at :math:`r` with standard deviation :python:`sig2` with intensity :math:`a`.
 
 .. testcode::
 
    psf = ot.presets.psf.halo(sig1=0.5, sig2=0.25, r=3.5, a=0.05) 
-
 
 
 .. _psf_preset_gallery:

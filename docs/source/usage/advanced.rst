@@ -223,9 +223,6 @@ The function still returns a tuple of 7 elements, but undesired elements have va
 See the code reference of :func:`rays_by_mask <optrace.tracer.ray_storage.RayStorage.rays_by_mask>` for more detail.
 
 
-.. TODO part on global_options
-
-
 Object Descriptions
 _____________________________
 

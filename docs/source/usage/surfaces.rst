@@ -1,5 +1,5 @@
-Base Shapes
-----------------------
+Base Shapes (Surface, Line, Point)
+------------------------------------
 
 .. |Element| replace:: :class:`Element <optrace.tracer.geometry.element.Element>`
 
@@ -50,7 +50,6 @@ To create a point simply write:
 
    P = ot.Point()
 
-
    
 A line with radius 2 and an angle of 40 degrees to the x-axis can be defined using:
 
@@ -96,6 +95,8 @@ A circle/disc of radius 3.5 can be created with:
 
    Disc = ot.CircularSurface(r=3.5)
 
+Ring Surface with function :math:`z(x,~y)=z_0` and being defined by a circular area around
+:math:`\vec{q} = (x_0, y_0, z_0)` with radius :math:`r` and inner radius :math:`0 < r_i < r`
 
 When constructing a ring surface and additional inner radius :math:`r_\text{i}` is required:
 
@@ -121,6 +122,29 @@ _____________________
    :align: center
 
    TiltedSurface geometry
+
+.. math::
+   \text{normal vector:}~~~~   \vec{n} &= (n_x, n_y, n_z)\\
+   \text{surface center vector:}~~~~ \vec{q} &= (x_0, y_0, z_0)\\
+   \text{point on surface:}~~~~ \vec{p} &= (x, y, z)\\
+
+point normal equation for a plane:
+
+.. math::
+   (\vec{p} - \vec{q})\cdot \vec{n} = 0
+   :label: plane_normal_eq_tilted_surface
+
+being equivalent to
+
+.. math::
+   (x - x_0) \cdot n_x + (y- y_0) \cdot n_y + (z-z_0)\cdot n_z = 0
+   :label: tilted_surface0
+
+can be rearranged to the surface function for :math:`n_z \neq 0`:
+
+.. math::
+   z(x, y) = z_0 - (x - x_0) \cdot \frac{n_x}{n_z} - (y- y_0) \cdot \frac{n_y}{n_z}
+   :label: tilted_surface
 
 A :class:`TiltedSurface <optrace.tracer.geometry.surface.tilted_surface.TiltedSurface>` has a circular projection in the xy-plane, but has a surface normal that is generally not parallel to the optical axis.
 It can be used for creating prisms or tilted glass plates.
@@ -157,8 +181,21 @@ Constructing such a surface is done with:
 
    sph = ot.SphericalSurface(r=2.5, R=-12.458)
 
+Internally, a spherical surface is handled as conic surface (explained in the subsequent section) with :math:`k=0`.
 
 **Conic Surface**
+
+.. math::
+   :label: conic
+
+   z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}}
+
+
+with
+
+.. math::
+   r^2 = (x-x_0)^2 + (y-y_0)^2
+   :label: asphere_r
 
 .. figure:: ../images/conic_surface.svg
    :width: 750
@@ -174,12 +211,17 @@ A :class:`ConicSurface <optrace.tracer.geometry.surface.conic_surface.ConicSurfa
    conic = ot.ConicSurface(r=2.5, R=23.8, k=-1)
 
 A visualization of different conical constants can be found in :footcite:`ConicWiki`.
-The mathematical formulation of such a surface is later described in the in-depth documentation in :numref:`conic_surface`.
 
 **Aspheric Surface**
 
+An aspheric surface is a conic surface with additional :math:`m` even order polynomial components :math:`a_1, ..., a_m`.
+
+.. math::
+   :label: asphere
+
+   z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}} + \sum_{i=1}^{m} a_i \cdot r^{2i}
+
 An :class:`AsphericSurface <optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface>` has additional polynomial components :math:`a_0 r^2 + a_1 r^4 + \dots`, where :math:`a_0,~a_1,\dots` are the polynomical coefficients given in powers of millimeters. 
-The fully mathematical formulation for an aspheric surface is found in :numref:`aspheric_surface`.
 
 For :math:`a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}` the surface is created like this:
 
@@ -358,41 +400,11 @@ Below you can see some additional geometrical quantities that are useful when mo
 There is a smallest three-dimensional box encompassing all of the surface. It can be described by four values, the :python:`extent`. It consists of two values per dimension, where each describes one of the bounds in this dimension.
 
 
-.. _surface_plotting:
-
 Plotting
-__________________________
+_________________
 
-Visualizing surfaces is done with the function :func:`surface_profile_plot <optrace.plots.misc_plots.surface_profile_plot>` from :mod:`optrace.plots`.
-The surface profiles are plotted with absolute coordinates, if you want to display them relative to each other provide :python:`remove_offset=True`.
-:python:`surface_profile_plot` takes a Surface or a list of Surfaces as argument as well as some other display options.
 
-In the following examples both cornea surfaces of the arizona eye model are plotted:
-
-.. testcode::
-
-   import optrace.plots as otp
-
-   G = ot.presets.geometry.arizona_eye()
-   L0 = G.lenses[0]
-
-   otp.surface_profile_plot([L0.front, L0.back], remove_offset=True)
-   
-
-Optionally a :python:`title` parameter can be provided. You can plot only part of the profiles by providing values for :python:`x0` and :python:`xe`.
-
-.. testcode::
-
-   otp.surface_profile_plot([L0.front, L0.back], remove_offset=True, x0=-0.5, xe=1.2, title="Cornea Surfaces")
-
-This produces the following plot:
-
-.. figure:: ../images/surface_profile_plot.svg
-   :align: center
-   :width: 550
-
-   Surface profile plot for the two cornea surfaces of the arizona eye model.
-
+See :ref:`surface_plotting`.
 
 
 ------------

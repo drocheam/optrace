@@ -3,7 +3,6 @@ from contextlib import contextmanager  # context managers
 
 import numpy as np
 
-# TODO documentation
 
 
 class ClassGlobalOptions:

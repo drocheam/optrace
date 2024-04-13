@@ -263,7 +263,7 @@ Otherwise the rectangular extent gets calculated from the outermost rays.
 
 If the detector is not planar (e.g. a sphere section) the coordinates are first mapped with a projection method that are described in :numref:`sphere_projections`.
 For all hitting rays a two-dimensional histogram is generated, with a beforehand defined pixel size.
-The pixel count is higher as requested, as each image is rendered in a higher resolution to allow for resolution changes after rendering, see :numref:`rimage_overview`.
+The pixel count is higher as requested, as each image is rendered in a higher resolution to allow for resolution changes after rendering, see :numref:`rimage_rendering`.
 
 Image rendering is also done in threads.
 The created RImage object hold images for the three tristimulus values X, Y, Z, that can encompass all human-visible colors.

@@ -3,7 +3,7 @@
 html {
 	/*--pst-header-height: 2rem;*/
     /*--pst-font-family-base-system: "Times New Roman", serif;*/
-    --pst-font-size-base: 14px;
+    /*--pst-font-size-base: 14px;*/
 	--pst-font-size-h1: 26px;
 	--pst-font-size-h2: 24px;
 	--pst-font-size-h3: 22px;
@@ -20,7 +20,7 @@ body {
 
 /*increase page size*/
 .bd-page-width {
-    max-width: 100%;
+    max-width: 90%;
 }
 
 /*set "Section Navigation" title in side bar to normal size*/
@@ -37,7 +37,7 @@ div.math mjx-container {
 
 /*increase size of article content from 60rem to 80rem*/
 .bd-main .bd-content .bd-article-container {
-   max-width: 100%;
+   max-width: 90%;
 }
 
 /*lower primary sidebar size*/

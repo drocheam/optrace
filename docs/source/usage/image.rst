@@ -1,6 +1,6 @@
 .. _usage_image:
 
-Image and Spectrum Rendering
+Image Classes
 ---------------------------------
 
 
@@ -84,7 +84,7 @@ If this is the case, either remove color information from the file or convert it
 RGBImage presets are also available, see <>.
 For convolution there are multiple PSF presets, that are LinearImage objects, see <>.
 
-.. _rimage_overview:
+.. _rimage_rendering:
 
 
 Rendering a RenderImage
@@ -406,39 +406,57 @@ An example for the difference of both sRGB modes is seen in :numref:`color_dispe
 
    * - .. figure:: ../images/rgb_render_srgb1.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          sRGB Absolute RI
 
      - .. figure:: ../images/rgb_render_srgb2.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          sRGB Perceptual RI
      
      - .. figure:: ../images/rgb_render_srgb3.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          Values outside of sRGB
    
    * - .. figure:: ../images/rgb_render_lightness.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          Lightness (CIELUV)
     
      - .. figure:: ../images/rgb_render_irradiance.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          Irradiance
 
      - .. figure:: ../images/rgb_render_illuminance.svg
           :align: center
-          :width: 300
+          :width: 330
      
+          Illuminance
+
    * - .. figure:: ../images/rgb_render_hue.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          Hue (CIELUV)
 
      - .. figure:: ../images/rgb_render_chroma.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          Chroma (CIELUV)
      
      - .. figure:: ../images/rgb_render_saturation.svg
           :align: center
-          :width: 300
+          :width: 330
+
+          Saturation (CIELUV)
 
 
 .. TODO describe different sRGB perceptual parameters
@@ -501,6 +519,10 @@ The image is automatically interpolated so the exported image has the same side 
 
    While the Image has arbitrary, generally non-square pixels, for the export the image is rescaled to have square pixels. However, in many cases there is no exact ratio that matches the side ratio with integer pixel counts. For instance, an image with sides 12.532 x 3.159 mm and a desired export size of 105 pixels for the smaller side leads to an image of 417 x 105 pixels. This matches the ratio approximately, but is still off by -0.46 pixels (around -13.7 µm). This error gets larger the smaller the resolution is.
 
+Plotting Images
+_________________
+
+See :ref:`image_plots`.
 
 Image Properties
 ________________________
@@ -573,179 +595,6 @@ Power in W and luminous power in lm are calculated from the following functions:
    >>> img.quantity
    'Illuminance'
 
-Rendering a LightSpectrum
-_____________________________________
-
-
-Rendering a light spectrum is also done on the source or detector surface.
-
-Analogously to rendering a source image, we can render a spectrum with :meth:`source_spectrum <optrace.tracer.raytracer.Raytracer.source_spectrum>` and by providing a :python:`source_index` parameter (default to zero).
-
-.. testcode::
-
-   spec = RT.source_spectrum(source_index=1)
-
-For a detector spectrum the :meth:`detector_spectrum <optrace.tracer.raytracer.Raytracer.detector_spectrum>` function is applied. It takes a :python:`detector_index` argument, that also defaults to zero.
-
-.. testcode::
-
-   spec = RT.detector_spectrum(detector_index=0)
-
-Additionally we can limit the rendering to a source by providing a :python:`source_index` or limit the detector area by providing the :python:`extent` parameter, as we did for the :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>`.
-
-.. testcode::
-
-   spec = RT.detector_spectrum(detector_index=0, source_index=1, extent=[0, 1, 0, 1])
-
-The above methods return an object of type :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` with :python:`spectrum_type="Histogram"`.
-
-
-
-.. _image_plots:
-
-Plotting Image and Spectra
-_____________________________________
-
-**Spectrum**
-
-A rendered spectrum can be plotted with the :func:`spectrum_plot <optrace.plots.spectrum_plots.spectrum_plot>` function from :mod:`optrace.plots`.
-More on plotting spectra is found in :numref:`spectrum_plots`.
-
-
-**Image**
-
-With a RenderImage object an image plot is created with the function :func:`image_plot <optrace.plots.image_plots.image_plot>`. But first, the plotting namespace needs to be imported:
-
-.. testcode::
-   
-   import optrace.plots as otp
-
-
-The plotting function takes an RGBImage or LinearImage as parameter.
-
-.. testcode::
-
-   otp.image_plot(img)
-
-We can use the additional parameter :python:`log` to scale the image values logarithmically or provide :python:`flip=True` to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the :python:`title` parameter.
-
-.. testcode::
-
-   otp.image_plot(img, title="Title 123", log=True, flip=True)
-
-**Image Cut**
-
-For plotting an image cut the analogous function :func:`image_cut_plot <optrace.plots.image_plots.image_cut_plot>` is applied. It takes the same arguments, but needs a cut parameter :python:`x` or :python:`y`. 
-
-.. testcode::
-
-   otp.image_cut_plot(img, x=0)
-
-Supporting all the same parameters as for :func:`image_plot <optrace.plots.image_plots.image_plot>`, the following call is also valid:
-
-.. testcode::
-
-   otp.image_cut_plot(img, y=0.2, title="Title 123", log=True, flip=True)
-
-
-
-.. list-table::
-   Exemplary image plot and image cut plot from the ``double_prism.py`` example.
-
-   * - |
-       |
-       |
-
-       .. figure:: ../images/color_dispersive3.svg
-          :align: center
-          :width: 400
-   
-     - .. figure:: ../images/color_dispersive1_cut.svg
-          :align: center
-          :width: 400
-
-
-.. figure:: ../images/example_spectrum_histogram.svg
-   :align: center
-   :width: 400
-
-   Another exemplary rendered histogram.
-
-
-.. _chromaticity_plots:
-
-Chromaticity Plots
-________________________
-
-
-**Usage**
-
-In some use cases it is helpful to display the spectrum color or image values inside a chromaticity diagram to see the color distribution.
-When doing so, the choice between the CIE 1931 xy chromaticity diagram and the CIE 1976 UCS chromaticity diagram must be undertaken. Differences are described in <>.
-
-Depending on your choice the :func:`chromaticities_cie_1931 <optrace.plots.chromaticity_plots.chromaticities_cie_1931>` or :func:`chromaticities_cie_1976 <optrace.plots.chromaticity_plots.chromaticities_cie_1976>` function is called
-In the simplest case it takes an RenderImage as parameter and displays the image colors:
-
-.. testcode::
-
-   otp.chromaticities_cie_1931(dimg)
-
-You can also pass an RGBImage:
-
-.. testcode::
-
-   img = dimg.get("sRGB (Perceptual RI)", 189)
-   otp.chromaticities_cie_1931(img)
-
-A :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` can also be provided:
-
-.. testcode::
-
-   otp.chromaticities_cie_1976(spec)
-
-Or a list of multiple spectra:
-
-.. testcode::
-
-   otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard)
-
-A user defined :python:`title` can also be set. :python:`norm` specifies the brightness normalization, explained a few paragraphs below.
-
-A full function call could look like this:
-
-.. testcode::
-
-   otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard, title="Standard Illuminants", norm="Largest")
-
-
-.. list-table:: Examples of CIE 1931 and 1976 chromaticity diagrams.
-
-   * - .. figure:: ../images/chroma_1931.svg
-          :align: center
-          :width: 400
-   
-     - .. figure:: ../images/chroma_1976.svg
-          :align: center
-          :width: 400
-
-**Norms**
-
-Chromaticity norms describe the brightness normalization for the colored diagram background. There are multiple norms available:
-
-*  **Largest**: Maximum brightness for this sRGB color. Leads to colors with maximum brightness and saturation.
-*  **Sum**: Normalize the sRGB such that the sum of all channels equals one. Leads to a diagram with smooth color changes and approximately equal brightness.
-
-.. list-table:: 
-   Example of a chromaticity plots showing the color coordinates of fluorescent lamp presets. Norms are "Sum" (left) and "Largest" (right).
-
-   * - .. figure:: ../images/fl_chroma_sum_norm.svg
-          :align: center
-          :width: 400
-   
-     - .. figure:: ../images/fl_chroma_largest_norm.svg
-          :align: center
-          :width: 400
-     
 
 
 Image Presets

@@ -169,6 +169,9 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(ValueError, RT.trace, 0)  # too few rays
         self.assertRaises(RuntimeError, RT.trace, 100000000000)  # too many rays
 
+        nt = len(RT.tracing_surfaces) + 2
+        self.assertRaises(RuntimeError, RT.trace, int(RT.MAX_RAY_STORAGE_RAM/nt + 1)) 
+
 
         # additional ray source geometry checks
 

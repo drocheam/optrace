@@ -51,7 +51,7 @@ Optrace |version| |release| Documentation
 
 .. list-table::
 
-   * - **What this is**
+   * - **Features**
         * a sequential raytracer for geometrical optics
         * a tool with presets and user defined surface shapes, ray sources and media
         * a library with an additional GUI with ray and geometry visualization
@@ -60,7 +60,7 @@ Optrace |version| |release| Documentation
         * a programming/scripting approach to simulation
         * free, open source software
 
-     - **What this isn't**
+     - **Non-Features**
         * a GUI focussed tool
         * an optics design program with lens optimization, aberration analysis and tolerancing
         * simulation incorporating wave optics, e.g. diffraction, interference
@@ -68,7 +68,7 @@ Optrace |version| |release| Documentation
         * a tool supporting mirror or fresnel lens optics
         * mature, bug-free software
 
-   * - **What this is for**
+   * - **Purpose/Use Cases**
         * educational purposes, demonstrating aberrations or simple optical setups
         * introductionary tool to paraxial, geometrical optics or image formation
         * simulation of simpler systems, like a prism, the eye model or a telescope

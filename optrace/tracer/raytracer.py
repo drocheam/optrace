@@ -255,8 +255,7 @@ class Raytracer(Group):
         # and +1 for the ray starting points
         nt = len(self.tracing_surfaces) + 2
        
-        # TODO test
-        if self.rays.storage_size(N, nt) > self.MAX_RAY_STORAGE_RAM:
+        if self.rays.storage_size(N, nt, self.rays.no_pol) > self.MAX_RAY_STORAGE_RAM:
             raise RuntimeError(f"More than {self.MAX_RAY_STORAGE_RAM*1e-9:.1f} GB RAM requested. Either decrease"
                                 " the number of rays, surfaces or do an iterative render. If your system can handle"
                                 " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")

@@ -391,6 +391,12 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
                 # time.sleep(2)  # wait some time so windows can be seen by a human user
 
+                # try setting many rays
+                rc0 = sim.ray_count
+                self._set_in_main(sim, "ray_count", 50000000-1)
+                self._wait_for_idle(sim)
+                self.assertEqual(rc0, sim.ray_count)
+
         RT = rt_example()
         sim = TraceGUI(RT)
         sim.debug(func=interact2, args=(sim,))

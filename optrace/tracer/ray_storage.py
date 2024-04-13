@@ -85,12 +85,18 @@ class RayStorage(BaseClass):
         self.n_list = np.zeros((N, nt), dtype=np.float64, order='F')
         self.wl_list = np.zeros(N, dtype=np.float32)
 
-    # TODO document and test
-    def storage_size(self, N: int, nt: int):
+    @staticmethod
+    def storage_size(N: int, nt: int, no_pol: bool) -> int:
         """
+        Calculate required RAM used for the ray properties (without actually creating anything).
+
+        :param N: number of rays
+        :param nt: number of sections per ray
+        :param no_pol: polarization calculation turned off
+        :return: approximate size in bytes
         """
         f16, f32, f64 = 2, 4, 8
-        fpol = f32 if not self.no_pol else f16
+        fpol = f32 if not no_pol else f16
         return N*nt*3*f64 + N*3*f64 + N*nt*3*fpol + N*nt*f32 + N*nt*f64 + N*f32
 
     @property

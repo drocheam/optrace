@@ -124,13 +124,13 @@ class ScenePlotting:
             if self.scene is not None and self.scene.camera is not None:
                 self.scene.camera.trait_set(**cc_traits_org)
     
-    def screenshot(self, *args, **kwargs) -> None:
+    def screenshot(self, path: str, **kwargs) -> None:
         """
         Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
         See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
         """
         self._status_text.visible = False  # temporarily hide status text so it won't be on the screenshot
-        self.scene.mlab.savefig(*args, **kwargs)
+        self.scene.mlab.savefig(path, **kwargs)
         self._status_text.visible = True
 
     def get_camera(self) -> tuple[np.ndarray, float, np.ndarray, float]:
@@ -157,13 +157,11 @@ class ScenePlotting:
         Sets the camera view.
         Not all parameters must be defined, setting single properties is also allowed.
         
-        :param focal_point: 3D position of camera focal point, also defines the center of the view
-        :param parallel_scale: view scaling. Defines half the size of the view in vertical direction.
-        :param center: 3D coordinates of center of view
+        :param center: 3D coordinates of center of view in mm
         :param height: half of vertical height in mm
         :param direction: camera view direction vector 
         (direction of vector perpendicular to your monitor and in your viewing direction)
-        :param roll: absolute camera roll angle
+        :param roll: absolute camera roll angle in degrees
         """
         # force parallel projection
         self.scene.parallel_projection = True

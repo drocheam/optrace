@@ -11,8 +11,8 @@ Usage
    geometry
    surfaces
    elements
-   spectrum
    refraction_index
+   spectrum
    image
    focus
    tma

@@ -1,4 +1,4 @@
-Base Geometries
+Raytracer Basics
 ------------------------------------------------
 
 
@@ -206,7 +206,7 @@ Since the |Raytracer| is a subclass of a |Group|, elements can be changed or add
 
 
 .. figure:: ../images/example_legrand1.png
-   :width: 100%
+   :width: 700
    :align: center
 
    Example of a raytracer geometry in the TraceGUI in side view
@@ -231,6 +231,7 @@ Since `optrace` implements sequential raytracing, the surfaces and objects must 
 The elements :python:`Detector, LineMarker, PointMarker, BoxVolume, SphereVolume, CylinderVolume` are excluded from this.
 All ray source elements must lie before all lenses, filters and apertures. And all subsequent lenses, filters, apertures must not collide and be inside the outline.
 
+Rays that hit the outline box at any place are also absorbed.
 
 **Surrounding Media**
 
@@ -246,16 +247,17 @@ The following figure shows a setup with lenses :python:`L0, L2` having a :python
    Schematic figure of a setup with a ray source, three different lenses and three different ambient media
 
 
-.. TODO update
+**Absorbing Rays**
 
-**absorb_missing**
+``optrace`` ensures that light which does not hit both surfaces of a lens gets absorbed.
+This also includes rays that don't hit any side at all.
 
-The :python:`absorb_missing` parameter, which is set to :python:`True` by default, ensures that light which does not hit a lens is absorbed. In principle, this is the typical and desired case. However, there are geometries where :python:`absorb_missing=False` could be useful. 
+Generally, these rays are seen as error cases.
+A ray only hitting one surfaces must enter/leave through the lens side cylinder, that is not handled in our sequential simulation.
+Rays not hitting the lens at all are typically undesired. 
+In real optical systems they would be absorbed by the housing of the system.
 
-A special case is when a ray does not hit a lens where a transition from surrounding media takes place (:python:`n2` differ). Here the rays are absorbed in any case, because the boundary surface is defined only at the lens itself.
-
-
-**no_pol**
+**Parameter** ``no_pol``
 
 The raytracer provides the functionality to trace polarization directions. Thus, not only the polarization vector for the ray and ray segment can be calculated, but also the exact transmission at each surface transition.
 Unfortunately, the calculation is comparatively computationally intensive.
@@ -295,8 +297,8 @@ A point source is added at the retina and the geometry is traced.
    RT.trace(100000)
 
 
-Loading ZEMAX Geometries (.zmx)
-__________________________________
+Loading ZEMAX OpticStudio Geometries (.zmx)
+____________________________________________
 
 
 It is possible to load ``.zmx`` geometries into `optrace`. For instance, the following example load some geometry from file ``setup.zmx`` into the raytracer.
@@ -321,7 +323,7 @@ You can either load them from a ``.agf`` catalogue like in :numref:`agf_load` or
 A list of exemplary ``.zmx`` files can be found in the following `repository <https://github.com/nzhagen/LensLibrary/tree/main/zemax_files>`_.
 
 
-Unfortunately, the support is only experimental, as there is no actual documentation on the file format. Additionally, only a subset of all ZEMAX functionality is supported, including:
+Unfortunately, the support is only experimental, as there is no actual documentation on the file format. Additionally, only a subset of all ZEMAX OpticStudio functionality is supported, including:
 
 * ``SEQ``-mode only
 * ``UNIT`` must be ``MM``

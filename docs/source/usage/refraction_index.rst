@@ -42,8 +42,95 @@ You can also specify the wavelength combination, for which :python:`n` and :pyth
 
 **Common Index Models**
    
-Defining a medium by a specific model is done by providing the model name and the correct number of coefficients in the :python:`coeff`.
-Note that all coefficients have units in µm or powers of µm. You can read more about the different supported models in :numref:`index_functions`.
+The subsequent equations describe common refractive index models used in simulation software.
+They are taken from :footcite:`ComsolDispersion` and :footcite:`ZemaxHagen`.
+A comprehensive list of different index models is found in :footcite:`palmer2005`.
+
+Generally, all coefficients must be given in powers of µm, while the same is true for the wavelength input.
+
+.. list-table::
+   :widths: 300 900
+
+   * - Cauchy
+
+     - .. math::
+          n = c_0 + \frac{c_1}{\lambda^2} + \frac{c_2}{\lambda^4} + \frac{c_3}{\lambda^6}
+          :label: n_cauchy
+
+   * - Conrady
+
+     - .. math::
+          n = c_0+ \frac{c_1} {\lambda} + \frac{c_2} {\lambda^{3.5}}
+          :label: n_conrady
+
+   * - Extended
+
+     - .. math::
+          n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+ \frac{c_4} {\lambda^{6}}+ \frac{c_5} {\lambda^{8}}+ \frac{c_6} {\lambda^{10}}+\frac{c_7} {\lambda^{12}}
+          :label: n_extended
+
+   * - Extended2
+
+     - .. math::
+          n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}+c_6 \lambda^4+c_7 \lambda^6
+          :label: n_extended2
+
+   * - Handbook of Optics 1
+
+     - .. math::
+          n^2 = c_0+\frac{c_1}{\lambda^2-c_2}-c_3 \lambda^2
+          :label: n_optics1
+
+   * - Handbook of Optics 2
+
+     - .. math::
+          n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}-c_3 \lambda^2
+          :label: n_optics2
+
+   * - Herzberger
+
+     - .. math::
+          \begin{align}
+          n =&~ c_0+c_1 L+c_2 L^2+c_3 \lambda^2+c_4 \lambda^4+c_5 \lambda^6 \\
+          &\text{ with   } L= \frac{1} {\lambda^2-0.028 {\mu m^2}}
+          \end{align}
+          :label: n_herzberger
+
+   * - Sellmeier1
+
+     - .. math::
+          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}
+          :label: n_sellmeier1 
+
+   * - Sellmeier2
+
+     - .. math::
+          n^2 = 1+c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2^2}+\frac{c_3}{\lambda^2-c_4^2}
+          :label: n_sellmeier2 
+
+   * - Sellmeier3
+
+     - .. math::
+          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}
+          :label: n_sellmeier3 
+
+   * - Sellmeier4
+
+     - .. math::
+          n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}+\frac{c_3 \lambda^2}{\lambda^2-c_4}
+          :label: n_sellmeier4 
+
+   * - Sellmeier5
+
+     - .. math::
+          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}+\frac{c_8 \lambda^2}{\lambda^2-c_9}
+          :label: n_sellmeier5 
+
+   * - Schott
+
+     - .. math::
+          n^2 = c_0+c_1 \lambda^2+\frac{c_2}{ \lambda^{2}}+\frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}
+          :label: n_schott 
 
 
 In the case of the Schott model the initialization could look as follows:
@@ -91,7 +178,14 @@ The call returns a vector of the same shape as the input.
 Abbe Number
 __________________
 
-Details on the calculation of the Abbe number can be found in :numref:`abbe_number`. 
+The Abbe number, also called :math:`V`-number, is a simple, scalar quantity describing the optical dispersive behavior of a medium. It is calculated from the refractive indices at three different wavelength.
+
+.. math::
+   V = \frac{n_\text{c} - 1}{n_\text{s} - n_\text{l}}
+   :label: abbe_eq
+
+With :math:`n_\text{s},~n_\text{c},~n_\text{l}` are the short, center and long wavelength refraction index.
+
 With a refractive index object at hand the Abbe number can be calculated with
 
 .. doctest::
@@ -126,49 +220,6 @@ You can also check if a medium is dispersive by calling
 
 A list of predefined lines can be found in :numref:`spectral_lines`.
 
-.. _index_plots:
-
-Plotting
-_______________________
-
-
-**Index Plot**
-
-A RefractionIndex or a list of RefractionIndex objects can be plotted with the function :func:`refraction_index_plot <optrace.plots.spectrum_plots.refraction_index_plot>` from :mod:`optrace.plots`.
-The example below plots the glass presets in one figure.
-
-.. testcode::
-
-   import optrace.plots as otp
-
-   otp.refraction_index_plot(ot.presets.refraction_index.glasses)
-
-You can also enable or disable the legend and labels with :python:`legend_off` and :python:`labels_off`
-
-.. testcode::
-
-   otp.refraction_index_plot(ot.presets.refraction_index.glasses, title="Test abc",
-                             legend_off=False, labels_off=True)
-
-Examples for an index plot are found below.
-
-**Abbe Plot**
-
-An Abbe plot is generated with :func:`abbe_plot <optrace.plots.misc_plots.abbe_plot>`.
-
-.. testcode::
-
-   otp.abbe_plot(ot.presets.refraction_index.glasses)
-
-It also supports the parameter :python:`title`. Additionally one can provide user defined :python:`lines` to calculate the index and V-number with:
-
-.. testcode::
-
-   otp.abbe_plot(ot.presets.refraction_index.glasses, title="abc", lines=ot.presets.spectral_lines.FeC)
-
-
-Exemplary Abbe plots are shown below in the presets section.
-
 .. _agf_load:
 
 Loading material catalogues (.agf)
@@ -192,6 +243,11 @@ Different ``.agf`` files are found in `this repository <https://github.com/nzhag
 Information on the file format can be found `here <https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf>`__ and
 and `here <https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf>`__.
 
+Plotting
+________________
+
+See :ref:`index_plots`.
+
 
 .. _refraction_index_presets:
 
@@ -203,44 +259,52 @@ The materials are also grouped into multiple lists :python:`ot.presets.refractiv
 
 These groups are plotted below in an index and an Abbe plot.
 
-**Glass**
 
-.. figure:: ../images/glass_presets_n.svg
-   :width: 600
-   :align: center
+.. list-table::
+   :widths: 500 500
 
-   Refraction index curves for different glass presets.
+   * - .. figure:: ../images/glass_presets_n.svg
+          :width: 500
+          :align: center
 
-.. figure:: ../images/glass_presets_V.svg
-   :width: 600
-   :align: center
+          Refraction index curves for different glass presets.
+
+     - .. figure:: ../images/glass_presets_V.svg
+          :width: 500
+          :align: center
+       
+          Abbe diagram for different glass presets.
    
-   Abbe diagram for different glass presets.
+   * - .. figure:: ../images/plastics_presets_n.svg
+          :width: 500
+          :align: center
+          
+          Refraction index curves for different plastic presets.
+       
+     - .. figure:: ../images/plastics_presets_V.svg
+          :width: 500
+          :align: center
+          
+          Abbe diagram for different plastic presets.
 
-**Plastics**
 
-.. figure:: ../images/plastics_presets_n.svg
-   :width: 600
-   :align: center
-   
-   Refraction index curves for different plastic presets.
+   * - .. figure:: ../images/misc_presets_n.svg
+          :width: 500
+          :align: center
+           
+          Refraction index curves for miscellaneous presets.
+     
+     - .. figure:: ../images/misc_presets_V.svg
+          :width: 500
+          :align: center
+          
+          Abbe diagram for miscellaneous presets. *Air* and *Vacuum* are missing here, because they are modelled without dispersion.
 
-.. figure:: ../images/plastics_presets_V.svg
-   :width: 600
-   :align: center
-   
-   Abbe diagram for different plastic presets.
 
-**Misc**
+------------
 
-.. figure:: ../images/misc_presets_n.svg
-   :width: 600
-   :align: center
+**References**
 
-   Refraction index curves for miscellaneous presets.
+.. footbibliography::
 
-.. figure:: ../images/misc_presets_V.svg
-   :width: 600
-   :align: center
-   
-   Abbe diagram for miscellaneous presets. *Air* and *Vacuum* are missing here, because they are modelled without dispersion.
+

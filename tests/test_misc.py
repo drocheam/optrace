@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import optrace.tracer.misc as misc
 
 import optrace as ot
+import optrace.plots as otp
 from optrace.tracer.base_class import BaseClass as BaseClass
 from optrace.tracer.ray_storage import RayStorage as RayStorage
 
@@ -31,11 +32,18 @@ class TracerMiscTests(unittest.TestCase):
         ot.global_options.multithreading = True
         ot.global_options.show_warnings = False
         ot.global_options.show_warnings = True
+
+        # spectral color map
         ot.global_options.wavelength_range = [300, 800]
+        otp.spectrum_plot(ot.presets.light_spectrum.led_b1)
         ot.global_options.wavelength_range[0] = 380
+        otp.spectrum_plot(ot.presets.light_spectrum.led_b1)
         ot.global_options.wavelength_range[1] = 780
-        ot.global_options.spectral_colormap = lambda wl: 255*plt.cm*viridis(wl/780)
+        ot.global_options.spectral_colormap = lambda wl: plt.cm.viridis(wl/780)
+        otp.spectrum_plot(ot.presets.light_spectrum.led_b1)
         ot.global_options.spectral_colormap = None
+        otp.spectrum_plot(ot.presets.light_spectrum.led_b1)
+        plt.close("all")
 
         # Type Errors
         self.assertRaises(TypeError, ot.global_options.__setattr__, "multithreading", [])
@@ -74,6 +82,7 @@ class TracerMiscTests(unittest.TestCase):
             self.assertFalse(ot.global_options.show_progressbar)
         self.assertFalse(ot.global_options.show_progressbar)
 
+    @pytest.mark.os
     def test_ray_storage(self):
 
         RS = RayStorage()
@@ -81,6 +90,21 @@ class TracerMiscTests(unittest.TestCase):
         self.assertRaises(AssertionError, RS.source_sections, 0)  # no rays
         self.assertRaises(AssertionError, RS.rays_by_mask, np.array([]))  # no rays
 
+        # test storage size
+        
+        RS_ = ot.RaySource(ot.Point())
+
+        for nt in [2, 3, 8, 17]:
+            for N in [1, 101, 2000, 10101, 321455]:
+                for pol in [False, True]:
+                    RS.init([RS_], N, nt, pol)
+
+                    calculated = RayStorage.storage_size(RS.N, RS.Nt, RS.no_pol)
+                    measured = RS.p_list.nbytes + RS.s0_list.nbytes + RS.pol_list.nbytes +\
+                        RS.w_list.nbytes + RS.n_list.nbytes + RS.wl_list.nbytes
+                    
+                    self.assertEqual(measured, calculated)
+        
         # actual tests are done with tracing in tracer test file
 
     def test_base_class(self):

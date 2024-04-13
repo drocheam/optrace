@@ -1,7 +1,7 @@
 .. _usage_gui:
 
-Using the GUI
----------------
+GUI Interaction
+------------------
 
 .. testcode:: 
    :hide:
@@ -14,9 +14,6 @@ Using the GUI
 .. role:: python(code)
   :language: python
   :class: highlight
-
-
-.. TODO information on set_camera, screenshot and parameter passdown to plotting functions (path, sargs, fargs)
 
 
 
@@ -517,6 +514,7 @@ and here about the `different objects populating the view <https://docs.enthough
    :align: center
    :width: 600
 
+.. _property_viewer:
 
 Property Viewer
 #######################
