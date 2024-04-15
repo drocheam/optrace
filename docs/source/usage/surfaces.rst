@@ -384,9 +384,55 @@ For a surface with rotational symmetry one radial vector is sufficient, for this
    data1d = ot.DataSurface1D(r=r0, data=h)
 
 
+Geometry Properties
+_____________________________
 
-Additional Geometrical Quantities
-_____________________________________
+All subclasses of |Element| share the following methods and properties.
+In the following, an element object :python:`El`, which can be of any the subclasses described above, to demonstrate them.
+
+**Position**
+
+The position of the surface/point/line is accessed using:
+
+.. code-block:: python
+
+   pos = surf.pos
+
+This returns a three element list with x, y, z center coordinates.
+
+**Extent**
+
+The extent box is the smallest encompassing bounding box that include the surface/point/line.
+The extent property returns a list of coordinate bounds :python:`[x0, x1, y0, y1, z0, z1]`.
+It is accessed using:
+
+.. code-block:: python
+
+   extent = surf.extent
+
+**Moving**
+
+Moving/setting its initial position of the surface/point/line is handled by its parent object 
+(typically a subclass of :class:`Element <optrace.tracer.geometry.element.Element>`, see :ref:`usage_elements`).
+
+**Rotation**
+
+Using the :python:`rotate` function the surface/point/line is rotated by 180 degrees around its center around the z-axis.
+The function takes a rotation angle in degrees:
+
+.. code-block:: python
+
+   surf.rotate(15)
+
+**Flipping**
+
+Flipping the surface rotates it around an axis parallel to the x-axis passing through its center :python:`El.pos`.
+
+.. code-block:: python
+
+   surf.flip()
+
+**Other**
 
 Below you can see some additional geometrical quantities that are useful when moving surfaces, assigning them to lenses or determining the correct thicknesses.
 

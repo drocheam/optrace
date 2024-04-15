@@ -364,8 +364,13 @@ class TracerTests(unittest.TestCase):
         ot.global_options.multithreading = True
 
         # aperture blocks all light
-        RT.add(ot.Aperture(ot.CircularSurface(r=3), pos=[0, 0, 0]))
+        RT.add(ot.Aperture(ot.CircularSurface(r=2.99), pos=[0, 0, -2.5]))
+        RT.trace(200000)
         RT.autofocus("Position Variance", z_start=10) # no rays here
+        
+        # changing the geometry without retracing leads to a RuntimeError
+        RT.add(ot.Aperture(ot.CircularSurface(r=2.99), pos=[0, 0, -2.2]))
+        self.assertRaises(RuntimeError, RT.autofocus, "Position Variance", z_start=10)
 
     def test_uniform_emittance(self):
         """test that surfaces in ray source emit uniformly"""
@@ -1170,6 +1175,15 @@ class TracerTests(unittest.TestCase):
         # hit_detector, hit_source are tested in iterative_render
         # different plot modes and parameter pass-through (projection_method, desc, ...) is tested in test_plots
         # hit_detector special cases are tested in test_tracer_special
+
+        # change geometry without retracing. Leads to a RuntimeError
+        RT = rt_example()
+        RT.trace(10000)
+        RT.remove(RT.lenses[0])
+        self.assertRaises(RuntimeError, RT.detector_image)
+        self.assertRaises(RuntimeError, RT.detector_spectrum)
+        self.assertRaises(RuntimeError, RT.source_image)
+        self.assertRaises(RuntimeError, RT.source_spectrum)
 
         # coverage: limit and extent defined, should emit a warning
         RT = rt_example()

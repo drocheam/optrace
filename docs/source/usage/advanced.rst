@@ -265,4 +265,11 @@ Color conversion are supported via the namespace :python:`optrace.color`.
 Check the :ref:`Color Handling <color_management>` section for a technical and fundamental descriptions of color processing and calculation.
 Go to the code reference section :mod:`optrace.tracer.color` for information on the usage of implemented functions.
 
+For the sRGB Perceptual Rendering Intent there a extra parameters available.
+For instance, a fixed saturation scaling can be set using the :python:`sat_scale` parameter of the :func:`optrace.tracer.color.xyz_to_srgb_linear <optrace.tracer.color.srgb.xyz_to_srgb_linear>` function.
+A suitable scaling factor can be calculated using :func:`optrace.tracer.color.get_saturation_scale <optrace.tracer.color.srgb.get_saturation_scale>`.
+This is useful for viable comparison between images, as the saturation scaling factor is the same.
+Alternatively, a relative lightness threshold can be set using the :python:`L_th` parameter, which excludes colors of darker image regions to calculate/apply the factor in both functions.
+This is helpful when the scaling factor is largely affected by color values that are mostly invisible.
+See the docstring of both functions for further information.
 

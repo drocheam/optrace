@@ -8,9 +8,10 @@ Usage
    :maxdepth: 2
    
    overview
-   geometry
    surfaces
    elements
+   group
+   raytracer
    refraction_index
    spectrum
    image

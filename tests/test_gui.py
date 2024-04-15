@@ -117,7 +117,7 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.gui1
     @pytest.mark.slow
-    def test_gui_inits(self) -> None:
+    def test_0gui_inits(self) -> None:
 
         # make raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
@@ -141,7 +141,9 @@ class GUITests(unittest.TestCase):
         RT.add(Det)
 
         # subtest function with count and args output
-        def trace_gui_run(**kwargs):
+        def trace_gui_run(clear=True,**kwargs):
+            if clear:
+                RT.rays.init(RT.ray_sources, RT.rays.N, RT.rays.Nt, RT.rays.no_pol)
             trace_gui_run.i += 1
             with self.subTest(i=trace_gui_run.i, args=kwargs):
                 sim = TraceGUI(RT, **kwargs)
@@ -184,6 +186,24 @@ class GUITests(unittest.TestCase):
         self.assertRaises(RuntimeError, TraceGUI, RT, detector_selection="DET1")
         self.assertRaises(RuntimeError, TraceGUI, RT, source_selection="RS1")
         self.assertRaises(RuntimeError, TraceGUI, RT, z_det=0)
+        
+        # Retrace tests. The TraceGUI tries to retrace automatically
+
+        # calling the GUI with a traced geometry does not retrace
+        rcrepr = RT.rays.crepr()
+        trace_gui_run(clear=False)
+        self.assertEqual(rcrepr, RT.rays.crepr())
+
+        # explicitly providing ray_count retraces
+        rcrepr = RT.rays.crepr()
+        trace_gui_run(clear=False, ray_count=2000)
+        self.assertNotEqual(rcrepr, RT.rays.crepr())
+        
+        # calling the GUI with changes in the geometry retraces
+        RT.remove(RT.lenses[0])
+        rcrepr = RT.rays.crepr()
+        trace_gui_run(clear=False)
+        self.assertNotEqual(rcrepr, RT.rays.crepr())
 
     @pytest.mark.gui2
     @pytest.mark.slow

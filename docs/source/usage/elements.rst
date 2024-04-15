@@ -1,6 +1,14 @@
+
+.. _usage_elements:
+
 Elements (Lens, Ray Source,  ...)
 ------------------------------------------
 
+.. |IdealLens| replace:: :class:`IdealLens <optrace.tracer.geometry.ideal_lens.IdealLens>`
+.. |Lens| replace:: :class:`Lens <optrace.tracer.geometry.lens.Lens>`
+.. |Group| replace:: :class:`Group <optrace.tracer.geometry.group.Group>`
+.. |Element| replace:: :class:`Element <optrace.tracer.geometry.element.Element>`
+.. |Raytracer| replace:: :class:`Raytracer <optrace.tracer.raytracer.Raytracer>`
 
 .. testsetup:: *
 
@@ -11,6 +19,140 @@ Elements (Lens, Ray Source,  ...)
 .. role:: python(code)
   :language: python
   :class: highlight
+
+
+Overview
+__________________
+
+
+Types
+##############
+
+In `optrace` the class |Element| denotes an object which has no, one or two surfaces and belongs to the tracing geometry.
+
+**Tracing Elements**
+
+Tracing elements are Elements with direct ray interaction:
+
+.. list-table::
+   :widths: 100 400
+   :header-rows: 0
+   :align: left
+
+   * - :class:`RaySource <optrace.tracer.geometry.ray_source.RaySource>`
+     - An element with a light emitting surface
+   * - |Lens|
+     - An element with two surfaces on which light is refracted.
+   * - |IdealLens|
+     - A Lens, except that it has a planar surface and refracts light without aberrations
+   * - :class:`Filter <optrace.tracer.geometry.filter.Filter>`
+     - Element with a surface on which wavelength-dependent filtering takes place.
+   * - :class:`Aperture <optrace.tracer.geometry.aperture.Aperture>`
+     - Similar to a Filter, except that incident light is completely absorbed.
+
+**Rendering Elements**
+
+Elements with no ray interaction for tracing, but the possibility to render images of intersecting rays.
+
+.. list-table::
+   :widths: 100 400
+   :header-rows: 0
+   :align: left
+
+   * - :class:`Detector <optrace.tracer.geometry.detector.Detector>`
+     - Element with one surface on which images or spectra can be rendered
+
+
+**Markers**
+
+Markers are Elements for annotations in 3D space.
+
+.. list-table::
+   :widths: 100 400
+   :header-rows: 0
+   :align: left
+
+   * - :class:`PointMarker <optrace.tracer.geometry.marker.point_marker.PointMarker>`
+     - Element consisting of a point and a label
+   * - :class:`LineMarker <optrace.tracer.geometry.marker.line_marker.LineMarker>`
+     - Element consisting of a line and a label
+
+
+**Volumes**
+
+Objects for plotting volumes in the TraceGUI, for instance an enclosing cylinder or a medium outline.
+
+.. list-table::
+   :widths: 100 400
+   :header-rows: 0
+   :align: left
+
+   * - :class:`BoxVolume <optrace.tracer.geometry.volume.box_volume.BoxVolume>`
+     - Volume of a box or cube
+   * - :class:`CylinderVolume <optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume>`
+     - Cylinder volume with the symmetry axis in direction of the optical axis
+   * - :class:`SphereVolume <optrace.tracer.geometry.volume.sphere_volume.SphereVolume>`
+     - A spherical volume
+
+.. _element_geometry_props:
+
+Shared Functions/Properties
+##############################
+
+All subclasses of |Element| share the following methods and properties.
+In the following, an element object :python:`El`, which can be of any the subclasses described above, to demonstrate them.
+
+**Position**
+
+The position of the element is accessed using:
+
+.. code-block:: python
+
+   pos = El.pos
+
+This returns a three element list with x, y, z coordinates.
+For an element consisting of a singular surface, line or point, the returned value is identical to the position of this surface/line/point.
+For an element consisting of two surfaces, the position depends on how the object was specified, for instance see :ref:`usage_lens`. 
+
+**Extent**
+
+The extent box is the smallest encompassing bounding box that include the element.
+The extent property returns a list of coordinate bounds :python:`[x0, x1, y0, y1, z0, z1]`.
+It is accessed using:
+
+.. code-block:: python
+
+   extent = El.extent
+
+**Moving**
+
+An object is moved using the :python:`move_to` function.
+A single parameter describes the new absolute position as list :python:`[x, y, z]`.
+
+.. code-block:: python
+
+   El.move_to([0.2, -1.25, 3])
+
+The element is moved in such a way that the provided position is its new :python:`El.pos`.
+
+**Rotation**
+
+Using the :python:`rotate` function the objects can be rotated around their center around the z-axis.
+The function takes a rotation angle in degrees:
+
+.. code-block:: python
+
+   El.rotate(15)
+
+**Flipping**
+
+Flipping the element rotates it around an axis parallel to the x-axis passing through the position :python:`El.pos`.
+Doing so, the order of front and back surface is reversed and each surface also gets flipped.
+
+.. code-block:: python
+
+   El.flip()
+
 
 RaySource
 _______________________

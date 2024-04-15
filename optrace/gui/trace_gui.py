@@ -32,7 +32,6 @@ from ..tracer.misc import PropertyChecker as pc
 from ..warnings import warning
 from .. import metadata
 
-# TODO don't retrace when init and already rays included in raytracer?
 
 
 
@@ -386,6 +385,8 @@ class TraceGUI(HasTraits):
         self._last_source_snap = None
         self.last_source_image = None
 
+        self._init_forced_ray_count = "ray_count" in kwargs
+
         # default value for image_pixels
         self.image_pixels = 189
 
@@ -655,12 +656,6 @@ class TraceGUI(HasTraits):
             # if GUILoaded Status should be reset in this function
             rdh = not bool(self.raytracer.ray_sources)
             
-            if (all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
-                    or change["RaySources"] or change["TraceSettings"]) and not rdh:
-                self.retrace()
-            elif all_ or change["Rays"]:
-                self.replot_rays()
-
             if all_ or change["Filters"]:
                 self._plot.plot_filters()
 
@@ -697,6 +692,23 @@ class TraceGUI(HasTraits):
                 # minimal/maximal z-positions of Detector_obj
                 self._z_det_min = self.raytracer.outline[4]
                 self._z_det_max = self.raytracer.outline[5]
+            
+            if (all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
+                    or change["RaySources"] or change["TraceSettings"]) and not rdh:
+
+                # when initializing the scene, don't retrace when the raytracer already has rays stored, 
+                # there are no geometry errors and the ray_count parameter for the TraceGUI is not explicitely set
+                # and the scene did not change since the last trace
+                if self._status["DisplayingGUI"] and self.raytracer.rays.N and not self._init_forced_ray_count\
+                        and not self.raytracer.geometry_error and self.raytracer.check_if_rays_are_current():
+                    with self._no_trait_action():
+                        self.ray_count = self.raytracer.rays.N
+                    self.replot_rays()
+                else:
+                    self.retrace()
+
+            elif all_ or change["Rays"]:
+                self.replot_rays()
 
         self.scene.disable_render = False
         self.scene.render()

@@ -77,6 +77,7 @@ class Raytracer(Group):
         self._ignore_geometry_error = False
         self.geometry_error = False  #: if geometry checks returned an error
         self._force_threads = None
+        self._last_trace_snapshot = None
         self.fault_pos = np.array([])
 
         super().__init__(None, n0, **kwargs)
@@ -131,16 +132,26 @@ class Raytracer(Group):
 
         :return: dictionary of properties
         """
+        return self.tracing_snapshot() |\
+            dict(Markers=[D.crepr() for D in self.markers],
+                 Volumes=[D.crepr() for D in self.volumes],
+                 Detectors=[D.crepr() for D in self.detectors])
+   
+    # TODO test
+    def tracing_snapshot(self) -> dict:
+        """
+        Creates a snapshot of properties of rays and Elements relevant for tracing.
+        Needed to detect changes since the last trace.
+
+        :return: dictionary of properties
+        """
         return dict(Rays=self.rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()],
                     TraceSettings=[self.no_pol],
                     Lenses=[D.crepr() for D in self.lenses],
                     Filters=[D.crepr() for D in self.filters],
                     Apertures=[D.crepr() for D in self.apertures],
-                    RaySources=[D.crepr() for D in self.ray_sources],
-                    Markers=[D.crepr() for D in self.markers],
-                    Volumes=[D.crepr() for D in self.volumes],
-                    Detectors=[D.crepr() for D in self.detectors])
+                    RaySources=[D.crepr() for D in self.ray_sources])
 
     def compare_property_snapshot(self, h1: dict, h2: dict) -> dict:
         """
@@ -158,6 +169,14 @@ class Raytracer(Group):
         diff["Any"] = any(val for val in diff.values())
 
         return diff
+
+    def check_if_rays_are_current(self):
+        """Check if anything tracing relevant changed since the last trace."""
+        if self._last_trace_snapshot is None:
+            return False
+
+        now = self.tracing_snapshot()
+        return not self.compare_property_snapshot(self._last_trace_snapshot, now)["Any"]
 
     def _set_messages(self, msgs: list[np.ndarray]) -> None:
         """
@@ -274,7 +293,6 @@ class Raytracer(Group):
         # create rays from RaySources
         self.rays.init(self.ray_sources, N, nt, self.no_pol)
 
-
         def sub_trace(N_threads: int, N_t: int) -> None:
 
             p, s, pols, weights, wavelengths, ns = self.rays.thread_rays(N_threads, N_t)
@@ -385,6 +403,9 @@ class Raytracer(Group):
 
         self._set_messages(msgs)
         self._show_messages(N)
+        
+        # store settings for this trace
+        self._last_trace_snapshot = self.tracing_snapshot()
 
     def __tracing_elements(self) -> list[Lens | Filter | Aperture]:
         """
@@ -849,6 +870,9 @@ class Raytracer(Group):
         if detector_index > len(self.detectors) - 1 or detector_index < 0:
             raise IndexError("Invalid detector_index.")
 
+        if not self.check_if_rays_are_current():
+            raise RuntimeError("Tracing geometry/properties changed. Please retrace first.")
+
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=4).start()\
             if global_options.show_progressbar else None
 
@@ -1232,6 +1256,9 @@ class Raytracer(Group):
 
         if source_index > len(self.ray_sources) - 1 or source_index < 0:
             raise IndexError("Invalid source_index.")
+        
+        if not self.check_if_rays_are_current():
+            raise RuntimeError("Tracing geometry/properties changed. Please retrace first.")
 
         bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=2).start()\
             if global_options.show_progressbar else None
@@ -1410,6 +1437,9 @@ class Raytracer(Group):
             raise IndexError(f"source_index={source_index} larger than number of simulated sources "
                              f"({len(self.rays.N_list)}. "
                              "Either the source was not added or the new geometry was not traced.")
+        
+        if not self.check_if_rays_are_current():
+            raise RuntimeError("Tracing geometry/properties changed or last trace had errors. Please retrace first.")
 
         # get search bounds
         ################################################################################################################

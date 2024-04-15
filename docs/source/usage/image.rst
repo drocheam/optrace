@@ -459,9 +459,6 @@ An example for the difference of both sRGB modes is seen in :numref:`color_dispe
           Saturation (CIELUV)
 
 
-.. TODO describe different sRGB perceptual parameters
-
-
 Image Cut
 _____________________________________
 

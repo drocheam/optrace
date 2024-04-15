@@ -114,6 +114,7 @@ In the following examples both cornea surfaces of the arizona eye model are plot
 
 .. testcode::
 
+   import optrace as ot
    import optrace.plots as otp
 
    G = ot.presets.geometry.arizona_eye()
@@ -192,6 +193,7 @@ The plotting function takes an RGBImage or LinearImage as parameter.
 
 .. testcode::
 
+   img = ot.presets.image.hong_kong([2, 2])
    otp.image_plot(img)
 
 We can use the additional parameter :python:`log` to scale the image values logarithmically or provide :python:`flip=True` to rotate the image by 180 degrees. This is useful when the desired image is flipped due to the system imaging. A user defined title is set with the :python:`title` parameter.
@@ -245,28 +247,31 @@ When doing so, the choice between the CIE 1931 xy chromaticity diagram and the C
 Depending on your choice the :func:`chromaticities_cie_1931 <optrace.plots.chromaticity_plots.chromaticities_cie_1931>` or :func:`chromaticities_cie_1976 <optrace.plots.chromaticity_plots.chromaticities_cie_1976>` function is called
 In the simplest case it takes an RenderImage as parameter and displays the image colors:
 
-.. testcode::
+.. code-block:: python
 
+   dimg = RT.detector_image()
    otp.chromaticities_cie_1931(dimg)
 
 You can also pass an RGBImage:
 
 .. testcode::
 
-   img = dimg.get("sRGB (Perceptual RI)", 189)
+   img = ot.presets.image.color_checker([3, 2])
    otp.chromaticities_cie_1931(img)
 
 A :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` can also be provided:
 
 .. testcode::
 
+   spec = ot.presets.light_spectrum.led_b1
    otp.chromaticities_cie_1976(spec)
 
 Or a list of multiple spectra:
 
 .. testcode::
 
-   otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard)
+   specs = [ot.presets.light_spectrum.led_b3, ot.presets.light_spectrum.d65]
+   otp.chromaticities_cie_1976(specs)
 
 A user defined :python:`title` can also be set. :python:`norm` specifies the brightness normalization, explained a few paragraphs below.
 

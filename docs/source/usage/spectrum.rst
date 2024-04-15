@@ -281,20 +281,21 @@ Rendering a LightSpectrum
 Rendering a light spectrum is  done on the ray source or detector surface.
 Read section :ref:`rimage_rendering` for details on rendering images, rendering spectra is done in a similar way.
 Analogously to rendering a source image, we can render a spectrum with :meth:`source_spectrum <optrace.tracer.raytracer.Raytracer.source_spectrum>` and by providing a :python:`source_index` parameter (default to zero).
+With a raytracer object called :python:`RT` a source spectrum is rendered with:
 
-.. testcode::
+.. code-block:: python
 
    spec = RT.source_spectrum(source_index=1)
 
 For a detector spectrum the :meth:`detector_spectrum <optrace.tracer.raytracer.Raytracer.detector_spectrum>` function is applied. It takes a :python:`detector_index` argument, that also defaults to zero.
 
-.. testcode::
+.. code-block:: python
 
    spec = RT.detector_spectrum(detector_index=0)
 
 Additionally we can limit the rendering to a source by providing a :python:`source_index` or limit the detector area by providing the :python:`extent` parameter, as we did for the :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>`.
 
-.. testcode::
+.. code-block:: python
 
    spec = RT.detector_spectrum(detector_index=0, source_index=1, extent=[0, 1, 0, 1])
 

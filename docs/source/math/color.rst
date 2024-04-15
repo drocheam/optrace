@@ -186,11 +186,11 @@ Implemented Rendering Intents:
 Intersecting the gamut edge for mode *Absolute Colorimetric* is done in the CIE 1931 xy chromaticity diagram and towards the whitepoint of the standard illuminants D65.
 Determining and rescaling the saturation in *Perceptual Colorimetric* mode is done in the CIE 1976 uv chromaticity diagram, since this is a representation where color differences directly correspond to spatial differences.
 
-
 In the default configuration Perceptual Colorimetric scales the saturation such that all colors are inside the gamut.
 A fixed rescaling factor (range 0-1) can be provided as ``sat_scale`` parameter that can enforce the same factor when for instance comparing different images.
 In the former adaptive case an additional ``L_th`` can be applied, which is a relative threshold and ignores values below this threshold for the calculation of the scaling factor.
 This proves useful when dark but saturated regions are inside the image but which can be neglected.
+See :ref:`usage_color` for more details.
 
 The effect of different rendering intents is illustrated in the next figures. The rendered images were created using the double prism example from the example folder, where light is decomposed into its components. Since all spectral wavelengths create colors beyond the sRGB gamut, this leads to an extreme case.
 In the first image the lightness component is pictured, the following images should be the colored version of this lightness image.
@@ -215,16 +215,16 @@ The third image shows the Perceptual Colorimetric rendering intent. One can clea
 
 
 When searching for chromaticity diagrams, a lot of negative examples can be found 
-(`Link1 <https://clarkvision.com/articles/color-cie-chromaticity-and-perception/color-rgb-xy-cie1931-diagram1g1000spjfjl1-1000-ciesrgb-axes-waveticks-c1-srgb-800.jpg>`_,
-`Link2 <https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a>`_,
-`Link3 <https://www.konicaminolta.com/instruments/knowledge/light/concepts/img/pict08_02.gif>`_,
-`Link4 <https://media.cheggcdn.com/study/e63/e632ad42-8674-4518-a7de-b031f2316b8a/image.png>`_,
-`Link5 <https://d1hjkbq40fs2x4.cloudfront.net/2017-06-05/files/perceptual-vs-absolute-rendering-intents_1621-2.jpg>`_).
+(`Link1 <https://clarkvision.com/articles/color-cie-chromaticity-and-perception/color-rgb-xy-cie1931-diagram1g1000spjfjl1-1000-ciesrgb-axes-waveticks-c1-srgb-800.jpg>`__,
+`Link2 <https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a>`__,
+`Link3 <https://galaxyav.com/wp-content/uploads/2022/11/Chromaticity-curve-of-LED-screen.jpg>`__,
+`Link4 <https://media.cheggcdn.com/study/e63/e632ad42-8674-4518-a7de-b031f2316b8a/image.png>`__,
+`Link5 <https://d1hjkbq40fs2x4.cloudfront.net/2017-06-05/files/perceptual-vs-absolute-rendering-intents_1621-2.jpg>`__).
 
 In most cases negative sRGB values were simply clipped, distorting not only saturation, but also hue and brightness. For instance, colors near 510 nm get shown in deep green compared to a slightly nuanced greenish-cyan. In some cases even the representable colors inside the gamut are incorrect, which can be for instance seen as high saturated colors everywhere inside the diagram. 
 On the other hand, positive examples are found here:
-`Link6 <https://commons.wikimedia.org/wiki/File:CIE1931xy_blank.svg>`_,
-`Link7 <https://www.wavemetrics.com/sites/www.wavemetrics.com/files/styles/content_body/public/2019-04/Chromaticity_1931.png>`_
+`Link6 <https://commons.wikimedia.org/wiki/File:CIE1931xy_blank.svg>`__,
+`Link7 <https://www.wavemetrics.com/sites/www.wavemetrics.com/files/styles/content_body/public/2019-04/Chromaticity_1931.png>`__
 Note that the positive examples have a different luminance norm, showing the colors with a higher brightness.
 
 CIELUV Color Space
