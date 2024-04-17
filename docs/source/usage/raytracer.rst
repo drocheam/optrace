@@ -52,6 +52,8 @@ This is also the only mandatory parameter of this class
 
 **Geometry**
 
+.. TODO how to add geometry elements?
+
 Since `optrace` implements sequential raytracing, the surfaces and objects must be in a well-defined and unique sequence. This applies to all elements with interactions of light: :python:`Lens, IdealLens, Filter, Aperture, RaySource`.
 The elements :python:`Detector, LineMarker, PointMarker, BoxVolume, SphereVolume, CylinderVolume` are excluded from this.
 All ray source elements must lie before all lenses, filters and apertures. And all subsequent lenses, filters, apertures must not collide and be inside the outline.
@@ -91,6 +93,11 @@ With the parameter :python:`no_pol=True` no polarizations are calculated and we 
 Whether you can neglect the influence of polarization depends of course on the exact setup of the geometry.
 However, for setups where the beam angles to the surface normals are small, this is usually the case.
 
+
+Tracing
+_____________________
+
+.. TODO document more
 
 **Example**
 

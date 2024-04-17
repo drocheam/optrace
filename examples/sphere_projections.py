@@ -26,7 +26,7 @@ DET = ot.Detector(DETS, pos=[0, 0, R])
 RT.add(DET)
 
 # trace some rays
-RT.trace(200000)
+RT.trace(600000)
 
 # plot detector images for different projection types
 for proj in ot.SphericalSurface.sphere_projection_methods:

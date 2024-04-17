@@ -50,7 +50,7 @@ class TraceGUI(HasTraits):
                              auto_set=False, label="Limit (µm)", mode='text')
     """gaussian filter constant standard deviation"""
 
-    rays_visible: Range = Range(1, 50000, 2000, desc='the number of rays which is drawn', enter_set=False,
+    rays_visible: Range = Range(1, ScenePlotting.MAX_RAYS_SHOWN, 2000, desc='the number of rays which is drawn', enter_set=False,
                                 auto_set=False, label="Count", mode='logslider')
     """Number of rays shown in mayavi scene"""
 
@@ -808,11 +808,17 @@ class TraceGUI(HasTraits):
         self._status["Drawing"] -= 1
 
     @observe('rays_visible', dispatch="ui")
-    def replot_rays(self, event=None) -> None:
+    def replot_rays(self, event=None, mask: np.ndarray = None, max_show: int = None) -> None:
         """
         choose a subset of all raytracer rays and plot them with :`TraceGUI._plot_rays`.
 
+        By default, a random subset is selected.
+        When mask and max_show (both optional) are provided, a specific subset is displayed.
+        See TraceGUI.select_rays.
+
         :param event: optional event from traits observe decorator
+        :param mask: boolean array for which rays to display. Shape must equal the number of currently traced rays.
+        :param max_show: maximum number of rays to display
         """
 
         if not self._no_trait_action_flag and not self._status["Tracing"]: 
@@ -827,31 +833,61 @@ class TraceGUI(HasTraits):
                 return
 
             def background():
-                with self.__ray_access_lock:
-                    res = self._plot.get_rays()
+                with self._try() as error:
+                    with self.__ray_access_lock:
+                        if mask is None:
+                            self._plot.random_ray_selection()
+                        else:
+                            self._plot.select_rays(mask, max_show)
+                        res = self._plot.get_rays()
 
                 def on_finish():
 
-                    self._plot.assign_ray_properties()
+                    if not error:
 
-                    with self._plot.constant_camera():
-                        self._plot.plot_rays(*res)
-                        self._change_ray_and_source_colors()
+                        self._plot.assign_ray_properties()
 
-                    # reset picker text, highlight plot and crosshair
-                    self._plot.clear_ray_text()
-                    self._plot.hide_crosshair()
-                    self._plot.hide_ray_highlight()
+                        with self._plot.constant_camera():
+                            self._plot.plot_rays(*res)
+                            self._change_ray_and_source_colors()
+
+                        # reset picker text, highlight plot and crosshair
+                        self._plot.clear_ray_text()
+                        self._plot.hide_crosshair()
+                        self._plot.hide_ray_highlight()
+                   
+                        # if a custom selection was provided, we need to update the number of displayed rays
+                        if mask is not None:
+                            with self._no_trait_action():
+                                self.rays_visible = np.count_nonzero(self.ray_selection)
 
                     self._status["Drawing"] -= 1
 
                     # gets unset on first run
                     if self._status["DisplayingGUI"]:
                         pyface_gui.invoke_later(self._set_gui_loaded)
-
+            
                 pyface_gui.invoke_later(on_finish)
             
             self._start_action(background)
+
+    def select_rays(self, mask: np.ndarray, max_show: int = None) -> None:
+        """
+        Apply a specific selection of rays for display.
+        If the number is too large it is either limited by the 'max_show' parameter or a predefined limit.
+
+        :param mask: boolean array for which rays to display. Shape must equal the number of currently traced rays.
+        :param max_show: maximum number of rays to display
+        """
+        if not self._status["Tracing"]:
+            self.replot_rays(None, mask, max_show)
+        else:
+            warning(f"Did not apply the ray selection as the raytracer is still tracing.")
+
+    @property
+    def ray_selection(self) -> np.ndarray:
+        """:return: boolean array for which of the traced rays in TraceGUI.raytracer.rays are displayed currently"""
+        return self._plot.ray_selection
 
     @observe('ray_count', dispatch="ui")
     def retrace(self, event=None) -> None:

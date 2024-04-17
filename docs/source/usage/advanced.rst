@@ -62,42 +62,62 @@ Overview
 **Shapes**:
 
 | **N**: number of rays
-| **nt**: number of sections per ray, equal for all rays
+| **Nt**: number of sections per ray, equal for all rays
 
 
 The number of sections is the same for all rays. If a ray gets absorbed early, all consecutive sections consist of zero length vectors starting at the last position and having their power set to zero. Direction and polarization are undefined.
 
+The following table shows an overview of ray properties.
+Some of those are attributes that are stored while tracing, while others are functions, as these properties must be calculated from other attributes first.
+They are intentionally kept as functions and are not exposed as properties, so an computational overhead is communicated to the user.
 
 .. list-table:: List of ray properties
-   :widths: 100 200 50 400
+   :widths: 100 100 200 50 400
    :header-rows: 0
    :align: left
 
-   * - Name
+   * - Quantity
+     - Method/Attribute
      - Type
      - Unit
      - Function
-   * - :attr:`p_list <optrace.tracer.ray_storage.RayStorage.p_list>`
-     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape N x nt x 3
+   * - Position
+     - :attr:`p_list <optrace.tracer.ray_storage.RayStorage.p_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape (N, Nt, 3)
      - mm
      - 3D starting position for all ray sections 
-   * - :attr:`s0_list <optrace.tracer.ray_storage.RayStorage.s0_list>`
-     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape N x 3
+   * - Direction vectors
+     - :meth:`direction_vectors() <optrace.tracer.ray_storage.RayStorage.direction_vectors>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape (N, Nt, 3)
      - ``-``
-     - unity direction vector at the ray source
-   * - :attr:`pol_list <optrace.tracer.ray_storage.RayStorage.pol_list>`
-     - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape N x nt x 3
+     - normalized (with :python:`normalize=True`) or unnormalized direction vectors for each ray section
+   * - Section lengths
+     - :meth:`ray_lengths() <optrace.tracer.ray_storage.RayStorage.ray_lengths>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape (N, Nt)
+     - ``-``
+     - geometrical length of each ray section
+   * - Optical section lengths
+     - :meth:`optical_lengths() <optrace.tracer.ray_storage.RayStorage.optical_lengths>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape (N, Nt)
+     - ``-``
+     - optical length of each ray section (geometrical length multiplied by refractive index)
+   * - Polarization
+     - :attr:`pol_list <optrace.tracer.ray_storage.RayStorage.pol_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape (N, Nt, 3)
      - ``-``
      - unity 3D polarization vector
-   * - :attr:`w_list <optrace.tracer.ray_storage.RayStorage.w_list>`
-     - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape N x nt
+   * - Power
+     - :attr:`w_list <optrace.tracer.ray_storage.RayStorage.w_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape (N, Nt)
      - W
      - ray power
-   * - :attr:`n_list <optrace.tracer.ray_storage.RayStorage.n_list>`
-     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape N x nt
+   * - Refractive Index
+     - :attr:`n_list <optrace.tracer.ray_storage.RayStorage.n_list>`
+     - :class:`numpy.ndarray` of type :attr:`numpy.float64` of shape (N, Nt)
      - ``-``
      - refractive indices for all ray sections
-   * - :attr:`wl_list <optrace.tracer.ray_storage.RayStorage.wl_list>`
+   * - Wavelength
+     - :attr:`wl_list <optrace.tracer.ray_storage.RayStorage.wl_list>`
      - :class:`numpy.ndarray` of type :attr:`numpy.float32` of shape N
      - nm
      - wavelength of the ray
@@ -150,26 +170,12 @@ Access position z-component of all sections of the twenty-third to twenty-sixth 
 
    RT.rays.p_list[22:25, :, 2]
 
-
-Ray lengths
-#################
-
-Ray section lengths, optical lengths as well as direction vectors are not directly accessible, but need to be calculated on demand.
-
-For the former two there are methods available, for the latter one the :meth:`rays_by_mask <optrace.tracer.ray_storage.RayStorage.rays_by_mask>` function from the next section can be used
-
-Functions :meth:`ray_lengths <optrace.tracer.ray_storage.RayStorage.ray_lengths>` and :meth:`optical_lengths <optrace.tracer.ray_storage.RayStorage.optical_lengths>` are available.
-Both take an optional boolean mask as argument, that masks the rays to the desired selection:
+Access the ray section lengths for the fourth section:
 
 .. code-block:: python
 
-   mask = np.array([0, 1, 0, 1, ...], dtype=bool)
-   RT.rays.optical_lengths(mask)
+   RT.rays.ray_lengths()[:, 3]
 
-By default, no rays are masked and all lengths are returned.
-
-Note that these functions return the section lengths, not the overall length.
-But the latter can be simply calculated by summing all ray section lengths together for each ray.
 
 Masking
 ################

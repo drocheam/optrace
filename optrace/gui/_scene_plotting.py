@@ -13,8 +13,8 @@ from ..warnings import warning
 from ..global_options import global_options as go
 
 from ..tracer.misc import PropertyChecker as pc
+from ..tracer.misc import part_mask
 
-# TODO select rays function, where ray_selection can be set manually
 
 
 class ScenePlotting:
@@ -27,7 +27,7 @@ class ScenePlotting:
     SURFACE_RES: int = 150
     """Surface sampling count in each dimension"""
 
-    MAX_RAYS_SHOWN: int = 10000
+    MAX_RAYS_SHOWN: int = 50000
     """Maximum of rays shown in visualization"""
 
     LABEL_STYLE: dict = dict(font_size=11, bold=True, font_family="courier", shadow=True, italic=False)
@@ -84,7 +84,8 @@ class ScenePlotting:
         # ray properties
         self.__ray_property_dict = {}  # properties of shown rays, set while tracing
         self._ray_property_dict = {}  # properties of shown rays, set after tracing
-
+        self.ray_selection = None
+        
         # pickers
         self._ray_picker = None
         self._space_picker = None
@@ -1182,27 +1183,41 @@ class ScenePlotting:
             warning("Number of RaySourcePlots differs from actual Sources. "
                     "Maybe the GUI was not updated properly?")
 
-    def get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """assign traced and selected rays into a ray dictionary"""
-        
+    def random_ray_selection(self):
+        """
+        select 'TraceGUI.rays_visible' rays from raytracer.rays.N random rays.
+        Assigns the ScenePlotting.ray_selection boolean array.
+        """
+        # chose random elements
         N = self.raytracer.rays.N
         set_size = min(N, self.ui.rays_visible)
         rindex = np.random.choice(N, size=set_size, replace=False)  # random choice
 
         # make bool array with chosen rays set to true
-        ray_selection = np.zeros(N, dtype=bool)
-        ray_selection[rindex] = True
+        self.ray_selection = np.zeros(N, dtype=bool)
+        self.ray_selection[rindex] = True
 
-        p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(ray_selection, normalize=True)
-        l_ = self.raytracer.rays.ray_lengths(ray_selection)
-        ol_ = self.raytracer.rays.optical_lengths(ray_selection)
+    def get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """assign traced and selected rays into a ray dictionary"""
         
-        _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(ray_selection, normalize=False,
+        # N = self.raytracer.rays.N
+        # set_size = min(N, self.ui.rays_visible)
+        # rindex = np.random.choice(N, size=set_size, replace=False)  # random choice
+
+        # # make bool array with chosen rays set to true
+        # ray_selection = np.zeros(N, dtype=bool)
+        # ray_selection[rindex] = True
+
+        p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(self.ray_selection, normalize=True)
+        l_ = self.raytracer.rays.ray_lengths()[self.ray_selection]
+        ol_ = self.raytracer.rays.optical_lengths()[self.ray_selection]
+        
+        _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(self.ray_selection, normalize=False,
                                                                   ret=[0, 1, 0, 0, 0, 0, 0])
 
         # force copies
         self.__ray_property_dict.update(p=p_.copy(), s=s_.copy(), pol=pol_.copy(), w=w_.copy(), wl=wl_.copy(),
-                                        snum=snum_.copy(), n=n_.copy(), index=np.where(ray_selection)[0],
+                                        snum=snum_.copy(), n=n_.copy(), index=np.where(self.ray_selection)[0],
                                         l=l_.copy(), ol=ol_.copy(), s_un=s_un.copy())
        
         # use flatten instead of ravel so we have guaranteed copies
@@ -1226,6 +1241,57 @@ class ScenePlotting:
             with self.constant_camera():
                 self._ray_plot.parent.parent.remove()
                 self._ray_plot = None
+
+    def select_rays(self, mask: np.ndarray, max_show: int = None) -> None:
+        """
+        Apply a specific selection of rays for display.
+        If the number is too large it is either limited by the 'max_show' parameter or a predefined limit.
+
+        :param mask: boolean array for which rays to display. Shape must equal the number of currently traced rays.
+        :param max_show: maximum number of rays to display
+        """
+
+        if mask.shape[0] != self.raytracer.rays.N:
+            raise ValueError(f"Shape mismatch between mask ({mask.shape[0]}) "
+                             f"and number of rays ({self.raytracer.rays.N}).")
+
+        if mask.ndim != 1:
+            raise ValueError(f"Mask must have only a single dimension, but has {mask.ndim}.")
+        
+        if max_show is not None and max_show <= 0:
+            raise ValueError(f"Parameter 'max_show' must be above zero, but is {max_show}.")
+
+        if mask.dtype != "bool":
+            raise ValueError(f"Mask must be boolean, but is {mask.dtype}.")
+
+        true_val = np.count_nonzero(mask)
+
+        if not true_val:
+            raise ValueError("No elements are set inside the mask.")
+
+        if max_show is not None or true_val > self.MAX_RAYS_SHOWN:
+
+            if max_show is None and true_val > self.MAX_RAYS_SHOWN:
+                warning(f"Limited the number of displayed rays to {self.MAX_RAYS_SHOWN}, as the requested value "
+                        f"of {true_val} was above the limit.")
+                bound = self.MAX_RAYS_SHOWN
+            
+            elif max_show is not None and max_show > self.MAX_RAYS_SHOWN:
+                warning(f"Limited the number of displayed rays to {self.MAX_RAYS_SHOWN}, as the requested value "
+                        f"of {max_show} was above the limit.")
+                bound = min(true_val, self.MAX_RAYS_SHOWN)
+
+            else:
+                bound = min(max_show, true_val)
+
+            sub = np.zeros(true_val, dtype=bool)
+            indices = np.random.choice(true_val, size=bound, replace=False)
+            sub[indices] = True
+            self.ray_selection = part_mask(mask, sub) 
+
+        else:
+            self.ray_selection = mask
+
 
     # Picking Handler
     ###################################################################################################################

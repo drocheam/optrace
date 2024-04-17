@@ -136,8 +136,7 @@ class Raytracer(Group):
             dict(Markers=[D.crepr() for D in self.markers],
                  Volumes=[D.crepr() for D in self.volumes],
                  Detectors=[D.crepr() for D in self.detectors])
-   
-    # TODO test
+
     def tracing_snapshot(self) -> dict:
         """
         Creates a snapshot of properties of rays and Elements relevant for tracing.

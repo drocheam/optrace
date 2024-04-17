@@ -20,6 +20,7 @@ Here are some exemplary tasks that can be achieved with automation:
 
 * changing the geometry and visualizing all changes
 * changing camera views accurately
+* displaying specific rays
 * picking specific rays
 * debugging
 * taking automated screenshots of the scene
@@ -206,6 +207,44 @@ Below you can find examples for a call:
 
 Note that using the :python:`magnification` parameter leads to a rescaled scene, where some elements change their relative size.
 
+.. _usage_gui_selecting_rays:
+
+Selecting Rays
+_________________________
+
+
+By default, a random selection of rays is displayed inside the scene where the number is specified by :attr:`TraceGUI.rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`.
+A custom selection can be set using function :meth:`TraceGUI.select_rays <optrace.gui.trace_gui.TraceGUI.select_rays>`.
+It takes a :python:`mask` parameter, which is a one-dimensional boolean :obj:`numpy.array`, and an optional :python:`max_show` parameter, that specified the maximum amount of rays to display.
+Parameter :python:`mask` must have the same length as there are rays simulated, which is set by :attr:`TraceGUI.ray_count <optrace.gui.trace_gui.TraceGUI.ray_count>`
+Note that there is a maximum amount of rays that can be displayed (specified by the maximum value of :attr:`TraceGUI.rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`, by default :python:`50000`).
+If the :python:`mask` includes more values, a random subset is selected.
+Accessing :attr:`TraceGUI.ray_selection <optrace.gui.trace_gui.TraceGUI.ray_selection>` returns the boolean array for the currently displayed rays.
+
+Typical useful scenarios are debugging or ray analysis.
+For instance, only rays from a specific source, region or wavelength range can be selected and displayed.
+See :ref:`usage_ray_access` to learn how to access ray properties.
+You can find examples for ray selections below.
+
+.. code-block:: python
+
+   def automated(GUI):
+       
+       # display rays with wavelengths between 400 and 450nm
+       mask = (GUI.raytracer.rays.wl_list >= 400) & (GUI.raytracer.rays.wl_list <= 450)
+       GUI.select_rays(mask) # no max_show provided, but might be limited by this function
+
+       # display 2000 rays that start at x > 0
+       mask = GUI.raytracer.rays.p_list[:, :, 0] > 0
+       GUI.select_rays(mask[:, 0], 2000)  # slicing with 0 so mask is 1D
+       
+       # get mask for actually displayed selection
+       selection = GUI.ray_selection
+
+   # create the GUI and provide the automation function to TraceGUI.control()
+   sim = TraceGUI(RT)
+   sim.control(func=automated, args=(sim,))
+
 
 Picking Manually
 ________________________
@@ -213,14 +252,16 @@ ________________________
 
 The function :meth:`TraceGUI.pick_ray <optrace.gui.trace_gui.TraceGUI.pick_ray>` highlights a full ray.
 A :python:`index` parameter is required as integer to select a given ray.
+Only currently displayed rays can be picked, which are defined by :attr:`TraceGUI.ray_selection <optrace.gui.trace_gui.TraceGUI.ray_selection>`, see :ref:`usage_gui_selecting_rays`.
+So an :python:`index=50` means that the 50th :python:`True` value of :attr:`TraceGUI.ray_selection <optrace.gui.trace_gui.TraceGUI.ray_selection>` is picked.
 
-Function :meth:`TraceGUI.pick_ray <optrace.gui.trace_gui.TraceGUI.pick_ray_section>` highlights a ray at a given intersection.
+Function :meth:`TraceGUI.pick_ray_section <optrace.gui.trace_gui.TraceGUI.pick_ray_section>` highlights a ray at a given intersection.
 The ray is highlighted, a crosshair is shown at the intersection position and a ray information text is shown inside the scene.
 Compared to the previous function, an additional integer :python:`section` parameter is needed.
 An optional parameter :python:`detailed` defines if more detailed information should be shown.
 This would be equivalent to picking a section manually in the scene with the Shift key hold.
 
-To deactivate the ray hightlight, information text and cross hair, :meth:`TraceGUI.pick_ray <optrace.gui.trace_gui.TraceGUI.reset_picking>` should be called.
+To deactivate the ray highlight, information text and cross hair, :meth:`TraceGUI.pick_ray <optrace.gui.trace_gui.TraceGUI.reset_picking>` should be called.
 
 Here is an example:
 
@@ -243,14 +284,6 @@ Here is an example:
    # create the GUI and provide the automation function to TraceGUI.control()
    sim = TraceGUI(RT)
    sim.control(func=automated, args=(sim,))
-
-Currently, only rays shown in the scene can be highlighted/picked, which are a subset of all shown rays.
-The index values used for the functions above are indices for the displayed rays, not the indices for the array of all traced rays.
-To find out, which display index corresponds to which traced index, you can open the :numref:`property_viewer` of the TraceGUI and check the index tree in the tab `Shown Rays`.
-
-In the future it is planned to provide these values inside the TraceGUI as an dictionary and implement a specific function that displays specific rays inside the scene.
-
-.. TODO
 
 Showing Plots
 ________________________

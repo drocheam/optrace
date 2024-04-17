@@ -731,6 +731,23 @@ class TracerTests(unittest.TestCase):
 
             RT.remove(RT.ray_sources[-1])
 
+        RT = rt_example()
+        RT.trace(100000)
+
+        # coverage: test that direction_vectors produce the same result as rays_by_mask
+        _, s1, _, _, _, _, _ = RT.rays.rays_by_mask(ret=[0, 1, 0, 0, 0, 0, 0], normalize=False)
+        s2 = RT.rays.direction_vectors(False)
+        self.assertTrue(np.all((s1 == s2) | np.isnan(s1)))  # additional isnan as nan == nan would be false.
+        # np.isnan(s2) not needed as both s1, s2, must be the same
+        _, s1, _, _, _, _, _ = RT.rays.rays_by_mask(ret=[0, 1, 0, 0, 0, 0, 0], normalize=True)
+        s2 = RT.rays.direction_vectors(True)
+        self.assertTrue(np.all((s1 == s2) | np.isnan(s1)))
+        
+        # coverage: test that source_numbers produce the same result as rays_by_mask
+        _, _, _, _, _, sn1, _ = RT.rays.rays_by_mask(ret=[0, 0, 0, 0, 0, 1, 0])
+        sn2 = RT.rays.source_numbers()
+        self.assertTrue(np.all(sn1 == sn2))
+
         # ray_lengths is tested in tracing tests
 
     def test_optical_lengths_ray_lengths(self):

@@ -7,6 +7,7 @@ from . import misc  # calculations
 from ..warnings import warning
 
 
+
 class RayStorage(BaseClass):
 
     def __init__(self, **kwargs) -> None:
@@ -161,27 +162,43 @@ class RayStorage(BaseClass):
         return self.p_list[Ns:Ne, 0], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne, 0],\
             self.w_list[Ns:Ne, 0], self.wl_list[Ns:Ne]
 
-    def ray_lengths(self, ch: np.ndarray = None) -> np.ndarray:
+    def ray_lengths(self) -> np.ndarray:
         """
         Euclidean lengths of the ray sections.
 
-        :param ch: boolean area selecting the desired rays, shape N
         :return: length array with shape (N, nt)
         """
-        _, s, _, _, _, _, _ = self.rays_by_mask(ch, ret=[0, 1, 0, 0, 0, 0, 0], normalize=False)
+        _, s, _, _, _, _, _ = self.rays_by_mask(ret=[0, 1, 0, 0, 0, 0, 0], normalize=False)
         return np.linalg.norm(s, axis=s.ndim-1)
     
-    def optical_lengths(self, ch: np.ndarray = None) -> np.ndarray:
+    def optical_lengths(self) -> np.ndarray:
         """
         Optical lengths of the ray sections
 
-        :param ch: boolean array for ray selection, shape N
         :return: Optical path length for each ray section, shape (N, nt)
         """
-
-        l = self.ray_lengths(ch)
-        _, _, _, _, _, _, n = self.rays_by_mask(ch, ret=[0, 0, 0, 0, 0, 0, 1])
+        l = self.ray_lengths()
+        _, _, _, _, _, _, n = self.rays_by_mask(ret=[0, 0, 0, 0, 0, 0, 1])
         return l*n
+
+    def source_numbers(self) -> np.ndarray:
+        """
+        Ray source numbers for each ray
+        
+        :return: ray source numbers
+        """
+        _, _, _, _, _, sn, _ = self.rays_by_mask(ret=[0, 0, 0, 0, 0, 1, 0])
+        return sn
+    
+    def direction_vectors(self, normalize: bool = True) -> np.ndarray:
+        """
+        Normalized or unnormalized direction ray vectors for each ray and ray section
+        
+        :param normalize: if direction vectors should be normalized
+        :return: direction vectors, shape (N, 3)
+        """
+        _, s, _, _, _, _, _ = self.rays_by_mask(ret=[0, 1, 0, 0, 0, 0, 0], normalize=normalize)
+        return s
 
     def rays_by_mask(self,
                      ch:           np.ndarray = None,

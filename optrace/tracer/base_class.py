@@ -5,7 +5,7 @@ from typing import Any  # Any type
 import numpy as np  # calculations
 
 from .misc import PropertyChecker as pc  # type checking
-
+import time
 
 class BaseClass:
 
@@ -42,22 +42,20 @@ class BaseClass:
 
         for key, val in self.__dict__.items():
 
-            if key != "_lock":
+            if issubclass(type(val), BaseClass):
+                cl.append(val.crepr())
 
-                if isinstance(val, list):
-                    cl.append(tuple(val))
+            elif isinstance(val, np.ndarray):
+                cl.append(tuple(val.flat) if val.size < 20 else id(val))
 
-                elif issubclass(type(val), BaseClass):
-                    cl.append(val.crepr())
+            elif callable(val):
+                cl.append(id(val))
+            
+            elif isinstance(val, list):
+                cl.append(tuple(val))
 
-                elif isinstance(val, np.ndarray):
-                    cl.append(tuple(val.flat) if val.size < 20 else id(val))
-
-                elif callable(val):
-                    cl.append(id(val))
-
-                else:
-                    cl.append(val)
+            else:
+                cl.append(val)
 
         return cl
 

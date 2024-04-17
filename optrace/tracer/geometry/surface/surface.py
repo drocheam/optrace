@@ -93,7 +93,6 @@ class Surface(BaseClass):
 
         return z_min, z_max
 
-    # TODO make private
     def move_to(self, pos: (list | np.ndarray)) -> None:
         """
         Moves the surface in 3D space.

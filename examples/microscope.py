@@ -104,6 +104,7 @@ vol = ot.CylinderVolume(r=15.9, length=eyepiece.extent[5]-objective.extent[4]-1.
                         pos=[0, 0, objective.extent[4]+1.3], color=(0.0, 0.0, 0.0))
 RT.add(vol)
 
+RT.tracing_snapshot()
 
 # run the simulator
 sim = TraceGUI(RT, ray_count=1000000, vertical_labels=True, minimalistic_view=True)

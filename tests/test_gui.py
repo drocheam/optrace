@@ -117,7 +117,7 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.gui1
     @pytest.mark.slow
-    def test_0gui_inits(self) -> None:
+    def test_gui_inits(self) -> None:
 
         # make raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
@@ -1657,6 +1657,91 @@ class GUITests(unittest.TestCase):
                     self.assertNotEqual(text, text2)
                     text2 = text
 
+        sim = TraceGUI(RT)
+        sim.debug(interact, args=(sim,))
+        self.raise_thread_exceptions()
+
+    @pytest.mark.gui3
+    def test_select_rays(self):
+        """
+        tests for manually selecting rays. Tests TraceGUI.select_rays and TraceGUI.ray_selection.
+        Therefore also checks ScenePlotting.select_rays, ScenePlotting.ray_selection, TraceGUI.replot_rays
+        """
+        
+        RT = rt_example()
+        N = 500000
+        RT.trace(N)
+        
+        def interact(sim):
+            with self._try(sim):
+                
+                # test: get mask for actually displayed selection
+                # check if set values match rays_visible
+                selection = sim.ray_selection
+                self.assertEqual(np.count_nonzero(sim.ray_selection), sim.rays_visible)
+                self.assertTrue(np.all(sim.ray_selection == sim._plot.ray_selection))
+
+                # exceptions
+                id0 = id(sim._plot._ray_plot)
+                self.assertRaises(ValueError, sim._plot.select_rays, np.ones(100, dtype=bool))  # mask size not same as ray number
+                self.assertRaises(ValueError, sim._plot.select_rays, np.ones((100, 2), dtype=bool))  # mask not 1D
+                self.assertRaises(ValueError, sim._plot.select_rays, np.zeros(N, dtype=bool))  # no elements set
+                self.assertRaises(ValueError, sim._plot.select_rays, np.ones(N, dtype=bool), -1)  # max_show negative
+                id1 = id(sim._plot._ray_plot)
+                self.assertEqual(id0, id1)  # rays were not replotted
+
+                # test cases below. Each test tests if ray_selection array and rays_visible trait are set correctly
+                # additionally ray_plots are compared, as they also must have been updated
+
+                # test case 1: mask provided, but number of displayed rays is limited
+                mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 750)
+                assert np.count_nonzero(mask) > sim._plot.MAX_RAYS_SHOWN
+                sim.select_rays(mask) # no max_show provided, but might be limited by this function
+                self._wait_for_idle(sim)
+                self.assertEqual(np.count_nonzero(sim.ray_selection), sim._plot.MAX_RAYS_SHOWN)
+                self.assertEqual(sim.rays_visible, sim._plot.MAX_RAYS_SHOWN)
+                id2 = id(sim._plot._ray_plot)
+                self.assertNotEqual(id1, id2)
+
+                # test case 2: mask and max_show provided
+                mask = sim.raytracer.rays.p_list[:, :, 0] > 0
+                sim.select_rays(mask[:, 0], 2000) 
+                self._wait_for_idle(sim)
+                self.assertEqual(np.count_nonzero(sim.ray_selection), 2000)
+                self.assertEqual(sim.rays_visible, 2000)
+                id3 = id(sim._plot._ray_plot)
+                self.assertNotEqual(id2, id3)
+                
+                # test case 3: mask provided, number of selected rays is below limit
+                mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 405)
+                assert np.count_nonzero(mask) < sim._plot.MAX_RAYS_SHOWN
+                sim.select_rays(mask)
+                self._wait_for_idle(sim)
+                self.assertEqual(np.count_nonzero(sim.ray_selection), np.count_nonzero(mask))
+                self.assertEqual(sim.rays_visible, np.count_nonzero(mask))
+                id4 = id(sim._plot._ray_plot)
+                self.assertNotEqual(id3, id4)
+                
+                # test case 4: mask provided, max_show above limit
+                mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 750)
+                assert np.count_nonzero(mask) > sim._plot.MAX_RAYS_SHOWN
+                sim.select_rays(mask, sim._plot.MAX_RAYS_SHOWN+5)
+                self._wait_for_idle(sim)
+                self.assertEqual(np.count_nonzero(sim.ray_selection), sim._plot.MAX_RAYS_SHOWN)
+                self.assertEqual(sim.rays_visible, sim._plot.MAX_RAYS_SHOWN)
+                id5 = id(sim._plot._ray_plot)
+                self.assertNotEqual(id4, id5)
+                
+                # test case 5: max_show above true number of set values
+                mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 405)
+                assert np.count_nonzero(mask) < sim._plot.MAX_RAYS_SHOWN
+                sim.select_rays(mask, sim._plot.MAX_RAYS_SHOWN)
+                self._wait_for_idle(sim)
+                self.assertEqual(np.count_nonzero(sim.ray_selection), np.count_nonzero(mask))
+                self.assertEqual(sim.rays_visible, np.count_nonzero(mask))
+                id6 = id(sim._plot._ray_plot)
+                self.assertNotEqual(id5, id6)
+        
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
         self.raise_thread_exceptions()
