@@ -188,7 +188,6 @@ class Raytracer(Group):
         for msg in msgs:
             self._msgs += msg
 
-    # TODO test
     def _surface_names(self) -> list[str]:
         """Generate a list of surface names ordered by their z-position"""
 
@@ -1135,9 +1134,6 @@ class Raytracer(Group):
         if (N := int(N)) <= 0:
             raise ValueError(f"Ray number N_rays needs to be a positive int, but is {N}.")
 
-        if not self.detectors and pos is not None:
-            raise RuntimeError("No detectors in geometry.")
-
         # use current detector position if pos is empty
         if pos is None:
             if isinstance(detector_index, list):
@@ -1204,25 +1200,24 @@ class Raytracer(Group):
                     self.trace(N=rays_step)
                     msgs_cum += self._msgs  # add to cumulative warnings
 
-            if self.detectors:
-                # for all detector positions
-                for j in np.arange(len(pos)):
-                   
-                    self.detectors[detector_index[j]].move_to(pos[j])
-                
-                    with global_options.no_progressbar():
-                        Imi = self.detector_image(detector_index=detector_index[j],
-                                                  extent=extentc[j], limit=limit[j], _dont_filter=True,
-                                                  projection_method=projection_method[j])
-                   
-                    Imi._data *= rays_step / N
+            # for all detector positions
+            for j in np.arange(len(pos)):
+               
+                self.detectors[detector_index[j]].move_to(pos[j])
+            
+                with global_options.no_progressbar():
+                    Imi = self.detector_image(detector_index=detector_index[j],
+                                              extent=extentc[j], limit=limit[j], _dont_filter=True,
+                                              projection_method=projection_method[j])
+               
+                Imi._data *= rays_step / N
 
-                    # append image to list in first iteration, after that just add image content
-                    if i == 0:
-                        DIm_res.append(Imi)
-                        extentc[j] = Imi._extent0  # assign actual extent in case it was "auto"
-                    else:
-                        DIm_res[j]._data += Imi._data
+                # append image to list in first iteration, after that just add image content
+                if i == 0:
+                    DIm_res.append(Imi)
+                    extentc[j] = Imi._extent0  # assign actual extent in case it was "auto"
+                else:
+                    DIm_res[j]._data += Imi._data
 
             global_options.show_progressbar = True
        

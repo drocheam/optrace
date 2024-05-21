@@ -639,21 +639,22 @@ class SurfaceTests(unittest.TestCase):
         # check assertion errors when wrong types are returned from user provided functions
         x = np.linspace(-1, 1, 1000)
         y = np.linspace(-1, 1, 1000)
-        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x > y)  # must return floats
-        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: x + y)  # must return bools
-        self.assertRaises(AssertionError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x, 1)).normals, x, y)  # must return two np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (1, y)).normals, x, y)  # must return two np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x > y, y)).normals, x, y)  # must return two np.ndarray with float values
-        self.assertRaises(AssertionError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (y, x > y)).normals, x, y)  # must return two np.ndarray with float values
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D, r=2, func=lambda x, y: x > y)  # must return floats
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D, r=2, func=lambda x, y: 1)  # must return np.ndarray
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: x + y)  # must return bools
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, mask_func=lambda x, y: 1)  # must return np.ndarray
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x, 1)).normals, x, y)  # must return two np.ndarray
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (1, y)).normals, x, y)  # must return two np.ndarray
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (x > y, y)).normals, x, y)  # must return two np.ndarray with float values
+        self.assertRaises(RuntimeError, ot.FunctionSurface2D(r=2, func=lambda x, y: x, deriv_func=lambda x, y: (y, x > y)).normals, x, y)  # must return two np.ndarray with float values
 
         # FunctionSurface1D
-        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: x > y)  # must return floats
-        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: r)  # must return bools
-        self.assertRaises(AssertionError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: 1)  # must return np.ndarray
-        self.assertRaises(AssertionError, ot.FunctionSurface1D(r=2, func=lambda r: r, deriv_func=lambda r: r > 0).normals, x, y)  # must return a np.ndarray with float values
+        self.assertRaises(RuntimeError, ot.FunctionSurface1D, r=2, func=lambda r: x > y)  # must return floats
+        self.assertRaises(RuntimeError, ot.FunctionSurface1D, r=2, func=lambda r: 1)  # must return np.ndarray
+        self.assertRaises(RuntimeError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: r)  # must return bools
+        self.assertRaises(RuntimeError, ot.FunctionSurface1D, r=2, func=lambda r: r, mask_func=lambda r: 1)  # must return np.ndarray
+        self.assertRaises(RuntimeError, ot.FunctionSurface1D(r=2, func=lambda r: r, deriv_func=lambda r: 0).normals, x, y)  # must return a np.ndarray
+        self.assertRaises(RuntimeError, ot.FunctionSurface1D(r=2, func=lambda r: r, deriv_func=lambda r: r > 0).normals, x, y)  # must return a np.ndarray with float values
 
 
     @pytest.mark.os

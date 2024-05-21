@@ -1657,6 +1657,19 @@ class GUITests(unittest.TestCase):
                     self.assertNotEqual(text, text2)
                     text2 = text
 
+                # coverage: select section and change contrast (affects crosshair and rayhighlight plot)
+                self._do_in_main(sim.pick_ray_section, 0, 5)
+                self._wait_for_idle(sim)
+                self._set_in_main(sim, "high_contrast", True)
+                self._wait_for_idle(sim)
+                self._set_in_main(sim, "high_contrast", False)
+                self._wait_for_idle(sim)
+
+                # coverage: pick but ray property dict missing
+                # raises exception, but gets caught
+                sim._plot._ray_property_dict = []
+                self._do_in_main(sim.pick_ray_section, 0, 5)
+
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
         self.raise_thread_exceptions()
@@ -1684,9 +1697,12 @@ class GUITests(unittest.TestCase):
                 # exceptions
                 id0 = id(sim._plot._ray_plot)
                 self.assertRaises(ValueError, sim._plot.select_rays, np.ones(100, dtype=bool))  # mask size not same as ray number
-                self.assertRaises(ValueError, sim._plot.select_rays, np.ones((100, 2), dtype=bool))  # mask not 1D
+                self.assertRaises(ValueError, sim._plot.select_rays, np.ones((N, 2), dtype=bool))  # mask not 1D
+                self.assertRaises(ValueError, sim._plot.select_rays, np.ones(N, dtype=np.uint8))  # mask not bool
                 self.assertRaises(ValueError, sim._plot.select_rays, np.zeros(N, dtype=bool))  # no elements set
                 self.assertRaises(ValueError, sim._plot.select_rays, np.ones(N, dtype=bool), -1)  # max_show negative
+                self.assertRaises(TypeError, sim.select_rays, 1)  # invalid mask
+                self.assertRaises(TypeError, sim.select_rays, np.ones(N, dtype=bool), [])  # invalid max_show
                 id1 = id(sim._plot._ray_plot)
                 self.assertEqual(id0, id1)  # rays were not replotted
 
@@ -1902,7 +1918,9 @@ class GUITests(unittest.TestCase):
         
         def interact(sim):
             with self._try(sim):
-               
+             
+                self.assertRaises(TypeError, sim.screenshot, 123)  # path not string
+
                 # check different combinations of types and magnification
                 for path in ["screenshot.png", "screenshot.jpg"]:
                     for magnification in ["auto", 1, 2]:

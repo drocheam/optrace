@@ -585,6 +585,7 @@ class GeometryTests(unittest.TestCase):
         # image error handling
         self.assertRaises(RuntimeError, ot.RaySource, ot.RGBImage(np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3)),
                                                                [2, 2]))  # image too large
+        self.assertRaises(ValueError, ot.RaySource, ot.RGBImage(np.zeros((100, 100, 3)), [2, 2]))  # image completely black
 
     def test_ray_source_polarization(self):
             

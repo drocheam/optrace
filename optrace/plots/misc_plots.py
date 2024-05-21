@@ -46,17 +46,17 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.figure()
 
     # evaluation points and connection line of cost function
-    plt.plot(r, vals)
-    plt.plot(r, vals, "r.")
+    plt.plot(r, vals, label="cost estimation")
+    plt.plot(r, vals, "r.", label="cost values")
 
     # found minimum x and y coordinate
-    plt.axvline(res.x, ls="--", color="y")
+    plt.axvline(res.x, ls="--", color="y", label="found minimum")
     plt.axhline(res.fun, ls="--", color="y")
 
     _show_grid()
     plt.xlabel("z in mm")
     plt.ylabel("cost")
-    plt.legend(["cost estimation", "cost values", "found minimum"])
+    plt.legend()
     plt.title(title)
     plt.tight_layout()
     _save_or_show(path, sargs)
@@ -144,7 +144,6 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     pc.check_type("remove_offset", remove_offset, bool)
 
     Surf_list = [surface] if isinstance(surface, Surface) else surface  # enforce list even for one element
-    legends = []  # legend entries
 
     plt.figure()
 
@@ -166,9 +165,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
         if np.any(np.isfinite(vals)):
             plottable = True
 
-        plt.plot(x, vals)
-        # legend entry is long_desc, desc or fallback
-        legends.append(Surfi.get_long_desc(fallback=f"Surface {i}"))
+        plt.plot(x, vals, label=Surfi.get_long_desc(fallback=f"Surface {i}"))
 
     # print info message
     if Surf_list and not plottable:
@@ -178,7 +175,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     plt.xlabel("x in mm")
     plt.ylabel("z in mm")
     plt.title(title)
-    plt.legend(legends)
+    plt.legend()
     plt.tight_layout()
     _save_or_show(path, sargs)
 

@@ -58,8 +58,8 @@ div.math mjx-container {
 	/*vertical-align: middle;*/
 }
 
-/*fixes lists inside table cells*/
-.table dt, .table dd {
+/*fixes lists colors in dark mode inside table cells*/
+.table dt, .table dd, .table td {
     color: var(--pst-color-text-base);
 }
 

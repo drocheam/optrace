@@ -93,12 +93,14 @@ class FunctionSurface2D(Surface):
         else:
             self.z_min, self.z_max = self._find_bounds()
 
+        surf_name = f"{type(self).__name__} {self.get_desc(hex(id(self)))}"
+
         if z_max is not None and z_min is not None:
             z_range_probed = self.z_max - self.z_min
             z_range_provided = z_max - z_min
             
             if z_range_probed and z_range_provided + self.N_EPS < z_range_probed:
-                warning(f"Provided a z-extent of {z_range_provided} for surface {self.get_desc(hex(id(self)))},"
+                warning(f"{surf_name}: Provided a z-extent of {z_range_provided},"
                         f"but measured range is at least {z_range_probed}, an increase of at "
                         f"least {100*(z_range_probed - z_range_provided)/z_range_probed:.5g}."
                         f" I will use the measured values for now.")
@@ -106,24 +108,24 @@ class FunctionSurface2D(Surface):
 
                 range_factor = 1.2
                 if z_range_provided > range_factor*z_range_probed:
-                    warning(f"Provided z-range is more than {(range_factor-1)*100:.5g}% "
+                    warning(f"{surf_name}: Provided z-range is more than {(range_factor-1)*100:.5g}% "
                             f"larger than measured z-range")
 
                 z_max_ = self.z_max + self._offset
                 z_min_ = self.z_min + self._offset
 
                 if z_max + self.N_EPS < z_max_:
-                    warning(f"Provided z_max={z_max} lower than measured value of {z_max_}."
+                    warning(f"{surf_name}: Provided z_max={z_max} lower than measured value of {z_max_}."
                             f" Using the measured values for now")
                 
                 elif z_min - self.N_EPS > z_min_:
-                    warning(f"Provided z_min={z_min} higher than measured value of {z_min_}."
+                    warning(f"{surf_name}: Provided z_min={z_min} higher than measured value of {z_min_}."
                             f" Using the measured values for now")
                 else:
                     self.z_min, self.z_max = z_min - self._offset, z_max - self._offset
 
         elif z_max is None and z_min is None:
-            warning(f"Estimated z-bounds of surface {self.get_desc(hex(id(self)))}: [{self._offset+self.z_min:.9g}, "
+            warning(f"Estimated z-bounds of {surf_name}: [{self._offset+self.z_min:.9g}, "
                     f"{self._offset+self.z_max:.9g}], provide actual values to make it more exact.")
         
         else:
@@ -146,9 +148,11 @@ class FunctionSurface2D(Surface):
             x_, y_ = self._rotate_rc(x, y, -self._angle)
             vals = self.func(x_, self._sign*y_, **self._func_args)
 
-        assert isinstance(vals, np.ndarray), "func must return a np.ndarray"
-        assert not vals.shape[0] or isinstance(vals[0], np.float64),\
-                "Elements of return value of func must be of type np.float64"
+        if not isinstance(vals, np.ndarray): 
+            raise RuntimeError(f"func must return a np.ndarray, but returns type {type(vals)}.")
+
+        if vals.shape[0] and not isinstance(vals[0], np.float64):
+            raise RuntimeError("Elements of return value of func must be of type np.float64")
 
         return self._sign*(vals - self._offset)
 
@@ -177,9 +181,11 @@ class FunctionSurface2D(Surface):
                 x_, y_ = self._rotate_rc(xm, ym, -self._angle)
                 maskf = self.mask_func(x_, self._sign*y_, **self._mask_args)
                 
-            assert isinstance(maskf, np.ndarray), "mask_func must return a np.ndarray"
-            assert not maskf.shape[0] or isinstance(maskf[0], bool | np.bool_),\
-                    f"Elements of return value of mask_func must be of type bool"
+            if not isinstance(maskf, np.ndarray):
+                raise RuntimeError(f"mask_func must return a np.ndarray, but returns type {type(maskf)}.")
+
+            if maskf.shape[0] and not isinstance(maskf[0], bool | np.bool_):
+                raise RuntimeError("Elements of return value of mask_func must be of type bool")
 
             mask = mask & maskf
 
@@ -213,8 +219,11 @@ class FunctionSurface2D(Surface):
                 rm = ne.evaluate("sqrt(xm**2 + ym**2)")
                 nr = self._sign*self.deriv_func(rm, **self._deriv_args)
                 
-                assert isinstance(nr, np.ndarray), "deriv_func must return a np.ndarray"
-                assert not nr.shape[0] or isinstance(nr[0], np.float64), "values of deriv_func must be np.float64"
+                if not isinstance(nr, np.ndarray):
+                    raise RuntimeError(f"deriv_func must return a np.ndarray, but returns type {type(nr)}.")
+
+                if nr.shape[0] and not isinstance(nr[0], np.float64):
+                    raise RuntimeError("Values of deriv_func must be np.float64")
                 
                 nxn, nyn = ne.evaluate("nr*cos(phi)"), ne.evaluate("nr*sin(phi)")
 
@@ -229,12 +238,12 @@ class FunctionSurface2D(Surface):
                 nxn, nyn = self.deriv_func(xm, self._sign*ym, **self._deriv_args)
                 # ^-- y is negative, since surface is flipped
                 
-                assert isinstance(nxn, np.ndarray), "deriv_func must return two np.ndarray"
-                assert isinstance(nyn, np.ndarray), "deriv_func must return two np.ndarray"
-                assert not nxn.shape[0] or isinstance(nxn[0], np.float64),\
-                        "Elements of return value of deriv_func must be of type np.float64"
-                assert not nyn.shape[0] or isinstance(nyn[0], np.float64),\
-                        "Elements of return value of deriv_func must be of type np.float64"
+                if not isinstance(nxn, np.ndarray) or not isinstance(nyn, np.ndarray):
+                    raise RuntimeError("deriv_func must return two np.ndarray.")
+
+                if (nxn.shape[0] and not isinstance(nxn[0], np.float64)) or\
+                        (nyn.shape[0] and not isinstance(nyn[0], np.float64)):
+                    raise RuntimeError("Elements of return value of deriv_func must be of type np.float64")
 
                 nxn, nyn = self._rotate_rc(nxn*self._sign, nyn, self._angle)
 

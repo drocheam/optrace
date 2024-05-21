@@ -251,7 +251,8 @@ def convolve(img:                RGBImage | LinearImage,
     if bar is not None:
         bar.update(2)
     
-    # INTER_AREA downscaling leaves the power sum unchanged (therefore the color and channel ratios should stay the same). 
+    # INTER_AREA downscaling leaves the power sum unchanged 
+    # (therefore the color and channel ratios should stay the same). 
     # Weighs pixels according to their area.
     # since no polynomial interpolation of higher degree takes place, the value range is limited
     # (as wouldn't be the case for instance with polynomials of degree 3 or higher)

@@ -773,6 +773,8 @@ class TracerTests(unittest.TestCase):
 
         RT.trace(1000)
 
+        # TODO ray lengths and optical lengths should also be tested with masks ch, ch2
+
         # optical path lengths
         olengths = RT.rays.optical_lengths()
         olengths2 = olengths.copy()
@@ -801,6 +803,7 @@ class TracerTests(unittest.TestCase):
         RT.trace(10000)
 
     def test_raytracer_output_threading_nopol(self):
+        """test actions without multithreading, progressbar and tracing with no_pol"""
         RT = rt_example()
         ot.global_options.multithreading = False
         ot.global_options.show_progressbar = False

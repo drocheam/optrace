@@ -357,8 +357,6 @@ class RenderImage(BaseClass):
 
         super().__setattr__(key, val)
 
-    # TODO extent option should be provided to render
-    # handling of extent option should also be done in this class
 
     def render(self,
                p:               np.ndarray = None,

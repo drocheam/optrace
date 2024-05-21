@@ -541,6 +541,8 @@ class TraceGUI(HasTraits):
         Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
         See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
         """
+        pc.check_type("path", path, str)
+       
         self._status["Screenshot"] += 1
         self._plot.screenshot(path, **kwargs)
         self._status["Screenshot"] -= 1
@@ -879,6 +881,9 @@ class TraceGUI(HasTraits):
         :param mask: boolean array for which rays to display. Shape must equal the number of currently traced rays.
         :param max_show: maximum number of rays to display
         """
+        pc.check_type("mask", mask, np.ndarray)
+        pc.check_type("max_show", max_show, int | None)
+
         if not self._status["Tracing"]:
             self.replot_rays(None, mask, max_show)
         else:

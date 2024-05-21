@@ -13,7 +13,7 @@ from ..warnings import warning
 from ..global_options import global_options as go
 
 from ..tracer.misc import PropertyChecker as pc
-from ..tracer.misc import part_mask
+from ..tracer.misc import part_mask, timer
 
 
 
@@ -541,9 +541,6 @@ class ScenePlotting:
         Highlight the ray with index 'index'.
         Assigns the positions to the _ray_highlight_plot and makes it visible
         """
-        if not len(self._ray_property_dict):
-            return
-    
         p_ = self.__ray_property_dict["p"]
         s_un = self.__ray_property_dict["s_un"]
 
@@ -696,10 +693,6 @@ class ScenePlotting:
                 
                 case "c":  # high_contrast
                     self.ui.high_contrast = not bool(self.ui.high_contrast)
-
-                case "r":  # cycle plotting types (Point or Rays)
-                    ptypes = self.ui.plotting_types
-                    self.ui.plotting_mode = ptypes[(ptypes.index(self.ui.plotting_mode) + 1) % len(ptypes)]
 
                 case "b":  # toggle label visibility
                     self.ui.hide_labels = not bool(self.ui.hide_labels)
@@ -1209,8 +1202,8 @@ class ScenePlotting:
         # ray_selection[rindex] = True
 
         p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(self.ray_selection, normalize=True)
-        l_ = self.raytracer.rays.ray_lengths()[self.ray_selection]
-        ol_ = self.raytracer.rays.optical_lengths()[self.ray_selection]
+        l_ = self.raytracer.rays.ray_lengths(self.ray_selection)
+        ol_ = l_*n_  # in this situation faster than calling self.raytracer.rays.optical_lengths
         
         _, s_un, _, _, _, _, _ = self.raytracer.rays.rays_by_mask(self.ray_selection, normalize=False,
                                                                   ret=[0, 1, 0, 0, 0, 0, 0])
@@ -1371,6 +1364,9 @@ class ScenePlotting:
         :param section: intersection index (starting position is zero)
         :param detailed: If 'detailed' is set, a more detailed ray info text is shown
         """
+        if not len(self._ray_property_dict):
+            raise RuntimeError("No rays available.")
+
         # count of displayed rays and sections
         N = self._ray_property_dict["p"].shape[0]
         Nt = self._ray_property_dict["p"].shape[1]

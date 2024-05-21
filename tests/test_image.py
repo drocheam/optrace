@@ -36,6 +36,10 @@ class ImageTests(unittest.TestCase):
        
         # now has an image
         self.assertTrue(img.has_image())
+
+        # data is _data
+        self.assertTrue(np.all(img.data == img._data))  # same content
+        self.assertFalse(id(img.data) == id(img._data))  # must be copy
         
         # check display_modes
         for dm in ot.RenderImage.image_modes:
@@ -349,8 +353,8 @@ class ImageTests(unittest.TestCase):
             for i, img in enumerate([ot.presets.image.cell([1, 1]),
                                      ot.presets.image.ETDRS_chart([1, 1]),
                                      ot.presets.psf.airy(5),
-                                     ot.LinearImage(np.full((100, 100, 3), 150), [1, 1]),
-                                     ot.LinearImage(np.full((100, 100, 3), 0.0001), [1, 1]),
+                                     ot.LinearImage(np.full((100, 100, 3), 150), [2, 1]),
+                                     ot.LinearImage(np.full((100, 100, 3), 0.0001), [1, 2]),
                                      ot.presets.psf.circle(5)]):
 
                 img.save(path)

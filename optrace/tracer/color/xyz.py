@@ -1,6 +1,7 @@
 
 import numpy as np  # matrix calculations
 import scipy.interpolate  # curve interpolation
+import scipy.integrate
 
 from .observers import x_observer, y_observer, z_observer  # spectrum to tristimulus
 from .tools import wavelengths
@@ -62,7 +63,7 @@ def xyz_from_spectrum(wl, spec, method="sum") -> np.ndarray:
     :param method: "sum" or "trapz", method for numerical integration
     :return: numpy array of 3 elements
     """
-    integrate = np.sum if method  == "sum" else np.trapz
+    integrate = np.sum if method  == "sum" else scipy.integrate.trapezoid
 
     xyz = np.array([integrate(spec * x_observer(wl)),
                     integrate(spec * y_observer(wl)),

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np  # calculations
 import scipy.special  # error function and inverse
+import scipy.integrate
 from typing import Any  # Any type
 
 from .spectrum import Spectrum  # parent class
@@ -9,6 +10,7 @@ from .. import color # color conversions
 from .. import misc  # random_from_distribution
 from ..misc import PropertyChecker as pc  # check types and values
 from ...global_options import global_options as go
+
 
 class LightSpectrum(Spectrum):
 
@@ -244,7 +246,8 @@ class LightSpectrum(Spectrum):
             case _ :
                 wl = color.wavelengths(100000)
                 s = self(wl)
-                return np.trapz(wl*s) / np.trapz(s) if np.any(s > 0) else np.mean(go.wavelength_range)
+                return scipy.integrate.trapezoid(wl*s) / scipy.integrate.trapezoid(s)\
+                        if np.any(s > 0) else np.mean(go.wavelength_range)
 
     def peak(self) -> float:
         """
@@ -359,7 +362,7 @@ class LightSpectrum(Spectrum):
             
             case _:
                 wl = color.wavelengths(100000)
-                return np.trapz(sensitivity(wl)*self(wl)) * (wl[1] - wl[0])
+                return scipy.integrate.trapezoid(sensitivity(wl)*self(wl)) * (wl[1] - wl[0])
 
     def power(self) -> float:
         """

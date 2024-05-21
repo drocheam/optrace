@@ -89,10 +89,12 @@ class ConvolutionTests(unittest.TestCase):
         s_img = img.s
         s_psf = psf.s
         
-        # check that call is correct, also tests threading
-        for threading in [False, True]:
-            ot.global_options.multithreading = threading
-            ot.convolve(img, psf)
+        # check that call is correct, also tests threading and progressbar
+        for bar in [False, True]:
+            for threading in [False, True]:
+                ot.global_options.show_progressbar = bar
+                ot.global_options.multithreading = threading
+                ot.convolve(img, psf)
 
         # coverage tests
         #############################################
@@ -229,7 +231,8 @@ class ConvolutionTests(unittest.TestCase):
         # i == 1: bw psf and colored image
         # i == 2: both bw
         # i == 3: both colored
-        for i in range(4):
+        # i == 4: colored psf and linear image
+        for i in range(5):
 
             # raytracer and raysource
             RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], no_pol=True)
@@ -256,7 +259,13 @@ class ConvolutionTests(unittest.TestCase):
             psf = img.copy()
 
             # image
-            img = ot.presets.image.ETDRS_chart_inverted if i == 0 or i == 2 else ot.presets.image.color_checker
+            if i in [0, 2]:
+                img = ot.presets.image.ETDRS_chart_inverted 
+            elif i == 4:
+                img = lambda x: ot.presets.psf.gaussian(x[0]*1000/5/2)
+            else: 
+                img = ot.presets.image.color_checker
+
             s_img = [0.07, 0.07]
 
             # swap old source for image source
@@ -275,6 +284,11 @@ class ConvolutionTests(unittest.TestCase):
             mag = 2.222751
             img_conv_ = ot.convolve(img([s_img[0]*mag, s_img[1]*mag]), psf)
             img_conv, s_img_conv  = img_conv_.data, img_conv_.s
+
+            # plot
+            # import optrace.plots as otp
+            # otp.image_plot(img_conv_)
+            # otp.image_plot(img_ren0.get("sRGB (Absolute RI)", 189), flip=True)
 
             # spacing vectors
             x = np.linspace(-s_img_conv[0]/2, s_img_conv[0]/2, img_conv.shape[1])

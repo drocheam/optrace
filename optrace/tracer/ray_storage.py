@@ -79,6 +79,7 @@ class RayStorage(BaseClass):
 
         # weights, polarization and wavelengths don't need double precision, this way we save some RAM
         # fortran order='F' speeds things up around 20% in our application
+        # positions and direction must have higher precision, the same as n, as optical lengths are calculated from it
         self.p_list = np.zeros((N, nt, 3), dtype=np.float64, order='F')
         self.s0_list = np.zeros((N, 3), dtype=np.float64, order='F')
         self.pol_list = np.zeros((N, nt, 3), dtype=pol_dtype, order='F')
@@ -162,23 +163,31 @@ class RayStorage(BaseClass):
         return self.p_list[Ns:Ne, 0], self.s0_list[Ns:Ne], self.pol_list[Ns:Ne, 0],\
             self.w_list[Ns:Ne, 0], self.wl_list[Ns:Ne]
 
-    def ray_lengths(self) -> np.ndarray:
+    def ray_lengths(self, ch: np.ndarray = None, ch2: np.ndarray = None) -> np.ndarray:
         """
         Euclidean lengths of the ray sections.
 
+        :param ch: bool array selecting the desired rays, shape N. Default to None, meaning all rays are selected
+        :param ch2: int array selecting the desired ray sections. 
+                    Needs to be the same shape as the number of true values in ch.
+                    Defaults to None, meaning all sections per ray are selected
         :return: length array with shape (N, nt)
         """
-        _, s, _, _, _, _, _ = self.rays_by_mask(ret=[0, 1, 0, 0, 0, 0, 0], normalize=False)
+        _, s, _, _, _, _, _ = self.rays_by_mask(ch, ch2, ret=[0, 1, 0, 0, 0, 0, 0], normalize=False)
         return np.linalg.norm(s, axis=s.ndim-1)
     
-    def optical_lengths(self) -> np.ndarray:
+    def optical_lengths(self, ch: np.ndarray = None, ch2: np.ndarray = None) -> np.ndarray:
         """
         Optical lengths of the ray sections
 
+        :param ch: bool array selecting the desired rays, shape N. Default to None, meaning all rays are selected
+        :param ch2: int array selecting the desired ray sections. 
+                    Needs to be the same shape as the number of true values in ch.
+                    Defaults to None, meaning all sections per ray are selected
         :return: Optical path length for each ray section, shape (N, nt)
         """
-        l = self.ray_lengths()
-        _, _, _, _, _, _, n = self.rays_by_mask(ret=[0, 0, 0, 0, 0, 0, 1])
+        _, s, _, _, _, _, n = self.rays_by_mask(ch, ch2, ret=[0, 1, 0, 0, 0, 0, 1], normalize=False)
+        l = np.linalg.norm(s, axis=s.ndim-1)
         return l*n
 
     def source_numbers(self) -> np.ndarray:

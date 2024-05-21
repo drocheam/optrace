@@ -115,20 +115,17 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
 
     # multiple spectra
     else:
-        lg = []
         for i, obji in enumerate(obj):
             wlp, val = get_val(obji)
 
             cl = color[i] if color is not None else None
 
             if obji.spectrum_type == "Histogram":
-                axp = ax1.stairs(val, wlp, color=cl)
+                axp = ax1.stairs(val, wlp, color=cl, label=obji.get_long_desc())
                 tcolor = axp._original_edgecolor
             else:
-                axp = ax1.plot(wlp, val, color=cl)
+                axp = ax1.plot(wlp, val, color=cl, label=obji.get_long_desc())
                 tcolor = axp[0]._color
-
-            lg.append(obji.get_long_desc())
 
             # labels for each spectrum
             if not labels_off:
@@ -137,7 +134,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
 
         # add legend and title
         if not legend_off:
-            ax1.legend(lg)
+            ax1.legend()
         ax1.set_title(title)
 
     _show_grid(ax1)

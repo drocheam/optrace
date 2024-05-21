@@ -118,6 +118,13 @@ class LoadTests(unittest.TestCase):
 
             # delete file
             os.remove(temp_file)
+    
+    def test_zmx_special(self):
+        """test zmx special cases: COAT provided, MATERIAL == _BLANK and MATERIAL unknown, 
+        but index and Abbe provided"""
+        path0 = pathlib.Path(__file__).resolve().parent / "test_files"
+        n_schott = ot.load_agf("schott.agf")
+        ot.load_zmx(str(path0 / "zmx_special_cases.zmx"), n_schott)
 
     @pytest.mark.os
     def test_zmx_errors(self):
