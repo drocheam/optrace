@@ -3,6 +3,7 @@ Optrace |version| |release| Documentation
 ============================================
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: images/arizona_eye_scene.png
           :align: center
@@ -50,6 +51,7 @@ Optrace |version| |release| Documentation
 **Overview**
 
 .. list-table::
+   :class: table-borderless
 
    * - **Features**
         * a sequential raytracer for geometrical optics
@@ -81,6 +83,7 @@ Optrace |version| |release| Documentation
 **Similar/related Python software**
 
 .. list-table:: 
+   :class: table-borderless
 
    * - Geometrical Optics
         * `RayOptics <https://ray-optics.readthedocs.io/en/latest/>`__ by Michael Hayford. Tracing and optical design analysis tool. 

@@ -37,6 +37,7 @@ Arizona Eye Model
    :width: 600
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: images/example_arizona_render1.svg
           :width: 400
@@ -90,6 +91,7 @@ Cosine Surfaces
    :align: center
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/example_cosine_surfaces2.svg
           :align: center
@@ -128,6 +130,7 @@ Double Gauss
    :width: 600
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/example_double_gauss2.svg
           :align: center
@@ -171,6 +174,7 @@ GUI Automation
 **Screenshots**:
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/example_gui_automation_1.png
           :align: center
@@ -212,6 +216,7 @@ Image Render
    :align: center
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/rgb_render_srgb1.svg
           :align: center
@@ -240,6 +245,7 @@ Image Render Many Rays
 **Screenshots**:
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: images/example_rgb_render1.svg
           :align: center
@@ -269,6 +275,7 @@ Keratoconus
 **Screenshots**:
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/example_keratoconus_1.svg
           :align: center
@@ -301,6 +308,7 @@ The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) 
    :align: center
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: images/example_microscope1.svg
           :width: 400
@@ -322,6 +330,7 @@ PSF Imaging
 **Screenshots**:
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/example_psf1.svg
           :align: center
@@ -349,6 +358,7 @@ Refraction Index Presets
 
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/glass_presets_n.svg
           :width: 400
@@ -386,6 +396,7 @@ Spectrum Presets
 
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/Standard_illuminants.svg
           :width: 400
@@ -424,6 +435,7 @@ Sphere Projections
    :width: 600
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ./images/indicatrix_equidistant.svg
           :align: center

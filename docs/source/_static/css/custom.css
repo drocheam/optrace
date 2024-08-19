@@ -1,4 +1,8 @@
 
+/** Main style changes **/
+/***********************************************************/
+
+
 /*font and header settings*/
 html {
 	/*--pst-header-height: 2rem;*/
@@ -11,7 +15,6 @@ html {
 	--pst-font-size-h5: 18px;
 	--pst-font-size-h6: 17px;
 }
-
 
 /*lower the line height*/
 body {
@@ -29,12 +32,6 @@ body {
 /*}*/
 
 
-/**additional padding from pydata-sphinx theme cuts parts off the mathjax box**/
-div.math mjx-container {
-    padding-bottom: unset;
-    overflow: unset;
-}
-
 /*increase size of article content from 60rem to 80rem*/
 .bd-main .bd-content .bd-article-container {
    max-width: 90%;
@@ -45,12 +42,18 @@ div.math mjx-container {
     max-width: 20rem;
 }
 
+
+
+/**Table Settings**/
+/*******************************************************************/
+
 /*unset "width 100%" for a table so width gets adjusted automatically*/
 .table {
 	width: unset;
 	margin-top: 1rem;
 	margin-bottom: 2rem;
 }
+
 
 /*lower row padding in tables*/
 .table td, .table th {
@@ -63,9 +66,34 @@ div.math mjx-container {
     color: var(--pst-color-text-base);
 }
 
+/** new borderless class for image and object alignment **/
+.table-borderless {
+    border:none !important;
+}
+
+/**no left border line for each element in row**/
+.table-borderless td {
+    border-left: none !important;
+}
+
+/**remove coloring for rows**/
+.table-borderless tr{
+    background-color: inherit !important;
+}
+
+
+/** Misc **/
+/****************************************************************/
+
 /**move "back to top" button down**/
 #pst-back-to-top {
     top: 95vh;
+}
+
+/**additional padding from pydata-sphinx theme cuts parts off the mathjax box**/
+div.math mjx-container {
+    padding-bottom: unset;
+    overflow: unset;
 }
 
 /*fix for badly displayed reference links*/

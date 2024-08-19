@@ -492,6 +492,7 @@ Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
 
 .. list-table::
    :widths: 500 500
+   :class: table-borderless
 
    * -  .. figure:: ../images/Standard_illuminants.svg
            :width: 500

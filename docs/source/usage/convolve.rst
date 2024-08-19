@@ -134,6 +134,7 @@ __________________________
 
 
 .. list-table:: Image convolution from ``./examples/psf_imaging.py``
+   :class: table-borderless
 
    * - .. figure:: ../images/example_psf1.svg
           :align: center
@@ -262,6 +263,7 @@ _____________________
 
 
 .. list-table:: PSF presets
+   :class: table-borderless
 
    * - .. figure:: ../images/psf_circle.svg
           :align: center

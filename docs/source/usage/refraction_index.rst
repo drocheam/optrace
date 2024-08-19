@@ -262,6 +262,7 @@ These groups are plotted below in an index and an Abbe plot.
 
 .. list-table::
    :widths: 500 500
+   :class: table-borderless
 
    * - .. figure:: ../images/glass_presets_n.svg
           :width: 500

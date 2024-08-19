@@ -205,6 +205,7 @@ The UI elements will be discussed in the following sections.
 
 .. list-table::
    :align: center
+   :class: table-borderless
 
    * - .. figure:: ../images/ui_main_tab.png
           :align: center

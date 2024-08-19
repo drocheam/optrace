@@ -30,6 +30,7 @@ Both types have no extent in z-direction, are therefore parallel to the xy-plane
 
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ../images/point.svg
           :align: center
@@ -68,6 +69,7 @@ These two dimensional surfaces have no extent in z-direction, therefore being pa
 typically can be found for Apertures, and :class:`RectangularSurfaces <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>` for detectors or image RaySources.
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ../images/circle.svg
           :align: center

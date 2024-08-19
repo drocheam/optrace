@@ -265,6 +265,7 @@ Available methods are:
 
 .. list-table::
     `Tissot's indicatrices <https://en.wikipedia.org/wiki/Tissot%27s_indicatrix>`__ for different projection methods. All circles should have the same size, shape and brightness. Taken from the ``sphere_projections.py`` example.
+   :class: table-borderless
 
 
    * - .. figure:: ../images/indicatrix_equidistant.svg
@@ -309,6 +310,7 @@ While the limit is wavelength dependent, one fixed value is applied to all wavel
 
 
 .. list-table:: Images of the focus in the ``achromat.py`` example. From left to right: No filter, filter with 1 µm size, filter with 5 µm size. For a setup with a resolution limit of 5 µm we are clearly inside the limit, but even for 1 µm we are diffraction limited.   
+   :class: table-borderless
 
    * - .. figure:: ../images/rimage_limit_off.svg
           :align: center
@@ -403,6 +405,7 @@ An example for the difference of both sRGB modes is seen in :numref:`color_dispe
 
 
 .. list-table:: Renderes images from the ``image_rgb.py`` example. From left to right, top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.
+   :class: table-borderless
 
    * - .. figure:: ../images/rgb_render_srgb1.svg
           :align: center
@@ -601,6 +604,7 @@ ____________________
 Below you can find preset images that can be used for a ray source.
 
 .. list-table:: Photos of natural scenes or objects
+   :class: table-borderless
 
    * - .. figure:: ../../../optrace/ressources/images/cell.webp
           :align: center
@@ -656,6 +660,7 @@ Below you can find preset images that can be used for a ray source.
 
 
 .. list-table:: Test images for color, resolution or distortion
+   :class: table-borderless
 
    
    * - .. figure:: ../../../optrace/ressources/images/ETDRS_chart.png

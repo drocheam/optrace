@@ -194,6 +194,7 @@ A comparison to simple sampling (white noise generation) can be found in the fol
 A reduction in noise is clearly visible.
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ../images/rect_simple_sampling.svg
           :align: center
@@ -220,6 +221,7 @@ Stratified sampling generates a rectangular grid, but for a circular surface thi
 While this done uniformly in :numref:`circle_sampling`, there are some circular artefacts visible, especially at the center.
 
 .. list-table::
+   :class: table-borderless
 
    * - .. figure:: ../images/circ_sampling_strat.svg
           :align: center

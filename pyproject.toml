@@ -11,7 +11,8 @@ license = {text = "not specified yet"}
 requires-python = ">=3.10,<3.13"
 dependencies = [
     "numpy>1.21", 
-    "numexpr", 
+    "numexpr",
+    "configobj",  # TODO seems to be needed as of 19.08.2024, is this is a bug from mayavi?
     "chardet", 
     "scipy>=1.10", 
     "pyface", 

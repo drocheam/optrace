@@ -160,6 +160,7 @@ The user can provide a user-defined :python:`title`, turn off/on labels and the 
 
 .. list-table::
    :widths: 500 500
+   :class: table-borderless
 
    * - .. figure:: ../images/LED_illuminants.svg
           :width: 500
@@ -220,6 +221,7 @@ Supporting all the same parameters as for :func:`image_plot <optrace.plots.image
 
 .. list-table:: Exemplary image plot and image cut plot from the ``double_prism.py`` example.
    :widths: 500 300
+   :class: table-borderless
 
    * - |
 
@@ -284,6 +286,7 @@ A full function call could look like this:
 
 .. list-table:: Examples of CIE 1931 and 1976 chromaticity diagrams.
    :widths: 500 500
+   :class: table-borderless
 
    * - .. figure:: ../images/chroma_1931.svg
           :align: center
@@ -302,6 +305,7 @@ Chromaticity norms describe the brightness normalization for the colored diagram
 
 .. list-table:: 
    Example of a chromaticity plots showing the color coordinates of fluorescent lamp presets. Norms are "Sum" (left) and "Largest" (right).
+   :class: table-borderless
 
    * - .. figure:: ../images/fl_chroma_sum_norm.svg
           :align: center
@@ -393,6 +397,7 @@ Below you can find examples for cost plots.
 
 .. list-table::
    :widths: 500 500
+   :class: table-borderless
 
    * - .. figure:: ../images/af_debug_position_variance.svg
           :align: center

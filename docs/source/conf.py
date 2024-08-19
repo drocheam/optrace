@@ -77,7 +77,7 @@ html_theme_options = {
                     "icon": "fa-brands fa-square-github",
                     "logo": "",
                     "type": "fontawesome",},],
-    "pygment_dark_style": "github-dark",
+    "pygments_dark_style": "github-dark",
 }
 
 # html_context = {

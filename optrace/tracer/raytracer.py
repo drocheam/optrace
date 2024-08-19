@@ -365,6 +365,7 @@ class Raytracer(Group):
                     n1 = n2
 
                 elif isinstance(element, Filter | Aperture):  # pragma: no branch
+
                     p[hw, i+1], hit, ill = element.surface.find_hit(p[hw, i], s[hw])
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
                     hwh = misc.part_mask(hw, hit)  # rays having power and hitting filter
