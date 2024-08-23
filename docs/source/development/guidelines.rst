@@ -4,6 +4,10 @@
 General Guidelines
 -----------------------
 
+.. TODO add image compression info. E.g. use tinypng to shrink pngs, vecta.io for pyplot generated svgs
+.. shrink embedded pngs in svg by extracting png images in inkscape, changing them, then embedding them back
+.. compression needed as images will be served over the internet and take space in the .git directory
+
 
 **Library Design**
 

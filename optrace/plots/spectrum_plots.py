@@ -82,6 +82,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     wl0, wl1 = go.wavelength_range
 
     fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [15, 1]})
+    _show_grid(ax1)
 
     # get spectrum values
     def get_val(obj):
@@ -103,7 +104,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     if not isinstance(obj, list):
         wlp, val = get_val(obj)
         if obj.spectrum_type == "Histogram":
-            ax1.stairs(val, wlp, color=color)
+            ax1.stairs(val, wlp, color=color, zorder=10)
         else:
             ax1.plot(wlp, val, color=color)
 
@@ -121,7 +122,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
             cl = color[i] if color is not None else None
 
             if obji.spectrum_type == "Histogram":
-                axp = ax1.stairs(val, wlp, color=cl, label=obji.get_long_desc())
+                axp = ax1.stairs(val, wlp, color=cl, label=obji.get_long_desc(), zorder=10)
                 tcolor = axp._original_edgecolor
             else:
                 axp = ax1.plot(wlp, val, color=cl, label=obji.get_long_desc())
@@ -136,8 +137,6 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
         if not legend_off:
             ax1.legend()
         ax1.set_title(title)
-
-    _show_grid(ax1)
 
     # add wavelength color bar
     # enforce image extent of 1:10 for every wavelength range,

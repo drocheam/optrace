@@ -25,6 +25,9 @@ import matplotlib.pyplot as plt
 
 class PlotTests(unittest.TestCase):
 
+    # random dark mode per test function
+    def setUp(self) -> None:
+        ot.global_options.plot_dark_mode = bool(np.random.choice([False, True]))
 
     def tearDown(self) -> None:
         plt.close('all')

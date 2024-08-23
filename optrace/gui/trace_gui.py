@@ -6,10 +6,6 @@ from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context managers
 import numpy as np
                 
-# enforce qt backend  
-from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt'
-
 from pyface.api import GUI as pyface_gui  # invoke_later() method
 from pyface.qt import QtGui, QtCore  # closing UI elements
 
@@ -30,8 +26,8 @@ from ._scene_plotting import ScenePlotting
 
 from ..tracer.misc import PropertyChecker as pc
 from ..warnings import warning
+from ..global_options import global_options
 from .. import metadata
-
 
 
 
@@ -329,25 +325,18 @@ class TraceGUI(HasTraits):
 
     def __init__(self, 
                  raytracer:         Raytracer, 
-                 ui_theme:          str = None, 
                  initial_camera:    dict = {},
                  **kwargs) -> None:
         """
         Create a new TraceGUI with the assigned Raytracer.
 
         :param RT: raytracer
-        :param ui_theme: UI style string for Qt
         :param initial_camera: parameter dictionary for set_camera
         :param kwargs: additional arguments, options, traits and parameters
         """
         pc.check_type("raytracer", raytracer, Raytracer)
-        pc.check_type("ui_theme", ui_theme, str | None)
         pc.check_type("initial_camera", initial_camera, dict)
 
-        # set UI theme. Unfortunately this does not work dynamically (yet)
-        if ui_theme is not None:
-            QtGui.QApplication.setStyle(ui_theme)
-  
         # allow SIGINT interrupts
         pyface_gui.allow_interrupt()
 
@@ -1455,6 +1444,11 @@ class TraceGUI(HasTraits):
             self._command_window_view = self.command_window.edit_traits()
         else:
             self._command_window_view.control.window().raise_()
+            
+        # code editor does not work correctly with dark mode, so we need to change the design
+        bgcolor = "#aaa" if global_options.ui_dark_mode else "white"
+        self._command_window_view.control.window().\
+                setStyleSheet(f"QAbstractScrollArea{{font-family: monospace; background-color: {bgcolor}; color: black}}")
 
     @observe('_property_browser_button', dispatch="ui")
     def open_property_browser(self, event=None) -> None:

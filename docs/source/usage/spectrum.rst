@@ -494,29 +494,33 @@ Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
    :widths: 500 500
    :class: table-borderless
 
-   * -  .. figure:: ../images/Standard_illuminants.svg
-           :width: 500
-           :align: center
+   * - .. figure:: ../images/Standard_illuminants.svg
+          :width: 500
+          :align: center
+          :class: dark-light
           
-           CIE standard illuminants. Available as ``ot.presets.light_spectrum.<name>`` with ``a, d50, ...`` as ``<name>``
+          CIE standard illuminants. Available as ``ot.presets.light_spectrum.<name>`` with ``a, d50, ...`` as ``<name>``
 
-     -  .. figure:: ../images/LED_illuminants.svg
-           :width: 500
-           :align: center
+     - .. figure:: ../images/LED_illuminants.svg
+          :width: 500
+          :align: center
+          :class: dark-light
            
-           CIE standard illuminants LED series. Available as ``ot.presets.light_spectrum.<name>`` with ``led_b1, led_b2, ...`` as ``<name>``
+          CIE standard illuminants LED series. Available as ``ot.presets.light_spectrum.<name>`` with ``led_b1, led_b2, ...`` as ``<name>``
            
    * - .. _fig_led_illuminants:
 
        .. figure:: ../images/Fluor_illuminants.svg
           :width: 500
           :align: center
+          :class: dark-light
          
           CIE standard illuminants Fluorescent series. Available as ``ot.presets.light_spectrum.<name>`` with ``fl2, fl7, ...`` as ``<name>``
 
      - .. figure:: ../images/srgb_spectrum.svg
           :width: 500
           :align: center
+          :class: dark-light
          
           Possible sRGB primary spectra.
           Available as ``ot.presets.light_spectrum.<name>`` with ``srgb_r, srgb_g, ...`` as ``<name>``
@@ -524,6 +528,7 @@ Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
    * - .. figure:: ../images/cie_cmf.svg
           :width: 500
           :align: center
+          :class: dark-light
          
           CIE color matching functions.
           Available as ``ot.presets.spectrum.<name>`` with ``x, y, z`` as ``<name>``

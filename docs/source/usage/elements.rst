@@ -432,6 +432,7 @@ To allow for simple definitions of lens thickness and positions, there are multi
 .. figure:: ../images/lens_thickness.svg
    :align: center
    :width: 500
+   :class: dark-light
 
    :math:`d` and :math:`d_\text{e}` for a convex lens, a concave lens and a meniscus lens
 
@@ -451,6 +452,7 @@ On the other hand setting :python:`d1=..., d2=0` leads to the back surface cente
 .. figure:: ../images/lens_thickness_position.svg
    :align: center
    :width: 500
+   :class: dark-light
 
    Defining a convex lens by ``de=...``, by ``d1=0, d2=...`` and by ``d1=..., d2=0``.
 

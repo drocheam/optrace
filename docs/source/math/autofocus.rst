@@ -23,6 +23,7 @@ With it set to ``True`` it also takes place to enable the plotting of the cost f
 .. figure:: ../images/FocusPAP.svg
    :width: 400
    :align: center
+   :class: dark-light
    
    Autofocus process flowchart.
 

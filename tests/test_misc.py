@@ -45,11 +45,19 @@ class TracerMiscTests(unittest.TestCase):
         otp.spectrum_plot(ot.presets.light_spectrum.led_b1)
         plt.close("all")
 
+        # dark modes. Check by toggling. Functionality is tested elsewhere
+        ot.global_options.plot_dark_mode = not ot.global_options.plot_dark_mode
+        ot.global_options.plot_dark_mode = not ot.global_options.plot_dark_mode
+        ot.global_options.ui_dark_mode = not ot.global_options.ui_dark_mode
+        ot.global_options.ui_dark_mode = not ot.global_options.ui_dark_mode
+
         # Type Errors
         self.assertRaises(TypeError, ot.global_options.__setattr__, "multithreading", [])
         self.assertRaises(TypeError, ot.global_options.__setattr__, "show_progressbar", [])
         self.assertRaises(TypeError, ot.global_options.__setattr__, "show_warnings", [])
         self.assertRaises(TypeError, ot.global_options.__setattr__, "wavelength_range", 2)
+        self.assertRaises(TypeError, ot.global_options.__setattr__, "plot_dark_mode", 2)
+        self.assertRaises(TypeError, ot.global_options.__setattr__, "ui_dark_mode", 2)
 
         # Value Errors
         self.assertRaises(ValueError, ot.global_options.__setattr__, "wavelength_range", [380, 870, 1000])

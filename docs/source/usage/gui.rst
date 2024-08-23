@@ -89,18 +89,6 @@ An initial camera view can be applied with the ``initial_camera`` parameter:
 Theses properties are directly passed to ``TraceGUI.set_camera``.
 You can read more about the camera settings in <>.
 
-**UI Theme**
-
-The TraceGUI uses Qt5 as UI backend. Qt5 supports different themes that can be controlled with the :python:`ui_theme` parameter on the TraceGUI initialization.
-
-.. testcode::
-
-   sim = TraceGUI(RT, ui_theme="Windows")
-
-Details on styles can be found in the `Qt documentation <https://doc.qt.io/qt-5/qstyle.html#details>`__.
-Available themes depend on your system and Qt installation, but can be extended using plugins.
-Normally, at least styles :python:`"Windows"` and :python:`"Fusion"` should be available on all systems.
-Most notably, dark themes like in :numref:`ui_dark_theme` prove especially useful in low light environments.
 
 
 UI Overview
@@ -112,6 +100,7 @@ Full UI
 .. figure:: ../images/UI_scene_full.svg
    :align: center
    :width: 800
+   :class: dark-light
 
 
 .. _gui_overview_scene:
@@ -209,19 +198,23 @@ The UI elements will be discussed in the following sections.
 
    * - .. figure:: ../images/ui_main_tab.png
           :align: center
-          :width: 200
+          :width: 250
+          :class: dark-light
 
      - .. figure:: ../images/ui_image_tab.png
           :align: center
-          :width: 200
+          :width: 250
+          :class: dark-light
 
      - .. figure:: ../images/ui_spectrum_tab.png
           :align: center
-          :width: 200
+          :width: 250
+          :class: dark-light
 
      - .. figure:: ../images/ui_focus_tab.png
           :align: center
-          :width: 200
+          :width: 250
+          :class: dark-light
 
 
 Additional Windows
@@ -265,8 +258,6 @@ ____________________
 Main Tab
 #######################
 
-
-.. TODO update screenshot without absorb_missing
 
 .. list-table::
    :header-rows: 1
@@ -514,6 +505,7 @@ and here about the `different objects populating the view <https://docs.enthough
 .. figure:: ../images/ui_pipeline.png
    :align: center
    :width: 600
+   :class: dark-light
 
 .. _property_viewer:
 
@@ -535,6 +527,7 @@ Navigate the tabs to switch to different trees.
 .. figure:: ../images/ui_property_browser.png
    :align: center
    :width: 600
+   :class: dark-light
 
 Command Window
 #######################
@@ -557,6 +550,7 @@ Also available is a ``Clear``-Button that empties the history.
 .. figure:: ../images/ui_command_window.png
    :align: center
    :width: 600
+   :class: dark-light
 
 As mentioned, the commands are run from within the TraceGUI object :python:`self` therefore denotes the object itself, so e.g. :python:`self.replot()` would replot the geometry.
 There are multiple object aliases available to simplify coding inside the command window
@@ -593,33 +587,6 @@ By default, you also have access to most `optrace` classes like :python:`Raytrac
 Tips and Tricks
 ____________________
 
-
-
-**Changing the UI Theme Externally**
-
-UI themes can also be set externally, however any theme set inside the script overwrites the global style.
-
-From outside the theme can either be provided by setting an environment variable:
-
-.. code-block:: bash
-
-   env QT_STYLE_OVERRIDE=kvantum-dark python ./examples/microscope.py
-
-...Or by providing a ``style`` parameter when calling the script/interpreter.
-
-.. code-block:: bash
-
-   python ./examples/microscope.py -style kvantum-dark
-
-Note that the mentioned style needs to be supported by your Qt installation. The above syntax is that for an Unix system and can differ for other systems.
-
-.. _ui_dark_theme:
-
-.. figure:: ../images/ui_kvantum_theme.png
-   :align: center
-   :width: 600
-
-   UI with the dark theme.
 
 **Passing Properties to the GUI object**
 

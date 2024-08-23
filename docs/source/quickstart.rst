@@ -23,7 +23,11 @@ The library comes with a variety of different example scripts that can be found 
 .. figure:: images/example_spherical_aberration1.png
    :align: center
    :width: 600
+   :class: dark-light
 
 .. figure:: images/example_spherical_aberration2.png
    :align: center
    :width: 600
+   :class: dark-light
+
+

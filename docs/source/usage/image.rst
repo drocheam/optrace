@@ -270,19 +270,23 @@ Available methods are:
 
    * - .. figure:: ../images/indicatrix_equidistant.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
      - .. figure:: ../images/indicatrix_equal_area.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
    * - .. figure:: ../images/indicatrix_stereographic.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
      - .. figure:: ../images/indicatrix_orthographic.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
 
 
@@ -314,15 +318,18 @@ While the limit is wavelength dependent, one fixed value is applied to all wavel
 
    * - .. figure:: ../images/rimage_limit_off.svg
           :align: center
-          :width: 300
+          :height: 300
+          :class: dark-light
    
      - .. figure:: ../images/rimage_limit_on.svg
           :align: center
-          :width: 300
+          :height: 300
+          :class: dark-light
      
      - .. figure:: ../images/rimage_limit_on2.svg
           :align: center
-          :width: 300
+          :height: 300
+          :class: dark-light
 
 The limit parameter can be applied either while creating the RenderImage (:python:`ot.RenderImage(..., limit=5)`) or by providing it to methods the create an RenderImage (:python:`Raytracer.detector_image(..., limit=1)`, :python:`Raytracer.iterative_render(..., limit=2.5)`.
 
@@ -410,54 +417,63 @@ An example for the difference of both sRGB modes is seen in :numref:`color_dispe
    * - .. figure:: ../images/rgb_render_srgb1.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           sRGB Absolute RI
 
      - .. figure:: ../images/rgb_render_srgb2.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           sRGB Perceptual RI
      
      - .. figure:: ../images/rgb_render_srgb3.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           Values outside of sRGB
    
    * - .. figure:: ../images/rgb_render_lightness.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           Lightness (CIELUV)
     
      - .. figure:: ../images/rgb_render_irradiance.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           Irradiance
 
      - .. figure:: ../images/rgb_render_illuminance.svg
           :align: center
           :width: 330
+          :class: dark-light
      
           Illuminance
 
    * - .. figure:: ../images/rgb_render_hue.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           Hue (CIELUV)
 
      - .. figure:: ../images/rgb_render_chroma.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           Chroma (CIELUV)
      
      - .. figure:: ../images/rgb_render_saturation.svg
           :align: center
           :width: 330
+          :class: dark-light
 
           Saturation (CIELUV)
 

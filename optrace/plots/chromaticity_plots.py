@@ -216,12 +216,12 @@ def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSp
     # fill upper edge part of gamut
     xf1 = np.concatenate(([x[0]],   xs[wl >= wlleft], [x[-1]]))
     yf1 = np.concatenate(([ylleft], ys[wl >= wlleft], [ys[-1]]))
-    plt.fill_between(xf1, yf1, np.ones_like(xf1)*y[-1], color="0.2", label='_nolegend_')  # fill region outside gamut
+    plt.fill_between(xf1, yf1, np.ones_like(xf1)*y[-1], color="#1f2023", label='_nolegend_')  # fill region outside gamut
 
     # fill lower edge part of gamut
     xf2 = np.concatenate(([x[0]],   np.flip(xs[wl <= wlleft]), [xs[-1]], [x[-1]]))
     yf2 = np.concatenate(([ylleft], np.flip(ys[wl <= wlleft]), [ys[-1]], [ys[-1]]))
-    plt.fill_between(xf2, yf2, np.ones_like(xf2)*y[0], color="0.2", label='_nolegend_')
+    plt.fill_between(xf2, yf2, np.ones_like(xf2)*y[0], color="#1f2023", label='_nolegend_')
 
     # plot gamut edge line
     plt.plot(xs, ys, color="k", zorder=4, linewidth=1, label='_nolegend_')
@@ -235,7 +235,7 @@ def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSp
 
     # draw sRGB gamut and whitepoint
     plt.plot([r[0], g[0], b[0], r[0]], [r[1], g[1], b[1], r[1]], "k-.", linewidth=1)
-    plt.scatter(w[0], w[1], color="w", marker="o", s=20, edgecolor="k")
+    plt.scatter(w[0], w[1], color="w", marker="o", s=20, edgecolor="k", zorder=15)
 
     # plot image/spectrum points and labels
     xi, yi = conv(XYZ)

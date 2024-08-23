@@ -17,10 +17,13 @@ Achromat
 .. figure:: ./images/example_achromat1.png
    :width: 600
    :align: center
+   :class: dark-light
 
 .. figure:: ./images/example_achromat2.png
    :width: 600
    :align: center
+   :class: dark-light
+
 
 Arizona Eye Model
 ----------------------
@@ -32,9 +35,11 @@ Arizona Eye Model
 **Screenshots**:
 
 
-.. figure:: images/arizona_eye_scene.png
+.. figure:: images/example_arizona_eye_scene.png
    :align: center
    :width: 600
+   :class: dark-light
+
 
 .. list-table::
    :class: table-borderless
@@ -42,10 +47,13 @@ Arizona Eye Model
    * - .. figure:: images/example_arizona_render1.svg
           :width: 400
           :align: center
+          :class: dark-light
+
    
      - .. figure:: images/example_arizona_render2.svg
           :width: 400
           :align: center
+          :class: dark-light
 
 Astigmatism
 ----------------------
@@ -59,10 +67,14 @@ Astigmatism
 .. figure:: ./images/example_astigmatism1.png
    :width: 600
    :align: center
+   :class: dark-light
+
 
 .. figure:: ./images/example_astigmatism2.png
    :width: 600
    :align: center
+   :class: dark-light
+
 
 Brewster Polarizer
 ----------------------
@@ -76,6 +88,8 @@ Brewster Polarizer
 .. figure:: images/example_brewster.png
    :align: center
    :width: 600
+   :class: dark-light
+
 
 Cosine Surfaces
 ----------------------
@@ -89,6 +103,8 @@ Cosine Surfaces
 .. figure:: ./images/example_cosine_surfaces1.png
    :width: 600
    :align: center
+   :class: dark-light
+
 
 .. list-table::
    :class: table-borderless
@@ -96,24 +112,12 @@ Cosine Surfaces
    * - .. figure:: ./images/example_cosine_surfaces2.svg
           :align: center
           :width: 400
+          :class: dark-light
 
      - .. figure:: ./images/example_cosine_surfaces3.svg     
           :align: center
           :width: 400
-
-
-Custom Surfaces
-----------------------
-
-**File**: ``examples/custom_surfaces.py``
-
-**Description**: An example with custom surfaces of DataSurface and FunctionSurface type, as wells as a filter with a custom transmission spectrum.
-
-**Screenshots**:
-
-.. figure:: images/example_custom_surfaces.png
-   :align: center
-   :width: 600
+          :class: dark-light
 
 
 Double Gauss
@@ -129,40 +133,21 @@ Double Gauss
    :align: center
    :width: 600
 
+
 .. list-table::
    :class: table-borderless
 
    * - .. figure:: ./images/example_double_gauss2.svg
           :align: center
           :width: 400
+          :class: dark-light
 
      - .. figure:: ./images/example_double_gauss3.svg
           :align: center
           :width: 400
+          :class: dark-light
 
 
-Double Prism
-----------------------
-
-**File**: ``examples/double_prism.py``
-
-**Description**: A double prism setup dividing the source light spectrum into its components.
-
-**Screenshots**:
-
-.. figure:: images/example_double_prism.png
-   :align: center
-   :width: 600
-
-.. figure:: ./images/color_dispersive1.svg
-   :width: 500
-   :align: center
-.. figure:: ./images/color_dispersive2.svg
-   :width: 500
-   :align: center
-.. figure:: ./images/color_dispersive3.svg
-   :width: 500
-   :align: center
 
 GUI Automation
 ----------------------
@@ -179,10 +164,12 @@ GUI Automation
    * - .. figure:: ./images/example_gui_automation_1.png
           :align: center
           :width: 400
+          :class: dark-light
 
      - .. figure:: ./images/example_gui_automation_2.png
           :align: center
           :width: 400
+          :class: dark-light
      
 
 LeGrand Eye Model
@@ -197,10 +184,14 @@ LeGrand Eye Model
 .. figure:: images/example_legrand1.png
    :width: 600
    :align: center
+   :class: dark-light
+
 
 .. figure:: images/example_legrand2.png
    :width: 600
    :align: center
+   :class: dark-light
+
 
 Image Render
 ----------------------
@@ -214,6 +205,8 @@ Image Render
 .. figure:: images/example_image_rgb.png
    :width: 600
    :align: center
+   :class: dark-light
+
 
 .. list-table::
    :class: table-borderless
@@ -221,18 +214,22 @@ Image Render
    * - .. figure:: ./images/rgb_render_srgb1.svg
           :align: center
           :width: 400
+          :class: dark-light
 
      - .. figure:: ./images/rgb_render_lightness.svg
           :align: center
           :width: 400
+          :class: dark-light
      
    * - .. figure:: ./images/rgb_render_hue.svg
           :align: center
           :width: 400
+          :class: dark-light
     
      - .. figure:: ./images/rgb_render_illuminance.svg
           :align: center
           :width: 400
+          :class: dark-light
      
 
 Image Render Many Rays
@@ -250,18 +247,22 @@ Image Render Many Rays
    * - .. figure:: images/example_rgb_render1.svg
           :align: center
           :width: 400
+          :class: dark-light
 
      - .. figure:: images/example_rgb_render2.svg
           :align: center
           :width: 400
+          :class: dark-light
 
    * - .. figure:: images/example_rgb_render3.svg
           :align: center
           :width: 400
+          :class: dark-light
 
      - .. figure:: images/example_rgb_render4.svg
           :align: center
           :width: 400
+          :class: dark-light
 
 Keratoconus
 ----------------------
@@ -280,18 +281,22 @@ Keratoconus
    * - .. figure:: ./images/example_keratoconus_1.svg
           :align: center
           :width: 400
+          :class: dark-light
 
      - .. figure:: ./images/example_keratoconus_2.svg
           :align: center
           :width: 400
+          :class: dark-light
      
    * - .. figure:: ./images/example_keratoconus_3.svg
           :align: center
           :width: 400
+          :class: dark-light
     
      - .. figure:: ./images/example_keratoconus_4.svg
           :align: center
           :width: 400
+          :class: dark-light
 
 Microscope
 ----------------------
@@ -306,6 +311,8 @@ The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) 
 .. figure:: images/example_microscope0.png
    :width: 100%
    :align: center
+   :class: dark-light
+
 
 .. list-table::
    :class: table-borderless
@@ -313,11 +320,46 @@ The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) 
    * - .. figure:: images/example_microscope1.svg
           :width: 400
           :align: center
+          :class: dark-light
 
      - .. figure:: images/example_microscope2.svg
           :width: 400
           :align: center
+          :class: dark-light
 
+Prism
+----------------------
+
+**File**: ``examples/prism.py``
+
+**Description**: A prism setup dividing the source light spectrum into its components.
+
+**Screenshots**:
+
+.. figure:: images/example_prism.png
+   :align: center
+   :width: 600
+   :class: dark-light
+
+
+
+.. list-table::
+   :class: table-borderless
+
+   * - .. figure:: ./images/color_dispersive1.svg
+          :width: 400
+          :align: center
+          :class: dark-light
+
+     - .. figure:: ./images/color_dispersive2.svg
+          :width: 400
+          :align: center
+          :class: dark-light
+
+     - .. figure:: ./images/color_dispersive3.svg
+          :width: 400
+          :align: center
+          :class: dark-light
 
 
 PSF Imaging
@@ -335,16 +377,20 @@ PSF Imaging
    * - .. figure:: ./images/example_psf1.svg
           :align: center
           :width: 400
+          :class: dark-light
 
    
      - .. figure:: ./images/example_psf2.svg
           :align: center
           :width: 400
+          :class: dark-light
 
 
 .. figure:: ./images/example_psf3.svg
    :align: center
    :width: 400
+   :class: dark-light
+
 
 
 Refraction Index Presets
@@ -363,26 +409,32 @@ Refraction Index Presets
    * - .. figure:: ./images/glass_presets_n.svg
           :width: 400
           :align: center
+          :class: dark-light
 
      - .. figure:: ./images/glass_presets_V.svg
           :width: 400
           :align: center
+          :class: dark-light
 
    * - .. figure:: ./images/plastics_presets_n.svg
           :width: 400
           :align: center
+          :class: dark-light
 
      - .. figure:: ./images/plastics_presets_V.svg
           :width: 400
           :align: center
+          :class: dark-light
 
    * - .. figure:: ./images/misc_presets_n.svg
           :width: 400
           :align: center
+          :class: dark-light
 
      - .. figure:: ./images/misc_presets_V.svg
           :width: 400
           :align: center
+          :class: dark-light
 
 
 Spectrum Presets
@@ -401,22 +453,28 @@ Spectrum Presets
    * - .. figure:: ./images/Standard_illuminants.svg
           :width: 400
           :align: center
+          :class: dark-light
   
      - .. figure:: ./images/LED_illuminants.svg
           :width: 400
           :align: center
+          :class: dark-light
    
    * - .. figure:: ./images/Fluor_illuminants.svg
           :width: 400
           :align: center
+          :class: dark-light
   
      - .. figure:: ./images/srgb_spectrum.svg
           :width: 400
           :align: center
+          :class: dark-light
 
 .. figure:: ./images/cie_cmf.svg
    :width: 400
    :align: center
+   :class: dark-light
+
 
   
 
@@ -433,25 +491,31 @@ Sphere Projections
 .. figure:: images/example_sphere_projections.png
    :align: center
    :width: 600
+   :class: dark-light
+
 
 .. list-table::
    :class: table-borderless
 
    * - .. figure:: ./images/indicatrix_equidistant.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
      - .. figure:: ./images/indicatrix_equal_area.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
    * - .. figure:: ./images/indicatrix_stereographic.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
      - .. figure:: ./images/indicatrix_orthographic.svg
           :align: center
-          :width: 300
+          :width: 400
+          :class: dark-light
 
 
 Spherical Aberration
@@ -466,9 +530,13 @@ Spherical Aberration
 .. figure:: images/example_spherical_aberration1.png
    :align: center
    :width: 600
+   :class: dark-light
+
 
 .. figure:: images/example_spherical_aberration2.png
    :align: center
    :width: 600
+   :class: dark-light
+
 
 

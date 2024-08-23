@@ -29,6 +29,8 @@ These are also called the CIE 1931 2° observer curves and are the most commonly
 .. figure:: ../images/cie_cmf.svg
    :width: 600
    :align: center
+   :class: dark-light
+
 
    CIE 1931 2° color matching functions
 
@@ -62,6 +64,7 @@ The resulting chromaticity geometry as well as the whitepoint are pictured in :n
 .. figure:: ../images/chroma_1931.svg
    :width: 700
    :align: center
+   :class: dark-light
 
    xy chromaticity diagram with sRGB Gamut
 
@@ -174,6 +177,8 @@ Multiple methods for *gamut clipping* are presented in :footcite:`OttossonClippi
 .. figure:: ../images/rendering_intents.svg
    :align: center
    :width: 550
+   :class: dark-light
+
 
    Absolute and perceptual colorimetric rendering intent in the CIE 1976 chromaticity diagram.
 
@@ -197,21 +202,25 @@ In the first image the lightness component is pictured, the following images sho
 With the Absolute Colorimetric rendering intent one can see not only the colors having different saturation, but the lightness gradient is different compared to the first image. This can especially be seen around :math:`x = 1.3` mm to :math:`x= 1.4` mm. While the lightness values were in fact unchanged, this subjective difference comes from the Helmholtz-Kohlrausch effect :footcite:`HelmKohlWiki`, which describes that color saturation can lead to higher perceived lightness. Since the saturation was clipped, and the maximum value depends on the spectral wavelength, saturation ratios are falsified, leading to this effect behaving differently for every color.
 The third image shows the Perceptual Colorimetric rendering intent. One can clearly see a decreased saturation for all colors. However, the saturation ratios are kept and the lightness gradient matches the lightness image.
 
-
-.. figure:: ../images/color_dispersive1.svg
-   :width: 600
-   :align: center
-.. figure:: ../images/color_dispersive2.svg
-   :width: 600
-   :align: center
-
 .. _color_dispersive1:
+   
+.. list-table:: Difference in different sRGB rendering intents.
+   :class: table-borderless
 
-.. figure:: ../images/color_dispersive3.svg
-   :width: 600
-   :align: center
+   * - .. figure:: ../images/color_dispersive1.svg
+          :width: 400
+          :align: center
+          :class: dark-light
 
-   Difference in different sRGB rendering intents.
+     - .. figure:: ../images/color_dispersive2.svg
+          :width: 400
+          :align: center
+          :class: dark-light
+          
+     - .. figure:: ../images/color_dispersive3.svg
+          :width: 400
+          :align: center
+          :class: dark-light
 
 
 When searching for chromaticity diagrams, a lot of negative examples can be found 
@@ -245,6 +254,7 @@ The latter is not the case in the CIE 1931 chromaticity diagram in figure :numre
 .. figure:: ../images/chroma_1976.svg
    :width: 700
    :align: center
+   :class: dark-light
 
    u'v' chromaticity diagram with sRGB Gamut
 
@@ -427,10 +437,13 @@ Utilizing optimization methods in python, the following functions were found, th
                 & + 0.184484176 \cdot S(\lambda, 459.658190, 71.0927568)\Big]\\
    :label: r0g0b0_curves
 
+.. The next three figures were created using /tests/misc/RGB_Fit.py
+
 .. _rgb_curve1:
 .. figure:: ../images/rgb_curves1.svg
    :width: 600
    :align: center
+   :class: dark-light
 
 
 The green primary is implemented with only one gaussian, while the other use two gaussian functions. From :footcite:`ClarkChromaticity`, figure 3a, is known, that it is not possible to reach the chromaticity coordinates of the red channel with only one such curve. While it is possible for the blue curve, only narrow illuminants with a small standard deviation are viable. For higher flexibility in spectrum width selection two functions are also applied here.
@@ -447,6 +460,7 @@ However, all luminance ratios are different to the sRGB primaries. For this we n
 .. figure:: ../images/rgb_curves2.svg
    :width: 600
    :align: center
+   :class: dark-light
 
 
 The resulting spectrum for sRGB white (coordinates :math:`[1.0, 1.0, 1.0]`) looks as follows:
@@ -455,6 +469,7 @@ The resulting spectrum for sRGB white (coordinates :math:`[1.0, 1.0, 1.0]`) look
 .. figure:: ../images/rgb_white.svg
    :width: 600
    :align: center
+   :class: dark-light
 
 .. topic:: Note
    

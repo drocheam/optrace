@@ -11,6 +11,7 @@ from ..tracer.geometry import Surface
 from ..tracer.presets import spectral_lines as Lines  # spectral lines for AbbePlot
 from ..tracer.misc import PropertyChecker as pc
 from ..warnings import warning
+from ..global_options import global_options
 
 
 def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
@@ -186,15 +187,19 @@ def block() -> None:
 
 def _show_grid(what=plt) -> None:
     """active major and minor grid lines, while minor are dashed and less visible"""
-    what.grid(visible=True, which='major')
-    what.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
+    if global_options.plot_dark_mode:
+        what.grid(visible=True, which='major', color="#555")
+        what.grid(visible=True, which='minor', color='#333', linestyle='--')
+    else:
+        what.grid(visible=True, which='major')
+        what.grid(visible=True, which='minor', color="gainsboro", linestyle='--')
     what.minorticks_on()
 
 
 def _save_or_show(path: str = None, sargs: dict = {}):
     """show a plot (path is None) or store the image of a plot at file given as 'path'"""
     pc.check_type("path", path, str | None)
-
+               
     if path is None:
         plt.show(block=False)
         plt.pause(0.1)

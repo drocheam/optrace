@@ -134,6 +134,7 @@ This produces the following plot:
 .. figure:: ../images/surface_profile_plot.svg
    :align: center
    :width: 550
+   :class: dark-light
 
    Surface profile plot for the two cornea surfaces of the arizona eye model.
 
@@ -165,12 +166,14 @@ The user can provide a user-defined :python:`title`, turn off/on labels and the 
    * - .. figure:: ../images/LED_illuminants.svg
           :width: 500
           :align: center
+          :class: dark-light
          
           CIE standard illuminants LED series. 
 
      - .. figure:: ../images/example_spectrum_histogram.svg
           :align: center
           :width: 500
+          :class: dark-light
 
           A rendered histogram spectrum.
 
@@ -219,19 +222,18 @@ Supporting all the same parameters as for :func:`image_plot <optrace.plots.image
 
 
 
-.. list-table:: Exemplary image plot and image cut plot from the ``double_prism.py`` example.
-   :widths: 500 300
+.. list-table:: Exemplary image plot and image cut plot from the ``prism.py`` example.
    :class: table-borderless
 
-   * - |
-
-       .. figure:: ../images/color_dispersive3.svg
+   * - .. figure:: ../images/color_dispersive2.svg
           :align: center
-          :width: 500
+          :height: 350
+          :class: dark-light
    
      - .. figure:: ../images/color_dispersive1_cut.svg
           :align: center
-          :width: 300
+          :height: 350
+          :class: dark-light
 
 
 
@@ -291,10 +293,12 @@ A full function call could look like this:
    * - .. figure:: ../images/chroma_1931.svg
           :align: center
           :width: 500
+          :class: dark-light
    
      - .. figure:: ../images/chroma_1976.svg
           :align: center
           :width: 500
+          :class: dark-light
 
 **Norms**
 
@@ -310,10 +314,12 @@ Chromaticity norms describe the brightness normalization for the colored diagram
    * - .. figure:: ../images/fl_chroma_sum_norm.svg
           :align: center
           :width: 500
+          :class: dark-light
    
      - .. figure:: ../images/fl_chroma_largest_norm.svg
           :align: center
           :width: 500
+          :class: dark-light
      
 
 
@@ -344,6 +350,7 @@ You can also enable or disable the legend and labels with :python:`legend_off` a
 .. figure:: ../images/glass_presets_n.svg
    :width: 600
    :align: center
+   :class: dark-light
    
    Example of a Refractive Index Plot.
 
@@ -366,6 +373,7 @@ It also supports the parameter :python:`title`. Additionally one can provide use
 .. figure:: ../images/glass_presets_V.svg
    :width: 600
    :align: center
+   :class: dark-light
 
    Example of an Abbe Plot.
 
@@ -402,12 +410,14 @@ Below you can find examples for cost plots.
    * - .. figure:: ../images/af_debug_position_variance.svg
           :align: center
           :width: 500
+          :class: dark-light
 
           Focus finding for mode "Position Variance" in the ``spherical_aberration.py`` example.
 
      - .. figure:: ../images/af_debug_image_sharpness.svg
           :align: center
           :width: 500
+          :class: dark-light
 
           Focus finding for mode "Image Sharpness" in the ``spherical_aberration.py`` example.
 

@@ -30,10 +30,10 @@ class ScenePlotting:
     MAX_RAYS_SHOWN: int = 50000
     """Maximum of rays shown in visualization"""
 
-    LABEL_STYLE: dict = dict(font_size=11, bold=True, font_family="courier", shadow=True, italic=False)
+    LABEL_STYLE: dict = dict(font_size=12, bold=True, font_family="courier", shadow=True, italic=False)
     """Standard Text Style. Used for object labels, legends and axes"""
 
-    INFO_STYLE: dict = dict(font_size=13, bold=True, font_family="courier", shadow=True, italic=False)
+    INFO_STYLE: dict = dict(font_size=14, bold=True, font_family="courier", shadow=True, italic=False)
     """Info Text Style. Used for status messages and interaction overlay"""
 
     ##########
@@ -294,7 +294,7 @@ class ScenePlotting:
         """plot cartesian axes"""
 
         # save old font factor. This is the one we adapted constantly in self._resizeSceneElements()
-        ff_old = self._axis_plots[0][0].axes.font_factor if self._axis_plots else 0.65
+        ff_old = self._axis_plots[0][0].axes.font_factor if self._axis_plots else 0.75
 
         self.__remove_objects(self._axis_plots)
 
@@ -462,7 +462,8 @@ class ScenePlotting:
             self.scene.engine.add_source(ParametricSurface(name=f"{type(obj).__name__} {num}"), self.scene)
 
         # plot front
-        a = plot(obj.front.plotting_mesh(N=self.SURFACE_RES), "front") if plotFront else None
+        nres = self.SURFACE_RES if not plotFront or not isinstance(obj.front, RectangularSurface) else 10
+        a = plot(obj.front.plotting_mesh(N=nres), "front") if plotFront else None
 
         # cylinder between surfaces
         b = plot(obj.cylinder_surface(nc=2 * self.SURFACE_RES), "cylinder") if plotCyl else None
@@ -587,7 +588,7 @@ class ScenePlotting:
 
                 text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
                                         background_color=self.scene.background, **tprop)
-                text.property.font_size = int(8 * mark.text_factor)
+                text.property.font_size = int(8.4 * mark.text_factor)
                 text.actor.text_scale_mode = 'none'
                 text.visible = not bool(self.ui.hide_labels)
 
@@ -620,7 +621,7 @@ class ScenePlotting:
 
                 text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
                                         background_color=self.scene.background, **tprop)
-                text.property.font_size = int(8 * mark.text_factor)
+                text.property.font_size = int(8.4 * mark.text_factor)
                 text.actor.text_scale_mode = 'none'
                 text.visible = not bool(self.ui.hide_labels)
 
@@ -644,19 +645,19 @@ class ScenePlotting:
         high_contrast = self.ui.high_contrast
 
         self._lens_alpha =          0.35
-        self._detector_alpha =      0.9
+        self._detector_alpha =      0.99
         self._raysource_alpha =     0.55
         self._info_opacity =        0.2
         self._aperture_color =      (0, 0, 0)
         self._crosshair_color =     (1, 0, 0)
-        self.scene.background =     (0.205, 0.19, 0.19)  if not high_contrast else (1, 1, 1)
+        self.scene.background =     (0.2, 0.2, 0.2)      if not high_contrast else (1, 1, 1)
         self.scene.foreground =     (1, 1, 1)            if not high_contrast else (0, 0, 0)
         self._lens_color =          (0.63, 0.79, 1.00)   if not high_contrast else self.scene.foreground
-        self._detector_color =      (0, 0, 0)            if not high_contrast else self.scene.foreground
+        self._detector_color =      (0.0, 0.0, 0.0)      if not high_contrast else self.scene.foreground
         self._subtle_color =        (0.3, 0.3, 0.3)      if not high_contrast else (0.7, 0.7, 0.7)
         self._marker_color =        (0, 1, 0)            if not high_contrast else self.scene.foreground
         self._line_marker_color =   (0.8, 0, 0.8)        if not high_contrast else self.scene.foreground
-        self._outline_color =       (0, 0, 0)            if not high_contrast else (0.8, 0.8, 0.8)
+        self._outline_color =       (0.5, 0.5, 0.5)      if not high_contrast else (0.8, 0.8, 0.8)
         self._axis_color =          (1, 1, 1)            if not high_contrast else (0.5, 0.5, 0.5)
         self._info_frame_color =    (0, 0, 0)            if not high_contrast else (1, 1, 1)
         self._volume_color =        (0.45, 0.45, 0.45)   if not high_contrast else (1, 1, 1)
@@ -699,8 +700,10 @@ class ScenePlotting:
                 
                 case "d":  # render DetectorImage
                     self.ui.detector_image()
-                
-                case "q":  # close all pyplots
+               
+                #  q does not seem to be registered anymore. Is it already used by vtk for something? 
+                # Use 0 as key instead
+                case "0":  # close all pyplots
                     plt.close("all")
 
                 case "n":  # reselect and replot rays
@@ -712,8 +715,10 @@ class ScenePlotting:
                 # after pressing F11 then Esc also triggers this
                 # case "" if vtk_obj.GetKeySym() == "F11":
                     # self.scene.scene_editor._full_screen_fired()
-
-        self.scene.interactor.add_observer('KeyReleaseEvent', keyrelease)  # calls keyrelease() in main thread
+        
+        # TODO change this back to KeyReleaseEvent back
+        # currently the application gets old keyrelease event from the terminal
+        self.scene.interactor.add_observer('KeyPressEvent', keyrelease)  # calls keyrelease() in main thread
 
     def init_crosshair(self) -> None:
         """init a crosshair for the picker"""

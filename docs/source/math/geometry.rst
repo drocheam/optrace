@@ -93,9 +93,10 @@ Surface Extension
 --------------------
 
 
-.. figure:: ../images/Oberflächen_Erweiterung.svg
-   :width: 700
+.. figure:: ../images/surface_extension.svg
+   :width: 900
    :align: center
+   :class: dark-light
 
    Surface Extension
 

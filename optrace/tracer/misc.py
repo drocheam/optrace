@@ -143,6 +143,13 @@ def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.n
         theta[r_ < 0] -= np.pi
         return np.abs(r_), theta
 
+
+# TODO use constants like pc.float that include float, float32, float64 etc.?
+
+# TODO doctests don't work with new numpy version
+# set np.set_printoptions(legacy="1.25")? Must be changed in the future, when numpy>=2 can be required as default
+# TODO or require numpy 2?
+
 # class only used for separate namespace
 class PropertyChecker:
 

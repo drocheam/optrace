@@ -5,50 +5,61 @@ Optrace |version| |release| Documentation
 .. list-table::
    :class: table-borderless
 
-   * - .. figure:: images/arizona_eye_scene.png
+   * - .. figure:: images/example_spherical_aberration2.png
           :align: center
-          :width: 200
+          :height: 150
+          :class: dark-light
     
      - .. figure:: images/example_rgb_render2.svg
           :align: center
-          :width: 200
-
-     - .. figure:: ./images/example_cosine_surfaces1.png 
+          :height: 150
+          :class: dark-light
+  
+     - .. figure:: images/example_legrand2.png
           :align: center
-          :width: 200
+          :height: 150
+          :class: dark-light
      
      - .. figure:: ./images/example_keratoconus_4.svg
           :align: center
-          :width: 200
+          :height: 150
+          :class: dark-light
      
      - .. figure:: images/example_brewster.png
           :align: center
-          :width: 200
+          :height: 150
+          :class: dark-light
    
    * - .. figure:: ./images/example_gui_automation_1.png
           :align: center
-          :width: 200
+          :height: 150
+          :class: dark-light
 
      - .. figure:: ./images/LED_illuminants.svg
           :align: center
-          :width: 200
-     
-     - .. figure:: images/example_spherical_aberration2.png
+          :height: 150
+          :class: dark-light
+
+     - .. figure:: images/example_double_gauss_2.png
           :align: center
-          :width: 200
-     
-     - .. figure:: images/example_double_gauss.png
-          :align: center
-          :width: 200
+          :height: 150
+          :class: dark-light
      
      - .. figure:: ./images/rgb_render_srgb1.svg
           :align: center
-          :width: 200
+          :height: 150
+          :class: dark-light
 
+     - .. figure:: ./images/example_cosine_surfaces1.png 
+          :align: center
+          :height: 150
+          :class: dark-light
 
 .. See the :ref:`example gallery <examples>` for more samples
 
-**Overview**
+
+Overview
+----------------------
 
 .. list-table::
    :class: table-borderless
@@ -68,7 +79,6 @@ Optrace |version| |release| Documentation
         * simulation incorporating wave optics, e.g. diffraction, interference
         * a non-sequential raytracer, simulating ghost images, reflections
         * a tool supporting mirror or fresnel lens optics
-        * mature, bug-free software
 
    * - **Purpose/Use Cases**
         * educational purposes, demonstrating aberrations or simple optical setups
@@ -80,7 +90,8 @@ Optrace |version| |release| Documentation
 
 
 
-**Similar/related Python software**
+Similar/related Python software
+-------------------------------------
 
 .. list-table:: 
    :class: table-borderless

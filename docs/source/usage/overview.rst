@@ -176,3 +176,11 @@ The colormap can be reset by setting it to ``None``.
    ot.global_options.spectral_colormap = None
    ot.global_options.wavelength_range = [380, 780]
 
+
+**UI Dark Mode**
+
+.. TODO
+
+**Plot Dark Mode**
+
+.. TODO

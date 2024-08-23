@@ -1,7 +1,4 @@
 
-# explicitly load Qt5, as matplotlib could load a different framework otherwise
-import PyQt5
-
 import matplotlib
 
 # set font globally
@@ -9,9 +6,10 @@ matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 # increase dpi if in "inline" backend, otherwise the resolution is way too low in IDEs like spyder
-if "inline" in matplotlib.rcParams["backend"]: # pragma: no cover
-    matplotlib.rcParams["figure.dpi"] = 300 # pragma: no cover
-
+if "inline" in matplotlib.rcParams["backend"]:  # pragma: no cover
+    matplotlib.rcParams["figure.dpi"] = 300  # pragma: no cover
+else:
+    matplotlib.rcParams["backend"] = "qtagg"
 
 from .image_plots import image_plot, image_cut_plot
 from .misc_plots import autofocus_cost_plot, abbe_plot, surface_profile_plot, block

@@ -80,9 +80,9 @@ html_theme_options = {
     "pygments_dark_style": "github-dark",
 }
 
-# html_context = {
-   # "default_mode": "light"  # force light mode
-# }
+html_context = {
+   "default_mode": "dark"  # force light mode
+}
 
 # primary side bar
 html_sidebars = {

@@ -24,7 +24,7 @@ After this, `optrace` should be installed on your system.
 .. list-table:: 
    :widths: 200 350
    :header-rows: 1
-   :align: center
+   :align: left
 
    * - Dependency
      - Needed for/as
@@ -44,6 +44,8 @@ After this, `optrace` should be installed on your system.
      - animated progressbar in standard output (terminal)
    * - `PyQt5 <https://pypi.org/project/PyQt5/>`_
      - GUI backend for mayavi
+   * - `pyqtdarktheme <https://pypi.org/project/pyqtdarktheme//>`_
+     - setting a QT dark theme
    * - `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
      - specialized methods for interpolation and math
    * - `traitsui <https://docs.enthought.com/traitsui/>`_

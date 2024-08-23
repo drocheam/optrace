@@ -139,16 +139,20 @@ __________________________
    * - .. figure:: ../images/example_psf1.svg
           :align: center
           :width: 400
+          :class: dark-light
 
    
      - .. figure:: ../images/example_psf2.svg
           :align: center
           :width: 400
+          :class: dark-light
 
 
 .. figure:: ../images/example_psf3.svg
    :align: center
    :width: 400
+   :class: dark-light
+
 
 
 **Code Example**
@@ -262,36 +266,45 @@ Preset Gallery
 _____________________
 
 
-.. list-table:: PSF presets
+.. TODO what to do here? plotting linearly makes no sense, as we can't see the glare or sidelobes of the airy
+
+
+.. list-table:: PSF presets. Linear representation to intensity. 
+   Airy Sidelobes and outer glare of 'glare' presets are hardly noticeable in this representation.
    :class: table-borderless
 
    * - .. figure:: ../images/psf_circle.svg
           :align: center
           :width: 400
+          :class: dark-light
 
           Exemplary Circle PSF.
    
      - .. figure:: ../images/psf_gaussian.svg
           :align: center
           :width: 400
+          :class: dark-light
 
           Exemplary Gaussian PSF.
 
    * - .. figure:: ../images/psf_airy.svg
           :align: center
           :width: 400
+          :class: dark-light
 
           Exemplary Airy PSF.
    
      - .. figure:: ../images/psf_halo.svg
           :align: center
           :width: 400
+          :class: dark-light
 
           Exemplary Halo PSF.
    
    * - .. figure:: ../images/psf_glare.svg
           :align: center
           :width: 400
+          :class: dark-light
 
           Exemplary Glare PSF.
 

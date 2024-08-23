@@ -35,12 +35,14 @@ Both types have no extent in z-direction, are therefore parallel to the xy-plane
    * - .. figure:: ../images/point.svg
           :align: center
           :width: 250
+          :class: dark-light
 
           Point geometry
 
      - .. figure:: ../images/line.svg
           :align: center
           :width: 250
+          :class: dark-light
 
           Line geometry
 
@@ -74,6 +76,7 @@ typically can be found for Apertures, and :class:`RectangularSurfaces <optrace.t
    * - .. figure:: ../images/circle.svg
           :align: center
           :width: 250
+          :class: dark-light
 
           Circle geometry
 
@@ -81,12 +84,14 @@ typically can be found for Apertures, and :class:`RectangularSurfaces <optrace.t
      - .. figure:: ../images/ring.svg
           :align: center
           :width: 250
+          :class: dark-light
 
           Ring geometry
 
      - .. figure:: ../images/rectangle.svg
           :align: center
           :width: 250
+          :class: dark-light
 
           Rectangle geometry
 
@@ -122,6 +127,7 @@ _____________________
 .. figure:: ../images/tilted_surface.svg
    :width: 500
    :align: center
+   :class: dark-light
 
    TiltedSurface geometry
 
@@ -173,6 +179,7 @@ A :class:`SphericalSurface <optrace.tracer.geometry.surface.spherical_surface.Sp
 .. figure:: ../images/spherical_surface.svg
    :width: 700
    :align: center
+   :class: dark-light
 
    Spherical surface geometry with a positive and negative curvature radius :math:`R`
 
@@ -202,6 +209,7 @@ with
 .. figure:: ../images/conic_surface.svg
    :width: 750
    :align: center
+   :class: dark-light
 
    Conic surface geometry with a different conic constant :math:`k` signs. 
    An aspheric surface has a small additional rotationally symmetric polynomial added.
@@ -247,6 +255,7 @@ However, for functions with symmetry we can also use the :class:`FunctionSurface
 .. figure:: ../images/function_surface.svg
    :width: 500
    :align: center
+   :class: dark-light
 
    Custom function according to :math:`z_\text{s}(x,~y)`, which can be a symmetric or asymmetric function or a dataset
 
@@ -441,6 +450,7 @@ Below you can see some additional geometrical quantities that are useful when mo
 .. figure:: ../images/surface_geometry_quantities.svg
    :width: 500
    :align: center
+   :class: dark-light
 
 :math:`z_\text{min}` and :math:`z_\text{max}` describe the minimal and maximal z-position on the surface, while :math:`z_0` is the z-position of the center.
 :math:`d_\text{s}` is the difference between :math:`z_\text{min}` and :math:`z_\text{max}`, :math:`d_\text{p}` is the difference between :math:`z_\text{max}` and :math:`z_0` and :math:`d_\text{n}` the difference between :math:`z_0` and :math:`z_\text{min}`.

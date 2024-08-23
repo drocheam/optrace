@@ -27,21 +27,18 @@ class CommandWindow(HasTraits):
                                                          format_func=lambda x: x),
                                    desc="if the scene is automatically reploted and traced on changes")
 
+    # code_editor = 
     view = View(
                 HSplit(
                     Group(
                         Group(
                             Item("_execute_label", style='readonly', show_label=False, emphasized=True),
-                            # custom stylesheet because colored or dark themes mess up the syntax highlighting
-                            # of the code editor
-                            Item('_cmd', editor=CodeEditor(), show_label=False, style="custom", 
-                                 style_sheet="*{background-color: white; color: black}"),
+                            Item('_cmd', editor=CodeEditor(), show_label=False, style="custom"),
                             ),
                         Item("_whitespace_label", style='readonly', show_label=False, width=563),
                         Group(
                             Item("_history_label", style='readonly', show_label=False, emphasized=True),
-                            Item("_history", editor=ListStrEditor(horizontal_lines=True), show_label=False,
-                                 height=220, style_sheet="*{font-family: monospace}"),
+                            Item("_history", editor=ListStrEditor(horizontal_lines=True), show_label=False, height=220),
                             ),
                         ),
                     Group(
@@ -102,11 +99,11 @@ class CommandWindow(HasTraits):
             output += el + "\n"
 
         clipboard = QtGui.QApplication.clipboard()
-        clipboard.clear(mode=clipboard.Clipboard)  
-        clipboard.setText(output, mode=clipboard.Clipboard)
+        clipboard.clear(mode=QtGui.QClipboard.Clipboard)  
+        clipboard.setText(output, mode=QtGui.QClipboard.Clipboard)
  
         # check if actually copied
-        if clipboard.text(mode=clipboard.Clipboard) != output:  
+        if clipboard.text(mode=QtGui.QClipboard.Clipboard) != output:  
             # can't test these, because it seems to fail only on Windows
             warning("Copying to clipboard failed. This can be an library or system issue.\n")  # pragma: no cover
     

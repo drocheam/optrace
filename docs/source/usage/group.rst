@@ -198,6 +198,7 @@ Note that :math:`b, g`  both need to be positive for this preset.
 .. figure:: ../images/ideal_camera.svg
    :align: center
    :width: 600
+   :class: dark-light
 
    Visualization of the ``ideal_camera`` parameters.
 
@@ -342,9 +343,11 @@ As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>`, we
 
    eye_model = ot.presets.geometry.arizona_eye(adaptation=1, pupil=3, r_det=10, pos=[0.3, 0.7, 1.2])
 
-.. figure:: ../images/arizona_eye_scene.png
+.. figure:: ../images/example_arizona_eye_scene.png
    :align: center
    :width: 600
+   :class: dark-light
+
 
    Eye model in the ``arizona_eye_model.py`` example script.
 

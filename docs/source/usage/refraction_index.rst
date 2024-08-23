@@ -267,24 +267,28 @@ These groups are plotted below in an index and an Abbe plot.
    * - .. figure:: ../images/glass_presets_n.svg
           :width: 500
           :align: center
+          :class: dark-light
 
           Refraction index curves for different glass presets.
 
      - .. figure:: ../images/glass_presets_V.svg
           :width: 500
           :align: center
+          :class: dark-light
        
           Abbe diagram for different glass presets.
    
    * - .. figure:: ../images/plastics_presets_n.svg
           :width: 500
           :align: center
+          :class: dark-light
           
           Refraction index curves for different plastic presets.
        
      - .. figure:: ../images/plastics_presets_V.svg
           :width: 500
-          :align: center
+          :align: center 
+          :class: dark-light
           
           Abbe diagram for different plastic presets.
 
@@ -292,12 +296,14 @@ These groups are plotted below in an index and an Abbe plot.
    * - .. figure:: ../images/misc_presets_n.svg
           :width: 500
           :align: center
+          :class: dark-light
            
           Refraction index curves for miscellaneous presets.
      
      - .. figure:: ../images/misc_presets_V.svg
           :width: 500
           :align: center
+          :class: dark-light
           
           Abbe diagram for miscellaneous presets. *Air* and *Vacuum* are missing here, because they are modelled without dispersion.
 

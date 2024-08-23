@@ -331,10 +331,11 @@ Optical Center
 
 .. figure:: ../images/optical_center.svg
    :align: center
-   :width: 550
+   :width: 650
+   :class: dark-light
 
 
-From the red triangle follows that:
+From the yellow triangle follows that:
 
 .. math::
    \tan \phi = \frac{x_2 - x_1}{V_2 - V_1}
@@ -584,7 +585,8 @@ To calculate the entrance and exit pupil for a given system and aperture stop th
 
 .. figure:: ../images/pupil_calculation.svg
    :align: center
-   :width: 750
+   :width: 850
+   :class: dark-light
 
    Visualization of the matrix separation and different distances.
 

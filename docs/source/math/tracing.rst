@@ -17,6 +17,7 @@ While not explicitly mentioned, new ray polarization and weights are calculated 
 .. figure:: ../images/TracePAP.svg
    :width: 400
    :align: center
+   :class: dark-light
    
    Tracing process flowchart.
 
@@ -30,8 +31,9 @@ Commonly found forms of the law of refraction are composed of an input and outpu
 The following figure shows the refraction of a ray on a curved surface.
 
 .. figure:: ../images/refraction_interface.svg
-   :width: 300
+   :width: 400
    :align: center
+   :class: dark-light
    
    Refraction on a curved interface.
 
@@ -57,8 +59,9 @@ The polarization vector :math:`E` can be decomposed into a :math:`E_\text{p}` -c
 Note that for our calculations all vectors are unity vectors, while length information of the polarization components is contained in the scaling factors :math:`A_\text{tp}, A_\text{ts}`.
 
 .. figure:: ../images/refraction_interface_polarization.svg
-   :width: 620
+   :width: 700
    :align: center
+   :class: dark-light
 
    Ray polarization components before and after refraction.
 
@@ -139,6 +142,7 @@ Optics tells us that ideally parallel rays meet in the same position in the foca
 .. figure:: ../images/ideal_refraction.svg
    :width: 500
    :align: center
+   :class: dark-light
 
    Geometry for refraction on an ideal lens.
 
@@ -276,6 +280,7 @@ After image rendering the image is optionally filtered with an Airy-disk resolut
 .. figure:: ../images/DetectorPAP.svg
    :width: 400
    :align: center
+   :class: dark-light
    
    Detector intersection and image rendering flowchart.
 

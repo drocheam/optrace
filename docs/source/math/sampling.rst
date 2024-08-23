@@ -199,12 +199,14 @@ A reduction in noise is clearly visible.
    * - .. figure:: ../images/rect_simple_sampling.svg
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays on a square area with simple uniform sampling, image rendered with 189 x 189 pixel
 
      - .. figure:: ../images/rect_strat_sampling.svg
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays on a square area with two dimensional stratified sampling, image rendered with 189 x 189 pixel
 
@@ -226,12 +228,14 @@ While this done uniformly in :numref:`circle_sampling`, there are some circular 
    * - .. figure:: ../images/circ_sampling_strat.svg
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays with stratified sampling and a polar grid transformation as done in :numref:`circle_sampling`, image rendered with 189 x 189 pixel
 
      - .. figure:: ../images/circ_sampling_mapping.svg
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays on a circular area with positions mapped from stratified grid, 
           image rendered with 189 x 189 pixel
@@ -312,6 +316,7 @@ However, :math:`s_x,~s_y` are not parallel to the cartesian :math:`x,y,z` axes, 
 .. figure:: ../images/direction_cone.svg
    :width: 450
    :align: center
+   :class: dark-light
 
    Exemplary direction vector :math:`s` inside a cone volume around :math:`s_0`
 
@@ -448,7 +453,6 @@ The following angle distributions :math:`\mathcal{A}` with :math:`\alpha \in \ma
 
 .. list-table:: Polarization angle modes
    :widths: 150 400
-   :header-rows: 1
    :align: center
    
    * - **x-Polarization**

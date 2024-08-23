@@ -11,6 +11,7 @@ docs/build
 
 # backups don't need to be included
 bak
+*.bkp
 
 .python-version
 

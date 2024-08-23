@@ -73,9 +73,14 @@ def image_plot(im:       LinearImage | RGBImage,
 
     # plot image
     fig = plt.figure()
+
+    # show ticks but hide grid
     _show_grid()
+    plt.grid(visible=False, which="major")
+    plt.grid(visible=False, which="minor")
+   
     plt.imshow(Imd, extent=extent, cmap=current_cmap, aspect="equal", norm=norm, 
-               vmin=vmin, vmax=vmax, origin="lower", zorder=10)
+               vmin=vmin, vmax=vmax, origin="lower")
 
     # plot labels
     plt.xlabel(xlabel)
@@ -155,7 +160,7 @@ def image_cut_plot(im:       RGBImage | LinearImage,
     colors = ["r", "g", "b"] if isinstance(im, RGBImage) else [None, None, None]
 
     # plot curve(s)
-    [plt.stairs(Imd[i], s, color=colors[i]) for i, _ in enumerate(Imd)]
+    [plt.stairs(Imd[i], s, color=colors[i], zorder=10) for i, _ in enumerate(Imd)]
 
     # flip if desired
     if flip:

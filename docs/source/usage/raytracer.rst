@@ -33,6 +33,7 @@ Since the |Raytracer| is a subclass of a |Group|, elements can be changed or add
 .. figure:: ../images/example_legrand1.png
    :width: 700
    :align: center
+   :class: dark-light
 
    Example of a raytracer geometry in the TraceGUI in side view
 
@@ -70,6 +71,7 @@ The following figure shows a setup with lenses :python:`L0, L2` having a :python
 .. figure:: ../images/rt_setup_different_ambient_media.svg
    :width: 700
    :align: center
+   :class: dark-light
 
    Schematic figure of a setup with a ray source, three different lenses and three different ambient media
 

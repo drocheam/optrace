@@ -5,6 +5,9 @@ import matplotlib
 import numpy as np
 import scipy.optimize
 
+import optrace.plots
+from optrace.plots.misc_plots import _show_grid
+
 import optrace.tracer.color as color
 from optrace.tracer.color.srgb import gauss
 
@@ -110,16 +113,12 @@ Y_norm_g /= norm2
 Y_norm_b /= norm2
 
 # plot r, g, b with normalized height
-matplotlib.rcParams['mathtext.fontset'] = 'stix'
-matplotlib.rcParams['font.family'] = 'STIXGeneral'
 fsize=(6,2.6)
 plt.figure(figsize=fsize)
 plt.plot(wl, r, 'r')
 plt.plot(wl, g, 'g')
 plt.plot(wl, b, 'b')
-plt.grid(visible=True, which='major')
-plt.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
-plt.minorticks_on()
+_show_grid()
 plt.xlabel(r"$\lambda$ in nm")
 plt.ylabel("arb. unit")
 plt.legend(["red", "green", "blue"])
@@ -146,9 +145,7 @@ plt.figure(figsize=fsize)
 plt.plot(wl, r, 'r')
 plt.plot(wl, g, 'g')
 plt.plot(wl, b, 'b')
-plt.grid(visible=True, which='major')
-plt.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
-plt.minorticks_on()
+_show_grid()
 plt.xlabel(r"$\lambda$ in nm")
 plt.ylabel("arb. unit")
 plt.legend(["red", "green", "blue"])
@@ -157,10 +154,8 @@ plt.show(block=False)
 
 
 plt.figure(figsize=fsize)
-plt.plot(wl, r+g+b, 'r')
-plt.grid(visible=True, which='major')
-plt.grid(visible=True, which='minor', color='gainsboro', linestyle='--')
-plt.minorticks_on()
+plt.plot(wl, r+g+b, '#ddd')
+_show_grid()
 plt.xlabel(r"$\lambda$ in nm")
 plt.ylabel("arb. unit")
 plt.tight_layout()

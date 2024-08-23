@@ -11,7 +11,7 @@ otp.spectrum_plot(ot.presets.light_spectrum.standard_fl, labels_off=True,
                   title="CIE Standard Illuminants Fluorescent")
 
 otp.chromaticities_cie_1931(ot.presets.light_spectrum.srgb, norm="Largest")
-otp.spectrum_plot(ot.presets.light_spectrum.srgb, color=["r", "g", "b", "k"],
+otp.spectrum_plot(ot.presets.light_spectrum.srgb, color=["r", "g", "b", "#888"],
                   labels_off=True, title="sRGB Primaries")
 
 otp.spectrum_plot(ot.presets.spectrum.xyz_observers, color=["r", "g", "b"],
