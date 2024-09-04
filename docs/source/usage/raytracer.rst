@@ -69,7 +69,7 @@ In the case of the raytracer, we can define an :python:`n0` which defines the re
 The following figure shows a setup with lenses :python:`L0, L2` having a :python:`n2` defined and a custom :python:`n0` parameter in the raytracer class. The medium before the first lens as well as the medium behind :python:`L1` are therefore also :python:`n0`.
 
 .. figure:: ../images/rt_setup_different_ambient_media.svg
-   :width: 700
+   :width: 760
    :align: center
    :class: dark-light
 

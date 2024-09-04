@@ -126,6 +126,21 @@ Right-clicking inside the scene displays the coordinates of the picked point.
 
 ``Shift+ Right Click`` moves the currently selected detector to the picked. z-position.
 
+**High Contrast Mode**
+
+By activating the high contrast mode the background becomes white and all geometry elements grey or black.
+This mode can also be useful when creating scene views for academic purposes, as the background color in documents is also white.
+You can find an example below.
+
+.. figure:: ../images/example_double_gauss.png
+  :align: center
+  :width: 800
+  :class: dark-light
+
+  With ``plot_dark_mode`` enabled.
+   
+
+
 **Keyboard Shortcuts**
 
 The following keyboard shortcuts are available inside the scene:
@@ -244,9 +259,6 @@ Beside the main window there are additional windows in the interface. These will
    * - Property Browser
      - button at the bottom of the main tab in the sidebar
      - overview of raytracer, scene and ray properties as well as cardinal points
-
-The Scene
-____________________
 
 
 .. _gui_tabs:

@@ -95,7 +95,8 @@ ______________________
 
 Global options can be controlled through the attributes of the class :class:`optrace.global_options <optrace.global_options>`.
 
-**Progressbar**
+Progressbar
+###################
 
 For calculation-intensive tasks a progress bar is displayed inside the terminal that displays the progress and estimated remaining time.
 It can be turned off globally by:
@@ -111,7 +112,8 @@ There is also a context manager available that turns it off temporarily:
    with ot.global_options.no_progressbar():
        do_something()
 
-**Warnings**
+Warnings
+###################
 
 ``optrace`` outputs warnings of type :exc:`OptraceWarning <optrace.warnings.OptraceWarning>` (which in turn is a subclass of :exc:`UserWarning`). These can be filtered using the :mod:`warnings` python module.
 A simple way to silence them, for example when doing many automated tasks, one can write:
@@ -127,7 +129,8 @@ There is also a context manager available that turns it off temporarily:
    with ot.global_options.no_warnings():
        do_something()
 
-**Multithreading**
+Multithreading
+###################
 
 By default, multithreading is used to parallelize tasks like raytracing, image rendering.
 However, this can be undesired, especially when debugging or multiple raytracers are run in parallel.
@@ -138,7 +141,8 @@ Multithreading can be turned off using:
    ot.global_options.multi_threading = False
 
 
-**Wavelength Range**
+Wavelength Range
+###################
 
 ``optrace`` is optimized for operation in the visible range of 380 - 780 nm.
 The range can be extended by:
@@ -149,7 +153,8 @@ The range can be extended by:
 
 Note that most presets like refractive indices are not defined for regions outside the default range, so they can not be used.
 
-**Spectral Colormap**
+Spectral Colormap
+######################
 
 Spectrum, refractive index plots as well as the ray display in the TraceGUI use a spectral colormap that maps wavelength values to a color.
 For the visible range, a rainbow-like mapping is applied.
@@ -177,10 +182,63 @@ The colormap can be reset by setting it to ``None``.
    ot.global_options.wavelength_range = [380, 780]
 
 
-**UI Dark Mode**
+UI Dark Mode
+###################
 
-.. TODO
+UI dark mode is enabled by default.
+The mode can be changed by setting the ``ui_dark_mode`` parameter.
+Changes are applied to all current GUI windows as well as new ones.
 
-**Plot Dark Mode**
+For instance, to deactive the mode, use:
 
-.. TODO
+.. testcode::
+
+   ot.global_options.ui_dark_mode = False
+   
+.. figure:: ../images/ui_dark_mode.png
+   :align: center
+   :width: 800
+   :class: dark-light
+
+   With ``ui_dark_mode`` enabled.
+
+.. figure:: ../images/ui_light_mode.png
+   :align: center
+   :width: 800
+   :class: dark-light
+
+   With ``ui_dark_mode`` disabled.
+
+
+Plot Dark Mode
+###################
+
+For the content of plotting windows, there is a separate option ``plot_dark_mode``.
+It is also enabled by default.
+
+To deactivate it, use:
+
+.. testcode::
+
+   ot.global_options.plot_dark_mode = False
+
+Deactivating can be useful for documentation or article output, where the background is also white.
+Note that changes are only applied to new pyplot windows, not already opened ones.
+
+.. list-table::
+   :class: table-borderless
+
+   * - .. figure:: ../images/srgb_spectrum.svg
+          :align: center
+          :width: 400
+          :class: dark-light
+
+          With ``plot_dark_mode`` enabled.
+   
+     - .. figure:: ../images/srgb_spectrum_light.svg
+          :align: center
+          :width: 400
+          :class: dark-light
+
+          With ``plot_dark_mode`` disabled.
+

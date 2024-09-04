@@ -149,7 +149,7 @@ class TraceGUI(HasTraits):
     autofocus_method: Enum = Enum(*Raytracer.autofocus_methods, desc="Method for Autofocus")
     """Focus Finding Mode from raytracer.AutofocusModes"""
 
-    cut_dimension: Enum = Enum(["y", "x"], desc="image cut dimension")
+    cut_dimension: Enum = Enum(["x", "y"], desc="image cut dimension")
     """dimension for image cut"""
 
     source_names: List = List()  #: short names for raytracer ray sources

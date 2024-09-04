@@ -9,6 +9,7 @@ from .misc_plots import _show_grid, _save_or_show
 from ..tracer.image import RGBImage, LinearImage
 from ..tracer.misc import PropertyChecker as pc  # check types and values
 from ..tracer import color
+from .. import global_options
 
 
 def image_plot(im:       LinearImage | RGBImage,
@@ -157,7 +158,10 @@ def image_cut_plot(im:       RGBImage | LinearImage,
     _show_grid()
 
     # enforce rgb colors for rgb modes
-    colors = ["r", "g", "b"] if isinstance(im, RGBImage) else [None, None, None]
+    if isinstance(im, RGBImage):
+        colors = ["#f30", "#2b3", "#08e"] if global_options.plot_dark_mode else ["r", "g", "b"] 
+    else:
+        colors = [None, None, None]
 
     # plot curve(s)
     [plt.stairs(Imd[i], s, color=colors[i], zorder=10) for i, _ in enumerate(Imd)]

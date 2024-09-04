@@ -34,14 +34,14 @@ Both types have no extent in z-direction, are therefore parallel to the xy-plane
 
    * - .. figure:: ../images/point.svg
           :align: center
-          :width: 250
+          :width: 300
           :class: dark-light
 
           Point geometry
 
      - .. figure:: ../images/line.svg
           :align: center
-          :width: 250
+          :width: 300
           :class: dark-light
 
           Line geometry
@@ -75,7 +75,7 @@ typically can be found for Apertures, and :class:`RectangularSurfaces <optrace.t
 
    * - .. figure:: ../images/circle.svg
           :align: center
-          :width: 250
+          :width: 300
           :class: dark-light
 
           Circle geometry
@@ -83,14 +83,14 @@ typically can be found for Apertures, and :class:`RectangularSurfaces <optrace.t
 
      - .. figure:: ../images/ring.svg
           :align: center
-          :width: 250
+          :width: 300
           :class: dark-light
 
           Ring geometry
 
      - .. figure:: ../images/rectangle.svg
           :align: center
-          :width: 250
+          :width: 300
           :class: dark-light
 
           Rectangle geometry
@@ -125,7 +125,7 @@ _____________________
 **Tilted Surface**
 
 .. figure:: ../images/tilted_surface.svg
-   :width: 500
+   :width: 600
    :align: center
    :class: dark-light
 
@@ -177,7 +177,7 @@ A :class:`SphericalSurface <optrace.tracer.geometry.surface.spherical_surface.Sp
 .. _sphericaL_surface_fig:
 
 .. figure:: ../images/spherical_surface.svg
-   :width: 700
+   :width: 750
    :align: center
    :class: dark-light
 
@@ -207,7 +207,7 @@ with
    :label: asphere_r
 
 .. figure:: ../images/conic_surface.svg
-   :width: 750
+   :width: 800
    :align: center
    :class: dark-light
 
@@ -253,7 +253,7 @@ However, for functions with symmetry we can also use the :class:`FunctionSurface
 
 
 .. figure:: ../images/function_surface.svg
-   :width: 500
+   :width: 600
    :align: center
    :class: dark-light
 
@@ -448,7 +448,7 @@ Flipping the surface rotates it around an axis parallel to the x-axis passing th
 Below you can see some additional geometrical quantities that are useful when moving surfaces, assigning them to lenses or determining the correct thicknesses.
 
 .. figure:: ../images/surface_geometry_quantities.svg
-   :width: 500
+   :width: 600
    :align: center
    :class: dark-light
 

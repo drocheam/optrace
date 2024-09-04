@@ -93,10 +93,10 @@ class RenderImage(BaseClass):
     @property
     def s(self) -> list[float, float]:
         """ geometric side lengths of image in direction (x, y)"""
-        return [self.extent[1] - self.extent[0], self.extent[3] - self.extent[2]]
+        return [float(self.extent[1] - self.extent[0]), float(self.extent[3] - self.extent[2])]
 
     @property
-    def shape(self) -> list[float, float]:
+    def shape(self) -> tuple[int, int]:
         """data image shape (y, x)"""
         self.__check_for_image()
         return self._data.shape
@@ -115,12 +115,12 @@ class RenderImage(BaseClass):
     def power(self) -> float:
         """:return: calculated total image power"""
         self.__check_for_image()
-        return np.sum(self._data[:, :, 3])
+        return float(np.sum(self._data[:, :, 3]))
 
     def luminous_power(self) -> float:
         """:return: calculated total image luminous power"""
         self.__check_for_image()
-        return self.K * np.sum(self._data[:, :, 1])
+        return float(self.K * np.sum(self._data[:, :, 1]))
 
     @property
     def limit(self) -> float:

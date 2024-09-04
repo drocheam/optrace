@@ -115,9 +115,9 @@ Y_norm_b /= norm2
 # plot r, g, b with normalized height
 fsize=(6,2.6)
 plt.figure(figsize=fsize)
-plt.plot(wl, r, 'r')
-plt.plot(wl, g, 'g')
-plt.plot(wl, b, 'b')
+plt.plot(wl, r, '#f30')
+plt.plot(wl, g, '#2b3')
+plt.plot(wl, b, '#08e')
 _show_grid()
 plt.xlabel(r"$\lambda$ in nm")
 plt.ylabel("arb. unit")
@@ -142,9 +142,9 @@ print("Normalization by Y stimulus: (with Y_norm_g = 1)", Y_norm_r, Y_norm_g, Y_
 
 # plot r, g, b with equal same relative brightness between r, g, b as sRGB primaries
 plt.figure(figsize=fsize)
-plt.plot(wl, r, 'r')
-plt.plot(wl, g, 'g')
-plt.plot(wl, b, 'b')
+plt.plot(wl, r, '#f30')
+plt.plot(wl, g, '#2b3')
+plt.plot(wl, b, '#08e')
 _show_grid()
 plt.xlabel(r"$\lambda$ in nm")
 plt.ylabel("arb. unit")

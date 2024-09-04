@@ -62,8 +62,11 @@ def load_agf(path: str) -> dict:
     skip = False
 
     # file format documentation
-    # https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf
-    # and https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf
+    #
+    # see ZEMAX® Optical Design Program User's Manual, July 8, 2011
+    # https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf (pages 599-600)
+    # and 
+    # https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf
 
     # relevant lines
     # NM <material name> <formula mode number> <> <index at center wavelength> <abbe number> <> <>
@@ -149,7 +152,9 @@ def load_zmx(filename: str, n_dict: dict = None, no_marker: bool = False) -> Gro
     :return: Group including the geometry from the .zmx
     """
 
-    # see https://documents.pub/document/zemaxmanual.html?page=461
+    # see
+    # ZEMAX® Optical Design Program User’s Guide Version 9.0, chapter 29 "THE ZMX FILE FORMAT"
+    # https://pdfcoffee.com/zemaxmanual-pdf-free.html
 
     lines = _read_lines(filename)
     n_dict = n_dict or {}

@@ -270,22 +270,22 @@ Available methods are:
 
    * - .. figure:: ../images/indicatrix_equidistant.svg
           :align: center
-          :width: 400
+          :width: 450
           :class: dark-light
 
      - .. figure:: ../images/indicatrix_equal_area.svg
           :align: center
-          :width: 400
+          :width: 450
           :class: dark-light
 
    * - .. figure:: ../images/indicatrix_stereographic.svg
           :align: center
-          :width: 400
+          :width: 450
           :class: dark-light
 
      - .. figure:: ../images/indicatrix_orthographic.svg
           :align: center
-          :width: 400
+          :width: 450
           :class: dark-light
 
 

@@ -27,7 +27,7 @@ After this, `optrace` should be installed on your system.
    :align: left
 
    * - Dependency
-     - Needed for/as
+     - Description
    * - `chardet <https://chardet.readthedocs.io/en/latest/>`_
      - automatic detection of file encoding
    * - `mayavi <https://docs.enthought.com/mayavi/mayavi/>`_
@@ -44,7 +44,7 @@ After this, `optrace` should be installed on your system.
      - animated progressbar in standard output (terminal)
    * - `PyQt5 <https://pypi.org/project/PyQt5/>`_
      - GUI backend for mayavi
-   * - `pyqtdarktheme <https://pypi.org/project/pyqtdarktheme//>`_
+   * - `pyqtdarktheme <https://pypi.org/project/pyqtdarktheme/>`_
      - setting a QT dark theme
    * - `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
      - specialized methods for interpolation and math

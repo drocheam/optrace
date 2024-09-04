@@ -200,7 +200,7 @@ class LightSpectrum(Spectrum):
         """
         XYZ = np.array([[[*self.xyz()]]])
         RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip, L_th=L_th, sat_scale=sat_scale)[0, 0]
-        return RGB[0], RGB[1], RGB[2]
+        return float(RGB[0]), float(RGB[1]), float(RGB[2])
 
     def dominant_wavelength(self) -> float:
         """
@@ -208,7 +208,7 @@ class LightSpectrum(Spectrum):
 
         :return: dominant wavelength in nm if any exists, else np.nan
         """
-        return color.dominant_wavelength(self.xyz())
+        return float(color.dominant_wavelength(self.xyz()))
 
     def complementary_wavelength(self) -> float:
         """
@@ -216,7 +216,7 @@ class LightSpectrum(Spectrum):
 
         :return: complementary wavelength in nm if any exists, else np.nan
         """
-        return color.complementary_wavelength(self.xyz())
+        return float(color.complementary_wavelength(self.xyz()))
 
     def centroid_wavelength(self) -> float:
         """
@@ -229,25 +229,27 @@ class LightSpectrum(Spectrum):
         match self.spectrum_type:
 
             case "Monochromatic":
-                return self.wl
+                res = self.wl
 
             case "Lines":
                 lamb = np.array(self.lines)
                 s = np.array(self.line_vals)
-                return np.sum(s*lamb) / np.sum(s)
+                res = np.sum(s*lamb) / np.sum(s)
      
             case "Rectangle":
-                return np.mean([self.wl0, self.wl1])
+                res = np.mean([self.wl0, self.wl1])
             
             case "Constant":
-                return np.mean(go.wavelength_range)
+                res = np.mean(go.wavelength_range)
 
             # Blackbody, Function, Data, Gaussian
             case _ :
                 wl = color.wavelengths(100000)
                 s = self(wl)
-                return scipy.integrate.trapezoid(wl*s) / scipy.integrate.trapezoid(s)\
+                res = scipy.integrate.trapezoid(wl*s) / scipy.integrate.trapezoid(s)\
                         if np.any(s > 0) else np.mean(go.wavelength_range)
+    
+        return float(res)
 
     def peak(self) -> float:
         """
@@ -259,17 +261,19 @@ class LightSpectrum(Spectrum):
         match self.spectrum_type:
 
             case ("Monochromatic" | "Gaussian" | "Rectangle" | "Constant"| "Blackbody"):
-                return self.val
+                res = self.val
 
             case "Lines":
-                return np.max(self.line_vals)
+                res = np.max(self.line_vals)
 
             case ("Histogram" | "Data"):
-                return np.max(self._vals)
+                res = np.max(self._vals)
 
             case _:
                 wl = color.wavelengths(100000)
-                return np.max(self(wl))
+                res = np.max(self(wl))
+
+        return float(res)
 
     def peak_wavelength(self) -> float:
         """
@@ -282,24 +286,26 @@ class LightSpectrum(Spectrum):
         match self.spectrum_type:
 
             case "Monochromatic":
-                return self.wl
+                res = self.wl
 
             case "Lines":
-                return self.lines[np.argmax(self.line_vals)]
+                res = self.lines[np.argmax(self.line_vals)]
 
             case "Rectangle":
-                return self.wl0
+                res = self.wl0
 
             case "Constant":
-                return go.wavelength_range[0]
+                res = go.wavelength_range[0]
 
             case "Gaussian":
-                return self.mu  # True because it is enforced that mu is inside the visible range
+                res = self.mu  # True because it is enforced that mu is inside the visible range
 
             # also includes "Blackbody", as the peak might not lie inside the visible range
             case _:
                 wl = color.wavelengths(100000)
-                return wl[np.argmax(self(wl))]
+                res = wl[np.argmax(self(wl))]
+
+        return float(res)
 
     def fwhm(self) -> float:
         """
@@ -311,13 +317,13 @@ class LightSpectrum(Spectrum):
         match self.spectrum_type:
 
             case ("Monochromatic" | "Lines"):
-                return 0
+                res = 0
 
             case "Rectangle":
-                return self.wl1 - self.wl0
+                res = self.wl1 - self.wl0
 
             case "Constant":
-                return go.wavelength_range[1] - go.wavelength_range[0]
+                res = go.wavelength_range[1] - go.wavelength_range[0]
 
             # default case (Function, Data, Histogram, Gaussian)
             # Gaussian is included here because it could be truncated
@@ -339,7 +345,9 @@ class LightSpectrum(Spectrum):
                 indl = ind - np.argmax(bl) if np.any(bl) else 0
 
                 # FWHM is the difference between crossings
-                return wl[indr] - wl[indl]
+                res = wl[indr] - wl[indl]
+
+        return float(res)
 
     def _power(self, sensitivity) -> float:
         """
@@ -350,19 +358,21 @@ class LightSpectrum(Spectrum):
         match self.spectrum_type:
 
             case "Monochromatic":
-                return sensitivity(self.wl)*self.val
+                res = sensitivity(self.wl)*self.val
 
             case "Lines":
-                return np.sum(sensitivity(self.lines)*self.line_vals)
+                res = np.sum(sensitivity(self.lines)*self.line_vals)
 
             case "Histogram":
                 dl = self._wls[1] - self._wls[0]
                 wl2 = self._wls[:-1] + dl/2
-                return np.sum(sensitivity(wl2)*self._vals)*dl
+                res = np.sum(sensitivity(wl2)*self._vals)*dl
             
             case _:
                 wl = color.wavelengths(100000)
-                return scipy.integrate.trapezoid(sensitivity(wl)*self(wl)) * (wl[1] - wl[0])
+                res = scipy.integrate.trapezoid(sensitivity(wl)*self(wl)) * (wl[1] - wl[0])
+        
+        return float(res)
 
     def power(self) -> float:
         """

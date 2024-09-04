@@ -151,7 +151,7 @@ Unfortunately, the support is only experimental, as there is no actual documenta
 * temperature or absorption behavior of the material is neglected
 * only loads lens and aperture geometries, no support for additional objects
 
-Information on the file format can be found `here <https://documents.pub/document/zemaxmanual.html?page=461>`__, `here <https://github.com/mjhoptics/ray-optics/blob/master/src/rayoptics/zemax/zmxread.py>`__ and `here <https://github.com/quartiq/rayopt/blob/master/rayopt/zemax.py>`__.
+Information on the file format can be found in :footcite:`Zemax_2000`, as well as `here <https://github.com/mjhoptics/ray-optics/blob/master/src/rayoptics/zemax/zmxread.py>`__ and `here <https://github.com/quartiq/rayopt/blob/master/rayopt/zemax.py>`__.
 
 
 Geometry Presets
@@ -197,7 +197,7 @@ Note that :math:`b, g`  both need to be positive for this preset.
 
 .. figure:: ../images/ideal_camera.svg
    :align: center
-   :width: 600
+   :width: 730
    :class: dark-light
 
    Visualization of the ``ideal_camera`` parameters.
@@ -345,7 +345,7 @@ As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>`, we
 
 .. figure:: ../images/example_arizona_eye_scene.png
    :align: center
-   :width: 600
+   :width: 730
    :class: dark-light
 
 

@@ -331,7 +331,7 @@ Optical Center
 
 .. figure:: ../images/optical_center.svg
    :align: center
-   :width: 650
+   :width: 550
    :class: dark-light
 
 

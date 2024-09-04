@@ -10,10 +10,11 @@ otp.spectrum_plot(ot.presets.light_spectrum.standard_led, labels_off=True, title
 otp.spectrum_plot(ot.presets.light_spectrum.standard_fl, labels_off=True,
                   title="CIE Standard Illuminants Fluorescent")
 
+ot.global_options.plot_dark_mode = False
 otp.chromaticities_cie_1931(ot.presets.light_spectrum.srgb, norm="Largest")
-otp.spectrum_plot(ot.presets.light_spectrum.srgb, color=["r", "g", "b", "#888"],
+otp.spectrum_plot(ot.presets.light_spectrum.srgb, color=["#f30", "#2b3", "#08e", "#999"],
                   labels_off=True, title="sRGB Primaries")
 
-otp.spectrum_plot(ot.presets.spectrum.xyz_observers, color=["r", "g", "b"],
+otp.spectrum_plot(ot.presets.spectrum.xyz_observers, color=["#f30", "#2b3", "#08e"],
                   title="CIE 1931 XYZ Standard Observer Color Matching Functions", labels_off=True)
 otp.block() 

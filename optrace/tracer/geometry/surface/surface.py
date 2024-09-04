@@ -91,7 +91,7 @@ class Surface(BaseClass):
         z_min = min(np.nanmin(vals), np.nanmin(vals2))
         z_max = max(np.nanmax(vals), np.nanmax(vals2))
 
-        return z_min, z_max
+        return float(z_min), float(z_max)
 
     def move_to(self, pos: (list | np.ndarray)) -> None:
         """
@@ -128,12 +128,12 @@ class Surface(BaseClass):
     @property
     def dn(self) -> float:
         """thickness between center z-position and lowest point on surface"""
-        return self.pos[2] - self.z_min
+        return float(self.pos[2] - self.z_min)
     
     @property
     def dp(self) -> float:
         """thickness between highest point on surface and center z-position"""
-        return self.z_max - self.pos[2]
+        return float(self.z_max - self.pos[2])
 
     def values(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """

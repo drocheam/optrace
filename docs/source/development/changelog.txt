@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.5.9   |   2024-08-23   |   Dark mode options for GUI and pyplots. Everything is now dark by default. 
   1.5.8   |   2024-04-17   |   Function select_rays for manually selecting custom rays for the scene. 
   1.5.7   |   2024-03-21   |   Support for Python 3.12 and vtk 9.3. 
   1.5.6   |   2024-02-28   |   Migrated from setup.py to pyproject.toml. There's now a ray RAM limit. 

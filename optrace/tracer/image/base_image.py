@@ -91,14 +91,14 @@ class BaseImage(BaseClass):
         return self._data.copy()
 
     @property 
-    def s(self) ->list[float, float]:
+    def s(self) -> list[float, float]:
         """image side lengths, x-dimension first"""
-        return [self.extent[1] - self.extent[0], self.extent[3] - self.extent[2]]
+        return [float(self.extent[1] - self.extent[0]), float(self.extent[3] - self.extent[2])]
 
     @property
     def Apx(self) -> float:
         """area per pixel in mm^2"""
-        return self.s[0] * self.s[1] / (self.shape[1] * self.shape[0])
+        return float(self.s[0] * self.s[1] / (self.shape[1] * self.shape[0]))
 
     def save(self, 
              path:    str,

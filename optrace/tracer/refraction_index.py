@@ -264,7 +264,7 @@ class RefractionIndex(Spectrum):
         """
         lines = lines if lines is not None else self.lines  # default to FDC spectral lines
         ns, nc, nl = tuple(self(lines))
-        return (nc - 1) / (ns - nl) if ns != nl else np.inf
+        return float((nc - 1) / (ns - nl) if ns != nl else np.inf)
 
     def is_dispersive(self) -> bool:
         """:return: if the refractive index is dispersive, determined by the Abbe Number"""

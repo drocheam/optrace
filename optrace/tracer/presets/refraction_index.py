@@ -167,18 +167,18 @@ COP: RefractionIndex = RefractionIndex("Sellmeier1", coeff=[1.2969, 0.011721, 0,
 
 Finalite: RefractionIndex = RefractionIndex("Abbe", n=1.600, V=42, desc="Finalite", long_desc="Sola Finalite")
 """
-Sola Finalite from https://eyewiki.aao.org/Lens_Material_Properties
+Sola Finalite from https://eyewiki.org/Lens_Material_Properties
 """
 
 
 MR7: RefractionIndex = RefractionIndex("Abbe", n=1.660, V=32, desc="MR-7", long_desc="MR-7")
 """
-MR-7 from https://eyewiki.aao.org/Lens_Material_Properties
+MR-7 from https://eyewiki.org/Lens_Material_Properties
 """
 
 Ormex: RefractionIndex = RefractionIndex("Abbe", n=1.558, V=32, desc="Ormex", long_desc="Essilor Ormex")
 """
-Essilor Ormex from https://eyewiki.aao.org/Lens_Material_Properties
+Essilor Ormex from https://eyewiki.org/Lens_Material_Properties
 """
 
 PC: RefractionIndex = RefractionIndex(
@@ -239,7 +239,7 @@ linearly extrapolated for 380 and 390nm"""
 
 Spectralite: RefractionIndex = RefractionIndex("Abbe", n=1.537, V=47, desc="Spectralite", long_desc="Sola Spectralite")
 """
-Sola Spectralite from https://eyewiki.aao.org/Lens_Material_Properties
+Sola Spectralite from https://eyewiki.org/Lens_Material_Properties
 """
 
 

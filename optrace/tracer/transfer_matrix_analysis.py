@@ -45,14 +45,14 @@ class TMA(BaseClass):
 
         L = sorted(lenses, key=lambda el: el.front.pos[2])
 
-        self.vertex_points: tuple[float, float] = (L[0].front.pos[2], L[-1].back.pos[2]) if len(lenses)\
-                                                 else (np.nan, np.nan)
+        self.vertex_points: tuple[float, float] = (float(L[0].front.pos[2]), float(L[-1].back.pos[2])) if len(lenses)\
+                                                 else (float("NAN"), float("NAN"))
         """z-position of vertex points"""
 
-        self.n1: float = n0(self.wl) if n0 is not None else 1.0
+        self.n1: float = float(n0(self.wl)) if n0 is not None else 1.0
         """refraction index value before the lens setup"""
         
-        self.n2: float = L[-1].n2(self.wl) if len(lenses) and L[-1].n2 is not None else self.n1
+        self.n2: float = float(L[-1].n2(self.wl)) if len(lenses) and L[-1].n2 is not None else self.n1
         """refraction index value after the lens setup"""
 
         _1, _2 = self._1, self._2 = self.vertex_points
@@ -64,32 +64,34 @@ class TMA(BaseClass):
         """abcd matrix for matrix ray optics calculations """
 
         n1_, n2_ = self.n1, self.n2
-        A, B, C, D = tuple(self.abcd.ravel())
+        A, B, C, D = tuple([float(el) for el in self.abcd.ravel()])
 
         self.principal_points:\
-            tuple[float, float] = (_1 - (n1_ - n2_ * D) / (n2_ * C), _2 + (1 - A) / C) if C else (np.nan, np.nan)
+            tuple[float, float] = (_1 - (n1_ - n2_ * D) / (n2_ * C), _2 + (1 - A) / C) if C \
+            else (float("NAN"), float("NAN"))
         """z-position of principal points"""
 
         p1, p2 = self.principal_points
 
         self.nodal_points:\
-            tuple[float, float] = (_1 - (1 - D) / C, _2 + (n1_ - n2_ * A) / (n2_ * C)) if C else (np.nan, np.nan)
+            tuple[float, float] = (_1 - (1 - D) / C, _2 + (n1_ - n2_ * A) / (n2_ * C)) if C \
+            else (float("NAN"), float("NAN"))
         """z-position of nodal points"""
         
-        self.focal_points: tuple[float, float] = (p1 + n1_ / n2_ / C, p2 - 1 / C) if C else (np.nan, np.nan)
+        self.focal_points: tuple[float, float] = (p1 + n1_ / n2_ / C, p2 - 1 / C) if C else (float("NAN"), float("NAN"))
         """z-position of focal points"""
 
         f1p, f2p = self.focal_points
 
-        self.focal_lengths: tuple[float, float] = (f1p - p1, f2p - p2) if C else (np.nan, np.nan)
+        self.focal_lengths: tuple[float, float] = (f1p - p1, f2p - p2) if C else (float("NAN"), float("NAN"))
         """focal lengths of the lens """
         
         f1, f2 = self.focal_lengths
 
-        self.ffl: float = f1p - _1 if C else np.nan
+        self.ffl: float = f1p - _1 if C else float("NAN")
         """back focal length, Distance between back focal point and back surface vertex point """
        
-        self.bfl: float = f2p - _2 if C else np.nan
+        self.bfl: float = f2p - _2 if C else float("NAN")
         """front focal length, Distance between front focal point and front surface vertex"""
 
         self.d: float = self._2 - self._1
@@ -114,8 +116,8 @@ class TMA(BaseClass):
         This definition has the advantage, that both powers always have the same magnitude, but only different signs.
         """
 
-        _oc = 1 - A + B*C / (D - 1) if D - 1 else np.inf
-        self.optical_center = _1 + self.d / _oc if _oc and not np.isnan(_oc) and C != 0 else np.nan
+        _oc = 1 - A + B*C / (D - 1) if D - 1 else float(np.inf)
+        self.optical_center = _1 + self.d / _oc if _oc and not np.isnan(_oc) and C != 0 else float(np.nan)
         """optical center of the setup"""
         
         super().__init__(**kwargs)
@@ -137,7 +139,7 @@ class TMA(BaseClass):
         for i in np.arange(len(L)):
           
             # check symmetry
-            if i+1 < len(L) and (not np.isclose(L[i].pos[0], L[i+1].pos[0])\
+            if i+1 < len(L) and (not np.isclose(L[i].pos[0], L[i+1].pos[0])
                     or not np.isclose(L[i].pos[1], L[i+1].pos[1])):
                 raise RuntimeError("Lenses don't share one axis.")
       
@@ -266,7 +268,7 @@ class TMA(BaseClass):
             ze2 = zp
             m2 = 1
 
-        return ze1, ze2, m1, m2
+        return float(ze1), float(ze2), float(m1), float(m2)
 
     def pupil_position(self, z_s: float) -> tuple[float, float]:
         """
@@ -299,7 +301,7 @@ class TMA(BaseClass):
         g = self._1 - z_g
         b = self._obj_dist(self.abcd, g, rev=False)
 
-        return b + self._2
+        return float(b + self._2)
     
     def image_magnification(self, z_g) -> float:
         """
@@ -311,7 +313,7 @@ class TMA(BaseClass):
         with np.errstate(invalid='ignore'):  # suppresses nan warnings
             z_b = self.image_position(z_g)
             mat = self.matrix_at(z_g, z_b)
-            return mat[0, 0]
+            return float(mat[0, 0])
 
     def object_position(self, z_b) -> float:
         """
@@ -326,7 +328,7 @@ class TMA(BaseClass):
         b = z_b - self._2
         g = self._obj_dist(self.abcd, b, rev=True)
 
-        return self._1 - g
+        return float(self._1 - g)
 
     def object_magnification(self, z_b) -> float:
         """
@@ -338,7 +340,7 @@ class TMA(BaseClass):
         with np.errstate(invalid='ignore'):  # suppresses nan warnings
             z_g = self.object_position(z_b)
             mat = self.matrix_at(z_g, z_b)
-            return mat[0, 0]
+            return float(mat[0, 0])
 
     @staticmethod
     def _dist_mat(abcd: np.ndarray, g: float, b: float) -> np.ndarray:

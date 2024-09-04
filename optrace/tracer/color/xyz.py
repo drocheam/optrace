@@ -117,7 +117,7 @@ def dominant_wavelength(XYZ_s: np.ndarray, res: int = 10000) -> float:
     :return: dominant wavelength in nm
     """
     phi_s, interp = _chrom_angle(XYZ_s, res)
-    return interp(phi_s)[()]
+    return float(interp(phi_s)[()])
 
 
 def complementary_wavelength(XYZ_s: np.ndarray, res: int = 10000) -> float:
@@ -137,5 +137,5 @@ def complementary_wavelength(XYZ_s: np.ndarray, res: int = 10000) -> float:
     if phi_c < 0 and phi_c < -np.pi/2:
         phi_c += 2*np.pi
 
-    return interp(phi_c)[()]
+    return float(interp(phi_c)[()])
 

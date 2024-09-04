@@ -80,7 +80,9 @@ Overview
         * a non-sequential raytracer, simulating ghost images, reflections
         * a tool supporting mirror or fresnel lens optics
 
-   * - **Purpose/Use Cases**
+   * - |
+
+       **Purpose/Use Cases**
         * educational purposes, demonstrating aberrations or simple optical setups
         * introductionary tool to paraxial, geometrical optics or image formation
         * simulation of simpler systems, like a prism, the eye model or a telescope
@@ -90,7 +92,7 @@ Overview
 
 
 
-Similar/related Python software
+Similar Python software
 -------------------------------------
 
 .. list-table:: 
@@ -106,7 +108,9 @@ Similar/related Python software
         * `poppy <https://github.com/spacetelescope/poppy>`__ by Space Telescope Science Institute. Fraunhofer and Fresnel propagation for optics.
         * `prysm <https://prysm.readthedocs.io/en/stable/index.html>`__ by Brandon Dube. Interferometer and diffraction calculations.
    
-   * - Geometrical + Wave Optics
+   * - |
+
+       Geometrical + Wave Optics
         * `opticspy <http://opticspy.org/>`__ by Xing Fan, tracing. Wave optics, aberration and Zernike polynomial analysis.
         * `raypier <https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model>`__ by Bryan Cole. Raytracing and beamlet propagation with 3D viewer.
 

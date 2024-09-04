@@ -15,12 +15,12 @@ Achromat
 **Screenshots**:
 
 .. figure:: ./images/example_achromat1.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
 .. figure:: ./images/example_achromat2.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
@@ -37,7 +37,7 @@ Arizona Eye Model
 
 .. figure:: images/example_arizona_eye_scene.png
    :align: center
-   :width: 600
+   :width: 720
    :class: dark-light
 
 
@@ -65,13 +65,13 @@ Astigmatism
 **Screenshots**:
 
 .. figure:: ./images/example_astigmatism1.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
 
 .. figure:: ./images/example_astigmatism2.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
@@ -87,7 +87,7 @@ Brewster Polarizer
 
 .. figure:: images/example_brewster.png
    :align: center
-   :width: 600
+   :width: 720
    :class: dark-light
 
 
@@ -101,7 +101,7 @@ Cosine Surfaces
 **Screenshots**:
 
 .. figure:: ./images/example_cosine_surfaces1.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
@@ -131,7 +131,7 @@ Double Gauss
 
 .. figure:: images/example_double_gauss.png
    :align: center
-   :width: 600
+   :width: 720
 
 
 .. list-table::
@@ -182,13 +182,13 @@ LeGrand Eye Model
 **Screenshots**:
 
 .. figure:: images/example_legrand1.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
 
 .. figure:: images/example_legrand2.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
@@ -203,7 +203,7 @@ Image Render
 **Screenshots**:
 
 .. figure:: images/example_image_rgb.png
-   :width: 600
+   :width: 720
    :align: center
    :class: dark-light
 
@@ -338,7 +338,7 @@ Prism
 
 .. figure:: images/example_prism.png
    :align: center
-   :width: 600
+   :width: 720
    :class: dark-light
 
 
@@ -490,7 +490,7 @@ Sphere Projections
 
 .. figure:: images/example_sphere_projections.png
    :align: center
-   :width: 600
+   :width: 720
    :class: dark-light
 
 
@@ -529,13 +529,13 @@ Spherical Aberration
 
 .. figure:: images/example_spherical_aberration1.png
    :align: center
-   :width: 600
+   :width: 720
    :class: dark-light
 
 
 .. figure:: images/example_spherical_aberration2.png
    :align: center
-   :width: 600
+   :width: 720
    :class: dark-light
 
 

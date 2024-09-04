@@ -266,11 +266,7 @@ Preset Gallery
 _____________________
 
 
-.. TODO what to do here? plotting linearly makes no sense, as we can't see the glare or sidelobes of the airy
-
-
-.. list-table:: PSF presets. Linear representation to intensity. 
-   Airy Sidelobes and outer glare of 'glare' presets are hardly noticeable in this representation.
+.. list-table:: PSF presets with default parameters. Plotted with human brightness perception. 
    :class: table-borderless
 
    * - .. figure:: ../images/psf_circle.svg

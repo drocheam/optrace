@@ -248,7 +248,7 @@ def get_saturation_scale(Luv: np.ndarray, L_th: float = 0.0) -> float:
         s = np.sqrt(s_sq)
 
         # due to numerical issues s could be above 1 or below some worst case
-        return np.clip(s, 0.32, 1.0)
+        return float(np.clip(s, 0.32, 1.0))
 
 
 def xyz_to_srgb_linear(xyz:                 np.ndarray, 
