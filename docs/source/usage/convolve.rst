@@ -101,7 +101,7 @@ When convolving with a PSF of type RenderImage, colors of the resulting image ma
 Using a rendering intent conversion they are projected/clipped them into the gamut.
 This is done by the ``cargs`` argument (conversion arguments).
 
-By default it is set to :python:`dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None)`.
+By default it is set to :python:`dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None)`.
 
 You can provide a ``cargs`` dictionary that overrides this setting.
 

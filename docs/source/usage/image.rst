@@ -372,7 +372,7 @@ To get a Illuminance image with 315 pixels, one could write:
 Only for image modes `"sRGB (Perceptual RI)"` and `"sRGB (Absolute RI)"` the returned object type is RGBImage.
 For all other modes it is of type LinearImage.
 
-For mode `"sRGB (Perceptual RI)"` there are two optional additional parameters `L_th` and `sat_scale`, see <> for more details.
+For mode `"sRGB (Perceptual RI)"` there are two optional additional parameters `L_th` and `chroma_scale`, see <> for more details.
 
 Let us assume the ``dimg`` has a side length of ``s=[1, 2.63]``, so it was rendered in a resolution of 945x2835. This is the case because the nearest side factor to 2.63 is 3 and because 945 is the size for all internally rendered images.
 From this resolution the image can be scaled to 315x945 189x567 135x405 105x315 63x189 45x135 35x105 27x81 21x63 15x45 9x27 7x21 5x15 3x9 1x3.

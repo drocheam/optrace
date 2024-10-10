@@ -84,7 +84,8 @@ def outside_srgb_gamut(xyz: np.ndarray) -> np.ndarray:
     :param xyz: XYZ values, shape (Ny, Nx, 3)
     :return: boolean 2D image, shape (Ny, Nx)
     """
-    return np.any(xyz_to_srgb_linear(xyz, rendering_intent="Ignore") < 0, axis=2)
+    # small negative tolerance because of numeric precision
+    return np.any(xyz_to_srgb_linear(xyz, normalize=True, rendering_intent="Ignore") < -1e-6, axis=2)
 
 
 def _to_srgb(xyz_: np.ndarray, normalize: bool) -> np.ndarray:
@@ -190,27 +191,17 @@ def _triangle_intersect(r, g, b, w, x, y):
     y[is_br] = ne.evaluate("by + (t - bx)*abr")
 
 
-def get_saturation_scale(Luv: np.ndarray, L_th: float = 0.0) -> float:
+def _get_chroma_scale(Luv: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
-    Calculate the saturation scaling factor for xyz_to_srgb_linear with mode "Perceptual"
-    Ignore values below L_th*np.max(L) with L being the lightness.
-    Impossible colors are also ignored.
-
-    This functions determines the needed saturation scaling factor so all image colors are inside the sRGB gamut.
+    Calculate chroma scaling factors for each pixel so it fits into the sRGB gamut.
 
     :param Luv: CIELUV image values (shape (Ny, Nx, 3))
-    :param L_th: optional lightness threshold as fraction of the peak lightness (range 0 - 1)
-    :return: saturation scaling factor (0-1)
+    :return: array of valid colors (human vision), array of chroma scaling factors
     """
 
     # convert to CIE1976 UCS diagram coordinates
     u_v_L = luv_to_u_v_l(Luv)
-    mask = Luv[:, :, 0] > L_th*np.max(Luv[:, :, 0])
-    u_, v_ = u_v_L[mask, 0], u_v_L[mask, 1]
-
-    # no values above L_th threshold
-    if not u_.shape[0]:
-        return 1.0
+    u_, v_ = u_v_L[:, :, 0], u_v_L[:, :, 1]
 
     # sRGB primaries and D65 uv coordinates
     r, g, b, w = SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV
@@ -228,34 +219,66 @@ def get_saturation_scale(Luv: np.ndarray, L_th: float = 0.0) -> float:
 
     # only invalid colors
     if not np.any(in_gamut):
-        return 1.0
+        return in_gamut, np.ones_like(u_)
 
     else:
-        u_i, v_i = u_[in_gamut], v_[in_gamut]
-        
-        # squared saturation
+        # squared chroma
         # using the squared saturation saves sqrt calculation
         # we can use the squared saturation since the ratio is minimal at the same point as the saturation ratio
-        s0_sq = ne.evaluate("(u_i-un)**2 + (v_i-vn)**2")
+        cr0_sq = ne.evaluate("(u_-un)**2 + (v_-vn)**2")
 
-        _triangle_intersect(r, g, b, w, u_i, v_i)
+        _triangle_intersect(r, g, b, w, u_, v_)
 
-        # squared saturation after clipping
-        s1_sq = ne.evaluate("(u_i-un)**2 + (v_i-vn)**2")
+        # squared chroma after clipping
+        cr1_sq = ne.evaluate("(u_-un)**2 + (v_-vn)**2")
 
-        # saturation ratio is minimal when squared saturation ratio is minimal
-        s_sq = np.min(s1_sq/(s0_sq+1e-9))
-        s = np.sqrt(s_sq)
+        # chroma scaling factor
+        cr_fact2 = cr1_sq/(cr0_sq+1e-9)
 
-        # due to numerical issues s could be above 1 or below some worst case
-        return float(np.clip(s, 0.32, 1.0))
+        return in_gamut, cr_fact2
 
 
-def xyz_to_srgb_linear(xyz:                 np.ndarray, 
-                       normalize:           bool = True, 
+def get_chroma_scale(Luv: np.ndarray, L_th = 0.0):
+    """
+    Calculate the chroma scaling factor for xyz_to_srgb_linear with mode "Perceptual"
+    Ignore values below L_th*np.max(L) with L being the lightness.
+    Impossible colors are also ignored.
+
+    This functions determines the needed scaling factor so all image colors are inside the sRGB gamut.
+
+    :param Luv: CIELUV image values (shape (Ny, Nx, 3))
+    :param L_th: optional lightness threshold as fraction of the peak lightness (range 0 - 1)
+    :return: saturation scaling factor (0-1)
+    """
+
+    mask_valid, cr_fact2 = _get_chroma_scale(Luv)
+    mask_th = Luv[:, :, 0] > L_th*np.max(Luv[:, :, 0])
+    return _min_factor_from_chroma_factors(cr_fact2[mask_valid & mask_th])
+
+
+def _min_factor_from_chroma_factors(cr_fact2):
+    """
+    Calculate the smallest scaling factor from chroma factors.
+    Enfoce range 0.32-1
+
+    :param cr_fact2: list of quadratic chroma factors
+    :return: chroma factor
+    """
+    if not cr_fact2.size:
+        return 1.0
+
+    cr_sq = np.min(cr_fact2)
+    cr = np.sqrt(cr_sq)
+    
+    # due to numerical issues cr could be above 1 or below some worst case
+    return float(np.clip(cr, 0.32, 1.0))
+
+
+def xyz_to_srgb_linear(xyz:                 np.ndarray,
+                       normalize:           bool = True,
                        rendering_intent:    str = "Absolute",
                        L_th:                float = 0.,
-                       sat_scale:           float = None)\
+                       chroma_scale:        float = None)\
         -> np.ndarray:
     """
     Conversion XYZ to linear RGB values.
@@ -263,19 +286,22 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
     Ignore: Leave out of gamut colors as is
     Absolute: Clip the saturation of out-of-bound colors, but preserve hue and brightness
 
-    Perceptual: Scale the saturation of all pixels so saturation ratio stays the same.
+    Perceptual: Scale the chroma of all pixels so saturation ratios stay the same.
     Scaling factor is determined so all colors are representable.
     Additional lightness L_th threshold:
     L_th = 0.01 ignores all colors below 1% of the peak brightness for saturation detection.
     Prevents dark, merely visible pixels from scaling down the saturation of the whole image.
     Impossible colors are left untouched by this mode, so clipping the output values is recommended.
-    Alternatively the sat_scale parameter can be provided that scales the saturation down by a fixed amount
+    Alternatively the chroma_scale parameter can be provided that scales the chroma down by a fixed amount.
+    The colors still outside the gamut after the operation are chroma clipped like in Absolute RI.
+    So Perceptual RI with L_th or chroma_scale can be seen as hybrid method, perceptual for colors meeting
+    the criteria, Absolute RI for colors not doing so.
 
     :param xyz: XYZ image (shape (Ny, Nx, 3))
     :param normalize: if image is normalized to highest value before conversion (bool)
     :param rendering_intent: "Absolute", "Perceptual" or "Ignore", see above
     :param L_th: lightness threshold for mode "Perceptual". 
-    :param sat_scale: sat_scale option for mode "Perceptual" 
+    :param chroma_scale: chroma_scale option for mode "Perceptual"
     :return: linear sRGB image (shape (Ny, Nx, 3))
     """
 
@@ -299,7 +325,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         # the following part implements saturation clipping
         # hue and lightness stay untouched, but chroma/saturation is reduced so the color fits inside the sRGB gamut
         # however, in human vision saturation and lightness are not completely independent,
-        # see "Helmholtz–Kohlrausch effect". Therefore the perceived lightness still changes slightly.
+        # see "Helmholtz–Kohlrausch effect". Therefore, the perceived lightness still changes slightly.
 
         xyY = xyz_to_xyY(np.array([XYZ[inv]]))
         x, y, Y = xyY[:, :, 0], xyY[:, :, 1], xyY[:, :, 2]
@@ -319,10 +345,15 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         Luv = xyz_to_luv(XYZ, normalize=False)  
         # ^-- don't normalize, since we transform back and forth and expect the same L
 
-        if sat_scale is None:
-            sat_scale = get_saturation_scale(Luv, L_th)
+        mask_th = Luv[:, :, 0] > L_th*np.max(Luv[:, :, 0])
+        mask_valid, cr_fact2 =  _get_chroma_scale(Luv)
 
-        Luv[:, :, 1:] *= sat_scale
+        if chroma_scale is None:
+            chroma_scale = _min_factor_from_chroma_factors(cr_fact2[mask_th & mask_valid])
+
+        cr_fact = np.sqrt(cr_fact2)
+        cr_fact[cr_fact > chroma_scale] = chroma_scale
+        Luv[:, :, 1:] *= cr_fact[:, :, np.newaxis]
 
         XYZ = luv_to_xyz(Luv)
 
@@ -359,7 +390,7 @@ def xyz_to_srgb(xyz:                np.ndarray,
                 clip:               bool = True,
                 rendering_intent:   str = "Absolute",
                 L_th:               float = 0,
-                sat_scale:          float = None)\
+                chroma_scale:       float = None)\
         -> np.ndarray:
     """
     Conversion of XYZ to sRGB Linear to sRGB.
@@ -371,12 +402,12 @@ def xyz_to_srgb(xyz:                np.ndarray,
     :param rendering_intent: one of SRGB_RENDERING_INTENTS ("Ignore", "Absolute", "Perceptual")
     :param clip: if sRGB values are clipped before gamma correction
     :param L_th: lightness threshold for mode "Perceptual". 
-    :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
+    :param chroma_scale: chroma_scale option for mode "sRGB (Perceptual RI)"
     :return: sRGB image (numpy 3D array)
     """
     # XYZ -> sRGB is just XYZ -> RGBLinear -> sRGB
     RGBL = xyz_to_srgb_linear(xyz, normalize=normalize, rendering_intent=rendering_intent,
-                              L_th=L_th, sat_scale=sat_scale)
+                              L_th=L_th, chroma_scale=chroma_scale)
 
     if clip:
         RGBL = np.clip(RGBL, 0, 1)
@@ -414,9 +445,8 @@ def log_srgb(img: np.ndarray) -> np.ndarray:
     luv2[L > 0, 0] = L02 = ne.evaluate("100 - 99.5*log(L0/ lmax) / log(lmin / lmax)")
     
     # rescale uv so chromaticity stays the same
-    sat_scale = L02 / L0
-    luv2[L > 0, 1] *= sat_scale
-    luv2[L > 0, 2] *= sat_scale
+    chroma_scale = L02 / L0
+    luv2[L > 0, 1:] *= chroma_scale[:, np.newaxis]
 
     # convert back to srgb
     xyz = luv_to_xyz(luv2)

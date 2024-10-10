@@ -41,13 +41,13 @@ class Filter(Element):
         """
         return self.spectrum(wl)
 
-    def color(self, rendering_intent="Absolute", clip=True, L_th=0, sat_scale=None)\
+    def color(self, rendering_intent="Absolute", clip=True, L_th=0, chroma_scale=None)\
             -> tuple[float, float, float, float]:
         """
         Get Filter color under daylight (D65).
         pass-through of spectrum.color, see this method for details
         """
-        return self.spectrum.color(rendering_intent, clip, L_th=L_th, sat_scale=sat_scale)
+        return self.spectrum.color(rendering_intent, clip, L_th=L_th, chroma_scale=chroma_scale)
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

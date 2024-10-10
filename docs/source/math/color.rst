@@ -192,7 +192,7 @@ Intersecting the gamut edge for mode *Absolute Colorimetric* is done in the CIE 
 Determining and rescaling the saturation in *Perceptual Colorimetric* mode is done in the CIE 1976 uv chromaticity diagram, since this is a representation where color differences directly correspond to spatial differences.
 
 In the default configuration Perceptual Colorimetric scales the saturation such that all colors are inside the gamut.
-A fixed rescaling factor (range 0-1) can be provided as ``sat_scale`` parameter that can enforce the same factor when for instance comparing different images.
+A fixed rescaling factor (range 0-1) can be provided as ``chroma_scale`` parameter that can enforce the same factor when for instance comparing different images.
 In the former adaptive case an additional ``L_th`` can be applied, which is a relative threshold and ignores values below this threshold for the calculation of the scaling factor.
 This proves useful when dark but saturated regions are inside the image but which can be neglected.
 See :ref:`usage_color` for more details.

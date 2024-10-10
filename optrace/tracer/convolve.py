@@ -48,7 +48,7 @@ def convolve(img:                RGBImage | LinearImage,
     while also using values outside the sRGB gamut.
     To remove this out-of-gamut colors in the resulting image, color transformations are performed.
     Parameter cargs overwrites parameters for color.xyz_to_srgb. By default these parameters are:
-    dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None).
+    dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None).
     For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged
 
     When convolving two LinearImages it is recommended to normalize the PSF sum to 1, 
@@ -62,7 +62,7 @@ def convolve(img:                RGBImage | LinearImage,
     :param padding_value: padding value for padding_mode='constant'. 
      Three elements if img is a RGBImage, single element otherwise. Defaults to zeros.
     :param cargs: overwrite for parameters for color.xyz_to_srgb. By default these parameters are:
-     dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None).
+     dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None).
      For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged
     :return: LinearImage or RGBImage, see above 
     """
@@ -318,7 +318,7 @@ def convolve(img:                RGBImage | LinearImage,
 
         # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
         img2 = color.srgb_linear_to_xyz(img2)
-        cargs0 = dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, sat_scale=None)
+        cargs0 = dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None)
         img2 = color.xyz_to_srgb(img2, **(cargs0 | cargs))
     
     else:

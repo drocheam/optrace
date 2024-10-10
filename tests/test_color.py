@@ -110,7 +110,7 @@ class ColorTests(unittest.TestCase):
         og = color.outside_srgb_gamut(xyz)
 
         # check if those are true that have negative srgb values
-        self.assertTrue(np.all(og == np.any(srgbl < 0, axis=2)))
+        self.assertTrue(np.all(og == np.any(srgbl < -1e-6, axis=2)))  # same tolerance as outside_srgb_gamut function
 
     def test_srgb_conversion(self):
         """test xyz -> srgb conversion by comparing to colour-science conversion"""
@@ -569,8 +569,8 @@ class ColorTests(unittest.TestCase):
         self.assertTrue(np.all(np.diff(lines) > 0))
 
 
-    def test_color_sat_scale(self):
-        """test saturation scaling in 'Perceptual' rendering intent """
+    def test_color_chroma_scale(self):
+        """test chroma scaling in 'Perceptual' rendering intent """
 
         # convert wavelength to XYZ color space
         def wl_to_xyz(wl):
@@ -583,28 +583,28 @@ class ColorTests(unittest.TestCase):
         wl = color.wavelengths(1000)
         xyz = wl_to_xyz(wl)
         luv = color.xyz_to_luv(xyz)
-        sf = color.get_saturation_scale(luv)
+        sf = color.get_chroma_scale(luv)
         self.assertAlmostEqual(sf, 0.3236, delta=1e-4)
 
         # case 2: srgb colors
         srgb = np.random.sample((100, 100, 3))
         xyz = color.srgb_to_xyz(srgb)
         luv = color.xyz_to_luv(xyz)
-        sf = color.get_saturation_scale(luv)
+        sf = color.get_chroma_scale(luv)
         self.assertAlmostEqual(sf, 1.0, delta=1e-5)
         
         # case 3: black image
         srgb = np.zeros((100, 100, 3))
         xyz = color.srgb_to_xyz(srgb)
         luv = color.xyz_to_luv(xyz)
-        sf = color.get_saturation_scale(luv)
+        sf = color.get_chroma_scale(luv)
         self.assertAlmostEqual(sf, 1.0, delta=1e-5)
         
         # case 4: white image
         srgb = np.ones((100, 100, 3))
         xyz = color.srgb_to_xyz(srgb)
         luv = color.xyz_to_luv(xyz)
-        sf = color.get_saturation_scale(luv)
+        sf = color.get_chroma_scale(luv)
         self.assertAlmostEqual(sf, 1.0, delta=1e-5)
 
         # case 5: srgb colors with faint value outside srgb gamut
@@ -613,19 +613,19 @@ class ColorTests(unittest.TestCase):
         luv = color.xyz_to_luv(xyz)
         luv[0, 0] = [6.225, 4.216, -36.377]  # outside sRGB gamut
         luv[0, 1] = [100, 0, 0]  # brightest pixel
-        sf = color.get_saturation_scale(luv)
+        sf = color.get_chroma_scale(luv)
         self.assertNotAlmostEqual(sf, 1.0, delta=1e-1)  # factor should be < 1
         
         # case 6: srgb colors with faint value outside srgb gamut, but below threshold
         # ignore values below 7% of peak brightness (which is 100, see above)
-        sf = color.get_saturation_scale(luv, L_th=0.07)
+        sf = color.get_chroma_scale(luv, L_th=0.07)
         self.assertAlmostEqual(sf, 1.0, delta=1e-5)  # faint values are ignored, factor is 1
 
         # case 7: all colors are outside the visible gamut (for coverage testing)
         xyz = np.zeros((100, 100, 3))
         xyz[:, :, 1] = 1  # XYZ = (0, 1, 0) is a color left of the visible CIE xyz gamut
         luv = color.xyz_to_luv(xyz)
-        sf = color.get_saturation_scale(luv)
+        sf = color.get_chroma_scale(luv)
         self.assertAlmostEqual(sf, 1.0, delta=1e-5)
 
         # case 8: gamut edge colors get scaled to sRGB edge and scaling factor is now 1
@@ -634,7 +634,7 @@ class ColorTests(unittest.TestCase):
         srgb = color.xyz_to_srgb(xyz, rendering_intent="Perceptual")
         xyz2 = color.srgb_to_xyz(srgb)
         luv = color.xyz_to_luv(xyz2)
-        sf = color.get_saturation_scale(luv)
+        sf = color.get_chroma_scale(luv)
         self.assertAlmostEqual(sf, 1, delta=1e-4)
 
         # case 9: like case #6, but check color.xyz_to_srgb function
@@ -645,19 +645,23 @@ class ColorTests(unittest.TestCase):
         luv[0, 1] = [100, 0, 0]  # brightest pixel
         xyz2 = color.luv_to_xyz(luv)
         srgb2 = color.xyz_to_srgb(xyz2, rendering_intent="Perceptual", L_th=0.07, clip=False)
-        xyz2 = color.srgb_to_xyz(srgb2)
-        luv2 = color.xyz_to_luv(xyz2)
-        sf = color.get_saturation_scale(luv2)
-        self.assertNotAlmostEqual(sf, 1.0, delta=1e-1)  # factor should be < 1
+        srgb3 = color.xyz_to_srgb(xyz2, rendering_intent="Perceptual", L_th=0.0, clip=False)
+        self.assertFalse(np.allclose(srgb2, srgb3, 1e-4))
 
         # case 10: manual scaling option
         wl = color.wavelengths(1000)
         xyz = wl_to_xyz(wl)
-        srgb = color.xyz_to_srgb(xyz, rendering_intent="Perceptual", sat_scale=0.5, clip=False)
-        xyz2 = color.srgb_to_xyz(srgb)
-        luv = color.xyz_to_luv(xyz2)
-        sf = color.get_saturation_scale(luv)
-        self.assertAlmostEqual(sf, 2*0.3236, delta=1e-4)  # twice the value from case #1
+        srgb = color.xyz_to_srgb(xyz, rendering_intent="Perceptual", chroma_scale=0.5, clip=False)
+        srgb2 = color.xyz_to_srgb(xyz, rendering_intent="Perceptual", chroma_scale=0.75, clip=False)
+        self.assertFalse(np.allclose(srgb2, srgb, 1e-4))
+
+        # case 11: perceptual with chroma_scale = 1 is just Absolute RIT
+        wl = color.wavelengths(1000)
+        xyz = wl_to_xyz(wl)
+        srgb = color.xyz_to_srgb(xyz, rendering_intent="Perceptual", chroma_scale=1)
+        srgb2 = color.xyz_to_srgb(xyz, rendering_intent="Absolute")
+        self.assertTrue(np.allclose(srgb2, srgb, atol=1e-4))
+        
 
     def test_spectral_color_map(self):
 

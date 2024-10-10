@@ -10,7 +10,7 @@ readme = "ReadMe.md"
 license = {text = "not specified yet"}
 requires-python = ">=3.10,<3.13"
 dependencies = [
-    "numpy<2",  # TODO lift restriction when colour and tvtk use numpy 2 
+    "numpy>2",
     "numexpr",
     "configobj",  # TODO seems to be needed as of 19.08.2024, is this is a bug from mayavi?
     "chardet", 
@@ -69,7 +69,7 @@ docs = [
 ]
 
 [build-system]
-requires = ["setuptools >= 61.0", "numpy>1.21"]
+requires = ["setuptools >= 61.0", "numpy>2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]

@@ -190,7 +190,7 @@ class LightSpectrum(Spectrum):
 
         return color.xyz_from_spectrum(wl, spec)
 
-    def color(self, rendering_intent="Ignore", clip=False, L_th=0, sat_scale=0) -> tuple[float, float, float]:
+    def color(self, rendering_intent="Ignore", clip=False, L_th=0, chroma_scale=0) -> tuple[float, float, float]:
         """
         Get the sRGB color of the spectrum
 
@@ -199,7 +199,7 @@ class LightSpectrum(Spectrum):
         :return: tuple of 3 sRGB values
         """
         XYZ = np.array([[[*self.xyz()]]])
-        RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip, L_th=L_th, sat_scale=sat_scale)[0, 0]
+        RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip, L_th=L_th, chroma_scale=chroma_scale)[0, 0]
         return float(RGB[0]), float(RGB[1]), float(RGB[2])
 
     def dominant_wavelength(self) -> float:

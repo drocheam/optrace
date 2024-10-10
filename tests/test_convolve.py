@@ -296,7 +296,7 @@ class ConvolutionTests(unittest.TestCase):
             xi = np.linspace(-s_img_ren[0]/2, s_img_ren[0]/2, img_ren.shape[1])
             yi = np.linspace(-s_img_ren[1]/2, s_img_ren[1]/2, img_ren.shape[0])
 
-            # interpolate on convoluted image and subtract from rendered one channel-wise
+            # interpolate on convolved image and subtract from rendered one channel-wise
             img_ren = color.srgb_to_srgb_linear(img_ren)
             img_conv = color.srgb_to_srgb_linear(img_conv)
             im_diff = np.fliplr(np.flipud(img_ren)).copy()

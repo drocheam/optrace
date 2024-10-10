@@ -1034,7 +1034,7 @@ class Raytracer(Group):
         :return: rendered RenderImage
         """
 
-        if limit is not None and extent is not None:
+        if limit is not None and extent is not None and not "_dont_filter" in kwargs:
             warning("Using the limit parameter in combination with a user defined extent"
                     " will produce an incorrect detector image, as the rays outside the extent"
                     " are not included in the convolution calculation.")

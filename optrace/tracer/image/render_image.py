@@ -131,7 +131,7 @@ class RenderImage(BaseClass):
             mode:       str,
             N:          int = 315,
             L_th:       float = 0,
-            sat_scale:  float = None)\
+            chroma_scale:  float = None)\
             -> RGBImage | LinearImage:
         """
         Get a converted image with mode 'mode'. Must be one of RenderImage.image_modes.
@@ -143,13 +143,13 @@ class RenderImage(BaseClass):
         Depending on the image mode, the returned image is an RGBImage with three channels
         or a LinearImage with one channel.
 
-        Parameters L_th and sat_scale are only needed for mode='sRGB (Perceptual RI)',
+        Parameters L_th and chroma_scale are only needed for mode='sRGB (Perceptual RI)',
         see function color.xyz_to_srgb_linear for more details.
 
         :param mode: one of RenderImage.image_modes
         :param N: pixel count of smaller side, nearest of RenderImage.SIZES is automatically selected
         :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
-        :param sat_scale: sat_scale option for mode "sRGB (Perceptual RI)" 
+        :param chroma_scale: chroma_scale option for mode "sRGB (Perceptual RI)"
         :return: RGBImage or LinearImage, depending on 'mode'
         """
         self.__check_for_image()
@@ -189,7 +189,7 @@ class RenderImage(BaseClass):
 
                 rendering_intent = "Absolute" if mode == "sRGB (Absolute RI)" else "Perceptual"
                 data = color.xyz_to_srgb(img[:, :, :3], rendering_intent=rendering_intent, 
-                                         L_th=L_th, sat_scale=sat_scale)
+                                         L_th=L_th, chroma_scale=chroma_scale)
 
                 return RGBImage(data, **iargs)
 
@@ -224,7 +224,7 @@ class RenderImage(BaseClass):
         """
         Point images are given a valid 2D extent.
         Line images or images with a large side-to-side ratio are adapted.
-        The image is extented to fit its convoluted version (if RenderImage._limit is not None)
+        The image is extented to fit its convolved version (if RenderImage._limit is not None)
         """
 
         sx, sy = self.s  # use copies since extent changes along the way

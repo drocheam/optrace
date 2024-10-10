@@ -952,6 +952,7 @@ class GUITests(unittest.TestCase):
                     self._wait_for_idle(sim)
                     self._do_in_main(sim.command_window.copy_history)
                     self._wait_for_idle(sim)
+                    time.sleep(0.5)  # TODO somehow needed?
                     self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
 
         sim.debug(interact, args=(sim,))

@@ -23,5 +23,5 @@ img_conv = ot.convolve(img, psf, m=0.75,
 # plot images
 otp.image_plot(img, title="Initial Image")
 otp.image_plot(psf, title="PSF")
-otp.image_plot(img_conv, title="Convoluted Image")
+otp.image_plot(img_conv, title="Convolved Image")
 otp.block()

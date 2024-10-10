@@ -15,4 +15,4 @@ from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, luv_saturation, luv_chrom
 from .srgb import SRGB_RENDERING_INTENTS, SRGB_R_XY, SRGB_G_XY, SRGB_B_XY, srgb_to_srgb_linear, srgb_linear_to_xyz,\
         srgb_to_xyz, xyz_to_srgb, outside_srgb_gamut, srgb_r_primary, srgb_g_primary, srgb_b_primary,\
         random_wavelengths_from_srgb, _power_from_srgb, spectral_colormap, xyz_to_srgb_linear, srgb_linear_to_srgb,\
-        get_saturation_scale, log_srgb
+        get_chroma_scale, log_srgb
