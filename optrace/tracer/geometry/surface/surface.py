@@ -123,7 +123,7 @@ class Surface(BaseClass):
     @property
     def ds(self) -> float:
         """surface thickness. Difference between highest and lowest point on surface"""
-        return self.z_max - self.z_min
+        return float(self.z_max - self.z_min)
 
     @property
     def dn(self) -> float:

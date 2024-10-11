@@ -716,8 +716,6 @@ class ScenePlotting:
                 # case "" if vtk_obj.GetKeySym() == "F11":
                     # self.scene.scene_editor._full_screen_fired()
         
-        # TODO change this back to KeyReleaseEvent back
-        # currently the application gets old keyrelease event from the terminal
         self.scene.interactor.add_observer('KeyPressEvent', keyrelease)  # calls keyrelease() in main thread
 
     def init_crosshair(self) -> None:

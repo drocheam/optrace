@@ -9,9 +9,9 @@ see https://www.eckop.com/resources/optical-testing/measuring-aberrations/
 
 modification of ``hit_detector()``, such that:
 
- * only works on one source
- * only works on sources with one degree of freedom (Line: Line Parameter, Point: Opening Angle)
- * returns TRA/LRA values
+* only works on one source
+* only works on sources with one degree of freedom (Line: Line Parameter, Point: Opening Angle)
+* returns TRA/LRA values
 
 Problems:
  * only allow discrete wavelengths?

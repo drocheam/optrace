@@ -273,7 +273,7 @@ Go to the code reference section :mod:`optrace.tracer.color` for information on 
 
 For the sRGB Perceptual Rendering Intent there a extra parameters available.
 For instance, a fixed saturation scaling can be set using the :python:`chroma_scale` parameter of the :func:`optrace.tracer.color.xyz_to_srgb_linear <optrace.tracer.color.srgb.xyz_to_srgb_linear>` function.
-A suitable scaling factor can be calculated using :func:`optrace.tracer.color.get_saturation_scale <optrace.tracer.color.srgb.get_saturation_scale>`.
+A suitable scaling factor can be calculated using :func:`optrace.tracer.color.get_saturation_scale <optrace.tracer.color.srgb.get_chroma_scale>`.
 This is useful for viable comparison between images, as the saturation scaling factor is the same.
 The function :func:`optrace.tracer.color.xyz_to_srgb_linear <optrace.tracer.color.srgb.xyz_to_srgb_linear>` provides the :python:`chroma_scale` parameter to override the best matching one.
 Alternatively, a relative lightness threshold can be set using the :python:`L_th` parameter, which excludes colors of darker image regions to calculate/apply the factor in both functions.

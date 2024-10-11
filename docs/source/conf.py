@@ -122,7 +122,7 @@ autodoc_typehints = "description"
 # ignore links that seemingly only work in a browser and not in automated tests
 linkcheck_ignore = [# 'https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.html',
                     'https://doi.org/10.1002/9783527648962.app1',
-                    # 'https://www.publicdomainpictures.net/en/view-image.php',
+                    'https://www.publicdomainpictures.net/en/view-image.php',
                     'https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/',
                     'https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/',
                     'https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/',

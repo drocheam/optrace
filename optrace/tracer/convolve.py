@@ -42,7 +42,7 @@ def convolve(img:                RGBImage | LinearImage,
     It must have three elements if img is an RGBImage, and one otherwise.
 
     If a result with the same side lengths and pixel count as the input is desired,
-    parameter slice\_ must be set to True so the image is sliced back.
+    parameter `slice_` must be set to True so the image is sliced back.
 
     In the internals of this function the convolution is done in linear sRGB values, 
     while also using values outside the sRGB gamut.

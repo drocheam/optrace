@@ -208,16 +208,9 @@ class ConvolutionTests(unittest.TestCase):
             self.assertAlmostEqual(np.mean(np.abs(diff)), 0, delta=5e-05)  # difference small
             self.assertAlmostEqual(np.mean(np.abs(diff-diff.T)), 0, delta=1e-12)  # rotationally symmetric
 
-            # TODO there seems to be some remaining error
+            # NOTE there seems to be some remaining error
             # similar to an integration error that becomes smaller and smaller for a larger resolution
 
-            # visualize
-            # import matplotlib.pyplot as plt
-            # import optrace.plots as otp
-
-            # plt.figure()
-            # plt.imshow(diff)
-            # plt.show(block=True)
 
     @pytest.mark.slow
     @pytest.mark.timeout(600)

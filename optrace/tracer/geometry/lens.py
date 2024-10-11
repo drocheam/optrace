@@ -109,7 +109,7 @@ class Lens(Element):
     @property
     def de(self) -> float:
         """thickness extension"""
-        return self.back.z_min - self.front.z_max
+        return float(self.back.z_min - self.front.z_max)
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

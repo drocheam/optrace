@@ -173,7 +173,7 @@ The call returns a vector of the same shape as the input.
    >>> n = ot.RefractionIndex("Abbe", n=1.543, V=62.1)
    >>> wl = np.linspace(380, 780, 5)
    >>> n(wl)
-   array([1.56237798, 1.54967658, 1.54334457, 1.53971213, 1.53742918])
+   array([1.56237795, 1.54967655, 1.54334454, 1.5397121 , 1.53742915])
 
 Abbe Number
 __________________

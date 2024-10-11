@@ -1,0 +1,37 @@
+./examples
+├── achromat.py
+├── arizona_eye_model.py
+├── astigmatism.py
+├── brewster_polarizer.py
+├── cosine_surfaces.py
+├── double_gauss.py
+├── gui_automation.py
+├── image_render_many_rays.py
+├── image_render.py
+├── keratoconus.py
+├── legrand_eye_model.py
+├── microscope.py
+├── prism.py
+├── psf_imaging.py
+├── refraction_index_presets.py
+├── ressources
+│   ├── eyepiece
+│   │   ├── LICENSE.txt
+│   │   ├── SOURCE.txt
+│   │   └── UK565851-1.zmx
+│   ├── materials
+│   │   ├── hikari.agf
+│   │   ├── hoya.agf
+│   │   ├── LICENSE.txt
+│   │   ├── ohara.agf
+│   │   ├── schott.agf
+│   │   └── SOURCE.txt
+│   └── microscope
+│       ├── LICENSE.txt
+│       ├── Nikon_1p25NA_60x_US7889433B2_MultiConfig_v2.zmx
+│       └── SOURCE.txt
+├── spectrum_presets.py
+├── sphere_projections.py
+└── spherical_aberration.py
+
+5 directories, 30 files
