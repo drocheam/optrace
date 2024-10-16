@@ -1,8 +1,9 @@
 from .tools import wavelengths, blackbody, normalized_blackbody, has_color
 
 from .illuminants import a_illuminant, c_illuminant, d50_illuminant, d55_illuminant, d65_illuminant, d75_illuminant,\
-    e_illuminant, fl2_illuminant, fl7_illuminant, fl11_illuminant, led_b1_illuminant, led_b2_illuminant,\
-    led_b3_illuminant, led_b4_illuminant, led_b5_illuminant
+    e_illuminant, f2_illuminant, f7_illuminant, f11_illuminant, led_b1_illuminant, led_b2_illuminant,\
+    led_b3_illuminant, led_b4_illuminant, led_b5_illuminant, led_bh1_illuminant, led_rgb1_illuminant,\
+    led_v1_illuminant, led_v2_illuminant
 
 from .observers import x_observer, y_observer, z_observer
 

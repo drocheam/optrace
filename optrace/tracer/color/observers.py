@@ -1,19 +1,19 @@
 import pathlib
 import numpy as np  # calculations
 
+# CIE 1931 2° colorimetric standard observers
+# see optrace/ressources/SOURCE.txt for more information
+
 
 # load observers from file
 _obs_names = ["wl", "x", "y", "z"]
 _obs_path = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "observers.csv"
 _observers = np.genfromtxt(_obs_path, skip_header=1, delimiter=",", filling_values=0, dtype=np.float64)
 
-# Sources for xyz_observers values:
-# https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer
-
 
 def x_observer(wl: np.ndarray) -> np.ndarray:
     """
-    Human eye x observer values (CIE 1931 2° Standard Observer)
+    CIE 1931 2° colorimetric standard observer x.
 
     :param wl: wavelength array in nm
     :return: value array
@@ -23,7 +23,7 @@ def x_observer(wl: np.ndarray) -> np.ndarray:
 
 def y_observer(wl: np.ndarray) -> np.ndarray:
     """
-    Human eye y observer values (CIE 1931 2° Standard Observer)
+    CIE 1931 2° colorimetric standard observer y.
 
     :param wl: wavelength array in nm
     :return: value array
@@ -33,9 +33,10 @@ def y_observer(wl: np.ndarray) -> np.ndarray:
 
 def z_observer(wl: np.ndarray) -> np.ndarray:
     """
-    Human eye z observer values (CIE 1931 2° Standard Observer)
+    CIE 1931 2° colorimetric standard observer z.
 
     :param wl: wavelength array in nm
     :return: value array
     """
     return np.interp(wl, _observers[:, 0], _observers[:, _obs_names.index("z")], left=0, right=0)
+

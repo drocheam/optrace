@@ -1,0 +1,9 @@
+Observers:
+CIE 2018, CIE 1931 colour-matching functions , 2 degree observer (data table), International Commission on Illumination (CIE), Vienna, Austria, DOI:10.25039/CIE.DS.xvudnb9b
+
+Illuminants A, C, E, D50, D55, D65, D75, F2, F7, F11:
+CIE Colorimetry, 3. Edition, 2004
+
+Illuminants LED:
+CIE 2018, Relative spectral power distributions of illuminants representing typical LED lamps, International Commission on Illumination, Vienna, Austria, DOI: 10.25039/CIE.DS.vgssnyfg
+

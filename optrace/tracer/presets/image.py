@@ -5,6 +5,7 @@ from ..image import RGBImage
 # path of the image library folder
 image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "images"
 
+# for information on image sources and licenses see SOURCE.txt in optrace/ressources/images/
 
 # Scene Images
 #######################################################################################################################
@@ -33,7 +34,7 @@ def documents(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> 
 
 def fruits(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
-    Photo of different fruits on a tray. Source: https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/ 
+    Photo of different fruits on a tray.
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -44,7 +45,6 @@ def fruits(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGB
 def group_photo(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     Photo of a group of people in front of a blackboard. 
-    Source: https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/ 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -55,7 +55,6 @@ def group_photo(s: np.ndarray | list = None, extent: list | np.ndarray = None) -
 def hong_kong(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     Photo of a Hong Kong street at night. 
-    Source: https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/ 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -66,7 +65,6 @@ def hong_kong(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> 
 def interior(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     Green sofa in an interior room. 
-    Source: https://www.pexels.com/photo/green-2-seat-sofa-1918291/ 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -77,7 +75,6 @@ def interior(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> R
 def landscape(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     Landscape image of a mountain and water scene. 
-    Source: https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/ 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -95,8 +92,6 @@ scenes: list = [cell, documents, fruits, group_photo, hong_kong, interior, lands
 def color_checker(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     Color checker chart
-    Public domain image from
-    https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -107,7 +102,6 @@ def color_checker(s: np.ndarray | list = None, extent: list | np.ndarray = None)
 def ETDRS_chart(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     ETDRS Chart standard
-    Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -118,7 +112,6 @@ def ETDRS_chart(s: np.ndarray | list = None, extent: list | np.ndarray = None) -
 def ETDRS_chart_inverted(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     ETDRS Chart inverted
-    edited version of Public Domain Image from https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -129,7 +122,6 @@ def ETDRS_chart_inverted(s: np.ndarray | list = None, extent: list | np.ndarray 
 def eye_test_vintage(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
     Photo of a vintage eye test chart. 
-    Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -153,7 +145,7 @@ def grid(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBIm
 
 def siemens_star(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
-    Siemens Star Image. Own creation
+    Siemens Star Image.
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -163,8 +155,7 @@ def siemens_star(s: np.ndarray | list = None, extent: list | np.ndarray = None) 
 
 def tv_testcard1(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
-    TV test card
-    Public Domain Image from  https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg 
+    TV test card 1
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
@@ -174,8 +165,7 @@ def tv_testcard1(s: np.ndarray | list = None, extent: list | np.ndarray = None) 
 
 def tv_testcard2(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
-    TV test card
-    Public Domain Image from https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png 
+    TV test card 2
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]

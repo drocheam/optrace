@@ -605,7 +605,7 @@ class SpectrumTests(unittest.TestCase):
 
         # with the help of
         # http://www.brucelindbloom.com/index.html?ColorCalcHelp.html
-        spec = ot.presets.light_spectrum.fl11
+        spec = ot.presets.light_spectrum.f11
         self.assertAlmostEqual(spec.dominant_wavelength(), 581.4, delta=0.1)
         xy = color.xyz_to_xyY(np.array([[spec.xyz()]]))[0, 0, :2]
         ccmp = colour.complementary_wavelength(xy, color.WP_D65_XY)[0]

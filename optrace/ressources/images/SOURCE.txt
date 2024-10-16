@@ -1,0 +1,57 @@
+cell:
+Source: https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064
+As the image was made with the Stable Diffusion 1.5 model, it is public domain (CC0), see https://lexica.art/terms
+
+documents:
+Source: https://www.pexels.com/photo/documents-on-wooden-surface-95916/ 
+Free to use, no restrictions, no attribution, see https://www.pexels.com/license/
+
+fruits:
+Source: https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/ 
+Free to use, no restrictions, no attribution, see https://www.pexels.com/license/
+
+group_photo:
+Source: https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/ 
+Free to use, no restrictions, no attribution, see https://www.pexels.com/license/
+
+hong_kong:
+Source: https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/ 
+Free to use, no restrictions, no attribution, see https://www.pexels.com/license/
+
+interior:
+Source: https://www.pexels.com/photo/green-2-seat-sofa-1918291/ 
+Free to use, no restrictions, no attribution, see https://www.pexels.com/license/
+
+landscape:
+Source: https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/ 
+Free to use, no restrictions, no attribution, see https://www.pexels.com/license/
+
+color_checker:
+Source: https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg 
+Public domain image (CC0)
+
+ETDRS_chart:
+Source: https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg 
+Public domain image
+
+ETDRS_chart_inverted:
+own creation, edited version of public domain image: https://commons.wikimedia.org/wiki/File:ETDRS_Chart_2.svg 
+
+eye_test_vintage:
+Source: https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage 
+Public domain image (CC0)
+
+grid:
+own creation
+
+siemens_star:
+own creation
+
+tv_testcard1:
+Source: https://commons.wikimedia.org/wiki/File:TestScreen_square_more_colors.svg 
+Public domain image (CC0) 
+
+tv_testcard2:
+Source: https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png 
+Public domain image 
+
