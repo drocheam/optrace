@@ -16,10 +16,19 @@ import optrace as ot
 import optrace.tracer.load as load
 
 
+# test files (zmx, agf) are downloaded on demand, as I don't want to care about licenses for each file
+# when they would be included in the rep
+
 class LoadTests(unittest.TestCase):
     
-    # don't sort tests randomly
-    pytestmark = pytest.mark.random_order(disabled=True)
+    def __init__(self, *args, **kwargs):
+
+        # load schott material file from examples
+        schott_path = str(pathlib.Path(__file__).resolve().parent.parent\
+                         / "examples" / "ressources" / "materials" / "schott.agf")
+        self.n_schott = ot.load_agf(schott_path)
+
+        super().__init__(*args, **kwargs)
 
     def save_file(self, source: str, path: str):
         """
@@ -28,7 +37,6 @@ class LoadTests(unittest.TestCase):
 
         # get web ressource with 5 retries and Firefox User Agent
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
-        # headers={"User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"}
         adapter = HTTPAdapter(max_retries=5)
         http = requests.Session()
         http.mount("http://", adapter)
@@ -40,18 +48,6 @@ class LoadTests(unittest.TestCase):
 
         if str(r.content).find("<head>") != -1:
             raise RuntimeError("HTML file downloaded, most probably crawling activated some protections.")
-
-    # run first
-    @pytest.mark.os
-    def test_0_download_schott(self):
-        """download schott catalogue needed for some examples"""
-        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/schott.agf", "schott.agf")
-
-    # run last
-    @pytest.mark.os
-    def test_zzzzzzzzzz_delete_schott(self):
-        """delete schott catalogue needed for some examples"""
-        os.remove("schott.agf")
 
     @pytest.mark.os
     def test_readlines(self):
@@ -123,8 +119,7 @@ class LoadTests(unittest.TestCase):
         """test zmx special cases: COAT provided, MATERIAL == _BLANK and MATERIAL unknown, 
         but index and Abbe provided"""
         path0 = pathlib.Path(__file__).resolve().parent / "test_files"
-        n_schott = ot.load_agf("schott.agf")
-        ot.load_zmx(str(path0 / "zmx_special_cases.zmx"), n_schott)
+        ot.load_zmx(str(path0 / "zmx_special_cases.zmx"), self.n_schott)
 
     @pytest.mark.os
     def test_zmx_errors(self):
@@ -209,10 +204,8 @@ class LoadTests(unittest.TestCase):
 
         self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/Smith1998b.zmx", "temp.zmx") 
 
-        n_schott = ot.load_agf("schott.agf")
-
-        n_dict = dict(LAFN21=n_schott["N-LAF21"]) 
-        G = ot.load_zmx("temp.zmx", n_schott | n_dict)
+        n_dict = dict(LAFN21=self.n_schott["N-LAF21"]) 
+        G = ot.load_zmx("temp.zmx", self.n_schott | n_dict)
 
         RT.add(G)
         RT.trace(10000)
@@ -234,9 +227,7 @@ class LoadTests(unittest.TestCase):
 
         self.save_file("https://www.edmundoptics.com/document/download/391148", "temp.zmx")   # cloudflare protection active? 
 
-        n_schott = ot.load_agf("schott.agf")
-
-        G = ot.load_zmx("temp.zmx", n_schott)
+        G = ot.load_zmx("temp.zmx", self.n_schott)
 
         RT.add(G)
         RT.trace(10000)
@@ -258,8 +249,7 @@ class LoadTests(unittest.TestCase):
         RT.add(RS)
 
         self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/4037934a.zmx", "temp.zmx") 
-        n_schott = ot.load_agf("schott.agf")
-        G = ot.load_zmx("temp.zmx", n_schott, no_marker=True)  # coverage test with no_marker
+        G = ot.load_zmx("temp.zmx", self.n_schott, no_marker=True)  # coverage test with no_marker
 
         RT.add(G)
         RT.trace(10000)
@@ -280,10 +270,7 @@ class LoadTests(unittest.TestCase):
         RT.add(RS)
 
         self.save_file("https://www.edmundoptics.de/document/download/389048", "temp.zmx") 
-
-        n_schott = ot.load_agf("schott.agf")
-
-        G = ot.load_zmx("temp.zmx", n_schott, no_marker=True)  # coverage test with no_marker
+        G = ot.load_zmx("temp.zmx", self.n_schott, no_marker=True)  # coverage test with no_marker
 
         RT.add(G)
         RT.trace(10000)
@@ -311,8 +298,7 @@ class LoadTests(unittest.TestCase):
         self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/hikari.agf", "hikari.agf")
         self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/hoya.agf", "hoya.agf")
 
-        n_dict = ot.load_agf("schott.agf")
-        n_dict = n_dict | ot.load_agf("ohara.agf")
+        n_dict = self.n_schott | ot.load_agf("ohara.agf")
         n_dict = n_dict | ot.load_agf("hikari.agf")
         n_dict = n_dict | ot.load_agf("hoya.agf")
         n_dict["H-ZF7L"] = ot.RefractionIndex("Abbe", n=1.805180, V=25.46)

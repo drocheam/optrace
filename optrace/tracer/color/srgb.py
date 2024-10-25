@@ -456,7 +456,7 @@ def log_srgb(img: np.ndarray) -> np.ndarray:
 def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     """
     Gauss Function / Normal distribution.
-    Normaklized so peak value is 1.
+    Normalized so peak value is 1.
 
     :param x: 1D value vector
     :param mu: mean value

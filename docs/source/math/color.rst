@@ -363,6 +363,12 @@ Such an implementation would enable us a simple simulation of different light an
 The conversion process is commonly referred to as *Spectral Upsampling*, *Spectral Rendering* or *Spectral Synthesis*.  An implementation with real LED spectral curves is found in :footcite:`10.2312:sr.20221150`, while modelling sRGB reflectances is found in :footcite:`10.2312:sr.20191216`.
 It is important to note that not all chromaticities inside the human vision and even the sRGB gamut can be modelled by valid reflectance spectra, since the reflectance range is bound to :math:`[0,~1]`. However, when choosing illuminant curves there is no such limitation.
 
+.. TODO auch eingehen auf http://scottburns.us/fast-rgb-to-spectrum-conversion-for-reflectances/
+.. TODO nennen, dass wir mit den Reflektionsspektra auch Illuminanten erzeugen könnten über D65 Licht
+.. TODO macht es einen Sinn, sich so auf die Farbwiedergabe zu fixieren wie die? Was machen die da überhaupt?
+.. TODO benennen, warum wir eigene Spektren entwickeln (mehr Licht im sichtbaren Bereich, einfache mathematische Form, keine Zacken und Kanten wie bei D65)
+
+
 While the conversion of a spectral distribution to a color is well-defined, going backwards the conversion is not unique and simply reversible. Multiple spectral distributions can create the same color stimulus, an effect known as *metamerism*.
 In fact, there infinitely many distributions being perceived as the same color.
 With so many possibilities to choose from, we can demand some requirements for our sRGB primaries:

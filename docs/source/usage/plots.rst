@@ -304,21 +304,29 @@ A full function call could look like this:
 
 Chromaticity norms describe the brightness normalization for the colored diagram background. There are multiple norms available:
 
-*  **Largest**: Maximum brightness for this sRGB color. Leads to colors with maximum brightness and saturation.
 *  **Sum**: Normalize the sRGB such that the sum of all channels equals one. Leads to a diagram with smooth color changes and approximately equal brightness.
+*  **Euclidean**: Root-mean-square value of linear sRGB channels. A good compromise between "Largest" and "Sum", having more saturated colors than "Sum", but also smooth color changes compared to "Largest". The default option.
+*  **Largest**: Maximum brightness for this sRGB color. Leads to colors with maximum brightness and saturation.
 
 .. list-table:: 
+   Example of "Sum", "Euclidean" and "Largest" norm (from left to right)
    Example of a chromaticity plots showing the color coordinates of fluorescent lamp presets. Norms are "Sum" (left) and "Largest" (right).
    :class: table-borderless
 
-   * - .. figure:: ../images/fl_chroma_sum_norm.svg
+   * - .. figure:: ../images/chroma_sum_norm.svg
           :align: center
-          :width: 500
+          :width: 300
+          :class: dark-light
+    
+     - .. figure:: ../images/chroma_rms_norm.svg
+          :align: center
+          :width: 300
           :class: dark-light
    
-     - .. figure:: ../images/fl_chroma_largest_norm.svg
+   
+     - .. figure:: ../images/chroma_largest_norm.svg
           :align: center
-          :width: 500
+          :width: 300
           :class: dark-light
      
 

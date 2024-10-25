@@ -1,14 +1,16 @@
-# Optrace 1.5.9
+# Optrace
 ## Geometrical OPtics rayTRACEr and image simulation
 
-[![Python 3.10](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/downloads/release/python-3100/)
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
-[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/downloads/release/python-3120/)
+[![Python 3.10, 3.11, 3.12](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/release/python-3127/)
 [![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)]()
 <!--TODO add license-->
+<!-- TODO add version tag, such as https://img.shields.io/github/v/tag/drocheam/optrace?label=version see https://shields.io/badges/git-hub-tag -->
 
 [![Testing](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml)
 [![Documentation](https://github.com/drocheam/optrace/actions/workflows/gen_docs.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/gen_docs.yml)
+<!-- TODO link tag to documentation -->
+
+<!-- TODO add coverage info (via third party site?), lines of code, comment/docstring quality etc. -->
 
 <img src="./docs/source/images/example_spherical_aberration2.png" width="18.2%"></img>
 <img src="./docs/source/images/example_rgb_render2.svg" width="17%"></img>
@@ -21,6 +23,8 @@
 <img src="./docs/source/images/example_double_gauss_2.png" width="18.2%"></img>
 <img src="./docs/source/images/rgb_render_srgb1.svg" width="17%"></img>
 <img src="./docs/source/images/example_cosine_surfaces1.png" width="18.2%"></img>
+
+<!-- TODO images are clickable, redirect to example page -->
 
 ## Overview
 
@@ -65,6 +69,7 @@ Clone/download the repository and run the following command from a terminal with
 
 More details on the installation process and the requirements are found at <>.
 
+<!-- TODO add Contributing section -->
 
 ## Similar software
 

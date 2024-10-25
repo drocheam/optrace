@@ -12,8 +12,12 @@ from ..tracer import color  # color conversions for chromaticity plots
 from ..tracer.misc import PropertyChecker as pc
 from .misc_plots import _save_or_show
 
+# see https://www.shadertoy.com/view/7s2SDc
+# or https://www.shadertoy.com/view/XclyWs
+# for an alternative implementation of rendering a chromaticity diagram with correct hues
 
-chromaticity_norms: list[str, str, str] = ["Largest", "Sum"]
+
+chromaticity_norms: list[str, str, str] = ["Largest", "Sum", "Euclidean"]
 """possible norms for the chromaticity diagrams"""
 
 
@@ -109,7 +113,7 @@ def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSp
                        title:                   str,
                        xl:                      str,
                        yl:                      str,
-                       norm:                    str = "Sum",
+                       norm:                    str = "Euclidean",
                        path:                    str = None,
                        sargs:                   dict = {})\
         -> None:
@@ -194,6 +198,11 @@ def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSp
     elif norm == "Sum":
         mask = ~np.all(RGB == 0, axis=2)
         RGB[mask] /= np.sum(RGB[mask], axis=1)[:, np.newaxis]  # normalize brightness
+    
+    # "compromise" diagram -> brighter and more saturated colors
+    elif norm == "Euclidean":
+        mask = ~np.all(RGB == 0, axis=2)
+        RGB[mask] /= (np.abs(RGB[mask, 0]**2 + RGB[mask, 1]**2 + RGB[mask, 2]**2)**0.5)[:, np.newaxis]  # normalize brightness
 
     # convert to sRGB
     sRGB = color.srgb_linear_to_srgb(RGB)
