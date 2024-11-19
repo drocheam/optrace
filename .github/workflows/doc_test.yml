@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
 
     steps:
     - uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
     - name: Install Qt5
       run: |
         sudo apt-get update
-        sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake
+        sudo apt install -y libxcb-cursor0 qtcreator qtbase5-dev qt5-qmake cmake
         
     ## needed for the x-server to work
     - name: Setup headless display
