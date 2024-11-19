@@ -19,10 +19,11 @@ dependencies = [
     "opencv-python-headless",
     "vtk", 
     "pyqtdarktheme-fork",  # TODO use official version when they support python 3.12
-    "PyQt5", 
+    "pyside6", 
     "matplotlib", 
     "progressbar2", 
-    "mayavi @ git+https://github.com/enthought/mayavi"
+    #"mayavi",
+    "mayavi @ git+https://github.com/enthought/mayavi"  # TODO git version needed as pypi version does not work with numpy 2
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -38,6 +39,7 @@ classifiers = [
     "Operating System :: MacOS",
     "Programming Language :: Python ::  3.10",
     "Programming Language :: Python ::  3.11",
+    "Programming Language :: Python ::  3.12",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Visualization",

@@ -19,39 +19,53 @@ This library requires Python 3.10, 3.11 or 3.12.
 This automatically runs the file ``setup.py``, which provides all the required information for the installation.
 After this, `optrace` should be installed on your system. 
 
+
 **External dependencies**
 
 .. list-table:: 
-   :widths: 200 350
+   :widths: 250 600 250
    :header-rows: 1
    :align: left
 
    * - Dependency
      - Description
+     - License
    * - `chardet <https://chardet.readthedocs.io/en/latest/>`_
      - automatic detection of file encoding
+     - LGPLv2.1
    * - `mayavi <https://docs.enthought.com/mayavi/mayavi/>`_
      - 3D plotting library
+     - BSD 3-Clause
    * - `matplotlib <https://matplotlib.org/stable/users/index>`_
      - 2D plotting library
+     - PSF License
    * - `numexpr <https://numexpr.readthedocs.io/en/latest/>`_
      - sped-up and optimized calculations
+     - MIT License
    * - `numpy <https://numpy.org/doc/stable/user/index.html#user>`_
      - matrix calculations
+     - BSD 3-Clause
    * - `OpenCV headless <https://pypi.org/project/opencv-python-headless/>`_
      - image loading, saving and resizing
+     - Apache 2.0 License
    * - `progressbar2 <https://pypi.org/project/progressbar2/>`_
      - animated progressbar in standard output (terminal)
-   * - `PyQt5 <https://pypi.org/project/PyQt5/>`_
-     - GUI backend for mayavi
+     - BSD 3-Clause
+   * - `PySide6 <https://wiki.qt.io/Qt_for_Python>`_
+     - Qt GUI backend
+     - LGPLv3
    * - `pyqtdarktheme <https://pypi.org/project/pyqtdarktheme/>`_
      - setting a QT dark theme
+     - MIT License
    * - `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
      - specialized methods for interpolation and math
+     - BSD 3-Clause
    * - `traitsui <https://docs.enthought.com/traitsui/>`_
      - trait framework for mayavi
+     - BSD 3-Clause
    * - `vtk <https://pypi.org/project/vtk/>`_
      - 3D toolkit needed for mayavi
+     - BSD 3-Clause
 
 
 **Troubleshooting**
