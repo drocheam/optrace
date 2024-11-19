@@ -82,7 +82,6 @@ class ClassGlobalOptions:
             assert threading.current_thread() is threading.main_thread(),\
                 "Change of ui_dark_mode must be done in main thread!!!"
 
-            # TODO remove this
             # qdarktheme.enable_hi_dpi()
             
             if val == True:
