@@ -21,6 +21,7 @@ jobs:
     - uses: actions/checkout@v4
     
     # see https://stackoverflow.com/questions/72874772/pytest-core-dump-on-unbutu-22-04-lts-when-using-pyqt5-with-mayavi-and-pyvirtuald
+    # cursor0 needed, see https://github.com/pytest-dev/pytest-qt/issues/550#issuecomment-2032788974
     - name: Install Qt5
       run: |
         sudo apt-get update
@@ -45,7 +46,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox tox-gh-actions pyside2
+        python -m pip install tox tox-gh-actions
         
     # actual tests
     - name: Test with tox
