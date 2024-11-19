@@ -45,7 +45,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox tox-gh-actions
+        python -m pip install tox tox-gh-actions pyside2
         
     # actual tests
     - name: Test with tox

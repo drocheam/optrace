@@ -1,5 +1,7 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.5.12  |   2024-11-19   |  Replaced PyQt5 dependency with PySide6   
+  1.5.11  |   2024-10-16   |  New LED-BH1, LED-RGB1, LED-V1, LED-V2 standard illuminants.   
   1.5.10  |   2024-10-10   |  numpy 2.0 support. In Perceptual RI remaining out-of-gamut colors are handled with Absolute RI   
   1.5.9   |   2024-08-23   |  Dark mode options for GUI and pyplots. Everything is now dark by default.   
   1.5.8   |   2024-04-17   |  Function select_rays for manually selecting custom rays for the scene.   

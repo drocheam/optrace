@@ -29,9 +29,11 @@
 │   │   ├── interior.webp
 │   │   ├── landscape.webp
 │   │   ├── siemens_star.webp
+│   │   ├── SOURCE.txt
 │   │   ├── tv_testcard1.png
 │   │   └── tv_testcard2.png
-│   └── observers.csv
+│   ├── observers.csv
+│   └── SOURCE.txt
 ├── tracer
 │   ├── base_class.py
 │   ├── color
@@ -108,4 +110,4 @@
 │   └── transfer_matrix_analysis.py
 └── warnings.py
 
-14 directories, 95 files
+14 directories, 97 files

@@ -21,7 +21,7 @@ dependencies = [
     "pyqtdarktheme-fork",  # TODO use official version when they support python 3.12
     "pyside6", 
     "matplotlib", 
-    "progressbar2", 
+    "progressbar2",
     #"mayavi",
     "mayavi @ git+https://github.com/enthought/mayavi"  # TODO git version needed as pypi version does not work with numpy 2
 ]
@@ -71,7 +71,7 @@ docs = [
 ]
 
 [build-system]
-requires = ["setuptools >= 61.0", "numpy>2", "pyside6"]
+requires = ["setuptools >= 61.0", "numpy>2", "pyside2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
