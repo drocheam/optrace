@@ -29,6 +29,6 @@ def warning(text: str) -> None:
         warnings.formatwarning = formatwarning_org
 
 # set OptraceWarnings to 'always', means that they are displayed multiple times,
-# which is non-default for warnings
+# which is the non-default behavior for warnings
 warnings.simplefilter('always', OptraceWarning)
 

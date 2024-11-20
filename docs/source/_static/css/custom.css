@@ -96,13 +96,13 @@ div.math mjx-container {
     overflow: unset;
 }
 
-/*fix for badly displayed reference links*/
-/*a.footnote-reference, a::before, a::after {*/
-	/*vertical-align: unset;*/
-	/*font-size: unset;*/
-	/*font-family: unset;*/
-	/*margin-right: unset;*/
-/*}*/
+/*fix for reference links as superscript*/
+a.footnote-reference, a::before, a::after {
+    vertical-align: unset;
+    font-size: unset;
+    font-family: unset;
+    margin-right: unset;
+}
 
 /*[>fix for badly displayed reference link part 2<]*/
 /*a::after {*/

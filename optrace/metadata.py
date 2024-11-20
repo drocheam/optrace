@@ -2,13 +2,14 @@
 name = "optrace"
 """project title"""
 
-version = "1.5.12"
+version = "1.6.0"
 """project version"""
 
 author = "Damian Mendroch"
 """project author"""
 
-# license = ""
+license = "MIT"
+"""project license"""
 
 url = "https://github.com/drocheam/optrace"
 """project url"""

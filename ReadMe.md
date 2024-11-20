@@ -3,7 +3,7 @@
 
 [![Python 3.10, 3.11, 3.12](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/release/python-3127/)
 [![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)]()
-<!--TODO add license-->
+[![License MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/drocheam/optrace/blob/main/LICENSE)
 <!-- TODO add version tag, such as https://img.shields.io/github/v/tag/drocheam/optrace?label=version see https://shields.io/badges/git-hub-tag -->
 
 [![Testing](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml)
@@ -69,7 +69,10 @@ Clone/download the repository and run the following command from a terminal with
 
 More details on the installation process and the requirements are found at <>.
 
-<!-- TODO add Contributing section -->
+
+## Contributing
+
+## License
 
 ## Similar software
 

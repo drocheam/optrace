@@ -360,14 +360,10 @@ While doing the conversion of a physical light spectrum to coordinates in a huma
 In our application the conversion is used to load digital images into the raytracer and propagate spectral wavelengths throughout the tracing geometry.
 Such an implementation would enable us a simple simulation of different light and lightning scenes.
 
-The conversion process is commonly referred to as *Spectral Upsampling*, *Spectral Rendering* or *Spectral Synthesis*.  An implementation with real LED spectral curves is found in :footcite:`10.2312:sr.20221150`, while modelling sRGB reflectances is found in :footcite:`10.2312:sr.20191216`.
+The conversion process is commonly referred to as *Spectral Upsampling*, *Spectral Rendering* or *Spectral Synthesis*.  An implementation with real LED spectral curves is found in :footcite:`10.2312:sr.20221150`, while modelling sRGB reflectances is found in :footcite:`10.2312:sr.20191216` or :footcite:`Burns_2018`.
 It is important to note that not all chromaticities inside the human vision and even the sRGB gamut can be modelled by valid reflectance spectra, since the reflectance range is bound to :math:`[0,~1]`. However, when choosing illuminant curves there is no such limitation.
 
-.. TODO auch eingehen auf http://scottburns.us/fast-rgb-to-spectrum-conversion-for-reflectances/
-.. TODO nennen, dass wir mit den Reflektionsspektra auch Illuminanten erzeugen könnten über D65 Licht
-.. TODO macht es einen Sinn, sich so auf die Farbwiedergabe zu fixieren wie die? Was machen die da überhaupt?
-.. TODO benennen, warum wir eigene Spektren entwickeln (mehr Licht im sichtbaren Bereich, einfache mathematische Form, keine Zacken und Kanten wie bei D65)
-
+.. TODO macht es einen Sinn, warum die sich so auf die Farbwiedergabe fixieren? Was machen die da überhaupt?
 
 While the conversion of a spectral distribution to a color is well-defined, going backwards the conversion is not unique and simply reversible. Multiple spectral distributions can create the same color stimulus, an effect known as *metamerism*.
 In fact, there infinitely many distributions being perceived as the same color.
@@ -388,6 +384,10 @@ Linear sRGB values need to be used, since they are proportional to the physical 
 Points 3 and 4 are needed to approximate natural illuminants close to reality. Adding all sRGB primaries together for a white spectrum should lead to no missing regions in the spectral range. Such gaps would lower the color rendering index (CRI) of the illuminant, which is basically the measure to quantify faithfully rendering object colors when illuminated with this light. For instance, a light spectrum with a yellow gap fails to render purely yellow colors.
 
 Point 5 ensures most of the traced light actually contributes to a rendered image. A color image in sRGB, which is a color space for human vision, should lead to an image with colors in human vision. Rays with colors far outside the visible spectrum would be a waste of rendering time.
+
+Theoretically we could use a D65 white spectrum and the reflectance curves from the aforementioned works to generate spectra for the sRGB primaries.
+The shortcomings are that the resulting spectra are not smooth, due to D65 not being smooth, and a relatively large part of the spectrum falls in the human invisible/barely visible range.
+There is also no simple mathematical descriptions for the resulting curves.
 
 .. list-table:: sRGB primary specification, see :footcite:`sRGBWikiEN`
    :widths: 50 50 50 50 50
@@ -537,28 +537,31 @@ By doing so, each pixel gets an intensity weight that needs to be rescaled so th
 
    1. Convert to linear sRGB
    
-    .. math::
-        \begin{bmatrix}
-        [1.000, 0.000, 0.033] & [0.000, 0.000, 0.000]\\
-        [0.010, 0.214, 1.000] & [1.000, 0.033, 1.000]
-        \end{bmatrix}
+   .. math::
+
+       \begin{bmatrix}
+       [1.000, 0.000, 0.033] & [0.000, 0.000, 0.000]\\
+       [0.010, 0.214, 1.000] & [1.000, 0.033, 1.000]
+       \end{bmatrix}
 
 
    2. Multiply by area factors :math:`r_\text{P}, g_\text{P}, b_\text{P}` and sum all channels for each pixel
 
-    .. math::
-        \begin{bmatrix}
-        0.911 & 0.000\\
-        0.999 & 1.694
-        \end{bmatrix}
+   .. math::
+
+       \begin{bmatrix}
+       0.911 & 0.000\\
+       0.999 & 1.694
+       \end{bmatrix}
 
    3. Normalize weights
     
-     .. math::
-        \begin{bmatrix}
-        0.253 & 0.000\\
-        0.277 & 0.470
-        \end{bmatrix}
+   .. math::
+
+      \begin{bmatrix}
+      0.253 & 0.000\\
+      0.277 & 0.470
+      \end{bmatrix}
 
    4. Chose randomly according to probability: The first six chosen pixels could be: :math:`\text{RGB1}, \text{RGB4}, \text{RGB4}, \text{RGB1}, \text{RGB3}, \text{RGB4}`
 

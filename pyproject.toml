@@ -4,10 +4,10 @@ name = "optrace"
 dynamic = ["version"]
 authors = [{name = "Damian Mendroch", email =  "damian.mendroch@th-koeln.de"}]
 maintainers = [{name = "Damian Mendroch", email = "damian.mendroch@th-koeln.de"}]
-description = "An optics simulation package with sequential raytracing, image rendering and a gui frontend" 
+description = "An optics simulation package with sequential raytracing, image rendering and a GUI frontend" 
 keywords = ["simulation", "optics", "raytracing"]
 readme = "ReadMe.md"
-license = {text = "not specified yet"}
+license = {text = "MIT License"}
 requires-python = ">=3.10,<3.13"
 dependencies = [
     "numpy>2",
@@ -15,22 +15,26 @@ dependencies = [
     "configobj",  # TODO seems to be needed as of 19.08.2024, is this is a bug from mayavi?
     "chardet", 
     "scipy", 
-    "pyface", 
     "opencv-python-headless",
-    "vtk", 
     "pyqtdarktheme-fork",  # TODO use official version when they support python 3.12
     "pyside6", 
     "matplotlib", 
     "progressbar2",
-    #"mayavi",
+    #"mayavi>4.8.1",
     "mayavi @ git+https://github.com/enthought/mayavi"  # TODO git version needed as pypi version does not work with numpy 2
 ]
+#
+# TODO git links lead to issues in later publishing the package on PyPi
+# see https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links
+# and https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation#comment115929654_65527149
+# or https://stackoverflow.com/a/54894359
+#
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
-    # "License :: OSI Approved :: # TODO add license
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Operating System :: Microsoft :: Windows",
