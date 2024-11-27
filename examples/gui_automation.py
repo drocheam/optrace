@@ -12,7 +12,6 @@ from optrace.gui import TraceGUI
 
 # besides just displaying the scene, one could for instance also take screenshots using TraceGUI.screenshot()
 
-
 RT = ot.Raytracer(outline=[-10, 10, -10, 10, -25, 40])
 
 # Line Source emitting parallel white light

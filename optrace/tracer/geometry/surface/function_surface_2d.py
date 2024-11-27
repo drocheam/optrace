@@ -126,7 +126,7 @@ class FunctionSurface2D(Surface):
 
         elif z_max is None and z_min is None:
             warning(f"Estimated z-bounds of {surf_name}: [{self._offset+self.z_min:.9g}, "
-                    f"{self._offset+self.z_max:.9g}], provide actual values to make it more exact.")
+                    f"{self._offset+self.z_max:.9g}], provide actual values for higher precision.")
         
         else:
             raise ValueError(f"z_max and z_min need to be both None or both need a value")

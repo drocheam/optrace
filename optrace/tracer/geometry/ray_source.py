@@ -281,6 +281,10 @@ class RaySource(Element):
         # alpha: angle in plane perpendicular to base orientation s0
         # theta: angle between orientation s and base orientation s0
 
+        # NOTE creating a source with varying ray orientation but a specific divergence function
+        # (mostly likely) leads to a different divergence function in the far field
+        # e.g. a Lambertian radiator with spatially varying base orientation is not a lambertian radiator anymore
+
         # for 2D divergence theta has only two values, angle and angle + pi
         if self.div_2d:
             t = np.radians(self.div_axis_angle).repeat(2) + [0, np.pi]

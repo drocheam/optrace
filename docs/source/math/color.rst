@@ -378,7 +378,7 @@ With so many possibilities to choose from, we can demand some requirements for o
      4. wide spectrum
      5. relatively few light in non-visible regions (infrared and ultraviolet)
 
-Points 1 and 2 simplify the upsampling process, since the mixing ratio of the linear sRGB values can be used directly. In principle we could create a new color space and gamut, that includes the sRGB gamut. But with this we would need to add additional color space conversions.
+Points 1 and 2 simplify the upsampling process, since the mixing ratio of the linear sRGB values can be used directly. In principle we could create a new color space and gamut, that includes the sRGB gamut but is much wider. But with this we would need to add additional color space conversions. Additionally this would lead to narrower spectra, contrary to point 4.
 Linear sRGB values need to be used, since they are proportional to the physical intensity of the sRGB primaries. In contrast normal sRGB values are gamma corrected to approximate non-linear human vision.
 
 Points 3 and 4 are needed to approximate natural illuminants close to reality. Adding all sRGB primaries together for a white spectrum should lead to no missing regions in the spectral range. Such gaps would lower the color rendering index (CRI) of the illuminant, which is basically the measure to quantify faithfully rendering object colors when illuminated with this light. For instance, a light spectrum with a yellow gap fails to render purely yellow colors.
@@ -433,6 +433,9 @@ The mathematical functions of choice is an gaussian function, which is defined a
    S(\lambda, \mu, \sigma)=\frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \left(-\frac{(\lambda-\mu)^{2}}{2 \sigma^{2}}\right)
    :label: Gauss_Opt
 
+A gaussian function is a suitable choice because of the smooth, bell-like shape and its widely known usage.
+The principle of maximum entropy :footcite:`Wiki_maximum_entropy` also recommends this type of function for the two parameters position and width.
+
 Utilizing optimization methods in python, the following functions were found, that have the same color stimulus as the primaries:
 
 .. math::
@@ -452,9 +455,9 @@ Utilizing optimization methods in python, the following functions were found, th
    :class: dark-light
 
 
-The green primary is implemented with only one gaussian, while the other use two gaussian functions. From :footcite:`ClarkChromaticity`, figure 3a, is known, that it is not possible to reach the chromaticity coordinates of the red channel with only one such curve. While it is possible for the blue curve, only narrow illuminants with a small standard deviation are viable. For higher flexibility in spectrum width selection two functions are also applied here.
+The green primary is implemented with only one gaussian, while the other use two gaussian functions. From :footcite:`ClarkChromaticity`, figure 3a, is known, that it is not possible to reach the chromaticity coordinates of the red channel with only one such curve. While it is possible for the blue curve, only narrow illuminants with a small standard deviation would be viable. For higher flexibility in spectrum width selection two functions are also applied here.
 
-However, all luminance ratios are different to the sRGB primaries. For this we need to rescale the functions to match the ratio. The green curve factor is kept as 1. The rescaling factors are:
+However, all luminance ratios are different to the sRGB primaries. For this we need to rescale the functions to match the ratio. The green curve factor is kept at a value of 1. The rescaling factors are then:
 
 .. math::
     r(\lambda) =&~ 0.951190393 \cdot r_0(\lambda)\\

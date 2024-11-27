@@ -68,6 +68,10 @@ class ExampleTests(unittest.TestCase):
     def test_spherical_aberration(self):
         self.execute("spherical_aberration.py", 10)
     
+    @pytest.mark.slow
+    def test_iol_pinhole_imaging(self):
+        self.execute("IOL_pinhole_imaging.py", 15)
+    
     def test_convolve(self):
         self.execute("psf_imaging.py", 10)
     

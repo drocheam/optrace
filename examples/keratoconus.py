@@ -7,9 +7,9 @@ import optrace.plots as otp
 
 
 # options:
-g = 0.6e3  # object distance
+g = 0.67e3  # object distance
 G_alpha = 4  # angle of object in view
-P = 3  # pupil diameter
+P = 3.0  # pupil diameter
 image = ot.presets.image.ETDRS_chart_inverted  # test image
 position = "far"  # keratoconus cone position (see "positions" dictionary below)
 cases = [0, 4, 7, 14]  # cases to simulate (see "gauss_params" list below)
