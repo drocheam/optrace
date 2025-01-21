@@ -976,9 +976,12 @@ class GUITests(unittest.TestCase):
                 ss1 = ss0 * 1.3
                 ss2 = ss1 / 1.2
 
+                # time to wait after resizing
+                dt = 1.5
+
                 # enlarge
                 self._do_in_main(Window.resize, *ss1.astype(int))
-                time.sleep(0.5)  # how to check how much time it takes?
+                time.sleep(dt)  # how to check how much time it takes?
 
                 # check if scale properties changed
                 self.assertNotAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])  # scene size variable changed
@@ -991,17 +994,17 @@ class GUITests(unittest.TestCase):
                                           sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
 
                 self._do_in_main(Window.resize, *ss2.astype(int))
-                time.sleep(0.5)
+                time.sleep(dt)
                 self._do_in_main(Window.showFullScreen)
-                time.sleep(0.5)
+                time.sleep(dt)
                 self._do_in_main(Window.showMaximized)
-                time.sleep(0.5)
+                time.sleep(dt)
                 self._do_in_main(Window.showMinimized)
-                time.sleep(0.5)
+                time.sleep(dt)
                 self._do_in_main(Window.showNormal)
-                time.sleep(0.5)
+                time.sleep(dt)
                 self._do_in_main(Window.resize, *ss0.astype(int))
-                time.sleep(0.5)
+                time.sleep(dt)
                
                 # check if scale properties are back at their default state
                 self.assertAlmostEqual(sim._plot._scene_size[0], SceneSize0[0], delta=2)
@@ -1017,7 +1020,7 @@ class GUITests(unittest.TestCase):
                 # coverage test: delete orientation:axes and resize
                 sim._plot._orientation_axes = None
                 self._do_in_main(Window.resize, *ss2.astype(int))
-                time.sleep(0.5)
+                time.sleep(dt)
                 
         sim.debug(interact, args=(sim,))
         self.raise_thread_exceptions()
