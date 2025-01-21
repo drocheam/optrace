@@ -973,15 +973,19 @@ class GUITests(unittest.TestCase):
 
                 qsize = Window.size()
                 ss0 = np.array([qsize.width(), qsize.height()])
-                ss1 = ss0 * 1.3
-                ss2 = ss1 / 1.2
+                ss1 = (ss0 * 1.3).astype(int)
+                ss2 = (ss1 / 1.2).astype(int)
 
                 # time to wait after resizing
-                dt = 1.5
+                dt = 0.5
 
                 # enlarge
                 self._do_in_main(Window.resize, *ss1.astype(int))
                 time.sleep(dt)  # how to check how much time it takes?
+
+                # check if window was actually resized
+                qsize2 = sim.scene.scene_editor._content.window().size()
+                self.assertFalse(np.all(ss0 == np.array([qsize2.width(), qsize2.height()])))
 
                 # check if scale properties changed
                 self.assertNotAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])  # scene size variable changed
@@ -1316,6 +1320,7 @@ class GUITests(unittest.TestCase):
                 # this also removes the old fault markers
                 RT.remove(RT.lenses[1:])
                 self._do_in_main(sim.replot)
+                time.sleep(0.5)
                 self._wait_for_idle(sim)
                 self.assertTrue(RT.rays.N > 0)  # rays traced
                 self.assertEqual(len(sim._plot._fault_markers), 0)  # no fault_marker in GUI

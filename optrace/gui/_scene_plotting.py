@@ -281,8 +281,8 @@ class ScenePlotting:
         self._orientation_axes = self.scene.mlab.orientation_axes()
         self._orientation_axes.text_property.trait_set(**self.LABEL_STYLE)
         self._orientation_axes.marker.interactive = 0  # make orientation axes non-interactive
-        self._orientation_axes.visible = not bool(self.ui.minimalistic_view)
         self._orientation_axes.widgets[0].viewport = [0, 0, 0.1, 0.15]
+        self._orientation_axes.axes.visibility = not bool(self.ui.minimalistic_view)
 
         # turn of text scaling of orientation_axes
         mark = self._orientation_axes.widgets[0].orientation_marker
@@ -780,7 +780,7 @@ class ScenePlotting:
         show = not bool(self.ui.minimalistic_view)
 
         if self._orientation_axes is not None:
-            self._orientation_axes.visible = show
+            self._orientation_axes.axes.visibility = show
 
         for rio in self._index_box_plots:
             if rio[1] is not None:
