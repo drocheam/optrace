@@ -1975,6 +1975,7 @@ class GUITests(unittest.TestCase):
                         assert not os.path.exists(path)
                         
                         self._do_in_main(plot, path=path, sargs=dict(dpi=120))
+                        time.sleep(0.05)
                         self._wait_for_idle(sim)
 
                         # check if file was saved

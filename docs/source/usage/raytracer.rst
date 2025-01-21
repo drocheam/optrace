@@ -50,10 +50,7 @@ This is also the only mandatory parameter of this class
    RT = ot.Raytracer(outline=[-2, 2, -3, 3, -5, 60])
 
 
-
 **Geometry**
-
-.. TODO how to add geometry elements?
 
 Since optrace implements sequential raytracing, the surfaces and objects must be in a well-defined and unique sequence. This applies to all elements with interactions of light: :python:`Lens, IdealLens, Filter, Aperture, RaySource`.
 The elements :python:`Detector, LineMarker, PointMarker, BoxVolume, SphereVolume, CylinderVolume` are excluded from this.
