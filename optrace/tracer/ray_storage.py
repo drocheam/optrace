@@ -267,4 +267,4 @@ class RayStorage(BaseClass):
             self.w_list[ch, ch2] if ret[3] else None,\
             self.wl_list[ch] if ret[4] else None,\
             snums if ret[5] else None,\
-            self.n_list[ch] if ret[6] else None
+            self.n_list[ch, ch2] if ret[6] else None

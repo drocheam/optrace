@@ -312,7 +312,7 @@ For the :python:`func` argument the matching parameter would be :python:`func_ar
 
 **z-Range**
 
-When initializing a surface `optrace` tries to determine the surface extent in z-direction. The :python:`z_min` and :python:`z_max` values are needed to know the surface bounds, which in turn are needed for tracing of the surface.
+When initializing a surface optrace tries to determine the surface extent in z-direction. The :python:`z_min` and :python:`z_max` values are needed to know the surface bounds, which in turn are needed for tracing of the surface.
 While this works automatically in many cases, the user has the option to provide these values manually.
 If these values should largely differ from the automatically estimated values a warning or for large deviation an exception is issued.
 

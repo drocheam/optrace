@@ -3,6 +3,11 @@
 GUI Interaction
 ------------------
 
+
+.. |TraceGUI| replace:: :class:`TraceGUI <optrace.gui.trace_gui.TraceGUI>`
+.. |Raytracer| replace:: :class:`Raytracer <optrace.tracer.raytracer.Raytracer>`
+
+
 .. testcode:: 
    :hide:
 
@@ -30,7 +35,7 @@ As always, import the main optrace namespace:
    import optrace as ot
 
 
-To import the TraceGUI into the current namespace write:
+To import the |TraceGUI| into the current namespace write:
 
 .. testcode::
 
@@ -50,7 +55,7 @@ Let's create some exemplary geometry:
    eye = ot.presets.geometry.legrand_eye()
    RT.add(eye)
 
-A TraceGUI takes the raytracer as argument:
+A |TraceGUI| takes the |Raytracer| as argument:
 
 .. testcode::
 
@@ -79,15 +84,15 @@ Available properties are discussed in :numref:`gui_tabs`.
 
 **Initial Camera**
 
-An initial camera view can be applied with the ``initial_camera`` parameter:
+An initial camera view can be applied with the :python:`initial_camera` parameter:
 
 .. testcode::
 
    sim = TraceGUI(RT, high_contrast=True, ray_count=2000000,\
                   initial_camera=dict(center=[-50, -50, 0], direction=[-1, -1, -1], height=150, roll=-120))
 
-Theses properties are directly passed to ``TraceGUI.set_camera``.
-You can read more about the camera settings in <>.
+Theses properties are directly passed to :meth:`TraceGUI.set_camera <optrace.gui.trace_gui.TraceGUI.set_camera>`.
+You can read more about the camera settings in :numref:`gui_camera`.
 
 
 
@@ -120,11 +125,11 @@ In the bottom left you can find orientation axes, that display the directions of
 When clicking on the ray intersection of ray and a surface, there is a list of properties shown for the selected ray, that is also marked with a red crosshair.
 The picked ray is highlighted in red.
 
-When using ``Shift+Click`` an advanced output is shown, showing even more properties.
+When using ``Shift + Click`` an advanced output is shown, showing even more properties.
 
 Right-clicking inside the scene displays the coordinates of the picked point.
 
-``Shift+ Right Click`` moves the currently selected detector to the picked. z-position.
+``Shift + Right Click`` moves the currently selected detector to the picked. z-position.
 
 **High Contrast Mode**
 
@@ -137,7 +142,7 @@ You can find an example below.
   :width: 800
   :class: dark-light
 
-  With ``plot_dark_mode`` enabled.
+  With :python:`plot_dark_mode` enabled.
    
 
 
@@ -508,7 +513,7 @@ Pipeline View
 #######################
 
 The pipeline of the mayavi scene enables the viewing and alteration of different geometry objects of the visible scene. For instance, one can change the colors or representation of different elements.
-Note that editing the visualization objects inside the scene is different from changing the geometry objects inside the raytracer.
+Note that editing the visualization objects inside the scene is different from changing the geometry objects inside the |Raytracer|.
 
 Here you can read more about the `pipeline view <https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__
 and here about the `different objects populating the view <https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__
@@ -528,10 +533,10 @@ The property viewer provides an interactive tree view to the following propertie
 
 * properties about the rays/points currently shown
 * cardinal points and other paraxial properties of the lenses and the whole lens setup
-* properties of and objects inside the Raytracer class
+* properties of and objects inside the |Raytracer| class
 * available presets
-* TraceGUI properties
-* TraceGUI scene properties
+* |TraceGUI| properties
+* |TraceGUI| scene properties
 
 All property values are a read-only snapshot, to update the values click on the ``Update`` button.
 Navigate the tabs to switch to different trees.
@@ -545,8 +550,8 @@ Command Window
 #######################
 
 
-Inside the command window commands can run from inside the TraceGUI class.
-You can therefore do scripting on the GUI or change raytracer properties, like adding, changing or removing geometries.
+Inside the command window commands can run from inside the |TraceGUI| class.
+You can therefore do scripting on the GUI or change |Raytracer| properties, like adding, changing or removing geometries.
 
 After entering a command in the above text field the ``Run``-Button must be pressed.
 Note that the command is only run, if the GUI is idle, therefore not doing any other tasks.
@@ -594,7 +599,7 @@ There are multiple object aliases available to simplify coding inside the comman
      - the volume list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.volumes`)
 
 For instance, inside the command window you can write :python:`RT.remove(AL[1])` to remove the second aperture of tracing geometry.
-By default, you also have access to most `optrace` classes like :python:`Raytracer, RImage, Group, RingSurface, ...`.
+By default, you also have access to most optrace classes like :python:`Raytracer, RImage, Group, RingSurface, ...`.
 
 Tips and Tricks
 ____________________
@@ -605,7 +610,7 @@ ____________________
 Under some circumstances it is useful to provide additional parameters like properties or functions to the GUI so they can be accessed in the control window.
 For instance, we implemented a function that changes the geometry in some specific way or steps through different source or lens constellations.
 
-As example, the user can define some function :python:`func` inside his script and pass it to the TraceGUI:
+As example, the user can define some function :python:`func` inside his script and pass it to the |TraceGUI|:
 
 .. testcode::
 
@@ -615,7 +620,7 @@ As example, the user can define some function :python:`func` inside his script a
 
    sim = TraceGUI(RT, important_function=func)
 
-:python:`func` get assigned to the TraceGUI under the name :python:`important_function`. Therefore it can be used inside the command window as :python:`self.important_function`.
+:python:`func` get assigned to the |TraceGUI| under the name :python:`important_function`. Therefore it can be used inside the command window as :python:`self.important_function`.
 
-This is not limited to functions but works for arbitrary objects, however note that the assigned name must not collide with any variable or method name already implemented in the TraceGUI class.
+This is not limited to functions but works for arbitrary objects, however note that the assigned name must not collide with any variable or method name already implemented in the |TraceGUI| class.
 

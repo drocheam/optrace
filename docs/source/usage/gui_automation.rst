@@ -125,6 +125,9 @@ Here is an example:
 When controlling the TraceGUI through the CommandWindow of the GUI, there is also the option to replot all objects automatically.
 The implementation is done internally in the same way by using :meth:`TraceGUI.smart_replot <optrace.gui.trace_gui.TraceGUI.smart_replot>`.
 
+
+.. _gui_camera:
+
 Controlling the Camera
 ________________________
 

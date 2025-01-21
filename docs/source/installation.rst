@@ -8,16 +8,20 @@ Installation
   :language: python
   :class: highlight
 
+.. role:: bash(code)
+  :language: bash
+  :class: highlight
+
 This library requires Python 3.10, 3.11 or 3.12.
 
 **Instructions**
 
 #. make sure you have Python 3.10, 3.11 or 3.12 installed on your system
-#. download/clone the whole project repository. This is the folder that includes the ``optrace``-folder as well as the ``setup.py`` file.
-#. open a terminal in the downloaded folder and run :python:`pip install .` :math:`\leftarrow` Note that the dot is part of the command.
+#. download/clone the whole project repository. This is the folder that includes the optrace-folder as well as the `setup.py <https://github.com/drocheam/optrace/blob/main/setup.py>`_ file.
+#. open a terminal in the downloaded folder and run :bash:`pip install .` :math:`\leftarrow` Note that the dot is part of the command.
 
-This automatically runs the file ``setup.py``, which provides all the required information for the installation.
-After this, `optrace` should be installed on your system. 
+This automatically runs the file `setup.py <https://github.com/drocheam/optrace/blob/main/setup.py>`_, which provides all the required information for the installation.
+After this, optrace should be installed on your system. 
 
 
 **External dependencies**
@@ -64,7 +68,7 @@ After this, `optrace` should be installed on your system.
 
 **Troubleshooting**
 
-* When mayavi fails installing vtk, try to install vtk first
+* When `mayavi <https://pypi.org/project/mayavi/>`__ fails installing `vtk <https://pypi.org/project/vtk/>`_, try to install vtk first
 
 * When the installation of vtk fails, try to install from a list of other wheels from `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
 

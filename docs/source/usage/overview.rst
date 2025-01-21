@@ -1,6 +1,8 @@
 Overview
 ------------------------------------------------------------------------
 
+.. |TraceGUI| replace:: :class:`TraceGUI <optrace.gui.trace_gui.TraceGUI>`
+
 .. testcode:: 
    :hide:
 
@@ -21,7 +23,7 @@ Structure
 ___________________
 
 
-.. list-table:: Overview of `optrace` functionality
+.. list-table:: Overview of optrace functionality
    :widths: 100 250 100 125
    :header-rows: 1
    :align: left
@@ -67,7 +69,7 @@ ______________________
 
 
 The library itself is the primary namespace.
-While there is a separete namespace :mod:`optrace.tracer`, all objects are also included in the main one.
+While there is a separate namespace :mod:`optrace.tracer`, all objects are also included in the main one.
 
 .. testcode::
 
@@ -75,7 +77,7 @@ While there is a separete namespace :mod:`optrace.tracer`, all objects are also 
 
 Now objects can be accessed by :python:`ot.Raytracer, ot.CircularSurface, ot.RaySource, ...`.
 
-`optrace` provides plotting functionality for images, spectra, media etc.
+optrace provides plotting functionality for images, spectra, media etc.
 These plotting functions are included in the :mod:`optrace.plots` namespace.
 
 .. testcode:: 
@@ -83,7 +85,7 @@ These plotting functions are included in the :mod:`optrace.plots` namespace.
    import optrace.plots as otp
 
 The GUI is included in the namespace :mod:`optrace.gui`.
-Since the :class:`optrace.gui.TraceGUI <optrace.gui.trace_gui.TraceGUI>` is the only one relevant there, it can be directly imported in the main namespace:
+Since the |TraceGUI| is the only one relevant there, it can be directly imported in the main namespace:
 
 .. testcode::
 
@@ -115,7 +117,7 @@ There is also a context manager available that turns it off temporarily:
 Warnings
 ###################
 
-``optrace`` outputs warnings of type :exc:`OptraceWarning <optrace.warnings.OptraceWarning>` (which in turn is a subclass of :exc:`UserWarning`). These can be filtered using the :mod:`warnings` python module.
+optrace outputs warnings of type :exc:`OptraceWarning <optrace.warnings.OptraceWarning>` (which in turn is a subclass of :exc:`UserWarning`). These can be filtered using the :mod:`warnings` python module.
 A simple way to silence them, for example when doing many automated tasks, one can write:
 
 .. testcode::
@@ -144,7 +146,7 @@ Multithreading can be turned off using:
 Wavelength Range
 ###################
 
-``optrace`` is optimized for operation in the visible range of 380 - 780 nm.
+optrace is optimized for operation in the visible range of 380 - 780 nm.
 The range can be extended by:
 
 .. testcode::
@@ -156,7 +158,7 @@ Note that most presets like refractive indices are not defined for regions outsi
 Spectral Colormap
 ######################
 
-Spectrum, refractive index plots as well as the ray display in the TraceGUI use a spectral colormap that maps wavelength values to a color.
+Spectrum, refractive index plots as well as the ray display in the |TraceGUI| use a spectral colormap that maps wavelength values to a color.
 For the visible range, a rainbow-like mapping is applied.
 
 When working in the infrared or ultraviolet region, the human sensitivity would map the wavelength to pure black.
@@ -170,10 +172,10 @@ To make different values discernible, a custom mapping function can be supplied 
    
    ot.global_options.spectral_colormap = lambda wl: plt.cm.viridis((wl-300)/800)
 
-In this example the colormap is adapted to use the viridis colormap from pyplot, where 300 is mapped to the lowest value of 0 and 800 to the highest value of 1.
+In this example the colormap is adapted to use the `viridis colormap from pyplot <https://matplotlib.org/stable/users/explain/colors/colormaps.html#sequential>`_, where 300 is mapped to the lowest value of 0 and 800 to the highest value of 1.
 The specified function should take a wavelength numpy array (of some length N) as argument and return a two dimensional array with RGBA values between 0-1 and shape (N, 4).
 
-The colormap can be reset by setting it to ``None``.
+The colormap can be reset by setting it to :python:`None`.
 
 .. testcode::
    :hide:
@@ -186,10 +188,10 @@ UI Dark Mode
 ###################
 
 UI dark mode is enabled by default.
-The mode can be changed by setting the ``ui_dark_mode`` parameter.
+The mode can be changed by setting the :python:`ui_dark_mode` parameter.
 Changes are applied to all current GUI windows as well as new ones.
 
-For instance, to deactive the mode, use:
+For instance, to deactivate the mode, use:
 
 .. testcode::
 
@@ -200,20 +202,20 @@ For instance, to deactive the mode, use:
    :width: 800
    :class: dark-light
 
-   With ``ui_dark_mode`` enabled.
+   With :python:`ui_dark_mode` enabled.
 
 .. figure:: ../images/ui_light_mode.png
    :align: center
    :width: 800
    :class: dark-light
 
-   With ``ui_dark_mode`` disabled.
+   With :python:`ui_dark_mode` disabled.
 
 
 Plot Dark Mode
 ###################
 
-For the content of plotting windows, there is a separate option ``plot_dark_mode``.
+For the content of plotting windows, there is a separate option :python:`plot_dark_mode`.
 It is also enabled by default.
 
 To deactivate it, use:
@@ -223,7 +225,7 @@ To deactivate it, use:
    ot.global_options.plot_dark_mode = False
 
 Deactivating can be useful for documentation or article output, where the background is also white.
-Note that changes are only applied to new pyplot windows, not already opened ones.
+Note that changes are only applied to new :obj:`pyplot <matplotlib.pyplot>` windows, not already opened ones.
 
 .. list-table::
    :class: table-borderless
@@ -233,12 +235,12 @@ Note that changes are only applied to new pyplot windows, not already opened one
           :width: 400
           :class: dark-light
 
-          With ``plot_dark_mode`` enabled.
+          With :python:`plot_dark_mode` enabled.
    
      - .. figure:: ../images/srgb_spectrum_light.svg
           :align: center
           :width: 400
           :class: dark-light
 
-          With ``plot_dark_mode`` disabled.
+          With :python:`plot_dark_mode` disabled.
 

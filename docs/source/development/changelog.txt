@@ -1,5 +1,7 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.6.1   |   2024-11-27   |  New IOL_pinhole_imaging example.   
+  1.6.0   |   2024-11-20   |  Licensed with MIT License   
   1.5.12  |   2024-11-19   |  Replaced PyQt5 dependency with PySide6   
   1.5.11  |   2024-10-16   |  New LED-BH1, LED-RGB1, LED-V1, LED-V2 standard illuminants.   
   1.5.10  |   2024-10-10   |  numpy 2.0 support. In Perceptual RI remaining out-of-gamut colors are handled with Absolute RI   

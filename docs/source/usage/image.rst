@@ -3,6 +3,9 @@
 Image Classes
 ---------------------------------
 
+.. |RenderImage| replace:: :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`
+.. |LinearImage| replace:: :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`
+.. |RGBImage| replace:: :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>`
 
 .. role:: python(code)
   :language: python
@@ -15,16 +18,18 @@ Image Classes
    ot.global_options.show_progressbar = False
 
 
+.. _image_classes:
+
 Image Classes
 ______________
 
 
-* **RGBImage**: Image object containing three channel sRGB data as well as geometry information. 
-* **LinearImage**: Image object with only a single channel modeling some physical or physiological property. 
-* **RenderImage**: Image created in the raytracer that holds raw XYZ colorspace as well as power data. 
-  From this object different mode RGBImage and LinearImage can be created.
+* |RGBImage|: Image object containing three channel sRGB data as well as geometry information. 
+* |LinearImage|: Image object with only a single channel modeling some physical or physiological property. 
+* |RenderImage|: Image created in the raytracer that holds raw XYZ colorspace as well as power data. 
+  From this object different mode |RGBImage| and |LinearImage| can be created.
 
-RGBImage and LinearImage can also be used as emitting surface in a RaySource.
+|RGBImage| and |LinearImage| can also be used as emitting surface in a RaySource.
 These two types can also be plotted using image_plots and be exported as image file.
 
 
@@ -32,19 +37,19 @@ Creating LinearImage and RGBImage
 _____________________________________
 
 
-Both LinearImage and RGBImage are created by a data argument and a geometry argument, with the latter being either `s` or `extent`.
+Both |LinearImage| and |RGBImage| are created by a data argument and a geometry argument, with the latter being either :python:`s` or :python:`extent`.
 
-`s` is a two element list describing the side lengths of the image. The first element is the length in x-direction, the second in y-direction.
-Alternatively the edge positions are described using the `extent` parameter.
+:python:`s` is a two element list describing the side lengths of the image. The first element is the length in x-direction, the second in y-direction.
+Alternatively the edge positions are described using the :python:`extent` parameter.
 It defines the x- and y- position of the edges as four element list.
-For instance, `extent=[-1, 2, 3, 5]` describes that the geometry of the image reaches from `x=-1` to `x=2` and `y=3` to `y=5`.
+For instance, :python:`extent=[-1, 2, 3, 5]` describes that the geometry of the image reaches from :python:`x=-1` to :python:`x=2` and :python:`y=3` to :python:`y=5`.
 It is therefore possible to describe images with an offset geometry.
-In the case of specifying `s` instead, the image is automatically centered at `x=0` and `y=0`
+In the case of specifying :python:`s` instead, the image is automatically centered at :python:`x=0` and :python:`y=0`
 
-As data argument one can either provide a `numpy.ndarray` with either two dimensions (LinearImage) or three dimensions (RGBImage).
-In both cases, the data must be strictly non-negative and in the case of the RGBImage additionally lie in the range [0, 1].
+As data argument one can either provide a numpy array with either two dimensions (|LinearImage|) or three dimensions (|RGBImage|).
+In both cases, the data must be strictly non-negative and in the case of the |RGBImage| additionally lie in the range :python:`[0, 1]`.
 
-One could create a random LinearImage using a numpy array and the `s` argument using:
+One could create a random |LinearImage| using a numpy array and the :python:`s` argument using:
 
 .. testcode::
   
@@ -55,7 +60,7 @@ One could create a random LinearImage using a numpy array and the `s` argument u
    img = ot.LinearImage(img_data, s=[0.1, 0.08])
 
 
-While a random RGBImage is created using:
+While a random |RGBImage| is created using:
 
 .. testcode::
   
@@ -81,8 +86,8 @@ However, it has to be ensured, that there is no significant coloring included, o
 If this is the case, either remove color information from the file or convert it to a color space without colors.
 
 
-RGBImage presets are also available, see <>.
-For convolution there are multiple PSF presets, that are LinearImage objects, see <>.
+|RGBImage| presets are available in :numref:`image_presets`. 
+For convolution there are multiple PSF presets, that are |LinearImage| objects, see :numref:`psf_preset_gallery`.
 
 .. _rimage_rendering:
 
@@ -138,7 +143,7 @@ Example for the function call:
 
    simg = RT.source_image()
 
-This renders an RenderImage for the first source and returns an RenderImage.
+This renders an |RenderImage| for the first source and returns an |RenderImage|.
 
 The following code renders it for the second source (since index counting starts at zero) and additionally provides the resolution limit :python:`limit` parameter of 3 µm.
 
@@ -168,6 +173,8 @@ As for :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` th
 
    dimg = RT.detector_image(detector_index=0, source_index=1, extent=[0, 1, 0, 1], limit=3, projection_method="Orthographic")
 
+
+.. _rimage_iterative_render:
 
 Iterative Render
 _______________________
@@ -218,7 +225,7 @@ ___________________________________________
 
 **Saving**
 
-n RenderImage can be saved on the disk for later use in `optrace`. This is done with the following command, that takes a file path as argument:
+A |RenderImage| can be saved on the disk for later use in optrace. This is done with the following command, that takes a file path as argument:
 
 .. code-block:: python
 
@@ -229,11 +236,14 @@ The file ending should be ``.npz``, but gets added automatically. This function 
 
 **Loading**
 
-For loading the object the static method :meth:`load <optrace.tracer.image.render_image.RenderImage.load>` of the RenderImage class is used. It takes a path and returns the RenderImage object.
+For loading the object the static method :meth:`load <optrace.tracer.image.render_image.RenderImage.load>` of the |RenderImage| class is used. It takes a path and returns the |RenderImage| object.
 
 .. code-block:: python
 
    dimg = ot.RenderImage.load("RImage_12345")
+
+
+.. _image_sphere_projections:
 
 Sphere Projections
 ___________________________
@@ -241,7 +251,7 @@ ___________________________
 
 With a spherical detector surface, there are multiple ways to project it down to a rectangular surface. Note that there is no possible way for a projection, that correctly represents angles, distances and areas. One might now this problem from different map projections.
 
-Below you can find the projection methods implemented in `optrace` and Wikipedia links for their detailed explanation.
+Below you can find the projection methods implemented in optrace and Wikipedia links for their detailed explanation.
 Details on the math applied internally are found in the math section in :numref:`sphere_projections`.
 
 Available methods are:
@@ -293,7 +303,7 @@ Available methods are:
 Resolution Limit Filter
 ___________________________
 
-Unfortunately, `optrace` does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` class provides a limit parameter. 
+Unfortunately, optrace does not take wave optics into account when simulating the light path or rendering image intensities. To help in estimating the effect of a resolution limit the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` class provides a limit parameter. 
 For a limit value a corresponding airy disc is created, that is convolved with the image.
 This parameter describes the Rayleigh limit, being half the size of the airy disc core (zeroth order), known from the equation:
 Only the first two diffraction orders (core + 2 rings) are used.
@@ -331,7 +341,7 @@ While the limit is wavelength dependent, one fixed value is applied to all wavel
           :height: 300
           :class: dark-light
 
-The limit parameter can be applied either while creating the RenderImage (:python:`ot.RenderImage(..., limit=5)`) or by providing it to methods the create an RenderImage (:python:`Raytracer.detector_image(..., limit=1)`, :python:`Raytracer.iterative_render(..., limit=2.5)`.
+The limit parameter can be applied either while creating the |RenderImage| (:python:`ot.RenderImage(..., limit=5)`) or by providing it to methods the create an |RenderImage| (:python:`Raytracer.detector_image(..., limit=1)`, :python:`Raytracer.iterative_render(..., limit=2.5)`.
 
 
 Getting an Image by Mode
@@ -339,10 +349,10 @@ _____________________________________
 
 **Usage**
 
-As described above, multiple different image modes can be generated. This is done by utilizing the :python:`get` function of the image and a selected image mode name.
+As described above, multiple different image modes can be generated. This is done by utilizing the :meth:`get <optrace.tracer.image.render_image.RenderImage.get>` method and a selected image mode name.
 
 The function takes an optional pixel size parameter, that determines the pixel count for the smaller image size.
-Internally the RenderImage stores its data with a pixel count of `945` for the smaller side, while the larger side is either `1, 3` or `5` times this size, depending on the side length ratio.
+Internally the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` stores its data with a pixel count of 945 for the smaller side, while the larger side is either 1, 3 or 5 times this size, depending on the side length ratio.
 Rescaling the image to the desired resolution is done by joining image bins, therefore no interpolation takes place, that would falsify the results.
 To only join full bins, the available sizes are reduced to:
 
@@ -351,17 +361,17 @@ To only join full bins, the available sizes are reduced to:
    >>> ot.RenderImage.SIZES
    [1, 3, 5, 7, 9, 15, 21, 27, 35, 45, 63, 105, 135, 189, 315, 945]
 
-As can be seen, all sizes are integer factors of `945`.
+As can be seen, all sizes are integer factors of 945.
 All sizes are odd, so there is always a pixel/line/row for the center of the image.
 This is useful as often images have some kind of symmetry.
 Without a center pixel/line/row the value position would be badly defined, either being offset or jumping around depending on numerical errors.
 
 This restricted pixel sizes for both image dimensions lead to typically non-square pixels, but which are handled correctly by plotting and processing functions.
-They will only become relevant when exporting the image to an image file, where the pixels must be squared, more details in section <>.
+They will only become relevant when exporting the image to an image file, where the pixels must be squared, more details in section :numref:`image_saving`.
 
-Note that only image sizes of :attr:`RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` are valid, 
+Note that only image sizes of :attr:`RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` are valid,.
 
-In the function `get()` the nearest value from `ot.RenderImage.SIZES` to the user selected value is chosen.
+In the function :meth:`get <optrace.tracer.image.render_image.RenderImage.get>` the nearest value from :attr:`RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` to the user selected value is chosen.
 
 To get a Illuminance image with 315 pixels, one could write:
 
@@ -369,12 +379,12 @@ To get a Illuminance image with 315 pixels, one could write:
 
    img = dimg.get("Illuminance", 500)
 
-Only for image modes `"sRGB (Perceptual RI)"` and `"sRGB (Absolute RI)"` the returned object type is RGBImage.
-For all other modes it is of type LinearImage.
+Only for image modes :python:`"sRGB (Perceptual RI)"` and :python:`"sRGB (Absolute RI)"` the returned object type is :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` .
+For all other modes it is of type :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`.
 
-For mode `"sRGB (Perceptual RI)"` there are two optional additional parameters `L_th` and `chroma_scale`, see <> for more details.
+For mode :python:`"sRGB (Perceptual RI)"` there are two optional additional parameters :python:`L_th` and :python:`chroma_scale`, see :numref:`usage_color` for more details.
 
-Let us assume the ``dimg`` has a side length of ``s=[1, 2.63]``, so it was rendered in a resolution of 945x2835. This is the case because the nearest side factor to 2.63 is 3 and because 945 is the size for all internally rendered images.
+Let us assume the :python:`dimg` has a side length of :python:`s=[1, 2.63]`, so it was rendered in a resolution of 945x2835. This is the case because the nearest side factor to 2.63 is 3 and because 945 is the size for all internally rendered images.
 From this resolution the image can be scaled to 315x945 189x567 135x405 105x315 63x189 45x135 35x105 27x81 21x63 15x45 9x27 7x21 5x15 3x9 1x3.
 The user image is then scaled into size 315x945, as it is the nearest to a size of 500.
 
@@ -411,7 +421,7 @@ The difference between chroma and saturation is elaborately explained in :footci
 An example for the difference of both sRGB modes is seen in :numref:`color_dispersive1`. 
 
 
-.. list-table:: Renderes images from the ``image_rgb.py`` example. From left to right, top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.
+.. list-table:: Renderes images from the :ref:`example_image_render` example. From left to right, top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.
    :class: table-borderless
 
    * - .. figure:: ../images/rgb_render_srgb1.svg
@@ -498,12 +508,13 @@ For a cut in x-direction the following can be used:
 The function returns a tuple of the histogram bin edges and the histogram values, both one dimensional numpy arrays. Note that the bin arrays is larger by one element.
 
 
+.. _image_saving:
 
 Saving Images
 ___________________________________________
 
 
-An RenderImage can be saved on the disk for later use in `optrace`. In the simplest case saving is done with the following command, that takes a file path as argument:
+An RenderImage can be saved on the disk for later use in optrace. In the simplest case saving is done with the following command, that takes a file path as argument:
 
 .. code-block:: python
 
@@ -511,7 +522,7 @@ An RenderImage can be saved on the disk for later use in `optrace`. In the simpl
 
 The file type is automatically determined from the file ending in the path string.
 
-Often times the image is flipped, but it can be flipped using ``flip=True``. This rotates the image by 180 degrees.
+Often times the image is flipped, but it can be flipped using :python:`flip=True`. This rotates the image by 180 degrees.
 
 .. code-block:: python
 
@@ -526,10 +537,10 @@ Depending on the file type there can be additional saving parameters provided, f
    img.save("image_render_srgb.jpg", params=[cv2.IMWRITE_PNG_COMPRESSION, 1], flip=True)
 
 
-See `cv2.ImwriteFlags <https://docs.opencv.org/4.x/d8/d6a/group__imgcodecs__flags.html#ga292d81be8d76901bff7988d18d2b42ac>` for more info.
+See `cv2.ImwriteFlags <https://docs.opencv.org/4.x/d8/d6a/group__imgcodecs__flags.html#ga292d81be8d76901bff7988d18d2b42ac>`_ for more info.
 
 
-The image is automatically interpolated so the exported image has the same side length ratio as the RGBImage/LinearImage object.
+The image is automatically interpolated so the exported image has the same side length ratio as the |RGBImage|/|LinearImage| object.
 
 .. note::
 
@@ -546,9 +557,9 @@ ________________________
 
 **Overview**
 
-Classes LinearImage, RenderImage, RGBImage share property methods.
+Classes |LinearImage|, |RenderImage|, |RGBImage| share property methods.
 These include geometry information and metadata.
-When an LinearImage or RGBImage is created from a RenderImage the metadata and geometry is automatically propagated.
+When a |LinearImage| or |RGBImage| is created from a |RenderImage| the metadata and geometry is automatically propagated.
 
 **Size Properties**
 
@@ -570,7 +581,7 @@ The data shape:
    (945, 945, 4)
 
 
-``Apx`` is the area per pixel in mm²:
+:python:`Apx` is the area per pixel in mm²:
 
 .. doctest::
 
@@ -612,6 +623,7 @@ Power in W and luminous power in lm are calculated from the following functions:
    'Illuminance'
 
 
+.. _image_presets:
 
 Image Presets
 ____________________

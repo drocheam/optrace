@@ -4,6 +4,9 @@
 General Guidelines
 -----------------------
 
+.. role:: python(code)
+  :language: python
+  :class: highlight
 
 **Library Design**
 
@@ -44,7 +47,7 @@ General Guidelines
 * use LaTeX formatted equations/labels
 * highlight more important elements by colors, font size or boldness
 * axes, minor and major grid lines, titles and legend are a must
-* ``block`` option allows for halting the rest of the program when plotting or continuing it with ``block=False``
+* :python:`block` option allows for halting the rest of the program when plotting or continuing it with :python:`block=False`
 * options for hiding some visual elements (labels, axes in GUI, legend entries)
 * use tinypng to shrink pngs, vecta.io for pyplot svgs
 * shrink embedded pngs in svg by extracting png images in inkscape, changing them, then embedding them back
@@ -58,10 +61,10 @@ General Guidelines
    * minimize python code (because of the GIL limitation while multithreading). Use lower level libraries with no python code like numpy for heavy tasks
 
 * all worker and background threads need to terminate immediately when the main thread is terminated. 
-  This is ensured by providing ``daemon=True`` while creating the ``Thread`` object.
-* all classes and functions using multithreading should have a boolean threading option that can be set to ``threading=False``. 
+  This is ensured by providing :python:`daemon=True` while creating the :python:`Thread` object.
+* all classes and functions using multithreading should have a boolean threading option that can be set to :python:`threading=False`. 
   Turning off threading is useful when debugging, profiling or running multiple things in parrallel.
-* threading rules ``TraceGUI``, with some ideas from `traits Futures <https://traits-futures.readthedocs.io/en/latest/guide/threading.html>`_
+* threading rules for :python:`TraceGUI`, with some ideas from `traits Futures <https://traits-futures.readthedocs.io/en/latest/guide/threading.html>`_
    * GUI changes only in main thread
    * the GUI must be responsive at all costs
    * simplified Read/Write access model: only one thread can read and write
@@ -71,19 +74,19 @@ General Guidelines
 **Performance and Memory**
 
 * use multithreading
-* ``numpy`` where possible
+* :mod:`numpy` where possible
 * avoid loops
-* sometimes noticeable speed-ups when using ``numexpr`` over ``numpy``
+* sometimes noticeable speed-ups when using :mod:`numexpr` over :mod:`numpy`
 * work with references when possible (instead copies)
 * use masks on arrays instead of creating new ones
 * only do calculations on elements actually needed
 * initial initialization instead of growing an array step by step
-* use ``float32`` or ``int`` instead of ``float64`` where high precision is not needed
+* use :python:`np.float32` or :python:`int` instead of :python:`np.float64` where high precision is not needed
 * prefer analytical solutions instead of iterative numerical approximations
-* multi-dimensional array access can profit from the correct memory layout of the ``numpy.ndarray`` (``order="F", order="C"`` etc.)
+* multi-dimensional array access can profit from the correct memory layout of the :class:`numpy.ndarray` (:python:`order="F", order="C"` etc.)
 * always keep the GUI responsive
-* range indexing (``array[52:79829]``) is faster than boolean indexing (``array[[False, False, True, ..., True, False]]``, 
-  which is faster than indexing by index list (``array[[52, 456, 897987, 0, 77, ...]]``)
+* range indexing (:python:`array[52:79829]`) is faster than boolean indexing (:python:`array[[False, False, True, ..., True, False]]`, 
+  which is faster than indexing by index list (:python:`array[[52, 456, 897987, 0, 77, ...]]`)
 * limit array sizes
 * store results that will be needed in the future or are accessed multiple times
 * when plotting only use a reasonable amount of points and curves
@@ -121,8 +124,8 @@ General Guidelines
    * we can't expect the user to know where assignments are possible without side effects and where not. The library has too much complexity for this.
 * ➜ restricting assignments
    * ignore people saying "this is not pythonic!!"
-   * lock the geometry of an ``Element``, surfaces can only be assigned by using a special functions, the position can only be changed with a dedicated method
-   * lock objects like a ``Surface`` to avoid nasty side effects
+   * lock the geometry of an :python:`Element`, surfaces can only be assigned by using a special functions, the position can only be changed with a dedicated method
+   * lock objects like a :python:`Surface` to avoid nasty side effects
    * allow assignments where possible
    * make numpy arrays read-only while locking
    * when knowing the internals of the locking mechanism the user could turn it off. Let's hope warning and info messages convince him not to do so.
@@ -144,13 +147,13 @@ General Guidelines
 
 * ``CamelCase`` class names, ``lower_case_with_underscores`` for functions, filenames, parameters. Note that the latter this is not always possible when mathematical or physical quantities are used
 * increased line length of 120 characters
-* prefer writing out keyword arguments (``function(width=1026, height=4596)``) instead just the value (``function(1026, 4596)``) for readability and simpler documentation
+* prefer writing out keyword arguments (:python:`function(width=1026, height=4596)`) instead just the value (:python:`function(1026, 4596)`) for readability and simpler documentation
 
 
 **Standard Output**
 
 * functions and classes output information and warnings, when operations are experimental, have inprecise results or use edge cases
-* all classes and functions writing to standard output have a "silent" boolean parameter that can be set to ``False`` to mute output
+* all classes and functions writing to standard output have a "silent" boolean parameter that can be set to :python:`False` to mute output
 * clear, explaining warning messages and exceptions
 
 

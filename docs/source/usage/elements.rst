@@ -28,7 +28,7 @@ __________________
 Types
 ##############
 
-In `optrace` the class |Element| denotes an object which has no, one or two surfaces and belongs to the tracing geometry.
+In optrace the class |Element| denotes an object which has no, one or two surfaces and belongs to the tracing geometry.
 
 **Tracing Elements**
 

@@ -383,7 +383,7 @@ See :ref:`spectrum_plots`.
 Spectral Lines Presets
 ______________________
 
-`optrace` has some spectral wavelength lines defined in its presets.
+optrace has some spectral wavelength lines defined in its presets.
 While there are many such lines, only those relevant for the calculation of the Abbe number are built-in.
 
 .. list-table:: Fraunhofer lines commonly used for Abbe number determination :footcite:`AbbeWiki`

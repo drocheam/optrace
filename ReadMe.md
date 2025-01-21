@@ -76,6 +76,8 @@ More details on the installation process and the requirements are found at <>.
 
 ## Similar software
 
+<!--What about this: https://github.com/guo-research-group/AD-Ray-Optics-->
+
 - Geometrical Optics
    * [RayOptics](https://ray-optics.readthedocs.io/en/latest/) by Michael Hayford. Tracing and optical design analysis tool. 
    * [rayopt](https://github.com/quartiq/rayopt) by QUARTIQ. Tracing and optical design analysis tool. 

@@ -266,7 +266,7 @@ _______________________________
 
 
 Color conversion are supported via the namespace :python:`optrace.color`.
-`optrace` provides conversions for the colorspaces XYZ, sRGB, linear SRGB, CIELUV and xyY as well as some color properties like Saturation and Hue in CIELUV.
+optrace provides conversions for the colorspaces XYZ, sRGB, linear SRGB, CIELUV and xyY as well as some color properties like Saturation and Hue in CIELUV.
 
 Check the :ref:`Color Handling <color_management>` section for a technical and fundamental descriptions of color processing and calculation.
 Go to the code reference section :mod:`optrace.tracer.color` for information on the usage of implemented functions.

@@ -3,6 +3,9 @@
 PSF Convolution
 ------------------------------------------------------------------------
 
+.. |RenderImage| replace:: :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`
+.. |LinearImage| replace:: :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`
+.. |RGBImage| replace:: :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>`
 
 .. role:: python(code)
   :language: python
@@ -24,7 +27,7 @@ A PSF is nothing different than the impulse response of the optical system for t
 It has to be noted, that the PSF actually changes spatially, but for paraxial imaging it can be assumed constant.
 However this also means, that many aberration can't be simulated this way (astigmatism, coma, vignette, distortion, ...).
 
-In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF to an object using the convolution functionality in ``optrace``.
+In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF to an object using the convolution functionality in optrace.
 
 For the convolution to work the object and PSF size are needed besides the PSF and objects itself. 
 Most optical systems also have a magnification factor that rescaled the object size by a specific amount.
@@ -32,16 +35,16 @@ Most optical systems also have a magnification factor that rescaled the object s
 Both colored objects and PSFs are supported.
 
 Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible cases. 
-Also see the section :numref:`psf_color_handling` on this.
+Also see section :numref:`psf_color_handling` on this.
 
 
 **Usage**
 
-The image should be either of type RGBImage or LinearImage.
-The PSF should be either LinearImage or RenderImage.
-For more details on image classes see <>.
+The image should be either of type |RGBImage| or |LinearImage|.
+The PSF should be either |LinearImage| or |RenderImage|.
+For more details on image classes see :numref:`image_classes`.
 
-Colored PSFs can be only used with class RenderImage, as all human visible colors are needed for convolution.
+Colored PSFs can be only used with class |RenderImage|, as all human visible colors are needed for convolution.
 
 Let's use predefined images and psf:
 
@@ -52,33 +55,33 @@ Let's use predefined images and psf:
    psf = ot.presets.psf.halo()
 
 
-Typically the imaging system has a magnification factor :python:`m` that is also needed to scale the input object size.
+Typically the imaging system has a magnification factor :math:`m` that is also needed to scale the input object size.
 This factor is equivalent the magnification factor known from geometrical optics.
-Therefore ``abs(m) > 1`` means a magnification and ``abs(m) < 1`` an image shrinking.
-``m > 0`` is an upright image, while ``m < 0`` correspond to a flipped image.
+Therefore :math:`\lvert m \rvert > 1` means a magnification and :math:`\lvert m\rvert < 1` an image shrinking.
+:math:`m > 0` is an upright image, while :math:`m < 0` correspond to a flipped image.
 
-You can then call :python:`convolve` like this:
+You can then call :func:`convolve <optrace.tracer.convolve.convolve>` like this:
 
 .. testcode::
 
    img2 = ot.convolve(img, psf, m=0.5)
 
-The function returns the convolved image object :python:``img2``.
-When ``img`` and ``psf`` are of type LinearImage, ``img2`` is also a LinearImage.
-In all other cases color information are generated and ``img2`` is a RGBImage.
+The function returns the convolved image object :python:`img2`.
+When :python:`img` and :python:`psf` are of type |LinearImage|, :python:`img2` is also a |LinearImage|.
+In all other cases color information are generated and :python:`img2` is a |RGBImage|.
 
 
 **Slicing and padding**
 
 While doing a convolution the output image grows in size by half the PSF size in that direction.
 So the output image has a higher pixel count as well as larger side lengths.
-If it is required to leave both properties the same, ``slice_=True`` can be provided so the image is sliced back to its initial size:
+If it is required to leave both properties the same, :python:`slice_=True` can be provided so the image is sliced back to its initial size:
 
 .. testcode::
 
    img2 = ot.convolve(img, psf, m=0.5, slice_=True)
 
-When doing the convolution, the operation `guesses` what lies behind the image edges, as it also must use this data near the boundary of the image.
+When doing the convolution, the operation estimates what lies behind the image edges, as it also must use this data near the boundary of the image.
 By default it pads the data outside with zeros, but other modes can also be set.
 
 For instance, padding with white is done in the following fashion:
@@ -87,7 +90,7 @@ For instance, padding with white is done in the following fashion:
 
    img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="constant", padding_value=[1, 1, 1])
 
-``padding_value`` must have the same number of elements as ``img`` has channels, so one for a LinearImage and three for an RGBImage.
+:python:`padding_value` must have the same number of elements as :python:`img` has channels, so one for a |LinearImage| and three for an |RGBImage|.
 
 Edge padding is done as follows:
 
@@ -97,34 +100,34 @@ Edge padding is done as follows:
 
 **Color conversion**
 
-When convolving with a PSF of type RenderImage, colors of the resulting image may lie outside the sRGB gamut.
+When convolving with a PSF of type |RenderImage|, colors of the resulting image may lie outside the sRGB gamut.
 Using a rendering intent conversion they are projected/clipped them into the gamut.
-This is done by the ``cargs`` argument (conversion arguments).
+This is done by the :python:`cargs` argument (conversion arguments).
 
 By default it is set to :python:`dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None)`.
 
-You can provide a ``cargs`` dictionary that overrides this setting.
+You can provide a :python:`cargs` dictionary that overrides this setting.
 
 .. testcode::
 
    img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="edge", cargs=dict(rendering_intent="sRGB (Perceptual RI)"))
 
-The above command overrides the ``rendering_intent`` while leaving the other default options unchanged.
+The above command overrides the :python:`rendering_intent` while leaving the other default options unchanged.
 
 **Normalization**
 
-When convolving two LinearImages it is recommended to normalize the PSF sum to 1, 
+When convolving two |LinearImage| objects it is recommended to normalize the PSF sum to 1, 
 so the sum of the input image and output image is preserved (with the sum for instance corresponding to the power).
 
 Restrictions
 _______________________
 
-* two RGBImage or two RenderImage can't be convolved
+* two |RGBImage| or two |RenderImage| objects can't be convolved
 * resolutions for both image and PSF must be between 50x50 pixels and 4 megapixels
 * the size of the PSF can't be twice the size than the image scaled by the magnification factor
 * when convolving two colored images, the resulting image is only one possible solution of many
 * the convolution is done using :func:`scipy.signal.fftconvolve`, so due to numerical errors small values in dark image regions can appear
-* convolution of images that have been sphere projected (see <>) is prohibited, as it doesn't make sense geometrically.
+* convolution of images that have been sphere projected (see :numref:`image_sphere_projections`) is prohibited, as it doesn't make sense geometrically.
   In the projection always one of distance, area or angle is non-linear.
 
 Examples
@@ -133,7 +136,7 @@ __________________________
 **Image Example**
 
 
-.. list-table:: Image convolution from ``./examples/psf_imaging.py``
+.. list-table:: Image convolution from the :ref:`example_psf_imaging` example
    :class: table-borderless
 
    * - .. figure:: ../images/example_psf1.svg
@@ -180,7 +183,7 @@ The following example loads an image preset and convolves it with a square PSF t
 Presets
 _____________________
 
-`optrace` features presets for different PSF shapes.
+optrace features presets for different PSF shapes.
 In the next section a gallery of point spread function presets can be found.
 
 All presets are normalized such that the image sum is 1.
@@ -196,7 +199,7 @@ A circle PSF is defined using the :python:`d` parameter that defines the circle 
 **Gaussian**
 
 A gaussian function can model the zeroth order shape of an airy disc.
-The shape parameter `sig` defines the gaussian's standard deviation.
+The shape parameter :python:`sig` defines the gaussian's standard deviation.
 
 A simple gaussian intensity distribution is described as:
 

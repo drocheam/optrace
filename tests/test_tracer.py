@@ -773,8 +773,6 @@ class TracerTests(unittest.TestCase):
 
         RT.trace(1000)
 
-        # TODO ray lengths and optical lengths should also be tested with masks ch, ch2
-
         # optical path lengths
         olengths = RT.rays.optical_lengths()
         olengths2 = olengths.copy()
@@ -783,7 +781,13 @@ class TracerTests(unittest.TestCase):
         olengths2[:, 2] = 2.8
         olengths2[:, 3] = 4
         self.assertTrue(np.allclose(olengths - olengths2, 0, atol=1e-9, rtol=0))
-        
+       
+        # optical path lengths with masks
+        mask1 = np.random.choice(np.array([0, 1], dtype=bool), size=RT.rays.N)
+        mask2 = np.random.choice(np.arange(RT.rays.Nt), size=RT.rays.N, replace=True)[mask1]
+        olengths_m = RT.rays.optical_lengths(mask1, mask2)
+        self.assertTrue(np.all(olengths[mask1, mask2] == olengths_m))
+
         # ray lengths
         lengths = RT.rays.ray_lengths()
         lengths2 = lengths.copy()
@@ -792,6 +796,12 @@ class TracerTests(unittest.TestCase):
         lengths2[:, 2] = 2.8
         lengths2[:, 3] = 4
         self.assertTrue(np.allclose(lengths - lengths2, 0, atol=1e-9, rtol=0))
+        
+        # ray lengths with masks
+        mask1 = np.random.choice(np.array([0, 1], dtype=bool), size=RT.rays.N)
+        mask2 = np.random.choice(np.arange(RT.rays.Nt), size=RT.rays.N, replace=True)[mask1]
+        lengths_m = RT.rays.ray_lengths(mask1, mask2)
+        self.assertTrue(np.all(lengths[mask1, mask2] == lengths_m))
 
     def test_ray_storage_misc(self):
         # coverage tests

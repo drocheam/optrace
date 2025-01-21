@@ -26,7 +26,7 @@ A more mathematical descriptions of biasedness can be found here: :footcite:`Scr
 
 **Stratified Sampling:** One of many low discrepancy methods. Random values are chosen from a set of sub-groups.
 It is guaranteed, that values are chosen from every sub-group (e.g. different intervals), but the values inside each sub-group are chosen randomly (e.g. random positions inside each interval).
-Details on the implementation in `optrace` are discussed in :numref:`stratified_sampling`.
+Details on the implementation in optrace are discussed in :numref:`stratified_sampling`.
 
 **Inverse Transform Sampling:** Generating non-uniform random numbers according to a known distribution function by utilizing the inverse transform method.
 See below for a mathematical definition.
@@ -251,7 +251,7 @@ This is especially important as the center of the disc typically lies at the opt
 Reducing those artefacts is done by first sampling a square grid that then gets mapped onto a disc.
 The difference is that using special mapping methods the square cells comparatively get less distorted, or alternatively get distorted more uniformly. Note that equi-areal mapping methods are needed, since we want to keep the point density and uniformity of the noise.
 
-One such method is the Square-Disc Mapping method from :footcite:p:`doi:10.1080/10867651.1997.10487479`. `optrace` implements a simplified method from :footcite:`ShirleyCode`.
+One such method is the Square-Disc Mapping method from :footcite:p:`doi:10.1080/10867651.1997.10487479`. optrace implements a simplified method from :footcite:`ShirleyCode`.
 
 
 Sampled grid values :math:`x,~y` lie inside a grid with bounds :math:`(-r_\text{o}, ~r_\text{o}, ~-r_\text{o}, ~r_\text{o})` and get transformed to radial disc coordinates using:

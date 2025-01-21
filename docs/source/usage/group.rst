@@ -120,7 +120,7 @@ Loading ZEMAX OpticStudio Geometries (.zmx)
 ____________________________________________
 
 
-It is possible to load ``.zmx`` geometries into `optrace`. For instance, the following example load some geometry from file ``setup.zmx`` into the raytracer.
+It is possible to load ``.zmx`` geometries into optrace. For instance, the following example load some geometry from file ``setup.zmx`` into the raytracer.
 
 .. code-block:: python
 
@@ -146,7 +146,7 @@ Unfortunately, the support is only experimental, as there is no actual documenta
 
 * ``SEQ``-mode only
 * ``UNIT`` must be ``MM``
-* only ``STANDARD`` or ``EVENASPH`` surfaces, this is equivalent to :python:`RingSurface, CircularSurface, SphericalSurface, ConicSurface, AsphericSurface` in `optrace`
+* only ``STANDARD`` or ``EVENASPH`` surfaces, this is equivalent to :python:`RingSurface, CircularSurface, SphericalSurface, ConicSurface, AsphericSurface` in optrace
 * no support for coatings
 * temperature or absorption behavior of the material is neglected
 * only loads lens and aperture geometries, no support for additional objects
@@ -200,7 +200,7 @@ Note that :math:`b, g`  both need to be positive for this preset.
    :width: 730
    :class: dark-light
 
-   Visualization of the ``ideal_camera`` parameters.
+   Visualization of the :func:`ideal_camera <optrace.tracer.presets.geometry.ideal_camera>` parameters.
 
 
 LeGrand Paraxial Eye Model
@@ -349,7 +349,7 @@ As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>`, we
    :class: dark-light
 
 
-   Eye model in the ``arizona_eye_model.py`` example script.
+   Eye model in the :ref:`example_arizona_eye_model` example script.
 
 ------------
 

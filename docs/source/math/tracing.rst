@@ -45,7 +45,7 @@ An equation for such a form of the refraction law can be found in :footcite:`Opt
    s^{\prime}=\frac{n_1}{n_2} s-n\left\{\frac{n_1}{n_2}(n s)-\sqrt{1-\left(\frac{n_1}{n_2}\right)^{2}\left[1-(n s)^{2}\right]}\right\}
    :label: refraction
 
-In case of total internal reflection (TIR) the root argument becomes negative. In `optrace` TIR rays get absorbed, as reflections are not modelled, and the user is notified with a message.
+In case of total internal reflection (TIR) the root argument becomes negative. In optrace TIR rays get absorbed, as reflections are not modelled, and the user is notified with a message.
 
 
 .. _tracing_pol:
@@ -293,6 +293,7 @@ Ray intersections are calculated, only hitting rays are selected and a histogram
 But compared to an image, this is a spectral histogram within a wavelength range resulting from the rays wavelengths and powers.
 Instead of an ``RImage`` a ``LightSpectrum`` object is created with type ``"Histogram"``.
 
+.. TODO ^-- does the above belong here? And add class links.
 
 The number of bins for the histogram is:
 

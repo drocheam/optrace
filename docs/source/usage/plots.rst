@@ -222,7 +222,7 @@ Supporting all the same parameters as for :func:`image_plot <optrace.plots.image
 
 
 
-.. list-table:: Exemplary image plot and image cut plot from the ``prism.py`` example.
+.. list-table:: Exemplary image plot and image cut plot from the :ref:`example_prism` example.
    :class: table-borderless
 
    * - .. figure:: ../images/color_dispersive2.svg
@@ -420,14 +420,14 @@ Below you can find examples for cost plots.
           :width: 500
           :class: dark-light
 
-          Focus finding for mode "Position Variance" in the ``spherical_aberration.py`` example.
+          Focus finding for mode "Position Variance" in the :ref:`example_spherical_aberration` example.
 
      - .. figure:: ../images/af_debug_image_sharpness.svg
           :align: center
           :width: 500
           :class: dark-light
 
-          Focus finding for mode "Image Sharpness" in the ``spherical_aberration.py`` example.
+          Focus finding for mode "Image Sharpness" in the :ref:`example_spherical_aberration` example.
 
 .. highlight:: none
 
