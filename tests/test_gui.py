@@ -974,8 +974,8 @@ class GUITests(unittest.TestCase):
 
                 qsize = Window.size()
                 ss0 = np.array([qsize.width(), qsize.height()])
-                ss1 = (ss0 * 1.3).astype(int)
-                ss2 = (ss1 / 1.2).astype(int)
+                ss1 = ss0 * 1.2
+                ss2 = ss1 / 1.1
 
                 # time to wait after resizing
                 dt = 0.5
@@ -991,6 +991,10 @@ class GUITests(unittest.TestCase):
                 # check if scene was actually resized
                 SceneSizei1 = sim.scene.scene_editor.interactor.size.copy()
                 self.assertFalse(np.all(SceneSizei0 == SceneSizei1))
+
+                # check if sizing parents exist
+                self.assertFalse(sim.scene.scene_editor is None or sim.scene.scene_editor.interactor\
+                        is None or sim.scene._renwin is None)
 
                 # check if scale properties changed
                 self.assertNotAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])  # scene size variable changed
