@@ -1490,11 +1490,11 @@ class TraceGUI(HasTraits):
         self._status["RunningCommand"] -= 1
         self._sequential = False
 
-    # rescale axes texts when the window was resized
-    # for some reasons these are the only ones having no text_scaling_mode = 'none' option
+    # rescale axes texts when the scene was resized
+    # (for some reasons these are the only ones having no text_scaling_mode = 'none' option)
     # this is the only trait so far that does not work with @observe, like:
-    # @observe("scene:scene_editor:interactor:size:items:value")
-    @observe("scene:scene_editor:busy", dispatch="ui")
+    # unfortunately size:items:value does not work, this way it gets called for every assignment of size
+    @observe("scene:_renwin:size", dispatch="ui")
     def _resize_scene_elements(self, event=None) -> None:
         """
         Handles GUI window size changes. Fixes incorrect scaling by mayavi.
