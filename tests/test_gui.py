@@ -952,7 +952,7 @@ class GUITests(unittest.TestCase):
     # for now exclude in github actions
     # @pytest.mark.os
     @pytest.mark.gui2
-    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS"), reason="Issues with headless display in github actions")
+    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Issues with headless display in github actions")
     def test_resize(self):
         """
         this test checks if
