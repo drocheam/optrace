@@ -978,12 +978,11 @@ class GUITests(unittest.TestCase):
                 ss2 = ss1 / 1.1
 
                 # time to wait after resizing
-                dt = 0.5
+                dt = 1.5
 
                 # enlarge
                 self._do_in_main(Window.resize, *ss1.astype(int))
                 time.sleep(dt)  # how to check how much time it takes?
-                pyface_gui.process_events()
 
                 # check if window was actually resized
                 qsize2 = sim.scene.scene_editor._content.window().size()

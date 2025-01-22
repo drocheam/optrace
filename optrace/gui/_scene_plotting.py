@@ -900,8 +900,8 @@ class ScenePlotting:
         It is called from within the TraceGUI
         """
 
-        if self.scene._renwin is not None and self.scene.scene_editor.interactor is not None:
-            scene_size = self.scene.scene_editor.interactor.size
+        if self.scene._renwin is not None and self.scene.scene_editor._interactor is not None:
+            scene_size = self.scene.scene_editor._interactor.size
 
             if scene_size[0]*scene_size[1] > 0 and\
                 (self._scene_size[0] != scene_size[0] or self._scene_size[1] != scene_size[1]):
