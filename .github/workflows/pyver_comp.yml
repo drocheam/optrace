@@ -47,4 +47,5 @@ jobs:
     # actual tests
     - name: Python 3.10 and 3.11 tests with tox
       run: |        
+        export LIBGL_ALWAYS_INDIRECT=1
         tox -e fast 
