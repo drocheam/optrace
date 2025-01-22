@@ -203,7 +203,7 @@ class TraceGUI(HasTraits):
     _status: Dict = Dict(Str())
 
     # size of the mlab scene
-    _scene_size0 = [1100, 800]  # default size
+    _scene_size0 = np.array([1100, 800], dtype=np.int64)  # default size
 
     _bool_list_elements = []
 

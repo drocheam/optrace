@@ -906,7 +906,7 @@ class ScenePlotting:
             if scene_size[0]*scene_size[1] > 0 and\
                 (self._scene_size[0] != scene_size[0] or self._scene_size[1] != scene_size[1]):
 
-                # average  of x and y size for former and current scene size
+                # average of x and y size for former and current scene size
                 ch1 = (self._scene_size[0] + self._scene_size[1]) / 2
                 ch2 = (scene_size[0] + scene_size[1]) / 2
 
