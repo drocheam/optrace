@@ -964,6 +964,7 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
 
                 SceneSize0 = sim._plot._scene_size.copy()
+                SceneSizei0 = sim.scene.scene_editor.interactor.size.copy()
                 Window = sim.scene.scene_editor._content.window()
 
                 # properties before resizing
@@ -986,6 +987,10 @@ class GUITests(unittest.TestCase):
                 # check if window was actually resized
                 qsize2 = sim.scene.scene_editor._content.window().size()
                 self.assertFalse(np.all(ss0 == np.array([qsize2.width(), qsize2.height()])))
+
+                # check if scene was actually resized
+                SceneSizei1 = sim.scene.scene_editor.interactor.size.copy()
+                self.assertFalse(np.all(SceneSizei0 == SceneSizei1))
 
                 # check if scale properties changed
                 self.assertNotAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])  # scene size variable changed

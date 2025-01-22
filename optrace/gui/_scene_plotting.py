@@ -924,7 +924,7 @@ class ScenePlotting:
                     bar.position = [bar.position[0], (1-bar.position2[1])/2]
 
                 # set current window size
-                self._scene_size = scene_size
+                self._scene_size = scene_size.copy()
 
     def set_ray_opacity(self) -> None:
         """change the ray opacity"""
