@@ -3,6 +3,9 @@
 Tracing Procedure
 *********************************
 
+.. role:: python(code)
+  :language: python
+  :class: highlight
 
 Tracing Process
 ========================
@@ -291,9 +294,7 @@ Spectrum Rendering
 Spectrum rendering works in a similar way to image rendering.
 Ray intersections are calculated, only hitting rays are selected and a histogram is rendered.
 But compared to an image, this is a spectral histogram within a wavelength range resulting from the rays wavelengths and powers.
-Instead of an ``RImage`` a ``LightSpectrum`` object is created with type ``"Histogram"``.
-
-.. TODO ^-- does the above belong here? And add class links.
+Instead of an :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` a :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` object is created with type :python:`"Histogram"`.
 
 The number of bins for the histogram is:
 

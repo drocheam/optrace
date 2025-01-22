@@ -539,12 +539,11 @@ class GUITests(unittest.TestCase):
         RT.clear()
         test_features(RT)
 
-    @pytest.mark.slow
     # @pytest.mark.skip(reason="there seems to be some issue with qt4, leads to segmentation faults.")
+    @pytest.mark.slow
+    @pytest.mark.gui1
     def test_action_spam(self):
         """spam the gui with many possible actions to check threading locks and for race conditions"""
-
-        # TODO add screenshot() and set_camera() ?
 
         RT = rt_example()
         sim = TraceGUI(RT)
@@ -572,10 +571,12 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.replot_rays)
                 self._do_in_main(sim.run_command, "GUI.replot()")
                 self._do_in_main(sim.detector_image)
+                self._do_in_main(sim.screenshot, "tmp.png") 
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
 
                 self._set_in_main(sim, "ray_count", 1000000)
                 self._do_in_main(sim.replot_rays)
+                self._do_in_main(sim.set_camera, [5, 10, 3], 30)
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
                 self._do_in_main(sim.move_to_focus)
                 self._do_in_main(sim.source_spectrum)
@@ -584,6 +585,7 @@ class GUITests(unittest.TestCase):
 
                 self.assertEqual(sim.ray_count, 1000000)
                 self.assertEqual(sim.raytracer.rays.N, 1000000)
+                os.remove("tmp.png")
 
         sim.debug(interact, args=(sim,))
         self.raise_thread_exceptions()
@@ -946,10 +948,11 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
 
-    # TODO why does this fail on latest ubuntu in github actions?
-    # window and scene resized, but trait change not handled (how?)
+    # TODO this fails in github actions, issue with headless display?
+    # for now exclude in github actions
+    # @pytest.mark.os
     @pytest.mark.gui2
-    @pytest.mark.os
+    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS"), reason="Issues with headless display in github actions")
     def test_resize(self):
         """
         this test checks if
@@ -982,7 +985,7 @@ class GUITests(unittest.TestCase):
                 ss2 = ss1 / 1.1
 
                 # time to wait after resizing
-                dt = 1.5
+                dt = 0.5
 
                 # enlarge
                 self._do_in_main(Window.resize, *ss1.astype(int))

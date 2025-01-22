@@ -99,7 +99,6 @@ class CommandWindow(HasTraits):
             output += el + "\n"
 
         clipboard = QtGui.QApplication.clipboard()
-        # clipboard.clear(mode=QtGui.QClipboard.Clipboard)  # TODO needed?  
         clipboard.setText(output, mode=QtGui.QClipboard.Clipboard)
  
         # check if actually copied
