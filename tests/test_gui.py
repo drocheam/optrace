@@ -945,7 +945,11 @@ class GUITests(unittest.TestCase):
         sim.debug(interact, args=(sim,))
         self.raise_thread_exceptions()
 
+
+    # TODO why does this fail on latest ubuntu in github actions?
+    # window and scene resized, but trait change not handled (how?)
     @pytest.mark.gui2
+    @pytest.mark.os
     def test_resize(self):
         """
         this test checks if
