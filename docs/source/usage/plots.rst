@@ -246,8 +246,6 @@ ________________________
 **Usage**
 
 In some use cases it is helpful to display the spectrum color or image values inside a chromaticity diagram to see the color distribution.
-When doing so, the choice between the CIE 1931 xy chromaticity diagram and the CIE 1976 UCS chromaticity diagram must be undertaken. Differences are described in <>.
-
 Depending on your choice the :func:`chromaticities_cie_1931 <optrace.plots.chromaticity_plots.chromaticities_cie_1931>` or :func:`chromaticities_cie_1976 <optrace.plots.chromaticity_plots.chromaticities_cie_1976>` function is called
 In the simplest case it takes an RenderImage as parameter and displays the image colors:
 

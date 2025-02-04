@@ -23,7 +23,7 @@ ________________
 Overview
 ##############
 
-A |Group| can be seen as a list or container of several elements.
+A |Group| is a container of several elements.
 
 It contains the following functionality:
 
@@ -46,7 +46,7 @@ It contains the following functionality:
    * - rotate or flip all elements: 
      - | :python:`G.rotate(-12)`
        | :python:`G.flip()`
-   * - create ray transfer matrix of the whole lens system: 
+   * - create a ray transfer matrix of the whole group: 
      - :python:`G.tma()`
 
 A |Group| object stores all elements in their own class lists:
@@ -54,13 +54,13 @@ A |Group| object stores all elements in their own class lists:
 Where |IdealLens| and |Lens| are included in the same list, all marker types are included in :python:`markers` and all volume types in :python:`volumes`.
 
 When adding objects, the order of objects remains the same.
-Thus :python:`lenses[2]` denotes the lens that was added third (since counting starts at 0).
-For simplicity it is recommended to add objects in the order in which the light passes through them.
+Thus :python:`lenses[2]` denotes the lens that was added third (counting starts at 0).
+For clarity, it is recommended to add objects in their correct z-order.
 
 Geometry properties
 ###########################
 
-A group shares the same functions for geometry properties and manupulations as an element, see :ref:`element_geometry_props`.
+A group shares the same functions for geometry properties and manipulations as an element, see :ref:`element_geometry_props`.
 There are three main differences:
 
 **Position**
@@ -69,8 +69,8 @@ The position property describes the position of the first element (smallest z-po
 
 **Flipping**
 
-When flipping, additional parameters :python:`y0`, :python:`z0` can be provided to describe a rotation axis.
-By default, :python:`y0 = 0` and :python:`z0` is the center of the extent of the group.
+When flipping, additional parameters :python:`y0`, :python:`z0` can be provided to define a rotation axis.
+By default, :python:`y0 = 0` and :python:`z0` are the center of the extent of the group.
 See :func:`Group.flip <optrace.tracer.geometry.group.Group.flip>` for details.
 
 **Rotation**
@@ -92,7 +92,7 @@ The following example creates a Group consisting of an |IdealLens| and an :class
    G = ot.Group([IL, F])
 
 Next, we flip the group, reversing the z-order of the elements and flipping each element around its x-axis through the center.
-Since all elements are rotationally symmetric, this has only an effect on the order of them.
+Since all elements are rotationally symmetric, this just reorders them.
 After flipping we move the group to a new position. This position is the new position for the first element (which after flipping is the filter), whereas all relative distances to all other elements are kept equal.
 
 .. testcode::
@@ -120,7 +120,8 @@ Loading ZEMAX OpticStudio Geometries (.zmx)
 ____________________________________________
 
 
-It is possible to load ``.zmx`` geometries into optrace. For instance, the following example load some geometry from file ``setup.zmx`` into the raytracer.
+It is possible to load ``.zmx`` geometries into optrace. 
+The following example loads a geometry from file ``setup.zmx`` into the raytracer:
 
 .. code-block:: python
 
@@ -142,7 +143,7 @@ You can either load them from a ``.agf`` catalogue like in :numref:`agf_load` or
 A list of exemplary ``.zmx`` files can be found in the following `repository <https://github.com/nzhagen/LensLibrary/tree/main/zemax_files>`_.
 
 
-Unfortunately, the support is only experimental, as there is no actual documentation on the file format. Additionally, only a subset of all ZEMAX OpticStudio functionality is supported, including:
+Unfortunately, the support is only experimental, as there is no official documentation on the file format. Additionally, only a subset of all ZEMAX OpticStudio functionality is supported, including:
 
 * ``SEQ``-mode only
 * ``UNIT`` must be ``MM``
@@ -161,10 +162,7 @@ _______________________
 Ideal Camera
 ###############################
 
-In cases of a virtual image, an additional lens or lens system is needed to create a real image.
-Real lens systems come with aberrations and falsify the virtual image by adding additional errors.
-
-For this application an ideal camera preset is included, that provides aberration-free imaging towards a detector.
+An ideal camera preset is included, that provides aberration-free imaging towards a detector.
 
 The preset is loaded with :func:`ot.presets.geometry.ideal_camera <optrace.tracer.presets.geometry.ideal_camera>` and returns a |Group| object consisting of a lens and a detector.
 Required parameters are the object position :python:`z_g` as well as the camera position (the position of the lens) :python:`cam_pos`, as well as the image distance :python:`b`, which in this case is just the difference distance between lens and detector.
@@ -176,7 +174,7 @@ An exemplary call could be:
 
    G = ot.presets.geometry.ideal_camera(cam_pos=[1, -2.5, 12.3], z_g=-56.06, b=10)
 
-In many cases the additional lens diameter parameter :python:`r` and detector radius :python:`r_det` need to be provided:
+The lens diameter parameter :python:`r` and detector radius :python:`r_det` are provided by doing the following:
 
 .. testcode::
 
@@ -192,7 +190,7 @@ When given a desired object magnification :math:`m`, the image distance paramete
 
 Which should be known from the fundamentals of optics.
 Where :math:`g` is the object distance, in our example :python:`z_g - cam_pos[2]`.
-Note that :math:`b, g`  both need to be positive for this preset.
+Note that :math:`b, g`  both need to be positive for this preset to work.
 
 
 .. figure:: ../images/ideal_camera.svg
@@ -268,7 +266,7 @@ Optional parameters include a pupil diameter and a lateral detector (retina) rad
 Arizona Eye Model
 #####################
 
-A more advanced model is the :func:`arizona_eye <optrace.tracer.presets.geometry.arizona_eye>` model, which tries to match clinical levels of aberration and for different adaption levels. It consists of conic surfaces, dispersive media and adaptation dependent parameters.
+A more advanced model is the :func:`arizona_eye <optrace.tracer.presets.geometry.arizona_eye>` model, which tries to match clinical levels of aberration for different adaption levels. It consists of conic surfaces, dispersive media and adaptation dependent parameters.
 
 .. list-table:: Arizona Eye Model :footcite:`SchwiegerlingOptics`
    :widths: 75 75 75 75 75 75
@@ -329,7 +327,7 @@ With an accommodation level :math:`A` in dpt the missing parameters are calculat
    \end{array}
 
 
-Accessing and adding works as for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` preset.
+Accessing and adding the group works the same as for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` preset.
 
 .. testcode::
 

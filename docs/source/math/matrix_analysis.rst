@@ -466,6 +466,8 @@ In fact, doing this with two ideal lenses with focal lengths :math:`f_1` and :ma
 
 For :math:`R_2 = -R_1` in :math:numref:`eq_oc_radii` or :math:`f_2 = f_1` in :math:numref:`eq_oc_two_lenses` the optical center lies at exactly the center of the lens/lens combination.
 
+.. _image_object_distance:
+
 Image and Object Distances 
 =================================================
 
@@ -603,8 +605,18 @@ In the case of the aperture stop being inside the lens setup, the setup and its 
 
 The entrance pupil is the result of the stop being imaged into the front group, whereas the exit pupil is the image of the aperture stop into the rear group.
 
-The exit pupil position is simply calculated with an object distance :math:`g_\text{ex}` between the stop position :math:`z_\text{s}` and the front vertex of the rear group and the matrix :math:`\text{M}_\text{rear}` with the procedure in <>.
-The resulting :math:`z_\text{ex}` is the exit pupil's absolute position.
+The object distance for the exit pupil is:
+
+.. math::
+   g_\text{ex} = V_{1,\text{rear}} - z_\text{s}
+   :label: eq_pupils_gex
+
+The exit pupil image distance :math:`b_\text{ex}` is calculated with :math:`\text{M}_{b,g} = \text{M}_\text{rear}` and the procedure in :numref:`image_object_distance`.
+The resulting :math:`z_\text{ex}` is then:
+
+.. math::
+   z_\text{ex} = V_{2,\text{rear}} + b_\text{ex}
+   :label: eq_pupils_zex
 
 For the entrance pupil, we need to image the stop in backwards direction through :math:`\text{M}_\text{front}`. This is done by inverting the matrix:
 
@@ -625,7 +637,8 @@ The object distance is negative and calculated with the back vertex of the front
    g_\text{en} = V_{2,\text{front}} - z_\text{s}
    :label: eq_pupils_gen
 
-The procedure in <> with :math:`g_\text{en}` and :math:`\text{M}^{-1}_\text{front}` gives us the image distance :math:`b_\text{en}`, that needs to be added to the front vertex of the front group to get the entrance pupil position.:
+Calculating :math:`b_\text{en}(g_\text{en})` is done with the help of the procedure in :numref:`image_object_distance` and by setting :math:`\text{M}_{b,g} = \text{M}^{-1}_\text{front}`.
+The image distance :math:`b_\text{en}` then needs to be added to the front vertex of the front group to get the entrance pupil position:
 
 .. math::
    z_\text{en} = V_{1,\text{front}} + b_\text{en}

@@ -115,7 +115,7 @@ class PropertyBrowser(HasTraits):
 
         elif isinstance(val, np.ndarray):
             # unpack arrays with only one element
-            if val.size == 1:
+            if val.size == 1:  # TODO test this case
                 return self._gen_dict_repr(val[()])
 
             # force convert to float, but only if size is not gigantic

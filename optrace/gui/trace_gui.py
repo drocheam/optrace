@@ -875,7 +875,7 @@ class TraceGUI(HasTraits):
 
         if not self._status["Tracing"]:
             self.replot_rays(None, mask, max_show)
-        else:
+        else:  # TODO test this case
             warning(f"Did not apply the ray selection as the raytracer is still tracing.")
 
     @property

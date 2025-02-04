@@ -427,6 +427,8 @@ For the angle distributions we get:
 This is consistent with :footcite:`ParticleCosine`.
 
 
+.. _polarization_sampling:
+
 Polarization Sampling
 ==========================
 

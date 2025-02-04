@@ -1,7 +1,7 @@
 # Optrace
 ## Geometrical OPtics rayTRACEr and image simulation
 
-[![Python 3.10, 3.11, 3.12](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/release/python-3127/)
+[![Python 3.10, 3.11, 3.12, 3.13](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/downloads/release/python-3127/)
 [![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)]()
 [![License MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/drocheam/optrace/blob/main/LICENSE)
 <!-- TODO add version tag, such as https://img.shields.io/github/v/tag/drocheam/optrace?label=version see https://shields.io/badges/git-hub-tag -->
@@ -61,7 +61,7 @@ See <>
 
 ## Installation
 
-This library requires Python 3.10, 3.11 or 3.12.
+This library requires Python 3.10, 3.11, 3.12 or 3.13.
 
 Clone/download the repository and run the following command from a terminal within the folder:
 
@@ -76,8 +76,6 @@ More details on the installation process and the requirements are found at <>.
 
 ## Similar software
 
-<!--What about this: https://github.com/guo-research-group/AD-Ray-Optics-->
-
 - Geometrical Optics
    * [RayOptics](https://ray-optics.readthedocs.io/en/latest/) by Michael Hayford. Tracing and optical design analysis tool. 
    * [rayopt](https://github.com/quartiq/rayopt) by QUARTIQ. Tracing and optical design analysis tool. 
@@ -89,5 +87,5 @@ More details on the installation process and the requirements are found at <>.
    * [prysm](https://prysm.readthedocs.io/en/stable/index.html) by Brandon Dube. Interferometer and diffraction calculations.
 
 - Geometrical + Wave Optics
-   * [opticspy](http://opticspy.org/) by Xing Fan, tracing. Wave optics, aberration and Zernike polynomial analysis.
+   * [opticspy](http://opticspy.org/) by Xing Fan. Tracing, wave optics, aberration and Zernike polynomial analysis.
    * [raypier](https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model) by Bryan Cole. Raytracing and beamlet propagation with 3D viewer.

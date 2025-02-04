@@ -12,7 +12,7 @@ Achromat
 
 **File**: `examples/achromat.py <https://github.com/drocheam/optrace/blob/main/examples/achromat.py>`_
 
-**Description**: This example demonstrates the effect of an achromatic doublet on the dispersion. Ray sources consist of different monochromatic spectral lines to show the different focal lengths. Inside the script the chromatic correction can be turned off to make it comparable to the normal case.
+**Description**: This example demonstrates the effect of an achromatic doublet on the dispersion. Ray sources consist of different monochromatic spectral lines to show the different focal lengths. The chromatic correction can be turned off inside the script to compare it to the uncorrected case.
 
 **Screenshots**:
 
@@ -34,7 +34,7 @@ Arizona Eye Model
 
 **File**: `examples/arizona_eye_model.py <https://github.com/drocheam/optrace/blob/main/examples/arizona_eye_model.py>`_
 
-**Description**: Demonstration of human eye vision for an adaption at a resolution chart at distance 66 cm. The arizona eye model is used with the matching adaptation. In the rendered image a slight blur and chromatic dispersion can be seen.
+**Description**: Demonstration of human eye vision with adaptation at a distance of 66 cm. The arizona eye model is employed to simulate a resolution chart. In the rendered image a slight blur and chromatic dispersion is found.
 
 **Screenshots**:
 
@@ -66,7 +66,7 @@ Astigmatism
 
 **File**: `examples/astigmatism.py <https://github.com/drocheam/optrace/blob/main/examples/astigmatism.py>`_
 
-**Description**: With saggital and meridional ray beams we can show the different focal point positions because of rotational asymmetry for non-parallel light. 
+**Description**: Astigmatism is demonstrated by using sagittal and meridional ray beams and non-parallel light. 
 
 **Screenshots**:
 
@@ -104,7 +104,7 @@ Cosine Surfaces
 
 **File**: `examples/cosine_surfaces.py <https://github.com/drocheam/optrace/blob/main/examples/cosine_surfaces.py>`_
 
-**Description**: An example with two lenses with orthogonal cosine modulations on each side. Creates squary, caleidoscope-like images inside the beam path.
+**Description**: An example with two lenses with orthogonal cosine modulations on each side. Creates rectangular, kaleidoscope-like images inside the beam path.
 
 **Screenshots**:
 
@@ -134,7 +134,7 @@ Double Gauss
 
 **File**: `examples/double_gauss.py <https://github.com/drocheam/optrace/blob/main/examples/double_gauss.py>`_
 
-**Description**: Example of the double gauss, Nikkor Wakamiya, 100mm, f1.4, objective. Point sources at -50m are traced through the setup and a PSF can be rendered.                
+**Description**: Example of the double gauss Nikkor Wakamiya, 100mm, f1.4 objective. The simulation traces point sources from a distance of -50m and renders their PSF.                
 
 **Screenshots**:
 
@@ -163,7 +163,7 @@ GUI Automation
 
 **File**: `examples/gui_automation.py <https://github.com/drocheam/optrace/blob/main/examples/gui_automation.py>`_
 
-**Description**: An example on how to automate the GUI. Varies the position and size of a line source that illuminates a sphere lens.
+**Description**: An example on GUI automation. Position and size of a line source are varied, which illuminates a sphere lens.
 
 **Screenshots**:
 
@@ -187,7 +187,7 @@ LeGrand Eye Model
 
 **File**: `examples/legrand_eye_model.py <https://github.com/drocheam/optrace/blob/main/examples/legrand_eye_model.py>`_
 
-**Description**: A geometry with the paraxial eye model, where the cardinal points and pupils are marked.
+**Description**: A geometry with the paraxial LeGrand eye model. Cardinal points, exit and entrance pupils are marked inside the scene.
 
 **Screenshots**:
 
@@ -209,7 +209,7 @@ Image Render
 
 **File**: `examples/image_render.py <https://github.com/drocheam/optrace/blob/main/examples/image_render.py>`_
 
-**Description**: A simple imaging system consisting of one lens. Suitable example to showcase the effect of spherical aberration, distortion and vignetting.
+**Description**: A simple imaging system consisting of a single lens. Spherical aberration, distortion and vignetting are apparent.
 
 **Screenshots**:
 
@@ -249,7 +249,7 @@ Image Render Many Rays
 
 **File**: `examples/image_render_many_rays.py <https://github.com/drocheam/optrace/blob/main/examples/image_render_many_rays.py>`_
 
-**Description**: Same as the :ref:`example_image_render` example, but instead of starting the GUI the geometry is traced with many rays and images are rendered in different distances.
+**Description**: Comparable to the :ref:`example_image_render` example. Same lens setup, but it is traced with many more rays by using the iterative render functionality. This is done for multiple image distances and without needing to start a GUI.
 
 **Screenshots**:
 
@@ -313,7 +313,7 @@ Keratoconus
 
 **File**: `examples/keratoconus.py <https://github.com/drocheam/optrace/blob/main/examples/keratoconus.py>`_
 
-**Description**: A simulation of vision through a patient's eye with progressing levels of keratoconus. Models are taken from the work of `Tan et al. (2008) <https://jov.arvojournals.org/article.aspx?articleid=2158188>`__.
+**Description**: A simulation of vision through a patient's eye with progressing levels of keratoconus. Parameters are taken from the work of `Tan et al. (2008) <https://jov.arvojournals.org/article.aspx?articleid=2158188>`__.
 
 
 **Screenshots**:
@@ -379,7 +379,7 @@ Prism
 
 **File**: `examples/prism.py <https://github.com/drocheam/optrace/blob/main/examples/prism.py>`_
 
-**Description**: A prism setup dividing the source light spectrum into its components.
+**Description**: A prism that splits the light spectrum into its spectral components.
 
 **Screenshots**:
 
@@ -415,7 +415,7 @@ PSF Imaging
 
 **File**: `examples/psf_imaging.py <https://github.com/drocheam/optrace/blob/main/examples/psf_imaging.py>`_
 
-**Description**: Demonstrates image forming by convolution for a resolution chart and a halo PSF.
+**Description**: Demonstrates image formation by convolution of a resolution chart and a halo PSF.
 
 **Screenshots**:
 
@@ -446,7 +446,7 @@ Refraction Index Presets
 
 **File**: `examples/refraction_index_presets.py <https://github.com/drocheam/optrace/blob/main/examples/refraction_index_presets.py>`_
 
-**Description**: An example loading different refractive index plots.
+**Description**: This example displays different plots for the refraction index presets.
 
 **Screenshots**:
 
@@ -532,7 +532,7 @@ Sphere Projections
 
 **File**: `examples/sphere_projections.py <https://github.com/drocheam/optrace/blob/main/examples/sphere_projections.py>`_
 
-**Description**: This script demonstrates the effect of different projections methods for a spherical surface detector. There are multiple same power cone sources that illuminate the spherical area and display a Tissot indicatrix in the detector view.
+**Description**: This script demonstrates the effect of different projections methods for a spherical surface detector. Multiple point sources emit an angular cone spectrum and illuminate a spherical detector. The detector view then displays an equivalent of a Tissot's indicatrix.
 
 **Screenshots**:
 
@@ -573,7 +573,7 @@ Spherical Aberration
 
 **File**: `examples/spherical_aberration.py <https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py>`_
 
-**Description**: The example used as quickstart script. Showcases the refractive error of a spherical sources by tracing a paraxial and a normal light beam for comparison.
+**Description**: The example demonstrates the refractive error of a spherical sources by tracing a paraxial and a normal light beam for comparison. This example is suited as a quickstart example, as it includes many explanations.
 
 **Screenshots**:
 

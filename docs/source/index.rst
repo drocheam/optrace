@@ -2,6 +2,9 @@
 Optrace |version| |release| Documentation
 ============================================
 
+.. TODO Titel/Kurzbeschreibung prägnant
+
+
 .. list-table::
    :class: table-borderless
 
@@ -65,12 +68,12 @@ Overview
    :class: table-borderless
 
    * - **Features**
-        * a sequential raytracer for geometrical optics
-        * a tool with presets and user defined surface shapes, ray sources and media
-        * a library with an additional GUI with ray and geometry visualization
-        * a renderer for colored detector images inside an optical setup
-        * a program including paraxial analysis (matrix optics, position of cardinal points/planes and psf convolution)
-        * a programming/scripting approach to simulation
+        * sequential raytracer for geometrical optics
+        * tool with presets and user defined surface shapes, ray sources and media
+        * library with an additional GUI with ray and geometry visualization
+        * renderer for colored detector images inside an optical setup
+        * program including paraxial analysis (matrix optics, position of cardinal points/planes and psf convolution)
+        * programming/scripting approach to simulation
         * free, open source software
 
      - **Non-Features**
@@ -95,6 +98,8 @@ Overview
 Similar Python software
 -------------------------------------
 
+.. What about this: https://github.com/guo-research-group/AD-Ray-Optics
+
 .. list-table:: 
    :class: table-borderless
 
@@ -111,7 +116,7 @@ Similar Python software
    * - |
 
        Geometrical + Wave Optics
-        * `opticspy <http://opticspy.org/>`__ by Xing Fan, tracing. Wave optics, aberration and Zernike polynomial analysis.
+        * `opticspy <http://opticspy.org/>`__ by Xing Fan. Tracing, Wave optics, aberration and Zernike polynomial analysis.
         * `raypier <https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model>`__ by Bryan Cole. Raytracing and beamlet propagation with 3D viewer.
 
      - 

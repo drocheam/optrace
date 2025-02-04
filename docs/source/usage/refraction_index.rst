@@ -11,6 +11,7 @@ Refractive Indices
    import optrace as ot
    import numpy as np
 
+
 Defining the Index
 ________________________
 
@@ -24,7 +25,7 @@ In the simplest case a constant (wavelength-independent) :class:`refractive inde
 
 **By Abbe Number**
 
-Many materials are simply characterized by the index at a center wavelength and the Abbe number.
+In many cases materials are characterized by the index at a center wavelength and the Abbe number only.
 However, materials with these same quantities can still differ slightly.
 
 .. testcode::
@@ -133,13 +134,16 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
           :label: n_schott 
 
 
-In the case of the Schott model the initialization could look as follows:
+In the case of the Schott model, the initialization looks as follows:
 
 .. testcode::
 
    n = ot.RefractionIndex("Schott", coeff=[2.13e-06, 1.65e-08, -6.98e-11, 1.02e-06, 6.56e-10, 0.208])
 
 **User Data**
+
+With type :python:`"Data"` a wavelength and index vector should be provided.
+Values in-between are interpolated linearly.
 
 .. testcode::
 
@@ -149,13 +153,13 @@ In the case of the Schott model the initialization could look as follows:
 
 **User Function**
 
-optrace also supports user functions for the refractive index. The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
+optrace supports custom user functions for the refractive index. The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
 
 .. testcode::
 
    n = ot.RefractionIndex("Function", func=lambda wl: 1.6 - 1e-4*wl)
 
-When providing a function with multiple parameters you can use the :python:`func_args` parameter.
+When providing a function with multiple parameters, you can use the :python:`func_args` parameter.
 
 .. testcode::
 
@@ -178,14 +182,6 @@ The call returns a vector of the same shape as the input.
 Abbe Number
 __________________
 
-The Abbe number, also called :math:`V`-number, is a simple, scalar quantity describing the optical dispersive behavior of a medium. It is calculated from the refractive indices at three different wavelength.
-
-.. math::
-   V = \frac{n_\text{c} - 1}{n_\text{s} - n_\text{l}}
-   :label: abbe_eq
-
-With :math:`n_\text{s},~n_\text{c},~n_\text{l}` are the short, center and long wavelength refraction index.
-
 With a refractive index object at hand the Abbe number can be calculated with
 
 .. doctest::
@@ -193,7 +189,6 @@ With a refractive index object at hand the Abbe number can be calculated with
    >>> n = ot.presets.refraction_index.LAF2
    >>> n.abbe_number()
    44.850483919254984
-
 
 Alternatively the function can be called with a different spectral line combination from :mod:`ot.presets.spectral_lines <optrace.tracer.presets.spectral_lines>`:
 
@@ -225,9 +220,8 @@ A list of predefined lines can be found in :numref:`spectral_lines`.
 Loading material catalogues (.agf)
 _________________________________________
 
-
-optrace  can also load .agf catalogue files containing different materials.
-The function :func:`ot.load_agf <optrace.tracer.load.load_agf>` takes a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
+optrace can also load .agf catalogue files containing different materials.
+The function :func:`ot.load_agf <optrace.tracer.load.load_agf>` requires a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
 
 For instance, loading the Schott catalogue and accessing the material ``N-LAF21`` can be done as follows:
 
@@ -238,7 +232,6 @@ For instance, loading the Schott catalogue and accessing the material ``N-LAF21`
 
 
 Different ``.agf`` files are found in `this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`__ or `this one <https://github.com/edeforas/Astree/tree/master/glass>`__.
-
 
 Information on the file format can be found `here <https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf>`__ and
 and `here <https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf>`__.

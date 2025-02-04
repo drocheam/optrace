@@ -130,7 +130,7 @@ class BaseImage(BaseClass):
         # if single channel image / linear image: make three channels and normalize
         if self._data.ndim == 2:
             img = np.repeat(img[:, :, np.newaxis], 3, axis=2)
-            if (maxi := np.max(img)):
+            if (maxi := np.max(img)):  # TODO maxi = 0 not tested?
                 img /= maxi
 
         # normalize and convert to 8bit cv2 format

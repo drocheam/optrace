@@ -172,7 +172,7 @@ class Raytracer(Group):
     def check_if_rays_are_current(self) -> bool:
         """Check if anything tracing relevant changed since the last trace."""
         if self._last_trace_snapshot is None:
-            return False
+            return False  # TODO test this case
 
         now = self.tracing_snapshot()
         return not self.compare_property_snapshot(self._last_trace_snapshot, now)["Any"]

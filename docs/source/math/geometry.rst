@@ -3,6 +3,32 @@
 Geometric Features
 ********************
 
+TiltedSurface Equation
+============================
+
+.. math::
+   \text{normal vector:}~~~~   \vec{n} &= (n_x, n_y, n_z)\\
+   \text{surface center vector:}~~~~ \vec{q} &= (x_0, y_0, z_0)\\
+   \text{point on surface:}~~~~ \vec{p} &= (x, y, z)\\
+
+point normal equation for a plane:
+
+.. math::
+   (\vec{p} - \vec{q})\cdot \vec{n} = 0
+   :label: plane_normal_eq_tilted_surface
+
+being equivalent to
+
+.. math::
+   (x - x_0) \cdot n_x + (y- y_0) \cdot n_y + (z-z_0)\cdot n_z = 0
+   :label: tilted_surface0
+
+can be rearranged to the surface function for :math:`n_z \neq 0`:
+
+.. math::
+   z(x, y) = z_0 - (x - x_0) \cdot \frac{n_x}{n_z} - (y- y_0) \cdot \frac{n_y}{n_z}
+   :label: tilted_surface
+
 .. _analytical_hit_find:
 
 Analytical Hit Detection

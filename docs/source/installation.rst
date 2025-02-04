@@ -12,17 +12,16 @@ Installation
   :language: bash
   :class: highlight
 
-This library requires Python 3.10, 3.11 or 3.12.
+This library requires Python 3.10, 3.11, 3.12 or 3.13.
 
 **Instructions**
 
-#. make sure you have Python 3.10, 3.11 or 3.12 installed on your system
-#. download/clone the whole project repository. This is the folder that includes the optrace-folder as well as the `setup.py <https://github.com/drocheam/optrace/blob/main/setup.py>`_ file.
-#. open a terminal in the downloaded folder and run :bash:`pip install .` :math:`\leftarrow` Note that the dot is part of the command.
+#. install Python 3.10, 3.11, 3.12 or 3.13 on your system
+#. download/clone the whole project repository
+#. open a terminal in the downloaded folder and run :bash:`pip install .`
 
-This automatically runs the file `setup.py <https://github.com/drocheam/optrace/blob/main/setup.py>`_, which provides all the required information for the installation.
+This automatically executes `setup.py <https://github.com/drocheam/optrace/blob/main/setup.py>`_ from the main folder, which automatically installs all dependencies and builts the optrace package.
 After this, optrace should be installed on your system. 
-
 
 **External dependencies**
 

@@ -4,13 +4,14 @@ Quickstart
 ################
 
 
-The library comes with a variety of different example scripts that are described in :numref:`examples` and the script files located `here <https://github.com/drocheam/optrace/blob/main/examples/>`_.
+The library comes with a variety of different example scripts that are described in :numref:`examples`.
+The script files are located `here <https://github.com/drocheam/optrace/blob/main/examples/>`_.
 
-| The `spherical_aberration.py <https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py>`_ script, also from this folder, provides a good quickstart introduction.
-| Below you can find its code with detailed comments.
+The `spherical_aberration.py <https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py>`_ script provides a good quickstart introduction.
+Below you can find its code with detailed comments.
 
-| Before running make sure to follow the installation instructions in :numref:`installation`.
-| Further details on working with the raytracer and the frontend can be found in :numref:`usage`.
+.. | Before running make sure to follow the installation instructions in :numref:`installation`.
+.. | Further details on working with the raytracer and the frontend can be found in :numref:`usage`.
 
 
 **Code of** `examples/spherical_aberration.py <https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py>`_:
