@@ -1,0 +1,4 @@
+# needed so tests directory gets excluded from dist
+# see https://stackoverflow.com/a/72821651
+# and https://stackoverflow.com/a/48912748 at comment from bogeymin
+recursive-exclude tests *

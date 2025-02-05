@@ -79,8 +79,8 @@ requires = ["setuptools >= 61.0", "numpy>2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["optrace", "optrace.plots", "optrace.gui"]
-include-package-data = true
+packages.find.include =  ["optrace*"]
+include-package-data = false
 dynamic = {version = {attr = "optrace.metadata.version"}}
-package-data = {optrace = ["*.png", "*.jpg", "*.webp", "*.csv"]}
-
+package-data = {optrace = ["ressources/*", "ressources/images/*"]}  
+# ^--- would be excluded in wheel otherwise
