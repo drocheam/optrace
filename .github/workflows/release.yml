@@ -1,4 +1,4 @@
-name: Build and Release Python Package
+name: Release Package and Examples
 
 on:
   workflow_dispatch:
@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed so git describe knows the full context
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -25,9 +27,13 @@ jobs:
       - name: Build package
         run: python -m build
 
+      - name: Zip example folder
+        run: zip -r examples.zip examples/      
+
       - name: Get latest tag
         id: get_version
-        run: echo "VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
+        run: |
+          echo "VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -40,4 +46,5 @@ jobs:
           prerelease: false
           files: |
             dist/*.tar.gz
+            examples.zip
 
