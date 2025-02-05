@@ -29,7 +29,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
           name: "Release ${{ github.ref_name }}"
           #body: "## Changes in this release\n\n- Add your release notes here"
           draft: false
