@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # needed so git describe knows the full context
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -33,7 +31,7 @@ jobs:
       - name: Extract version from built package
         id: get_version1
         run: |
-          VERSION1=$(python -c "import importlib.metadata; print(importlib.metadata.version('your-package-name'))")
+          VERSION1=$(python -c "import importlib.metadata; print(importlib.metadata.version('optrace'))")
           echo "VERSION1=$VERSION1" >> $GITHUB_ENV
 
       - name: Get latest tag
