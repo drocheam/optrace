@@ -31,13 +31,13 @@ jobs:
         run: zip -r examples.zip examples/      
       
       - name: Extract version from built package
-        id: get_version
+        id: get_version1
         run: |
           VERSION1=$(python -c "import importlib.metadata; print(importlib.metadata.version('your-package-name'))")
           echo "VERSION1=$VERSION1" >> $GITHUB_ENV
 
       - name: Get latest tag
-        id: get_version
+        id: get_version2
         run: |
           echo "VERSION2=$(git describe --tags --always)" >> $GITHUB_ENV
 
