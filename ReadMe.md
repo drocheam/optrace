@@ -61,18 +61,27 @@ See <>
 
 ## Installation
 
-This library requires Python 3.10, 3.11, 3.12 or 3.13.
+Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 
-Clone/download the repository and run the following command from a terminal within the folder:
+**Installing the latest official release**
 
-``pip install .``
+#. Find the newest release at the `Releases page <https://github.com/drocheam/optrace/releases>`__ and download the .tar.gz archive from the Assets section
+#. Open a terminal
+#. Run :bash:`pip install <path to archive>`, where :bash:`<path to archive>` is the path to the archive downloaded in the first step
 
-More details on the installation process and the requirements are found at <>.
+**Installing the current git version**
+
+#. Open a terminal
+#. Clone the whole project repository using git: :bash:`git clone https://github.com/drocheam/optrace/`
+#. Change the directory into the cloned folder: :bash:`cd optrace`
+#. Install using :bash:`pip install .`
 
 
 ## Contributing
 
 ## License
+
+This project is published under an MIT License.
 
 ## Similar software
 
