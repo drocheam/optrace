@@ -28,24 +28,24 @@ jobs:
       - name: Zip example folder
         run: zip -r examples.zip examples/      
       
-      - name: Extract version from built package
-        id: get_version1
+      - name: Extract version
+        id: get_version
         run: |
           VERSION1=$(python -c "import importlib.metadata; print(importlib.metadata.version('optrace'))")
-          echo "VERSION1=$VERSION1" >> $GITHUB_ENV
+          VERSION2=$(git describe --tags --always)
+          echo "VERSION=$VERSION1-$VERSION2" >> $GITHUB_ENV
 
-      - name: Get latest tag
-        id: get_version2
-        run: |
-          echo "VERSION2=$(git describe --tags --always)" >> $GITHUB_ENV
+      - name: Get last commit message
+        id: last_commit
+        run: echo "COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ env.VERSION1 }}-${{ env.VERSION2 }}
-          name: "Release ${{ env.VERSION1 }}-${{ env.VERSION2 }}"
-          #body: "## Changes in this release\n\n- Add your release notes here"
+          tag_name: ${{ env.VERSION }}
+          name: "optrace ${{ env.VERSION }}"
+          body: "Release Notes: ${{ env.COMMIT_MSG}}"
           draft: false
           preserve_order: true
           prerelease: false
