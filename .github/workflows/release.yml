@@ -27,7 +27,7 @@ jobs:
 
       - name: Zip example folder
         run: zip -r examples.zip examples/      
-      
+     
       - name: Extract version
         id: get_version
         run: |
@@ -45,7 +45,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.VERSION }}
           name: "optrace ${{ env.VERSION }}"
-          body: "Release Notes: ${{ env.COMMIT_MSG}}"
+          body: "**Commit Message**: ${{ env.COMMIT_MSG }}"
           draft: false
           preserve_order: true
           prerelease: false
