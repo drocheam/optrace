@@ -2,6 +2,7 @@ name: Build and Release Python Package
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   release:
