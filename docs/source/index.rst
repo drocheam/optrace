@@ -2,64 +2,60 @@
 Optrace |version| |release| Documentation
 ============================================
 
-.. TODO Titel/Kurzbeschreibung prägnant
+optrace - A scripting based optics simulation package with sequential raytracing, image rendering and a GUI frontend.
 
-
-.. list-table::
+.. list-table:: 
    :class: table-borderless
 
    * - .. figure:: images/example_spherical_aberration2.png
           :align: center
-          :height: 150
+          :width: 165
           :class: dark-light
     
      - .. figure:: images/example_rgb_render2.svg
           :align: center
-          :height: 150
+          :width: 155
           :class: dark-light
   
      - .. figure:: images/example_legrand2.png
           :align: center
-          :height: 150
+          :width: 165
           :class: dark-light
      
      - .. figure:: ./images/example_keratoconus_4.svg
           :align: center
-          :height: 150
+          :width: 155
           :class: dark-light
      
      - .. figure:: images/example_brewster.png
           :align: center
-          :height: 150
+          :width: 165
           :class: dark-light
    
    * - .. figure:: ./images/example_gui_automation_1.png
           :align: center
-          :height: 150
+          :width: 165
           :class: dark-light
 
      - .. figure:: ./images/LED_illuminants.svg
           :align: center
-          :height: 150
+          :width: 155
           :class: dark-light
 
      - .. figure:: images/example_double_gauss_2.png
           :align: center
-          :height: 150
+          :width: 165
           :class: dark-light
      
      - .. figure:: ./images/rgb_render_srgb1.svg
           :align: center
-          :height: 150
+          :width: 155
           :class: dark-light
 
      - .. figure:: ./images/example_cosine_surfaces1.png 
           :align: center
-          :height: 150
+          :width: 165
           :class: dark-light
-
-.. See the :ref:`example gallery <examples>` for more samples
-
 
 Overview
 ----------------------
@@ -74,6 +70,7 @@ Overview
         * renderer for colored detector images inside an optical setup
         * program including paraxial analysis (matrix optics, position of cardinal points/planes and psf convolution)
         * programming/scripting approach to simulation
+        * high performance of 0.1 s / surface / million rays (:ref:`details <benchmarking>`)
         * free, open source software
 
      - **Non-Features**
@@ -94,11 +91,8 @@ Overview
      - 
 
 
-
-Similar Python software
+Similar Software
 -------------------------------------
-
-.. What about this: https://github.com/guo-research-group/AD-Ray-Optics
 
 .. list-table:: 
    :class: table-borderless

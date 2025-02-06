@@ -9,50 +9,51 @@ Documentation
   :language: bash
   :class: highlight
 
-**Goal**
+Overview
+_______________________
 
-* website documenting library functionality and source code
-* mathematical description of methods, including images, equations and sources
-* installation instruction and simple functionality overview
+The documentation should contain information about the project, its usage as well as implementation and programming details.
+All should be presented as easily navigable webpage which includes figures, equations and code snippets.
 
-
-**Source Code**
-
-* `typing hints <https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html>`_ for almost all functions
-* `docstring <https://peps.python.org/pep-0257/>`_ comments for functions and important variables
-* comments have `reStructuredText <https://docutils.sourceforge.io/docs/user/rst/quickref.html>`_ syntax
+To allow for a simple and up-to-date code reference the process should be automatic, by generating it from `typing hints <https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html>`_ and  `docstrings <https://peps.python.org/pep-0257/>`_. 
 
 
-**Documentation**
+Workflow
+_______________________
 
-* see documentation guidelines in :numref:`guidelines`
-* generate source code documentation using `Sphinx <https://www.sphinx-doc.org/en/master/>`_.
-* functionality description is done using `reStructuredText <https://docutils.sourceforge.io/docs/user/rst/quickref.html>`_ and embedded in the rest of the documentation
-* documentation also includes information on testing, library dependencies, changelog and documentation
-* documentation source files can be found under `docs/source/ <https://github.com/drocheam/optrace/blob/main/docs/source/>`_ and consist of :bash:`.rst` files
-* run :bash:`make html` from the `docs <https://github.com/drocheam/optrace/blob/main/docs/>`_ folder to generate the html documentation (requires the `GNU make utility <https://www.gnu.org/software/make/>`_)
-* build files get created in :bash:`docs/build/html/`, open the documentation by e.g. :bash:`firefox ./docs/build/html/index.html`
-* check code snippets with `sphinx.ext.doctest <https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html>`_ and :bash:`make doctest`
+The `gen_docs.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/gen_docs.yml>`_ action compiles the documentation and publishes it in the `gh-pages <https://github.com/drocheam/optrace/tree/gh-pages>`__ branch. In the future, this content will be published on a webpage.
 
-**Workflow**
+Internally the workflow executes the :bash:`docs` environment for `tox <https://tox.wiki/en/latest/>`_ (see the :ref:`tox file <tox_file>`), which builds the documentation with the help of `Sphinx <https://www.sphinx-doc.org/en/master/>`_.
+The steps also include an automatic generation of a changelog and a source file toctree.
 
-* `tox <https://tox.wiki/en/latest/>`_ environment :bash:`docs`, call from main folder using :bash:`tox -e docs`, see the `tox.ini <https://github.com/drocheam/optrace/blob/main/tox.ini>`_ file for details
-* this runs the following:
-   * the `Sphinx <https://www.sphinx-doc.org/en/master/>`_ html documentation compilation
-   * a bash script generating the changelog
-   * a bash script generating the source file toctree
+Documentation Generation
+__________________________________
 
+The documentation is created with `Sphinx <https://www.sphinx-doc.org/en/master/>`_, which uses `reStructuredText <https://docutils.sourceforge.io/docs/user/rst/quickref.html>`_ as markup language. 
+The html builder of Sphinx compiles a webpage including the self-written documentation, automatically generated code information, as well as indices for searching.
 
-**Sphinx configuration**
+The following extensions are used:
 
-* see `docs/source/conf.py <https://github.com/drocheam/optrace/blob/main/docs/source/conf.py>`_ for details
-* Sphinx extensions 
-   * `autodoc <https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html>`_ for automatic source code documentation generation
-   * `intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`_ for linking documentation of other packages
-   * `mathjax <https://www.sphinx-doc.org/en/master/usage/extensions/math.html>`_ for LaTeX equations
-   * `sphinxcontrib.bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ for a bibliography
-* `pyramid <https://sphinx-themes.org/sample-sites/default-pyramid/>`_ Sphinx theme, however we overwrite the text font family by including the `docs/source/_static/css/custom.css <https://github.com/drocheam/optrace/blob/main/docs/source/_static/css/custom.css>`_ file. This also centrally aligns the equation label vertically.
+.. list-table::
+   :align: left
 
+   * - `sphinx.ext.doctest <https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html>`_ 
+     - automatic testing of documentation code examples
+   * - `autodoc <https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html>`_ 
+     - automatic source code documentation generation
+   * - `intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`_ 
+     - linking to the documentation of external packages
+   * - `mathjax <https://www.sphinx-doc.org/en/master/usage/extensions/math.html>`_ 
+     - LaTeX equations
+   * - `sphinxcontrib.bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ 
+     - bibliography management
+   * - `PyData Sphinx Theme <https://pydata-sphinx-theme.readthedocs.io/en/stable/>`_
+     - A modern looking theme
+
+Additionally, a custom css (`docs/source/_static/css/custom.css <https://github.com/drocheam/optrace/blob/main/docs/source/_static/css/custom.css>`_) adapts the formatting to our needs.
+
+Documentation source files can be found under `docs/source/ <https://github.com/drocheam/optrace/blob/main/docs/source/>`_
+The Sphinx configuration can be found below.
 
 **Content of** `docs/source/conf.py <https://github.com/drocheam/optrace/blob/main/docs/source/conf.py>`_
 

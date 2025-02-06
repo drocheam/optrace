@@ -16,7 +16,7 @@ Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 
 **Installing the latest official release**
 
-#. Find the newest release at the `Releases page <https://github.com/drocheam/optrace/releases>`__ and download the .tar.gz archive from the Assets section
+#. Download the optrace .tar.gz archive from the `latest release <https://github.com/drocheam/optrace/releases/latest>`__
 #. Open a terminal
 #. Run :bash:`pip install <path to archive>`, where :bash:`<path to archive>` is the path to the archive downloaded in the first step
 
@@ -61,7 +61,7 @@ Below you can find a list of external dependencies that will be automatically in
    * - `progressbar2 <https://pypi.org/project/progressbar2/>`_
      - animated progressbar in standard output (terminal)
      - BSD 3-Clause
-   * - `pyqtdarktheme <https://pypi.org/project/pyqtdarktheme/>`_
+   * - `pyqtdarktheme-fork <https://pypi.org/project/pyqtdarktheme-fork/>`_
      - setting a QT dark theme
      - MIT
    * - `pyside6 <https://wiki.qt.io/Qt_for_Python>`_
@@ -76,9 +76,10 @@ Below you can find a list of external dependencies that will be automatically in
 
 * When `mayavi <https://pypi.org/project/mayavi/>`__ fails installing `vtk <https://pypi.org/project/vtk/>`_, try to install vtk first
 
-* When the installation of vtk fails, try to install from a list of other wheels from `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
+* When the installation of vtk fails, try to install from a list of other wheels as described `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
 
 * Consult the `mayavi issues <https://github.com/enthought/mayavi/issues>`__, `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ or `PySide issues <https://bugreports.qt.io/projects/PYSIDE/issues/>`__ for current problems and solutions
 
-* In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. The syntax is shown `here <https://stackoverflow.com/questions/5226311/installing-specific-package-version-with-pip/5226504#5226504>`__. Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
+* In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. The syntax is: :bash:`pip install --force-reinstall -v "some-package==1.2.2"`.
+  Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
 

@@ -529,9 +529,7 @@ class ScenePlotting:
         self._ray_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True,
                                                       opacity=self.ui.ray_opacity)
 
-        self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width,
-                                                point_size=self.ui.ray_width if self.ui.plotting_mode == "Points"
-                                                                             else 0.1)
+        self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width, point_size=self.ui.ray_width)
 
         self._ray_plot.glyph.color_mode = "color_by_scalar"
         self._ray_plot.parent.parent.name = "Rays"
@@ -675,7 +673,7 @@ class ScenePlotting:
             match vtk_obj.GetKeyCode():
 
                 # it seems like pressing "m" in the scene does something,
-                #  although i can't find any documentation on this
+                # although i can't find any documentation on this
                 # a side effect is deactivating the mouse pickers, to reactivate we need to press "m" another time
                 case "m":
                     warning("Avoid pressing 'm' in the scene because it interferes with mouse picking handlers.")
@@ -701,7 +699,7 @@ class ScenePlotting:
                 case "d":  # render DetectorImage
                     self.ui.detector_image()
                
-                #  q does not seem to be registered anymore. Is it already used by vtk for something? 
+                # q does not seem to be registered anymore. Is it already used by vtk for something? 
                 # Use 0 as key instead
                 case "0":  # close all pyplots
                     plt.close("all")
@@ -994,8 +992,13 @@ class ScenePlotting:
         :param movement: moving distance
         """
         if ind < len(self._detector_plots):
-            self._detector_plots[ind][0].mlab_source.z += diff
-            self._detector_plots[ind][1].mlab_source.z += diff
+            # change relative actor position without touching the underlying mlab_source array
+            # some time ago we change the data with mlab_source.z, but this lead to issues
+            # for flat surfaces that weren't moved at all for some reason
+            det = self._detector_plots[ind]
+            # v--- don't use += here, as changes won't be correctly detected
+            det[0].actor.actor.position = det[0].actor.actor.position + [0, 0, diff]
+            det[1].actor.actor.position = det[1].actor.actor.position + [0, 0, diff]
             self._detector_plots[ind][3].z_position += diff
 
     def clear_ray_text(self) -> None:
@@ -1198,14 +1201,6 @@ class ScenePlotting:
     def get_rays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """assign traced and selected rays into a ray dictionary"""
         
-        # N = self.raytracer.rays.N
-        # set_size = min(N, self.ui.rays_visible)
-        # rindex = np.random.choice(N, size=set_size, replace=False)  # random choice
-
-        # # make bool array with chosen rays set to true
-        # ray_selection = np.zeros(N, dtype=bool)
-        # ray_selection[rindex] = True
-
         p_, s_, pol_, w_, wl_, snum_, n_ = self.raytracer.rays.rays_by_mask(self.ray_selection, normalize=True)
         l_ = self.raytracer.rays.ray_lengths(self.ray_selection)
         ol_ = l_*n_  # in this situation faster than calling self.raytracer.rays.optical_lengths

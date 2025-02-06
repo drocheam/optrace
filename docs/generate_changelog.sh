@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# don't do in github actions, as the online repo typically does not have the full tag history
+if [[ "$GITHUB_ACTIONS" == "true" ]]; then
+    exit 0
+fi
+
 # create table header
 out=" Version  |      Date      |                                 Description "
 out+=$'\n'

@@ -2,7 +2,6 @@ name: Release Package and Examples
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   release:
@@ -27,7 +26,8 @@ jobs:
 
       - name: Zip example folder
         run: zip -r examples.zip examples/      
-     
+    
+      # don't use tags for versions as all tags need to always be pushed to github to be available
       - name: Extract version
         id: get_version
         run: |

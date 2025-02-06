@@ -4,6 +4,9 @@
 Example Gallery
 ################
 
+This gallery showcases all optrace examples.
+
+You can download the full examples.zip archive `here <https://github.com/drocheam/optrace/releases/latest/download/examples.zip>`__.
 
 .. _example_achromat:
 

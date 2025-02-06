@@ -3,7 +3,7 @@
 import sys  # adding to PATH
 sys.path.append('.')
 import pathlib  # handling file paths
-import os  # deleting files
+import os  # deleting files, getenv
 
 import pytest  # testing framework
 
@@ -15,9 +15,7 @@ import unittest  # testing framework
 import optrace as ot
 import optrace.tracer.load as load
 
-
-# test files (zmx, agf) are downloaded on demand, as I don't want to care about licenses for each file
-# when they would be included in the rep
+# test files (zmx, agf) are downloaded on demand, as I don't want to care about licenses and copyright for each file
 
 class LoadTests(unittest.TestCase):
     
@@ -36,7 +34,7 @@ class LoadTests(unittest.TestCase):
         """
 
         # get web ressource with 5 retries and Firefox User Agent
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0'}
         adapter = HTTPAdapter(max_retries=5)
         http = requests.Session()
         http.mount("http://", adapter)
@@ -217,7 +215,7 @@ class LoadTests(unittest.TestCase):
 
         os.remove("temp.zmx")
 
-    @pytest.mark.skip(reason="Cloudflare protection seems to be active.")
+    # @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Cloudflare protection seems to be active.")
     def test_zmx_achromat(self):
         """load an achromat example"""
 
@@ -225,7 +223,9 @@ class LoadTests(unittest.TestCase):
         RS = ot.RaySource(ot.CircularSurface(r=10), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        self.save_file("https://www.edmundoptics.com/document/download/391148", "temp.zmx")   # cloudflare protection active? 
+        # use some russian site, edmundoptics seems to have good cloudflare protection
+        self.save_file("https://oxxius.ru/upload/iblock/fc0/ylodlsvbqgobcqnbmfckan8cxd7bfxpx/zmax_49360.zmx", "temp.zmx")
+        # self.save_file("https://www.edmundoptics.com/document/download/391148", "temp.zmx")
 
         G = ot.load_zmx("temp.zmx", self.n_schott)
 
@@ -261,7 +261,7 @@ class LoadTests(unittest.TestCase):
 
         os.remove("temp.zmx")
     
-    @pytest.mark.skip(reason="Cloudflare protection seems to be active.")
+    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Cloudflare protection seems to be active.")
     def test_zmx_plan_concave(self):
         """zmx of a single lens, so only two surfaces"""
 

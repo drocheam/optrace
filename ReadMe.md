@@ -35,7 +35,10 @@
   * a renderer for colored detector images inside an optical setup
   * a program including paraxial analysis (matrix optics, position of cardinal points/planes and psf convolution)
   * a programming/scripting approach to simulation
+  * high performance of 0.1 s / surface / million rays
   * free, open source software
+
+<!--  ^--- TODO add benchmarking details when documentation is online-->
 
  **Non-Features**
   * a GUI focussed tool
@@ -65,16 +68,16 @@ Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 
 **Installing the latest official release**
 
-#. Find the newest release at the `Releases page <https://github.com/drocheam/optrace/releases>`__ and download the .tar.gz archive from the Assets section
-#. Open a terminal
-#. Run :bash:`pip install <path to archive>`, where :bash:`<path to archive>` is the path to the archive downloaded in the first step
+1. Download the optrace .tar.gz archive from https://github.com/drocheam/optrace/releases/latest
+2. Open a terminal
+3. Run `pip install <path to archive>`, where `<path to archive>` is the path to the archive downloaded in the first step
 
 **Installing the current git version**
 
-#. Open a terminal
-#. Clone the whole project repository using git: :bash:`git clone https://github.com/drocheam/optrace/`
-#. Change the directory into the cloned folder: :bash:`cd optrace`
-#. Install using :bash:`pip install .`
+1. Open a terminal
+2. Clone the whole project repository using git: `git clone https://github.com/drocheam/optrace/`
+3. Change the directory into the cloned folder: `cd optrace`
+4. Install using `pip install .`
 
 
 ## Contributing
@@ -98,3 +101,4 @@ This project is published under an MIT License.
 - Geometrical + Wave Optics
    * [opticspy](http://opticspy.org/) by Xing Fan. Tracing, wave optics, aberration and Zernike polynomial analysis.
    * [raypier](https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model) by Bryan Cole. Raytracing and beamlet propagation with 3D viewer.
+
