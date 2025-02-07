@@ -50,7 +50,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries"
 ]
 
-# TODO update this links when documentation is online
+# TODO update these links when documentation is online
 [project.urls]
 #Homepage = ""
 Repository = "https://www.github.com/drocheam/optrace"
@@ -81,6 +81,6 @@ build-backend = "setuptools.build_meta"
 packages.find.include =  ["optrace*"]
 include-package-data = false
 dynamic = {version = {attr = "optrace.metadata.version"}}
-package-data = {optrace = ["ressources/*", "ressources/images/*"]}  
-# ^--- ressources would be excluded in wheel otherwise
+package-data = {optrace = ["resources/*", "resources/images/*"]}  
+# ^--- resources would be excluded in wheel otherwise
 

@@ -4,12 +4,12 @@ import pathlib
 import numpy as np  # calculations
 
 # CIE standard illuminants
-# see optrace/ressources/SOURCE.txt for more information
+# see optrace/resources/SOURCE.txt for more information
 
 # load illuminants from file
 _ill_names = ["wl", "A", "C", "D50", "D55", "D65", "D75", "F2", "F7", "F11",
               "LED-B1", "LED-B2", "LED-B3", "LED-B4", "LED-B5", "LED-BH1", "LED-RGB1", "LED-V1", "LED-V2"]
-_ill_path = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "illuminants.csv"
+_ill_path = pathlib.Path(__file__).resolve().parent.parent.parent / "resources" / "illuminants.csv"
 _illuminants = np.genfromtxt(_ill_path, skip_header=1, delimiter=",", filling_values=0, dtype=np.float64)
 
 

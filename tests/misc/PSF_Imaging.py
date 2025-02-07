@@ -20,9 +20,9 @@ debug = True
 log = True
 log_exp = 4
 
-img = "/mnt/Data/Dateien/Dokumente/Job/WMA TH 2022/Optrace/optrace/ressources/images/ETDRS_Chart_inverted.png"
-# img = "/mnt/Data/Dateien/Dokumente/Job/WMA TH 2022/Optrace/optrace/ressources/images/interior.jpg"
-# img = "/mnt/Data/Dateien/Dokumente/Job/WMA TH 2022/Optrace/optrace/ressources/images/TestScreen_square.png"
+img = "/mnt/Data/Dateien/Dokumente/Job/WMA TH 2022/Optrace/optrace/resources/images/ETDRS_Chart_inverted.png"
+# img = "/mnt/Data/Dateien/Dokumente/Job/WMA TH 2022/Optrace/optrace/resources/images/interior.jpg"
+# img = "/mnt/Data/Dateien/Dokumente/Job/WMA TH 2022/Optrace/optrace/resources/images/TestScreen_square.png"
 
 
 # img = np.zeros((500, 500, 3))

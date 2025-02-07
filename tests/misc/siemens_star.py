@@ -27,4 +27,4 @@ plt.xlim([-1, 1])
 plt.ylim([-1, 1])
 plt.tight_layout()
 
-plt.savefig(f"./optrace/ressources/images/siemens_star.webp", bbox_inches='tight', pad_inches=0, dpi=300, transparent=False)
+plt.savefig(f"./optrace/resources/images/siemens_star.webp", bbox_inches='tight', pad_inches=0, dpi=300, transparent=False)

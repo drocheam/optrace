@@ -10,11 +10,11 @@ from optrace.gui import TraceGUI
 # The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files
 # that are were built from patent data.
 
-# make sure the folder examples/ressources with all subfolders and files is available, as we will need those
+# make sure the folder examples/resources with all subfolders and files is available, as we will need those
 
 # path for needed resources (materials and eyepiece, objective files)
 # we could use a path string for ot.load_agf() and ot.load_zmx(), but using pathlib makes it platform-independent
-ressource_dir = pathlib.Path(__file__).resolve().parent / "ressources"
+resource_dir = pathlib.Path(__file__).resolve().parent / "resources"
 
 # create tracer
 RT = ot.Raytracer(outline=[-50, 50, -50, 50, -30, 430])
@@ -27,16 +27,16 @@ RT.add(RS)
 
 # load material files 
 with ot.global_options.no_warnings():  # ignore import warnings
-    schott = ot.load_agf(str(ressource_dir / "materials" / "schott.agf"))
-    ohara = ot.load_agf(str(ressource_dir / "materials" / "ohara.agf"))
-    hikari = ot.load_agf(str(ressource_dir / "materials" / "hikari.agf"))
-    hoya = ot.load_agf(str(ressource_dir / "materials" / "hoya.agf"))
+    schott = ot.load_agf(str(resource_dir / "materials" / "schott.agf"))
+    ohara = ot.load_agf(str(resource_dir / "materials" / "ohara.agf"))
+    hikari = ot.load_agf(str(resource_dir / "materials" / "hikari.agf"))
+    hoya = ot.load_agf(str(resource_dir / "materials" / "hoya.agf"))
 
 # join to one material dictionary
 n_dict = schott | ohara | hikari | hoya
 
 # load microscope setup
-G = ot.load_zmx(str(ressource_dir / "microscope" / "Nikon_1p25NA_60x_US7889433B2_MultiConfig_v2.zmx"), n_dict=n_dict)
+G = ot.load_zmx(str(resource_dir / "microscope" / "Nikon_1p25NA_60x_US7889433B2_MultiConfig_v2.zmx"), n_dict=n_dict)
 
 # create objective group
 objective = ot.Group(G.lenses[:18])
@@ -48,7 +48,7 @@ tube.move_to(G.lenses[20].pos-[0, 0, 150])  # lower the distance to the tube len
 RT.add(tube)
 
 # load eyepiece
-eyepiece = ot.load_zmx(str( ressource_dir / "eyepiece" / "UK565851-1.zmx"), n_dict=n_dict)
+eyepiece = ot.load_zmx(str(resource_dir / "eyepiece" / "UK565851-1.zmx"), n_dict=n_dict)
 eyepiece.remove(eyepiece.detectors)
 
 # position of intermediate image

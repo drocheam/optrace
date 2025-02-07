@@ -3,9 +3,9 @@ import numpy as np  # np.ndarray | list type
 from ..image import RGBImage
 
 # path of the image library folder
-image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "images"
+image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "resources" / "images"
 
-# for information on image sources and licenses see SOURCE.txt in optrace/ressources/images/
+# for information on image sources and licenses see SOURCE.txt in optrace/resources/images/
 
 # Scene Images
 #######################################################################################################################

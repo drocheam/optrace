@@ -18,7 +18,7 @@ class LoadTests(unittest.TestCase):
 
         # load schott material file from examples
         schott_path = str(pathlib.Path(__file__).resolve().parent.parent\
-                         / "examples" / "ressources" / "materials" / "schott.agf")
+                         / "examples" / "resources" / "materials" / "schott.agf")
         self.n_schott = ot.load_agf(schott_path)
 
         super().__init__(*args, **kwargs)

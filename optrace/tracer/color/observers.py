@@ -2,12 +2,12 @@ import pathlib
 import numpy as np  # calculations
 
 # CIE 1931 2° colorimetric standard observers
-# see optrace/ressources/SOURCE.txt for more information
+# see optrace/resources/SOURCE.txt for more information
 
 
 # load observers from file
 _obs_names = ["wl", "x", "y", "z"]
-_obs_path = pathlib.Path(__file__).resolve().parent.parent.parent / "ressources" / "observers.csv"
+_obs_path = pathlib.Path(__file__).resolve().parent.parent.parent / "resources" / "observers.csv"
 _observers = np.genfromtxt(_obs_path, skip_header=1, delimiter=",", filling_values=0, dtype=np.float64)
 
 
