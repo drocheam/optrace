@@ -11,7 +11,7 @@ license = {text = "MIT License"}
 requires-python = ">=3.10,<3.14"
 dependencies = [
     "numpy>2",
-    "numexpr>2.9",
+    "numexpr>=2.10",
     "chardet", 
     "scipy", 
     "opencv-python-headless",
@@ -19,9 +19,9 @@ dependencies = [
     "pyside6", 
     "matplotlib", 
     "progressbar2",
-    "mayavi @ git+https://github.com/enthought/mayavi"  # TODO git version needed as official version does not work with numpy 2
-]
-#
+    "mayavi @ git+https://github.com/enthought/mayavi"
+    ]
+# mayavi git version needed as PyPi version rarely gets updated
 # TODO git links lead to issues in later publishing the package on PyPi
 # see https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links
 # and https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation#comment115929654_65527149
@@ -63,7 +63,6 @@ tests = [
     "pytest",
     "coverage",
     "colour-science", 
-    "requests",
     "pytest-timeout",
     "pytest-random-order"
 ]
@@ -83,4 +82,5 @@ packages.find.include =  ["optrace*"]
 include-package-data = false
 dynamic = {version = {attr = "optrace.metadata.version"}}
 package-data = {optrace = ["ressources/*", "ressources/images/*"]}  
-# ^--- would be excluded in wheel otherwise
+# ^--- ressources would be excluded in wheel otherwise
+

@@ -6,16 +6,11 @@ import pathlib  # handling file paths
 import os  # deleting files, getenv
 
 import pytest  # testing framework
-
-import requests  # downloading web ressources
-from requests.adapters import HTTPAdapter
-
 import unittest  # testing framework
 
 import optrace as ot
 import optrace.tracer.load as load
 
-# test files (zmx, agf) are downloaded on demand, as I don't want to care about licenses and copyright for each file
 
 class LoadTests(unittest.TestCase):
     
@@ -28,24 +23,6 @@ class LoadTests(unittest.TestCase):
 
         super().__init__(*args, **kwargs)
 
-    def save_file(self, source: str, path: str):
-        """
-        try to download a web ressource 'source' to a file 'path'
-        """
-
-        # get web ressource with 5 retries and Firefox User Agent
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0'}
-        adapter = HTTPAdapter(max_retries=5)
-        http = requests.Session()
-        http.mount("http://", adapter)
-        r = http.get(source, headers=headers)
-
-        # save to file
-        with open(path,'wb') as f:
-            f.write(r.content)
-
-        if str(r.content).find("<head>") != -1:
-            raise RuntimeError("HTML file downloaded, most probably crawling activated some protections.")
 
     @pytest.mark.os
     def test_readlines(self):
@@ -57,7 +34,7 @@ class LoadTests(unittest.TestCase):
         # test different file encodings
         fnames = ["utf8.txt", "utf16.txt", "utf32.txt", "latin1.txt", "utf16le.txt", "utf16be.txt",
                   "utf32be.txt", "utf32le.txt", "windows1252.txt"]
-        path0 = pathlib.Path(__file__).resolve().parent / "test_files"
+        path0 = pathlib.Path(__file__).resolve().parent / "test_files" / "encoding"
 
         for i, fn in enumerate(fnames):
             path = str(path0 / fn)
@@ -68,62 +45,56 @@ class LoadTests(unittest.TestCase):
             # all files have the same content, loaded lines should be the same for all
             self.assertEqual(lines, lines0)
 
+
     def test_agf_coverage(self):
         """load a file with materials with invalid formula mode number"""
-        path = pathlib.Path(__file__).resolve().parent / "test_files" / "error.agf"
+        path = pathlib.Path(__file__).resolve().parent / "test_files" / "edge_cases_agf" / "error.agf"
 
         ns = ot.load_agf(str(path))
         self.assertEqual(len(ns), 1)  # one valid, two invalid
 
+
     @pytest.mark.os
-    @pytest.mark.slow
     def test_agf_valid_files(self):
         """load different agf catalogues and check if everything is handled correctly"""
 
-        # not sure about the copyright of these files, that's why we download them only for testing
-        url0 = "https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/"
-        webfiles = ["archer.agf", "arton.agf", "birefringent.agf", "cdgm.agf", "corning.agf", "heraeus.agf",
-                    "hikari.agf", "hoya.agf", "infrared.agf", "isuzu.agf", "liebetraut.agf", "lightpath.agf",
-                    "lzos.agf", "misc.agf", "nikon.agf", "ohara.agf", "rad_hard.agf", "rpo.agf", "schott.agf",
-                    "sumita.agf", "topas.agf", "umicore.agf", "zeon.agf"]
-      
-        webfiles = [url0+a for a in webfiles]
-        webfiles += ["https://lweb.cfa.harvard.edu/~aas/pisco/model330/zemax_files/MY_I_LINE.AGF",
-                     "https://lweb.cfa.harvard.edu/~aas/pisco/model330/zemax_files/SAFE.AGF",
-                     "https://lweb.cfa.harvard.edu/~aas/pisco/model330/zemax_files/SCHOTT.AGF",
-                     "https://usn.figshare.com/ndownloader/files/9478777"]
+        path0 = pathlib.Path(__file__).resolve().parent / "test_files" / "zemaxglass" / "files"
+        files0 = ["archer.agf", "arton.agf", "birefringent.agf", "cdgm.agf", "corning.agf", "heraeus.agf",
+                  "hikari.agf", "hoya.agf", "infrared.agf", "isuzu.agf", "liebetraut.agf", "lightpath.agf",
+                  "lzos.agf", "misc.agf", "nikon.agf", "ohara.agf", "rad_hard.agf", "rpo.agf", "schott.agf",
+                  "sumita.agf", "topas.agf", "umicore.agf", "zeon.agf"]
 
-        for file in webfiles:
+        path1 = pathlib.Path(__file__).resolve().parent / "test_files" / "PISCO_zemax" / "files"
+        files1 = ["MY_I_LINE.AGF", "SAFE.AGF", "SCHOTT.AGF"]
+        
+        path2 = pathlib.Path(__file__).resolve().parent / "test_files" / "eye_zemax" / "files" / "EYE.AGF"
+        
+        files = [path0 / file0 for file0 in files0] + [path1 / file1 for file1 in files1] + [path2] 
 
-            # load web ressource
-            print(file)
-            temp_file = "temp.agf"
-            self.save_file(file, temp_file)
+        for file in files:
 
             # count lines with NM, which is the number of different media
-            lin = load._read_lines(temp_file)
+            lin = load._read_lines(str(file))
             lins = [li for li in lin if li.startswith("NM")]
             ncount = len(lins)
 
             # process file
-            ns = ot.load_agf(temp_file)
+            ns = ot.load_agf(str(file))
             self.assertTrue(len(ns)/ncount > 0.95)  # more than 95% detected
             # sometimes the files have media with the same name or media with invalid n below 1
 
-            # delete file
-            os.remove(temp_file)
     
     def test_zmx_special(self):
         """test zmx special cases: COAT provided, MATERIAL == _BLANK and MATERIAL unknown, 
         but index and Abbe provided"""
-        path0 = pathlib.Path(__file__).resolve().parent / "test_files"
+        path0 = pathlib.Path(__file__).resolve().parent / "test_files" / "edge_cases_zmx"
         ot.load_zmx(str(path0 / "zmx_special_cases.zmx"), self.n_schott)
 
     @pytest.mark.os
     def test_zmx_errors(self):
         """test runtime errors that occur with invalid zmx files"""
 
-        path0 = pathlib.Path(__file__).resolve().parent / "test_files"
+        path0 = pathlib.Path(__file__).resolve().parent / "test_files" / "edge_cases_zmx"
         self.assertRaises(RuntimeError, ot.load_zmx, str(path0 / "zmx_invalid_mode.zmx"))
         self.assertRaises(RuntimeError, ot.load_zmx, str(path0 / "zmx_invalid_unit.zmx"))
         self.assertRaises(RuntimeError, ot.load_zmx, str(path0 / "zmx_invalid_surface_type.zmx"))
@@ -138,8 +109,8 @@ class LoadTests(unittest.TestCase):
         RS = ot.RaySource(ot.CircularSurface(r=0.05), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/Liang2006d.zmx", "temp.zmx") 
-        G = ot.load_zmx("temp.zmx", dict(COC=ot.presets.refraction_index.COC, POLYSTYR=ot.presets.refraction_index.PS,
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "LensLibrary" / "files" / "Liang2006d.zmx")
+        G = ot.load_zmx(zmx, dict(COC=ot.presets.refraction_index.COC, POLYSTYR=ot.presets.refraction_index.PS,
                                          BK7=ot.presets.refraction_index.BK7))
         RT.add(G)
         RT.trace(10000)
@@ -149,7 +120,6 @@ class LoadTests(unittest.TestCase):
         # https://github.com/nzhagen/LensLibrary/blob/main/lens_properties_list.txt
         self.assertAlmostEqual(RT.tma().efl, 0.37, delta=0.005)
         
-        os.remove("temp.zmx")
     
     @pytest.mark.os
     def test_zmx_portrait_lens(self):
@@ -159,8 +129,8 @@ class LoadTests(unittest.TestCase):
         RS = ot.RaySource(ot.CircularSurface(r=7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/1843519.zmx", "temp.zmx") 
-        G = ot.load_zmx("temp.zmx")
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "LensLibrary" / "files" / "1843519.zmx")
+        G = ot.load_zmx(zmx)
 
         RT.add(G)
         RT.trace(10000)
@@ -170,7 +140,6 @@ class LoadTests(unittest.TestCase):
         # https://github.com/nzhagen/LensLibrary/blob/main/lens_properties_list.txt
         self.assertAlmostEqual(RT.tma().efl, 100, delta=0.02)
 
-        os.remove("temp.zmx")
     
     def test_zmx_camera_lens(self):
         """load a camera lens example"""
@@ -179,8 +148,8 @@ class LoadTests(unittest.TestCase):
         RS = ot.RaySource(ot.CircularSurface(r=0.7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/7558005b.zmx", "temp.zmx") 
-        G = ot.load_zmx("temp.zmx")
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "LensLibrary" / "files" / "7558005b.zmx")
+        G = ot.load_zmx(zmx)
 
         RT.add(G)
         RT.trace(10000)
@@ -190,7 +159,6 @@ class LoadTests(unittest.TestCase):
         # https://github.com/nzhagen/LensLibrary/blob/main/lens_properties_list.txt
         self.assertAlmostEqual(RT.tma(wl=587).efl, 4.55, delta=0.005)
 
-        os.remove("temp.zmx")
     
     @pytest.mark.os
     def test_zmx_smith_tessar(self):
@@ -200,10 +168,9 @@ class LoadTests(unittest.TestCase):
         RS = ot.RaySource(ot.CircularSurface(r=7), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/Smith1998b.zmx", "temp.zmx") 
-
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "LensLibrary" / "files" / "Smith1998b.zmx")
         n_dict = dict(LAFN21=self.n_schott["N-LAF21"]) 
-        G = ot.load_zmx("temp.zmx", self.n_schott | n_dict)
+        G = ot.load_zmx(zmx, self.n_schott | n_dict)
 
         RT.add(G)
         RT.trace(10000)
@@ -213,33 +180,29 @@ class LoadTests(unittest.TestCase):
         # https://github.com/nzhagen/LensLibrary/blob/main/lens_properties_list.txt
         self.assertAlmostEqual(RT.tma().efl, 52.0, delta=0.1)
 
-        os.remove("temp.zmx")
 
-    # @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Cloudflare protection seems to be active.")
     def test_zmx_achromat(self):
         """load an achromat example"""
+
+        # model from
+        # https://www.edmundoptics.com/p/25mm-dia-x-100mm-fl-vis-nir-coated-achromatic-lens/9763/
 
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=10), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        # use some russian site, edmundoptics seems to have good cloudflare protection
-        self.save_file("https://oxxius.ru/upload/iblock/fc0/ylodlsvbqgobcqnbmfckan8cxd7bfxpx/zmax_49360.zmx", "temp.zmx")
-        # self.save_file("https://www.edmundoptics.com/document/download/391148", "temp.zmx")
-
-        G = ot.load_zmx("temp.zmx", self.n_schott)
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "edmund_zmx" / "files" / "zmax_49360.zmx")
+        G = ot.load_zmx(zmx, self.n_schott)
 
         RT.add(G)
         RT.trace(10000)
 
-        # check properties, see
-        # https://www.edmundoptics.com/p/25mm-dia-x-100mm-fl-vis-nir-coated-achromatic-lens/9763/
+        # check properties
         tma = RT.tma(587.6)
         self.assertAlmostEqual(tma.d, 8.5, delta=1e-4)
         self.assertAlmostEqual(tma.bfl, 95.92, delta=0.05)
         self.assertAlmostEqual(tma.efl, 100, delta=0.05)
 
-        os.remove("temp.zmx")
 
     def test_zmx_microscope_objective(self):
         """load an objective example"""
@@ -248,8 +211,8 @@ class LoadTests(unittest.TestCase):
         RS = ot.RaySource(ot.CircularSurface(r=0.8), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        self.save_file("https://raw.githubusercontent.com/nzhagen/LensLibrary/main/zemax_files/4037934a.zmx", "temp.zmx") 
-        G = ot.load_zmx("temp.zmx", self.n_schott, no_marker=True)  # coverage test with no_marker
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "LensLibrary" / "files" / "4037934a.zmx")
+        G = ot.load_zmx(zmx, self.n_schott, no_marker=True)  # coverage test with no_marker
 
         RT.add(G)
         RT.trace(10000)
@@ -259,31 +222,30 @@ class LoadTests(unittest.TestCase):
         # https://github.com/nzhagen/LensLibrary/blob/main/lens_properties_list.txt
         self.assertAlmostEqual(RT.tma().efl, 1, delta=0.002)
 
-        os.remove("temp.zmx")
     
-    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Cloudflare protection seems to be active.")
     def test_zmx_plan_concave(self):
         """zmx of a single lens, so only two surfaces"""
+
+        # model from
+        # https://www.edmundoptics.de/f/uncoated-plano-poncave-pcv-lenses/12263/
 
         RT = ot.Raytracer(outline=[-40, 40, -40, 40, -40, 200])
         RS = ot.RaySource(ot.CircularSurface(r=1.2), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
         RT.add(RS)
 
-        self.save_file("https://www.edmundoptics.de/document/download/389048", "temp.zmx") 
-        G = ot.load_zmx("temp.zmx", self.n_schott, no_marker=True)  # coverage test with no_marker
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "edmund_zmx" / "files" / "zmax_45374.zmx")
+        G = ot.load_zmx(zmx, self.n_schott, no_marker=True)  # coverage test with no_marker
 
         RT.add(G)
         RT.trace(10000)
         self.assertFalse(RT.geometry_error)
 
-        # test focal length. see
-        # https://www.edmundoptics.de/f/uncoated-plano-poncave-pcv-lenses/12263/
+        # test focal length
         tma = RT.tma(587.6)
         self.assertAlmostEqual(tma.efl, -6.00, delta=0.02)
         self.assertAlmostEqual(tma.bfl, -6.56, delta=0.02)
         self.assertAlmostEqual(tma.d, 1, delta=0.02)
 
-        os.remove("temp.zmx")
 
     def test_zmx_nikon_100x_objective(self):
         """this example tests:
@@ -293,14 +255,10 @@ class LoadTests(unittest.TestCase):
         4) a long list of surfaces
         5) __BLANK materials, but with index and abbe number
         """
-
-        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/ohara.agf", "ohara.agf")
-        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/hikari.agf", "hikari.agf")
-        self.save_file("https://raw.githubusercontent.com/nzhagen/zemaxglass/master/AGF_files/hoya.agf", "hoya.agf")
-
-        n_dict = self.n_schott | ot.load_agf("ohara.agf")
-        n_dict = n_dict | ot.load_agf("hikari.agf")
-        n_dict = n_dict | ot.load_agf("hoya.agf")
+        n_path = pathlib.Path(__file__).resolve().parent / "test_files" / "zemaxglass" / "files"
+        n_dict = self.n_schott | ot.load_agf(str(n_path / "ohara.agf"))
+        n_dict = n_dict | ot.load_agf(str(n_path / "hikari.agf"))
+        n_dict = n_dict | ot.load_agf(str(n_path / "hoya.agf"))
         n_dict["H-ZF7L"] = ot.RefractionIndex("Abbe", n=1.805180, V=25.46)
 
         # create tracer
@@ -311,9 +269,10 @@ class LoadTests(unittest.TestCase):
         RS = ot.RaySource(RSS, divergence="Lambertian",
                           pos=[0, 0, -0.00001], s=[0, 0, 1], div_angle=60, desc="Cell")
         RT.add(RS)
-
-        self.save_file("https://figshare.com/ndownloader/files/2259958", "temp.zmx") 
-        G = ot.load_zmx("temp.zmx", n_dict=n_dict)
+        
+        zmx = str(pathlib.Path(__file__).resolve().parent / "test_files" / "Kurvits_zemax" / \
+                  "files" / "Nikon_1p4NA_100x_US6519092B2_Embodiment_2_v2.zmx")
+        G = ot.load_zmx(zmx, n_dict=n_dict)
         RT.add(G)
         
         det = ot.Detector(ot.RectangularSurface([200, 200]), pos=[0, 0, 1000])
@@ -323,10 +282,6 @@ class LoadTests(unittest.TestCase):
         img = RT.detector_image()
         self.assertTrue(img.power() > 0.35)
 
-        os.remove("temp.zmx")
-        os.remove("hikari.agf")
-        os.remove("hoya.agf")
-        os.remove("ohara.agf")
         
     @pytest.mark.os
     def test_zmx_minimal(self):
@@ -335,7 +290,7 @@ class LoadTests(unittest.TestCase):
         there should be no surfaces and lenses created, only a marker
         which gets ignored with no_marker=True
         """
-        path = pathlib.Path(__file__).resolve().parent / "test_files" / "minimal.zmx"
+        path = pathlib.Path(__file__).resolve().parent / "test_files" / "edge_cases_zmx" / "minimal.zmx"
         G = ot.load_zmx(str(path), no_marker=True)  # coverage test with no_marker
 
         # check if empty

@@ -1,0 +1,4 @@
+https://figshare.com/articles/dataset/Zemax_optical_design_files_of_microscope_objectives_tube_lenses_and_Fourier_imaging_setups/1481270
+
+Zemax files related to the manuscript entitled “Comparative analysis of imaging configurations and objectives for Fourier microscopy” by Jonathan A. Kurvits, Mingming Jiang, and Rashid Zia.
+http://dx.doi.org/10.1364/JOSAA.32.002082
