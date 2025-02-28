@@ -51,6 +51,10 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
 
 .. list-table::
    :widths: 300 900
+   :header-rows: 1
+
+   * - Name
+     - Equation
 
    * - Cauchy
 
@@ -93,7 +97,7 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
      - .. math::
           \begin{align}
           n =&~ c_0+c_1 L+c_2 L^2+c_3 \lambda^2+c_4 \lambda^4+c_5 \lambda^6 \\
-          &\text{ with   } L= \frac{1} {\lambda^2-0.028 {\mu m^2}}
+          &\text{ with   } L= \frac{1} {\lambda^2-0.028 \mathrm{\,µm}^2}
           \end{align}
           :label: n_herzberger
 

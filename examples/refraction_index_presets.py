@@ -3,6 +3,8 @@
 import optrace as ot
 import optrace.plots as otp
 
+# This example displays different plots for the refraction index presets.
+
 otp.refraction_index_plot(ot.presets.refraction_index.glasses, legend_off=True, title="Glass Presets")
 otp.refraction_index_plot(ot.presets.refraction_index.plastics, legend_off=True, title="Plastic Presets")
 otp.refraction_index_plot(ot.presets.refraction_index.misc, legend_off=True,

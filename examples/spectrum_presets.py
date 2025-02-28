@@ -3,6 +3,7 @@
 import optrace as ot
 import optrace.plots as otp
 
+# An example loading multiple light spectrum plots, including the sRGB primaries and standard illuminants.
 
 otp.chromaticities_cie_1976(ot.presets.light_spectrum.standard_natural)
 otp.spectrum_plot(ot.presets.light_spectrum.standard_natural, labels_off=False, title="CIE Standard Illuminants")

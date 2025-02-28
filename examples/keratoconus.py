@@ -5,6 +5,8 @@ import numpy as np
 import optrace as ot
 import optrace.plots as otp
 
+# A simulation of vision through a patient's eye with progressing levels of keratoconus. 
+# Parameters are taken from the work of Tan et al. (2008), https://doi.org/10.1167/8.2.13.
 
 # options:
 g = 0.67e3  # object distance

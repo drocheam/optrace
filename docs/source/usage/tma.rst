@@ -19,29 +19,28 @@ Paraxial Analysis
 Overview
 ______________
 
-A ray transfer matrix analysis object |TMA_link| allows for the analysis of the paraxial properties of a lens or lens setups. After being computed once and for a specific wavelength it stores a snapshot of different quantities.
+A ray transfer matrix analysis object |TMA_link| allows for the analysis of the paraxial properties of a lens or lens setups. 
+It is computed for the current state of the geometry and stores the properties for a specific wavelength.
 These for instance include focal lengths, nodal points, optical powers and more.
-
-You can read about the calculation and meaning of the matrix analysis in :numref:`ray_matrix_analysis`.
 
 Defining the Geometry for the Analysis
 __________________________________________
 
 **Group/Raytracer**
 
-From a :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` with a specific geometry the |TMA_link| objected can be created with the member function :meth:`tma() <optrace.tracer.geometry.group.Group.tma>`.
+From a :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` with a specific geometry the |TMA_link| object is calculated with the member function :meth:`tma() <optrace.tracer.geometry.group.Group.tma>`.
 
 .. testcode::
 
    tma = RT.tma()
 
-The function optionally takes a wavelength in nanometers as argument, for which the properties are calculated.
+The function optionally takes a wavelength in nanometers as argument, for which the properties are calculated:
 
 .. testcode::
 
    tma = RT.tma(780)
 
-For a Group object this everything works the same way:
+For a :class:`Group <optrace.tracer.geometry.group.Group>` object this works in the same way:
 
 .. testcode::
 
@@ -51,7 +50,7 @@ For a Group object this everything works the same way:
 
 **Single Lens**
 
-We can also create the analysis object for a single lens:
+We can also create the analysis object for a single :class:`Lens <optrace.tracer.geometry.lens.Lens>`:
 
 .. testcode::
 
@@ -62,7 +61,11 @@ We can also create the analysis object for a single lens:
 
    tma = L.tma()
 
-But since a single Lens does not know about the ambient medium before it, we can provide it as parameter :python:`n0` to calculate the properties correctly for a non-default (different than vacuum) prior medium.
+While a single Lens defines the subsequent ambient medium, it has no knowledge on the preceding medium.
+Normally it will be assigned by either the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` or the previous lens.
+The same is the case for the medium :python:`n0` of the raytracer, which defines all undefined :python:`Lens.n2` media.
+To define it for the TMA, we can provide a :python:`n0` parameter.
+Otherwise it defaults to the vacuum properties.
 
 .. testcode::
 
@@ -71,7 +74,7 @@ But since a single Lens does not know about the ambient medium before it, we can
 
 **Multiple Lenses**
 
-Without a specific geometry we can also create the |TMA_link| object by simply providing a list of lenses.
+Without a specific geometry, we can also create the |TMA_link| object by providing a list of lenses.
 
 .. testcode::
 
@@ -83,17 +86,18 @@ Without a specific geometry we can also create the |TMA_link| object by simply p
    Ls = [L, L2]
    tma = ot.TMA(Ls)
 
-As for the lens the ambient medium before the first lens is not known but can be provided with the :python:`n0` parameter.
+As for the lens, the previous ambient medium (or the medium for all undefined :python:`Lens.n2`) can be provided with the :python:`n0` parameter.
 
 .. testcode::
 
    tma = ot.TMA(Ls, n0=n0)
 
+
 Paraxial Properties
 __________________________________________
 
-
-Below a tabular overview of the supported properties is found. Details on their meaning and calculation are documented in :numref:`ray_cardinal_points` and more information on the different definitions for focal lengths and powers in :numref:`ray_power_def`.
+The following table provides an overview of supported TMA properties.
+Details on their meaning and calculation are documented in :numref:`ray_matrix_analysis` and more information on the different definitions for focal lengths and powers in :numref:`ray_power_def`.
 
 .. list-table:: Properties of a |TMA_link| object
    :widths: 75 60 40 200
@@ -195,8 +199,7 @@ Below a tabular overview of the supported properties is found. Details on their 
      - nm
      - wavelength for the analysis
 
-
-The above properties can be simply accessed like the following examples:
+Access the properties in the following way:
 
 .. doctest::
 
@@ -213,8 +216,8 @@ The above properties can be simply accessed like the following examples:
 Calculating Image and Object Distance
 __________________________________________
 
-
-The member function :meth:`image_position <optrace.tracer.transfer_matrix_analysis.TMA.image_position>` enables us to calculate a image position from an object position.
+The method :meth:`image_position <optrace.tracer.transfer_matrix_analysis.TMA.image_position>` allows for the calculation of an image position.
+You need to provide an object position:
 
 .. doctest::
 
@@ -223,15 +226,14 @@ The member function :meth:`image_position <optrace.tracer.transfer_matrix_analys
 
 Both input and output value are absolute positions at the optical axis in millimeters.
 
-On the contrary we can calculate an object position from a known image position with
-:meth:`object_position <optrace.tracer.transfer_matrix_analysis.TMA.object_position>`:
+Conversely, we can calculate an object position from a known image position with :meth:`object_position <optrace.tracer.transfer_matrix_analysis.TMA.object_position>`:
 
 .. doctest::
 
    >>> tma.object_position(100)
    -33.84654855214077
 
-For both function infinite values (:python:`-np.inf, np.inf`) are supported as function parameters.
+In botch cases infinite values (:python:`-np.inf, np.inf`) are supported as function parameters.
 For the image position at infinity we get:
 
 .. doctest::
@@ -239,7 +241,7 @@ For the image position at infinity we get:
    >>> tma.object_position(np.inf)
    -16.93123809931588
 
-Which should be exactly the same position as the first focal point:
+Which is equal to the position of the first focal point:
 
 .. doctest::
    
@@ -247,8 +249,7 @@ Which should be exactly the same position as the first focal point:
    -16.93123809931588
 
 
-
-Analogously not only the positions but also the magnification factors at the image/object plane can be calculated:
+Analogously the magnification factors at the image/object plane can be calculated:
 
 .. doctest::
 
@@ -260,12 +261,13 @@ Analogously not only the positions but also the magnification factors at the ima
    >>> tma.object_magnification(18)
    0.8640542105175426
 
-A positive factor corresponds to an upright image, a negative to an inverted one. A number of magnitude larger than one means magnification, a number smaller than this a size decrease.
+A positive factor corresponds to an upright image, a negative to an inverted one. 
+A magnitude larger than one implies magnification, a smaller number a size decrease.
 
-Details on the math are listed in :numref:`ray_image_object_distances`.
+Details on the implementation are described in :numref:`ray_image_object_distances`.
 
 Another feature is the calculation of the ABCD matrix for a specific object and image distance.
-The :meth:`matrix_at <optrace.tracer.transfer_matrix_analysis.TMA.matrix_at>` method takes the object and image position as arguments and returns the matrix.
+The corresponding :meth:`matrix_at <optrace.tracer.transfer_matrix_analysis.TMA.matrix_at>` method requires the object and image position:
 
 .. doctest::
 
@@ -274,13 +276,13 @@ The :meth:`matrix_at <optrace.tracer.transfer_matrix_analysis.TMA.matrix_at>` me
           [ -0.03263119,  -1.40538498]])
 
 
-Calculation of Entrance and Exit Pupil
+Calculation of Entrance and Exit Pupils
 __________________________________________
 
-Entrance and exit pupil position and magnifications are also available for calculation.
+Methods for calculating the entrance and exit pupil position and magnifications are also available.
 Details on the math are found in :numref:`pupil_calculation`.
 
-First, let's load the paraxial eye model, get the pupil position and create the matrix analysis object:
+The following example loads the paraxial eye model from :func:`legrand_eye() <optrace.tracer.presets.geometry.legrand_eye>` and creates the TMA object:
 
 .. testcode::
 
@@ -288,15 +290,15 @@ First, let's load the paraxial eye model, get the pupil position and create the 
    aps = eye.apertures[0].pos[2]
    tma = eye.tma()
 
-The function :meth:`pupil_position <optrace.tracer.transfer_matrix_analysis.TMA.pupil_position>` takes the aperture stop position and returns a tuple of entrance and exit pupil position along the optical axis.
-Regarding the position of the stop, the aperture can lie inside, behind or in front of the lens setup. Therefore there are no limitations.
+The function :meth:`pupil_position <optrace.tracer.transfer_matrix_analysis.TMA.pupil_position>` requires an aperture stop position argumentand returns a tuple of entrance and exit pupil position along the optical axis.
+The aperture can lie inside, behind or in front of the lens setup. 
 
 .. doctest::
    
    >>> tma.pupil_position(aps)
    (3.037565216550855, 3.6821114369501466)
 
-Magnifications are returned with the member function :meth:`pupil_magnification <optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification>`.
+The method :meth:`pupil_magnification <optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification>` calculates the pupil magnifications:
 
 .. doctest::
    
@@ -307,11 +309,10 @@ Magnifications are returned with the member function :meth:`pupil_magnification 
 Miscellaneous Properties
 __________________________________________
 
-Unfortunately pupil sizes, numerical apertures, f-numbers, airy disk diameters are not available (yet).
-This is due to the |TMA_link| object not holding any information about the lens diameters or incident or outgoing light.
+The calculation is currently limited to these properties.
+Unfortunately pupil sizes, numerical apertures, f-numbers, airy disk diameters are not available.
+This is due to the |TMA_link| object not having any information about the lens diameters or ray characteristics.
 
-If these properties are needed they can be estimated by tracing the scene and investigating the ray properties for instance through the picker mode in the GUI, see the section :ref:`GUI scene <gui_overview_scene>`.
+In some cases the properties can be estimated using the interactive GUI and ray picking.
 For instance, the pupil sizes can be calculated from the pupil positions from the |TMA_link| and the radial distance of the outermost traced rays at this position.
-
-
 

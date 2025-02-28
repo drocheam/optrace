@@ -3,6 +3,7 @@
 import optrace as ot
 import optrace.plots as otp
 
+# Demonstrates image formation by convolution of a resolution chart and a halo PSF.
 
 # load a test image and define the image side lengths in mm
 img = ot.presets.image.ETDRS_chart([1.5, 1.2])

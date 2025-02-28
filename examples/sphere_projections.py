@@ -5,9 +5,11 @@ import optrace as ot
 import optrace.plots as otp
 from optrace.gui import TraceGUI
 
-# create Tissot’s indicatrix and compare projection methods
+# This script demonstrates the effect of different projections methods for a spherical surface detector.
+# Multiple point sources emit an angular cone spectrum from the spherical center of a spherical detector.
+# The detector view then displays an equivalent of a Tissot's indicatrix.
 
-R = 90
+R = 90  # radius of sphere
 
 # make raytracer
 RT = ot.Raytracer(outline=[-100, 100, -100, 100, -10, 100])

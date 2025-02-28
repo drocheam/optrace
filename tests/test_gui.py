@@ -1973,6 +1973,127 @@ class GUITests(unittest.TestCase):
         sim.debug(interact, args=(sim,))
         self.raise_thread_exceptions()
 
+    @pytest.mark.os
+    @pytest.mark.gui1
+    def test_0custom_ui(self) -> None:
+        """test if custom UI elements are correctly created, initialized and execute their action"""
+
+        RT = rt_example()
+        
+        val1 = [0]
+        val2 = [0]
+        val3 = [0]
+
+        def set_val1(a):
+            val1[0] = a
+
+        def set_val2(a):
+            val2[0] = a
+
+        def set_val3(a):
+            val3[0] = a
+        
+        def interact(sim):
+            with self._try(sim):
+
+                # check default values
+                self.assertEqual(len(sim.custom_checkbox_1), 1)
+                self.assertEqual(len(sim.custom_checkbox_2), 0)
+                self.assertEqual(len(sim.custom_checkbox_3), 1)
+                self.assertEqual(sim.custom_value_1, 5)
+                self.assertEqual(sim.custom_value_2, 6)
+                self.assertEqual(sim.custom_value_3, 7)
+                self.assertEqual(sim.custom_selection_1, "a")
+                self.assertEqual(sim.custom_selection_2, "e")
+                self.assertEqual(sim.custom_selection_3, "i")
+
+                # check setting of boxes by toggling them
+                self._set_in_main(sim, "custom_checkbox_1", False)
+                self._wait_for_idle(sim)
+                self.assertEqual(val1[0], False)
+                self._set_in_main(sim, "custom_checkbox_2", True)
+                self._wait_for_idle(sim)
+                self.assertEqual(val2[0], True)
+                self._set_in_main(sim, "custom_checkbox_3", False)
+                self._wait_for_idle(sim)
+                self.assertEqual(val3[0], False)
+
+                # check value setting
+                self._set_in_main(sim, "custom_value_1", 2.3)
+                self._wait_for_idle(sim)
+                self.assertEqual(val1[0], 2.3)
+                self._set_in_main(sim, "custom_value_2", -0.34)
+                self._wait_for_idle(sim)
+                self.assertEqual(val2[0], -0.34)
+                self._set_in_main(sim, "custom_value_3", 12.23)
+                self._wait_for_idle(sim)
+                self.assertEqual(val3[0], 12.23)
+
+                # check selection setting
+                self._set_in_main(sim, "custom_selection_1", "b")
+                self._wait_for_idle(sim)
+                self.assertEqual(val1[0], "b")
+                self._set_in_main(sim, "custom_selection_2", "d")
+                self._wait_for_idle(sim)
+                self.assertEqual(val2[0], "d")
+                self._set_in_main(sim, "custom_selection_3", "g")
+                self._wait_for_idle(sim)
+                self.assertEqual(val3[0], "g")
+
+                # check button actions
+                self._do_in_main(sim.custom_button_action_1)
+                self._wait_for_idle(sim)
+                self.assertEqual(val1[0], 1)
+                self._do_in_main(sim.custom_button_action_2)
+                self._wait_for_idle(sim)
+                self.assertEqual(val1[0], 2)
+                self._do_in_main(sim.custom_button_action_3)
+                self._wait_for_idle(sim)
+                self.assertEqual(val1[0], 3)
+
+                # set bound functions to None. Handling should still work
+                sim._custom_selection_functions[0] = None
+                sim._custom_button_functions[0] = None
+                sim._custom_value_functions[0] = None
+                sim._custom_checkbox_functions[0] = None
+                self._set_in_main(sim, "custom_value_1", 2.35)
+                self._set_in_main(sim, "custom_selection_1", "c")
+                self._set_in_main(sim, "custom_checkbox_1", True)
+
+                # time.sleep(20)
+
+        sim = TraceGUI(RT)
+
+        # custom boxes
+        sim.add_custom_checkbox("Box 1", True, set_val1)
+        sim.add_custom_checkbox("Box 2", False, set_val2)
+        sim.add_custom_checkbox("Box 3", True, set_val3)
+        
+        # custom buttons
+        sim.add_custom_button("Button 1", lambda: set_val1(1))
+        sim.add_custom_button("Button 2", lambda: set_val1(2))
+        sim.add_custom_button("Button 3", lambda: set_val1(3))
+
+        # custom values
+        sim.add_custom_value("Value 1", 5, set_val1)
+        sim.add_custom_value("Value 2", 6, set_val2)
+        sim.add_custom_value("Value 3", 7, set_val3)
+        
+        # custom selection
+        sim.add_custom_selection("Selection 1", ["a", "b", "c"], "a", set_val1)
+        sim.add_custom_selection("Selection 2", ["d", "e", "f"], "e", set_val2)
+        sim.add_custom_selection("Selection 3", ["g", "h", "i"], "i", set_val3)
+
+        # each element type is limited to three each
+        # check if adding additional elements is correctly handled
+        sim.add_custom_checkbox("Box 3", True, set_val3)
+        sim.add_custom_button("Button 3", lambda: set_val1(3))
+        sim.add_custom_value("Value 3", 7, set_val3)
+        sim.add_custom_selection("Selection 3", ["g", "h", "i"], "i", set_val3)
+        
+        sim.debug(interact, args=(sim,))
+        self.raise_thread_exceptions()
+
     @pytest.mark.slow
     @pytest.mark.os
     @pytest.mark.gui3

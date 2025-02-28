@@ -4,28 +4,31 @@ import numpy as np
 import optrace as ot
 from optrace.gui import TraceGUI
 
+# Example simulation of the double gauss Nikkor Wakamiya, 100mm, f1.4 objective. 
+# The simulation traces point sources from a distance of -50m and renders their PSF.
+
 # Nikkor Wakamiya, 100mm, f1.4, 
 # from https://nbviewer.org/github/quartiq/rayopt-notebooks/blob/master/Nikkor-Wakamiya-50mmf1.4_Ex1.ipynb
 # and https://patents.google.com/patent/US4448497
 
 # Elements:
-# # T   Distance   Rad Curv   Diameter          Material       n      nd      Vd
-# 0 S         20        inf        100         basic/air   1.000   1.000   89.30
-# 1 S          5      78.36         76                 -   1.797   1.797   45.50
-# 2 S     9.8837      469.5         76         basic/air   1.000   1.000   89.30
-# 3 S     0.1938       50.3         64                 -   1.773   1.773   49.40
-# 4 S     9.1085      74.38         62         basic/air   1.000   1.000   89.30
-# 5 S     2.9457      138.1         60                 -   1.673   1.673   32.20
-# 6 S     2.3256      34.33         51         basic/air   1.000   1.000   89.30
-# 7 S      16.07        inf       49.6         basic/air   1.000   1.000   89.30
-# 8 S         13     -34.41       48.8                 -   1.740   1.740   28.30
-# 9 S      1.938      -2907         57                 -   1.773   1.773   49.40
-# 10 S     12.403     -59.05         60         basic/air   1.000   1.000   89.30
-# 11 S     0.3876     -150.9       66.8                 -   1.788   1.788   47.50
-# 12 S      8.333     -57.89       67.8         basic/air   1.000   1.000   89.30
-# 13 S     0.1938      284.6         66                 -   1.788   1.788   47.50
-# 14 S     5.0388     -253.2         66         basic/air   1.000   1.000   89.30
-# 15 S     73.839        inf      86.53         basic/air   1.000   1.000   89.30
+# Num T   Distance   Rad Curv   Diameter          Material       n      nd      Vd
+# 0   S         20        inf        100         basic/air   1.000   1.000   89.30
+# 1   S          5      78.36         76                 -   1.797   1.797   45.50
+# 2   S     9.8837      469.5         76         basic/air   1.000   1.000   89.30
+# 3   S     0.1938       50.3         64                 -   1.773   1.773   49.40
+# 4   S     9.1085      74.38         62         basic/air   1.000   1.000   89.30
+# 5   S     2.9457      138.1         60                 -   1.673   1.673   32.20
+# 6   S     2.3256      34.33         51         basic/air   1.000   1.000   89.30
+# 7   S      16.07        inf       49.6         basic/air   1.000   1.000   89.30
+# 8   S         13     -34.41       48.8                 -   1.740   1.740   28.30
+# 9   S      1.938      -2907         57                 -   1.773   1.773   49.40
+# 10  S     12.403     -59.05         60         basic/air   1.000   1.000   89.30
+# 11  S     0.3876     -150.9       66.8                 -   1.788   1.788   47.50
+# 12  S      8.333     -57.89       67.8         basic/air   1.000   1.000   89.30
+# 13  S     0.1938      284.6         66                 -   1.788   1.788   47.50
+# 14  S     5.0388     -253.2         66         basic/air   1.000   1.000   89.30
+# 15  S     73.839        inf      86.53         basic/air   1.000   1.000   89.30
 
 # create tracer
 RT = ot.Raytracer(outline=[-2000, 2000, -22000, 2000, -50000, 180])

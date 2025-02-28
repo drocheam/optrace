@@ -21,8 +21,8 @@ Spectrum Classes
 LightSpectrum
 ______________________
 
-A |LightSpectrum| defines emittance or a similar quantity for light output depending on the wavelength. All spectral values need be greater or equal to zero.
-|LightSpectrum| objects are used when creating a |RaySource| or when we want to render the spectral distribution of light hitting a detector.
+A |LightSpectrum| defines wavelength-dependent emittance of light, with all spectral values being :math:`geq 0`.
+|LightSpectrum| objects are needed when creating a |RaySource| or to render spectral distribution of detectors.
 
 Creating the Spectrum
 #########################
@@ -30,19 +30,13 @@ Creating the Spectrum
 
 **Units**
 
-For line spectra (modes :python:`"Monochromatic"` and :python:`"Lines"`) the spectral unit is W, while for all other modes the spectral power density with unit W/nm.
-The actual values and height parameters (:python:`val, line_vals, ...`) are therefore given in the same unit.
-For spectra used in raytracing the absolute height is unimportant, as the function gets rescaled to the correct power by the parent ray source.
+For line spectra (modes :python:`"Monochromatic"` and :python:`"Lines"`) the spectral unit are Watts, while for all other modes the spectral power density is given as unit W/nm.
+Distribution and shape parameters (:python:`val, line_vals, ...`) are given in the same units.
+For spectra used in raytracing, the absolute scaling is unimportant, as the values will be rescaled by the parent ray source, which specifies the overall power.
 
 **Constant**
 
-This defines a constant spectrum with value :math:`S_0`:
-
-.. math::
-   S(\lambda) = S_0
-   :label: eq_spectrum_const
-
-The |LightSpectrum| is initialized in the following, with :python:`val` as :math:`S_0`:
+This mode defines a constant spectrum with value :python:`val`:
 
 .. testcode::
     
@@ -50,11 +44,7 @@ The |LightSpectrum| is initialized in the following, with :python:`val` as :math
 
 **Monochromatic**
 
-This implements a monochromatic source with wavelength :math:`\lambda_0`.
-
-.. math::
-   S(\lambda) = S_0\, \delta(\lambda - \lambda_0)
-   :label: eq_spectrum_mono
+This mode implements a monochromatic source with wavelength :python:`wl`.
 
 .. testcode::
     
@@ -62,13 +52,8 @@ This implements a monochromatic source with wavelength :math:`\lambda_0`.
 
 **Lines**
 
-A line spectrum consist of multiple monochromatic sources, parameters are a set of power and wavelength combinations :math:`L=\left\{(P_1,~\lambda_1),~(P_2,~\lambda_2),~\dots\right\}`.
-
-.. math::
-   S(\lambda) = \sum_{(S_i, ~\lambda_i) \in L}  S_i \, \delta(\lambda - \lambda_i)
-   :label: eq_spectrum_lines
-
-Argument :python:`lines` is a list of wavelengths, while :python:`line_vals` is a list with the same number of elements describing the height/power of each wavelength.
+A line spectrum consist of multiple monochromatic sources.
+The argument :python:`lines` is a list of wavelengths, while :python:`line_vals` is a list with the same number of elements describing the height/power of each wavelength.
 
 .. testcode::
 
@@ -77,11 +62,7 @@ Argument :python:`lines` is a list of wavelengths, while :python:`line_vals` is 
 
 **Rectangle**
 
-Spectrum with a rectangular function :math:`\Pi(\lambda)` with bounds :math:`\lambda_0,~\lambda_1` and a scaling factor :math:`S_0`.
-
-.. math::
-   S(\lambda) = S_0\, \Pi_{[\lambda_0,~\lambda_1]}(\lambda)
-   :label: eq_spectrum_rect
+The following equations defines a spectrum with a rectangular function with bounds :python:`wl0`, :python:`wl1` and a scaling factor :python:`val`:
 
 .. testcode::
     
@@ -90,14 +71,14 @@ Spectrum with a rectangular function :math:`\Pi(\lambda)` with bounds :math:`\la
 
 **Gaussian**
 
-A gaussian spectrum is modelled with a scaling factor :math:`S_0`, a center wavelength :math:`\lambda_0` and a standard deviation :math:`\lambda_\sigma`.
+A Gaussian spectrum is modelled mathematically with a scaling factor :math:`S_0`, a center wavelength :math:`\lambda_0` and a standard deviation :math:`\sigma_\lambda`:
 
 .. math::
-   S(\lambda) = S_0 \exp \left( -\frac{\left(\lambda - \lambda_0\right)^2}{2 \lambda^2_\sigma}\right)
+   S(\lambda) = S_0 \exp \left( -\frac{\left(\lambda - \lambda_0\right)^2}{2 \sigma_\lambda^2}\right)
    :label: eq_spectrum_gauss
 
-When programming, the gaussian function is created with :python:`"Gaussian"`, a mean value :python:`mu` and standard deviation :python:`sig`, all given in nanometers.
-Note that the gaussian function will be truncated to the visible range [380nm, 780nm].
+The spectrum object is created with mode :python:`"Gaussian"`, a mean value :python:`mu` and standard deviation :python:`sig`, all given in nanometers.
+Note that the Gaussian function will be truncated to the visible range [380nm, 780nm].
 
 .. testcode::
     
@@ -107,7 +88,7 @@ Note that the gaussian function will be truncated to the visible range [380nm, 7
 **Blackbody Radiator**
 
 
-The spectral radiance for a blackbody according to Planck's Law is: :footcite:`PlanckWiki`
+The spectral radiance of a blackbody according to Planck's Law is given as: :footcite:`PlanckWiki`
 
 .. math::
    B_\lambda (\lambda, ~T) = \frac{2 h c^2}{\lambda^5} \frac{1}{\exp\left(\frac{h  c } {\lambda k_\text{B}  T}\right) - 1}
@@ -120,19 +101,20 @@ The equation contains the speed of light :math:`c`, the Planck constant :math:`h
    h =&~ 6.62607015\cdot 10^{-34} ~\text{J s}\\
    k_\text{B} =&~ 1.380649 \cdot 10^{-23} ~\text{J/K}\\
 
-Note that :math:`\lambda` must be specified in meters.
+Note that :math:`\lambda` must be specified in meters in the above equation.
 
 
 .. topic:: Note
 
    The spectral radiance :math:`B_\lambda` (Power per solid angle, source area and wavelength) is given in units :math:`\text{W}/(\text{m}^3~\text{sr})`, whereas the units in this class should be :math:`\text{W/nm}` (Power per wavelength). Since :math:`B_\lambda` is constant over the source area and angle independent, converting it corresponds to a simple rescaling. 
-   This is done while raytracing, where a specfic desired power is matched.
 
 
-There is an option to normalize the spectrum, such that the peak value inside the visible range is equal to one.
-If the peak wavelength is inside the visible range then to Stefan–Boltzmann law can be applied to calculate the normalization factor, otherwise the maximum value should lie at one of the edges of the visible range.
+There is an option to normalize the spectrum, so the peak value equals one.
+This can prove useful for plotting the spectrum.
+If the peak wavelength is inside the visible range, then the Stefan–Boltzmann law can be applied to calculate the normalization factor.
+Otherwise the maximum value will lie at one of the edges of the visible range.
 
-A blackbody radiator, following Planck's law, with a specific temperature :python:`T` in Kelvin is initialized with:
+A blackbody radiator, following Planck's law, with a specific temperature of :python:`T` in Kelvin, is initialized as:
 
 .. testcode::
     
@@ -142,26 +124,24 @@ The :python:`val` parameter defines the peak value in W/nm.
 
 **User Function/Data**
 
-With Data/Function mode the spectrum is simply modelled by a user function/ data set. With a data set data is linearly interpolated.
+With the Data/Function mode, the spectrum is modelled by a user function/ data set. 
+With a dataset, the data will be linearly interpolated.
 
-.. math::
-   S(\lambda) = S_F(\lambda)
-   :label: eq_spectrum_user
-
-This function must take wavelength array in nm as input and also return a numpy array with the same shape.
+This function requires a wavelength array in nm as input and returns a numpy array of the same shape.
 
 .. testcode::
     
    spec = ot.LightSpectrum("Function", func=lambda wl: np.arctan(wl - 520)**2)
 
 
-If a function with multiple parameters is utilized, additional arguments can be put in the :python:`func_args` parameter dictionary.
+If a function with multiple parameters is utilized, additional arguments can be provided in the :python:`func_args` parameter dictionary.
 
 .. testcode::
     
    spec = ot.LightSpectrum("Function", func=lambda wl, c: np.arctan(wl - c)**2, func_args=dict(c=489))
 
-For discrete datasets the :python:`"Data"` mode proves useful. In this case the |LightSpectrum| constructor takes a wavelength array :python:`wls` and a value array :python:`vals`, both being the same shape and one dimensional numpy arrays.
+For discrete datasets, the :python:`"Data"` mode proves useful. 
+In this case the |LightSpectrum| constructor takes a wavelength array :python:`wls` and a value array :python:`vals` as arguments, where both must be of the exact same one-dimensional shape.
 
 .. testcode::
     
@@ -175,12 +155,13 @@ Note that :python:`wls` needs to be monotonically increasing with the same step 
 
 **Histogram**
 
-This spectrum type generally is not user created, but is rendered on a detector or source. It consists of a list of bins and bin values.
+This spectrum type is not user created, but is rendered on a detector or source. 
+It consists of a list of bins and bin values.
 
-Getting Spectral Values
-#########################
+Calculating Spectral Values
+##############################
 
-The |LightSpectrum| object can be called with wavelengths to get the spectral values:
+The |LightSpectrum| object can be called with a wavelength array to calculate the spectral values:
 
 .. doctest::
 
@@ -203,24 +184,23 @@ Wavelength Characteristics
      - Meaning
    * - :meth:`peak_wavelength <optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak_wavelength>`
      - nm
-     - Wavelength with the spectrum peak
+     - wavelength for the spectral peak
    * - :meth:`centroid_wavelength <optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength>`
      - nm
      - power-weighted average wavelength, see `Centroid Wavelength <https://en.wikipedia.org/wiki/Spectral_centroid>`__
    * - :meth:`fwhm <optrace.tracer.spectrum.light_spectrum.LightSpectrum.fwhm>`
      - nm
-     - full width half maximum wavelength range
+     - full-width-at-half-maximum wavelength range
    * - :meth:`dominant_wavelength <optrace.tracer.spectrum.light_spectrum.LightSpectrum.dominant_wavelength>`
      - nm
-     - | wavelength with the same hue as the spectrum, see `Dominant Wavelength <https://en.wikipedia.org/wiki/Dominant_wavelength>`__
-       | NaN if not existent
+     - | same hue wavelength, see `Dominant Wavelength <https://en.wikipedia.org/wiki/Dominant_wavelength>`__
+       | :python:`np.nan` if not existent
    * - :meth:`complementary_wavelength <optrace.tracer.spectrum.light_spectrum.LightSpectrum.complementary_wavelength>`
      - nm
-     - | wavelength with the opposite hue as the spectrum, see `Dominant Wavelength <https://en.wikipedia.org/wiki/Dominant_wavelength>`__
-       | NaN if not existent
+     - | opposite hue wavelength, see `Dominant Wavelength <https://en.wikipedia.org/wiki/Dominant_wavelength>`__
+       | :python:`np.nan` if non-existent
 
-As an example we can load the LED B1 standard illuminant, that can also be seen in :numref:`fig_led_illuminants`.
-Then the peak wavelength is calculated with:
+For instance, we can calculate the peak wavelength of the LED B1 standard illuminant by doing:
 
 .. doctest::
 
@@ -228,8 +208,9 @@ Then the peak wavelength is calculated with:
    >>> spec.peak_wavelength()
    605.00225...
 
-Note that with multiple same height peaks or a broad constant peak region the first peak value is returned. However, due to numerical precision this is not always the case.
-In our example the power-weighted average wavelength (centroid) is different from this:
+Note that with multiple same height peaks or a broad constant peak region the first peak value will be returned.
+
+The centroid wavelength for the spectrum is:
 
 .. doctest::
 
@@ -243,10 +224,10 @@ The dominant wavelength is calculated using:
    >>> spec.dominant_wavelength()
    584.75088...
 
-When dominant or complementary are not existent, as for instance magenta can't be described by a single wavelength, the values are set to NaN (not a number).
-You can find a visual explanation on both dominant and complementary wavelength `on this Wiki page <https://en.wikipedia.org/wiki/Dominant_wavelength>`__.
+When dominant or complementary are not existent (e.g. magenta can't be described by a wavelength), the values are set to NaN (not a number).
+You can find a visualization on both dominant and complementary wavelengths `on this Wiki page <https://en.wikipedia.org/wiki/Dominant_wavelength>`__.
 
-The FWHM (full width at half maximum) can be calculated with:
+The FWHM (full width at half maximum) is calculated usin:
 
 .. doctest::
 
@@ -254,20 +235,22 @@ The FWHM (full width at half maximum) can be calculated with:
    129.18529...
 
 
-The function calculates the smallest FWHM around the highest peak. Note that for some spectral distributions, for instance multiple gaussians, this function is not suitable, as the FWHM is not meaningful here.
+The method calculates the smallest FWHM around the highest peak.
+While it is possible to calculate this value for all spectral shapes, it is only meaningful as width characterization for functions with a distinctive peak and an outward fall-off.
+For instance this metric does not make sense for a spectrum consisting of multiple separated bell-shaped curves.
 
 
 Power
 #############
 
-The spectral power in W can be calculated with:
+The spectral power can be calculated with:
 
 .. doctest::
 
    >>> spec.power()
    3206.9749...
 
-And the luminous power in lumens with:
+And the luminous power in lumen units with:
 
 .. doctest::
 
@@ -278,35 +261,40 @@ And the luminous power in lumens with:
 Rendering a LightSpectrum
 #################################
 
-Rendering a light spectrum is  done on the ray source or detector surface.
 Read section :ref:`rimage_rendering` for details on rendering images, rendering spectra is done in a similar way.
 Analogously to rendering a source image, we can render a spectrum with :meth:`source_spectrum <optrace.tracer.raytracer.Raytracer.source_spectrum>` and by providing a :python:`source_index` parameter (default to zero).
-With a raytracer object called :python:`RT` a source spectrum is rendered with:
+With a raytracer object :python:`RT`, a source spectrum from source 1 is rendered with:
 
 .. code-block:: python
 
    spec = RT.source_spectrum(source_index=1)
 
-For a detector spectrum the :meth:`detector_spectrum <optrace.tracer.raytracer.Raytracer.detector_spectrum>` function is applied. It takes a :python:`detector_index` argument, that also defaults to zero.
+For a detector spectrum the :meth:`detector_spectrum <optrace.tracer.raytracer.Raytracer.detector_spectrum>` function is applied. 
+It takes a :python:`detector_index` argument, that defaults to zero.
 
 .. code-block:: python
 
    spec = RT.detector_spectrum(detector_index=0)
 
-Additionally we can limit the rendering to a source by providing a :python:`source_index` or limit the detector area by providing the :python:`extent` parameter, as we did for the :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>`.
+Additionally we can render only a specific source by providing a :python:`source_index` or limit the detector area by providing the :python:`extent` parameter, as we did for the :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>` method.
 
 .. code-block:: python
 
    spec = RT.detector_spectrum(detector_index=0, source_index=1, extent=[0, 1, 0, 1])
 
-The above methods return an object of type :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` with :python:`spectrum_type="Histogram"`.
+The above methods return a :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` object with type :python:`spectrum_type="Histogram"`.
+
 
 TransmissionSpectrum
 ______________________
 
-A TransmissionSpectrum is applied as filter function for a Filter element. All transmission values need to be inside the [0, 1] range.
-The TransmissionSpectrum provides less modes than the LightSpectrum class. Note that now the scaling factor :python:`vall` becomes important.
-This class defines a new :python:`inverse` parameter, that subtracts the defined function from a value of one. This has the effect that the function instead does not define the transmittance behavior, but the absorption one. A gaussian bandpass becomes a notch filter, a rectangular bandpass a rectangular blocking one.
+The :class:`Filter <optrace.tracer.geometry.filter.Filter>` class requires a |TransmissionSpectrum|. 
+All relative transmission values need to be inside the [0, 1] range.
+The |TransmissionSpectrum| provides less modes than the |LightSpectrum| class. 
+Compared to the latter, the scaling factor :python:`vall` now becomes important.
+This class defines a new :python:`inverse` parameter, that subtracts the defined function from a value of one. 
+This has the effect of turning the transmittance behavior into absorptance. 
+A Gaussian bandpass becomes a notch filter, a rectangular bandpass a rectangular blocking filter.
 
 **Constant**
 
@@ -318,13 +306,13 @@ A neutral density filter is defined with mode :python:`"Constant"` and the linea
 
 **Gaussian**
 
-Colored filters (or bandpass filters) are often similar to a Gaussian function.
+Colored filters (most commonly bandpass filters) can be created with a Gaussian function.
 
 .. testcode::
     
    spec = ot.TransmissionSpectrum("Gaussian", mu=550, sig=30, val=1)
 
-A gaussian notch filter can be defined with :python:`inverse=True`.
+A Gaussian notch filter is easily defined with parameter :python:`inverse=True`.
 
 .. testcode::
     
@@ -332,7 +320,7 @@ A gaussian notch filter can be defined with :python:`inverse=True`.
 
 **Rectangle**
 
-A rectangular pass filter can be modelled by a rectangular function.
+A rectangular pass filter is modelled by a rectangular function.
 
 .. testcode::
     
@@ -344,7 +332,7 @@ A rectangular blocking filter can be defined with :python:`inverse=True`.
     
    spec = ot.TransmissionSpectrum("Rectangle", wl0=500, wl1=650, inverse=True)
 
-An edgepass filter can be created by simply setting one of the bounds to the bound of the visible range.
+Creating an edgepass filter becomes easy by setting the bound to the edge of the visible range.
 
 .. testcode::
     
@@ -353,11 +341,12 @@ An edgepass filter can be created by simply setting one of the bounds to the bou
 
 **User Data/Function**
 
-Creating a |TransmissionSpectrum| with discrete data or a user function works exactly like for the |LightSpectrum|, however all function/data values need to be inside range [0, 1].
+Creating a |TransmissionSpectrum| with discrete data is equivalent to a |LightSpectrum|.
+However, all function/data values need to be inside the range [0, 1].
 
 **Getting Spectral Values**
 
-As for the |LightSpectrum| object we can get the spectral values with:
+As for the |LightSpectrum| object, we can get the spectral values with:
 
 .. doctest::
 
@@ -368,8 +357,11 @@ As for the |LightSpectrum| object we can get the spectral values with:
 Spectrum
 ______________________
 
-|Spectrum| is the parent class of both |LightSpectrum|, |TransmissionSpectrum|. It defines the following modes: :python:`"Monochromatic", "Rectangle", "List", "Function", "Data", "Gaussian", "Constant"`. Compared to |LightSpectrum| only modes :python:`"Histogram"` and :python:`"Blackbody"` are missing.
-Generally the |Spectrum| class is not used by the user. But for instance the color matching functions  :python:`ot.presets.spectrum.x, ot.presets.spectrum.y, ot.presets.spectrum.z` are objects of this class.
+|Spectrum| is the parent class of both |LightSpectrum| and |TransmissionSpectrum|. 
+It defines the following modes: :python:`"Monochromatic", "Rectangle", "List", "Function", "Data", "Gaussian", "Constant"`. 
+Compared to |LightSpectrum|, only modes :python:`"Histogram"` and :python:`"Blackbody"` are missing.
+Generally the |Spectrum| class is not exposed to the user. 
+But, for instance, the color matching functions :python:`ot.presets.spectrum.x, ot.presets.spectrum.y, ot.presets.spectrum.z` are objects of this type.
 
 
 Plotting
@@ -383,8 +375,7 @@ See :ref:`spectrum_plots`.
 Spectral Lines Presets
 ______________________
 
-optrace has some spectral wavelength lines defined in its presets.
-While there are many such lines, only those relevant for the calculation of the Abbe number are built-in.
+optrace provides some spectral wavelength lines in its presets.
 
 .. list-table:: Fraunhofer lines commonly used for Abbe number determination :footcite:`AbbeWiki`
    :widths: 70 70 70 70
@@ -441,7 +432,8 @@ While there are many such lines, only those relevant for the calculation of the 
      - K
      - IR-A
 
-Due to limitations in python variable names, the presets with a trailing apostrophe are instead named with an trailing underscore, for instance F' is named :python:`F_`.
+Due to limitations in python variable names, presets with a trailing apostrophe are named with an trailing underscore.
+For instance, F' is named :python:`F_`.
 
 .. doctest::
     
@@ -455,10 +447,10 @@ The most common wavelength combinations for Abbe numbers are FdC, FDC, FeC and F
    >>> ot.presets.spectral_lines.F_eC_
    [479.9914, 546.074, 643.8469]
 
-In the next table the dominant wavelengths of the sRGB primaries can be found. The dominant wavelength is the wavelength that produces a color with the same hue as the reference color.
-The scaling factors are dimensioned such that the sum of these three monochromatic light sources produces sRGB-white.
+The following table provides the dominant wavelengths of the sRGB primaries (ITU-R BT.709). 
+Dimensioning the scaling factors in the provided way produces D65 sRGB-white for equal R, G, B mixing ratios.
 
-.. list-table:: Dominant wavelengths of sRGB primaries. Own work. 
+.. list-table:: Dominant wavelengths of sRGB primaries. Derived by optimization. 
    :widths: 70 70 70
    :header-rows: 1
    :align: center
@@ -477,7 +469,7 @@ The scaling factors are dimensioned such that the sum of these three monochromat
      - 464.3118
      - 0.3895581
 
-These wavelengths prove useful when trying to simulate color mixing.
+These wavelengths are useful for simulating color mixing.
 
 .. doctest::
     
@@ -487,8 +479,7 @@ These wavelengths prove useful when trying to simulate color mixing.
 Spectrum Presets
 ______________________
 
-
-Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
+The following figures demonstrate the predefined presets for |Spectrum| and |LightSpectrum|.
 
 .. list-table::
    :widths: 500 500
@@ -499,14 +490,14 @@ Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
           :align: center
           :class: dark-light
           
-          CIE standard illuminants. Available as ``ot.presets.light_spectrum.<name>`` with ``a, d50, ...`` as ``<name>``
+          CIE standard illuminants. Available as :python:`ot.presets.light_spectrum.<name>` with :python:`a, d50, ...` as :python:`<name>`
 
      - .. figure:: ../images/LED_illuminants.svg
           :width: 500
           :align: center
           :class: dark-light
            
-          CIE standard illuminants LED series. Available as ``ot.presets.light_spectrum.<name>`` with ``led_b1, led_b2, ...`` as ``<name>``
+          CIE standard illuminants LED series. Available as :python:`ot.presets.light_spectrum.<name>` with :python:`led_b1, led_b2, ...` as :python:`<name>`
            
    * - .. _fig_led_illuminants:
 
@@ -515,7 +506,7 @@ Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
           :align: center
           :class: dark-light
          
-          CIE standard illuminants Fluorescent series. Available as ``ot.presets.light_spectrum.<name>`` with ``fl2, fl7, ...`` as ``<name>``
+          CIE standard illuminants Fluorescent series. Available as :python:`ot.presets.light_spectrum.<name>` with :python:`fl2, fl7, ...` as :python:`<name>`
 
      - .. figure:: ../images/srgb_spectrum.svg
           :width: 500
@@ -523,7 +514,7 @@ Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
           :class: dark-light
          
           Possible sRGB primary spectra.
-          Available as ``ot.presets.light_spectrum.<name>`` with ``srgb_r, srgb_g, ...`` as ``<name>``
+          Available as :python:`ot.presets.light_spectrum.<name>` with :python:`srgb_r, srgb_g, ...` as :python:`<name>`
 
    * - .. figure:: ../images/cie_cmf.svg
           :width: 500
@@ -531,7 +522,7 @@ Below you can find some predefined presets for |Spectrum| and |LightSpectrum|.
           :class: dark-light
          
           CIE color matching functions.
-          Available as ``ot.presets.spectrum.<name>`` with ``x, y, z`` as ``<name>``
+          Available as :python:`ot.presets.spectrum.<name>` with :python:`x, y, z` as :python:`<name>`
      
      - 
   

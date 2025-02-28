@@ -4,9 +4,12 @@ import numpy as np
 import optrace as ot
 from optrace.gui import TraceGUI
 
-# brewster angle at b_ang = arctan(n/n0)
-# maximum transmission for p-polarized rays
-# reflected rays s-polarized
+# A setup with three different light rays impinging on multiple planar surfaces 
+# with an incident angle equal to the Brewster angle. 
+# Depending on the polarization direction we can see a huge difference in the light's transmission.
+
+# The Brewster angle is at b_ang = arctan(n/n0),
+# with maximum transmission for p-polarized rays and reflected rays s-polarized
 
 n = ot.RefractionIndex("Constant", n=1.55)
 b_ang = np.arctan(1.55/1)

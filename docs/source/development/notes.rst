@@ -44,8 +44,9 @@ Notes
 * axes, minor and major grid lines, titles and legend are a must
 * :func:`block <optrace.plots.misc_plots.block>` function allows for halting the rest of the program when plotting 
 * options for hiding some visual elements (labels, axes in GUI, legend entries)
+* prefer svg for self-created figures, png for screenshots and webp for rendered images
 * use tinypng to shrink pngs for the webpage, vecta.io for pyplot svgs
-* shrink embedded pngs in svg by extracting png images in inkscape, changing them, then embedding them back
+* in some cases there are issues with webp output in chromatic channels, export in lossless webp in these cases
 
 **Multithreading and Multiprocessing**
 

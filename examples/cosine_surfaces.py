@@ -5,6 +5,9 @@ import optrace as ot
 from optrace.gui import TraceGUI
 import optrace.plots as otp
 
+# An example with two lenses with orthogonal cosine modulations on each side. 
+# Creates rectangular, kaleidoscope-like images inside the beam path.
+
 # init raytracer
 RT = ot.Raytracer(outline=[-15, 15, -15, 15, 0, 80])
 

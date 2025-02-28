@@ -40,3 +40,6 @@ Session.vim
 # cache not needed
 *__pycache__
 
+# temporary files
+temp.zmx
+tmp.png

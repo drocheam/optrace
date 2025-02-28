@@ -196,14 +196,14 @@ A reduction in noise is clearly visible.
 .. list-table::
    :class: table-borderless
 
-   * - .. figure:: ../images/rect_simple_sampling.svg
+   * - .. figure:: ../images/rect_simple_sampling.webp
           :align: center
           :width: 450
           :class: dark-light
 
           200k rays on a square area with simple uniform sampling, image rendered with 189 x 189 pixel
 
-     - .. figure:: ../images/rect_strat_sampling.svg
+     - .. figure:: ../images/rect_strat_sampling.webp
           :align: center
           :width: 450
           :class: dark-light
@@ -225,14 +225,14 @@ While this done uniformly in :numref:`circle_sampling`, there are some circular 
 .. list-table::
    :class: table-borderless
 
-   * - .. figure:: ../images/circ_sampling_strat.svg
+   * - .. figure:: ../images/circ_sampling_strat.webp
           :align: center
           :width: 450
           :class: dark-light
 
           200k rays with stratified sampling and a polar grid transformation as done in :numref:`circle_sampling`, image rendered with 189 x 189 pixel
 
-     - .. figure:: ../images/circ_sampling_mapping.svg
+     - .. figure:: ../images/circ_sampling_mapping.webp
           :align: center
           :width: 450
           :class: dark-light

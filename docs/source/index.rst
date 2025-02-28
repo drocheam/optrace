@@ -12,7 +12,7 @@ optrace - A scripting based optics simulation package with sequential raytracing
           :width: 165
           :class: dark-light
     
-     - .. figure:: images/example_rgb_render2.svg
+     - .. figure:: images/example_rgb_render2.webp
           :align: center
           :width: 155
           :class: dark-light
@@ -22,7 +22,7 @@ optrace - A scripting based optics simulation package with sequential raytracing
           :width: 165
           :class: dark-light
      
-     - .. figure:: ./images/example_keratoconus_4.svg
+     - .. figure:: ./images/example_keratoconus_4.webp
           :align: center
           :width: 155
           :class: dark-light
@@ -47,7 +47,7 @@ optrace - A scripting based optics simulation package with sequential raytracing
           :width: 165
           :class: dark-light
      
-     - .. figure:: ./images/rgb_render_srgb1.svg
+     - .. figure:: ./images/rgb_render_srgb1.webp
           :align: center
           :width: 155
           :class: dark-light
@@ -64,21 +64,22 @@ Overview
    :class: table-borderless
 
    * - **Features**
-        * sequential raytracer for geometrical optics
-        * tool with presets and user defined surface shapes, ray sources and media
-        * library with an additional GUI with ray and geometry visualization
-        * renderer for colored detector images inside an optical setup
-        * program including paraxial analysis (matrix optics, position of cardinal points/planes and psf convolution)
+        * sequential raytracing for geometrical optics
+        * rendering colored detector images
+        * paraxial analysis (matrix optics, cardinal points/planes and PSF convolution)
+        * presets and user defined surface shapes, ray sources and media
+        * an additional GUI for visualization
         * programming/scripting approach to simulation
         * high performance of 0.1 s / surface / million rays (:ref:`details <benchmarking>`)
-        * free, open source software
+        * free and open source software
 
-     - **Non-Features**
-        * a GUI focussed tool
-        * an optics design program with lens optimization, aberration analysis and tolerancing
-        * simulation incorporating wave optics, e.g. diffraction, interference
-        * a non-sequential raytracer, simulating ghost images, reflections
-        * a tool supporting mirror or fresnel lens optics
+     - **What it CAN'T do**
+        * coding-free simulations
+        * wave optics, including diffraction and interference
+        * non-sequential scenes, simulating ghost images, reflections
+        * mirror or fresnel lens optics
+        * scattering and polarization dependent media
+        * lens optimization, aberration analysis and tolerancing
 
    * - |
 
@@ -86,7 +87,7 @@ Overview
         * educational purposes, demonstrating aberrations or simple optical setups
         * introductionary tool to paraxial, geometrical optics or image formation
         * simulation of simpler systems, like a prism, the eye model or a telescope
-        * estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) would be overkill for
+        * estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) is overkill for
 
      - 
 

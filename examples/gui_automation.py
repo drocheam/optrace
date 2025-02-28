@@ -6,11 +6,9 @@ import numpy as np
 import optrace as ot
 from optrace.gui import TraceGUI
 
-
 # this example shows the automation capabilities of the GUI
 # the position and size of a source are varied and the scene and rays are updated after each step
-
-# besides just displaying the scene, one could for instance also take screenshots using TraceGUI.screenshot()
+# The automation function can be rerun by pressing the button in the "Custom" GUI tab.
 
 RT = ot.Raytracer(outline=[-10, 10, -10, 10, -25, 40])
 
@@ -43,6 +41,11 @@ def automated(GUI):
     # GUI properties were set, but the changes need to be processed
     GUI.process()
 
+    # default state, needed to rerun this function
+    with GUI.smart_replot():
+        RT.ray_sources[0].set_surface(ot.Line(r=1, angle=90))
+        RT.ray_sources[0].move_to([0, 0, -15])
+
     # vary the lateral source position
     for yp in np.linspace(1, 4, 4):
 
@@ -68,4 +71,5 @@ def automated(GUI):
 
 # create the GUI and provide the automation function to TraceGUI.control()
 sim = TraceGUI(RT)
+sim.add_custom_button("Rerun", lambda: automated(sim))
 sim.control(func=automated, args=(sim,))

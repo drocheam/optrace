@@ -10,8 +10,6 @@ from optrace.gui import TraceGUI
 # The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files
 # that are were built from patent data.
 
-# make sure the folder examples/resources with all subfolders and files is available, as we will need those
-
 # path for needed resources (materials and eyepiece, objective files)
 # we could use a path string for ot.load_agf() and ot.load_zmx(), but using pathlib makes it platform-independent
 resource_dir = pathlib.Path(__file__).resolve().parent / "resources"

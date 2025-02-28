@@ -1,5 +1,6 @@
 .. _usage_gui:
 
+
 GUI Interaction
 ------------------
 
@@ -26,16 +27,9 @@ Loading the GUI
 ____________________
 
 
-**Example**
+**Initializing the GUI**
 
-As always, import the main optrace namespace:
-
-.. testcode::
-
-   import optrace as ot
-
-
-To import the |TraceGUI| into the current namespace write:
+First, we need to import into the |TraceGUI| into the current namespace:
 
 .. testcode::
 
@@ -55,25 +49,26 @@ Let's create some exemplary geometry:
    eye = ot.presets.geometry.legrand_eye()
    RT.add(eye)
 
-A |TraceGUI| takes the |Raytracer| as argument:
+To create a |TraceGUI|, we need to pass the |Raytracer| as argument:
 
 .. testcode::
 
    sim = TraceGUI(RT)
 
-The GUI is now assigned to the :python:`sim` variable, but has not started yet.
-For running the GUI you need to write:
+**Running the GUI**
+
+The GUI is run with:
 
 .. code-block:: python
 
    sim.run()
 
-This loads the main window and also raytraces the geometry.
+This loads the main window and also raytraces the geometry if it hasn't already been traced.
 
 **Parameters**
 
 When creating the GUI, additional properties can be assigned.
-For instance, setting the scene to high contrast mode and increasing the amount of rays traced, we can write instead:
+To set the scene to high contrast mode and increase the amount of rays, we can call:
 
 .. testcode::
 
@@ -82,18 +77,17 @@ For instance, setting the scene to high contrast mode and increasing the amount 
 Available properties are discussed in :numref:`gui_tabs`.
 
 
-**Initial Camera**
+**Initial Camera View**
 
-An initial camera view can be applied with the :python:`initial_camera` parameter:
+The :python:`initial_camera` parameter sets an initial camera view.
 
 .. testcode::
 
    sim = TraceGUI(RT, high_contrast=True, ray_count=2000000,\
                   initial_camera=dict(center=[-50, -50, 0], direction=[-1, -1, -1], height=150, roll=-120))
 
-Theses properties are directly passed to :meth:`TraceGUI.set_camera <optrace.gui.trace_gui.TraceGUI.set_camera>`.
+These properties are directly passed to the :meth:`TraceGUI.set_camera <optrace.gui.trace_gui.TraceGUI.set_camera>` function.
 You can read more about the camera settings in :numref:`gui_camera`.
-
 
 
 UI Overview
@@ -115,44 +109,12 @@ Scene
 
 **Overview**
 
-Details on the scene navigation are found in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>` under "Mouse Interaction".
-There are also keyboard shortcuts available that are discussed in :numref:`gui_keyboard_shortcuts`.
+Details on the scene navigation are available in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>` under "Mouse Interaction".
+Inside the scene in the bottom left you can find orientation axes, that display the directions of the cartesian axes in the 3D view. 
+When an action/tasks is running, you are informed by a status text in the bottom right.
+A list of keyboard shortcuts is provided below.
 
-In the bottom left you can find orientation axes, that display the directions of the cartesian axes in the 3D view. When an action/tasks is running, you are informed by a text in the bottom right.
-
-**Picking and Clicking**
-
-When clicking on the ray intersection of ray and a surface, there is a list of properties shown for the selected ray, that is also marked with a red crosshair.
-The picked ray is highlighted in red.
-
-When using ``Shift + Click`` an advanced output is shown, showing even more properties.
-
-Right-clicking inside the scene displays the coordinates of the picked point.
-
-``Shift + Right Click`` moves the currently selected detector to the picked. z-position.
-
-**High Contrast Mode**
-
-By activating the high contrast mode the background becomes white and all geometry elements grey or black.
-This mode can also be useful when creating scene views for academic purposes, as the background color in documents is also white.
-You can find an example below.
-
-.. figure:: ../images/example_double_gauss.png
-  :align: center
-  :width: 800
-  :class: dark-light
-
-  With :python:`plot_dark_mode` enabled.
-   
-
-
-**Keyboard Shortcuts**
-
-The following keyboard shortcuts are available inside the scene:
-
-.. _gui_keyboard_shortcuts:
-
-.. list-table:: Available keyboards shortcuts
+.. list-table:: Available keyboards shortcuts inside the scene
    :header-rows: 1
    :align: center
    :widths: 100 300
@@ -185,15 +147,39 @@ The following keyboard shortcuts are available inside the scene:
    * - ``3``
      - anaglyph view (view for red-cyan 3D glasses)
 
+**Picking and Clicking**
+
+A list of properties for the selected ray is shown when clicking on the ray intersection of ray and surface.
+The intersection position is also marked with a red crosshair, while the picked ray is highlighted in red.
+Even more properties are shown when using ``Shift + Click``.
+
+Right-clicking inside the scene displays the coordinates of the picked point.
+``Shift + Right Click`` moves the currently selected detector to the picked z-position.
+
+**High Contrast Mode**
+
+By activating the high contrast mode the background becomes white and all geometry elements grey or black.
+This is useful when creating scene views for academic output, as the background color in documents is also white.
+
+.. figure:: ../images/example_double_gauss.png
+  :align: center
+  :width: 800
+  :class: dark-light
+
+  With :python:`plot_dark_mode` enabled.
+   
+
 Toolbar
 ######################
 
-The mayavi scene toolbar is positioned above the scene. It includes buttons for the pipeline view window, different perspectives, fullscreen, screenshot saving and scene settings. Details are found in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>`.
+The mayavi scene toolbar is positioned above the scene. 
+It includes buttons for the pipeline view window, different perspectives, fullscreen, screenshot saving and scene settings. 
+Details are available in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>`.
 
 Sidebar
 ######################
 
-The sidebar is positioned at the right hand side of the scene and consists of multiple tabs:
+The sidebar is positioned at the right side of the scene and consists of multiple tabs:
 
 .. list-table::
    :align: left
@@ -208,8 +194,9 @@ The sidebar is positioned at the right hand side of the scene and consists of mu
      - Settings for the rendering of source or detector light spectrum histograms
    * - Focus Tab
      - Option View and result output for finding the focus in the optical setup
+   * - Custom Tab
+     - Custom UI elements that can be created before running the GUI
 
-The following figure shows all tabs except the debug tab. 
 The UI elements will be discussed in the following sections.
 
 .. list-table::
@@ -231,7 +218,17 @@ The UI elements will be discussed in the following sections.
           :width: 250
           :class: dark-light
 
-     - .. figure:: ../images/ui_focus_tab.png
+
+.. list-table::
+   :align: center
+   :class: table-borderless
+
+   * - .. figure:: ../images/ui_focus_tab.png
+          :align: center
+          :width: 250
+          :class: dark-light
+     
+     - .. figure:: ../images/ui_custom_tab.png
           :align: center
           :width: 250
           :class: dark-light
@@ -240,8 +237,8 @@ The UI elements will be discussed in the following sections.
 Additional Windows
 #######################
 
-
-Beside the main window there are additional windows in the interface. These will be discussed in :numref:`gui_windows`, but a quick overview is given here:
+Besides the main window, there are additional windows in the interface. 
+These will be discussed in :numref:`gui_windows`, but a quick overview is provided here:
 
 .. list-table::
    :align: left
@@ -280,6 +277,7 @@ Main Tab
    :header-rows: 1
    :align: left
    :widths: 75 100 150 150
+   :width: 900px
    
    * - Property
      - Variable Name / Method
@@ -287,40 +285,40 @@ Main Tab
      - Description
    * - Rays
      - :attr:`ray_count <optrace.gui.trace_gui.TraceGUI.ray_count>`
-     - integer, 0 - 6000000
+     - :python:`int, 0 - 6000000`
      - number of rays for raytracing
    * - Plotting
      - :attr:`plotting_mode <optrace.gui.trace_gui.TraceGUI.plotting_mode>`
      - :python:`'Rays'` or :python:`'Points'`
-     - Visulation type of the rays
+     - visulation type of the rays
    * - Coloring
      - :attr:`coloring_mode <optrace.gui.trace_gui.TraceGUI.coloring_mode>`
      - :python:`'Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz', 'Polarization yz', 'Refractive Index'`
-     - Quantity determining the color of the rays/points
+     - Quantity for color mapping
    * - Count
      - :attr:`rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`
-     - integer, 1 - 1000
+     - :python:`int, 1 - 1000`
      - number of visible rays in the scene
    * - Opacity
      - :attr:`ray_opacity <optrace.gui.trace_gui.TraceGUI.ray_opacity>`
-     - float, 1e-05 - 1
+     - :python:`float, 1e-05 - 1.0`
      - opacity of the rays/points
    * - Width
      - :attr:`ray_width <optrace.gui.trace_gui.TraceGUI.ray_width>`
-     - float, 1 - 20
+     - :python:`float, 1.0 - 20.0`
      - ray width/ point size
    * - More Minimalistic Scene
      - :attr:`minimalistic_view <optrace.gui.trace_gui.TraceGUI.minimalistic_view>`
      - :python:`True` or :python:`False`
-     - if axis labels and long descriptions should be hidden
+     - should axis labels and long descriptions be hidden
    * - Maximize Scene
      - :attr:`maximize_scene <optrace.gui.trace_gui.TraceGUI.maximize_scene>`     
      - :python:`True` or :python:`False`
-     - if tool- and side bar should be hidden
+     - should tool- and side bar be hidden
    * - High Contrast Mode
      - :attr:`high_contrast <optrace.gui.trace_gui.TraceGUI.high_contrast>`
      - :python:`True` or :python:`False`
-     - dark elements on white background
+     - plot dark elements on white background
    * - Vertical Labels
      - :attr:`vertical_labels <optrace.gui.trace_gui.TraceGUI.vertical_labels>`
      - :python:`True` or :python:`False`
@@ -332,11 +330,11 @@ Main Tab
    * - Open Property Browser
      - :meth:`open_property_browser() <optrace.gui.trace_gui.TraceGUI.open_property_browser>`
      -
-     - open the property browser
+     - opens the property browser
    * - Open Command Window
      - :meth:`open_command_window() <optrace.gui.trace_gui.TraceGUI.open_command_window>`
      -
-     - open the command window
+     - opens the command window
 
 Image Tab
 #######################
@@ -353,27 +351,27 @@ Image Tab
      - Description
    * - Source 
      - :attr:`source_selection <optrace.gui.trace_gui.TraceGUI.source_selection>`
-     - string
+     - :python:`str`
      - selection of the ray source
    * - Detector
      - :attr:`detector_selection <optrace.gui.trace_gui.TraceGUI.detector_selection>` 
-     - string
+     - :python:`str`
      - selection of the detector
    * - z_det
      - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
-     - float
-     - position of the currently chosen detector
+     - :python:`float`
+     - position of the currently selected detector
    * - Image Mode
      - :attr:`image_mode <optrace.gui.trace_gui.TraceGUI.image_mode>`
-     - string, one of :attr:`RenderImage.image_modes <optrace.tracer.image.render_image.RenderImage.image_modes>`
-     - image mode for rendering
+     - :python:`str`, one of :attr:`RenderImage.image_modes <optrace.tracer.image.render_image.RenderImage.image_modes>`
+     - image rendering mode
    * - Projection Method
      - :attr:`projection_method <optrace.gui.trace_gui.TraceGUI.projection_method>`
-     - string, one of :attr:`SphericalSurface.sphere_projection_methods <optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods>`
+     - :python:`str`, one of :attr:`SphericalSurface.sphere_projection_methods <optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods>`
      - sphere projection method for spherical detectors
    * - Pixels_xy
      - :attr:`image_pixels <optrace.gui.trace_gui.TraceGUI.image_pixels>`
-     - integer, one of :attr:`RImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>`
+     - :python:`int`, one of :attr:`RImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>`
      - number of pixels in smaller image dimension
    * - Logarithmic Scaling 
      - :attr:`log_image <optrace.gui.trace_gui.TraceGUI.log_image>`
@@ -390,34 +388,34 @@ Image Tab
    * - Source Image
      - :meth:`source_image() <optrace.gui.trace_gui.TraceGUI.source_image>`
      -
-     - render a source image with the given settings
+     - renders a source image with the given settings
    * - Detector Image 
      - :meth:`detector_image() <optrace.gui.trace_gui.TraceGUI.detector_image>`
      -
-     - render a detector image with the given settings
+     - renders a detector image with the given settings
    * - Cut at
      - :attr:`cut_dimension <optrace.gui.trace_gui.TraceGUI.cut_dimension>`
      - :python:`'x', 'y'`
      - image cut dimension
    * - Cut Value
      - :attr:`cut_value <optrace.gui.trace_gui.TraceGUI.cut_value>`
-     - float
+     - :python:`float`
      - image cut value for the chosen dimension
    * - Source Image Cut
      - :meth:`source_cut() <optrace.gui.trace_gui.TraceGUI.source_cut>`
      -
-     - render a source image cut
+     - renders a source image cut
    * - Detector Image Cut
      - :meth:`detector_cut() <optrace.gui.trace_gui.TraceGUI.detector_cut>`
      -
-     - render a detector image cut
+     - renders a detector image cut
    * - Activate Filter 
      - :attr:`activate_filter <optrace.gui.trace_gui.TraceGUI.activate_filter>`
      - :python:`True` or :python:`False`
-     - activate the smoothing filter
+     - activate the smoothing / resolution limit filter
    * - Resolution Limit 
      - :attr:`filter_constant <optrace.gui.trace_gui.TraceGUI.filter_constant>`
-     -  float, 0.3 - 40
+     - :python:`float, 0.3 - 40`
      - resolution filter filter constant
 
 Spectrum Tab
@@ -433,15 +431,15 @@ Spectrum Tab
      - Description
    * - Source 
      - :attr:`source_selection <optrace.gui.trace_gui.TraceGUI.source_selection>`
-     - string
+     - :python:`str`
      - the selected ray source
    * - Detector
      - :attr:`detector_selection <optrace.gui.trace_gui.TraceGUI.detector_selection>` 
-     - string
+     - :python:`str`
      - the selected detector
    * - z_det
      - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
-     - float
+     - :python:`float`
      - position of the selected detector
    * -  Source Spectrum
      - :meth:`source_spectrum() <optrace.gui.trace_gui.TraceGUI.source_spectrum>`
@@ -450,15 +448,15 @@ Spectrum Tab
    * - Rays from Selected Source Only 
      - :attr:`detector_spectrum_single_source <optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source>` 
      - :python:`True` or :python:`False`
-     - if only the selected ray source should contribute to the detector image
+     - if only the selected ray source should contribute to the detector spectrum
    * -  Detector Spectrum
      - :meth:`detector_spectrum() <optrace.gui.trace_gui.TraceGUI.detector_spectrum>`
      - 
      - render a detector image
    * - Spectrum Properties
      - 
-     - string
-     - output for spectrum properties, like wavelengths and power
+     - 
+     - output field for spectrum properties
 
 Focus Tab
 #######################
@@ -473,19 +471,19 @@ Focus Tab
      - Description
    * - Source 
      - :attr:`source_selection <optrace.gui.trace_gui.TraceGUI.source_selection>`
-     - string
+     - :python:`str`
      - the selected source
    * - Detector
      - :attr:`detector_selection <optrace.gui.trace_gui.TraceGUI.detector_selection>` 
-     - string
+     - :python:`str`
      - the selected detector
    * - z_det
      - :attr:`z_det <optrace.gui.trace_gui.TraceGUI.z_det>`
-     - float
-     - position of the chosen detector
+     - :python:`float`
+     - position of the selected detector
    * - Focus Mode     
      - :attr:`autofocus_method <optrace.gui.trace_gui.TraceGUI.autofocus_method>`
-     - string, one of :attr:`Raytracer.autofocus_methods <optrace.tracer.raytracer.Raytracer.autofocus_methods>`
+     - :python:`str`, one of :attr:`Raytracer.autofocus_methods <optrace.tracer.raytracer.Raytracer.autofocus_methods>`
      - mode for focus finding
    * - Rays From Selected Source Only
      - :attr:`autofocus_single_source <optrace.gui.trace_gui.TraceGUI.autofocus_single_source>`
@@ -494,15 +492,86 @@ Focus Tab
    * -  Plot Cost Function
      - :attr:`cost_function_plot <optrace.gui.trace_gui.TraceGUI.cost_function_plot>`
      - :python:`True` or :python:`False`
-     - plots the evaluated cost function value in a window
+     - plots the evaluated cost function
    * -  Find Focus
      - :meth:`move_to_focus() <optrace.gui.trace_gui.TraceGUI.move_to_focus>`
      - 
-     - execute focus finding
+     - execute the focus search
    * -  Optimization  Output
      - 
-     - string
+     - 
      - output for displaying optimization information
+
+Custom Tab
+#######################
+
+optrace allows for the creation of custom UI elements in the "Custom" Tab with bindings to a function.
+Examples using such additional elements include :ref:`example_image_render` or :ref:`example_arizona_eye_model`.
+
+The elements must be added before running the TraceGUI.
+The following functions are available:
+
+.. list-table::
+   :header-rows: 1
+   :align: left
+
+   * - Method
+     - Parameters
+     - Description
+
+   * - :meth:`TraceGUI.add_custom_value <optrace.gui.trace_gui.TraceGUI.add_custom_value>`
+     - title (:python:`str`), default value (:python:`float`), callable function
+     - a textfield for setting a floating point value
+
+   * - :meth:`TraceGUI.add_custom_button <optrace.gui.trace_gui.TraceGUI.add_custom_value>`
+     - title (:python:`str`), callable function
+     - a custom button that executes an action
+
+   * - :meth:`TraceGUI.add_custom_selection <optrace.gui.trace_gui.TraceGUI.add_custom_value>`
+     - title (:python:`str`), options (:python:`list` of :python:`str`), default value (:python:`str`), callable function
+     - a text selection field
+
+   * - :meth:`TraceGUI.add_custom_checkbox <optrace.gui.trace_gui.TraceGUI.add_custom_value>`
+     - title (:python:`str`), default state (:python:`bool`), callable function
+     - a checkbox boolean option
+
+Changing the value, selection or checkbox automatically calls the function after enter has been pressed.
+The number of custom UI elements is limited to three of each type.
+The callable functions are an optional parameter (except for the button), which can be left empty of set to :python:`None`.
+This can be useful when using a field as setting for another action.
+
+The following examples creates a custom button, checkbox, selection and value:
+
+.. testcode::
+
+   RT = ot.Raytracer(outline=[-5, 5, -10, 10, 0, 60])
+
+   # create geometry
+   ...
+
+   # define custom actions
+
+   def change_aperture(RT, ap):
+       ...
+
+   def change_test_image(RT, image):
+       ...
+
+   def toggle_ray_info(RT, active):
+       ...
+
+   # create the GUI
+   sim = TraceGUI(RT)
+   
+   # add UI elements to "Custom Tab" in the TraceGUI
+   sim.add_custom_value("Aperture radius (1 - 3mm)", 2.0, lambda ap: change_aperture(RT, ap))
+   sim.add_custom_selection("Test Image", ["Testcard", "Grid"], "Testcard", lambda img: change_test_image(RT, img))
+   sim.add_custom_button("Detector Image", sim.detector_image)
+   sim.add_custom_checkbox("Print Ray Info", False, lambda b: toggle_ray_info(RT, b))
+
+After that, the TraceGUI can be run normally with :meth:`TraceGUI.run <optrace.gui.trace_gui.TraceGUI.run>`.
+Accessing or assigning these properties at runtime is described in :numref:`gui_automation_custom_UI`.
+
 
 .. _gui_windows:
 
@@ -512,12 +581,12 @@ ____________________
 Pipeline View
 #######################
 
-The pipeline of the mayavi scene enables the viewing and alteration of different geometry objects of the visible scene. For instance, one can change the colors or representation of different elements.
+The pipeline of the mayavi scene allows for the viewing and alteration of different geometry objects of the visible scene. 
+For instance, you can change the colors or representation of different elements.
 Note that editing the visualization objects inside the scene is different from changing the geometry objects inside the |Raytracer|.
+The former does not update the underlying geometry and does not update the rays.
 
-Here you can read more about the `pipeline view <https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__
-and here about the `different objects populating the view <https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__
-
+A more detailed information about the `pipeline view <https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__ and the `different objects populating the view <https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__ are available in the mayavi documentation.
 
 .. figure:: ../images/ui_pipeline.png
    :align: center
@@ -533,12 +602,13 @@ The property viewer provides an interactive tree view to the following propertie
 
 * properties about the rays/points currently shown
 * cardinal points and other paraxial properties of the lenses and the whole lens setup
-* properties of and objects inside the |Raytracer| class
+* properties of the |Raytracer| class
 * available presets
 * |TraceGUI| properties
 * |TraceGUI| scene properties
 
-All property values are a read-only snapshot, to update the values click on the ``Update`` button.
+All displayed property values are a read-only snapshot.
+To update the values, click on the ``Update`` button.
 Navigate the tabs to switch to different trees.
 
 .. figure:: ../images/ui_property_browser.png
@@ -549,19 +619,18 @@ Navigate the tabs to switch to different trees.
 Command Window
 #######################
 
+Inside this window commands can run from inside the |TraceGUI| class.
+Scripting on the GUI or change |Raytracer| properties is possible, like adding, changing or removing geometries.
 
-Inside the command window commands can run from inside the |TraceGUI| class.
-You can therefore do scripting on the GUI or change |Raytracer| properties, like adding, changing or removing geometries.
-
-After entering a command in the above text field the ``Run``-Button must be pressed.
+After entering a command in the upper text field the ``Run``-button needs to be pressed.
 Note that the command is only run, if the GUI is idle, therefore not doing any other tasks.
 
-After running the command, the scene is automatically updated and, if required, the geometry is retraced if the option "Retrace and replot automatically" is set.
-But this can also be done using the button "Replot/retrace".
+After running the command, the scene is automatically updated and the geometry is retraced if the option "Retrace and replot automatically" is set.
+This can also be done manually with th ``Replot/Retrace`` Button.
 
-The command gets added to the history. From the history field entries can be copied using ``Ctrl+C``
-or you can export the whole history into the clipboard by pressing the according button.
-Also available is a ``Clear``-Button that empties the history.
+The command is added to the history in the lower part of the window.
+Copy each history field with ``Ctrl+C`` or export the whole history by pressing ``Copy History to Clipboard``.
+There is also a ``Clear`` button available that empties the history.
 
 
 .. figure:: ../images/ui_command_window.png
@@ -569,58 +638,53 @@ Also available is a ``Clear``-Button that empties the history.
    :width: 600
    :class: dark-light
 
-As mentioned, the commands are run from within the TraceGUI object :python:`self` therefore denotes the object itself, so e.g. :python:`self.replot()` would replot the geometry.
+The commands are run from within the TraceGUI object.
+To avoid race conditions and issues with scene rendering, all actions are run sequential.
+This leads to the UI being unresponsive while running the command.
+
 There are multiple object aliases available to simplify coding inside the command window
 
 .. list-table:: Some object aliases
    :header-rows: 1
    :align: center
    :widths: 100 300
+   :width: 600px
 
    * - Alias
-     - Referenced
+     - Reference
    * - :python:`GUI`
      - the TraceGUI object (same as :python:`self`)
    * - :python:`RT`
      - the raytracer used
    * - :python:`LL`
-     - the lens list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.lenses`)
+     - the lens list of the raytracer
    * - :python:`AL`
-     - the aperture list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.apertures`)
+     - the aperture list of the raytracer
    * - :python:`FL`
-     - the filter list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.filters`)
+     - the filter list of the raytracer
    * - :python:`RSL`
-     - the ray source list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.ray_sources`)
+     - the ray source list of the raytracer
    * - :python:`DL`
-     - the detector list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.detectors`)
+     - the detector list of the raytracer
    * - :python:`ML`
-     - the marker list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.markers`)
+     - the marker list of the raytracer
    * - :python:`VL`
-     - the volume list of the raytracer (:obj:`optrace.tracer.geometry.group.Group.volumes`)
+     - the volume list of the raytracer
 
 For instance, inside the command window you can write :python:`RT.remove(AL[1])` to remove the second aperture of tracing geometry.
-By default, you also have access to most optrace classes like :python:`Raytracer, RImage, Group, RingSurface, ...`.
+By default, you also have access to most optrace classes, e.g. :python:`Raytracer, RGBImage, Group, RingSurface, ...`.
 
-Tips and Tricks
-____________________
-
-
-**Passing Properties to the GUI object**
-
-Under some circumstances it is useful to provide additional parameters like properties or functions to the GUI so they can be accessed in the control window.
-For instance, we implemented a function that changes the geometry in some specific way or steps through different source or lens constellations.
-
-As example, the user can define some function :python:`func` inside his script and pass it to the |TraceGUI|:
+To include custom objects in the class, you can simply pass them to the constructor:
 
 .. testcode::
 
-   def func(a, b, c):
-        # do some complicated things inside here
-        ...
+   var = 78.2353
+   
+   def func():
+       ...
 
-   sim = TraceGUI(RT, important_function=func)
+   sim = TraceGUI(RT, important_function=func, important_variable=var)
 
-:python:`func` get assigned to the |TraceGUI| under the name :python:`important_function`. Therefore it can be used inside the command window as :python:`self.important_function`.
+This also makes them available for usage in the command window as :python:`GUI.important_function(), GUI.important_variable, ...`.
 
-This is not limited to functions but works for arbitrary objects, however note that the assigned name must not collide with any variable or method name already implemented in the |TraceGUI| class.
 

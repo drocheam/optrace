@@ -3,9 +3,8 @@
 import optrace as ot
 from optrace.gui import TraceGUI
 
-# this example loads the paraxial eye model 
-# and plots the corresponding cardinal points and pupil positions
-
+# A geometry with the paraxial LeGrand eye model. 
+# Cardinal points, exit and entrance pupils are calculated and marked inside the scene.
 
 # create raytracer
 RT = ot.Raytracer(outline=[-15, 15, -15, 15, -15, 30])

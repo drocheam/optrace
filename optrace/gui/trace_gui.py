@@ -12,7 +12,7 @@ from pyface.qt import QtGui, QtCore  # closing UI elements
 # traits types and UI elements
 from traitsui.api import Group as TGroup
 from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeEditor
-from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool
+from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool, String
 
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 
@@ -46,8 +46,8 @@ class TraceGUI(HasTraits):
                              auto_set=False, label="Limit (µm)", mode='text')
     """gaussian filter constant standard deviation"""
 
-    rays_visible: Range = Range(1, ScenePlotting.MAX_RAYS_SHOWN, 2000, desc='the number of rays which is drawn', enter_set=False,
-                                auto_set=False, label="Count", mode='logslider')
+    rays_visible: Range = Range(1, ScenePlotting.MAX_RAYS_SHOWN, 2000, desc='the number of rays which is drawn', 
+                                enter_set=False, auto_set=False, label="Count", mode='logslider')
     """Number of rays shown in mayavi scene"""
 
     z_det: Range = Range(low='_z_det_min', high='_z_det_max', value='_z_det_max', mode='text',
@@ -164,6 +164,54 @@ class TraceGUI(HasTraits):
                               desc='Detector Image Pixels in Smaller of x or y Dimension')
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
+    # custom UI elements
+    # only show if they have been prodided
+    # unfortunately, for buttons, selections, value there is no way to change the label on runtime
+    # change the text of a separate label instead
+
+    # custom checkboxes
+    _custom_checkbox_1_visible: Bool = Bool(False)
+    _custom_checkbox_2_visible: Bool = Bool(False)
+    _custom_checkbox_3_visible: Bool = Bool(False)
+    custom_checkbox_1: List = List(editor=CheckListEditor(values=["Custom Checkbox 1"], format_func=lambda x: x),)
+    custom_checkbox_2: List = List(editor=CheckListEditor(values=["Custom Checkbox 2"], format_func=lambda x: x),)
+    custom_checkbox_3: List = List(editor=CheckListEditor(values=["Custom Checkbox 3"], format_func=lambda x: x),)
+  
+    # custom buttons
+    _custom_button_1_visible: Bool = Bool(False)
+    _custom_button_2_visible: Bool = Bool(False)
+    _custom_button_3_visible: Bool = Bool(False)
+    _custom_button_1_name: String = String("Custom Button 1")
+    _custom_button_2_name: String = String("Custom Button 2")
+    _custom_button_3_name: String = String("Custom Button 3")
+    _custom_button_1: Button = Button(label="Run Action")
+    _custom_button_2: Button = Button(label="Run Action")
+    _custom_button_3: Button = Button(label="Run Action")
+
+    # custom lists
+    _custom_selection_1_visible: Bool = Bool(False)
+    _custom_selection_2_visible: Bool = Bool(False)
+    _custom_selection_3_visible: Bool = Bool(False)
+    _custom_selection_1: List = List() 
+    _custom_selection_2: List = List() 
+    _custom_selection_3: List = List() 
+    _custom_selection_1_name: String = String("Custom Selection 1")
+    _custom_selection_2_name: String = String("Custom Selection 2")
+    _custom_selection_3_name: String = String("Custom Selection 3")
+    custom_selection_1: Enum = Enum(values='_custom_selection_1')
+    custom_selection_2: Enum = Enum(values='_custom_selection_2')
+    custom_selection_3: Enum = Enum(values='_custom_selection_3')
+    
+    # custom values
+    _custom_value_1_visible: Bool = Bool(False)
+    _custom_value_2_visible: Bool = Bool(False)
+    _custom_value_3_visible: Bool = Bool(False)
+    _custom_value_1_name: String = String("Custom Value 1")
+    _custom_value_2_name: String = String("Custom Value 2")
+    _custom_value_3_name: String = String("Custom Value 3")
+    custom_value_1: Float = Float(0, enter_set=False, auto_set=False, label="Custom Value 1", mode='text')
+    custom_value_2: Float = Float(0, enter_set=False, auto_set=False, label="Custom Value 2", mode='text')
+    custom_value_3: Float = Float(0, enter_set=False, auto_set=False, label="Custom Value 3", mode='text')
 
     # Buttons
 
@@ -242,8 +290,8 @@ class TraceGUI(HasTraits):
                             Item('hide_labels', style="custom", show_label=False),
                             _separator, _separator,
                             Item("_property_label", style='readonly', show_label=False, emphasized=True),
-                            Item('_property_browser_button', show_label=False),
-                            Item('_command_window_button', show_label=False),
+                            Item('_property_browser_button', show_label=False, emphasized=True),
+                            Item('_command_window_button', show_label=False, emphasized=True),
                             _separator,
                             label="Main"
                             ),
@@ -261,13 +309,13 @@ class TraceGUI(HasTraits):
                             Item('log_image', style="custom", show_label=False),
                             Item('flip_detector_image', style="custom", show_label=False),
                             Item('detector_image_single_source', style="custom", show_label=False),
-                            Item('_source_image_button', show_label=False),
-                            Item('_detector_image_button', show_label=False),
+                            Item('_source_image_button', show_label=False, emphasized=True),
+                            Item('_detector_image_button', show_label=False, emphasized=True),
                             _separator,
                             Item("cut_dimension", label="Cut at"),
                             Item("cut_value", label="Value"),
-                            Item('_source_cut_button', show_label=False),
-                            Item('_detector_cut_button', show_label=False),
+                            Item('_source_cut_button', show_label=False, emphasized=True),
+                            Item('_detector_cut_button', show_label=False, emphasized=True),
                             _separator,
                             Item("_filter_label", style='readonly', show_label=False, emphasized=True,
                                  enabled_when="not projection_method_enabled"),
@@ -284,9 +332,9 @@ class TraceGUI(HasTraits):
                             Item('z_det'),
                             _separator, _separator,
                             Item("_spectrum_label", style='readonly', show_label=False, emphasized=True),
-                            Item('_source_spectrum_button', show_label=False),
+                            Item('_source_spectrum_button', show_label=False, emphasized=True),
                             Item('detector_spectrum_single_source', style="custom", show_label=False),
-                            Item('_detector_spectrum_button', show_label=False),
+                            Item('_detector_spectrum_button', show_label=False, emphasized=True),
                             _separator, _separator,
                             Item("_spectrum_output_label", style='readonly', show_label=False, emphasized=True),
                             Item("_spectrum_information", show_label=False, style="custom"),
@@ -303,12 +351,58 @@ class TraceGUI(HasTraits):
                             Item('autofocus_method', label='Mode'),
                             Item('autofocus_single_source', style="custom", show_label=False),
                             Item('cost_function_plot', style="custom", show_label=False),
-                            Item('_auto_focus_button', show_label=False),
+                            Item('_auto_focus_button', show_label=False, emphasized=True),
                             _separator,
                             Item("_autofocus_output_label", style='readonly', show_label=False),
                             Item("_autofocus_information", show_label=False, style="custom"),
                             _separator,
                             label="Focus",
+                            ),
+                        TGroup(
+                            _separator,
+                            Item("_custom_selection_1_name", visible_when="_custom_selection_1_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item("custom_selection_1", label='Custom Selection 1', 
+                                 visible_when="_custom_selection_1_visible", show_label=False),
+                            Item("_custom_selection_2_name", visible_when="_custom_selection_2_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item("custom_selection_2", label='Custom Selection 2',
+                                 visible_when="_custom_selection_2_visible", show_label=False),
+                            Item("_custom_selection_3_name", visible_when="_custom_selection_3_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item("custom_selection_3", label='Custom Selection 3', 
+                                 visible_when="_custom_selection_3_visible", show_label=False),
+                            _separator,
+                            Item("custom_checkbox_1", style="custom", show_label=False, 
+                                 visible_when="_custom_checkbox_1_visible"),
+                            Item("custom_checkbox_2", style="custom", show_label=False, 
+                                 visible_when="_custom_checkbox_2_visible"),
+                            Item("custom_checkbox_3", style="custom", show_label=False, 
+                                 visible_when="_custom_checkbox_3_visible"),
+                            _separator,
+                            Item("_custom_value_1_name", visible_when="_custom_value_1_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item('custom_value_1', visible_when="_custom_value_1_visible", width=100, show_label=False),
+                            Item("_custom_value_2_name", visible_when="_custom_value_2_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item('custom_value_2', visible_when="_custom_value_2_visible", width=100, show_label=False),
+                            Item("_custom_value_3_name", visible_when="_custom_value_3_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item('custom_value_3', visible_when="_custom_value_3_visible", width=100, show_label=False),
+                            _separator,
+                            Item("_custom_button_1_name", visible_when="_custom_button_1_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item('_custom_button_1', show_label=False, 
+                                 visible_when="_custom_button_1_visible", emphasized=True),
+                            Item("_custom_button_2_name", visible_when="_custom_button_2_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item('_custom_button_2', show_label=False, 
+                                 visible_when="_custom_button_2_visible", emphasized=True),
+                            Item("_custom_button_3_name", visible_when="_custom_button_3_visible", 
+                                 style='readonly', show_label=False, emphasized=True),
+                            Item('_custom_button_3', show_label=False, 
+                                 visible_when="_custom_button_3_visible", emphasized=True),
+                            label="Custom",
                             ),
                         layout="tabbed",
                         visible_when="_scene_not_maximized",
@@ -367,13 +461,22 @@ class TraceGUI(HasTraits):
             self.z_det = self.raytracer.detectors[self._det_ind].pos[2]
         self._source_ind = 0
 
+        # exit flag for debugging, must be set externally
         self._exit = False
 
+        # detector and source images and snapshots
         self._last_det_snap = None
         self.last_det_image = None
         self._last_source_snap = None
         self.last_source_image = None
 
+        # list for custom GUI element functions
+        self._custom_checkbox_functions = []
+        self._custom_button_functions = []
+        self._custom_value_functions = []
+        self._custom_selection_functions = []
+
+        # was a ray count parameter provided?
         self._init_forced_ray_count = "ray_count" in kwargs
 
         # default value for image_pixels
@@ -426,7 +529,7 @@ class TraceGUI(HasTraits):
             val = self.detector_names[det_ind]
 
         super().__setattr__(key, val)
-
+   
     ####################################################################################################################
     # Helpers
 
@@ -784,8 +887,166 @@ class TraceGUI(HasTraits):
         
         pyface_gui.invoke_later(QtGui.QApplication.closeAllWindows)  # close remaining Qt windows
 
+    def add_custom_checkbox(self, name: str, val: bool, function: Callable = None) -> None:
+        """
+        Add a custom checkbox with an action to the "custom" GUI tab.
+         
+        :param name: Name of the checkbox / shown label
+        :param val: if the box is checked in its default state
+        :param function: function to call when box state is changed (optional). Exactly one boolean parameter.
+        """
+        if (n := len(self._custom_checkbox_functions)) > 2:
+           warning("All checkbox slots are taken")
+           return
+
+        with self._no_trait_action():
+            self._trait(f"custom_checkbox_{n+1}", 0).editor.values = [name]
+            self.__dict__[f"_custom_checkbox_{n+1}_visible"] = True
+            self.__dict__[f"custom_checkbox_{n+1}"] = [name] if val else []
+            self._custom_checkbox_functions += [function]
+    
+    def add_custom_button(self, name: str, function: Callable) -> None:
+        """
+        Add a custom button with an action to the "custom" GUI tab.
+         
+        :param name: Name of the button / shown label text 
+        :param function: function to call when the button is pressed. Function without parameters.
+        """
+        if (n := len(self._custom_button_functions)) > 2:
+           warning("All button slots are taken")
+           return
+
+        self.__dict__[f"_custom_button_{n+1}_visible"] = True
+        self.__dict__[f"_custom_button_{n+1}_name"] = name
+        self._custom_button_functions += [function]
+    
+    def add_custom_value(self, name: str, val: float, function: Callable = None) -> None:
+        """
+        Add a custom float value field with an action to the "custom" GUI tab.
+         
+        :param name: Name of the field / shown label text
+        :param val: default value
+        :param function: function to call when the value is changed (optional). Exactly one float parameter.
+        """
+        if (n := len(self._custom_value_functions)) > 2:
+           warning("All value slots are taken")
+           return
+
+        with self._no_trait_action():
+            self.__dict__[f"_custom_value_{n+1}_visible"] = True
+            self.__dict__[f"custom_value_{n+1}"] = val
+            self.__dict__[f"_custom_value_{n+1}_name"] = name
+            self._custom_value_functions += [function]
+    
+    def add_custom_selection(self, name: str, list_: list[str], val: str, function: Callable = None) -> None:
+        """
+        Add a custom selection field with an action to the "custom" GUI tab.
+         
+        :param name: Name of the checkbox / shown label text
+        :param list_: list of selectable string
+        :param val: default selection
+        :param function: function to call when selection is changed (optional). Exactly one string parameter.
+        """
+        if (n := len(self._custom_selection_functions)) > 2:
+           warning("All selection slots are taken")
+           return
+
+        with self._no_trait_action():
+            self.__dict__[f"_custom_selection_{n+1}_visible"] = True
+            self.__dict__[f"_custom_selection_{n+1}"] = list_
+            self.__dict__[f"custom_selection_{n+1}"] = val
+            self.__dict__[f"_custom_selection_{n+1}_name"] = name
+            self._custom_selection_functions += [function]
+    
+    def custom_button_action_1(self) -> Callable:
+        """:return: function assigned with custom button 1"""
+        return self._custom_button_functions[0]() if len(self._custom_button_functions) else None
+
+    def custom_button_action_2(self) -> Callable:
+        """:return: function assigned with custom button 1"""
+        return self._custom_button_functions[1]() if len(self._custom_button_functions) > 1 else None
+    
+    def custom_button_action_3(self) -> Callable:
+        """:return: function assigned with custom button 1"""
+        return self._custom_button_functions[2]() if len(self._custom_button_functions) > 2 else None
+
     ####################################################################################################################
     # Trait handlers.
+
+    @observe('custom_checkbox_1, custom_checkbox_2, custom_checkbox_3', dispatch="ui")
+    def _handle_custom_checkboxes(self, event=None) -> None:
+        """
+        Run the action associated with the checkbox.
+
+        :param event: optional event from traits observe decorator
+        """
+        if ((box := int(float(event.name[-1]))) < len(self._custom_checkbox_functions)+1
+                and not self._no_trait_action_flag):
+
+            with self.smart_replot():
+                self._sequential = True
+                self._status["RunningCommand"] += 1
+
+                if (func := self._custom_checkbox_functions[box - 1]) is not None:
+                    func(bool(self.__dict__[f"custom_checkbox_{box}"]))
+
+                self._status["RunningCommand"] -= 1
+                self._sequential = False
+    
+    @observe('_custom_button_1, _custom_button_2, _custom_button_3', dispatch="ui")
+    def _handle_custom_buttons(self, event=None) -> None:
+        """
+        Run the action associated with the button.
+
+        :param event: optional event from traits observe decorator
+        """
+        if (button := int(float(event.name[-1]))) < len(self._custom_button_functions)+1:
+
+            with self.smart_replot():
+                self._sequential = True
+                self._status["RunningCommand"] += 1
+                self._custom_button_functions[button - 1]()
+                self._status["RunningCommand"] -= 1
+                self._sequential = False
+    
+    @observe('custom_value_1, custom_value_2, custom_value_3', dispatch="ui")
+    def _handle_custom_values(self, event=None) -> None:
+        """
+        Run the action associated with the value field.
+
+        :param event: optional event from traits observe decorator
+        """
+        if (val := int(float(event.name[-1]))) < len(self._custom_value_functions)+1 and not self._no_trait_action_flag:
+
+            with self.smart_replot():
+                self._sequential = True
+                self._status["RunningCommand"] += 1
+
+                if (func := self._custom_value_functions[val - 1]) is not None:
+                    func(event.new)
+
+                self._status["RunningCommand"] -= 1
+                self._sequential = False
+
+    @observe('custom_selection_1, custom_selection_2, custom_selection_3', dispatch="ui")
+    def _handle_custom_selections(self, event=None) -> None:
+        """
+        Run the action associated with the selection field.
+
+        :param event: optional event from traits observe decorator
+        """
+        if ((sel := int(float(event.name[-1]))) < len(self._custom_selection_functions)+1 and
+                not self._no_trait_action_flag):
+
+            with self.smart_replot():
+                self._sequential = True
+                self._status["RunningCommand"] += 1
+
+                if (func := self._custom_selection_functions[sel - 1]) is not None:
+                    func(event.new)
+
+                self._status["RunningCommand"] -= 1
+                self._sequential = False
 
     @observe('high_contrast', dispatch="ui")
     def _change_contrast(self, event=None) -> None:

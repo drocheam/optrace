@@ -13,15 +13,15 @@
 <!-- TODO add coverage info (via third party site?), lines of code, comment/docstring quality etc. -->
 
 <img src="./docs/source/images/example_spherical_aberration2.png" width="18.2%"></img>
-<img src="./docs/source/images/example_rgb_render2.svg" width="17%"></img>
+<img src="./docs/source/images/example_rgb_render2.webp" width="17%"></img>
 <img src="./docs/source/images/example_legrand2.png" width="18.2%"></img>
-<img src="./docs/source/images/example_keratoconus_4.svg" width="17%"></img>
+<img src="./docs/source/images/example_keratoconus_4.webp" width="17%"></img>
 <img src="./docs/source/images/example_brewster.png" width="18.2%"></img>
    
 <img src="./docs/source/images/example_gui_automation_1.png" width="18.2%"></img>
 <img src="./docs/source/images/LED_illuminants.svg" width="17%"></img>
 <img src="./docs/source/images/example_double_gauss_2.png" width="18.2%"></img>
-<img src="./docs/source/images/rgb_render_srgb1.svg" width="17%"></img>
+<img src="./docs/source/images/rgb_render_srgb1.webp" width="17%"></img>
 <img src="./docs/source/images/example_cosine_surfaces1.png" width="18.2%"></img>
 
 <!-- TODO images are clickable, redirect to example page -->
@@ -29,38 +29,38 @@
 ## Overview
 
  **Features**
-  * a sequential raytracer for geometrical optics
-  * a tool with presets and user defined surface shapes, ray sources and media
-  * a library with an additional GUI with ray and geometry visualization
-  * a renderer for colored detector images inside an optical setup
-  * a program including paraxial analysis (matrix optics, position of cardinal points/planes and psf convolution)
-  * a programming/scripting approach to simulation
+  * sequential raytracing for geometrical optics
+  * rendering colored detector images
+  * paraxial analysis (matrix optics, cardinal points/planes and PSF convolution)
+  * presets and user defined surface shapes, ray sources and media
+  * an additional GUI for visualization
+  * programming/scripting approach to simulation
   * high performance of 0.1 s / surface / million rays
-  * free, open source software
+  * free and open source software
 
 <!--  ^--- TODO add benchmarking details when documentation is online-->
 
- **Non-Features**
-  * a GUI focussed tool
-  * an optics design program with lens optimization, aberration analysis and tolerancing
-  * simulation incorporating wave optics, e.g. diffraction, interference
-  * a non-sequential raytracer, simulating ghost images, reflections
-  * a tool supporting mirror or fresnel lens optics
+ **What it CAN'T do**
+  * coding-free simulations
+  * wave optics, including diffraction and interference
+  * non-sequential scenes, simulating ghost images, reflections
+  * mirror or fresnel lens optics
+  * scattering and polarization dependent media
+  * lens optimization, aberration analysis and tolerancing
 
  **Purpose/Use Cases**
   * educational purposes, demonstrating aberrations or simple optical setups
   * introductionary tool to paraxial, geometrical optics or image formation
   * simulation of simpler systems, like a prism, the eye model or a telescope
-  * estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) would be overkill for
-
+  * estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) is overkill for
 
 ## Examples
 
-An example gallery is found at <>.
+Coming soon.
 
 ## Documentation
 
-See <>
+Coming soon.
 
 ## Installation
 

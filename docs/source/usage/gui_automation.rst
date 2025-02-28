@@ -15,10 +15,9 @@ GUI Automation
   :language: python
   :class: highlight
 
-This page features information about the GUI automation.
-Here are some exemplary tasks that can be achieved with automation:
+Some exemplary automation tasks include:
 
-* changing the geometry and visualizing all changes
+* changing the geometry
 * changing camera views accurately
 * displaying specific rays
 * picking specific rays
@@ -32,24 +31,23 @@ The Control Method
 ________________________
 
 
-To do automated tasks, the :meth:`TraceGUI.control <optrace.gui.trace_gui.TraceGUI.control>` method is used instead of
-It takes an automation function as argument as well as an argument tuple.
-Typically, the automated function should take a reference to the TraceGUI, which is supplied by the :python:`args` argument of the control function.
+To do automated tasks, the :meth:`TraceGUI.control <optrace.gui.trace_gui.TraceGUI.control>` method needs to be used instead of :meth:`TraceGUI.run <optrace.gui.trace_gui.TraceGUI.run>`.
+It requires an automation function as well as an argument tuple.
 
 .. code-block:: python
 
    def automated(GUI):
 
-       # do some things
+       # do some automation things
        ...
 
    # create the GUI and provide the automation function to TraceGUI.control()
    sim = TraceGUI(RT)
    sim.control(func=automated, args=(sim,))
 
-By default, the control function is executed and the program is kept running.
-This makes it possible to interact with the GUI and scene and view the changes and adapt things.
-However, closing it is supported with :meth:`TraceGUI.close <optrace.gui.trace_gui.TraceGUI>`, as explained in :numref:`gui_automation_close`
+After the control function is executed the program is kept running.
+This makes it possible to interact with the GUI.
+Closing the application automatically is described in :numref:`gui_automation_close`
 
 To avoid race conditions, all actions inside the provided automation function are run sequentially.
 During this time, the GUI is unresponsive, as the automation function is run in the main thread (as user input would also be) so the interaction with the scene in this time will be limited.
@@ -67,7 +65,7 @@ This is in contrast to the standard :meth:`TraceGUI.run <optrace.gui.trace_gui.T
 where a setting is applied subsequently (for instance, changing the ray color setting updates the color in the scene automatically).
 
 To process all pending events :meth:`TraceGUI.process <optrace.gui.trace_gui.TraceGUI.process>` must be called.
-This is not needed after every property change, but only if the changes should be visible.
+This is not needed after every property change, but only if the changes should be visible/executed at this point.
 
 .. code-block:: python
 
@@ -80,6 +78,9 @@ This is not needed after every property change, but only if the changes should b
 
        # GUI properties were set, but the changes need to be processed
        GUI.process()
+
+       # dome some other things
+       ...
 
    # create the GUI and provide the automation function to TraceGUI.control()
    sim = TraceGUI(RT)
@@ -94,15 +95,13 @@ ________________________
 While :meth:`TraceGUI.process <optrace.gui.trace_gui.TraceGUI.process>` reacts to changes in the TraceGUI itself, it does not handle changes of the raytracer or tracing geometry.
 
 When changing the geometry, the changes are not automatically applied to the scene.
-The geometry is not automatically raytraced as well.
+The geometry is also not automatically raytraced.
 
-To force the redrawing and retracing of the full scene you can call :meth:`TraceGUI.replot <optrace.gui.trace_gui.TraceGUI.replot>`.
+To force the redrawing and retracing of the full scene, you can call :meth:`TraceGUI.replot <optrace.gui.trace_gui.TraceGUI.replot>`.
 
 With the context manager :meth:`TraceGUI.smart_replot <optrace.gui.trace_gui.TraceGUI.smart_replot>` it is possible to only update changed objects.
-For instance, if a detector is moved, there is no need for updating the lenses inside the geometry or tracing the scene.
+For instance, if a detector is moved, there is no need for updating the lenses inside the geometry or retracing the scene.
 :meth:`TraceGUI.smart_replot <optrace.gui.trace_gui.TraceGUI.smart_replot>` handles the detection of changes and updating automatically.
-Geometry and raytracing properties are stored when entering into the context manager and compared to when exiting.
-
 
 Here is an example:
 
@@ -116,7 +115,7 @@ Here is an example:
        # do some actions and at the end replot only changed objects
        # and/or retrace the geometry if needed.
        with GUI.smart_replot():
-           ...
+           some_action_1()
 
    # create the GUI and provide the automation function to TraceGUI.control()
    sim = TraceGUI(RT)
@@ -132,8 +131,8 @@ Controlling the Camera
 ________________________
 
 
-Controlling the camera is done using the functions :meth:`TraceGUI.set_camera <optrace.gui.trace_gui.TraceGUI.set_camera>` and :meth:`TraceGUI.get_camera <optrace.gui.trace_gui.TraceGUI.get_camera>`.
-The former sets properties, while the latter one returns a dictionary of the current settings.
+Controlling the camera is done with the functions :meth:`TraceGUI.set_camera <optrace.gui.trace_gui.TraceGUI.set_camera>` and :meth:`TraceGUI.get_camera <optrace.gui.trace_gui.TraceGUI.get_camera>`.
+The former sets the properties, while the latter one returns a dictionary of the current settings.
 
 The following settings are available:
 
@@ -153,7 +152,7 @@ The following settings are available:
    * - :python:`roll`
      - absolute camera roll angle in degrees 
 
-Below you can find example code:
+You can find example code below:
 
 .. code-block:: python
 
@@ -168,13 +167,11 @@ Below you can find example code:
        # reset to initial view
        sim.set_camera(**cam_props)
 
-
    # create the GUI and provide the automation function to TraceGUI.control()
    sim = TraceGUI(RT)
    sim.control(func=automated, args=(sim,))
 
-
-Applying camera properties can also be done initially using the :python:`initial_camera` parameter of the TraceGUI class.
+Applying camera properties at startup is possible using the :python:`initial_camera` parameter of the TraceGUI class.
 This parameter is a dictionary that can include all possible parameters of function :meth:`TraceGUI.set_camera <optrace.gui.trace_gui.TraceGUI.set_camera>`.
 
 .. code-block:: python
@@ -185,14 +182,11 @@ This parameter is a dictionary that can include all possible parameters of funct
 Taking Screenshots
 ________________________
 
-Screenshots of the scene can be taken with the :meth:`TraceGUI.screenshot <optrace.gui.trace_gui.TraceGUI.screenshot>` function.
-A path string is required.
-The file type is determined automatically.
+The :meth:`TraceGUI.screenshot <optrace.gui.trace_gui.TraceGUI.screenshot>` function make it possible to capture screenshots of the scene.
+A path string is required for this function.
+The file type is determined automatically from the file name.
 
-Internally, the :obj:`mayavi.mlab.savefig` function from `mayavi <https://docs.enthought.com/mayavi/mayavi>`__ is used.
-Therefore it also supports its additional parameters.
-
-Below you can find examples for a call:
+Internally, the :obj:`mayavi.mlab.savefig` function from `mayavi <https://docs.enthought.com/mayavi/mayavi>`__ is utilized, therefore supporting this function's additional parameters.
 
 .. code-block:: python
 
@@ -208,7 +202,7 @@ Below you can find examples for a call:
    sim = TraceGUI(RT)
    sim.control(func=automated, args=(sim,))
 
-Note that using the :python:`magnification` parameter leads to a rescaled scene, where some elements change their relative size.
+Note that the :python:`magnification` parameter leads to a rescaled scene, where some elements change their relative size.
 
 .. _usage_gui_selecting_rays:
 
@@ -217,7 +211,7 @@ _________________________
 
 
 By default, a random selection of rays is displayed inside the scene where the number is specified by :attr:`TraceGUI.rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`.
-A custom selection can be set using function :meth:`TraceGUI.select_rays <optrace.gui.trace_gui.TraceGUI.select_rays>`.
+A custom selection can be set using the function :meth:`TraceGUI.select_rays <optrace.gui.trace_gui.TraceGUI.select_rays>`.
 It takes a :python:`mask` parameter, which is a one-dimensional boolean :obj:`numpy.array`, and an optional :python:`max_show` parameter, that specified the maximum amount of rays to display.
 Parameter :python:`mask` must have the same length as there are rays simulated, which is set by :attr:`TraceGUI.ray_count <optrace.gui.trace_gui.TraceGUI.ray_count>`
 Note that there is a maximum amount of rays that can be displayed (specified by the maximum value of :attr:`TraceGUI.rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`, by default :python:`50000`).
@@ -254,17 +248,17 @@ ________________________
 
 
 The function :meth:`TraceGUI.pick_ray <optrace.gui.trace_gui.TraceGUI.pick_ray>` highlights a full ray.
-A :python:`index` parameter is required as integer to select a given ray.
-Only currently displayed rays can be picked, which are defined by :attr:`TraceGUI.ray_selection <optrace.gui.trace_gui.TraceGUI.ray_selection>`, see :ref:`usage_gui_selecting_rays`.
+An integer :python:`index` is required as to select a given ray.
+Only currently displayed rays are pickable, which are defined by :attr:`TraceGUI.ray_selection <optrace.gui.trace_gui.TraceGUI.ray_selection>`, see :ref:`usage_gui_selecting_rays`.
 So an :python:`index=50` means that the 50th :python:`True` value of :attr:`TraceGUI.ray_selection <optrace.gui.trace_gui.TraceGUI.ray_selection>` is picked.
 
 Function :meth:`TraceGUI.pick_ray_section <optrace.gui.trace_gui.TraceGUI.pick_ray_section>` highlights a ray at a given intersection.
 The ray is highlighted, a crosshair is shown at the intersection position and a ray information text is shown inside the scene.
 Compared to the previous function, an additional integer :python:`section` parameter is needed.
 An optional parameter :python:`detailed` defines if more detailed information should be shown.
-This would be equivalent to picking a section manually in the scene with the Shift key hold.
+This would be equivalent to picking a section manually in the scene with the Shift key held.
 
-To deactivate the ray highlight, information text and cross hair, :meth:`TraceGUI.pick_ray <optrace.gui.trace_gui.TraceGUI.reset_picking>` should be called.
+To deactivate the ray highlighting, information text and cross hair, :meth:`TraceGUI.reset_picking <optrace.gui.trace_gui.TraceGUI.reset_picking>` needs to be called.
 
 Here is an example:
 
@@ -297,8 +291,8 @@ Available plotting functions include :meth:`TraceGUI.source_image <optrace.gui.t
 :meth:`TraceGUI.move_to_focus <optrace.gui.trace_gui.TraceGUI.move_to_focus>`.
 
 There are more settings available than through the GUI.
-For example, it is possible to save a image instead to show it.
-Additionally a custom detector/source extent can be specified, which is not available through the GUI.
+For example, it is possible to save a image to the disk.
+Additionally, a custom detector/source extent can be specified, a setting not available through the GUI.
 
 .. code-block:: python
 
@@ -324,6 +318,27 @@ Additionally a custom detector/source extent can be specified, which is not avai
    sim = TraceGUI(RT)
    sim.control(func=automated, args=(sim,))
 
+.. _gui_automation_custom_UI:
+
+Accessing custom UI elements
+_________________________________
+
+Custom elements are accessible through a name, consisting of their type and a chronological number.
+The number corresponds to the order that the element has been created.
+Assigning values works analogously to all other parameters.
+To button action is called with a special function.
+
+You can find examples below.
+
+.. code-block:: python
+
+   sim.custom_value_2 = 4.5
+   sim.custom_checkbox_1 = False
+   sim.custom_selection_3 = "Case 2"
+
+   sim.custom_button_action_1()
+
+
 .. _gui_automation_close:
 
 Closing Down
@@ -345,5 +360,5 @@ To close the GUI down programmatically, the function :meth:`TraceGUI.close <optr
    sim = TraceGUI(RT)
    sim.control(func=automated, args=(sim,))
 
-This will close all GUI windows, as well as all plots and exit all background tasks.
+This will close all GUI and plotting windows and exit all background tasks.
 

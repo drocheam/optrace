@@ -17,50 +17,53 @@ PSF Convolution
    import optrace as ot
    ot.global_options.show_progressbar = False
 
-Convolving
+
+Overview
 _______________
 
-**Overview**
-
-Instead of waiting a long time for high quality, noise-free detector image renders in some cases the image can also be created by a PSF (point spread function) convolution. 
+Convolution can speed up image formation significantly by parallelizing the effect of a PSF (point spread function) for every object point.
+This results in a nearly noise-free image in a small fraction of the time normally required.
 A PSF is nothing different than the impulse response of the optical system for the given object and image distance combination.
-It has to be noted, that the PSF actually changes spatially, but for paraxial imaging it can be assumed constant.
-However this also means, that many aberration can't be simulated this way (astigmatism, coma, vignette, distortion, ...).
-
+It changes spatially, but for a small angular range it can be assumed constant.
+However this also implies that many aberration can't be simulated this way (astigmatism, coma, vignette, distortion, ...).
 In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF to an object using the convolution functionality in optrace.
 
-For the convolution to work the object and PSF size are needed besides the PSF and objects itself. 
-Most optical systems also have a magnification factor that rescaled the object size by a specific amount.
+The convolution approach requires:
+
+* the PSF
+* the object image to convolve
+* PSF size
+* object size
+* the system's magnification factor
 
 Both colored objects and PSFs are supported.
+Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible solutions. 
+See the details in section :numref:`psf_color_handling`.
 
-Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible cases. 
-Also see section :numref:`psf_color_handling` on this.
+Usage
+____________
 
+**Simple Calls**
 
-**Usage**
+A simple call to :func:`convolve <optrace.tracer.convolve.convolve>` required the object and PSF, as well as the magnification factor. 
 
-The image should be either of type |RGBImage| or |LinearImage|.
-The PSF should be either |LinearImage| or |RenderImage|.
+The object should be either of type |RGBImage| or |LinearImage|, while the PSF should be either |LinearImage| or |RenderImage|.
 For more details on image classes see :numref:`image_classes`.
+Colored PSFs can be only used with class |RenderImage|, as all human visible colors are required for convolution.
+The image objects include the information about their size and position.
 
-Colored PSFs can be only used with class |RenderImage|, as all human visible colors are needed for convolution.
+This magnification factor is equivalent the magnification factor known from geometrical optics.
+Therefore :math:`\lvert m \rvert > 1` means a magnification and :math:`\lvert m\rvert < 1` an image shrinking.
+:math:`m > 0` is an upright image, while :math:`m < 0` correspond to a flipped image.
 
-Let's use predefined images and psf:
+Let's define a predefined a image and PSF:
 
 .. testcode::
 
    img = ot.presets.image.ETDRS_chart_inverted([0.5, 0.5])
-
    psf = ot.presets.psf.halo()
 
-
-Typically the imaging system has a magnification factor :math:`m` that is also needed to scale the input object size.
-This factor is equivalent the magnification factor known from geometrical optics.
-Therefore :math:`\lvert m \rvert > 1` means a magnification and :math:`\lvert m\rvert < 1` an image shrinking.
-:math:`m > 0` is an upright image, while :math:`m < 0` correspond to a flipped image.
-
-You can then call :func:`convolve <optrace.tracer.convolve.convolve>` like this:
+You can then call :func:`convolve <optrace.tracer.convolve.convolve>` in the following way:
 
 .. testcode::
 
@@ -68,31 +71,31 @@ You can then call :func:`convolve <optrace.tracer.convolve.convolve>` like this:
 
 The function returns the convolved image object :python:`img2`.
 When :python:`img` and :python:`psf` are of type |LinearImage|, :python:`img2` is also a |LinearImage|.
-In all other cases color information are generated and :python:`img2` is a |RGBImage|.
+For all other cases color information is generated and :python:`img2` is a |RGBImage|.
 
+**Slicing and Padding**
 
-**Slicing and padding**
-
-While doing a convolution the output image grows in size by half the PSF size in that direction.
-So the output image has a higher pixel count as well as larger side lengths.
-If it is required to leave both properties the same, :python:`slice_=True` can be provided so the image is sliced back to its initial size:
+While doing a convolution, the output image grows in size by half the PSF size in each direction.
+By providing :python:`slice_=True` the padded data can be neglected for the resulting image.
 
 .. testcode::
 
    img2 = ot.convolve(img, psf, m=0.5, slice_=True)
 
-When doing the convolution, the operation estimates what lies behind the image edges, as it also must use this data near the boundary of the image.
-By default it pads the data outside with zeros, but other modes can also be set.
+The convolution operation requires the data outside of the image.
+By default, the image is padded with zeros before convolution.
 
+Other modes are also available.
 For instance, padding with white is done in the following fashion:
 
 .. testcode::
 
    img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="constant", padding_value=[1, 1, 1])
 
-:python:`padding_value` must have the same number of elements as :python:`img` has channels, so one for a |LinearImage| and three for an |RGBImage|.
+:python:`padding_value` specifies the values used for constant padding for each channel.
+Depending on type of :python:`img`, it needs to have three or only one element.
 
-Edge padding is done as follows:
+To reduce boundary effects, edge padding is a viable choice:
 
 .. testcode::
 
@@ -100,35 +103,32 @@ Edge padding is done as follows:
 
 **Color conversion**
 
-When convolving with a PSF of type |RenderImage|, colors of the resulting image may lie outside the sRGB gamut.
-Using a rendering intent conversion they are projected/clipped them into the gamut.
-This is done by the :python:`cargs` argument (conversion arguments).
-
+The convolution of colored images can produce colors outside of the sRGB gamut.
+To allow for a correct mapping into the gamut, conversion arguments can be provided by the :python:`cargs` argument.
 By default it is set to :python:`dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None)`.
 
-You can provide a :python:`cargs` dictionary that overrides this setting.
+Provide a :python:`cargs` dictionary to override this setting.
 
 .. testcode::
 
-   img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="edge", cargs=dict(rendering_intent="sRGB (Perceptual RI)"))
+   img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="edge", cargs=dict(rendering_intent="Perceptual"))
 
 The above command overrides the :python:`rendering_intent` while leaving the other default options unchanged.
 
 **Normalization**
 
-When convolving two |LinearImage| objects it is recommended to normalize the PSF sum to 1, 
-so the sum of the input image and output image is preserved (with the sum for instance corresponding to the power).
+When convolving two |LinearImage| objects it is recommended to normalize the PSF integral to 1.
+Doing so, the overall power of the image is preserved.
 
 Restrictions
 _______________________
 
-* two |RGBImage| or two |RenderImage| objects can't be convolved
-* resolutions for both image and PSF must be between 50x50 pixels and 4 megapixels
-* the size of the PSF can't be twice the size than the image scaled by the magnification factor
+* it is not possible to convolve two |RGBImage| or two |RenderImage|
+* image and PSF resolutions must be between 50x50 pixels and 4 megapixels
+* the PSF needs to be twice as large as the image scaled with the magnification factor
 * when convolving two colored images, the resulting image is only one possible solution of many
-* the convolution is done using :func:`scipy.signal.fftconvolve`, so due to numerical errors small values in dark image regions can appear
-* convolution of images that have been sphere projected (see :numref:`image_sphere_projections`) is prohibited, as it doesn't make sense geometrically.
-  In the projection always one of distance, area or angle is non-linear.
+* :func:`scipy.signal.fftconvolve` is involved, so small numerical errors in dark image regions can appear
+* convolution of sphere projected images (see :numref:`image_sphere_projections`) is prohibited, as distances are non-linear
 
 Examples
 __________________________
@@ -161,7 +161,7 @@ __________________________
 **Code Example**
 
 
-The following example loads an image preset and convolves it with a square PSF that was created as a numpy array.
+The following example loads an image preset and convolves it with a square PSF created as a numpy array.
 
 .. testcode::
   
@@ -183,14 +183,13 @@ The following example loads an image preset and convolves it with a square PSF t
 Presets
 _____________________
 
-optrace features presets for different PSF shapes.
-In the next section a gallery of point spread function presets can be found.
+The are multiple PSF presets available.
 
-All presets are normalized such that the image sum is 1.
+All presets are normalized such that the integral image sum equals 1.
 
 **Circle**
 
-A circle PSF is defined using the :python:`d` parameter that defines the circle diameter.
+A circular PSF is defined with the :python:`d` circle parameter.
 
 .. testcode::
 
@@ -198,14 +197,13 @@ A circle PSF is defined using the :python:`d` parameter that defines the circle 
 
 **Gaussian**
 
-A gaussian function can model the zeroth order shape of an airy disc.
-The shape parameter :python:`sig` defines the gaussian's standard deviation.
-
-A simple gaussian intensity distribution is described as:
+A simple Gaussian intensity distribution is described as:
 
 .. math::
 
    I_{\sigma}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)
+
+The shape parameter :python:`sig` defines the Gaussian's standard deviation:
 
 .. testcode::
 
@@ -223,9 +221,8 @@ The Airy function is:
 
    r_d = 3.8317 \frac{\sqrt{x^2 + y^2}}{r}
 
-The resolution limit is described as distance from the center to the first function zero, so the diameter describes the distance between the zero on one and the other side.
-
-An Airy PSF also include higher order diffraction and is also characterized by the resolution limit which is the first zero crossing position relative to its core.
+Where :math:`J_1` is the Bessel function of the first kind of order 1.
+The resolution limit :python:`r` is described as distance from the center to the first root.
 
 .. testcode::
 
@@ -233,13 +230,12 @@ An Airy PSF also include higher order diffraction and is also characterized by t
 
 **Glare**
 
-A glare consists of two different gaussians. Parameter :math:`a` describes the relative intensity of the larger one.
+A glare is modelled as two different Gaussians, a broad and a narrow one
+Parameter :math:`a` describes the relative intensity of the larger one.
 
 .. math::
 
   I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
-
-The glare consists of two gaussians, the first with parameter :python:`sig1`, the other with larger :python:`sig2` and relative intensity :python:`a`.
 
 .. testcode::
 
@@ -248,15 +244,13 @@ The glare consists of two gaussians, the first with parameter :python:`sig1`, th
 
 **Halo**
 
-A halo consists of a central gaussian and annular gaussian function around :math:`r`.
-:math:`\sigma_1, \sigma_2` describe the standard deviations of the gaussians.
+A halo is modelled as a central Gaussian and annular Gaussian function around :math:`r`.
+:math:`\sigma_1, \sigma_2` describe the standard deviations of both.
 :math:`a` describes the intensity of the ring.
 
 .. math::
 
    I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
-
-A halo consists of a center gaussian with :python:`sig1` and intensity 1, as well as a ring at :math:`r` with standard deviation :python:`sig2` with intensity :math:`a`.
 
 .. testcode::
 

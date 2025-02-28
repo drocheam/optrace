@@ -210,6 +210,7 @@ The LeGrand full theoretical eye model is a simple model consisting of only sphe
    :widths: 110 75 75 75 75
    :header-rows: 1
    :align: center
+   :width: 860px
 
    * - Surface
      - Radius in mm
@@ -272,6 +273,7 @@ A more advanced model is the :func:`arizona_eye <optrace.tracer.presets.geometry
    :widths: 75 75 75 75 75 75
    :header-rows: 1
    :align: center
+   :width: 860px
 
    * - Surface
      - Radius in mm
