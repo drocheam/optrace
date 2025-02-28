@@ -29,7 +29,7 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.convolve, 5, psf)  # invalid img
         self.assertRaises(TypeError, ot.convolve, img, 5)  # invalid psf
         self.assertRaises(TypeError, ot.convolve, img, psf, m=[])  # invalid magnification
-        self.assertRaises(TypeError, ot.convolve, img, psf, slice_=[])  # invalid slice_
+        self.assertRaises(TypeError, ot.convolve, img, psf, keep_size=[])  # invalid keep_size
         self.assertRaises(TypeError, ot.convolve, img, psf, cargs=[])  # invalid cargs
         self.assertRaises(TypeError, ot.convolve, img, psf, padding_mode=[])  # invalid padding_mode
         self.assertRaises(TypeError, ot.convolve, img, psf, padding_value=2)  # invalid padding_value for RGBImage
@@ -127,7 +127,7 @@ class ConvolutionTests(unittest.TestCase):
                 for psf_s in [(200, 200), (201, 201)]:
                     psf = np.ones(psf_s)
 
-                    img2_ = ot.convolve(image, ot.LinearImage(psf, s_psf), slice_=slice_, padding_mode=padding)
+                    img2_ = ot.convolve(image, ot.LinearImage(psf, s_psf), keep_size=slice_, padding_mode=padding)
                     img2, s2 = img2_.data, img2_.s
 
                     # compare
@@ -152,7 +152,7 @@ class ConvolutionTests(unittest.TestCase):
         # with default settings ("constant" and padding_value=0) no 
         # padding takes place, as scipy.fftconvolve automatically pads with black
             for slice_ in [False, True]:
-                img2_ = ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf, s_psf), slice_=slice_, padding_mode=padding)
+                img2_ = ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf, s_psf), keep_size=slice_, padding_mode=padding)
                 img2, s2 = img2_.data, img2_.s
 
                 # point stays at center
@@ -506,7 +506,7 @@ class ConvolutionTests(unittest.TestCase):
                         
                         psf = ot.LinearImage(np.ones((sh0, sh1)), [sp, sp])
 
-                        img2 = ot.convolve(img, psf, slice_=True, padding_mode=padding)
+                        img2 = ot.convolve(img, psf, keep_size=True, padding_mode=padding)
                         
                         # check shape and side lengths
                         self.assertTrue(np.all(img2.s == img.s))
@@ -530,13 +530,13 @@ class ConvolutionTests(unittest.TestCase):
             for slice_ in [True, False]:
 
                 # padding with black leaves a decreasing edge
-                img2 = ot.convolve(img, psf, slice_=slice_, padding_mode="constant", padding_value=pval1)
+                img2 = ot.convolve(img, psf, keep_size=slice_, padding_mode="constant", padding_value=pval1)
                 val = (np.mean(img2.data[0, :]) + np.mean(img2.data[-1, :])\
                         + np.mean(img2.data[:, 0]) + np.mean(img2.data[:, -1]))/4
                 self.assertNotAlmostEqual(val, 1, delta=0.00001)
                 
                 # padding with white keeps white edge
-                img3 = ot.convolve(img, psf, slice_=slice_, padding_mode="constant", padding_value=pval2)
+                img3 = ot.convolve(img, psf, keep_size=slice_, padding_mode="constant", padding_value=pval2)
                 val = (np.mean(img3.data[0, :]) + np.mean(img3.data[-1, :])\
                         + np.mean(img3.data[:, 0]) + np.mean(img3.data[:, -1]))/4
                 self.assertAlmostEqual(val, 1, delta=0.00001)
@@ -546,7 +546,7 @@ class ConvolutionTests(unittest.TestCase):
                     # check with different channel values, so we now each channel gets edge padded correctly
                     img4 = ot.RGBImage(np.full((100, 100, 3), 0.3), [1, 1])
                     img4._data[:, :, 0] = 0
-                    img5 = ot.convolve(img4, psf, slice_=slice_, padding_mode="edge", cargs=dict(normalize=False))
+                    img5 = ot.convolve(img4, psf, keep_size=slice_, padding_mode="edge", cargs=dict(normalize=False))
                     val0 = (np.mean(img5.data[0, :, 0]) + np.mean(img5.data[-1, :, 0])\
                             + np.mean(img5.data[:, 0, 0]) + np.mean(img5.data[:, -1, 0]))/4
                     self.assertAlmostEqual(val0, 0, delta=0.00001)
@@ -556,7 +556,7 @@ class ConvolutionTests(unittest.TestCase):
 
                 else:
                     img4 = ot.LinearImage(np.full((100, 100), 0.3), [1, 1])
-                    img5 = ot.convolve(img4, psf, slice_=slice_, padding_mode="edge", cargs=dict(normalize=False))
+                    img5 = ot.convolve(img4, psf, keep_size=slice_, padding_mode="edge", cargs=dict(normalize=False))
                     val = (np.mean(img5.data[0, :]) + np.mean(img5.data[-1, :])\
                             + np.mean(img5.data[:, 0]) + np.mean(img5.data[:, -1]))/4
                     self.assertAlmostEqual(val, 0.3, delta=0.00001)
@@ -577,7 +577,7 @@ class ConvolutionTests(unittest.TestCase):
 
             psf = ot.presets.psf.circle(60)
             
-            img5 = ot.convolve(img4, psf, slice_=True, padding_mode="edge", cargs=dict(normalize=False))
+            img5 = ot.convolve(img4, psf, keep_size=True, padding_mode="edge", cargs=dict(normalize=False))
 
             for i in range(3):
                 val = (np.mean(img5.data[0, :, i]) + np.mean(img5.data[-1, :, i])\
@@ -648,7 +648,7 @@ class ConvolutionTests(unittest.TestCase):
         data = np.zeros((1001, 1001, 3))
         data[500, 500] = 1
         img = ot.RGBImage(data, [0.5, 0.5])
-        img2 = ot.convolve(img, dimg, m=-1, slice_=True)
+        img2 = ot.convolve(img, dimg, m=-1, keep_size=True)
 
         # test that center of mass is above center
         cm = np.array(scipy.ndimage.center_of_mass(img2.data[:, :, 0])) / img2.shape[0]
@@ -686,7 +686,7 @@ class ConvolutionTests(unittest.TestCase):
             for psf in [psf0, psf1, psf2, psf3]:
                
                 # convolve
-                img_res = ot.convolve(img, psf, slice_=False)
+                img_res = ot.convolve(img, psf, keep_size=False)
 
                 # test relative error
                 Pres = np.sum(img_res.data)

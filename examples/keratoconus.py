@@ -105,7 +105,7 @@ for num in cases:
     m = ot.presets.geometry.arizona_eye().tma().image_magnification(RS.pos[2])
 
     # convolve with PSF
-    img_conv = ot.convolve(img, psf, m=m, slice_=True)
+    img_conv = ot.convolve(img, psf, m=m, keep_size=True)
     
     # show image
     otp.image_plot(img_conv, flip=True)

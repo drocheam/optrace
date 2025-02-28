@@ -243,3 +243,7 @@ Note that changes are only applied to new :obj:`pyplot <matplotlib.pyplot>` wind
 
           With :python:`plot_dark_mode` disabled.
 
+
+
+.. TODO notes how to run it on wayland
+

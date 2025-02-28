@@ -13,10 +13,10 @@ from .. import global_options
 from ..warnings import warning
 
 
-def convolve(img:                RGBImage | LinearImage, 
-             psf:                LinearImage | RenderImage, 
+def convolve(img:                RGBImage | LinearImage,
+             psf:                LinearImage | RenderImage,
              m:                  float = 1,
-             slice_:             bool = False,
+             keep_size:          bool = False,
              padding_mode:       str = "constant",
              padding_value:      list | float = None,
              cargs:              dict = {})\
@@ -42,7 +42,7 @@ def convolve(img:                RGBImage | LinearImage,
     It must have three elements if img is an RGBImage, and one otherwise.
 
     If a result with the same side lengths and pixel count as the input is desired,
-    parameter `slice_` must be set to True so the image is sliced back.
+    parameter `keep_size` must be set to True so the image is cropped back to its original shape.
 
     In the internals of this function the convolution is done in linear sRGB values, 
     while also using values outside the sRGB gamut.
@@ -57,7 +57,7 @@ def convolve(img:                RGBImage | LinearImage,
     :param img: initial image as either RGBImage or LinearImage
     :param psf: point spread function, Image or RenderImage.
     :param m: magnification factor
-    :param slice_: if output image should be sliced to size of input image
+    :param keep_size: if output image should be cropped back to size of the input image
     :param padding_mode: padding mode (from numpy.pad) for image padding before convolution.
     :param padding_value: padding value for padding_mode='constant'. 
      Three elements if img is a RGBImage, single element otherwise. Defaults to zeros.
@@ -75,7 +75,7 @@ def convolve(img:                RGBImage | LinearImage,
     pc.check_type("m", m, int | float)
     pc.check_type("cargs", cargs, dict)
     pc.check_above("abs(m)", abs(m), 0)
-    pc.check_type("slice_", slice_, bool)
+    pc.check_type("keep_size", keep_size, bool)
 
     make_linear = isinstance(psf, LinearImage) and isinstance(img, LinearImage)
     psf_color = isinstance(psf, RenderImage)
@@ -305,7 +305,7 @@ def convolve(img:                RGBImage | LinearImage,
     if padding_needed:
         img2 = img2[pad_y:-pad_y, pad_x:-pad_x]
     
-    if slice_:
+    if keep_size:
         iy0 = (pny_ - 1) // 2
         ix0 = (pnx_ - 1) // 2
         img2 = img2[iy0:iy0+iny, ix0:ix0+inx]

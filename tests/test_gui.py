@@ -240,13 +240,13 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.detector_image)
                 self._wait_for_idle(sim)
 
-                # detector cut and image with extent provided
+                # detector profile and image with extent provided
                 extent = [-1, 1, -1, 1]
                 self._do_in_main(sim.detector_image, extent=extent)
                 self._wait_for_idle(sim)
                 self.assertTrue(np.all(sim.last_det_image.extent == extent))
                 extent = [-1.2, 1, -1.2, 1]
-                self._do_in_main(sim.detector_cut, extent=extent)
+                self._do_in_main(sim.detector_profile, extent=extent)
                 self._wait_for_idle(sim)
                 self.assertTrue(np.all(sim.last_det_image.extent == extent))
 
@@ -276,8 +276,8 @@ class GUITests(unittest.TestCase):
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
                 self._wait_for_idle(sim)
 
-                for mode in ot.Raytracer.autofocus_methods:
-                    self._set_in_main(sim, "autofocus_method", mode)
+                for mode in ot.Raytracer.focus_search_methods:
+                    self._set_in_main(sim, "focus_search_method", mode)
                     self._wait_for_idle(sim)
                     self._do_in_main(sim.move_to_focus)
                     self._wait_for_idle(sim)
@@ -285,17 +285,17 @@ class GUITests(unittest.TestCase):
                     self._wait_for_idle(sim)
 
                 # Focus Test 4, show Debug Plot
-                self._set_in_main(sim, "cost_function_plot", True)
+                self._set_in_main(sim, "plot_cost_function", True)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.move_to_focus)
                 self._wait_for_idle(sim)
 
                 # Focus Test 5, one source only
-                self._set_in_main(sim, "cost_function_plot", False)
+                self._set_in_main(sim, "plot_cost_function", False)
                 self._wait_for_idle(sim)
                 self._set_in_main(sim, "z_det", pos0[2])
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "autofocus_single_source", True)
+                self._set_in_main(sim, "focus_search_single_source", True)
                 self._do_in_main(sim.move_to_focus)
                 self._wait_for_idle(sim)
                 
@@ -395,7 +395,7 @@ class GUITests(unittest.TestCase):
                     self._set_in_main(sim, "projection_method", pm)
                     self._do_in_main(sim.detector_image)
                     self._wait_for_idle(sim)
-                    self._do_in_main(sim.detector_cut)
+                    self._do_in_main(sim.detector_profile)
                     self._wait_for_idle(sim)
                     self.assertEqual(sim.last_det_image.projection, pm)
                 
@@ -438,24 +438,24 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.detector_spectrum)
                 self._wait_for_idle(sim)
 
-                # test image cuts
-                self._do_in_main(sim.source_cut)
+                # test image profiles
+                self._do_in_main(sim.source_profile)
                 self._wait_for_idle(sim)
                 self._set_in_main(sim, "detector_image_single_source", True)
                 self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_cut)
+                self._do_in_main(sim.detector_profile)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "cut_dimension", "x")
-                self._do_in_main(sim.detector_cut)
+                self._set_in_main(sim, "profile_position_dimension", "x")
+                self._do_in_main(sim.detector_profile)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "cut_dimension", "y")
-                self._do_in_main(sim.detector_cut)
+                self._set_in_main(sim, "profile_position_dimension", "y")
+                self._do_in_main(sim.detector_profile)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "cut_value", 0)  # exists inside image
-                self._do_in_main(sim.detector_cut)
+                self._set_in_main(sim, "profile_position", 0)  # exists inside image
+                self._do_in_main(sim.detector_profile)
                 self._wait_for_idle(sim)
-                self._set_in_main(sim, "cut_value", 100)  # does not exist inside image
-                self._do_in_main(sim.detector_cut)
+                self._set_in_main(sim, "profile_position", 100)  # does not exist inside image
+                self._do_in_main(sim.detector_profile)
                 self._wait_for_idle(sim)
 
         RT = rt_example()
@@ -560,7 +560,7 @@ class GUITests(unittest.TestCase):
                 time.sleep(0.01)
                 self._set_in_main(sim, "ray_count", int(N0/1.3))
                 self._set_in_main(sim, "z_det", (RT.outline[5] - RT.outline[4])/2)
-                self._do_in_main(sim.source_cut)
+                self._do_in_main(sim.source_profile)
                 self._do_in_main(sim.move_to_focus)
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
                 self._do_in_main(sim.detector_image)
@@ -648,20 +648,20 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
                 funcs = [sim.detector_image, sim.source_image, sim.source_spectrum, sim.move_to_focus,
                          sim.replot_rays, sim.open_property_browser, sim.open_command_window,
-                         sim.detector_spectrum, sim.detector_cut, sim.source_cut, sim.replot]
+                         sim.detector_spectrum, sim.detector_profile, sim.source_profile, sim.replot]
 
                 props = [('rays_visible', 500), ('rays_visible', 2000), ('minimalistic_view', True),
                          ('minimalistic_view', False), ('plotting_mode', "Rays"), ('plotting_mode', "Points"),
                          ('ray_opacity', 0.06), ('ray_width', 12),
-                         ('ray_opacity', 0.8), ('ray_width', 2), ('cut_value', 0), ('cut_dimension', 'x'), 
-                         ('cut_dimension', 'y'), ('hide_labels', True), ('hide_labels', False),
-                         ('autofocus_single_source', False), ('autofocus_single_source', True),
+                         ('ray_opacity', 0.8), ('ray_width', 2), ('profile_position', 0), ('profile_position_dimension', 'x'),
+                         ('profile_position_dimension', 'y'), ('hide_labels', True), ('hide_labels', False),
+                         ('focus_search_single_source', False), ('focus_search_single_source', True),
                          ('detector_image_single_source', False),
-                         ('detector_image_single_source', True), ('cut_value', 0.1), ('flip_detector_image', True),
+                         ('detector_image_single_source', True), ('profile_position', 0.1), ('flip_detector_image', True),
                          ('flip_detector_image', False), ('detector_spectrum_single_source', True),
                          ('detector_image_single_source', False),
-                         ('log_image', False), ('log_image', True),  ('cost_function_plot', True),
-                         ('cost_function_plot', False),
+                         ('log_image', False), ('log_image', True),  ('plot_cost_function', True),
+                         ('plot_cost_function', False),
                          ('maximize_scene', False), ('maximize_scene', True), ('vertical_labels', False), 
                          ('vertical_labels', True), ('activate_filter', False), ('activate_filter', True), 
                          ('high_contrast', False), ('high_contrast', True)]
@@ -685,7 +685,7 @@ class GUITests(unittest.TestCase):
                             if np.random.randint(0, 2):
                                 self._set_in_main(sim, "ray_count", np.random.randint(10000, 500000))
                         case 4:
-                            self._set_in_main(sim, "autofocus_method", np.random.choice(RT.autofocus_methods))
+                            self._set_in_main(sim, "focus_search_method", np.random.choice(RT.focus_search_methods))
                         case 5:
                             self._set_in_main(sim, "image_mode", np.random.choice(ot.RenderImage.image_modes))
                         case 6:
@@ -1091,11 +1091,11 @@ class GUITests(unittest.TestCase):
 
         def interact(sim):
             with self._try(sim):
-                # check handling of cut values outside the image
-                self._set_in_main(sim, "cut_value", 500)
-                self._do_in_main(sim.source_cut)
+                # check handling of profile values outside the image
+                self._set_in_main(sim, "profile_position", 500)
+                self._do_in_main(sim.source_profile)
                 self._wait_for_idle(sim)
-                self._do_in_main(sim.source_cut)
+                self._do_in_main(sim.source_profile)
                 self._wait_for_idle(sim)
 
                 # refraction index box replotting with vertical labels
@@ -1185,17 +1185,17 @@ class GUITests(unittest.TestCase):
                 # where status flags are set incorrectly
                 sim._det_ind = 50
                 sim._source_ind = 50
-                self._set_in_main(sim, "autofocus_single_source", True)
+                self._set_in_main(sim, "focus_search_single_source", True)
                 self._set_in_main(sim, "detector_image_single_source", True)
                 self._do_in_main(sim.detector_image)
                 self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_cut)
+                self._do_in_main(sim.detector_profile)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.detector_spectrum)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.source_image)
                 self._wait_for_idle(sim)
-                self._do_in_main(sim.source_cut)
+                self._do_in_main(sim.source_profile)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.source_spectrum)
                 self._wait_for_idle(sim)
@@ -2105,17 +2105,17 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             with self._try(sim):
 
-                # enable autofocus cost plot
-                self._set_in_main(sim, "cost_function_plot", True)
+                # enable focus_search cost plot
+                self._set_in_main(sim, "plot_cost_function", True)
                 time.sleep(0.05)
 
-                # needed for this kind of geometry, detector_cut plot fails otherwise
-                self._set_in_main(sim, "cut_dimension", "x")
+                # needed for this kind of geometry, detector_profile plot fails otherwise
+                self._set_in_main(sim, "profile_position_dimension", "x")
                 time.sleep(0.05)
 
                 # test passdown of path and sargs parameter
-                for plot in [sim.source_image, sim.source_cut, sim.detector_image, 
-                             sim.detector_cut, sim.detector_spectrum, sim.source_spectrum, sim.move_to_focus]:
+                for plot in [sim.source_image, sim.source_profile, sim.detector_image,
+                             sim.detector_profile, sim.detector_spectrum, sim.source_spectrum, sim.move_to_focus]:
 
                         assert not os.path.exists(path)
                         

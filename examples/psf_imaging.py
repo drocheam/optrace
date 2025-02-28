@@ -17,9 +17,8 @@ psf = ot.presets.psf.halo(sig1=4, sig2=4, a=0.1, r=30)
 
 # convolve
 # use constant padding with white color, as the background is white
-# slice_ slices the output back to the original image size
-img_conv = ot.convolve(img, psf, m=0.75, 
-                       padding_mode="constant", padding_value=[1, 1, 1], slice_=True)
+# keep_size slices the output back to the original image size
+img_conv = ot.convolve(img, psf, m=0.75, padding_mode="constant", padding_value=[1, 1, 1], keep_size=True)
 
 # plot images
 otp.image_plot(img, title="Initial Image")

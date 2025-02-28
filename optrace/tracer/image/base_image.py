@@ -144,18 +144,18 @@ class BaseImage(BaseClass):
         # save
         cv2.imwrite(path, img2, params)
     
-    def cut(self,
-            x:      float = None,
-            y:      float = None)\
+    def profile(self,
+                x:      float = None,
+                y:      float = None)\
             -> tuple[np.ndarray, list[np.ndarray]]:
         """
-        Create an image cut/profile.
+        Create an image profile.
         Only specify one of parameters x or y.
 
         There is no interpolation, the nearest pixel value is chosen (nearest neighbor 'interpolation')
         
-        :param x: x-value to cut at
-        :param y: y-value to cut at
+        :param x: x-value for the profile
+        :param y: y-value for the profile
         :return: bin edge array, list of image cuts (one for linear images, three for rgb images)
         """
         img = self._data

@@ -18,7 +18,7 @@ from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 
 # provides types and plotting functionality
 from ..tracer import *
-from ..plots import image_plot, image_cut_plot, autofocus_cost_plot, spectrum_plot  # different plots
+from ..plots import image_plot, image_profile_plot, focus_search_cost_plot, spectrum_plot  # different plots
 
 from .property_browser import PropertyBrowser  # dictionary browser
 from .command_window import CommandWindow
@@ -64,9 +64,9 @@ class TraceGUI(HasTraits):
                                                                               high=20.0, mode="logslider"))
     """Width of rays shown."""
 
-    cut_value: Float = Float(0, desc='value for specified cut dimension',
-                             enter_set=False, label="value", mode='text')
-    """numeric cut value for chosen image cut dimension"""
+    profile_position: Float = Float(0, desc='value for specified profile dimension',
+                                    enter_set=False, label="value", mode='text')
+    """numeric profile position value for chosen image profile dimension"""
 
     # Checklists (with capitalization workaround from https://stackoverflow.com/a/23783351)
     # this should basically be bool values, but because we want to have checkboxes with text right of them
@@ -81,7 +81,7 @@ class TraceGUI(HasTraits):
                                      desc="if detector image should be rotated by 180 degrees")
     """Boolean value for flipping the image (rotating it by 180°). Packed as Checkbox into a :obj:`List`"""
 
-    cost_function_plot: List = List(editor=CheckListEditor(values=['Plot Cost Function'], format_func=lambda x: x),
+    plot_cost_function: List = List(editor=CheckListEditor(values=['Plot Cost Function'], format_func=lambda x: x),
                                     desc="if cost function is shown")
     """Show a plot of the optimization cost function for the focus finding"""
 
@@ -93,9 +93,9 @@ class TraceGUI(HasTraits):
                                    desc="if object labels should be hidden")
     """Shows or hides object labels"""
 
-    autofocus_single_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
-                                                                format_func=lambda x: x),
-                                         desc="if autofocus only uses currently selected source")
+    focus_search_single_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
+                                                                   format_func=lambda x: x),
+                                            desc="if focus_search only uses currently selected source")
     """Use only rays from selected source for focus finding"""
 
     detector_image_single_source: List = List(editor=CheckListEditor(values=['Rays From Selected Source Only'],
@@ -146,11 +146,11 @@ class TraceGUI(HasTraits):
                                    desc="Projection Method for spherical detectors")
     """sphere surface projection method"""
 
-    autofocus_method: Enum = Enum(*Raytracer.autofocus_methods, desc="Method for Autofocus")
-    """Focus Finding Mode from raytracer.AutofocusModes"""
+    focus_search_method: Enum = Enum(*Raytracer.focus_search_methods, desc="Method for Focus Search")
+    """Focus Finding Mode from raytracer.focus_search_methods"""
 
-    cut_dimension: Enum = Enum(["x", "y"], desc="image cut dimension")
-    """dimension for image cut"""
+    profile_position_dimension: Enum = Enum(["x", "y"], desc="image profile position dimension")
+    """dimension for the image profile position"""
 
     source_names: List = List()  #: short names for raytracer ray sources
     source_selection: Enum = Enum(values='source_names', desc="Source Selection for Source Image")
@@ -165,7 +165,7 @@ class TraceGUI(HasTraits):
     """Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side."""
 
     # custom UI elements
-    # only show if they have been prodided
+    # only show if they have been provided
     # unfortunately, for buttons, selections, value there is no way to change the label on runtime
     # change the text of a separate label instead
 
@@ -220,26 +220,26 @@ class TraceGUI(HasTraits):
     _command_window_button:      Button = Button(label="Open Command Window", desc="command window is opened")
     _source_spectrum_button:     Button = Button(label="Source Spectrum", desc="sources spectrum is shown")
     _detector_spectrum_button:   Button = Button(label="Detector Spectrum", desc="detector spectrum is shown")
-    _source_cut_button:          Button = Button(label="Source Image Cut", desc="source image cut is shown")
-    _detector_cut_button:        Button = Button(label="Detector Image Cut", desc="detector image cut is shown")
+    _source_profile_button:      Button = Button(label="Source Image Profile", desc="source image profile is shown")
+    _detector_profile_button:    Button = Button(label="Detector Image Profile", desc="detector image profile is shown")
     _source_image_button:        Button = Button(label="Source Image", desc="Source Image of the Chosen Source")
-    _auto_focus_button:          Button = Button(label="Find Focus", desc="Finding the Focus Between the Lenses"
-                                                                          " around the Detector Position")
+    _focus_search_button:        Button = Button(label="Focus Search", desc="Finding the Focus Between the Lenses"
+                                                                            " around the Detector Position")
 
     # Strings and Labels
 
-    _autofocus_information:      Str = Str()
+    _focus_search_information:   Str = Str()
     _spectrum_information:       Str = Str()
     _spectrum_label:             Str = Str('Generate Spectrum:')
     _image_label:                Str = Str('Render Image:')
     _geometry_label:             Str = Str('Geometry:')
-    _autofocus_label:            Str = Str('Autofocus:')
+    _focus_search_label:         Str = Str('Focus Search:')
     _property_label:             Str = Str('Additional Windows:')
     _trace_label:                Str = Str('Trace Settings:')
     _plotting_label:             Str = Str('Ray Plotting Modes:')
     _ray_visual_label:           Str = Str('Ray Visual Settings:')
     _ui_visual_label:            Str = Str('Scene and UI Settings:')
-    _autofocus_output_label:     Str = Str('Optimization Output:')
+    _focus_output_label:         Str = Str('Optimization Output:')
     _spectrum_output_label:      Str = Str('Spectrum Properties:')
     _filter_label:               Str = Str('Resolution Limit Filter:')
     _whitespace_label:           Str = Str('')
@@ -312,10 +312,10 @@ class TraceGUI(HasTraits):
                             Item('_source_image_button', show_label=False, emphasized=True),
                             Item('_detector_image_button', show_label=False, emphasized=True),
                             _separator,
-                            Item("cut_dimension", label="Cut at"),
-                            Item("cut_value", label="Value"),
-                            Item('_source_cut_button', show_label=False, emphasized=True),
-                            Item('_detector_cut_button', show_label=False, emphasized=True),
+                            Item("profile_position_dimension", label="Profile at"),
+                            Item("profile_position", label="Value"),
+                            Item('_source_profile_button', show_label=False, emphasized=True),
+                            Item('_detector_profile_button', show_label=False, emphasized=True),
                             _separator,
                             Item("_filter_label", style='readonly', show_label=False, emphasized=True,
                                  enabled_when="not projection_method_enabled"),
@@ -347,14 +347,14 @@ class TraceGUI(HasTraits):
                             Item('detector_selection', label="Detector"),
                             Item('z_det'),
                             _separator, _separator,
-                            Item("_autofocus_label", style='readonly', show_label=False, emphasized=True),
-                            Item('autofocus_method', label='Mode'),
-                            Item('autofocus_single_source', style="custom", show_label=False),
-                            Item('cost_function_plot', style="custom", show_label=False),
-                            Item('_auto_focus_button', show_label=False, emphasized=True),
+                            Item("_focus_search_label", style='readonly', show_label=False, emphasized=True),
+                            Item('focus_search_method', label='Mode'),
+                            Item('focus_search_single_source', style="custom", show_label=False),
+                            Item('plot_cost_function', style="custom", show_label=False),
+                            Item('_focus_search_button', show_label=False, emphasized=True),
                             _separator,
-                            Item("_autofocus_output_label", style='readonly', show_label=False),
-                            Item("_autofocus_information", show_label=False, style="custom"),
+                            Item("_focus_output_label", style='readonly', show_label=False),
+                            Item("_focus_search_information", show_label=False, style="custom"),
                             _separator,
                             label="Focus",
                             ),
@@ -1300,29 +1300,29 @@ class TraceGUI(HasTraits):
 
             self._start_action(background)
 
-    @observe('_detector_cut_button', dispatch="ui")
-    def detector_cut(self, event = None, extent: list | np.ndarray = None, **kwargs) -> None:
+    @observe('_detector_profile_button', dispatch="ui")
+    def detector_profile(self, event = None, extent: list | np.ndarray = None, **kwargs) -> None:
         """
-        Plot a detector image cut.
+        Plot a detector image profile.
 
         :param event: optional event from traits observe decorator
         :param extent: image extent, see Raytracer.detector_image()
-        :param kwargs: additional keyword arguments for r_image_cut_plot
+        :param kwargs: additional keyword arguments for image_profile_plot
         """
-        self.detector_image(event, cut=True, extent=extent, **kwargs)
+        self.detector_image(event, profile=True, extent=extent, **kwargs)
 
     @observe('_detector_image_button', dispatch="ui")
-    def detector_image(self, 
-                       event        = None, 
-                       cut:         bool = False, 
-                       extent:      list | np.ndarray = None, 
+    def detector_image(self,
+                       event        = None,
+                       profile:         bool = False,
+                       extent:      list | np.ndarray = None,
                        **kwargs)\
             -> None:
         """
         Render a detector image at the chosen Detector, uses a separate thread.
 
         :param event: optional event from traits observe decorator
-        :param cut: if a Image cut image is plotted
+        :param profile: if a Image profile image is plotted
         :param extent: image extent, see Raytracer.detector_image()
         :param kwargs: additional keyword arguments for r_image_plot
         """
@@ -1369,14 +1369,14 @@ class TraceGUI(HasTraits):
 
                         with self._try():
 
-                            if (event is None and not cut) or (event is not None\
-                                    and event.name == "_detector_image_button"):
+                            if (event is None and not profile) or (event is not None \
+                                                                   and event.name == "_detector_image_button"):
                                 image_plot(img, log=bool(self.log_image), flip=bool(self.flip_detector_image), **kwargs)
 
                             else:
-                                cut_args = {self.cut_dimension : self.cut_value}
-                                image_cut_plot(img, log=bool(self.log_image),
-                                               flip=bool(self.flip_detector_image), **cut_args, **kwargs)
+                                cut_args = {self.profile_position_dimension : self.profile_position}
+                                image_profile_plot(img, log=bool(self.log_image),
+                                                   flip=bool(self.flip_detector_image), **cut_args, **kwargs)
 
                     self._status["DetectorImage"] -= 1
 
@@ -1422,15 +1422,15 @@ class TraceGUI(HasTraits):
 
             self._start_action(background)
 
-    @observe('_source_cut_button', dispatch="ui")
-    def source_cut(self, event = None, **kwargs) -> None:
+    @observe('_source_profile_button', dispatch="ui")
+    def source_profile(self, event = None, **kwargs) -> None:
         """
-        Plot a source image cut.
+        Plot a source image profile.
 
         :param event: optional event from traits observe decorator
-        :param kwargs: additional keyword arguments for r_image_cut_plot
+        :param kwargs: additional keyword arguments for image_profile_plot
         """
-        self.source_image(event, cut=True, **kwargs)
+        self.source_image(event, profile=True, **kwargs)
     
     def _get_spectrum_information(self, spec) -> str:
 
@@ -1485,12 +1485,12 @@ class TraceGUI(HasTraits):
             self._start_action(background)
 
     @observe('_source_image_button', dispatch="ui")
-    def source_image(self, event = None, cut: bool = False, **kwargs) -> None:
+    def source_image(self, event = None, profile: bool = False, **kwargs) -> None:
         """
         Render a source image for the chosen Source, uses a separate thread
 
         :param event: optional event from traits observe decorator
-        :param cut: if an Image cut plot is plotted
+        :param profile: if an Image profile plot is plotted
         :param kwargs: additional keyword arguments for image_plot
         """
 
@@ -1528,12 +1528,12 @@ class TraceGUI(HasTraits):
                 def on_finish() -> None:
                     if not error:
                         with self._try():
-                            if (event is None and not cut) or \
+                            if (event is None and not profile) or \
                                     (event is not None and event.name == "_source_image_button"):
                                 image_plot(img, log=bool(self.log_image), **kwargs)
                             else:
-                                cut_args = {self.cut_dimension : self.cut_value}
-                                image_cut_plot(img, log=bool(self.log_image), **cut_args, **kwargs)
+                                cut_args = {self.profile_position_dimension : self.profile_position}
+                                image_profile_plot(img, log=bool(self.log_image), **cut_args, **kwargs)
 
                     self._status["SourceImage"] -= 1
 
@@ -1541,7 +1541,7 @@ class TraceGUI(HasTraits):
 
             self._start_action(background)
 
-    @observe('_auto_focus_button', dispatch="ui")
+    @observe('_focus_search_button', dispatch="ui")
     def move_to_focus(self, event=None, **kwargs) -> None:
         """
         Find a Focus.
@@ -1550,26 +1550,26 @@ class TraceGUI(HasTraits):
         Search takes place in a separate thread, after that the Detector is moved to the focus
 
         :param event: optional event from traits observe decorator
-        :param kwargs: additional keyword arguments for autofocus_cost_plot
+        :param kwargs: additional keyword arguments for focus_search_cost_plot
         """
 
         if self.raytracer.detectors and self.raytracer.ray_sources and self.raytracer.rays.N:
 
             self._status["Focussing"] += 1
-            self._autofocus_information = ""
+            self._focus_search_information = ""
 
             def background() -> None:
 
                 error = False
 
-                source_index = None if not self.autofocus_single_source else self._source_ind
-                mode, z_det, ret_cost, det_ind = self.autofocus_method, self.z_det, bool(self.cost_function_plot), \
+                source_index = None if not self.focus_search_single_source else self._source_ind
+                mode, z_det, ret_cost, det_ind = self.focus_search_method, self.z_det, bool(self.plot_cost_function), \
                     self._det_ind
 
                 with self.__ray_access_lock:
                     with self._try() as error:
-                        res, afdict = self.raytracer.autofocus(mode, z_det, return_cost=ret_cost,
-                                                               source_index=source_index)
+                        res, afdict = self.raytracer.focus_search(mode, z_det, return_cost=ret_cost,
+                                                                  source_index=source_index)
 
                 if not error:
                     with self.__detector_lock:
@@ -1586,16 +1586,16 @@ class TraceGUI(HasTraits):
                         if det_ind < len(self.raytracer.detectors):  # pragma: no branch
                             self.z_det = self.raytracer.detectors[det_ind].pos[2]
 
-                        if self.cost_function_plot:
+                        if self.plot_cost_function:
                             with self._try():
-                                autofocus_cost_plot(res, afdict, f"{mode} Cost Function\nMinimum at z={res.x:.5g}mm",
-                                                    **kwargs)
+                                focus_search_cost_plot(res, afdict, f"{mode} Cost Function\nMinimum at z={res.x:.5g}mm",
+                                                       **kwargs)
 
-                        self._autofocus_information = \
+                        self._focus_search_information = \
                             f"Found 3D position: [{pos[0]:.7g}mm, {pos[1]:.7g}mm, {pos[2]:.7g}mm]\n"\
                             f"Search Region: z = [{bounds[0]:.7g}mm, {bounds[1]:.7g}mm]\n"\
                             f"Method: {mode}\n"\
-                            f"Used {N} Rays for Autofocus\n"\
+                            f"Used {N} Rays for Focus Search\n"\
                             f"Ignoring Filters and Apertures\n\nOptimizeResult:\n{res}"
 
                     self._status["Focussing"] -= 1

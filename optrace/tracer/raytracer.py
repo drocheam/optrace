@@ -51,9 +51,9 @@ class Raytracer(Group):
         OUTLINE_INTERSECTION = 4
     """enum for info messages in raytracing"""
 
-    autofocus_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
-                                              'Irradiance Variance', 'Irradiance Maximum', 'Image Sharpness']
-    """available autofocus methods"""
+    focus_search_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
+                                                 'Irradiance Variance', 'Irradiance Maximum', 'Image Sharpness']
+    """available focus_search methods"""
 
     def __init__(self,
                  outline:        (list | np.ndarray),
@@ -65,7 +65,7 @@ class Raytracer(Group):
         Initialize the raytracer
 
         :param outline: outline of raytracer space [x1, x2, y1, y2, z1, z2] (numpy 1D array or list)
-        :param n0: refraction index of the raytracer enviroment (RefractionIndex object)
+        :param n0: refraction index of the raytracer environment (RefractionIndex object)
         :param no_pol: if polarization should be neglected to speed things up
         """
 
@@ -218,7 +218,8 @@ class Raytracer(Group):
                     match type_:
                         case self.INFOS.TIR:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"with total inner reflection at surface {surf} ({surf_name[surf]}), treating as absorbed.")
+                                    f"with total inner reflection at surface {surf} ({surf_name[surf]}),"
+                                    " treating as absorbed.")
 
                         case self.INFOS.ABSORB_MISSING:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
@@ -226,8 +227,8 @@ class Raytracer(Group):
 
                         case self.INFOS.T_BELOW_TTH:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"with transmittivity at filter surface {surf}  ({surf_name[surf]}) below threshold of "
-                                    f"{self.T_TH*100:.3g}%, setting to absorbed.")
+                                    f"with transmittivity at filter surface {surf}  ({surf_name[surf]}) below threshold"
+                                    f" of {self.T_TH*100:.3g}%, setting to absorbed.")
                         
                         case self.INFOS.ILL_COND:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
@@ -1310,14 +1311,14 @@ class Raytracer(Group):
 
         return img
 
-    def __autofocus_cost_func(self,
-                              z_pos:   float,
-                              mode:    str,
-                              pa:      np.ndarray,
-                              sb:      np.ndarray,
-                              w:       np.ndarray,
-                              r0:      float = 1e-3,
-                              ret_pos: bool = False)\
+    def __focus_search_cost_function(self,
+                                     z_pos:   float,
+                                     mode:    str,
+                                     pa:      np.ndarray,
+                                     sb:      np.ndarray,
+                                     w:       np.ndarray,
+                                     r0:      float = 1e-3,
+                                     ret_pos: bool = False)\
             -> float | tuple[float, tuple[float, float, float]]:
         """
         Calculate the cost function value at this z position.
@@ -1390,19 +1391,19 @@ class Raytracer(Group):
 
         return cost, (xm, ym, z_pos)
 
-    def autofocus(self,
-                  method:           str,
-                  z_start:          float,
-                  source_index:     int = None,
-                  N:                int = 100000,
-                  return_cost:      bool = False)\
+    def focus_search(self,
+                     method:           str,
+                     z_start:          float,
+                     source_index:     int = None,
+                     N:                int = 100000,
+                     return_cost:      bool = False)\
             -> tuple[scipy.optimize.OptimizeResult, dict]:
         """
         Find the focal point using different methods. z_start defines the starting point,
         the search range is the region between lenses or the outline.
         The influence of filters and apertures is neglected. Outline intersections of rays are ignored.
 
-        :param method: focussing method from "autofocus_methods"
+        :param method: focussing method from "focus_search_methods"
         :param z_start: starting position z (float)
         :param source_index: source number, defaults to None, so rays from all sources are used
         :param N: maximum number of rays to evaluate for modes "Position Variance" and "Airy Disc Weighting"
@@ -1416,8 +1417,8 @@ class Raytracer(Group):
             raise ValueError(f"Starting position z_start={z_start} outside raytracer"
                              " z-outline range {RT.outline[4:]}.")
 
-        if method not in self.autofocus_methods:
-            raise ValueError(f"Invalid method '{method}', should be one of {self.autofocus_methods}.")
+        if method not in self.focus_search_methods:
+            raise ValueError(f"Invalid method '{method}', should be one of {self.focus_search_methods}.")
 
         if N < 1:
             raise ValueError(f"N needs to be a positive value, but is {N}")
@@ -1462,7 +1463,7 @@ class Raytracer(Group):
         # show filter warning
         for filter_ in (self.filters + self.apertures):
             if bounds[0] <= filter_.pos[2] <= bounds[1]:
-                warning("WARNING: The influence of the filters/apertures in the autofocus range will be ignored.")
+                warning("WARNING: The influence of the filters/apertures in the focus_search range will be ignored.")
 
         # start progress bar
         ################################################################################################################
@@ -1498,7 +1499,7 @@ class Raytracer(Group):
         N_act = np.count_nonzero(rays_pos)
         N_use = min(N, N_act) if method in ["Position Variance", "Airy Disc Weighting"] else N_act
         if N_use < 1000:  # throw error when no rays are present
-            warning(f"WARNING: Less than 1000 rays for autofocus ({N_use}).")
+            warning(f"WARNING: Less than 1000 rays for focus_search ({N_use}).")
 
         # no rays are used, return placeholder variables
         if N_use == 0:
@@ -1529,7 +1530,7 @@ class Raytracer(Group):
         sb = s/s[:, 2, np.newaxis]
 
         if method == "Position Variance":
-            res = scipy.optimize.minimize_scalar(self.__autofocus_cost_func,
+            res = scipy.optimize.minimize_scalar(self.__focus_search_cost_function,
                                                  args=("Position Variance", pa, sb, weights),
                                                  options={'maxiter': 500, 'xatol':1e-6},
                                                  bounds=bounds, method='Bounded')
@@ -1556,7 +1557,7 @@ class Raytracer(Group):
                 for i, Ni in enumerate(np.arange(Ns, Ne)):
                     if i % div == div-1 and bar is not None and not N_is:
                         bar.update(2+int(i/div + 1))
-                    vals[Ni] = self.__autofocus_cost_func(r[Ni], *afargs)
+                    vals[Ni] = self.__focus_search_cost_function(r[Ni], *afargs)
 
             if N_th > 1:
                 threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, pa, sb, weights, r0))
@@ -1573,7 +1574,7 @@ class Raytracer(Group):
         if method != "Position Variance":
             # # start search at minimum of sampled data
             pos = np.argmin(vals)
-            cost_func2 = lambda z, method: self.__autofocus_cost_func(z[0], method, pa, sb, weights, r0)
+            cost_func2 = lambda z, method: self.__focus_search_cost_function(z[0], method, pa, sb, weights, r0)
             res = scipy.optimize.minimize(cost_func2, r[pos], args=method, tol=None, callback=None,
                                           options={'maxiter': 300}, bounds=[bounds])
             res.x = res.x[0]
@@ -1590,6 +1591,6 @@ class Raytracer(Group):
             warning("Found minimum near search bounds, "
                     "this can mean the focus is outside of the search range.")
 
-        pos = self.__autofocus_cost_func(res.x, method, pa, sb, weights, r0, ret_pos=True)[1]
+        pos = self.__focus_search_cost_function(res.x, method, pa, sb, weights, r0, ret_pos=True)[1]
 
         return res, dict(pos=pos, bounds=bounds, z=r, cost=vals, N=N_use)

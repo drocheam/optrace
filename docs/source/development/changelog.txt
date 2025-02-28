@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.6.3   |   2025-02-28   |  New custom UI elements that can be assigned before starting the GUI.   
   1.6.2   |   2025-02-04   |  Support for python 3.13   
   1.6.1   |   2024-11-27   |  New IOL_pinhole_imaging example.   
   1.6.0   |   2024-11-20   |  Licensed with MIT License   

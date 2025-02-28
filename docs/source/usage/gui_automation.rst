@@ -285,8 +285,8 @@ Here is an example:
 Showing Plots
 ________________________
 
-Available plotting functions include :meth:`TraceGUI.source_image <optrace.gui.trace_gui.TraceGUI.source_image>` , :meth:`TraceGUI.source_cut <optrace.gui.trace_gui.TraceGUI.source_cut>`, 
-:meth:`TraceGUI.detector_image <optrace.gui.trace_gui.TraceGUI.detector_image>`, :meth:`TraceGUI.detector_cut <optrace.gui.trace_gui.TraceGUI.detector_cut>`,
+Available plotting functions include :meth:`TraceGUI.source_image <optrace.gui.trace_gui.TraceGUI.source_image>` , :meth:`TraceGUI.source_profile <optrace.gui.trace_gui.TraceGUI.source_profile>`,
+:meth:`TraceGUI.detector_image <optrace.gui.trace_gui.TraceGUI.detector_image>`, :meth:`TraceGUI.detector_profile <optrace.gui.trace_gui.TraceGUI.detector_profile>`,
 :meth:`TraceGUI.detector_spectrum <optrace.gui.trace_gui.TraceGUI.detector_spectrum>`, :meth:`TraceGUI.source_spectrum <optrace.gui.trace_gui.TraceGUI.source_spectrum>`,
 :meth:`TraceGUI.move_to_focus <optrace.gui.trace_gui.TraceGUI.move_to_focus>`.
 
@@ -302,8 +302,8 @@ Additionally, a custom detector/source extent can be specified, a setting not av
        sim.image_pixels = 315
        sim.image_mode = "Lightness (CIELUV)"
 
-       # show a source cut with a user-defined extent
-       sim.source_cut(extent=[0, 0.1, 0.2, 0.25])
+       # show a source profile with a user-defined extent
+       sim.source_profile(extent=[0, 0.1, 0.2, 0.25])
 
        # save a detector image with higher dpi
        sim.detector_image(path="detector.png", sargs=(dpi=600))

@@ -59,7 +59,7 @@ class ImageTests(unittest.TestCase):
         for mode in ot.RenderImage.image_modes:
             self.assertRaises(RuntimeError, RIm.get, mode)
     
-    def test_image_cut(self):
+    def test_image_profile(self):
        
         for ratio in [1/6, 0.9, 3, 5]:  # different side ratios
 
@@ -75,10 +75,10 @@ class ImageTests(unittest.TestCase):
                         kwargs = {cut_: ext[0] + p*(ext[1] - ext[0])}
 
                         if p < 0 or p > 1:
-                            self.assertRaises(ValueError, img.cut, **kwargs)
+                            self.assertRaises(ValueError, img.profile, **kwargs)
                         else:
                             rgb_mode = isinstance(img, ot.RGBImage)
-                            bine, vals = img.cut(**kwargs)
+                            bine, vals = img.profile(**kwargs)
 
                             # check properties
                             self.assertEqual(len(vals), 3 if rgb_mode else 1)  # channel count
@@ -90,17 +90,17 @@ class ImageTests(unittest.TestCase):
                             if rgb_mode:
                                 vals = np.dstack((vals[0], vals[1], vals[2]))
 
-                            # make cut through image, multiply with 1-1e-12 so p = 1 gets mapped into last bin
+                            # make profile through image, multiply with 1-1e-12 so p = 1 gets mapped into last bin
                             if cut_ == "x":
                                 img_ = img.data[:, int(p * (1 - 1e-12) * img.shape[1])]
                             else:
                                 img_ = img.data[int(p * (1 - 1e-12) * img.shape[0]), :]
 
-                            # compare with cut from before
+                            # compare with profile from before
                             self.assertTrue(np.allclose(img_ - vals, 0))
 
         # coverage: x and y not provided
-        self.assertRaises(ValueError, ot.presets.image.cell([1, 1]).cut)
+        self.assertRaises(ValueError, ot.presets.image.cell([1, 1]).profile)
 
     @pytest.mark.slow
     def test_r_image_render_and_rescaling(self):

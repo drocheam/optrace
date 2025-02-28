@@ -76,11 +76,11 @@ For all other cases color information is generated and :python:`img2` is a |RGBI
 **Slicing and Padding**
 
 While doing a convolution, the output image grows in size by half the PSF size in each direction.
-By providing :python:`slice_=True` the padded data can be neglected for the resulting image.
+By providing :python:`keep_size=True` the padded data can be neglected for the resulting image.
 
 .. testcode::
 
-   img2 = ot.convolve(img, psf, m=0.5, slice_=True)
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True)
 
 The convolution operation requires the data outside of the image.
 By default, the image is padded with zeros before convolution.
@@ -90,7 +90,7 @@ For instance, padding with white is done in the following fashion:
 
 .. testcode::
 
-   img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="constant", padding_value=[1, 1, 1])
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="constant", padding_value=[1, 1, 1])
 
 :python:`padding_value` specifies the values used for constant padding for each channel.
 Depending on type of :python:`img`, it needs to have three or only one element.
@@ -99,7 +99,7 @@ To reduce boundary effects, edge padding is a viable choice:
 
 .. testcode::
 
-   img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="edge")
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="edge")
 
 **Color conversion**
 
@@ -111,7 +111,7 @@ Provide a :python:`cargs` dictionary to override this setting.
 
 .. testcode::
 
-   img2 = ot.convolve(img, psf, m=0.5, slice_=True, padding_mode="edge", cargs=dict(rendering_intent="Perceptual"))
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="edge", cargs=dict(rendering_intent="Perceptual"))
 
 The above command overrides the :python:`rendering_intent` while leaving the other default options unchanged.
 

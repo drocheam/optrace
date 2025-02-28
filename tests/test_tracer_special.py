@@ -230,7 +230,7 @@ class TracerSpecialTests(unittest.TestCase):
                     RT.add(L)
 
                     RT.trace(100000)
-                    res, _ = RT.autofocus(RT.autofocus_methods[0], 5)
+                    res, _ = RT.focus_search(RT.focus_search_methods[0], 5)
                     f_list.append(res.x)
 
                     RT.remove(L)
@@ -408,9 +408,9 @@ class TracerSpecialTests(unittest.TestCase):
                 RT.detector_spectrum()
                 RT.iterative_render(N)
 
-                # test autofocus
-                for fm in RT.autofocus_methods:
-                    RT.autofocus(fm, z_start=30)
+                # test focus_search
+                for fm in RT.focus_search_methods:
+                    RT.focus_search(fm, z_start=30)
 
                 # ray storage
                 RT.rays.source_sections()
@@ -419,7 +419,7 @@ class TracerSpecialTests(unittest.TestCase):
                 RT.rays.rays_by_mask(np.full_like(RT.rays.wl_list, 0, dtype=bool))
                 RT.rays.rays_by_mask(np.full_like(RT.rays.wl_list, 1, dtype=bool))
 
-            # add aperture and move it so that no rays reach detector or autofocus region
+            # add aperture and move it so that no rays reach detector or focus_search region
             RT.add(AP)
             RT.apertures[0].move_to(AP.pos + [0.2, 0.2, 0])
       

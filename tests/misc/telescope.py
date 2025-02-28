@@ -63,7 +63,7 @@ RT.trace(4)
 # find focus of rays and create a black filter there
 aps = ot.RectangularSurface(dim=[2*r2, 2*r2])
 ap = ot.Aperture(aps, pos=[0, 0, RT.outline[5]])
-res, _ = RT.autofocus("Position Variance", z_start=RT.outline[5])
+res, _ = RT.focus_search("Position Variance", z_start=RT.outline[5])
 ap.move_to([0, 0, res.x])
 RT.add(ap)
 

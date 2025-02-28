@@ -394,21 +394,21 @@ Image Tab
      -
      - renders a detector image with the given settings
    * - Cut at
-     - :attr:`cut_dimension <optrace.gui.trace_gui.TraceGUI.cut_dimension>`
+     - :attr:`profile_position_dimension <optrace.gui.trace_gui.TraceGUI.profile_position_dimension>`
      - :python:`'x', 'y'`
-     - image cut dimension
+     - image profile dimension
    * - Cut Value
-     - :attr:`cut_value <optrace.gui.trace_gui.TraceGUI.cut_value>`
+     - :attr:`profile_position <optrace.gui.trace_gui.TraceGUI.profile_position>`
      - :python:`float`
-     - image cut value for the chosen dimension
+     - image profile value for the chosen dimension
    * - Source Image Cut
-     - :meth:`source_cut() <optrace.gui.trace_gui.TraceGUI.source_cut>`
+     - :meth:`source_profile() <optrace.gui.trace_gui.TraceGUI.source_profile>`
      -
-     - renders a source image cut
+     - renders a source image profile
    * - Detector Image Cut
-     - :meth:`detector_cut() <optrace.gui.trace_gui.TraceGUI.detector_cut>`
+     - :meth:`detector_profile() <optrace.gui.trace_gui.TraceGUI.detector_profile>`
      -
-     - renders a detector image cut
+     - renders a detector image profile
    * - Activate Filter 
      - :attr:`activate_filter <optrace.gui.trace_gui.TraceGUI.activate_filter>`
      - :python:`True` or :python:`False`
@@ -482,18 +482,18 @@ Focus Tab
      - :python:`float`
      - position of the selected detector
    * - Focus Mode     
-     - :attr:`autofocus_method <optrace.gui.trace_gui.TraceGUI.autofocus_method>`
-     - :python:`str`, one of :attr:`Raytracer.autofocus_methods <optrace.tracer.raytracer.Raytracer.autofocus_methods>`
-     - mode for focus finding
+     - :attr:`focus_search_method <optrace.gui.trace_gui.TraceGUI.focus_search_method>`
+     - :python:`str`, one of :attr:`Raytracer.focus_search_methods <optrace.tracer.raytracer.Raytracer.focus_search_methods>`
+     - mode for focus search
    * - Rays From Selected Source Only
-     - :attr:`autofocus_single_source <optrace.gui.trace_gui.TraceGUI.autofocus_single_source>`
+     - :attr:`focus_search_single_source <optrace.gui.trace_gui.TraceGUI.focus_search_single_source>`
      - :python:`True` or :python:`False`
-     - only use the rays from the selected source for focus finding
+     - only use the rays from the selected source for focus search
    * -  Plot Cost Function
-     - :attr:`cost_function_plot <optrace.gui.trace_gui.TraceGUI.cost_function_plot>`
+     - :attr:`plot_cost_function <optrace.gui.trace_gui.TraceGUI.plot_cost_function>`
      - :python:`True` or :python:`False`
      - plots the evaluated cost function
-   * -  Find Focus
+   * -  Find Focus and move the currently selected detector to it
      - :meth:`move_to_focus() <optrace.gui.trace_gui.TraceGUI.move_to_focus>`
      - 
      - execute the focus search

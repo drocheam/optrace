@@ -14,17 +14,17 @@ from ..warnings import warning
 from ..global_options import global_options
 
 
-def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
-                        afdict:  dict,
-                        title:   str = "Autofocus Cost Function",
-                        path:    str = None,
-                        sargs:   dict = {})\
+def focus_search_cost_plot(res:     scipy.optimize.OptimizeResult,
+                           fsdict:  dict,
+                           title:   str = "Autofocus Cost Function",
+                           path:    str = None,
+                           sargs:   dict = {})\
         -> None:
     """
-    Plot a cost function plot for the autofocus results.
+    Plot a cost function plot for the focus_search results.
 
-    :param res: optimize result from Raytracer.autofocus()
-    :param afdict: dictionary from Raytracer.autofocus()
+    :param res: optimize result from Raytracer.focus_search()
+    :param fsdict: dictionary from Raytracer.focus_search()
     :param title: title of the plot
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
@@ -33,16 +33,16 @@ def autofocus_cost_plot(res:     scipy.optimize.OptimizeResult,
 
     # type checking
     pc.check_type("res", res, scipy.optimize.OptimizeResult)
-    pc.check_type("afdict", afdict, dict)
+    pc.check_type("fsdict", fsdict, dict)
     pc.check_type("title", title, str)
 
-    if afdict["z"] is None or afdict["cost"] is None:
+    if fsdict["z"] is None or fsdict["cost"] is None:
         warning('Parameters missing in focus dict. For mode "Position Variance" set '
-                'autofocus("Position Variance", ..., return_cost=True) when'
+                'focus_search("Position Variance", ..., return_cost=True) when'
                 ' wanting to plot the debug plot.')
         return
 
-    r, vals = afdict["z"], afdict["cost"]
+    r, vals = fsdict["z"], fsdict["cost"]
 
     plt.figure()
 

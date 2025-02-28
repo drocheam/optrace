@@ -54,34 +54,34 @@ ______________
 
 
 For focus search you will need to trace the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` geometry.
-The :meth:`autofocus <optrace.tracer.raytracer.Raytracer.autofocus>` function is then called by passing the focus mode and a starting position.
+The :meth:`focus_search <optrace.tracer.raytracer.Raytracer.focus_search>` function is then called by passing the focus mode and a starting position.
 Focus Search then tries to find the focus in a search region between the last lens (or the outline) and the next lens (or the outline).
 
 .. testcode::
 
-   res, afdict = RT.autofocus("Position Variance", 12.09)
+   res, fsdict = RT.focus_search("Position Variance", 12.09)
 
-:python:`autofocus` returns two results, where the first one is a :class:`scipy.optimize.OptimizeResult` object with information on the root finding. 
+:python:`focus_search` returns two results, where the first one is a :class:`scipy.optimize.OptimizeResult` object with information on the root finding.
 The found z-position is accessed with :python:`res.x`.
 The second return value includes some additional information, for instance needed for the cost plot, see :ref:`focus_cost_plot`.
 
-By default, rays from all sources are used to autofocus. 
+By default, rays from all sources are used to focus_search.
 Optionally a :python:`source_index` parameter can be provided to limit the search to a specific ray source.
 
 .. testcode::
 
-   res, afdict = RT.autofocus("Position Variance", 12.09, source_index=1)
+   res, fsdict = RT.focus_search("Position Variance", 12.09, source_index=1)
 
 For modes :python:`"Position Variance", "Airy Disc Weighting"` the ray number is limited, as above a certain number the quality of results hardly increases anymore.
 Should it be needed, you can increase or lower this number with the parameter :python:`N`.
 It is set to 100000 by default. 
 
-Mode :python:`"Position Variance"` uses a slightly different approach for root finding, which leads to some parameters missing in the second return parameter :python:`afdict`.
+Mode :python:`"Position Variance"` uses a slightly different approach for root finding, which leads to some parameters missing in the second return parameter :python:`fsdict`.
 To include the results needed for a :ref:`focus_cost_plot`, set the parameter :python:`return_cost=True`.
 
 .. testcode::
 
-   res, afdict = RT.autofocus("Position Variance", 12.09, N=10000, return_cost=True)
+   res, fsdict = RT.focus_search("Position Variance", 12.09, N=10000, return_cost=True)
 
 
 Limitations

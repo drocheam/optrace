@@ -36,7 +36,7 @@ def image_plot(im:       LinearImage | RGBImage,
     else:
         Imd = im.data
 
-    _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, im.quantity, log, None)
+    _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, im.quantity, log)
 
     if im.projection not in ["Equal-Area", None] and im.quantity in ["Irradiance", "Illuminance"]:
         imax = np.max(Imd)
@@ -106,37 +106,37 @@ def image_plot(im:       LinearImage | RGBImage,
     _save_or_show(path, sargs)
 
 
-def image_cut_plot(im:       RGBImage | LinearImage,
-                   log:      bool = False,
-                   flip:     bool = False,
-                   title:    str = None,
-                   path:     str = None,
-                   sargs:    dict = {},
-                   **kwargs)\
+def image_profile_plot(im:       RGBImage | LinearImage,
+                       log:      bool = False,
+                       flip:     bool = False,
+                       title:    str = None,
+                       path:     str = None,
+                       sargs:    dict = {},
+                       **kwargs)\
         -> None:
     """
 
-    :param im: Rmage to plot
+    :param im: Image to plot
     :param log: if logarithmic values are shown
     :param flip: if the image should be flipped
     :param title: title of the plot
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
-    :param kwargs: additional keyword arguments for Image.cut
+    :param kwargs: additional keyword arguments for Image.profile
     """
     _check_types(im, log, flip, title)
     
-    # make cut
+    # make profile
     if isinstance(im, RGBImage) and log:
         im2 = RGBImage(color.log_srgb(im.data), extent=im.extent)
-        s, Imd = im2.cut(**kwargs)
+        s, Imd = im2.profile(**kwargs)
     else:
-        s, Imd = im.cut(**kwargs)
+        s, Imd = im.profile(**kwargs)
 
     # get labels
-    cut_val = kwargs["x" if "x" in kwargs else "y"]
-    xname, xunit, xlabel, yname, yunit, ylabel, _, _, zlabel, text = _get_labels(im, im.quantity, log, cut_val)
+    cut_dim, cut_val = ("x", kwargs["x"]) if "x" in kwargs else ("y", kwargs["y"])
+    xname, xunit, xlabel, yname, yunit, ylabel, _, _, zlabel, text = _get_labels(im, im.quantity, log, cut_dim, cut_val)
 
     # normalize values for sphere projections that are not Equal-Area
     # (since the values are incorrect anyway)
@@ -202,7 +202,11 @@ def _check_types(im, log, flip, title) -> None:
     pc.check_type("title", title, str | None)
 
 
-def _get_labels(im: RGBImage | LinearImage, mode: str, log: bool, cut: str = None)\
+def _get_labels(im:             RGBImage | LinearImage, 
+                mode:           str, 
+                log:            bool, 
+                cut_pos_dim:    str = None, 
+                cut_pos_val:    float = None)\
         -> tuple[str, str, str, str, str, str, str, str, str, str]:
     """get plot labels and title"""
 
@@ -220,8 +224,9 @@ def _get_labels(im: RGBImage | LinearImage, mode: str, log: bool, cut: str = Non
             xname, xunit, xlabel = fr"Nonlinear Projection $p_x$", "", fr"Nonlinear Projection $p_x$"
             yname, yunit, ylabel = fr"Nonlinear Projection $p_y$", "", fr"Nonlinear Projection $p_y$"
     
-    if cut is not None:
-        text += ", Cut at " + (f"{xname} = {cut:.5g} {xunit}" if cut == "x" else f"{yname} = {cut:.5g} {yunit}")
+    if cut_pos_dim is not None:
+        text += ", Profile at " + (f"{xname} = {cut_pos_val:.5g} {xunit}" if cut_pos_dim == "x" \
+                else f"{yname} = {cut_pos_val:.5g} {yunit}")
     
     zname, zunit, zlabel = mode, "", mode
     zlabel += ", Logarithmic" if log and mode.startswith("sRGB") else ""

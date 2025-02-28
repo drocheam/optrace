@@ -54,8 +54,8 @@ class PlotTests(unittest.TestCase):
                     img = rimg.get(modei, 200)
                     img.limit = None if random.choice([True, False]) else 5 
                     otp.image_plot(img, log=log, flip=flip)
-                    otp.image_cut_plot(img, log=log, flip=flip, x=0.1)
-                    otp.image_cut_plot(img, log=log, flip=flip, y=-0.156)
+                    otp.image_profile_plot(img, log=log, flip=flip, x=0.1)
+                    otp.image_profile_plot(img, log=log, flip=flip, y=-0.156)
                     plt.close('all')
 
                 # make image empty and check if plots can handle this
@@ -73,24 +73,24 @@ class PlotTests(unittest.TestCase):
 
         # check if user title gets applied
         otp.image_plot(img.get(ot.RenderImage.image_modes[0]), flip=True, title="Test title")
-        otp.image_cut_plot(img.get(ot.RenderImage.image_modes[0]), flip=True, x=0.15, title="Test title")
+        otp.image_profile_plot(img.get(ot.RenderImage.image_modes[0]), flip=True, x=0.15, title="Test title")
 
         # exception tests
         img = img.get("sRGB (Absolute RI)")
         self.assertRaises(TypeError, otp.image_plot, [5, 5])  # invalid Image
-        self.assertRaises(TypeError, otp.image_cut_plot, [5, 5])  # invalid Image
-        self.assertRaises(TypeError, otp.image_cut_plot, img, flip=2)  # invalid flip type
-        self.assertRaises(TypeError, otp.image_cut_plot, img, title=2)  # invalid title type
-        self.assertRaises(TypeError, otp.image_cut_plot, img, log=2)  # invalid log type
+        self.assertRaises(TypeError, otp.image_profile_plot, [5, 5])  # invalid Image
+        self.assertRaises(TypeError, otp.image_profile_plot, img, flip=2)  # invalid flip type
+        self.assertRaises(TypeError, otp.image_profile_plot, img, title=2)  # invalid title type
+        self.assertRaises(TypeError, otp.image_profile_plot, img, log=2)  # invalid log type
         self.assertRaises(TypeError, otp.image_plot, img, flip=2)  # invalid flip type
         self.assertRaises(TypeError, otp.image_plot, img, title=2)  # invalid title type
         self.assertRaises(TypeError, otp.image_plot, img, log=2)  # invalid log type
-        self.assertRaises(ValueError, otp.image_cut_plot, img)  # x and y missing
+        self.assertRaises(ValueError, otp.image_profile_plot, img)  # x and y missing
 
         # check zero image log plot
         RIm = ot.RenderImage(extent=[-1, 1, -1, 1])
         RIm.render()
-        otp.image_cut_plot(RIm.get("Irradiance"), x=0, log=True)  # log mode but zero image
+        otp.image_profile_plot(RIm.get("Irradiance"), x=0, log=True)  # log mode but zero image
         otp.image_plot(RIm.get("Irradiance"), log=True)  # log mode but zero image
 
     @pytest.mark.slow
@@ -187,22 +187,22 @@ class PlotTests(unittest.TestCase):
 
         # type checking
         args = (OptimizeResult(), dict())
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, [], args[1])  # not a OptimizeResult
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], [])  # incorrect afdict type, should be dict 
-        self.assertRaises(TypeError, otp.autofocus_cost_plot, args[0], args[1], title=2)  # invalid title type
+        self.assertRaises(TypeError, otp.focus_search_cost_plot, [], args[1])  # not a OptimizeResult
+        self.assertRaises(TypeError, otp.focus_search_cost_plot, args[0], [])  # incorrect fsdict type, should be dict
+        self.assertRaises(TypeError, otp.focus_search_cost_plot, args[0], args[1], title=2)  # invalid title type
 
         # dummy data
         sci, afdict = self.af_dummy()
 
         # calls
-        otp.autofocus_cost_plot(sci, afdict)
-        otp.autofocus_cost_plot(sci, afdict, title="Test title")
+        otp.focus_search_cost_plot(sci, afdict)
+        otp.focus_search_cost_plot(sci, afdict, title="Test title")
 
-        # missing z, cost in afdict, possible with "Position Variance" but without return_cost = True
-        otp.autofocus_cost_plot(sci, afdict | dict(z=None))
-        otp.autofocus_cost_plot(sci, afdict | dict(cost=None))
-        otp.autofocus_cost_plot(sci, afdict | dict(z=None))
-        otp.autofocus_cost_plot(sci, afdict | dict(cost=None))
+        # missing z, cost in fsdict, possible with "Position Variance" but without return_cost = True
+        otp.focus_search_cost_plot(sci, afdict | dict(z=None))
+        otp.focus_search_cost_plot(sci, afdict | dict(cost=None))
+        otp.focus_search_cost_plot(sci, afdict | dict(z=None))
+        otp.focus_search_cost_plot(sci, afdict | dict(cost=None))
 
     @pytest.mark.os
     def test_abbe_plot(self):
@@ -247,7 +247,7 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, SPP, 5)
 
     def af_dummy(self):
-        # dummy data for autofocus_cost_plot
+        # dummy data for focus_search_cost_plot
         z = np.linspace(-2.5, 501, 200)
         cost = (z-250)**2 / 250**2
         af_dict = dict(z=z, cost=cost)
@@ -275,9 +275,9 @@ class PlotTests(unittest.TestCase):
         # test different functions, they all must include a saving option and correctly handle the sargs parameter
         path = "figure.jpg"
         sargs = dict(pad_inches=10, dpi=120)
-        for plot, args, kwargs in zip([otp.chromaticities_cie_1931, otp.chromaticities_cie_1976, otp.spectrum_plot, 
+        for plot, args, kwargs in zip([otp.chromaticities_cie_1931, otp.chromaticities_cie_1976, otp.spectrum_plot,
                                        otp.refraction_index_plot, otp.abbe_plot, otp.surface_profile_plot,
-                                       otp.image_plot, otp.image_cut_plot, otp.autofocus_cost_plot], 
+                                       otp.image_plot, otp.image_profile_plot, otp.focus_search_cost_plot],
                                       [[[]], [[]], [[]], [[]], [[]], [[]], [RIm.get("Irradiance")],
                                         [RIm.get("sRGB (Absolute RI)")], self.af_dummy()], 
                                       [{}, {}, {}, {}, {}, {}, {}, dict(x=0), {}]):

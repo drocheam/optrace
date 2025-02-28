@@ -509,24 +509,24 @@ An example for the difference of both sRGB modes is seen in :numref:`color_dispe
           Saturation (CIELUV)
 
 
-Image Cut
+Image Profile
 _____________________________________
 
-An image cut is the profile of a generated image in x- or y-direction. 
-It is created by the :meth:`cut() <optrace.tracer.image.base_image.BaseImage.cut>` method.
-The parameters :python:`x` and :python:`y` define the positional value for the cut. 
+An image profile is a line profile of a generated image in x- or y-direction.
+It is created by the :meth:`profile() <optrace.tracer.image.base_image.BaseImage.profile>` method.
+The parameters :python:`x` and :python:`y` define the positional value for the profile.
 
-The following example generates an image cut in y-direction at :python:`x=0`:
-
-.. testcode::
-
-   bins, vals = img.cut(x=0)
-
-For a cut in x-direction we can write:
+The following example generates an image profile in y-direction at :python:`x=0`:
 
 .. testcode::
 
-   bins, vals = img.cut(y=0.25)
+   bins, vals = img.profile(x=0)
+
+For a profile in x-direction we can write:
+
+.. testcode::
+
+   bins, vals = img.profile(y=0.25)
 
 The function returns a tuple of the histogram bin edges and the histogram values, both one dimensional numpy arrays.
 Note that the bin array is larger by one element.

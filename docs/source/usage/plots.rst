@@ -199,21 +199,21 @@ This is useful when the desired image is flipped due to the system's imaging.
 
 **Image Cut**
 
-For plotting an image cut the analogous function :func:`image_cut_plot <optrace.plots.image_plots.image_cut_plot>` is applied. 
-It additionally requires a cut parameter :python:`x` or :python:`y` that specifies the cut coordinate.
+For plotting an image profile the analogous function :func:`image_profile_plot <optrace.plots.image_plots.image_profile_plot>` is applied.
+It additionally requires a profile parameter :python:`x` or :python:`y` that specifies the profile coordinate.
 
 .. testcode::
 
-   otp.image_cut_plot(img, x=0)
+   otp.image_profile_plot(img, x=0)
 
 Supporting all the same parameters as for :func:`image_plot <optrace.plots.image_plots.image_plot>`, the following call is possible:
 
 .. testcode::
 
-   otp.image_cut_plot(img, y=0.2, title="Title 123", log=True, flip=True)
+   otp.image_profile_plot(img, y=0.2, title="Title 123", log=True, flip=True)
 
 
-.. list-table:: Exemplary image plot and image cut plot from the :ref:`example_prism` example.
+.. list-table:: Exemplary image plot and image profile plot from the :ref:`example_prism` example.
    :class: table-borderless
 
    * - .. figure:: ../images/color_dispersive2.svg
@@ -382,19 +382,18 @@ You can provide user defined spectral :python:`lines` to calculate the index and
 
 .. _focus_cost_plot:
 
-Autofocus Cost Plots
-___________________________
+Focus Search Cost Function Plots
+__________________________________
 
 Cost plots are used to debug the focus search and assess how pronounced a focus or focus region is.
-Plotting the cost function and result is done by calling the :func:`autofocus_cost_plot <optrace.plots.misc_plots.autofocus_cost_plot>` method from :mod:`optrace.plots`.
-It requires the :python:`res, afdict` parameters from the :meth:`autofocus <optrace.tracer.raytracer.Raytracer.autofocus>` function.  
-.. TODO link autofocus and autofocus section
+Plotting the cost function and result is done by calling the :func:`focus_search_cost_plot <optrace.plots.misc_plots.focus_search_cost_plot>` method from :mod:`optrace.plots`.
+It requires the :python:`res, fsdict` parameters from the :meth:`focus_search <optrace.tracer.raytracer.Raytracer.focus_search>` function.
 
 .. code-block:: python
 
-   from optrace.plots import autofocus_cost_plot
+   from optrace.plots import focus_search_cost_plot
 
-   autofocus_cost_plot(res, afdict)
+   focus_search_cost_plot(res, fsdict)
 
 
 Below you can find examples for two cost function plots.

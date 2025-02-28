@@ -11,7 +11,7 @@ if "inline" in matplotlib.rcParams["backend"]:  # pragma: no cover
 else:
     matplotlib.rcParams["backend"] = "qtagg"
 
-from .image_plots import image_plot, image_cut_plot
-from .misc_plots import autofocus_cost_plot, abbe_plot, surface_profile_plot, block
+from .image_plots import image_plot, image_profile_plot
+from .misc_plots import focus_search_cost_plot, abbe_plot, surface_profile_plot, block
 from .spectrum_plots import spectrum_plot, refraction_index_plot
 from .chromaticity_plots import chromaticity_norms, chromaticities_cie_1931, chromaticities_cie_1976
