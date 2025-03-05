@@ -4,12 +4,8 @@ import optrace as ot
 import optrace.plots as otp
 import numpy as np
 
-# Example for the reproduction of the Alcon IQ images from the publication
-# Damian Mendroch, Stefan Altmeyer, Uwe Oberheide; „Polychromatic Virtual Retinal Imaging of Two 
-# Extended-Depth-of-Focus Intraocular Lenses“. Trans. Vis. Sci. Tech. 2025
-
-# this script simulates the retinal image of a pinhole for a patient with a monofocal Alcon IQ IOL 
-# after cataract surgery for different object distances
+# Simulation of vision with an Alcon IQ monfocal intraocular lens after cataract surgery
+# Renders a polychromatic pinhole image on the retina for a given pupil and object distance
 
 # simulation parameters
 #######################################################################################################################
@@ -32,7 +28,7 @@ g = [100000, 1333, 667]
 max_g = np.max(g)  # worst case object distance
 RS_r_max = oh_angle*max_g  # maximum raysource radius
 RT_xy_max = max(RS_r_max, 10)  # lateral maximum size
-RT_z0_min = -max(400, max_g)  # largest raysource position to the left
+RT_z0_min = -max(400, max_g)  # largest raysource position to -z direction
 
 # raytracer with worst case size
 RT = ot.Raytracer(outline=[-RT_xy_max, RT_xy_max, -RT_xy_max, RT_xy_max, RT_z0_min, 30])
@@ -82,7 +78,7 @@ for gi in g:
     RT.add(RS)
 
     # iteratively render the retinal image
-    # constant extent (testes empirically) so the images are comparable
+    # constant extent (tested empirically) so the images are comparable
     # detector_index=1 is the rectangular detector
     # approximate the resolution limit d=4µm for the eye
     det_im = RT.iterative_render(N_rays, detector_index=1, limit=4, extent=[-0.10, 0.10, -0.10, 0.10])

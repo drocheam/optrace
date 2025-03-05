@@ -301,22 +301,22 @@ The available methods are:
    :class: table-borderless
 
 
-   * - .. figure:: ../images/indicatrix_equidistant.svg
+   * - .. figure:: ../images/indicatrix_equidistant.webp
           :align: center
           :width: 450
           :class: dark-light
 
-     - .. figure:: ../images/indicatrix_equal_area.svg
+     - .. figure:: ../images/indicatrix_equal_area.webp
           :align: center
           :width: 450
           :class: dark-light
 
-   * - .. figure:: ../images/indicatrix_stereographic.svg
+   * - .. figure:: ../images/indicatrix_stereographic.webp
           :align: center
           :width: 450
           :class: dark-light
 
-     - .. figure:: ../images/indicatrix_orthographic.svg
+     - .. figure:: ../images/indicatrix_orthographic.webp
           :align: center
           :width: 450
           :class: dark-light
@@ -349,17 +349,17 @@ Only the first two diffraction orders (core + 2 rings) are used, higher orders s
 .. list-table:: Images of the focus in the :ref:`example_achromat` example. From left to right: No filter, filter with 1 µm size, filter with 5 µm size. For a setup with a resolution limit of 5 µm we are clearly inside the limit, but even for 1 µm we are diffraction limited.   
    :class: table-borderless
 
-   * - .. figure:: ../images/rimage_limit_off.svg
+   * - .. figure:: ../images/rimage_limit_off.webp
           :align: center
           :height: 300
           :class: dark-light
    
-     - .. figure:: ../images/rimage_limit_on.svg
+     - .. figure:: ../images/rimage_limit_on.webp
           :align: center
           :height: 300
           :class: dark-light
      
-     - .. figure:: ../images/rimage_limit_on2.svg
+     - .. figure:: ../images/rimage_limit_on2.webp
           :align: center
           :height: 300
           :class: dark-light

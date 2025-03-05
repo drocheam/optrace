@@ -417,28 +417,29 @@ IOL Pinhole Imaging
 
 **File**: `examples/IOL_pinhole_imaging.py <https://github.com/drocheam/optrace/blob/main/examples/IOL_pinhole_imaging.py>`_
 
-Simulation of an intraocular lens (IOL) in the Arizona Eye Model. A pinhole is rendered for three different viewing distances. 
-For more details see the publication *Damian Mendroch, Stefan Altmeyer, Uwe Oberheide; „Polychromatic Virtual Retinal Imaging of Two Extended-Depth-of-Focus Intraocular Lenses“. Trans. Vis. Sci. Tech. 2025*.
+Simulation of an Alcon IQ intraocular lens (IOL) in the Arizona Eye Model. A pinhole is rendered for three different viewing distances. 
+
+.. For more details see the publication *Damian Mendroch, Stefan Altmeyer, Uwe Oberheide; „Polychromatic Virtual Retinal Imaging of Two Extended-Depth-of-Focus Intraocular Lenses“. Trans. Vis. Sci. Tech. 2025*.
 
 
 .. list-table::
    :class: table-borderless
 
-   * - .. figure:: images/example_IOL_0D.svg
+   * - .. figure:: images/example_IOL_0D.webp
           :align: center
           :width: 300
           :class: dark-light
 
           0.01 D focus.
 
-     - .. figure:: images/example_IOL_075D.svg
+     - .. figure:: images/example_IOL_075D.webp
           :align: center
           :width: 300
           :class: dark-light
 
           0.75 D focus.
 
-     - .. figure:: images/example_IOL_150D.svg
+     - .. figure:: images/example_IOL_150D.webp
           :align: center
           :width: 300
           :class: dark-light
@@ -595,7 +596,7 @@ Demonstrates image formation by convolution of a resolution chart and a halo PSF
 .. list-table::
    :class: table-borderless
 
-   * - .. figure:: ./images/example_psf1.svg
+   * - .. figure:: ./images/example_psf1.webp
           :align: center
           :width: 400
           :class: dark-light
@@ -603,14 +604,14 @@ Demonstrates image formation by convolution of a resolution chart and a halo PSF
           Resolution chart.
 
    
-     - .. figure:: ./images/example_psf2.svg
+     - .. figure:: ./images/example_psf2.webp
           :align: center
           :width: 400
           :class: dark-light
    
           PSF, plotted in linear intensity.
 
-.. figure:: ./images/example_psf3.svg
+.. figure:: ./images/example_psf3.webp
    :align: center
    :width: 400
    :class: dark-light
@@ -742,28 +743,28 @@ The detector view then displays an equivalent of a `Tissot's indicatrix <https:/
 .. list-table::
    :class: table-borderless
 
-   * - .. figure:: ./images/indicatrix_equidistant.svg
+   * - .. figure:: ./images/indicatrix_equidistant.webp
           :align: center
           :width: 400
           :class: dark-light
 
           Equidistant map projection.
 
-     - .. figure:: ./images/indicatrix_equal_area.svg
+     - .. figure:: ./images/indicatrix_equal_area.webp
           :align: center
           :width: 400
           :class: dark-light
 
           Equal-Area map projection.
 
-   * - .. figure:: ./images/indicatrix_stereographic.svg
+   * - .. figure:: ./images/indicatrix_stereographic.webp
           :align: center
           :width: 400
           :class: dark-light
 
           Stereographic map projection.
 
-     - .. figure:: ./images/indicatrix_orthographic.svg
+     - .. figure:: ./images/indicatrix_orthographic.webp
           :align: center
           :width: 400
           :class: dark-light

@@ -139,19 +139,19 @@ __________________________
 .. list-table:: Image convolution from the :ref:`example_psf_imaging` example
    :class: table-borderless
 
-   * - .. figure:: ../images/example_psf1.svg
+   * - .. figure:: ../images/example_psf1.webp
           :align: center
           :width: 400
           :class: dark-light
 
    
-     - .. figure:: ../images/example_psf2.svg
+     - .. figure:: ../images/example_psf2.webp
           :align: center
           :width: 400
           :class: dark-light
 
 
-.. figure:: ../images/example_psf3.svg
+.. figure:: ../images/example_psf3.webp
    :align: center
    :width: 400
    :class: dark-light

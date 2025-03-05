@@ -44,13 +44,13 @@
   * coding-free simulations
   * wave optics, including diffraction and interference
   * non-sequential scenes, simulating ghost images, reflections
-  * mirror or fresnel lens optics
+  * mirror or Fresnel lens optics
   * scattering and polarization dependent media
   * lens optimization, aberration analysis and tolerancing
 
  **Purpose/Use Cases**
   * educational purposes, demonstrating aberrations or simple optical setups
-  * introductionary tool to paraxial, geometrical optics or image formation
+  * introductory tool to paraxial, geometrical optics and image formation
   * simulation of simpler systems, like a prism, the eye model or a telescope
   * estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) is overkill for
 
@@ -80,7 +80,7 @@ Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 4. Install using `pip install .`
 
 
-## Contributing
+<!-- ## Contributing-->
 
 ## License
 
