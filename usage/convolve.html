@@ -1,78 +1,73 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../" data-theme="dark">
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.10. PSF Convolution &#8212; optrace 1.4.3 documentation</title>
+    <title>4.11. PSF Convolution &#8212; optrace 1.6.4 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=964979e3" />
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'usage/convolve';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="4.11. Plotting" href="plots.html" />
-    <link rel="prev" title="4.9. Paraxial Analysis" href="tma.html" />
+    <link rel="next" title="4.12. Plotting Functions" href="plots.html" />
+    <link rel="prev" title="4.10. Paraxial Analysis" href="tma.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+  <div id="pst-scroll-pixel-helper"></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -80,7 +75,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -88,18 +82,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -108,88 +111,78 @@
   
   
   
-    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+    <p class="title logo__title">optrace 1.6.4 documentation</p>
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -201,28 +194,24 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -233,8 +222,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -244,29 +233,32 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -275,80 +267,63 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
-            
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/development.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -357,17 +332,14 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -378,8 +350,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -387,32 +359,61 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.11. PSF Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -422,7 +423,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">4.10. </span>PSF Convolution</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.11. </span>PSF Convolution</span></li>
   </ul>
 </nav>
 </div>
@@ -437,140 +438,228 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="psf-convolution">
-<h1><span class="section-number">4.10. </span>PSF Convolution<a class="headerlink" href="#psf-convolution" title="Permalink to this heading">#</a></h1>
-<section id="convolving">
-<h2><span class="section-number">4.10.1. </span>Convolving<a class="headerlink" href="#convolving" title="Permalink to this heading">#</a></h2>
-<p><strong>Usage</strong></p>
-<p>The image is a sRGB array with dimensions (Ny, Nx, 3) with value range 0-1. Alternatively a filepath to an image file can be provided.
-In contrast, the PSF holds linear power/intensity information and is there a simpler (Ny2, Nx2) shape. Alternatively an RImage object can be used to apply a colored PSF.</p>
-<p>Parameters <code class="code highlight python docutils literal highlight-python"><span class="n">s_img</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">s_psf</span></code> describe the side lengths of both images in millimeters, specified as list of two floats.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">ETDRS_chart_inverted</span>
-<span class="n">s_img</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
-
-<span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">halo</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>The call to <code class="code highlight python docutils literal highlight-python"><span class="n">convolve</span></code> looks like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The function returns the convolved image <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code>, the new image side lengths <code class="code highlight python docutils literal highlight-python"><span class="n">s2</span></code>.</p>
-<p>Additional parameters for this function include <code class="code highlight python docutils literal highlight-python"><span class="n">silent</span></code>, which omits all text output like a progressbar and informational messages. <code class="code highlight python docutils literal highlight-python"><span class="n">threading</span><span class="o">=</span><span class="kc">False</span></code> disables multithreading and <code class="code highlight python docutils literal highlight-python"><span class="n">rendering_intent</span></code> defines the used intent for the sRGB conversion.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">threading</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rendering_intent</span><span class="o">=</span><span class="s2">&quot;Perceptual&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><strong>Restrictions</strong></p>
+<span id="usage-convolution"></span><h1><span class="section-number">4.11. </span>PSF Convolution<a class="headerlink" href="#psf-convolution" title="Link to this heading">#</a></h1>
+<section id="overview">
+<h2><span class="section-number">4.11.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>Convolution can speed up image formation significantly by parallelizing the effect of a PSF (point spread function) for every object point.
+This results in a nearly noise-free image in a small fraction of the time normally required.
+A PSF is nothing different than the impulse response of the optical system for the given object and image distance combination.
+It changes spatially, but for a small angular range it can be assumed constant.
+However this also implies that many aberration can’t be simulated this way (astigmatism, coma, vignette, distortion, …).
+In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF to an object using the convolution functionality in optrace.</p>
+<p>The convolution approach requires:</p>
 <ul class="simple">
-<li><p>image is a (Ny, Nx, 3) sRGB array or filepath to a sRGB image</p></li>
-<li><p>PSF is either an intensity array or an RImage object</p></li>
-<li><p>the value range should be inside 0-1</p></li>
-<li><p>resolutions must be between 50x50 pixels and 4 megapixels</p></li>
-<li><p>at most one image or PSF has color information</p></li>
-<li><p>the size of the PSF can’t be much larger than the image scaled by the magnification factor</p></li>
+<li><p>the PSF</p></li>
+<li><p>the object image to convolve</p></li>
+<li><p>PSF size</p></li>
+<li><p>object size</p></li>
+<li><p>the system’s magnification factor</p></li>
 </ul>
-<p><strong>Example for Intensity Images</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<p>Both colored objects and PSFs are supported.
+Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible solutions.
+See the details in section <a class="reference internal" href="../math/convolution.html#psf-color-handling"><span class="std std-numref">Section 5.6.2</span></a>.</p>
+</section>
+<section id="usage">
+<h2><span class="section-number">4.11.2. </span>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
+<p><strong>Simple Calls</strong></p>
+<p>A simple call to <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> required the object and PSF, as well as the magnification factor.</p>
+<p>The object should be either of type <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>, while the PSF should be either <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> or <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>.
+For more details on image classes see <a class="reference internal" href="image.html#id1"><span class="std std-numref">Section 4.8.1</span></a>.
+Colored PSFs can be only used with class <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>, as all human visible colors are required for convolution.
+The image objects include the information about their size and position.</p>
+<p>This magnification factor is equivalent the magnification factor known from geometrical optics.
+Therefore <span class="math notranslate nohighlight">\(\lvert m \rvert &gt; 1\)</span> means a magnification and <span class="math notranslate nohighlight">\(\lvert m\rvert &lt; 1\)</span> an image shrinking.
+<span class="math notranslate nohighlight">\(m &gt; 0\)</span> is an upright image, while <span class="math notranslate nohighlight">\(m &lt; 0\)</span> correspond to a flipped image.</p>
+<p>Let’s define a predefined a image and PSF:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">ETDRS_chart_inverted</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">halo</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can then call <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The function returns the convolved image object <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code>.
+When <code class="code highlight python docutils literal highlight-python"><span class="n">img</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">psf</span></code> are of type <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>, <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is also a <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>.
+For all other cases color information is generated and <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is a <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>.</p>
+<p><strong>Slicing and Padding</strong></p>
+<p>While doing a convolution, the output image grows in size by half the PSF size in each direction.
+By providing <code class="code highlight python docutils literal highlight-python"><span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span></code> the padded data can be neglected for the resulting image.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The convolution operation requires the data outside of the image.
+By default, the image is padded with zeros before convolution.</p>
+<p>Other modes are also available.
+For instance, padding with white is done in the following fashion:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">padding_value</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">padding_value</span></code> specifies the values used for constant padding for each channel.
+Depending on type of <code class="code highlight python docutils literal highlight-python"><span class="n">img</span></code>, it needs to have three or only one element.</p>
+<p>To reduce boundary effects, edge padding is a viable choice:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Color conversion</strong></p>
+<p>The convolution of colored images can produce colors outside of the sRGB gamut.
+To allow for a correct mapping into the gamut, conversion arguments can be provided by the <code class="code highlight python docutils literal highlight-python"><span class="n">cargs</span></code> argument.
+By default it is set to <code class="code highlight python docutils literal highlight-python"><span class="nb">dict</span><span class="p">(</span><span class="n">rendering_intent</span><span class="o">=</span><span class="s2">&quot;Absolute&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">L_th</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">chroma_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>.</p>
+<p>Provide a <code class="code highlight python docutils literal highlight-python"><span class="n">cargs</span></code> dictionary to override this setting.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span><span class="p">,</span> <span class="n">cargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rendering_intent</span><span class="o">=</span><span class="s2">&quot;Perceptual&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The above command overrides the <code class="code highlight python docutils literal highlight-python"><span class="n">rendering_intent</span></code> while leaving the other default options unchanged.</p>
+<p><strong>Normalization</strong></p>
+<p>When convolving two <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> objects it is recommended to normalize the PSF integral to 1.
+Doing so, the overall power of the image is preserved.</p>
+</section>
+<section id="restrictions">
+<h2><span class="section-number">4.11.3. </span>Restrictions<a class="headerlink" href="#restrictions" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>it is not possible to convolve two <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or two <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a></p></li>
+<li><p>image and PSF resolutions must be between 50x50 pixels and 4 megapixels</p></li>
+<li><p>the PSF needs to be twice as large as the image scaled with the magnification factor</p></li>
+<li><p>when convolving two colored images, the resulting image is only one possible solution of many</p></li>
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.fftconvolve.html#scipy.signal.fftconvolve" title="(in SciPy v1.15.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.signal.fftconvolve()</span></code></a> is involved, so small numerical errors in dark image regions can appear</p></li>
+<li><p>convolution of sphere projected images (see <a class="reference internal" href="image.html#image-sphere-projections"><span class="std std-numref">Section 4.8.6</span></a>) is prohibited, as distances are non-linear</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2><span class="section-number">4.11.4. </span>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p><strong>Image Example</strong></p>
+<div class="pst-scrollable-table-container"><table class="table-borderless table" id="id1">
+<caption><span class="caption-number">Table 4.14 </span><span class="caption-text">Image convolution from the <a class="reference internal" href="../examples.html#example-psf-imaging"><span class="std std-ref">PSF Imaging</span></a> example</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_psf1.webp"><img alt="../_images/example_psf1.webp" class="dark-light" src="../_images/example_psf1.webp" style="width: 400px;" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_psf2.webp"><img alt="../_images/example_psf2.webp" class="dark-light" src="../_images/example_psf2.webp" style="width: 400px;" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_psf3.webp"><img alt="../_images/example_psf3.webp" class="dark-light" src="../_images/example_psf3.webp" style="width: 400px;" />
+</a>
+</figure>
+<p><strong>Code Example</strong></p>
+<p>The following example loads an image preset and convolves it with a square PSF created as a numpy array.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="c1"># intensity function</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">200</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">200</span><span class="n">j</span><span class="p">]</span>  <span class="c1"># data grid</span>
-<span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">30</span><span class="o">*</span><span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">Y</span><span class="o">**</span><span class="mi">2</span>  <span class="c1"># data function</span>
-
-<span class="c1"># make a sRGB array</span>
-<span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># repeat so we have three channels</span>
-<span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">color</span><span class="o">.</span><span class="n">srgb_linear_to_srgb</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>  <span class="c1"># convert intensities to sRGB (gamma correction)</span>
-
-<span class="c1"># image size</span>
-<span class="n">s_img</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]</span>
+<span class="c1"># load image preset</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">ETDRS_chart_inverted</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">])</span>
 
 <span class="c1"># square psf</span>
-<span class="n">psf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span>
-<span class="n">psf</span><span class="p">[</span><span class="mi">50</span><span class="p">:</span><span class="mi">150</span><span class="p">,</span> <span class="mi">50</span><span class="p">:</span><span class="mi">150</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">psf_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span>
+<span class="n">psf_data</span><span class="p">[</span><span class="mi">50</span><span class="p">:</span><span class="mi">150</span><span class="p">,</span> <span class="mi">50</span><span class="p">:</span><span class="mi">150</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="c1"># psf size</span>
-<span class="n">s_psf</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">]</span>
+<span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LinearImage</span><span class="p">(</span><span class="n">psf_data</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">])</span>
 
 <span class="c1"># convolution</span>
-<span class="n">img2</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="image-plotting">
-<h2><span class="section-number">4.10.2. </span>Image Plotting<a class="headerlink" href="#image-plotting" title="Permalink to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">optrace.plots</span> <span class="k">as</span> <span class="nn">otp</span>
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">image_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_img</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">otp</span><span class="o">.</span><span class="n">image_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_img</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Input Image&quot;</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=-</span><span class="mf">1.75</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="presets">
-<h2><span class="section-number">4.10.3. </span>Presets<a class="headerlink" href="#presets" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">4.11.5. </span>Presets<a class="headerlink" href="#presets" title="Link to this heading">#</a></h2>
+<p>The are multiple PSF presets available.</p>
+<p>All presets are normalized such that the integral image sum equals 1.</p>
 <p><strong>Circle</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
+<p>A circular PSF is defined with the <code class="code highlight python docutils literal highlight-python"><span class="n">d</span></code> circle parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Gaussian</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">gaussian</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<p>A simple Gaussian intensity distribution is described as:</p>
+<div class="math notranslate nohighlight">
+\[I_{\sigma}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)\]</div>
+<p>The shape parameter <code class="code highlight python docutils literal highlight-python"><span class="n">sig</span></code> defines the Gaussian’s standard deviation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">gaussian</span><span class="p">(</span><span class="n">sig</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Airy</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">airy</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<p>The Airy function is:</p>
+<div class="math notranslate nohighlight">
+\[I_{d}(x, y) = \left( \frac{2 J_1(r_d)}{r_d} \right)^2\]</div>
+<div class="math notranslate nohighlight">
+\[r_d = 3.8317 \frac{\sqrt{x^2 + y^2}}{r}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(J_1\)</span> is the Bessel function of the first kind of order 1.
+The resolution limit <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code> is described as distance from the center to the first root.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">airy</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Glare</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">glare</span><span class="p">(</span><span class="n">d1</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">d2</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<p>A glare is modelled as two different Gaussians, a broad and a narrow one
+Parameter <span class="math notranslate nohighlight">\(a\)</span> describes the relative intensity of the larger one.</p>
+<div class="math notranslate nohighlight">
+\[I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)\]</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">glare</span><span class="p">(</span><span class="n">sig1</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">sig2</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Halo</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="p">,</span> <span class="n">s_psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">halo</span><span class="p">(</span><span class="n">d1</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">d2</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<p>A halo is modelled as a central Gaussian and annular Gaussian function around <span class="math notranslate nohighlight">\(r\)</span>.
+<span class="math notranslate nohighlight">\(\sigma_1, \sigma_2\)</span> describe the standard deviations of both.
+<span class="math notranslate nohighlight">\(a\)</span> describes the intensity of the ring.</p>
+<div class="math notranslate nohighlight">
+\[I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right)\]</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">halo</span><span class="p">(</span><span class="n">sig1</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sig2</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="preset-gallery">
-<h2><span class="section-number">4.10.4. </span>Preset Gallery<a class="headerlink" href="#preset-gallery" title="Permalink to this heading">#</a></h2>
-<table class="table" id="id1">
-<caption><span class="caption-number">Table 4.15 </span><span class="caption-text">PSF presets</span><a class="headerlink" href="#id1" title="Permalink to this table">#</a></caption>
+<span id="psf-preset-gallery"></span><h2><span class="section-number">4.11.6. </span>Preset Gallery<a class="headerlink" href="#preset-gallery" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table-borderless table" id="id2">
+<caption><span class="caption-number">Table 4.15 </span><span class="caption-text">PSF presets with default parameters. Plotted with human brightness perception.</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
 <tbody>
-<tr class="row-odd"><td><figure class="align-center" id="id2">
-<a class="reference internal image-reference" href="../_images/psf_circle.svg"><img alt="../_images/psf_circle.svg" src="../_images/psf_circle.svg" width="400" /></a>
+<tr class="row-odd"><td><figure class="align-center" id="id3">
+<a class="dark-light reference internal image-reference" href="../_images/psf_circle.svg"><img alt="../_images/psf_circle.svg" class="dark-light" src="../_images/psf_circle.svg" style="width: 400px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.40 </span><span class="caption-text">Circle PSF with standard parameters.</span><a class="headerlink" href="#id2" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.55 </span><span class="caption-text">Exemplary Circle PSF.</span><a class="headerlink" href="#id3" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </td>
-<td><figure class="align-center" id="id3">
-<a class="reference internal image-reference" href="../_images/psf_gaussian.svg"><img alt="../_images/psf_gaussian.svg" src="../_images/psf_gaussian.svg" width="400" /></a>
+<td><figure class="align-center" id="id4">
+<a class="dark-light reference internal image-reference" href="../_images/psf_gaussian.svg"><img alt="../_images/psf_gaussian.svg" class="dark-light" src="../_images/psf_gaussian.svg" style="width: 400px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.41 </span><span class="caption-text">Gaussian PSF with standard parameters.</span><a class="headerlink" href="#id3" title="Permalink to this image">#</a></p>
-</figcaption>
-</figure>
-</td>
-</tr>
-<tr class="row-even"><td><figure class="align-center" id="id4">
-<a class="reference internal image-reference" href="../_images/psf_airy.svg"><img alt="../_images/psf_airy.svg" src="../_images/psf_airy.svg" width="400" /></a>
-<figcaption>
-<p><span class="caption-number">Fig. 4.42 </span><span class="caption-text">Airy PSF with standard parameters.</span><a class="headerlink" href="#id4" title="Permalink to this image">#</a></p>
-</figcaption>
-</figure>
-</td>
-<td><figure class="align-center" id="id5">
-<a class="reference internal image-reference" href="../_images/psf_halo.svg"><img alt="../_images/psf_halo.svg" src="../_images/psf_halo.svg" width="400" /></a>
-<figcaption>
-<p><span class="caption-number">Fig. 4.43 </span><span class="caption-text">Halo PSF with standard parameters.</span><a class="headerlink" href="#id5" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.56 </span><span class="caption-text">Exemplary Gaussian PSF.</span><a class="headerlink" href="#id4" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </td>
 </tr>
-<tr class="row-odd"><td><figure class="align-center" id="id6">
-<a class="reference internal image-reference" href="../_images/psf_glare.svg"><img alt="../_images/psf_glare.svg" src="../_images/psf_glare.svg" width="400" /></a>
+<tr class="row-even"><td><figure class="align-center" id="id5">
+<a class="dark-light reference internal image-reference" href="../_images/psf_airy.svg"><img alt="../_images/psf_airy.svg" class="dark-light" src="../_images/psf_airy.svg" style="width: 400px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.44 </span><span class="caption-text">Glare PSF with standard parameters.</span><a class="headerlink" href="#id6" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.57 </span><span class="caption-text">Exemplary Airy PSF.</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id6">
+<a class="dark-light reference internal image-reference" href="../_images/psf_halo.svg"><img alt="../_images/psf_halo.svg" class="dark-light" src="../_images/psf_halo.svg" style="width: 400px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.58 </span><span class="caption-text">Exemplary Halo PSF.</span><a class="headerlink" href="#id6" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-odd"><td><figure class="align-center" id="id7">
+<a class="dark-light reference internal image-reference" href="../_images/psf_glare.svg"><img alt="../_images/psf_glare.svg" class="dark-light" src="../_images/psf_glare.svg" style="width: 400px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.59 </span><span class="caption-text">Exemplary Glare PSF.</span><a class="headerlink" href="#id7" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </td>
@@ -578,6 +667,7 @@ In contrast, the PSF holds linear power/intensity information and is there a sim
 </tr>
 </tbody>
 </table>
+</div>
 </section>
 </section>
 
@@ -586,11 +676,10 @@ In contrast, the PSF holds linear power/intensity information and is there a sim
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer d-print-none">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="tma.html"
@@ -598,7 +687,7 @@ In contrast, the PSF holds linear power/intensity information and is there a sim
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">4.9. </span>Paraxial Analysis</p>
+        <p class="prev-next-title"><span class="section-number">4.10. </span>Paraxial Analysis</p>
       </div>
     </a>
     <a class="right-next"
@@ -606,61 +695,37 @@ In contrast, the PSF holds linear power/intensity information and is there a sim
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">4.11. </span>Plotting</p>
+        <p class="prev-next-title"><span class="section-number">4.12. </span>Plotting Functions</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolving">4.10.1. Convolving</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#image-plotting">4.10.2. Image Plotting</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#presets">4.10.3. Presets</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preset-gallery">4.10.4. Preset Gallery</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">4.11.1. Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">4.11.2. Usage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#restrictions">4.11.3. Restrictions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">4.11.4. Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#presets">4.11.5. Presets</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preset-gallery">4.11.6. Preset Gallery</a></li>
 </ul>
   </nav></div>
-
-  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
-<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
-<!--(similar to page-toc.html)-->
-<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">
-    Section Navigation
-  </p>
-  <div class="bd-toc-item navbar-nav">
-    <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">4.2. Base Geometries</a></li>
-<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.3. Base Shapes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="elements.html">4.4. Defining Elements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="spectrum.html">4.5. Spectrum Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="image.html">4.7. Image and Spectrum Rendering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="focus.html">4.8. Focus Finding</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tma.html">4.9. Paraxial Analysis</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.10. PSF Convolution</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plots.html">4.11. Plotting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ui.html">4.12. Using the GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.13. Advanced Topics</a></li>
-</ul>
-
-  </div>
-</nav></div>
 
 </div></div>
               
@@ -675,8 +740,8 @@ In contrast, the PSF holds linear power/intensity information and is there a sim
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -684,17 +749,19 @@ In contrast, the PSF holds linear power/intensity information and is there a sim
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
-      © Copyright 2022, Damian Mendroch.
+      © Copyright 2025, Damian Mendroch.
       <br/>
     
   </p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -702,10 +769,13 @@ In contrast, the PSF holds linear power/intensity information and is there a sim
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

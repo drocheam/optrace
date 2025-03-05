@@ -5,16 +5,20 @@ Usage
 ################
 
 .. toctree::
+   :maxdepth: 2
+   
    overview
-   geometry
    surfaces
    elements
-   spectrum
+   group
+   raytracer
    refraction_index
+   spectrum
    image
    focus
    tma
    convolve
    plots
-   ui
+   gui
+   gui_automation
    advanced

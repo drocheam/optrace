@@ -1,79 +1,73 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../" data-theme="dark">
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>6.4. Spectrum and Refraction Index &#8212; optrace 1.4.3 documentation</title>
+    <title>5.4. Spectrum and Refraction Index &#8212; optrace 1.6.4 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=964979e3" />
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'math/spectrum';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="6.5. Ray Transfer Matrix Analysis" href="matrix_analysis.html" />
-    <link rel="prev" title="6.3. Geometric Features" href="geometry.html" />
+    <link rel="next" title="5.5. Ray Transfer Matrix Analysis" href="matrix_analysis.html" />
+    <link rel="prev" title="5.3. Geometric Features" href="geometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+  <div id="pst-scroll-pixel-helper"></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -81,7 +75,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -89,18 +82,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -109,88 +111,78 @@
   
   
   
-    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+    <p class="title logo__title">optrace 1.6.4 documentation</p>
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="math.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -202,28 +194,24 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -234,8 +222,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -245,29 +233,32 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -276,80 +267,63 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
-            
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="math.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/development.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -358,17 +332,14 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -379,8 +350,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -388,32 +359,54 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">5.3. Geometric Features</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5.4. Spectrum and Refraction Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autofocus.html">5.7. Autofocus Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">5.8. Color Management</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -421,9 +414,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="math.html" class="nav-link"><span class="section-number">6. </span>Implementation Details</a></li>
+    <li class="breadcrumb-item"><a href="math.html" class="nav-link"><span class="section-number">5. </span>Implementation Details</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">6.4. </span>Spectrum and Refraction Index</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">5.4. </span>Spectrum and Refraction Index</span></li>
   </ul>
 </nav>
 </div>
@@ -438,201 +431,74 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="spectrum-and-refraction-index">
-<h1><span class="section-number">6.4. </span>Spectrum and Refraction Index<a class="headerlink" href="#spectrum-and-refraction-index" title="Permalink to this heading">#</a></h1>
+<h1><span class="section-number">5.4. </span>Spectrum and Refraction Index<a class="headerlink" href="#spectrum-and-refraction-index" title="Link to this heading">#</a></h1>
 <section id="spectrum">
-<h2><span class="section-number">6.4.1. </span>Spectrum<a class="headerlink" href="#spectrum" title="Permalink to this heading">#</a></h2>
-<section id="functions">
-<h3><span class="section-number">6.4.1.1. </span>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
-<p><strong>Monochromatic</strong></p>
-<p>This implements a monochromatic source with wavelength <span class="math notranslate nohighlight">\(\lambda_0\)</span>.</p>
-<div class="math notranslate nohighlight" id="equation-eq-spectrum-mono">
-<span class="eqno">(6.83)<a class="headerlink" href="#equation-eq-spectrum-mono" title="Permalink to this equation">#</a></span>\[S(\lambda) = \delta(\lambda - \lambda_0)\]</div>
-<p><strong>Lines</strong></p>
-<p>A line spectrum consist of multiple monochromatic sources, parameters are a set of power and wavelength combinations
-<span class="math notranslate nohighlight">\(L=\left\{(P_1,~\lambda_1),~(P_2,~\lambda_2),~\dots\right\}\)</span></p>
-<div class="math notranslate nohighlight" id="equation-eq-spectrum-lines">
-<span class="eqno">(6.84)<a class="headerlink" href="#equation-eq-spectrum-lines" title="Permalink to this equation">#</a></span>\[S(\lambda) = \sum_{(P_i, ~\lambda_i) \in L}  P_i \, \delta(\lambda - \lambda_i)\]</div>
-<p><strong>Constant</strong></p>
-<p>Constant spectrum with value <span class="math notranslate nohighlight">\(S_0\)</span></p>
-<div class="math notranslate nohighlight" id="equation-eq-spectrum-const">
-<span class="eqno">(6.85)<a class="headerlink" href="#equation-eq-spectrum-const" title="Permalink to this equation">#</a></span>\[S(\lambda) = S_0\]</div>
-<p>Note that while the function is constant, only rays inside the visible range (default being the 380-780 nanometer range) are simulated.</p>
-<p><strong>Rectangle</strong></p>
-<p>Spectrum with a rectangular function <span class="math notranslate nohighlight">\(\Pi(\lambda)\)</span> with bounds <span class="math notranslate nohighlight">\(\lambda_0,~\lambda_1\)</span> and a scaling factor <span class="math notranslate nohighlight">\(S_0\)</span>.</p>
-<div class="math notranslate nohighlight" id="equation-eq-spectrum-rect">
-<span class="eqno">(6.86)<a class="headerlink" href="#equation-eq-spectrum-rect" title="Permalink to this equation">#</a></span>\[S(\lambda) = S_0\, \Pi_{[\lambda_0,~\lambda_1]}(\lambda)\]</div>
-<p><strong>Gaussian</strong></p>
-<p>A gaussian spectrum is modelled with a scaling factor <span class="math notranslate nohighlight">\(S_0\)</span>, a center wavelength <span class="math notranslate nohighlight">\(\lambda_0\)</span> and a standard deviation <span class="math notranslate nohighlight">\(\lambda_\sigma\)</span>.</p>
-<div class="math notranslate nohighlight" id="equation-eq-spectrum-gauss">
-<span class="eqno">(6.87)<a class="headerlink" href="#equation-eq-spectrum-gauss" title="Permalink to this equation">#</a></span>\[S(\lambda) = S_0 \exp \left( -\frac{\left(\lambda - \lambda_0\right)^2}{2 \lambda^2_\sigma}\right)\]</div>
-<p><strong>User Data/Function</strong></p>
-<p>With Data/Function mode the spectrum is simply modelled by a user function/ data set. With a data set data is linearly interpolated.</p>
-<div class="math notranslate nohighlight" id="equation-eq-spectrum-user">
-<span class="eqno">(6.88)<a class="headerlink" href="#equation-eq-spectrum-user" title="Permalink to this equation">#</a></span>\[S(\lambda) = S_F(\lambda)\]</div>
-<p><strong>Blackbody</strong></p>
-<p>The spectral radiance for a blackbody according to Planck’s Law is: <a class="footnote-reference brackets" href="#footcite-planckwiki" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
-<div class="math notranslate nohighlight" id="equation-planck-radiator">
-<span class="eqno">(6.89)<a class="headerlink" href="#equation-planck-radiator" title="Permalink to this equation">#</a></span>\[B_\lambda (\lambda, ~T) = \frac{2 h c^2}{\lambda^5} \frac{1}{\exp\left(\frac{h  c } {\lambda k_\text{B}  T}\right) - 1}\]</div>
-<p>The equation contains the speed of light <span class="math notranslate nohighlight">\(c\)</span>, the Planck constant <span class="math notranslate nohighlight">\(h\)</span> and the Boltzmann constant <span class="math notranslate nohighlight">\(k_\text{B}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}c =&amp;~ 299792458 ~\text{m/s}\\
-h =&amp;~ 6.62607015\cdot 10^{-34} ~\text{J s}\\
-k_\text{B} =&amp;~ 1.380649 \cdot 10^{-23} ~\text{J/K}\\\end{split}\]</div>
-<p>Note that <span class="math notranslate nohighlight">\(\lambda\)</span> must be specified in meters.</p>
-<aside class="topic">
-<p class="topic-title">Note</p>
-<p>The spectral radiance <span class="math notranslate nohighlight">\(B_\lambda\)</span> (Power per solid angle, source area and wavelength) is given in units <span class="math notranslate nohighlight">\(\text{W}/(\text{m}^3~\text{sr})\)</span>, whereas the units in this class should be <span class="math notranslate nohighlight">\(\text{W/nm}\)</span> (Power per wavelength). Since <span class="math notranslate nohighlight">\(B_\lambda\)</span> is constant over the source area and angle independent, converting it corresponds to a simple rescaling.
-This is done while raytracing, where a specfic desired power is matched.</p>
-</aside>
-</section>
+<h2><span class="section-number">5.4.1. </span>Spectrum<a class="headerlink" href="#spectrum" title="Link to this heading">#</a></h2>
 <section id="color">
-<h3><span class="section-number">6.4.1.2. </span>Color<a class="headerlink" href="#color" title="Permalink to this heading">#</a></h3>
-<p>Analogously to <a class="reference internal" href="color.html#xyz-color-space"><span class="std std-numref">Section 6.8.1</span></a> the tristimulus values for the light spectrum <span class="math notranslate nohighlight">\(S(\lambda)\)</span> can be calculated with:</p>
+<h3><span class="section-number">5.4.1.1. </span>Color<a class="headerlink" href="#color" title="Link to this heading">#</a></h3>
+<p>Analogously to <a class="reference internal" href="color.html#xyz-color-space"><span class="std std-numref">Section 5.8.1</span></a> the tristimulus values for the light spectrum <span class="math notranslate nohighlight">\(S(\lambda)\)</span> can be calculated with:</p>
 <div class="math notranslate nohighlight" id="equation-xyz-calc-spectrum">
-<span class="eqno">(6.90)<a class="headerlink" href="#equation-xyz-calc-spectrum" title="Permalink to this equation">#</a></span>\[\begin{split}X &amp;=\int_{\lambda} S(\lambda) \cdot x(\lambda) ~d \lambda \\
-Y &amp;=\int_{\lambda} S(\lambda) \cdot y(\lambda) ~d \lambda \\
-Z &amp;=\int_{\lambda} S(\lambda) \cdot z(\lambda) ~d \lambda\end{split}\]</div>
+<span class="eqno">(5.79)<a class="headerlink" href="#equation-xyz-calc-spectrum" title="Link to this equation">#</a></span>\[\begin{split}X &amp;=\int_{\lambda} S(\lambda) x(\lambda) ~d \lambda \\
+Y &amp;=\int_{\lambda} S(\lambda) y(\lambda) ~d \lambda \\
+Z &amp;=\int_{\lambda} S(\lambda) z(\lambda) ~d \lambda\end{split}\]</div>
 <p>From there on, typical color model conversions can be applied.</p>
 </section>
 <section id="random-wavelengths">
-<span id="id2"></span><h3><span class="section-number">6.4.1.3. </span>Random Wavelengths<a class="headerlink" href="#random-wavelengths" title="Permalink to this heading">#</a></h3>
+<span id="id1"></span><h3><span class="section-number">5.4.1.2. </span>Random Wavelengths<a class="headerlink" href="#random-wavelengths" title="Link to this heading">#</a></h3>
 <p><strong>Monochromatic</strong></p>
 <p>The set of wavelengths <span class="math notranslate nohighlight">\(\Lambda\)</span> is simply the monochromatic wavelength repeated many times.</p>
 <div class="math notranslate nohighlight" id="equation-eq-lspectrum-random-mono">
-<span class="eqno">(6.91)<a class="headerlink" href="#equation-eq-lspectrum-random-mono" title="Permalink to this equation">#</a></span>\[\Lambda = \left\{\lambda_0,~\lambda_0, \dots\right\}\]</div>
+<span class="eqno">(5.80)<a class="headerlink" href="#equation-eq-lspectrum-random-mono" title="Link to this equation">#</a></span>\[\Lambda = \left\{\lambda_0,~\lambda_0, \dots\right\}\]</div>
 <p><strong>Lines</strong></p>
 <p>The sum power of all sources is</p>
 <div class="math notranslate nohighlight" id="equation-eq-lspectrum-lines-power">
-<span class="eqno">(6.92)<a class="headerlink" href="#equation-eq-lspectrum-lines-power" title="Permalink to this equation">#</a></span>\[P = \sum_{(P_i,~\lambda_i \in L)} P_i\]</div>
+<span class="eqno">(5.81)<a class="headerlink" href="#equation-eq-lspectrum-lines-power" title="Link to this equation">#</a></span>\[P = \sum_{(P_i,~\lambda_i \in L)} P_i\]</div>
 <p>The probabilities are then</p>
 <div class="math notranslate nohighlight" id="equation-eq-lspectrum-lines-p">
-<span class="eqno">(6.93)<a class="headerlink" href="#equation-eq-lspectrum-lines-p" title="Permalink to this equation">#</a></span>\[p = \left\{\frac{P_i}{P} ~~:~~ (P_i, \lambda_i) \in L \right\}\]</div>
+<span class="eqno">(5.82)<a class="headerlink" href="#equation-eq-lspectrum-lines-p" title="Link to this equation">#</a></span>\[p = \left\{\frac{P_i}{P} ~~:~~ (P_i, \lambda_i) \in L \right\}\]</div>
 <p><span class="math notranslate nohighlight">\(\Lambda\)</span> is then a random variable choosing from the set <span class="math notranslate nohighlight">\(\left\{\lambda_0,~\lambda_1, ~\dots\right\}\)</span> with probabilities <span class="math notranslate nohighlight">\(\left\{p_1,~p_2,~\dots\right\}\)</span>.</p>
 <p><strong>Constant</strong></p>
 <p>With <em>Constant</em> mode, the wavelengths are chosen from within the visible range with uniform random variable <span class="math notranslate nohighlight">\(\mathcal{U}\)</span>.</p>
 <div class="math notranslate nohighlight" id="equation-eq-lspectrum-random-const">
-<span class="eqno">(6.94)<a class="headerlink" href="#equation-eq-lspectrum-random-const" title="Permalink to this equation">#</a></span>\[\Lambda = \mathcal{U}_{[380\,\text{nm},~780\,\text{nm}]}\]</div>
+<span class="eqno">(5.83)<a class="headerlink" href="#equation-eq-lspectrum-random-const" title="Link to this equation">#</a></span>\[\Lambda = \mathcal{U}_{[380\,\text{nm},~780\,\text{nm}]}\]</div>
 <p><strong>Rectangle</strong></p>
 <p>In the case of a rectangular light spectrum the random variable is a uniform variable with the bounds being equal to the rectangle bounds.</p>
 <div class="math notranslate nohighlight" id="equation-eq-lspectrum-random-rect">
-<span class="eqno">(6.95)<a class="headerlink" href="#equation-eq-lspectrum-random-rect" title="Permalink to this equation">#</a></span>\[\Lambda = \mathcal{U}_{[\lambda_0,~\lambda_1]}\]</div>
+<span class="eqno">(5.84)<a class="headerlink" href="#equation-eq-lspectrum-random-rect" title="Link to this equation">#</a></span>\[\Lambda = \mathcal{U}_{[\lambda_0,~\lambda_1]}\]</div>
 <p><strong>Gaussian</strong></p>
 <p>A gaussian with <span class="math notranslate nohighlight">\(\lambda\)</span> being limited to <span class="math notranslate nohighlight">\(\lambda \in [\lambda_l,~\lambda_r]\)</span> the distribution is called a <em>truncated gaussian distribution</em>.
 For this function the anti-derivative integration bounds <span class="math notranslate nohighlight">\(\xi_a,~\xi_b\)</span> need to be calculated first before performing the inverse transform method.</p>
 <div class="math notranslate nohighlight" id="equation-gaussian-trunc-lambda-bounds">
-<span class="eqno">(6.96)<a class="headerlink" href="#equation-gaussian-trunc-lambda-bounds" title="Permalink to this equation">#</a></span>\[\begin{split}\xi_a =&amp;~ \frac{1}{2}\left(1 + \text{erf}\left(\frac{\lambda_\text{l} - \lambda_0}{\sqrt{2} \lambda_\sigma}\right)\right)\\
+<span class="eqno">(5.85)<a class="headerlink" href="#equation-gaussian-trunc-lambda-bounds" title="Link to this equation">#</a></span>\[\begin{split}\xi_a =&amp;~ \frac{1}{2}\left(1 + \text{erf}\left(\frac{\lambda_\text{l} - \lambda_0}{\sqrt{2} \lambda_\sigma}\right)\right)\\
 \xi_b =&amp;~ \frac{1}{2}\left(1 + \text{erf}\left(\frac{\lambda_\text{r} - \lambda_0}{\sqrt{2} \lambda_\sigma}\right)\right)\end{split}\]</div>
 <p>With these bounds the random wavelengths are then</p>
 <div class="math notranslate nohighlight" id="equation-gaussian-trunc-lambda">
-<span class="eqno">(6.97)<a class="headerlink" href="#equation-gaussian-trunc-lambda" title="Permalink to this equation">#</a></span>\[\Lambda = \lambda_0 + \sqrt{2} ~ \lambda_\sigma ~  \text{erf}^{-1}\left(2\,\mathcal{U}_{[\xi_a, ~\xi_b]}-1\right)\]</div>
+<span class="eqno">(5.86)<a class="headerlink" href="#equation-gaussian-trunc-lambda" title="Link to this equation">#</a></span>\[\Lambda = \lambda_0 + \sqrt{2} ~ \lambda_\sigma ~  \text{erf}^{-1}\left(2\,\mathcal{U}_{[\xi_a, ~\xi_b]}-1\right)\]</div>
 <p><strong>User Function/ User Data / Blackbody</strong></p>
-<p>For these the inverse transform method in <a class="reference internal" href="sampling.html#inverse-transform"><span class="std std-numref">Section 6.1.4</span></a> can be applied.</p>
-</section>
-<section id="wavelength-properties">
-<h3><span class="section-number">6.4.1.4. </span>Wavelength Properties<a class="headerlink" href="#wavelength-properties" title="Permalink to this heading">#</a></h3>
-<p><strong>Peak Wavelength</strong></p>
-<p><strong>Centroid Wavelength</strong></p>
-<p><strong>Dominant Wavelength</strong></p>
-<p><strong>Complementary Wavelength</strong></p>
-<p><strong>Full Width Half Maximum</strong></p>
+<p>For these the inverse transform method in <a class="reference internal" href="sampling.html#inverse-transform"><span class="std std-numref">Section 5.1.4</span></a> can be applied.</p>
 </section>
 </section>
-<section id="refractionindex">
-<h2><span class="section-number">6.4.2. </span>RefractionIndex<a class="headerlink" href="#refractionindex" title="Permalink to this heading">#</a></h2>
-<section id="index-functions">
-<span id="id3"></span><h3><span class="section-number">6.4.2.1. </span>Functions<a class="headerlink" href="#index-functions" title="Permalink to this heading">#</a></h3>
-<p>The subsequent equations describe common refractive index models used in simulation software.
-They are taken from <a class="footnote-reference brackets" href="#footcite-comsoldispersion" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#footcite-zemaxhagen" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
-<p>Generally, all coefficients must be given in powers of µm, while the same is true for the wavelength input.</p>
-<p><strong>Cauchy</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-cauchy">
-<span class="eqno">(6.98)<a class="headerlink" href="#equation-n-cauchy" title="Permalink to this equation">#</a></span>\[n = c_0 + \frac{c_1}{\lambda^2} + \frac{c_2}{\lambda^4} + \frac{c_3}{\lambda^6}\]</div>
-<p><strong>Conrady</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-conrady">
-<span class="eqno">(6.99)<a class="headerlink" href="#equation-n-conrady" title="Permalink to this equation">#</a></span>\[n = c_0+ \frac{c_1} {\lambda} + \frac{c_2} {\lambda^{3.5}}\]</div>
-<p><strong>Extended</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-extended">
-<span class="eqno">(6.100)<a class="headerlink" href="#equation-n-extended" title="Permalink to this equation">#</a></span>\[n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+ \frac{c_4} {\lambda^{6}}+ \frac{c_5} {\lambda^{8}}+ \frac{c_6} {\lambda^{10}}+\frac{c_7} {\lambda^{12}}\]</div>
-<p><strong>Extended2</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-extended2">
-<span class="eqno">(6.101)<a class="headerlink" href="#equation-n-extended2" title="Permalink to this equation">#</a></span>\[n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}+c_6 \lambda^4+c_7 \lambda^6\]</div>
-<p><strong>Handbook of Optics 1</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-optics1">
-<span class="eqno">(6.102)<a class="headerlink" href="#equation-n-optics1" title="Permalink to this equation">#</a></span>\[n^2 = c_0+\frac{c_1}{\lambda^2-c_2}-c_3 \lambda^2\]</div>
-<p><strong>Handbook of Optics 2</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-optics2">
-<span class="eqno">(6.103)<a class="headerlink" href="#equation-n-optics2" title="Permalink to this equation">#</a></span>\[n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}-c_3 \lambda^2\]</div>
-<p><strong>Herzberger</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-herzberger">
-<span class="eqno">(6.104)<a class="headerlink" href="#equation-n-herzberger" title="Permalink to this equation">#</a></span>\[\begin{split}\begin{align}
-n =&amp;~ c_0+c_1 L+c_2 L^2+c_3 \lambda^2+c_4 \lambda^4+c_5 \lambda^6 \\
-&amp;\text{ with   } L= \frac{1} {\lambda^2-0.028 {\mu m^2}}
-\end{align}\end{split}\]</div>
-<p><strong>Sellmeier1</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-sellmeier1">
-<span class="eqno">(6.105)<a class="headerlink" href="#equation-n-sellmeier1" title="Permalink to this equation">#</a></span>\[n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}\]</div>
-<p><strong>Sellmeier2</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-sellmeier2">
-<span class="eqno">(6.106)<a class="headerlink" href="#equation-n-sellmeier2" title="Permalink to this equation">#</a></span>\[n^2 = 1+c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2^2}+\frac{c_3}{\lambda^2-c_4^2}\]</div>
-<p><strong>Sellmeier3</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-sellmeier3">
-<span class="eqno">(6.107)<a class="headerlink" href="#equation-n-sellmeier3" title="Permalink to this equation">#</a></span>\[n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}\]</div>
-<p><strong>Sellmeier4</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-sellmeier4">
-<span class="eqno">(6.108)<a class="headerlink" href="#equation-n-sellmeier4" title="Permalink to this equation">#</a></span>\[n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}+\frac{c_3 \lambda^2}{\lambda^2-c_4}\]</div>
-<p><strong>Sellmeier5</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-sellmeier5">
-<span class="eqno">(6.109)<a class="headerlink" href="#equation-n-sellmeier5" title="Permalink to this equation">#</a></span>\[n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}+\frac{c_8 \lambda^2}{\lambda^2-c_9}\]</div>
-<p><strong>Schott</strong></p>
-<div class="math notranslate nohighlight" id="equation-n-schott">
-<span class="eqno">(6.110)<a class="headerlink" href="#equation-n-schott" title="Permalink to this equation">#</a></span>\[n^2 = c_0+c_1 \lambda^2+\frac{c_2}{ \lambda^{2}}+\frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}\]</div>
-</section>
-<section id="abbe-number">
-<span id="id6"></span><h3><span class="section-number">6.4.2.2. </span>Abbe Number<a class="headerlink" href="#abbe-number" title="Permalink to this heading">#</a></h3>
-<p>The Abbe number, also called <span class="math notranslate nohighlight">\(V\)</span>-number, is a simple, scalar quantity describing the optical dispersive behavior of a medium. It is calculated from the refractive indices at three different wavelength.</p>
-<div class="math notranslate nohighlight" id="equation-abbe-eq">
-<span class="eqno">(6.111)<a class="headerlink" href="#equation-abbe-eq" title="Permalink to this equation">#</a></span>\[V = \frac{n_\text{c} - 1}{n_\text{s} - n_\text{l}}\]</div>
-<p>With <span class="math notranslate nohighlight">\(n_\text{s},~n_\text{c},~n_\text{l}\)</span> are the short, center and long wavelength refraction index.
-A higher Abbe number is desirable, as it corresponds to less chromatic dispersion.
-In addition, most materials have a <em>normal dispersion</em>, categorized as being <span class="math notranslate nohighlight">\(\frac{\text{n}}{\text{d}\lambda}&lt;0\)</span>, so the index falls off with larger wavelengths.
-The <span class="math notranslate nohighlight">\(V\)</span>-number is therefore positive for such materials.
-A material with <span class="math notranslate nohighlight">\(V=0\)</span> is an ideal material with no dispersion.</p>
-<p>Selecting different glasses is often done with the help of a <em>Abbe diagram</em>, where the center refractive index as well as the <span class="math notranslate nohighlight">\(V\)</span>-number of the material are plotted as a scatter diagram. Examples can be found in <a class="reference internal" href="../usage/refraction_index.html#refraction-index-presets"><span class="std std-numref">Section 4.6.6</span></a>.</p>
-</section>
+<section id="refraction-index">
+<h2><span class="section-number">5.4.2. </span>Refraction  Index<a class="headerlink" href="#refraction-index" title="Link to this heading">#</a></h2>
 <section id="curve-from-abbe-number">
-<span id="index-from-abbe"></span><h3><span class="section-number">6.4.2.3. </span>Curve from Abbe Number<a class="headerlink" href="#curve-from-abbe-number" title="Permalink to this heading">#</a></h3>
+<span id="index-from-abbe"></span><h3><span class="section-number">5.4.2.1. </span>Curve from Abbe Number<a class="headerlink" href="#curve-from-abbe-number" title="Link to this heading">#</a></h3>
 <p>In many cases only refractive index and the Abbe number are known or provided.
 To simulate such materials a wavelength dependent model must be generated first.
 While there are infinite possible curves that produce the same parameters, it is expected that real materials with the same index and Abbe number differ only slightly in the visible region, where these parameters are provided for.</p>
 <p>We assume a model in the form of:</p>
 <div class="math notranslate nohighlight" id="equation-n-from-abbe-base">
-<span class="eqno">(6.112)<a class="headerlink" href="#equation-n-from-abbe-base" title="Permalink to this equation">#</a></span>\[n(\lambda) = A + \frac{B}{\lambda^2 - d}\]</div>
+<span class="eqno">(5.87)<a class="headerlink" href="#equation-n-from-abbe-base" title="Link to this equation">#</a></span>\[n(\lambda) = A + \frac{B}{\lambda^2 - d}\]</div>
 <p>With <span class="math notranslate nohighlight">\(d=0.014\, \mu\text{m}^2\)</span>, which is a compromise between the Cauchy (<span class="math notranslate nohighlight">\(d=0\)</span>) and the Herzberger (<span class="math notranslate nohighlight">\(d=0.028\,\mu\text{m}^2\)</span>) model.</p>
-<p>With <span class="math notranslate nohighlight">\(n_\text{s}:=n(\lambda_\text{s}),~n_\text{c}:=n(\lambda_\text{c}),~n_\text{l}:=n(\lambda_\text{l})\)</span> and the Abbe number equation in <a class="reference internal" href="#equation-n-from-abbe-base">(6.112)</a> one can solve for <span class="math notranslate nohighlight">\(A,~B\)</span>:</p>
+<p>With <span class="math notranslate nohighlight">\(n_\text{s}:=n(\lambda_\text{s}),~n_\text{c}:=n(\lambda_\text{c}),~n_\text{l}:=n(\lambda_\text{l})\)</span> and the Abbe number equation in <a class="reference internal" href="#equation-n-from-abbe-base">(5.87)</a> one can solve for <span class="math notranslate nohighlight">\(A,~B\)</span>:</p>
 <div class="math notranslate nohighlight" id="equation-n-from-abbe-solution">
-<span class="eqno">(6.113)<a class="headerlink" href="#equation-n-from-abbe-solution" title="Permalink to this equation">#</a></span>\[\begin{split}B =&amp;~ \frac{1}{V}\frac{n_\text{c}-1}{\frac{1}{\lambda^2_\text{s} - d} - \frac{1}{\lambda^2_\text{l}-d}}\\
+<span class="eqno">(5.88)<a class="headerlink" href="#equation-n-from-abbe-solution" title="Link to this equation">#</a></span>\[\begin{split}B =&amp;~ \frac{1}{V}\frac{n_\text{c}-1}{\frac{1}{\lambda^2_\text{s} - d} - \frac{1}{\lambda^2_\text{l}-d}}\\
 A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
 <p>Parameters <span class="math notranslate nohighlight">\(V\)</span>, <span class="math notranslate nohighlight">\(n_\text{c}\)</span> and the spectral lines <span class="math notranslate nohighlight">\(\lambda_\text{s},~\lambda_\text{c},~\lambda_\text{l}\)</span> are provided by the user.</p>
 <hr class="docutils" />
 <p><strong>References</strong></p>
-<div class="docutils container" id="id7">
-<aside class="footnote brackets" id="footcite-planckwiki" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Wikipedia. Planck’s law. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Planck%27s_law">https://en.wikipedia.org/wiki/Planck%27s_law</a> (visited on 2022-12-01).</p>
-</aside>
-<aside class="footnote brackets" id="footcite-comsoldispersion" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
-<p>COMSOL. Optical dispersion models. 2022. URL: <a class="reference external" href="https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.htm">https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.htm</a> (visited on 2022-12-01).</p>
-</aside>
-<aside class="footnote brackets" id="footcite-zemaxhagen" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">3</a><span class="fn-bracket">]</span></span>
-<p>Nathan Hagen. Zemaxglass user manual. 2013. URL: <a class="github reference external" href="https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf">nzhagen/zemaxglass</a> (visited on 2022-12-01).</p>
-</aside>
-</aside>
-</div>
 </section>
 </section>
 </section>
@@ -642,11 +508,10 @@ A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer d-print-none">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="geometry.html"
@@ -654,7 +519,7 @@ A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">6.3. </span>Geometric Features</p>
+        <p class="prev-next-title"><span class="section-number">5.3. </span>Geometric Features</p>
       </div>
     </a>
     <a class="right-next"
@@ -662,65 +527,40 @@ A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">6.5. </span>Ray Transfer Matrix Analysis</p>
+        <p class="prev-next-title"><span class="section-number">5.5. </span>Ray Transfer Matrix Analysis</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectrum">6.4.1. Spectrum</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">6.4.1.1. Functions</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#color">6.4.1.2. Color</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#random-wavelengths">6.4.1.3. Random Wavelengths</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wavelength-properties">6.4.1.4. Wavelength Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectrum">5.4.1. Spectrum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#color">5.4.1.1. Color</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#random-wavelengths">5.4.1.2. Random Wavelengths</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refractionindex">6.4.2. RefractionIndex</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#index-functions">6.4.2.1. Functions</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#abbe-number">6.4.2.2. Abbe Number</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curve-from-abbe-number">6.4.2.3. Curve from Abbe Number</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refraction-index">5.4.2. Refraction  Index</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curve-from-abbe-number">5.4.2.1. Curve from Abbe Number</a></li>
 </ul>
 </li>
 </ul>
   </nav></div>
-
-  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
-<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
-<!--(similar to page-toc.html)-->
-<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">
-    Section Navigation
-  </p>
-  <div class="bd-toc-item navbar-nav">
-    <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sampling.html">6.1. Property Sampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tracing.html">6.2. Tracing Procedure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">6.3. Geometric Features</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">6.4. Spectrum and Refraction Index</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">6.5. Ray Transfer Matrix Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="convolution.html">6.6. PSF Convolution</a></li>
-<li class="toctree-l1"><a class="reference internal" href="autofocus.html">6.7. Autofocus Methods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="color.html">6.8. Color Management</a></li>
-</ul>
-
-  </div>
-</nav></div>
 
 </div></div>
               
@@ -735,8 +575,8 @@ A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -744,17 +584,19 @@ A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
-      © Copyright 2022, Damian Mendroch.
+      © Copyright 2025, Damian Mendroch.
       <br/>
     
   </p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -762,10 +604,13 @@ A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

@@ -1,25 +1,22 @@
 Library Structure
 ----------------------------
 
-**Folder Structure**
+**Library Structure**
 
 .. highlight:: none
 
-.. include:: structure.txt
+.. include:: structure_library.txt
    :literal:
 
 .. highlight:: default
 
 
-**Dependency Tree**
+**Example Structure**
 
-.. _pydeps: https://github.com/thebjorn/pydeps
+.. highlight:: none
 
+.. include:: structure_examples.txt
+   :literal:
 
-.. figure:: ../images/Dep_Tree.svg   
-   :width: 800
-   :align: center
-  
-   Dependency tree. Created using `pydeps`_.
-
+.. highlight:: default
 

@@ -1,78 +1,73 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../" data-theme="dark">
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.5. Spectrum Classes &#8212; optrace 1.4.3 documentation</title>
+    <title>4.7. Spectrum Classes &#8212; optrace 1.6.4 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=964979e3" />
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'usage/spectrum';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="4.6. Refractive Indices" href="refraction_index.html" />
-    <link rel="prev" title="4.4. Defining Elements" href="elements.html" />
+    <link rel="next" title="4.8. Image Classes" href="image.html" />
+    <link rel="prev" title="4.6. Refractive Indices" href="refraction_index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+  <div id="pst-scroll-pixel-helper"></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -80,7 +75,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -88,18 +82,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -108,88 +111,78 @@
   
   
   
-    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+    <p class="title logo__title">optrace 1.6.4 documentation</p>
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -201,28 +194,24 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -233,8 +222,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -244,29 +233,32 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -275,80 +267,63 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
-            
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/development.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -357,17 +332,14 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -378,8 +350,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -387,32 +359,61 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.7. Spectrum Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -422,7 +423,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">4.5. </span>Spectrum Classes</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.7. </span>Spectrum Classes</span></li>
   </ul>
 </nav>
 </div>
@@ -437,63 +438,86 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="spectrum-classes">
-<h1><span class="section-number">4.5. </span>Spectrum Classes<a class="headerlink" href="#spectrum-classes" title="Permalink to this heading">#</a></h1>
+<span id="usage-spectrum"></span><h1><span class="section-number">4.7. </span>Spectrum Classes<a class="headerlink" href="#spectrum-classes" title="Link to this heading">#</a></h1>
 <section id="lightspectrum">
-<h2><span class="section-number">4.5.1. </span>LightSpectrum<a class="headerlink" href="#lightspectrum" title="Permalink to this heading">#</a></h2>
-<p>A <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> defines emittance or a similar quantity for light output depending on the wavelength. All spectral values need be greater or equal to zero.</p>
-<p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> objects are used when creating a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a> or when we want to render the spectral distribution of light hitting a detector.</p>
+<h2><span class="section-number">4.7.1. </span>LightSpectrum<a class="headerlink" href="#lightspectrum" title="Link to this heading">#</a></h2>
+<p>A <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> defines wavelength-dependent emittance of light, with all spectral values being <span class="math notranslate nohighlight">\(geq 0\)</span>.
+<a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> objects are needed when creating a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a> or to render spectral distribution of detectors.</p>
 <section id="creating-the-spectrum">
-<h3><span class="section-number">4.5.1.1. </span>Creating the Spectrum<a class="headerlink" href="#creating-the-spectrum" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">4.7.1.1. </span>Creating the Spectrum<a class="headerlink" href="#creating-the-spectrum" title="Link to this heading">#</a></h3>
 <p><strong>Units</strong></p>
-<p>For line spectra (modes <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Monochromatic&quot;</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Lines&quot;</span></code>) the spectral unit is W, while for all other modes the spectral power density with unit W/nm.</p>
-<p>The actual values and height parameters (<code class="code highlight python docutils literal highlight-python"><span class="n">val</span><span class="p">,</span> <span class="n">line_vals</span><span class="p">,</span> <span class="o">...</span></code>) are therefore given in the same unit.</p>
-<p>For spectra used in raytracing the absolute height is unimportant, as the function gets rescaled to the correct power by the parent ray source.</p>
+<p>For line spectra (modes <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Monochromatic&quot;</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Lines&quot;</span></code>) the spectral unit are Watts, while for all other modes the spectral power density is given as unit W/nm.
+Distribution and shape parameters (<code class="code highlight python docutils literal highlight-python"><span class="n">val</span><span class="p">,</span> <span class="n">line_vals</span><span class="p">,</span> <span class="o">...</span></code>) are given in the same units.
+For spectra used in raytracing, the absolute scaling is unimportant, as the values will be rescaled by the parent ray source, which specifies the overall power.</p>
 <p><strong>Constant</strong></p>
-<p>A constant (or uniform) <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> is defined using:</p>
+<p>This mode defines a constant spectrum with value <code class="code highlight python docutils literal highlight-python"><span class="n">val</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">12.3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Monochromatic</strong></p>
-<p>We can also define a spectrum with only a single wavelength:</p>
+<p>This mode implements a monochromatic source with wavelength <code class="code highlight python docutils literal highlight-python"><span class="n">wl</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Monochromatic&quot;</span><span class="p">,</span> <span class="n">wl</span><span class="o">=</span><span class="mf">423.56</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Lines</strong></p>
-<p>Multiple spectral lines are created with mode <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Lines&quot;</span></code>.
-Argument <code class="code highlight python docutils literal highlight-python"><span class="n">lines</span></code> is a list of wavelengths, while <code class="code highlight python docutils literal highlight-python"><span class="n">line_vals</span></code> is a list with the same number of elements describing the height/power of each wavelength.</p>
+<p>A line spectrum consist of multiple monochromatic sources.
+The argument <code class="code highlight python docutils literal highlight-python"><span class="n">lines</span></code> is a list of wavelengths, while <code class="code highlight python docutils literal highlight-python"><span class="n">line_vals</span></code> is a list with the same number of elements describing the height/power of each wavelength.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Lines&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="mi">458</span><span class="p">,</span> <span class="mi">523</span><span class="p">,</span> <span class="mf">729.6</span><span class="p">],</span> <span class="n">line_vals</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
 </pre></div>
 </div>
 <p><strong>Rectangle</strong></p>
-<p>A rectangular window is defined with <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Rectangle&quot;</span></code> and lower and upper wavelength bounds.</p>
+<p>The following equations defines a spectrum with a rectangular function with bounds <code class="code highlight python docutils literal highlight-python"><span class="n">wl0</span></code>, <code class="code highlight python docutils literal highlight-python"><span class="n">wl1</span></code> and a scaling factor <code class="code highlight python docutils literal highlight-python"><span class="n">val</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="n">wl0</span><span class="o">=</span><span class="mi">520</span><span class="p">,</span> <span class="n">wl1</span><span class="o">=</span><span class="mi">689</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Gaussian</strong></p>
-<p>A gaussian function can be created with <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Gaussian&quot;</span></code>, a mean value <code class="code highlight python docutils literal highlight-python"><span class="n">mu</span></code> and standard deviation <code class="code highlight python docutils literal highlight-python"><span class="n">sig</span></code>, all given in nanometers.
-Note that the gaussian function will be truncated to the visible range [380nm, 780nm].</p>
+<p>A Gaussian spectrum is modelled mathematically with a scaling factor <span class="math notranslate nohighlight">\(S_0\)</span>, a center wavelength <span class="math notranslate nohighlight">\(\lambda_0\)</span> and a standard deviation <span class="math notranslate nohighlight">\(\sigma_\lambda\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-spectrum-gauss">
+<span class="eqno">(4.16)<a class="headerlink" href="#equation-eq-spectrum-gauss" title="Link to this equation">#</a></span>\[S(\lambda) = S_0 \exp \left( -\frac{\left(\lambda - \lambda_0\right)^2}{2 \sigma_\lambda^2}\right)\]</div>
+<p>The spectrum object is created with mode <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Gaussian&quot;</span></code>, a mean value <code class="code highlight python docutils literal highlight-python"><span class="n">mu</span></code> and standard deviation <code class="code highlight python docutils literal highlight-python"><span class="n">sig</span></code>, all given in nanometers.
+Note that the Gaussian function will be truncated to the visible range [380nm, 780nm].</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">478</span><span class="p">,</span> <span class="n">sig</span><span class="o">=</span><span class="mf">23.5</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Blackbody Radiator</strong></p>
-<p>A blackbody radiator, following Planck’s law, with a specific temperature <code class="code highlight python docutils literal highlight-python"><span class="n">T</span></code> in Kelvin is initialized with:</p>
+<p>The spectral radiance of a blackbody according to Planck’s Law is given as: <a class="footnote-reference brackets" href="#footcite-planckwiki" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-planck-radiator">
+<span class="eqno">(4.17)<a class="headerlink" href="#equation-planck-radiator" title="Link to this equation">#</a></span>\[B_\lambda (\lambda, ~T) = \frac{2 h c^2}{\lambda^5} \frac{1}{\exp\left(\frac{h  c } {\lambda k_\text{B}  T}\right) - 1}\]</div>
+<p>The equation contains the speed of light <span class="math notranslate nohighlight">\(c\)</span>, the Planck constant <span class="math notranslate nohighlight">\(h\)</span> and the Boltzmann constant <span class="math notranslate nohighlight">\(k_\text{B}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}c =&amp;~ 299792458 ~\text{m/s}\\
+h =&amp;~ 6.62607015\cdot 10^{-34} ~\text{J s}\\
+k_\text{B} =&amp;~ 1.380649 \cdot 10^{-23} ~\text{J/K}\\\end{split}\]</div>
+<p>Note that <span class="math notranslate nohighlight">\(\lambda\)</span> must be specified in meters in the above equation.</p>
+<aside class="topic">
+<p class="topic-title">Note</p>
+<p>The spectral radiance <span class="math notranslate nohighlight">\(B_\lambda\)</span> (Power per solid angle, source area and wavelength) is given in units <span class="math notranslate nohighlight">\(\text{W}/(\text{m}^3~\text{sr})\)</span>, whereas the units in this class should be <span class="math notranslate nohighlight">\(\text{W/nm}\)</span> (Power per wavelength). Since <span class="math notranslate nohighlight">\(B_\lambda\)</span> is constant over the source area and angle independent, converting it corresponds to a simple rescaling.</p>
+</aside>
+<p>There is an option to normalize the spectrum, so the peak value equals one.
+This can prove useful for plotting the spectrum.
+If the peak wavelength is inside the visible range, then the Stefan–Boltzmann law can be applied to calculate the normalization factor.
+Otherwise the maximum value will lie at one of the edges of the visible range.</p>
+<p>A blackbody radiator, following Planck’s law, with a specific temperature of <code class="code highlight python docutils literal highlight-python"><span class="n">T</span></code> in Kelvin, is initialized as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Blackbody&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">3890</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <code class="code highlight python docutils literal highlight-python"><span class="n">val</span></code> parameter defines the peak value in W/nm.</p>
-<p><strong>User Function</strong></p>
-<p>For the user it is also possible to create an own function with the <code class="code highlight python docutils literal highlight-python"><span class="n">func</span></code> parameter. This function must take wavelength array in nm as input and also return a numpy array with the same shape.</p>
+<p><strong>User Function/Data</strong></p>
+<p>With the Data/Function mode, the spectrum is modelled by a user function/ data set.
+With a dataset, the data will be linearly interpolated.</p>
+<p>This function requires a wavelength array in nm as input and returns a numpy array of the same shape.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wl</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">wl</span> <span class="o">-</span> <span class="mi">520</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If a function with multiple parameters is utilized, additional arguments can be put in the <code class="code highlight python docutils literal highlight-python"><span class="n">func_args</span></code> parameter dictionary.</p>
+<p>If a function with multiple parameters is utilized, additional arguments can be provided in the <code class="code highlight python docutils literal highlight-python"><span class="n">func_args</span></code> parameter dictionary.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wl</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">wl</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">func_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="mi">489</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>For discrete datasets the <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Data&quot;</span></code> mode proves useful. In this case the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> constructor takes a wavelength array <code class="code highlight python docutils literal highlight-python"><span class="n">wls</span></code> and a value array <code class="code highlight python docutils literal highlight-python"><span class="n">vals</span></code>, both being the same shape and one dimensional numpy arrays.</p>
+<p>For discrete datasets, the <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Data&quot;</span></code> mode proves useful.
+In this case the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> constructor takes a wavelength array <code class="code highlight python docutils literal highlight-python"><span class="n">wls</span></code> and a value array <code class="code highlight python docutils literal highlight-python"><span class="n">vals</span></code> as arguments, where both must be of the exact same one-dimensional shape.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">wls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">450</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">wls</span><span class="o">/</span><span class="mi">500</span><span class="p">)</span>
 
@@ -502,11 +526,12 @@ Note that the gaussian function will be truncated to the visible range [380nm, 7
 </div>
 <p>Note that <code class="code highlight python docutils literal highlight-python"><span class="n">wls</span></code> needs to be monotonically increasing with the same step size and needs to be inside the visible range [380nm, 780nm].</p>
 <p><strong>Histogram</strong></p>
-<p>This spectrum type generally is not user created, but is rendered on a detector or source. It consists of a list of bins and bin values.</p>
+<p>This spectrum type is not user created, but is rendered on a detector or source.
+It consists of a list of bins and bin values.</p>
 </section>
-<section id="getting-spectral-values">
-<h3><span class="section-number">4.5.1.2. </span>Getting Spectral Values<a class="headerlink" href="#getting-spectral-values" title="Permalink to this heading">#</a></h3>
-<p>The <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object can be called with wavelengths to get the spectral values:</p>
+<section id="calculating-spectral-values">
+<h3><span class="section-number">4.7.1.2. </span>Calculating Spectral Values<a class="headerlink" href="#calculating-spectral-values" title="Link to this heading">#</a></h3>
+<p>The <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object can be called with a wavelength array to calculate the spectral values:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
 <span class="go">array([0.        , 0.        , 0.62160997, 0.58168242, 0.54030231])</span>
@@ -514,9 +539,9 @@ Note that the gaussian function will be truncated to the visible range [380nm, 7
 </div>
 </section>
 <section id="wavelength-characteristics">
-<h3><span class="section-number">4.5.1.3. </span>Wavelength Characteristics<a class="headerlink" href="#wavelength-characteristics" title="Permalink to this heading">#</a></h3>
-<table class="table table-center" id="id3">
-<caption><span class="caption-number">Table 4.3 </span><span class="caption-text">Wavelength characteristics functions</span><a class="headerlink" href="#id3" title="Permalink to this table">#</a></caption>
+<h3><span class="section-number">4.7.1.3. </span>Wavelength Characteristics<a class="headerlink" href="#wavelength-characteristics" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table table-center" id="id4">
+<caption><span class="caption-number">Table 4.4 </span><span class="caption-text">Wavelength characteristics functions</span><a class="headerlink" href="#id4" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 28.6%" />
 <col style="width: 11.9%" />
@@ -531,95 +556,121 @@ Note that the gaussian function will be truncated to the visible range [380nm, 7
 <tbody>
 <tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak_wavelength" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak_wavelength"><code class="xref py py-meth docutils literal notranslate"><span class="pre">peak_wavelength</span></code></a></p></td>
 <td><p>nm</p></td>
-<td><p>Wavelength with the spectrum peak</p></td>
+<td><p>wavelength for the spectral peak</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength"><code class="xref py py-meth docutils literal notranslate"><span class="pre">centroid_wavelength</span></code></a></p></td>
 <td><p>nm</p></td>
-<td><p>power-weighted average wavelength</p></td>
+<td><p>power-weighted average wavelength, see <a class="reference external" href="https://en.wikipedia.org/wiki/Spectral_centroid">Centroid Wavelength</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.fwhm" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum.fwhm"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fwhm</span></code></a></p></td>
 <td><p>nm</p></td>
-<td><p>full width half maximum wavelength range</p></td>
+<td><p>full-width-at-half-maximum wavelength range</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.dominant_wavelength" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum.dominant_wavelength"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dominant_wavelength</span></code></a></p></td>
 <td><p>nm</p></td>
 <td><div class="line-block">
-<div class="line">wavelength with the same hue as the spectrum</div>
-<div class="line">NaN if not existent</div>
+<div class="line">same hue wavelength, see <a class="reference external" href="https://en.wikipedia.org/wiki/Dominant_wavelength">Dominant Wavelength</a></div>
+<div class="line"><code class="code highlight python docutils literal highlight-python"><span class="n">np</span><span class="o">.</span><span class="n">nan</span></code> if not existent</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.complementary_wavelength" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum.complementary_wavelength"><code class="xref py py-meth docutils literal notranslate"><span class="pre">complementary_wavelength</span></code></a></p></td>
 <td><p>nm</p></td>
 <td><div class="line-block">
-<div class="line">wavelength with the opposite hue as the spectrum</div>
-<div class="line">NaN if not existent</div>
+<div class="line">opposite hue wavelength, see <a class="reference external" href="https://en.wikipedia.org/wiki/Dominant_wavelength">Dominant Wavelength</a></div>
+<div class="line"><code class="code highlight python docutils literal highlight-python"><span class="n">np</span><span class="o">.</span><span class="n">nan</span></code> if non-existent</div>
 </div>
 </td>
 </tr>
 </tbody>
 </table>
-<p>As an example we can load the LED B1 standard illuminant, that can also be seen in <a class="reference internal" href="#fig-led-illuminants"><span class="std std-numref">Fig. 4.19</span></a>.
-Then the peak wavelength is calculated with:</p>
+</div>
+<p>For instance, we can calculate the peak wavelength of the LED B1 standard illuminant by doing:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">led_b1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="o">.</span><span class="n">peak_wavelength</span><span class="p">()</span>
-<span class="go">605.0022500225002</span>
+<span class="go">605.00225...</span>
 </pre></div>
 </div>
-<p>Note that with multiple same height peaks or a broad constant peak region the first peak value is returned. However, due to numerical precision this is not always the case.</p>
-<p>In our example the power-weighted average wavelength (centroid) is different from this:</p>
+<p>Note that with multiple same height peaks or a broad constant peak region the first peak value will be returned.</p>
+<p>The centroid wavelength for the spectrum is:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="o">.</span><span class="n">centroid_wavelength</span><span class="p">()</span>
-<span class="go">592.3958585050702</span>
+<span class="go">592.39585...</span>
 </pre></div>
 </div>
 <p>The dominant wavelength is calculated using:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="o">.</span><span class="n">dominant_wavelength</span><span class="p">()</span>
-<span class="go">584.7508883332902</span>
+<span class="go">584.75088...</span>
 </pre></div>
 </div>
-<p>When dominant or complementary are not existent, as for instance magenta can’t be described by a single wavelength, the values are set to NaN (not a number).</p>
-<p>The FWHM can be calculated with:</p>
+<p>When dominant or complementary are not existent (e.g. magenta can’t be described by a wavelength), the values are set to NaN (not a number).
+You can find a visualization on both dominant and complementary wavelengths <a class="reference external" href="https://en.wikipedia.org/wiki/Dominant_wavelength">on this Wiki page</a>.</p>
+<p>The FWHM (full width at half maximum) is calculated usin:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="o">.</span><span class="n">fwhm</span><span class="p">()</span>
-<span class="go">129.18529185291857</span>
+<span class="go">129.18529...</span>
 </pre></div>
 </div>
-<p>The function calculates the smallest FWHM around the highest peak. Note that for some spectral distributions, for instance multuple gaussians, this function is not suitable, as the FWHM is not meaningful here.</p>
+<p>The method calculates the smallest FWHM around the highest peak.
+While it is possible to calculate this value for all spectral shapes, it is only meaningful as width characterization for functions with a distinctive peak and an outward fall-off.
+For instance this metric does not make sense for a spectrum consisting of multiple separated bell-shaped curves.</p>
 </section>
 <section id="power">
-<h3><span class="section-number">4.5.1.4. </span>Power<a class="headerlink" href="#power" title="Permalink to this heading">#</a></h3>
-<p>The spectral power in W can be calculated with:</p>
+<h3><span class="section-number">4.7.1.4. </span>Power<a class="headerlink" href="#power" title="Link to this heading">#</a></h3>
+<p>The spectral power can be calculated with:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="o">.</span><span class="n">power</span><span class="p">()</span>
-<span class="go">3206.974999684993</span>
+<span class="go">3206.9749...</span>
 </pre></div>
 </div>
-<p>And the luminous power in lumens with:</p>
+<p>And the luminous power in lumen units with:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="o">.</span><span class="n">luminous_power</span><span class="p">()</span>
-<span class="go">999886.8629801519</span>
+<span class="go">999886.86...</span>
 </pre></div>
 </div>
+</section>
+<section id="rendering-a-lightspectrum">
+<h3><span class="section-number">4.7.1.5. </span>Rendering a LightSpectrum<a class="headerlink" href="#rendering-a-lightspectrum" title="Link to this heading">#</a></h3>
+<p>Read section <a class="reference internal" href="image.html#rimage-rendering"><span class="std std-ref">Rendering a RenderImage</span></a> for details on rendering images, rendering spectra is done in a similar way.
+Analogously to rendering a source image, we can render a spectrum with <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_spectrum" title="optrace.tracer.raytracer.Raytracer.source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_spectrum</span></code></a> and by providing a <code class="code highlight python docutils literal highlight-python"><span class="n">source_index</span></code> parameter (default to zero).
+With a raytracer object <code class="code highlight python docutils literal highlight-python"><span class="n">RT</span></code>, a source spectrum from source 1 is rendered with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">source_spectrum</span><span class="p">(</span><span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For a detector spectrum the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_spectrum" title="optrace.tracer.raytracer.Raytracer.detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_spectrum</span></code></a> function is applied.
+It takes a <code class="code highlight python docutils literal highlight-python"><span class="n">detector_index</span></code> argument, that defaults to zero.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_spectrum</span><span class="p">(</span><span class="n">detector_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Additionally we can render only a specific source by providing a <code class="code highlight python docutils literal highlight-python"><span class="n">source_index</span></code> or limit the detector area by providing the <code class="code highlight python docutils literal highlight-python"><span class="n">extent</span></code> parameter, as we did for the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_image" title="optrace.tracer.raytracer.Raytracer.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_image</span></code></a> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_spectrum</span><span class="p">(</span><span class="n">detector_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The above methods return a <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object with type <code class="code highlight python docutils literal highlight-python"><span class="n">spectrum_type</span><span class="o">=</span><span class="s2">&quot;Histogram&quot;</span></code>.</p>
 </section>
 </section>
 <section id="transmissionspectrum">
-<h2><span class="section-number">4.5.2. </span>TransmissionSpectrum<a class="headerlink" href="#transmissionspectrum" title="Permalink to this heading">#</a></h2>
-<p>A TransmissionSpectrum is applied as filter function for a Filter element. All transmission values need to be inside the [0, 1] range.</p>
-<p>The TransmissionSpectrum provides less modes than the LightSpectrum class. Note that now the scaling factor <code class="code highlight python docutils literal highlight-python"><span class="n">vall</span></code> becomes important.</p>
-<p>This class defines a new <code class="code highlight python docutils literal highlight-python"><span class="n">inverse</span></code> parameter, that subtracts the defined function from a value of one. This has the effect that the function instead does not define the transmittance behavior, but the absorption one. A gaussian bandpass becomes a notch filter, a rectangular bandpass a rectangular blocking one.</p>
+<h2><span class="section-number">4.7.2. </span>TransmissionSpectrum<a class="headerlink" href="#transmissionspectrum" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a> class requires a <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a>.
+All relative transmission values need to be inside the [0, 1] range.
+The <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a> provides less modes than the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> class.
+Compared to the latter, the scaling factor <code class="code highlight python docutils literal highlight-python"><span class="n">vall</span></code> now becomes important.
+This class defines a new <code class="code highlight python docutils literal highlight-python"><span class="n">inverse</span></code> parameter, that subtracts the defined function from a value of one.
+This has the effect of turning the transmittance behavior into absorptance.
+A Gaussian bandpass becomes a notch filter, a rectangular bandpass a rectangular blocking filter.</p>
 <p><strong>Constant</strong></p>
 <p>A neutral density filter is defined with mode <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Constant&quot;</span></code> and the linear transmittance value.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Gaussian</strong></p>
-<p>Colored filters (or bandpass filters) are often similar to a Gaussian function.</p>
+<p>Colored filters (most commonly bandpass filters) can be created with a Gaussian function.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">sig</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>A gaussian notch filter can be defined with <code class="code highlight python docutils literal highlight-python"><span class="n">inverse</span><span class="o">=</span><span class="kc">True</span></code>.</p>
+<p>A Gaussian notch filter is easily defined with parameter <code class="code highlight python docutils literal highlight-python"><span class="n">inverse</span><span class="o">=</span><span class="kc">True</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">sig</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Rectangle</strong></p>
-<p>A rectangular pass filter can be modelled by a rectangular function.</p>
+<p>A rectangular pass filter is modelled by a rectangular function.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="n">wl0</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">wl1</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -627,14 +678,15 @@ Then the peak wavelength is calculated with:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="n">wl0</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">wl1</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>An edgepass filter can be created by simply setting one of the bounds to the bound of the visible range.</p>
+<p>Creating an edgepass filter becomes easy by setting the bound to the edge of the visible range.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="n">wl0</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">wl1</span><span class="o">=</span><span class="mi">780</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>User Data/Function</strong></p>
-<p>Creating a <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a> with discrete data or a user function works exactly like for the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>, however all function/data values need to be inside range [0, 1].</p>
+<p>Creating a <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a> with discrete data is equivalent to a <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>.
+However, all function/data values need to be inside the range [0, 1].</p>
 <p><strong>Getting Spectral Values</strong></p>
-<p>As for the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object we can get the spectral values with:</p>
+<p>As for the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object, we can get the spectral values with:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">550</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">spec</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
 <span class="go">array([0., 0., 0., 1., 1.])</span>
@@ -642,33 +694,22 @@ Then the peak wavelength is calculated with:</p>
 </div>
 </section>
 <section id="spectrum">
-<h2><span class="section-number">4.5.3. </span>Spectrum<a class="headerlink" href="#spectrum" title="Permalink to this heading">#</a></h2>
-<p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a> is the parent class of both <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>, <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a>. It defines the following modes: <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Monochromatic&quot;</span><span class="p">,</span> <span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="s2">&quot;List&quot;</span><span class="p">,</span> <span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="s2">&quot;Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;Constant&quot;</span></code>. Compared to <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> only modes <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Histogram&quot;</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Blackbody&quot;</span></code> are missing.
-Generally the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a> class is not used by the user. But for instance the color matching functions  <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectrum</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectrum</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectrum</span><span class="o">.</span><span class="n">z</span></code> are objects of this class.</p>
+<h2><span class="section-number">4.7.3. </span>Spectrum<a class="headerlink" href="#spectrum" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a> is the parent class of both <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> and <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a>.
+It defines the following modes: <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Monochromatic&quot;</span><span class="p">,</span> <span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="s2">&quot;List&quot;</span><span class="p">,</span> <span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="s2">&quot;Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;Constant&quot;</span></code>.
+Compared to <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>, only modes <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Histogram&quot;</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Blackbody&quot;</span></code> are missing.
+Generally the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a> class is not exposed to the user.
+But, for instance, the color matching functions <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectrum</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectrum</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectrum</span><span class="o">.</span><span class="n">z</span></code> are objects of this type.</p>
 </section>
 <section id="plotting">
-<span id="spectrum-plots"></span><h2><span class="section-number">4.5.4. </span>Plotting<a class="headerlink" href="#plotting" title="Permalink to this heading">#</a></h2>
-<p>A <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a> is plotted with the function <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.spectrum_plots.spectrum_plot" title="optrace.plots.spectrum_plots.spectrum_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">spectrum_plot</span></code></a> from <a class="reference internal" href="../library/optrace_plots.html#module-optrace.plots" title="optrace.plots"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optrace.plots</span></code></a>.
-It takes a <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>, subclasses or a list of them.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">optrace.plots</span> <span class="k">as</span> <span class="nn">otp</span>
-
-<span class="n">otp</span><span class="o">.</span><span class="n">spectrum_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">standard_natural</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The user can provide a user-defined <code class="code highlight python docutils literal highlight-python"><span class="n">title</span></code>, turn off/on labels and the legend with <code class="code highlight python docutils literal highlight-python"><span class="n">legend_off</span><span class="p">,</span> <span class="n">labels_off</span></code> and make the plot blocking with <code class="code highlight python docutils literal highlight-python"><span class="n">block</span><span class="o">=</span><span class="kc">True</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ot</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">spectrum_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">standard_natural</span><span class="p">,</span> <span class="n">labels_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CIE Standard Illuminants&quot;</span><span class="p">,</span>
-                       <span class="n">legend_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Examples for a spectrum plot are found below.</p>
+<h2><span class="section-number">4.7.4. </span>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">#</a></h2>
+<p>See <a class="reference internal" href="plots.html#spectrum-plots"><span class="std std-ref">Spectrum Plotting</span></a>.</p>
 </section>
-<section id="spectral-lines">
-<span id="id1"></span><h2><span class="section-number">4.5.5. </span>Spectral Lines<a class="headerlink" href="#spectral-lines" title="Permalink to this heading">#</a></h2>
-<p><cite>optrace</cite> has some spectral wavelength lines defined in its presets.
-While there are many such lines, only those relevant for the calculation of the Abbe number are built-in.
-More about the Abbe number can be found in <a class="reference internal" href="../math/spectrum.html#abbe-number"><span class="std std-numref">Section 6.4.2.2</span></a>.</p>
-<table class="table table-center" id="id4">
-<caption><span class="caption-number">Table 4.4 </span><span class="caption-text">Fraunhofer lines commonly used for Abbe number determination <a class="footnote-reference brackets" href="#footcite-abbewiki" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#id4" title="Permalink to this table">#</a></caption>
+<section id="spectral-lines-presets">
+<span id="spectral-lines"></span><h2><span class="section-number">4.7.5. </span>Spectral Lines Presets<a class="headerlink" href="#spectral-lines-presets" title="Link to this heading">#</a></h2>
+<p>optrace provides some spectral wavelength lines in its presets.</p>
+<div class="pst-scrollable-table-container"><table class="table table-center" id="id5">
+<caption><span class="caption-number">Table 4.5 </span><span class="caption-text">Fraunhofer lines commonly used for Abbe number determination <a class="footnote-reference brackets" href="#footcite-abbewiki" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#id5" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 25.0%" />
@@ -744,7 +785,9 @@ More about the Abbe number can be found in <a class="reference internal" href=".
 </tr>
 </tbody>
 </table>
-<p>Due to limitations in python variable names, the presets with a trailing apostrophe are instead named with an trailing underscore, for instance F’ is named <code class="code highlight python docutils literal highlight-python"><span class="n">F_</span></code>.</p>
+</div>
+<p>Due to limitations in python variable names, presets with a trailing apostrophe are named with an trailing underscore.
+For instance, F’ is named <code class="code highlight python docutils literal highlight-python"><span class="n">F_</span></code>.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectral_lines</span><span class="o">.</span><span class="n">F_</span>
 <span class="go">479.9914</span>
 </pre></div>
@@ -754,10 +797,10 @@ More about the Abbe number can be found in <a class="reference internal" href=".
 <span class="go">[479.9914, 546.074, 643.8469]</span>
 </pre></div>
 </div>
-<p>In the next table the dominant wavelengths of the sRGB primaries can be found. The dominant wavelength is the wavelength that produces a color with the same hue as the reference color.
-The scaling factors are dimensioned such that the sum of these three monochromatic light sources produces sRGB-white.</p>
-<table class="table table-center" id="id5">
-<caption><span class="caption-number">Table 4.5 </span><span class="caption-text">Dominant wavelengths of sRGB primaries. Own work.</span><a class="headerlink" href="#id5" title="Permalink to this table">#</a></caption>
+<p>The following table provides the dominant wavelengths of the sRGB primaries (ITU-R BT.709).
+Dimensioning the scaling factors in the provided way produces D65 sRGB-white for equal R, G, B mixing ratios.</p>
+<div class="pst-scrollable-table-container"><table class="table table-center" id="id6">
+<caption><span class="caption-number">Table 4.6 </span><span class="caption-text">Dominant wavelengths of sRGB primaries. Derived by optimization.</span><a class="headerlink" href="#id6" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 33.3%" />
 <col style="width: 33.3%" />
@@ -788,48 +831,86 @@ The scaling factors are dimensioned such that the sum of these three monochromat
 </tr>
 </tbody>
 </table>
-<p>These wavelengths prove useful when trying to simulate color mixing.</p>
+</div>
+<p>These wavelengths are useful for simulating color mixing.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectral_lines</span><span class="o">.</span><span class="n">rgb</span>
 <span class="go">[464.3118, 549.1321, 611.2826]</span>
 </pre></div>
 </div>
 </section>
 <section id="spectrum-presets">
-<h2><span class="section-number">4.5.6. </span>Spectrum Presets<a class="headerlink" href="#spectrum-presets" title="Permalink to this heading">#</a></h2>
-<p>Below you can find some predefined presets for <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a> and <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>.</p>
-<figure class="align-center" id="id6">
-<a class="reference internal image-reference" href="../_images/Standard_illuminants.svg"><img alt="../_images/Standard_illuminants.svg" src="../_images/Standard_illuminants.svg" width="600" /></a>
+<h2><span class="section-number">4.7.6. </span>Spectrum Presets<a class="headerlink" href="#spectrum-presets" title="Link to this heading">#</a></h2>
+<p>The following figures demonstrate the predefined presets for <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a> and <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>.</p>
+<div class="pst-scrollable-table-container"><table class="table-borderless table">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id7">
+<a class="dark-light reference internal image-reference" href="../_images/Standard_illuminants.svg"><img alt="../_images/Standard_illuminants.svg" class="dark-light" src="../_images/Standard_illuminants.svg" style="width: 500px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.17 </span><span class="caption-text">CIE standard illuminants. Available as <code class="docutils literal notranslate"><span class="pre">ot.presets.light_spectrum.&lt;name&gt;</span></code> with <code class="docutils literal notranslate"><span class="pre">a,</span> <span class="pre">d50,</span> <span class="pre">...</span></code> as <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code></span><a class="headerlink" href="#id6" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.26 </span><span class="caption-text">CIE standard illuminants. Available as <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.&lt;</span><span class="n">name</span><span class="o">&gt;</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">a</span><span class="p">,</span> <span class="n">d50</span><span class="p">,</span> <span class="o">...</span></code> as <code class="code highlight python docutils literal highlight-python"><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span></code></span><a class="headerlink" href="#id7" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<figure class="align-center" id="id7">
-<a class="reference internal image-reference" href="../_images/LED_illuminants.svg"><img alt="../_images/LED_illuminants.svg" src="../_images/LED_illuminants.svg" width="600" /></a>
+</td>
+<td><figure class="align-center" id="id8">
+<a class="dark-light reference internal image-reference" href="../_images/LED_illuminants.svg"><img alt="../_images/LED_illuminants.svg" class="dark-light" src="../_images/LED_illuminants.svg" style="width: 500px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.18 </span><span class="caption-text">CIE standard illuminants LED series. Available as <code class="docutils literal notranslate"><span class="pre">ot.presets.light_spectrum.&lt;name&gt;</span></code> with <code class="docutils literal notranslate"><span class="pre">led_b1,</span> <span class="pre">led_b2,</span> <span class="pre">...</span></code> as <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code></span><a class="headerlink" href="#id7" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.27 </span><span class="caption-text">CIE standard illuminants LED series. Available as <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.&lt;</span><span class="n">name</span><span class="o">&gt;</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">led_b1</span><span class="p">,</span> <span class="n">led_b2</span><span class="p">,</span> <span class="o">...</span></code> as <code class="code highlight python docutils literal highlight-python"><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span></code></span><a class="headerlink" href="#id8" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<figure class="align-center" id="id8">
-<span id="fig-led-illuminants"></span><a class="reference internal image-reference" href="../_images/Fluor_illuminants.svg"><img alt="../_images/Fluor_illuminants.svg" src="../_images/Fluor_illuminants.svg" width="600" /></a>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id9">
+<span id="fig-led-illuminants"></span><a class="dark-light reference internal image-reference" href="../_images/Fluor_illuminants.svg"><img alt="../_images/Fluor_illuminants.svg" class="dark-light" src="../_images/Fluor_illuminants.svg" style="width: 500px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.19 </span><span class="caption-text">CIE standard illuminants Fluorescent series. Available as <code class="docutils literal notranslate"><span class="pre">ot.presets.light_spectrum.&lt;name&gt;</span></code> with <code class="docutils literal notranslate"><span class="pre">fl2,</span> <span class="pre">fl7,</span> <span class="pre">...</span></code> as <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code></span><a class="headerlink" href="#id8" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.28 </span><span class="caption-text">CIE standard illuminants Fluorescent series. Available as <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.&lt;</span><span class="n">name</span><span class="o">&gt;</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">fl2</span><span class="p">,</span> <span class="n">fl7</span><span class="p">,</span> <span class="o">...</span></code> as <code class="code highlight python docutils literal highlight-python"><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span></code></span><a class="headerlink" href="#id9" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<figure class="align-center" id="id9">
-<a class="reference internal image-reference" href="../_images/srgb_spectrum.svg"><img alt="../_images/srgb_spectrum.svg" src="../_images/srgb_spectrum.svg" width="600" /></a>
+</td>
+<td><figure class="align-center" id="id10">
+<a class="dark-light reference internal image-reference" href="../_images/srgb_spectrum.svg"><img alt="../_images/srgb_spectrum.svg" class="dark-light" src="../_images/srgb_spectrum.svg" style="width: 500px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.20 </span><span class="caption-text">Possible sRGB primary spectra.
-Available as <code class="docutils literal notranslate"><span class="pre">ot.presets.light_spectrum.&lt;name&gt;</span></code> with <code class="docutils literal notranslate"><span class="pre">srgb_r,</span> <span class="pre">srgb_g,</span> <span class="pre">...</span></code> as <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code></span><a class="headerlink" href="#id9" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.29 </span><span class="caption-text">Possible sRGB primary spectra.
+Available as <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.&lt;</span><span class="n">name</span><span class="o">&gt;</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">srgb_r</span><span class="p">,</span> <span class="n">srgb_g</span><span class="p">,</span> <span class="o">...</span></code> as <code class="code highlight python docutils literal highlight-python"><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span></code></span><a class="headerlink" href="#id10" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<figure class="align-center" id="id10">
-<a class="reference internal image-reference" href="../_images/cie_cmf.svg"><img alt="../_images/cie_cmf.svg" src="../_images/cie_cmf.svg" width="600" /></a>
+</td>
+</tr>
+<tr class="row-odd"><td><figure class="align-center" id="id11">
+<a class="dark-light reference internal image-reference" href="../_images/cie_cmf.svg"><img alt="../_images/cie_cmf.svg" class="dark-light" src="../_images/cie_cmf.svg" style="width: 500px;" />
+</a>
 <figcaption>
-<p><span class="caption-number">Fig. 4.21 </span><span class="caption-text">CIE color matching functions.
-Available as <code class="docutils literal notranslate"><span class="pre">ot.presets.spectrum.&lt;name&gt;</span></code> with <code class="docutils literal notranslate"><span class="pre">x,</span> <span class="pre">y,</span> <span class="pre">z</span></code> as <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code></span><a class="headerlink" href="#id10" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 4.30 </span><span class="caption-text">CIE color matching functions.
+Available as <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectrum</span><span class="o">.&lt;</span><span class="n">name</span><span class="o">&gt;</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span></code> as <code class="code highlight python docutils literal highlight-python"><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span></code></span><a class="headerlink" href="#id11" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<p>Other presets include spectra from spectral lines combination in <a class="reference internal" href="#spectral-lines"><span class="std std-numref">Section 4.5.5</span></a>. Namely <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.&lt;</span><span class="n">name</span><span class="o">&gt;</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">FdC</span><span class="p">,</span> <span class="n">FDC</span><span class="p">,</span> <span class="n">FeC</span><span class="p">,</span> <span class="n">F_eC_</span></code> as <code class="code highlight python docutils literal highlight-python"><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span></code>.</p>
+</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Other presets include spectra from spectral lines combination in <a class="reference internal" href="#spectral-lines"><span class="std std-numref">Section 4.7.5</span></a>. Namely <code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.&lt;</span><span class="n">name</span><span class="o">&gt;</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">FdC</span><span class="p">,</span> <span class="n">FDC</span><span class="p">,</span> <span class="n">FeC</span><span class="p">,</span> <span class="n">F_eC_</span><span class="p">,</span> <span class="n">rgb</span></code> as <code class="code highlight python docutils literal highlight-python"><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span></code>.</p>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id3">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-planckwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Planck’s law. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Planck%27s_law">https://en.wikipedia.org/wiki/Planck%27s_law</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-abbewiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Abbe-Zahl. 2022. URL: <a class="reference external" href="https://de.wikipedia.org/wiki/Abbe-Zahl">https://de.wikipedia.org/wiki/Abbe-Zahl</a> (visited on 2022-12-16).</p>
+</aside>
+</aside>
+</div>
 </section>
 </section>
 
@@ -838,89 +919,63 @@ Available as <code class="docutils literal notranslate"><span class="pre">ot.pre
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer d-print-none">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="elements.html"
+       href="refraction_index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">4.4. </span>Defining Elements</p>
+        <p class="prev-next-title"><span class="section-number">4.6. </span>Refractive Indices</p>
       </div>
     </a>
     <a class="right-next"
-       href="refraction_index.html"
+       href="image.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">4.6. </span>Refractive Indices</p>
+        <p class="prev-next-title"><span class="section-number">4.8. </span>Image Classes</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lightspectrum">4.5.1. LightSpectrum</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-spectrum">4.5.1.1. Creating the Spectrum</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-spectral-values">4.5.1.2. Getting Spectral Values</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wavelength-characteristics">4.5.1.3. Wavelength Characteristics</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#power">4.5.1.4. Power</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lightspectrum">4.7.1. LightSpectrum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-spectrum">4.7.1.1. Creating the Spectrum</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-spectral-values">4.7.1.2. Calculating Spectral Values</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wavelength-characteristics">4.7.1.3. Wavelength Characteristics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#power">4.7.1.4. Power</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rendering-a-lightspectrum">4.7.1.5. Rendering a LightSpectrum</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transmissionspectrum">4.5.2. TransmissionSpectrum</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectrum">4.5.3. Spectrum</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting">4.5.4. Plotting</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectral-lines">4.5.5. Spectral Lines</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectrum-presets">4.5.6. Spectrum Presets</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transmissionspectrum">4.7.2. TransmissionSpectrum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectrum">4.7.3. Spectrum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting">4.7.4. Plotting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectral-lines-presets">4.7.5. Spectral Lines Presets</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectrum-presets">4.7.6. Spectrum Presets</a></li>
 </ul>
   </nav></div>
-
-  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
-<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
-<!--(similar to page-toc.html)-->
-<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">
-    Section Navigation
-  </p>
-  <div class="bd-toc-item navbar-nav">
-    <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">4.2. Base Geometries</a></li>
-<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.3. Base Shapes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="elements.html">4.4. Defining Elements</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.5. Spectrum Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="image.html">4.7. Image and Spectrum Rendering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="focus.html">4.8. Focus Finding</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tma.html">4.9. Paraxial Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="convolve.html">4.10. PSF Convolution</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plots.html">4.11. Plotting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ui.html">4.12. Using the GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.13. Advanced Topics</a></li>
-</ul>
-
-  </div>
-</nav></div>
 
 </div></div>
               
@@ -935,8 +990,8 @@ Available as <code class="docutils literal notranslate"><span class="pre">ot.pre
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -944,17 +999,19 @@ Available as <code class="docutils literal notranslate"><span class="pre">ot.pre
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
-      © Copyright 2022, Damian Mendroch.
+      © Copyright 2025, Damian Mendroch.
       <br/>
     
   </p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -962,10 +1019,13 @@ Available as <code class="docutils literal notranslate"><span class="pre">ot.pre
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

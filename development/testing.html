@@ -1,78 +1,72 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../" data-theme="dark">
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>8.2. Testing &#8212; optrace 1.4.3 documentation</title>
+    <title>7.1. Testing &#8212; optrace 1.6.4 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=964979e3" />
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'development/testing';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="8.3. Documentation" href="documentation.html" />
-    <link rel="prev" title="8.1. General Guidelines" href="guidelines.html" />
+    <link rel="next" title="7.2. Documentation" href="documentation.html" />
+    <link rel="prev" title="7. Development" href="development.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+  <div id="pst-scroll-pixel-helper"></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -80,7 +74,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -88,18 +81,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -108,88 +110,78 @@
   
   
   
-    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+    <p class="title logo__title">optrace 1.6.4 documentation</p>
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="development.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -201,28 +193,24 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -233,8 +221,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -244,29 +232,32 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -275,80 +266,63 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
-            
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="development.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -357,17 +331,14 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -378,8 +349,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -387,32 +358,51 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">7.1. Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notes.html">7.4. Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">7.5. Changelog</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -420,9 +410,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">8. </span>Development</a></li>
+    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">8.2. </span>Testing</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.1. </span>Testing</span></li>
   </ul>
 </nav>
 </div>
@@ -437,172 +427,279 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="testing">
-<h1><span class="section-number">8.2. </span>Testing<a class="headerlink" href="#testing" title="Permalink to this heading">#</a></h1>
-<p><strong>Goal</strong></p>
+<h1><span class="section-number">7.1. </span>Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h1>
+<section id="functionality-testing">
+<h2><span class="section-number">7.1.1. </span>Functionality Testing<a class="headerlink" href="#functionality-testing" title="Link to this heading">#</a></h2>
+<p>The goal of the functionality testing is to check both typical features as well as edge cases.
+Not only should the code “run”, but also produce correct results.
+This is guaranteed by many automated test cases.</p>
+<p>Some examples include:</p>
 <ul class="simple">
-<li><p>automated testing of functionality and edge cases</p></li>
-<li><p>100% coverage, all branches and source code lines get executed at least once</p></li>
-<li><p>testing of the installation of the required packages on a clean system</p></li>
-<li><p>testing of multiple platforms (Linux, Windows, macOS)</p></li>
-<li><p>test multithreading with different number of cores</p></li>
-<li><p>future goal: support of multiple python versions (&gt;= Python 3.10)</p></li>
+<li><p>a nearly ideal lens produces a distinct focal point at the correct focal distance</p></li>
+<li><p>a growing number of rays decreases sampling noise</p></li>
+<li><p>user-built surfaces modeling a spherical surface behaving the same as the in-built type</p></li>
+<li><p>sampling of directions, color, positions produces the correct distribution on both the source and destination</p></li>
+<li><p>GUI interactions execute the expected actions</p></li>
+<li><p>images are correctly loaded and saved</p></li>
+<li><p>typical phenomena and aberrations of geometrical optics can be reproduced (spherical and chromatic aberration, vignetting, dispersion, astigmatism, coma, …)</p></li>
+<li><p>image formation by convolving produces correct results even the images must be scaled or interpolated</p></li>
+<li><p>PSF convolution and raytracing produce comparable results</p></li>
+<li><p>simple <code class="code highlight bash docutils literal highlight-bash">.zmx</code> and <code class="code highlight bash docutils literal highlight-bash">.agf</code> files are handled and imported correctly</p></li>
+<li><p>… many more</p></li>
 </ul>
-<p><strong>Main Testing</strong></p>
+<p>Some edge cases include:</p>
 <ul class="simple">
-<li><p>done by <a class="reference external" href="https://tox.wiki/en/latest/">tox</a>, this creates a virtual environment where the library is installed and tested</p></li>
-<li><p><a class="reference external" href="https://docs.pytest.org/en/7.2.x/">pytest</a> runs all test cases</p></li>
-<li><p><a class="reference external" href="https://coverage.readthedocs.io">coverage</a> wraps around <code class="docutils literal notranslate"><span class="pre">pytest</span></code> and reports on executed and missing lines</p></li>
-<li><p>see the <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code> file for details</p></li>
-<li><p>test files can be found under <code class="docutils literal notranslate"><span class="pre">./tests/</span></code>, starting with filename <code class="docutils literal notranslate"><span class="pre">test_</span></code></p></li>
+<li><p>normalizing a black image does not lead to divisions by zero</p></li>
+<li><p>requesting billions of rays prints an error message instead of crashing the PC due to too much requested RAM</p></li>
+<li><p>collisions of lenses are detected</p></li>
+<li><p>moving geometry elements outside of the setup bounding box is not possible</p></li>
+<li><p>check of value validity (no negative powers, wavelengths outside the visible range, …)</p></li>
+<li><p>plotting/loading/tracing of a single pixel image</p></li>
+<li><p>an optical setup without lenses, filters or apertures is traced correctly</p></li>
+<li><p>… many more</p></li>
 </ul>
-<p><strong>Test Cases</strong></p>
+<p>Test files can be found under <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tests/">tests/</a>, starting with filename <code class="code highlight bash docutils literal highlight-bash">test_</code>
+Testing is performed with <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v8.3.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a>.
+To ensure that it is performed on a “clean” and defined environment, it is run by <a class="reference external" href="https://tox.wiki/en/latest/">tox</a>, this creates a virtual python environment where the library is installed and tested.
+With its default call, <code class="code highlight bash docutils literal highlight-bash">tox</code> calls the testing environment that includes all test cases.
+To lower RAM usage, tox calls test groups instead of all tests at once.</p>
+<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/tox_test.yml">tox_test.yml</a> runs the functionality tests on a defined system and python version as github actions.
+By default this is done on pushed code changes, but the action can also be run manually.</p>
+</section>
+<section id="coverage-testing">
+<h2><span class="section-number">7.1.2. </span>Coverage Testing<a class="headerlink" href="#coverage-testing" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://coverage.readthedocs.io/en/latest/api_module.html#module-coverage" title="(in Coverage.py v7.6.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">coverage</span></code></a> is used to check if all code lines and branches were tested.
+It wraps around pytest inside the tox test environment and reports on executed and missing lines.
+The output gets represented as both html or as text output (inside the terminal or github action output).</p>
+</section>
+<section id="benchmark-testing">
+<span id="benchmarking"></span><h2><span class="section-number">7.1.3. </span>Benchmark Testing<a class="headerlink" href="#benchmark-testing" title="Link to this heading">#</a></h2>
+<p>Tracing performance depends on the number of surfaces and rays as well as the complexity of the surfaces.
+Spherical surfaces are easier to trace then complex user defined ones.
+For systems with a low number of surfaces the ray generation at the source becomes dominant.</p>
+<p>The example <a class="reference internal" href="../examples.html#example-microscope"><span class="std std-ref">Microscope</span></a> is used for testing in its default settings.
+These includes one million rays and 57 light-interacting surfaces (one ray source, one aperture, 27 lenses with front and back surface each, one outline surface of the bounding box).
+Detectors are excluded as they don’t interact with the rays unless image rendering is executed.
+From the start of the raytracing until the end 6.6 seconds pass on my system (Arch Linux 6.12, i7-1360P notebook CPU, Python 3.13), resulting in 0.12 s / surface / million rays.</p>
+</section>
+<section id="test-cases">
+<h2><span class="section-number">7.1.4. </span>Test Cases<a class="headerlink" href="#test-cases" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/doctest.html">doctest</a> for documentation strings in some non-class functions</p></li>
-<li><p>test cases are handled with <code class="docutils literal notranslate"><span class="pre">unittest</span></code>, testing is however typically done by <code class="docutils literal notranslate"><span class="pre">pytest</span></code> that loads and executed the created TestSuites</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/doctest.html#module-doctest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">doctest</span></code></a> for documentation strings in some non-class functions</p></li>
+<li><p>test cases are handled with <a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a>, testing is however typically done by <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v8.3.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a> that loads and executed the created TestSuites</p></li>
 <li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">TraceGUI</span></code> has a <code class="docutils literal notranslate"><span class="pre">debug</span></code> method, which runs a separate thread, from which actions are executed:</dt><dd><ul>
-<li><p>Note that each UI actions needs to be run in the main thread, for this <code class="docutils literal notranslate"><span class="pre">TraceGUI</span></code> provides <code class="docutils literal notranslate"><span class="pre">_do_in_main</span></code> and <code class="docutils literal notranslate"><span class="pre">_set_in_main</span> <span class="pre">methods</span></code></p></li>
-<li><p>generally we want to do an action, after the old one has finished. For this <code class="docutils literal notranslate"><span class="pre">TraceGUI._wait_for_idle</span></code> is implemented.</p></li>
+<dt><code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span></code> has a <code class="code highlight python docutils literal highlight-python"><span class="n">debug</span></code> method, which runs a separate thread, from which actions are executed:</dt><dd><ul>
+<li><p>Note that each UI actions needs to be run in the main thread, for this <code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span></code> provides <code class="code highlight python docutils literal highlight-python"><span class="n">_do_in_main</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">_set_in_main</span></code> methods</p></li>
+<li><p>generally we want to do an action, after the old one has finished. For this <code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span><span class="o">.</span><span class="n">_wait_for_idle</span></code> is implemented.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
-<p><strong>Platform and version testing</strong></p>
+</section>
+<section id="documentation-testing">
+<h2><span class="section-number">7.1.5. </span>Documentation Testing<a class="headerlink" href="#documentation-testing" title="Link to this heading">#</a></h2>
+<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/doc_test.yml">doc_test.yml</a> runs multiple test environments.
+This includes:</p>
 <ul class="simple">
-<li><dl class="simple">
-<dt>platform tests are done with a github workflow, that executes some platform dependent test. These include:</dt><dd><ul>
+<li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>docsbuildcheck</code>: Testing of correct documentation building while not permitting warning</p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>linkcheck</code>: Testing of all documentation links</p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>doctest</code>: Testing of most documentation code examples (using <a class="reference external" href="https://docs.python.org/3/library/doctest.html#module-doctest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">doctest</span></code></a>)</p></li>
+</ul>
+</section>
+<section id="python-version-testing">
+<h2><span class="section-number">7.1.6. </span>Python Version Testing<a class="headerlink" href="#python-version-testing" title="Link to this heading">#</a></h2>
+<p>Testing of the compatibility with multiple python versions is done with the <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml">pyver_comp.yml</a> workflow.
+It executes a subset of tests (<code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>fast</code>) for multiple python main versions in an Ubuntu runner.</p>
+</section>
+<section id="platform-testing">
+<h2><span class="section-number">7.1.7. </span>Platform Testing<a class="headerlink" href="#platform-testing" title="Link to this heading">#</a></h2>
+<p>Platform testing is done with the <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml">os_comp.yml</a> workflow.
+It executes the os tox environment, which runs a subset of all available tests.
+These tests include relevant possibly platform-dependent cases, including:</p>
+<ul class="simple">
+<li><p>installation</p></li>
 <li><p>loading and saving of files</p></li>
 <li><p>handling of filenames and paths</p></li>
+<li><p>loading sensitivity and image presets (which also are files inside the library)</p></li>
 <li><p>opening the gui and plots</p></li>
-<li><p>detecting the number of cores</p></li>
+<li><p>enforcing a specific float bit width</p></li>
+<li><p>detecting the number of cores and multithreading</p></li>
+</ul>
+<p>The workflow is executed with the current python version and both the latest macOC and Windows runners.
+Linux is not included, as all other workflows already run on Ubuntu.</p>
+</section>
+<section id="github-workflows">
+<h2><span class="section-number">7.1.8. </span>Github Workflows<a class="headerlink" href="#github-workflows" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>see <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/">.github/workflows/</a></p></li>
+<li><p>Actions: Main testing, OS Compatibility, Python 3.10 Compatibility</p></li>
+<li><p>all get run on a push the repository or can get run manually</p></li>
+</ul>
+</section>
+<section id="manual-tests">
+<h2><span class="section-number">7.1.9. </span>Manual Tests<a class="headerlink" href="#manual-tests" title="Link to this heading">#</a></h2>
+<p>Unfortunately, not all tests can be automated.
+The following test cases need to be handled manually:</p>
+<p><strong>Checking that</strong> <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.plots.block</span></code></a> <strong>actually pauses the program execution</strong></p>
+<p>This can’t be tested automatically, as it would halt testing. Maybe there is a way by using multithreading or multiprocessing and a timer?
+What about coverage information in such cases?</p>
+<p><strong>Correct and nice formatting inside plots and the GUI</strong></p>
+<p>Can only be tested by a human viewer.</p>
+<p><strong>Usage in Python Notebooks or inline IDEs such as Spyder</strong></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Installation:</dt><dd><ul>
+<li><p>see <a class="reference external" href="https://docs.spyder-ide.org/current/installation.html">https://docs.spyder-ide.org/current/installation.html</a></p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash">python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>spyder-env</code></p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash"><span class="nb">source</span><span class="w"> </span>spyder-env/bin/activate</code></p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><p>python version testing: currently does the same as platform testing, however some libraries don’t support Python 3.11 yet</p></li>
+<li><dl class="simple">
+<dt>Testing:</dt><dd><ul>
+<li><p>make sure pyplot windows are displayed correctly (plot viewer) with enough dpi</p></li>
+<li><p>make sure this is also the case for plots generated by the GUI</p></li>
 </ul>
-<p><strong>Github Workflows</strong></p>
-<ul class="simple">
-<li><p>see <code class="docutils literal notranslate"><span class="pre">.github/workflows/</span></code></p></li>
-<li><p>Actions: Main testing, OS Compatibility, Python 3.11 Compatibility</p></li>
-<li><p>all get run on a push the repository or can get run manually</p></li>
+</dd>
+</dl>
+</li>
 </ul>
-<p><strong>Tox configuration in</strong> <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[tox]
-envlist = py310
+</section>
+<section id="tox-configuration-in-tox-ini">
+<span id="tox-file"></span><h2><span class="section-number">7.1.10. </span>Tox configuration in <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tox.ini">tox.ini</a><a class="headerlink" href="#tox-configuration-in-tox-ini" title="Link to this heading">#</a></h2>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[tox]</span>
+<span class="na">envlist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">py313</span>
 
-# DISPLAY needed for pynput to work
-# numpy needed for mayavi to install
-# we can&#39;t use pytest-xdist for parallel testing, because it interferes with pynput and coverage
+<span class="c1"># we can&#39;t use pytest-xdist for parallel testing, as it seems to interfere with numexpr&gt;2.8.4</span>
+<span class="c1"># (tox -e fast fails with -n auto, KeyErrors for local/global dict etc.)</span>
+<span class="c1"># however the exact reason is not known to me</span>
+<span class="c1">#</span>
+<span class="c1"># when gui tests fail on wayland, first run &quot;xhost +&quot;</span>
 
-# older vtk wheels:
-# https://github.com/pyvista/pyvista-wheels
 
-# pytest options
-[pytest]
-markers = slow: marks tests as slow (deselect with &#39;-m &quot;not slow&quot;&#39;)
-          os: marks test relevant for testing of different operating systems
-testpaths = tests
-addopts = --random-order
+<span class="c1"># pytest options</span>
+<span class="k">[pytest]</span>
+<span class="na">markers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">slow: tests slower than 10 seconds on my machine</span>
+<span class="w">          </span><span class="na">os</span><span class="o">:</span><span class="w"> </span><span class="s">marks test relevant for testing of different operating systems</span>
+<span class="w">          </span><span class="na">gui1</span><span class="o">:</span><span class="w"> </span><span class="s">only first batch of GUI tests (separated for lower RAM usage)</span>
+<span class="w">          </span><span class="na">gui2</span><span class="o">:</span><span class="w"> </span><span class="s">only second batch of GUI tests (separated for lower RAM usage)</span>
+<span class="w">          </span><span class="na">gui3</span><span class="o">:</span><span class="w"> </span><span class="s">only third batch of GUI tests (separated for lower RAM usage)</span>
+<span class="na">testpaths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
+<span class="na">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">360</span>
+<span class="na">timeout_method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">thread</span>
+<span class="na">filterwarnings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ignore::UserWarning</span>
+<span class="na">addopts</span><span class="w"> </span><span class="o">=</span>
+<span class="c1"># --random-order</span>
 
-[gh-actions]
-python =
-    3.7: py37
-    3.8: py38
-    3.9: py39
-    3.10: py310, mypy
-    3.11: py311
-    
-# testing env
-[testenv]
-passenv = HOME
-          DISPLAY
-deps =
-    pytest
-    coverage
-    colour-science
-    pyautogui
-    pytest-random-order
-    requests
-	mock
-    numpy&gt;1.21
-commands =
-    coverage run --source=optrace --branch -m pytest {posargs}
-    coverage html
-    coverage report --show-missing
+<span class="k">[gh-actions]</span>
+<span class="na">python</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">3.10</span><span class="o">:</span><span class="w"> </span><span class="s">py310</span>
+<span class="w">    </span><span class="na">3.11</span><span class="o">:</span><span class="w"> </span><span class="s">py311</span>
+<span class="w">    </span><span class="na">3.12</span><span class="o">:</span><span class="w"> </span><span class="s">py312</span>
+<span class="w">    </span><span class="na">3.13</span><span class="o">:</span><span class="w"> </span><span class="s">py313</span>
+<span class="w">    </span>
+<span class="c1"># testing env</span>
+<span class="k">[testenv]</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">HOME</span>
+<span class="w">          </span><span class="na">DISPLAY</span>
+<span class="w">          </span><span class="na">WAYLAND_DISPLAY</span>
+<span class="w">          </span><span class="na">QT_QPA_PLATFORM</span>
+<span class="w">          </span><span class="na">XAUTHORITY</span>
+<span class="w">          </span><span class="na">GITHUB_ACTIONS</span>
+<span class="na">setenv</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">PYTHONPATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{env:PYTHONPATH}{:}{toxinidir}{:}{envsitepackagesdir}</span>
+<span class="w">    </span><span class="na">LIBGL_ALWAYS_SOFTWARE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w">  </span>
+<span class="c1"># ^--- see https://github.com/cypress-io/cypress/issues/29521</span>
+<span class="na">basepython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{envlist}</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest {posargs} ./tests/test_geometry.py ./tests/test_misc.py </span>\
+<span class="w">        </span><span class="s">./tests/test_image.py ./tests/test_refraction_index.py ./tests/test_scope.py ./tests/test_spectrum.py </span>\
+<span class="w">         </span><span class="s">./tests/test_surface.py ./tests/test_tma.py</span>
+<span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest {posargs} ./tests/test_color.py ./tests/test_convolve.py </span>\
+<span class="w">        </span><span class="s">./tests/test_load.py ./tests/test_tracer.py ./tests/test_tracer_special.py</span>
+<span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest {posargs} ./tests/test_plots.py</span>
+<span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest -m gui1 {posargs} ./tests/test_gui.py</span>
+<span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest -m gui2 {posargs} ./tests/test_gui.py</span>
+<span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest -m gui3 {posargs} ./tests/test_gui.py</span>
+<span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest {posargs} ./tests/test_examples.py</span>
+<span class="w">    </span><span class="na">coverage combine</span>
+<span class="w">    </span><span class="na">coverage html</span>
+<span class="w">    </span><span class="na">coverage report --show-missing</span>
 
-# fast testing
-[testenv:fast]
-passenv = {[testenv]passenv}
-deps = {[testenv]deps}
-commands = pytest -m &quot;not slow&quot; {posargs}
+<span class="c1"># don&#39;t test slower tests (&gt; 10 seconds)</span>
+<span class="k">[testenv:fast]</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]passenv}</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]deps}</span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]extras}</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pytest -m &quot;not slow&quot; {posargs}</span>
 
-# testing of system dependent functionality
-[testenv:os]
-passenv = {[testenv]passenv}
-deps = {[testenv]deps}
-commands = pytest -m os {posargs}
+<span class="c1"># testing of system dependent functionality</span>
+<span class="k">[testenv:os]</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]passenv}</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]deps}</span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]extras}</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pytest -m os {posargs}</span>
 
-# pylint
-[testenv:pylint]
-skipsdist=True
-skip_install=True
-deps = pylint
-# exclude some unnecessary rules
-# good-names-rgxs makes it possible to use one or two character names without error
-# extent line length to 120
-# allow all variable names
-commands = pylint ./optrace --max-line-length 120 --variable-naming-style any --disable=W0612,W0613,W0106,W0212,E1101,R0902,R0904,R0911,R0912,R0913,R0914,R0915,R0916,C0301,C0302 --good-names-rgxs=^[_a-z][_a-z0-9]?$
+<span class="c1"># pylint</span>
+<span class="k">[testenv:pylint]</span>
+<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<span class="na">skip_install</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pylint</span>
+<span class="c1"># exclude some unnecessary rules</span>
+<span class="c1"># good-names-rgxs makes it possible to use one or two character names without error</span>
+<span class="c1"># extent line length to 120</span>
+<span class="c1"># allow all variable names</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pylint ./optrace --max-line-length 120 --variable-naming-style any </span>\
+<span class="w">    </span><span class="s">--disable=W0612,W0613,W0106,W0212,E1101,R0902,R0904,R0911,R0912,R0913,R0914,R0915,R0916,C0301,C0302 </span>\
+<span class="w">    </span><span class="s">--good-names-rgxs=^[_a-z][_a-z0-9]?$</span>
 
-# documentation
-[testenv:docs]
-skipsdist=True
-passenv = HOME
-          DISPLAY
-allowlist_externals=
-    /usr/bin/bash
-deps = sphinx 
-       pydeps&gt;=1.10
-	   mock
-       sphinxcontrib-bibtex
-       pydata-sphinx-theme
-	   sphinx-copybutton
-commands = 
-    bash ./docs/generate_changelog.sh
-    bash ./docs/generate_bib_structure.sh
-    pydeps ./optrace/ --cluster --max-bacon=2 --no-show --only optrace -o &#39;./docs/source/images/Dep_Tree.svg&#39;
-    sphinx-build -M html ./docs/source ./docs/build -n -j auto
+<span class="c1"># documentation</span>
+<span class="k">[testenv:docs]</span>
+<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]passenv}</span>
+<span class="na">allowlist_externals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">/usr/bin/bash</span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">docs</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">bash ./docs/generate_changelog.sh</span>
+<span class="w">    </span><span class="na">bash ./docs/generate_bib_structure.sh</span>
+<span class="w">    </span><span class="na">sphinx-build -M html ./docs/source ./docs/build -n -j auto</span>
 
-# documentation link check
-[testenv:linkcheck]
-skipsdist=True
-passenv = {[testenv:docs]passenv}
-deps = {[testenv:docs]deps}
-commands = 
-    sphinx-build -M linkcheck ./docs/source ./docs/build -j auto
+<span class="c1"># documentation link check</span>
+<span class="k">[testenv:linkcheck]</span>
+<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]passenv}</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]deps}</span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]extras}</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">sphinx-build -M linkcheck ./docs/source ./docs/build -j auto</span>
 
-# documentation link check
-[testenv:doctest]
-skipsdist=True
-passenv = {[testenv:docs]passenv}
-deps = {[testenv:docs]deps}
-commands = 
-    sphinx-build -M doctest ./docs/source ./docs/build -j auto
+<span class="c1"># documentation link check</span>
+<span class="k">[testenv:doctest]</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]passenv}</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]deps}</span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]extras}</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">sphinx-build -M doctest ./docs/source ./docs/build -j auto</span>
 
-# check that html documentation builds without warnings and errors
-[testenv:docsbuildcheck]
-skipsdist=True
-passenv = {[testenv:docs]passenv}
-deps = {[testenv:docs]deps}
-commands = 
-    sphinx-build ./docs/source ./docs/build/htmlcheck -j auto -n -W
-
+<span class="c1"># check that html documentation builds without warnings and errors</span>
+<span class="k">[testenv:docsbuildcheck]</span>
+<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]passenv}</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]deps}</span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]extras}</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">sphinx-build ./docs/source ./docs/build/htmlcheck -n -W -j auto</span>
 </pre></div>
 </div>
+</section>
 </section>
 
 
@@ -610,19 +707,18 @@ commands =
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer d-print-none">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="guidelines.html"
+       href="development.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">8.1. </span>General Guidelines</p>
+        <p class="prev-next-title"><span class="section-number">7. </span>Development</p>
       </div>
     </a>
     <a class="right-next"
@@ -630,41 +726,41 @@ commands =
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">8.3. </span>Documentation</p>
+        <p class="prev-next-title"><span class="section-number">7.2. </span>Documentation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
-<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
-<!--(similar to page-toc.html)-->
-<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">
-    Section Navigation
-  </p>
-  <div class="bd-toc-item navbar-nav">
-    <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="guidelines.html">8.1. General Guidelines</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">8.2. Testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">8.3. Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packaging.html">8.4. Packaging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="future_features.html">8.5. Future Features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">8.6. Changelog</a></li>
-</ul>
 
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
   </div>
-</nav></div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functionality-testing">7.1.1. Functionality Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coverage-testing">7.1.2. Coverage Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#benchmark-testing">7.1.3. Benchmark Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-cases">7.1.4. Test Cases</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-testing">7.1.5. Documentation Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-version-testing">7.1.6. Python Version Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#platform-testing">7.1.7. Platform Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#github-workflows">7.1.8. Github Workflows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-tests">7.1.9. Manual Tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tox-configuration-in-tox-ini">7.1.10. Tox configuration in tox.ini</a></li>
+</ul>
+  </nav></div>
 
 </div></div>
               
@@ -679,8 +775,8 @@ commands =
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -688,17 +784,19 @@ commands =
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
-      © Copyright 2022, Damian Mendroch.
+      © Copyright 2025, Damian Mendroch.
       <br/>
     
   </p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -706,10 +804,13 @@ commands =
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

@@ -26,7 +26,7 @@ A more mathematical descriptions of biasedness can be found here: :footcite:`Scr
 
 **Stratified Sampling:** One of many low discrepancy methods. Random values are chosen from a set of sub-groups.
 It is guaranteed, that values are chosen from every sub-group (e.g. different intervals), but the values inside each sub-group are chosen randomly (e.g. random positions inside each interval).
-Details on the implementation in `optrace` are discussed in :numref:`stratified_sampling`.
+Details on the implementation in optrace are discussed in :numref:`stratified_sampling`.
 
 **Inverse Transform Sampling:** Generating non-uniform random numbers according to a known distribution function by utilizing the inverse transform method.
 See below for a mathematical definition.
@@ -194,16 +194,19 @@ A comparison to simple sampling (white noise generation) can be found in the fol
 A reduction in noise is clearly visible.
 
 .. list-table::
+   :class: table-borderless
 
-   * - .. figure:: ../images/rect_simple_sampling.svg
+   * - .. figure:: ../images/rect_simple_sampling.webp
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays on a square area with simple uniform sampling, image rendered with 189 x 189 pixel
 
-     - .. figure:: ../images/rect_strat_sampling.svg
+     - .. figure:: ../images/rect_strat_sampling.webp
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays on a square area with two dimensional stratified sampling, image rendered with 189 x 189 pixel
 
@@ -220,16 +223,19 @@ Stratified sampling generates a rectangular grid, but for a circular surface thi
 While this done uniformly in :numref:`circle_sampling`, there are some circular artefacts visible, especially at the center.
 
 .. list-table::
+   :class: table-borderless
 
-   * - .. figure:: ../images/circ_sampling_strat.svg
+   * - .. figure:: ../images/circ_sampling_strat.webp
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays with stratified sampling and a polar grid transformation as done in :numref:`circle_sampling`, image rendered with 189 x 189 pixel
 
-     - .. figure:: ../images/circ_sampling_mapping.svg
+     - .. figure:: ../images/circ_sampling_mapping.webp
           :align: center
           :width: 450
+          :class: dark-light
 
           200k rays on a circular area with positions mapped from stratified grid, 
           image rendered with 189 x 189 pixel
@@ -245,7 +251,7 @@ This is especially important as the center of the disc typically lies at the opt
 Reducing those artefacts is done by first sampling a square grid that then gets mapped onto a disc.
 The difference is that using special mapping methods the square cells comparatively get less distorted, or alternatively get distorted more uniformly. Note that equi-areal mapping methods are needed, since we want to keep the point density and uniformity of the noise.
 
-One such method is the Square-Disc Mapping method from :footcite:p:`doi:10.1080/10867651.1997.10487479`. `optrace` implements a simplified method from :footcite:`ShirleyCode`.
+One such method is the Square-Disc Mapping method from :footcite:p:`doi:10.1080/10867651.1997.10487479`. optrace implements a simplified method from :footcite:`ShirleyCode`.
 
 
 Sampled grid values :math:`x,~y` lie inside a grid with bounds :math:`(-r_\text{o}, ~r_\text{o}, ~-r_\text{o}, ~r_\text{o})` and get transformed to radial disc coordinates using:
@@ -310,6 +316,7 @@ However, :math:`s_x,~s_y` are not parallel to the cartesian :math:`x,y,z` axes, 
 .. figure:: ../images/direction_cone.svg
    :width: 450
    :align: center
+   :class: dark-light
 
    Exemplary direction vector :math:`s` inside a cone volume around :math:`s_0`
 
@@ -420,6 +427,8 @@ For the angle distributions we get:
 This is consistent with :footcite:`ParticleCosine`.
 
 
+.. _polarization_sampling:
+
 Polarization Sampling
 ==========================
 
@@ -446,7 +455,6 @@ The following angle distributions :math:`\mathcal{A}` with :math:`\alpha \in \ma
 
 .. list-table:: Polarization angle modes
    :widths: 150 400
-   :header-rows: 1
    :align: center
    
    * - **x-Polarization**

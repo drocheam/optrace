@@ -8,57 +8,78 @@ Installation
   :language: python
   :class: highlight
 
-This library requires Python 3.10.
+.. role:: bash(code)
+  :language: bash
+  :class: highlight
 
-**Instructions**
+Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 
-#. make sure you have Python 3.10 installed on your system
-#. download/clone the whole project repository. This is the folder that includes the ``optrace``-folder as well as the ``setup.py`` file.
-#. open a terminal in the downloaded folder and run :python:`pip install .` :math:`\leftarrow` Note that the dot is part of the command.
+**Installing the latest official release**
 
-This automatically runs the file ``setup.py``, which provides all the required information for the installation.
-After this, `optrace` should be installed on your system. 
+#. Download the optrace .tar.gz archive from the `latest release <https://github.com/drocheam/optrace/releases/latest>`__
+#. Open a terminal
+#. Run :bash:`pip install <path to archive>`, where :bash:`<path to archive>` is the path to the archive downloaded in the first step
+
+**Installing the current git version**
+
+#. Open a terminal
+#. Clone the whole project repository using git: :bash:`git clone https://github.com/drocheam/optrace/`
+#. Change the directory into the cloned folder: :bash:`cd optrace`
+#. Install using :bash:`pip install .`
+
 
 **External dependencies**
 
+Below you can find a list of external dependencies that will be automatically installed. 
+
 .. list-table:: 
-   :widths: 200 350
+   :widths: 250 600 250
    :header-rows: 1
-   :align: center
+   :align: left
 
    * - Dependency
-     - Needed for/as
+     - Description
+     - License
    * - `chardet <https://chardet.readthedocs.io/en/latest/>`_
      - automatic detection of file encoding
+     - LGPLv2.1
    * - `mayavi <https://docs.enthought.com/mayavi/mayavi/>`_
      - 3D plotting library
+     - BSD 3-Clause
    * - `matplotlib <https://matplotlib.org/stable/users/index>`_
      - 2D plotting library
+     - PSF
    * - `numexpr <https://numexpr.readthedocs.io/en/latest/>`_
      - sped-up and optimized calculations
+     - MIT
    * - `numpy <https://numpy.org/doc/stable/user/index.html#user>`_
      - matrix calculations
-   * - `Pillow <https://pillow.readthedocs.io/en/stable/>`_
-     - image loading and converting
+     - BSD 3-Clause
+   * - `opencv-python-headless <https://pypi.org/project/opencv-python-headless/>`_
+     - image loading, saving and resizing
+     - Apache 2.0
    * - `progressbar2 <https://pypi.org/project/progressbar2/>`_
      - animated progressbar in standard output (terminal)
-   * - `PyQt5 <https://pypi.org/project/PyQt5/>`_
-     - GUI backend for mayavi
+     - BSD 3-Clause
+   * - `pyqtdarktheme-fork <https://pypi.org/project/pyqtdarktheme-fork/>`_
+     - setting a QT dark theme
+     - MIT
+   * - `pyside6 <https://wiki.qt.io/Qt_for_Python>`_
+     - Qt GUI backend
+     - LGPLv3
    * - `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
      - specialized methods for interpolation and math
-   * - `traitsui <https://docs.enthought.com/traitsui/>`_
-     - trait framework for mayavi
-   * - `vtk <https://pypi.org/project/vtk/>`_
-     - 3D toolkit needed for mayavi
+     - BSD 3-Clause
 
 
 **Troubleshooting**
 
-* When mayavi fails installing vtk, try to install vtk first
+* When `mayavi <https://pypi.org/project/mayavi/>`__ fails installing `vtk <https://pypi.org/project/vtk/>`_, try to install vtk first
 
-* When the installation of vtk fails, try to install older wheels from `this repository <https://github.com/pyvista/pyvista-wheels>`__.
+* When the installation of vtk fails, try to install from a list of other wheels as described `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
 
-* Consult the `mayavi issues <https://github.com/enthought/mayavi/issues>`__, `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ or `PyQt5 issues <https://github.com/pyqt/python-qt5/issues>`__ for current problems and solutions
+* Consult the `mayavi issues <https://github.com/enthought/mayavi/issues>`__, `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ or `PySide issues <https://bugreports.qt.io/projects/PYSIDE/issues/>`__ for current problems and solutions
 
-* In many cases forcing the installation of a specific library version circumvents issues of newer releases. The syntax is shown `here <https://stackoverflow.com/a/5226504>`__. Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
+* In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. The syntax is: :bash:`pip install --force-reinstall -v "some-package==1.2.2"`.
+  Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
 

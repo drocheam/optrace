@@ -1,197 +1,305 @@
+.. _usage_convolution: 
+
 PSF Convolution
 ------------------------------------------------------------------------
 
-.. TODO
+.. |RenderImage| replace:: :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`
+.. |LinearImage| replace:: :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`
+.. |RGBImage| replace:: :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>`
 
 .. role:: python(code)
   :language: python
   :class: highlight
 
-.. mock progressbar library, so we have no stdout output for it
 
 .. testsetup:: *
 
-   import sys 
-   import mock
-   sys.modules['progressbar'] = mock.MagicMock()
-
    import optrace as ot
+   ot.global_options.show_progressbar = False
 
 
-Convolving
+Overview
 _______________
 
+Convolution can speed up image formation significantly by parallelizing the effect of a PSF (point spread function) for every object point.
+This results in a nearly noise-free image in a small fraction of the time normally required.
+A PSF is nothing different than the impulse response of the optical system for the given object and image distance combination.
+It changes spatially, but for a small angular range it can be assumed constant.
+However this also implies that many aberration can't be simulated this way (astigmatism, coma, vignette, distortion, ...).
+In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF to an object using the convolution functionality in optrace.
 
-**Usage**
+The convolution approach requires:
 
-.. TODO explain: image side lengths, non-square pixels, different resolutions, image and psf can be file paths, limitations on color images, images must be sRGB
+* the PSF
+* the object image to convolve
+* PSF size
+* object size
+* the system's magnification factor
 
-The image is a sRGB array with dimensions (Ny, Nx, 3) with value range 0-1. Alternatively a filepath to an image file can be provided.
-In contrast, the PSF holds linear power/intensity information and is there a simpler (Ny2, Nx2) shape. Alternatively an RImage object can be used to apply a colored PSF.
+Both colored objects and PSFs are supported.
+Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible solutions. 
+See the details in section :numref:`psf_color_handling`.
 
-Parameters :python:`s_img` and :python:`s_psf` describe the side lengths of both images in millimeters, specified as list of two floats.
+Usage
+____________
 
+**Simple Calls**
+
+A simple call to :func:`convolve <optrace.tracer.convolve.convolve>` required the object and PSF, as well as the magnification factor. 
+
+The object should be either of type |RGBImage| or |LinearImage|, while the PSF should be either |LinearImage| or |RenderImage|.
+For more details on image classes see :numref:`image_classes`.
+Colored PSFs can be only used with class |RenderImage|, as all human visible colors are required for convolution.
+The image objects include the information about their size and position.
+
+This magnification factor is equivalent the magnification factor known from geometrical optics.
+Therefore :math:`\lvert m \rvert > 1` means a magnification and :math:`\lvert m\rvert < 1` an image shrinking.
+:math:`m > 0` is an upright image, while :math:`m < 0` correspond to a flipped image.
+
+Let's define a predefined a image and PSF:
+
+.. testcode::
+
+   img = ot.presets.image.ETDRS_chart_inverted([0.5, 0.5])
+   psf = ot.presets.psf.halo()
+
+You can then call :func:`convolve <optrace.tracer.convolve.convolve>` in the following way:
 
 .. testcode::
 
-   img = ot.presets.image.ETDRS_chart_inverted
-   s_img = [0.5, 0.5]
+   img2 = ot.convolve(img, psf, m=0.5)
 
-   psf, s_psf = ot.presets.psf.halo()
+The function returns the convolved image object :python:`img2`.
+When :python:`img` and :python:`psf` are of type |LinearImage|, :python:`img2` is also a |LinearImage|.
+For all other cases color information is generated and :python:`img2` is a |RGBImage|.
 
+**Slicing and Padding**
 
-The call to :python:`convolve` looks like this:
-
-.. testcode::
-
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf)
-
-The function returns the convolved image :python:`img2`, the new image side lengths :python:`s2`.
-
-Additional parameters for this function include :python:`silent`, which omits all text output like a progressbar and informational messages. :python:`threading=False` disables multithreading and :python:`rendering_intent` defines the used intent for the sRGB conversion.
+While doing a convolution, the output image grows in size by half the PSF size in each direction.
+By providing :python:`keep_size=True` the padded data can be neglected for the resulting image.
 
 .. testcode::
 
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf, silent=True, threading=False, rendering_intent="Perceptual")
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True)
 
+The convolution operation requires the data outside of the image.
+By default, the image is padded with zeros before convolution.
 
-**Restrictions**
-
-* image is a (Ny, Nx, 3) sRGB array or filepath to a sRGB image
-* PSF is either an intensity array or an RImage object
-* the value range should be inside 0-1
-* resolutions must be between 50x50 pixels and 4 megapixels
-* at most one image or PSF has color information
-* the size of the PSF can't be much larger than the image scaled by the magnification factor
-
-
-**Example for Intensity Images**
-
-.. TODO explain that these are not linear intensities
+Other modes are also available.
+For instance, padding with white is done in the following fashion:
 
 .. testcode::
+
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="constant", padding_value=[1, 1, 1])
+
+:python:`padding_value` specifies the values used for constant padding for each channel.
+Depending on type of :python:`img`, it needs to have three or only one element.
+
+To reduce boundary effects, edge padding is a viable choice:
+
+.. testcode::
+
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="edge")
+
+**Color conversion**
+
+The convolution of colored images can produce colors outside of the sRGB gamut.
+To allow for a correct mapping into the gamut, conversion arguments can be provided by the :python:`cargs` argument.
+By default it is set to :python:`dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None)`.
+
+Provide a :python:`cargs` dictionary to override this setting.
+
+.. testcode::
+
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="edge", cargs=dict(rendering_intent="Perceptual"))
+
+The above command overrides the :python:`rendering_intent` while leaving the other default options unchanged.
+
+**Normalization**
+
+When convolving two |LinearImage| objects it is recommended to normalize the PSF integral to 1.
+Doing so, the overall power of the image is preserved.
+
+Restrictions
+_______________________
+
+* it is not possible to convolve two |RGBImage| or two |RenderImage|
+* image and PSF resolutions must be between 50x50 pixels and 4 megapixels
+* the PSF needs to be twice as large as the image scaled with the magnification factor
+* when convolving two colored images, the resulting image is only one possible solution of many
+* :func:`scipy.signal.fftconvolve` is involved, so small numerical errors in dark image regions can appear
+* convolution of sphere projected images (see :numref:`image_sphere_projections`) is prohibited, as distances are non-linear
+
+Examples
+__________________________
+
+**Image Example**
+
+
+.. list-table:: Image convolution from the :ref:`example_psf_imaging` example
+   :class: table-borderless
+
+   * - .. figure:: ../images/example_psf1.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+
    
+     - .. figure:: ../images/example_psf2.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+
+
+.. figure:: ../images/example_psf3.webp
+   :align: center
+   :width: 400
+   :class: dark-light
+
+
+
+**Code Example**
+
+
+The following example loads an image preset and convolves it with a square PSF created as a numpy array.
+
+.. testcode::
+  
    import numpy as np
 
-   # intensity function
-   X, Y = np.mgrid[-1:1:200j, -1:1:200j]  # data grid
-   img = np.sin(30*X**2)**2 + Y**2  # data function
-   
-   # make a sRGB array
-   img = np.repeat(img[:, :, np.newaxis], 3, axis=2)  # repeat so we have three channels
-   img = ot.color.srgb_linear_to_srgb(img)  # convert intensities to sRGB (gamma correction)
+   # load image preset
+   img = ot.presets.image.ETDRS_chart_inverted([0.9, 0.9])
 
-   # image size
-   s_img = [0.9, 0.9]
-  
    # square psf
-   psf = np.zeros((200, 200))
-   psf[50:150, 50:150] = 1
+   psf_data = np.zeros((200, 200))
+   psf_data[50:150, 50:150] = 1
 
-   # psf size
-   s_psf = [0.1, 0.08]
+   psf = ot.LinearImage(psf_data, [0.1, 0.08])
 
    # convolution
-   img2, s2 = ot.convolve(img, s_img, psf, s_psf)
-
-
-Image Plotting
-________________
-
-
-.. testcode::
-
-   import optrace.plots as otp
-
-.. testcode::
-   :hide:
-
-   import matplotlib.pyplot as plt
-   plt.close("all")
-
-
-.. testcode::
-
-   otp.image_plot(img, s_img)
-
-.. testcode::
-
-   otp.image_plot(img, s_img, title="Input Image", flip=True, block=False)
-
+   img2 = ot.convolve(img, psf, m=-1.75)
 
 
 Presets
 _____________________
 
+The are multiple PSF presets available.
+
+All presets are normalized such that the integral image sum equals 1.
 
 **Circle**
 
+A circular PSF is defined with the :python:`d` circle parameter.
+
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.circle(d=3.5) 
+   psf = ot.presets.psf.circle(d=3.5) 
 
 **Gaussian**
 
+A simple Gaussian intensity distribution is described as:
+
+.. math::
+
+   I_{\sigma}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)
+
+The shape parameter :python:`sig` defines the Gaussian's standard deviation:
+
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.gaussian(d=2.0) 
+   psf = ot.presets.psf.gaussian(sig=2.0) 
 
 **Airy**
 
+The Airy function is:
+
+.. math::
+
+   I_{d}(x, y) = \left( \frac{2 J_1(r_d)}{r_d} \right)^2
+
+.. math::
+
+   r_d = 3.8317 \frac{\sqrt{x^2 + y^2}}{r}
+
+Where :math:`J_1` is the Bessel function of the first kind of order 1.
+The resolution limit :python:`r` is described as distance from the center to the first root.
+
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.airy(d=2.0) 
+   psf = ot.presets.psf.airy(r=2.0) 
 
 **Glare**
 
+A glare is modelled as two different Gaussians, a broad and a narrow one
+Parameter :math:`a` describes the relative intensity of the larger one.
+
+.. math::
+
+  I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
+
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.glare(d1=2.0, d2=3.5, a=0.05) 
+   psf = ot.presets.psf.glare(sig1=2.0, sig2=3.5, a=0.05) 
 
 
 **Halo**
 
+A halo is modelled as a central Gaussian and annular Gaussian function around :math:`r`.
+:math:`\sigma_1, \sigma_2` describe the standard deviations of both.
+:math:`a` describes the intensity of the ring.
+
+.. math::
+
+   I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
+
 .. testcode::
 
-   psf, s_psf = ot.presets.psf.halo(d1=2.0, d2=3.5, a=0.05, w=0.1) 
+   psf = ot.presets.psf.halo(sig1=0.5, sig2=0.25, r=3.5, a=0.05) 
 
 
+.. _psf_preset_gallery:
 
 Preset Gallery
 _____________________
 
 
-.. list-table:: PSF presets
+.. list-table:: PSF presets with default parameters. Plotted with human brightness perception. 
+   :class: table-borderless
 
    * - .. figure:: ../images/psf_circle.svg
           :align: center
           :width: 400
+          :class: dark-light
 
-          Circle PSF with standard parameters.
+          Exemplary Circle PSF.
    
      - .. figure:: ../images/psf_gaussian.svg
           :align: center
           :width: 400
+          :class: dark-light
 
-          Gaussian PSF with standard parameters.
+          Exemplary Gaussian PSF.
 
    * - .. figure:: ../images/psf_airy.svg
           :align: center
           :width: 400
+          :class: dark-light
 
-          Airy PSF with standard parameters.
+          Exemplary Airy PSF.
    
      - .. figure:: ../images/psf_halo.svg
           :align: center
           :width: 400
+          :class: dark-light
 
-          Halo PSF with standard parameters.
+          Exemplary Halo PSF.
    
    * - .. figure:: ../images/psf_glare.svg
           :align: center
           :width: 400
+          :class: dark-light
 
-          Glare PSF with standard parameters.
+          Exemplary Glare PSF.
 
      - 
 

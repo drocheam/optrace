@@ -1,75 +1,69 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="./" data-theme="dark">
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; optrace 1.4.3 documentation</title>
+    <title>Index &#8212; optrace 1.6.4 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=964979e3" />
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
-  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script src="_static/documentation_options.js?v=8ea99608"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+  <div id="pst-scroll-pixel-helper"></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -77,7 +71,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -85,18 +78,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
+  
+    
   
 
 <a class="navbar-brand logo" href="index.html">
@@ -105,88 +107,78 @@
   
   
   
-    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+    <p class="title logo__title">optrace 1.6.4 documentation</p>
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="library/library.html">
+    Code Reference
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="development/development.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -198,28 +190,24 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -230,8 +218,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -241,29 +229,30 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -272,80 +261,63 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="quickstart.html">
+    Quickstart
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="development/development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
-            
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="library/library.html">
+    Code Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="development/development.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -354,17 +326,14 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -375,8 +344,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -386,26 +355,31 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article"></div>
+              <div class="bd-header-article d-print-none"></div>
               
               
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
 
 <h1 id="index">Index</h1>
@@ -494,25 +468,21 @@ document.write(`
       </ul></li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.abcd">abcd (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MEDIA_TRANS">ABSORB_MEDIA_TRANS (optrace.tracer.raytracer.Raytracer.INFOS attribute)</a>
-</li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.absorb_missing">absorb_missing (optrace.gui.trace_gui.TraceGUI attribute)</a>
-
-      <ul>
-        <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.absorb_missing">(optrace.tracer.raytracer.Raytracer attribute)</a>
-</li>
-      </ul></li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING">ABSORB_MISSING (optrace.tracer.raytracer.Raytracer.INFOS attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.activate_filter">activate_filter (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.add">add() (optrace.tracer.geometry.group.Group method)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.af_one_source">af_one_source (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_button">add_custom_button() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.load.agf">agf() (in module optrace.tracer.load)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_checkbox">add_custom_checkbox() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_selection">add_custom_selection() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value">add_custom_value() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.air">air (in module optrace.tracer.presets.refraction_index)</a>
 </li>
@@ -536,17 +506,19 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.apertures">apertures (optrace.tracer.geometry.group.Group attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.Apx">Apx (optrace.tracer.r_image.RImage property)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.base_image.BaseImage.Apx">Apx (optrace.tracer.image.base_image.BaseImage property)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.Apx">(optrace.tracer.image.render_image.RenderImage property)</a>
 </li>
+      </ul></li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.geometry.arizona_eye">arizona_eye() (in module optrace.tracer.presets.geometry)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface">AsphericSurface (class in optrace.tracer.geometry.surface.aspheric_surface)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.autofocus">autofocus() (optrace.tracer.raytracer.Raytracer method)</a>
+      <li><a href="library/optrace_global_module.html#optrace.metadata.author">author (in module optrace.metadata)</a>
 </li>
-      <li><a href="library/optrace_plots.html#optrace.plots.misc_plots.autofocus_cost_plot">autofocus_cost_plot() (in module optrace.plots.misc_plots)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.autofocus_methods">autofocus_methods (optrace.tracer.raytracer.Raytracer attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.command_window.CommandWindow.automatic_replot">automatic_replot (optrace.gui.command_window.CommandWindow attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -564,6 +536,8 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.base_class.BaseClass">BaseClass (class in optrace.tracer.base_class)</a>
 </li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.base_image.BaseImage">BaseImage (class in optrace.tracer.image.base_image)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.BASF64">BASF64 (in module optrace.tracer.presets.refraction_index)</a>
@@ -573,6 +547,8 @@ document.write(`
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.BK7">BK7 (in module optrace.tracer.presets.refraction_index)</a>
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.tools.blackbody">blackbody() (in module optrace.tracer.color.tools)</a>
+</li>
+      <li><a href="library/optrace_plots.html#optrace.plots.misc_plots.block">block() (in module optrace.plots.misc_plots)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume">BoxVolume (class in optrace.tracer.geometry.volume.box_volume)</a>
 </li>
@@ -598,11 +574,9 @@ document.write(`
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.card_dict">card_dict (optrace.gui.property_browser.PropertyBrowser attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.cell">cell (in module optrace.tracer.presets.image)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.cell">cell() (in module optrace.tracer.presets.image)</a>
 </li>
       <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength">centroid_wavelength() (optrace.tracer.spectrum.light_spectrum.LightSpectrum method)</a>
-</li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.change_label_orientation">change_label_orientation() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_above">check_above() (optrace.tracer.misc.PropertyChecker static method)</a>
 </li>
@@ -614,6 +588,8 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_if_element">check_if_element() (optrace.tracer.misc.PropertyChecker static method)</a>
 </li>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.check_if_rays_are_current">check_if_rays_are_current() (optrace.tracer.raytracer.Raytracer method)</a>
+</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_none_or_callable">check_none_or_callable() (optrace.tracer.misc.PropertyChecker static method)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_not_above">check_not_above() (optrace.tracer.misc.PropertyChecker static method)</a>
@@ -621,8 +597,6 @@ document.write(`
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_not_below">check_not_below() (optrace.tracer.misc.PropertyChecker static method)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.PropertyChecker.check_type">check_type() (optrace.tracer.misc.PropertyChecker static method)</a>
-</li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.checkerboard">checkerboard (in module optrace.tracer.presets.image)</a>
 </li>
       <li><a href="library/optrace_plots.html#optrace.plots.chromaticity_plots.chromaticities_cie_1931">chromaticities_cie_1931() (in module optrace.plots.chromaticity_plots)</a>
 </li>
@@ -634,6 +608,8 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.circular_surface.CircularSurface">CircularSurface (class in optrace.tracer.geometry.surface.circular_surface)</a>
 </li>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions">ClassGlobalOptions (class in optrace.global_options)</a>
+</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.clear">clear() (optrace.tracer.geometry.group.Group method)</a>
 
       <ul>
@@ -644,8 +620,6 @@ document.write(`
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.close">close() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.COC">COC (in module optrace.tracer.presets.refraction_index)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.coeff_count">coeff_count (optrace.tracer.refraction_index.RefractionIndex attribute)</a>
@@ -660,15 +634,13 @@ document.write(`
         <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.color">(optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum method)</a>
 </li>
       </ul></li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.color_checker">color_checker (in module optrace.tracer.presets.image)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.color_checker">color_checker() (in module optrace.tracer.presets.image)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_type">coloring_type (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_mode">coloring_mode (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_types">coloring_types (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.command_dont_replot">command_dont_replot (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.command_dont_skip">command_dont_skip (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_modes">coloring_modes (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.command_window.CommandWindow">CommandWindow (class in optrace.gui.command_window)</a>
 </li>
@@ -681,6 +653,8 @@ document.write(`
 </li>
       </ul></li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface">ConicSurface (class in optrace.tracer.geometry.surface.conic_surface)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.control">control() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.convolve.convolve">convolve() (in module optrace.tracer.convolve)</a>
 </li>
@@ -698,11 +672,29 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.cross">cross() (in module optrace.tracer.misc)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.cut">cut() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_button_action_1">custom_button_action_1() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.cut_dimension">cut_dimension (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_button_action_2">custom_button_action_2() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.cut_value">cut_value (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_button_action_3">custom_button_action_3() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_checkbox_1">custom_checkbox_1 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_checkbox_2">custom_checkbox_2 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_checkbox_3">custom_checkbox_3 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_selection_1">custom_selection_1 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_selection_2">custom_selection_2 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_selection_3">custom_selection_3 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_value_1">custom_value_1 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_value_2">custom_value_2 (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.custom_value_3">custom_value_3 (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.cylinder_surface">cylinder_surface() (optrace.tracer.geometry.element.Element method)</a>
 </li>
@@ -740,6 +732,12 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.d75_illuminant">d75_illuminant() (in module optrace.tracer.color.illuminants)</a>
 </li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.base_image.BaseImage.data">data (optrace.tracer.image.base_image.BaseImage property)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.data">(optrace.tracer.image.render_image.RenderImage property)</a>
+</li>
+      </ul></li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D">DataSurface1D (class in optrace.tracer.geometry.surface.data_surface_1d)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D">DataSurface2D (class in optrace.tracer.geometry.surface.data_surface_2d)</a>
@@ -748,31 +746,45 @@ document.write(`
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.debug">debug() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
+      <li><a href="library/optrace_global_module.html#optrace.metadata.description">description (in module optrace.metadata)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.det_image_one_source">det_image_one_source (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.det_spectrum_one_source">det_spectrum_one_source (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector">Detector (class in optrace.tracer.geometry.detector)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_image">detector_image() (optrace.tracer.raytracer.Raytracer method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image">detector_image() (optrace.gui.trace_gui.TraceGUI method)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_image">(optrace.tracer.raytracer.Raytracer method)</a>
+</li>
+      </ul></li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image_single_source">detector_image_single_source (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_names">detector_names (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_profile">detector_profile() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection">detector_selection (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_spectrum">detector_spectrum() (optrace.tracer.raytracer.Raytracer method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum">detector_spectrum() (optrace.gui.trace_gui.TraceGUI method)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.detector_spectrum">(optrace.tracer.raytracer.Raytracer method)</a>
+</li>
+      </ul></li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source">detector_spectrum_single_source (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.detectors">detectors (optrace.tracer.geometry.group.Group attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.diamond">diamond (in module optrace.tracer.presets.refraction_index)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.display_modes">display_modes (optrace.tracer.r_image.RImage attribute)</a>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.direction_vectors">direction_vectors() (optrace.tracer.ray_storage.RayStorage method)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.divergences">divergences (optrace.tracer.geometry.ray_source.RaySource attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.dn">dn (optrace.tracer.geometry.surface.surface.Surface property)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.documents">documents() (in module optrace.tracer.presets.image)</a>
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.xyz.dominant_wavelength">dominant_wavelength() (in module optrace.tracer.color.xyz)</a>
 
@@ -812,17 +824,15 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.elements">elements (optrace.tracer.geometry.group.Group property)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.EPS">EPS (optrace.tracer.r_image.RImage attribute)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.EPS">EPS (optrace.tracer.image.render_image.RenderImage attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.ETDRS_chart">ETDRS_chart (in module optrace.tracer.presets.image)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.ETDRS_chart">ETDRS_chart() (in module optrace.tracer.presets.image)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.ETDRS_chart_inverted">ETDRS_chart_inverted (in module optrace.tracer.presets.image)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.ETDRS_chart_inverted">ETDRS_chart_inverted() (in module optrace.tracer.presets.image)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.ethanol">ethanol (in module optrace.tracer.presets.refraction_index)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.export_png">export_png() (optrace.tracer.r_image.RImage method)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.extent">extent (optrace.tracer.geometry.element.Element property)</a>
 
@@ -837,11 +847,13 @@ document.write(`
 </li>
         <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.extent">(optrace.tracer.geometry.surface.surface.Surface property)</a>
 </li>
-        <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.extent">(optrace.tracer.r_image.RImage attribute)</a>
+        <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.extent">(optrace.tracer.image.render_image.RenderImage attribute)</a>
 </li>
         <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.extent">(optrace.tracer.raytracer.Raytracer property)</a>
 </li>
       </ul></li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.eye_test_vintage">eye_test_vintage() (in module optrace.tracer.presets.image)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -850,7 +862,19 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.F">F (in module optrace.tracer.presets.spectral_lines)</a>
 </li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.f11">f11 (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.f11_illuminant">f11_illuminant() (in module optrace.tracer.color.illuminants)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.f2">f2 (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.F2">F2 (in module optrace.tracer.presets.refraction_index)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.f2_illuminant">f2_illuminant() (in module optrace.tracer.color.illuminants)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.f7">f7 (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.f7_illuminant">f7_illuminant() (in module optrace.tracer.color.illuminants)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.F_">F_ (in module optrace.tracer.presets.spectral_lines)</a>
 </li>
@@ -892,21 +916,9 @@ document.write(`
         <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.find_hit">(optrace.tracer.geometry.surface.tilted_surface.TiltedSurface method)</a>
 </li>
       </ul></li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.FK51A">FK51A (in module optrace.tracer.presets.refraction_index)</a>
-</li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.fl11">fl11 (in module optrace.tracer.presets.light_spectrum)</a>
-</li>
-      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.fl11_illuminant">fl11_illuminant() (in module optrace.tracer.color.illuminants)</a>
-</li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.fl2">fl2 (in module optrace.tracer.presets.light_spectrum)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.fl2_illuminant">fl2_illuminant() (in module optrace.tracer.color.illuminants)</a>
-</li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.fl7">fl7 (in module optrace.tracer.presets.light_spectrum)</a>
-</li>
-      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.fl7_illuminant">fl7_illuminant() (in module optrace.tracer.color.illuminants)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.FK51A">FK51A (in module optrace.tracer.presets.refraction_index)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.flip">flip() (optrace.tracer.geometry.element.Element method)</a>
 
@@ -932,7 +944,7 @@ document.write(`
         <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.flip">(optrace.tracer.geometry.surface.tilted_surface.TiltedSurface method)</a>
 </li>
       </ul></li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.flip_det_image">flip_det_image (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.flip_detector_image">flip_detector_image (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths">focal_lengths (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
 </li>
@@ -940,9 +952,17 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_points">focal_points (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_cost_plot">focus_cost_plot (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.focus_search">focus_search() (optrace.tracer.raytracer.Raytracer method)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_type">focus_type (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_plots.html#optrace.plots.misc_plots.focus_search_cost_plot">focus_search_cost_plot() (in module optrace.plots.misc_plots)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_search_method">focus_search_method (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.focus_search_methods">focus_search_methods (optrace.tracer.raytracer.Raytracer attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_search_single_source">focus_search_single_source (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.fruits">fruits() (in module optrace.tracer.presets.image)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D">FunctionSurface1D (class in optrace.tracer.geometry.surface.function_surface_1d)</a>
 </li>
@@ -960,13 +980,17 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.g">g (in module optrace.tracer.presets.spectral_lines)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.garbage_collector_stats">garbage_collector_stats (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.srgb.gauss">gauss() (in module optrace.tracer.color.srgb)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.psf.gaussian">gaussian() (in module optrace.tracer.presets.psf)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.get">get() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.geometry_error">geometry_error (optrace.tracer.raytracer.Raytracer attribute)</a>
+</li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.get">get() (optrace.tracer.image.render_image.RenderImage method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.get_camera">get_camera() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.srgb.get_chroma_scale">get_chroma_scale() (in module optrace.tracer.color.srgb)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.base_class.BaseClass.get_desc">get_desc() (optrace.tracer.base_class.BaseClass method)</a>
 
@@ -984,9 +1008,11 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.glasses">glasses (in module optrace.tracer.presets.refraction_index)</a>
 </li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.grid">grid() (in module optrace.tracer.presets.image)</a>
+</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group">Group (class in optrace.tracer.geometry.group)</a>
 </li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.group_photo">group_photo (in module optrace.tracer.presets.image)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.group_photo">group_photo() (in module optrace.tracer.presets.image)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1000,13 +1026,19 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.has">has() (optrace.tracer.geometry.group.Group method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.has_back">has_back() (optrace.tracer.geometry.element.Element method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.has_image">has_image() (optrace.tracer.r_image.RImage method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.tools.has_color">has_color() (in module optrace.tracer.color.tools)</a>
+</li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.has_image">has_image() (optrace.tracer.image.render_image.RenderImage method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.hide_labels">hide_labels (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.high_contrast">high_contrast (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.hong_kong">hong_kong() (in module optrace.tracer.presets.image)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1020,15 +1052,21 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens">IdealLens (class in optrace.tracer.geometry.ideal_lens)</a>
 </li>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND">ILL_COND (optrace.tracer.raytracer.Raytracer.INFOS attribute)</a>
+</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.image_magnification">image_magnification() (optrace.tracer.transfer_matrix_analysis.TMA method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_mode">image_mode (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.image_modes">image_modes (optrace.tracer.image.render_image.RenderImage attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_pixels">image_pixels (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-      <li><a href="library/optrace_plots.html#optrace.plots.misc_plots.image_plot">image_plot() (in module optrace.plots.misc_plots)</a>
+      <li><a href="library/optrace_plots.html#optrace.plots.image_plots.image_plot">image_plot() (in module optrace.plots.image_plots)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.image_position">image_position() (optrace.tracer.transfer_matrix_analysis.TMA method)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_type">image_type (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_plots.html#optrace.plots.image_plots.image_profile_plot">image_profile_plot() (in module optrace.plots.image_plots)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.info">info (optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface property)</a>
 
@@ -1050,7 +1088,7 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.init">init() (optrace.tracer.ray_storage.RayStorage method)</a>
 </li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.interior">interior (in module optrace.tracer.presets.image)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.interior">interior() (in module optrace.tracer.presets.image)</a>
 </li>
       <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum.is_continuous">is_continuous() (optrace.tracer.spectrum.spectrum.Spectrum method)</a>
 </li>
@@ -1074,7 +1112,7 @@ document.write(`
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.K">K (optrace.tracer.r_image.RImage attribute)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.K">K (optrace.tracer.image.render_image.RenderImage attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1092,7 +1130,7 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LAK8">LAK8 (in module optrace.tracer.presets.refraction_index)</a>
 </li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.landscape">landscape (in module optrace.tracer.presets.image)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.landscape">landscape() (in module optrace.tracer.presets.image)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LASF44">LASF44 (in module optrace.tracer.presets.refraction_index)</a>
 </li>
@@ -1118,44 +1156,66 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.led_b5_illuminant">led_b5_illuminant() (in module optrace.tracer.color.illuminants)</a>
 </li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_bh1">led_bh1 (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.led_bh1_illuminant">led_bh1_illuminant() (in module optrace.tracer.color.illuminants)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_rgb1">led_rgb1 (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.led_rgb1_illuminant">led_rgb1_illuminant() (in module optrace.tracer.color.illuminants)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_v1">led_v1 (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.led_v1_illuminant">led_v1_illuminant() (in module optrace.tracer.color.illuminants)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.led_v2">led_v2 (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.illuminants.led_v2_illuminant">led_v2_illuminant() (in module optrace.tracer.color.illuminants)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.legend_title">legend_title (optrace.gui.property_browser.PropertyBrowser attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.geometry.legrand_eye">legrand_eye() (in module optrace.tracer.presets.geometry)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens">Lens (class in optrace.tracer.geometry.lens)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.lenses">lenses (optrace.tracer.geometry.group.Group attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.LF5">LF5 (in module optrace.tracer.presets.refraction_index)</a>
 </li>
+      <li><a href="library/optrace_global_module.html#optrace.metadata.license">license (in module optrace.metadata)</a>
+</li>
       <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum">LightSpectrum (class in optrace.tracer.spectrum.light_spectrum)</a>
 </li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.limit">limit (optrace.tracer.image.render_image.RenderImage property)</a>
+</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line">Line (class in optrace.tracer.geometry.line)</a>
+</li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage">LinearImage (class in optrace.tracer.image.linear_image)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker">LineMarker (class in optrace.tracer.geometry.marker.line_marker)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.lines">lines (in module optrace.tracer.presets.light_spectrum)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.load">load() (optrace.tracer.r_image.RImage static method)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.load">load() (optrace.tracer.image.render_image.RenderImage static method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.misc.load_image">load_image() (in module optrace.tracer.misc)</a>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.load.load_agf">load_agf() (in module optrace.tracer.load)</a>
+</li>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.load.load_zmx">load_zmx() (in module optrace.tracer.load)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.base_class.BaseClass.lock">lock() (optrace.tracer.base_class.BaseClass method)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.log_image">log_image (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.srgb.log_srgb_linear">log_srgb_linear() (in module optrace.tracer.color.srgb)</a>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.srgb.log_srgb">log_srgb() (in module optrace.tracer.color.srgb)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.luminous_power">luminous_power() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.luminous_power">luminous_power() (optrace.tracer.image.render_image.RenderImage method)</a>
 
       <ul>
         <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.luminous_power">(optrace.tracer.spectrum.light_spectrum.LightSpectrum method)</a>
 </li>
       </ul></li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.luv">luv() (optrace.tracer.r_image.RImage method)</a>
-</li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.luv.luv_chroma">luv_chroma() (in module optrace.tracer.color.luv)</a>
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.luv.luv_hue">luv_hue() (in module optrace.tracer.color.luv)</a>
@@ -1186,11 +1246,11 @@ document.write(`
       </ul></li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.matrix_at">matrix_at() (optrace.tracer.transfer_matrix_analysis.TMA method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.MAX_IMAGE_RATIO">MAX_IMAGE_RATIO (optrace.tracer.r_image.RImage attribute)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_RATIO">MAX_IMAGE_RATIO (optrace.tracer.image.render_image.RenderImage attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.MAX_IMAGE_SIDE">MAX_IMAGE_SIDE (optrace.tracer.r_image.RImage attribute)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_SIDE">MAX_IMAGE_SIDE (optrace.tracer.image.render_image.RenderImage attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.MAX_RAYS">MAX_RAYS (optrace.tracer.raytracer.Raytracer attribute)</a>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM">MAX_RAY_STORAGE_RAM (optrace.tracer.raytracer.Raytracer attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.maximize_scene">maximize_scene (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
@@ -1204,6 +1264,8 @@ document.write(`
     module
 
       <ul>
+        <li><a href="library/optrace_global_module.html#module-optrace.global_options">optrace.global_options</a>
+</li>
         <li><a href="library/optrace_gui.html#module-optrace.gui">optrace.gui</a>
 </li>
         <li><a href="library/optrace_gui.html#module-optrace.gui.command_window">optrace.gui.command_window</a>
@@ -1212,13 +1274,15 @@ document.write(`
 </li>
         <li><a href="library/optrace_gui.html#module-optrace.gui.trace_gui">optrace.gui.trace_gui</a>
 </li>
+        <li><a href="library/optrace_global_module.html#module-optrace.metadata">optrace.metadata</a>
+</li>
         <li><a href="library/optrace_plots.html#module-optrace.plots">optrace.plots</a>
 </li>
         <li><a href="library/optrace_plots.html#module-optrace.plots.chromaticity_plots">optrace.plots.chromaticity_plots</a>
 </li>
-        <li><a href="library/optrace_plots.html#module-optrace.plots.misc_plots">optrace.plots.misc_plots</a>
+        <li><a href="library/optrace_plots.html#module-optrace.plots.image_plots">optrace.plots.image_plots</a>
 </li>
-        <li><a href="library/optrace_plots.html#module-optrace.plots.r_image_plots">optrace.plots.r_image_plots</a>
+        <li><a href="library/optrace_plots.html#module-optrace.plots.misc_plots">optrace.plots.misc_plots</a>
 </li>
         <li><a href="library/optrace_plots.html#module-optrace.plots.spectrum_plots">optrace.plots.spectrum_plots</a>
 </li>
@@ -1302,6 +1366,16 @@ document.write(`
 </li>
         <li><a href="library/optrace_tracer_geometry.html#module-optrace.tracer.geometry.volume.volume">optrace.tracer.geometry.volume.volume</a>
 </li>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image">optrace.tracer.image</a>
+</li>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.base_image">optrace.tracer.image.base_image</a>
+</li>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.linear_image">optrace.tracer.image.linear_image</a>
+</li>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.render_image">optrace.tracer.image.render_image</a>
+</li>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.rgb_image">optrace.tracer.image.rgb_image</a>
+</li>
         <li><a href="library/optrace_tracer.html#module-optrace.tracer.load">optrace.tracer.load</a>
 </li>
         <li><a href="library/optrace_tracer.html#module-optrace.tracer.misc">optrace.tracer.misc</a>
@@ -1322,8 +1396,6 @@ document.write(`
 </li>
         <li><a href="library/optrace_tracer_presets.html#module-optrace.tracer.presets.spectrum">optrace.tracer.presets.spectrum</a>
 </li>
-        <li><a href="library/optrace_tracer.html#module-optrace.tracer.r_image">optrace.tracer.r_image</a>
-</li>
         <li><a href="library/optrace_tracer.html#module-optrace.tracer.ray_storage">optrace.tracer.ray_storage</a>
 </li>
         <li><a href="library/optrace_tracer.html#module-optrace.tracer.raytracer">optrace.tracer.raytracer</a>
@@ -1339,6 +1411,8 @@ document.write(`
         <li><a href="library/optrace_tracer_spectrum.html#module-optrace.tracer.spectrum.transmission_spectrum">optrace.tracer.spectrum.transmission_spectrum</a>
 </li>
         <li><a href="library/optrace_tracer.html#module-optrace.tracer.transfer_matrix_analysis">optrace.tracer.transfer_matrix_analysis</a>
+</li>
+        <li><a href="library/optrace_global_module.html#module-optrace.warnings">optrace.warnings</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1359,18 +1433,16 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.MR7">MR7 (in module optrace.tracer.presets.refraction_index)</a>
 </li>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.multithreading">multithreading (optrace.global_options.ClassGlobalOptions attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.N">N (optrace.tracer.r_image.RImage property)</a>
-
-      <ul>
-        <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.N">(optrace.tracer.ray_storage.RayStorage property)</a>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.N">N (optrace.tracer.ray_storage.RayStorage property)</a>
 </li>
-      </ul></li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.n0">n0 (optrace.tracer.geometry.group.Group attribute)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.n1">n1 (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
@@ -1389,10 +1461,16 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex.n_types">n_types (optrace.tracer.refraction_index.RefractionIndex attribute)</a>
 </li>
+      <li><a href="library/optrace_global_module.html#optrace.metadata.name">name (in module optrace.metadata)</a>
+</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.no_pol">no_pol (optrace.tracer.raytracer.Raytracer attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.no_progressbar">no_progressbar() (optrace.global_options.ClassGlobalOptions method)</a>
+</li>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.no_warnings">no_warnings() (optrace.global_options.ClassGlobalOptions method)</a>
+</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.nodal_points">nodal_points (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.normalize">normalize() (in module optrace.tracer.misc)</a>
@@ -1413,10 +1491,6 @@ document.write(`
       </ul></li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.Nt">Nt (optrace.tracer.ray_storage.RayStorage property)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.Nx">Nx (optrace.tracer.r_image.RImage property)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.Ny">Ny (optrace.tracer.r_image.RImage property)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -1427,10 +1501,6 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.object_position">object_position() (optrace.tracer.transfer_matrix_analysis.TMA method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ONLY_HIT_BACK">ONLY_HIT_BACK (optrace.tracer.raytracer.Raytracer.INFOS attribute)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ONLY_HIT_FRONT">ONLY_HIT_FRONT (optrace.tracer.raytracer.Raytracer.INFOS attribute)</a>
-</li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_command_window">open_command_window() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_property_browser">open_property_browser() (optrace.gui.trace_gui.TraceGUI method)</a>
@@ -1439,6 +1509,13 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.optical_lengths">optical_lengths() (optrace.tracer.ray_storage.RayStorage method)</a>
 </li>
+      <li>
+    optrace.global_options
+
+      <ul>
+        <li><a href="library/optrace_global_module.html#module-optrace.global_options">module</a>
+</li>
+      </ul></li>
       <li>
     optrace.gui
 
@@ -1468,6 +1545,13 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    optrace.metadata
+
+      <ul>
+        <li><a href="library/optrace_global_module.html#module-optrace.metadata">module</a>
+</li>
+      </ul></li>
+      <li>
     optrace.plots
 
       <ul>
@@ -1482,17 +1566,17 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    optrace.plots.image_plots
+
+      <ul>
+        <li><a href="library/optrace_plots.html#module-optrace.plots.image_plots">module</a>
+</li>
+      </ul></li>
+      <li>
     optrace.plots.misc_plots
 
       <ul>
         <li><a href="library/optrace_plots.html#module-optrace.plots.misc_plots">module</a>
-</li>
-      </ul></li>
-      <li>
-    optrace.plots.r_image_plots
-
-      <ul>
-        <li><a href="library/optrace_plots.html#module-optrace.plots.r_image_plots">module</a>
 </li>
       </ul></li>
       <li>
@@ -1670,8 +1754,6 @@ document.write(`
         <li><a href="library/optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     optrace.tracer.geometry.surface.aspheric_surface
 
@@ -1693,6 +1775,8 @@ document.write(`
         <li><a href="library/optrace_tracer_geometry_surface.html#module-optrace.tracer.geometry.surface.conic_surface">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     optrace.tracer.geometry.surface.data_surface_1d
 
@@ -1785,6 +1869,41 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    optrace.tracer.image
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image">module</a>
+</li>
+      </ul></li>
+      <li>
+    optrace.tracer.image.base_image
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.base_image">module</a>
+</li>
+      </ul></li>
+      <li>
+    optrace.tracer.image.linear_image
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.linear_image">module</a>
+</li>
+      </ul></li>
+      <li>
+    optrace.tracer.image.render_image
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.render_image">module</a>
+</li>
+      </ul></li>
+      <li>
+    optrace.tracer.image.rgb_image
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#module-optrace.tracer.image.rgb_image">module</a>
+</li>
+      </ul></li>
+      <li>
     optrace.tracer.load
 
       <ul>
@@ -1855,13 +1974,6 @@ document.write(`
 </li>
       </ul></li>
       <li>
-    optrace.tracer.r_image
-
-      <ul>
-        <li><a href="library/optrace_tracer.html#module-optrace.tracer.r_image">module</a>
-</li>
-      </ul></li>
-      <li>
     optrace.tracer.ray_storage
 
       <ul>
@@ -1917,6 +2029,15 @@ document.write(`
         <li><a href="library/optrace_tracer.html#module-optrace.tracer.transfer_matrix_analysis">module</a>
 </li>
       </ul></li>
+      <li>
+    optrace.warnings
+
+      <ul>
+        <li><a href="library/optrace_global_module.html#module-optrace.warnings">module</a>
+</li>
+      </ul></li>
+      <li><a href="library/optrace_global_module.html#optrace.warnings.OptraceWarning">OptraceWarning</a>
+</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.orientations">orientations (optrace.tracer.geometry.ray_source.RaySource attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.Ormex">Ormex (in module optrace.tracer.presets.refraction_index)</a>
@@ -1949,7 +2070,15 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.PET">PET (in module optrace.tracer.presets.refraction_index)</a>
 </li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray">pick_ray() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray_section">pick_ray_section() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.plastics">plastics (in module optrace.tracer.presets.refraction_index)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plot_cost_function">plot_cost_function (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.plot_dark_mode">plot_dark_mode (optrace.global_options.ClassGlobalOptions attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.plotting_mesh">plotting_mesh() (optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface method)</a>
 
@@ -1959,9 +2088,9 @@ document.write(`
         <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.plotting_mesh">(optrace.tracer.geometry.surface.surface.Surface method)</a>
 </li>
       </ul></li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_type">plotting_type (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_mode">plotting_mode (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_types">plotting_types (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_modes">plotting_modes (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.PMMA">PMMA (in module optrace.tracer.presets.refraction_index)</a>
 </li>
@@ -1971,10 +2100,10 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.pol_list">pol_list (optrace.tracer.ray_storage.RayStorage attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.polarizations">polarizations (optrace.tracer.geometry.ray_source.RaySource attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource.polarizations">polarizations (optrace.tracer.geometry.ray_source.RaySource attribute)</a>
+</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.pos">pos (optrace.tracer.geometry.element.Element property)</a>
 
       <ul>
@@ -1983,7 +2112,7 @@ document.write(`
         <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.pos">(optrace.tracer.raytracer.Raytracer property)</a>
 </li>
       </ul></li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.power">power() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.power">power() (optrace.tracer.image.render_image.RenderImage method)</a>
 
       <ul>
         <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.power">(optrace.tracer.spectrum.light_spectrum.LightSpectrum method)</a>
@@ -1997,7 +2126,13 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.principal_points">principal_points (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.base_class.BaseClass.print">print() (optrace.tracer.base_class.BaseClass method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process">process() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.base_image.BaseImage.profile">profile() (optrace.tracer.image.base_image.BaseImage method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.profile_position">profile_position (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.profile_position_dimension">profile_position_dimension (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.projection_method">projection_method (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
@@ -2037,10 +2172,6 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.r">r (in module optrace.tracer.presets.spectral_lines)</a>
 </li>
-      <li><a href="library/optrace_plots.html#optrace.plots.r_image_plots.r_image_cut_plot">r_image_cut_plot() (in module optrace.plots.r_image_plots)</a>
-</li>
-      <li><a href="library/optrace_plots.html#optrace.plots.r_image_plots.r_image_plot">r_image_plot() (in module optrace.plots.r_image_plots)</a>
-</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.random">random() (in module optrace.tracer.misc)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.random_from_distribution">random_from_distribution() (in module optrace.tracer.misc)</a>
@@ -2071,6 +2202,8 @@ document.write(`
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_opacity">ray_opacity (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection">ray_selection (optrace.gui.trace_gui.TraceGUI property)</a>
+</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.ray_source_list">ray_source_list (optrace.tracer.ray_storage.RayStorage attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.ray_sources">ray_sources (optrace.tracer.geometry.group.Group attribute)</a>
@@ -2095,43 +2228,43 @@ document.write(`
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.raytracer_dict">raytracer_dict (optrace.gui.property_browser.PropertyBrowser attribute)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.raytracer_single_thread">raytracer_single_thread (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.rdot">rdot() (in module optrace.tracer.misc)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface">RectangularSurface (class in optrace.tracer.geometry.surface.rectangular_surface)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.refilter">refilter() (optrace.tracer.r_image.RImage method)</a>
 </li>
       <li><a href="library/optrace_plots.html#optrace.plots.spectrum_plots.refraction_index_plot">refraction_index_plot() (in module optrace.plots.spectrum_plots)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex">RefractionIndex (class in optrace.tracer.refraction_index)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.remove">remove() (optrace.tracer.geometry.group.Group method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.render">render() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.render">render() (optrace.tracer.image.render_image.RenderImage method)</a>
 
       <ul>
         <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.render">(optrace.tracer.spectrum.light_spectrum.LightSpectrum static method)</a>
 </li>
       </ul></li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot">replot() (optrace.gui.trace_gui.TraceGUI method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage">RenderImage (class in optrace.tracer.image.render_image)</a>
 </li>
+      <li><a href="library/optrace_gui.html#optrace.gui.command_window.CommandWindow.replot">replot() (optrace.gui.command_window.CommandWindow method)</a>
+
+      <ul>
+        <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot">(optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+      </ul></li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot_rays">replot_rays() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.rescale">rescale() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.reset_picking">reset_picking() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.retrace">retrace() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.spectral_lines.rgb">rgb (in module optrace.tracer.presets.spectral_lines)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.rgb">rgb() (optrace.tracer.r_image.RImage method)</a>
-</li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.rgb_lines">rgb_lines (in module optrace.tracer.presets.light_spectrum)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage">RImage (class in optrace.tracer.r_image)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage">RGBImage (class in optrace.tracer.image.rgb_image)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.ring_uniform">ring_uniform() (in module optrace.tracer.misc)</a>
 </li>
@@ -2185,30 +2318,42 @@ document.write(`
       </ul></li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run">run() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run_command">run_command() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.base_image.BaseImage.s">s (optrace.tracer.image.base_image.BaseImage property)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.s">(optrace.tracer.image.render_image.RenderImage property)</a>
+</li>
+      </ul></li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.s0_list">s0_list (optrace.tracer.ray_storage.RayStorage attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.save">save() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.base_image.BaseImage.save">save() (optrace.tracer.image.base_image.BaseImage method)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.save">(optrace.tracer.image.render_image.RenderImage method)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.misc.save_with_fallback">save_with_fallback() (in module optrace.tracer.misc)</a>
-</li>
+      </ul></li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.scene">scene (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.scene_dict">scene_dict (optrace.gui.property_browser.PropertyBrowser attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.scenes">scenes (in module optrace.tracer.presets.image)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.command_window.CommandWindow.send_cmd">send_cmd() (optrace.gui.command_window.CommandWindow method)</a>
-
-      <ul>
-        <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.send_cmd">(optrace.gui.trace_gui.TraceGUI method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.screenshot">screenshot() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
-      </ul></li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.select_rays">select_rays() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.command_window.CommandWindow.send_command">send_command() (optrace.gui.command_window.CommandWindow method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera">set_camera() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.set_surface">set_surface() (optrace.tracer.geometry.element.Element method)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SF10">SF10 (in module optrace.tracer.presets.refraction_index)</a>
@@ -2221,38 +2366,56 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SF66">SF66 (in module optrace.tracer.presets.refraction_index)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_all_warnings">show_all_warnings (optrace.gui.trace_gui.TraceGUI attribute)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.base_image.BaseImage.shape">shape (optrace.tracer.image.base_image.BaseImage property)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.shape">(optrace.tracer.image.render_image.RenderImage property)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_cut">show_detector_cut() (optrace.gui.trace_gui.TraceGUI method)</a>
+      </ul></li>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.show_progressbar">show_progressbar (optrace.global_options.ClassGlobalOptions attribute)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_image">show_detector_image() (optrace.gui.trace_gui.TraceGUI method)</a>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.show_warnings">show_warnings (optrace.global_options.ClassGlobalOptions attribute)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_detector_spectrum">show_detector_spectrum() (optrace.gui.trace_gui.TraceGUI method)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.siemens_star">siemens_star() (in module optrace.tracer.presets.image)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_cut">show_source_cut() (optrace.gui.trace_gui.TraceGUI method)</a>
+      <li><a href="library/optrace_global_module.html#optrace.warnings.simplified_warning">simplified_warning() (in module optrace.warnings)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_image">show_source_image() (optrace.gui.trace_gui.TraceGUI method)</a>
-</li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.show_source_spectrum">show_source_spectrum() (optrace.gui.trace_gui.TraceGUI method)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.SIZES">SIZES (optrace.tracer.r_image.RImage attribute)</a>
+      <li><a href="library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.SIZES">SIZES (optrace.tracer.image.render_image.RenderImage attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.SK14">SK14 (in module optrace.tracer.presets.refraction_index)</a>
 </li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot">smart_replot() (optrace.gui.trace_gui.TraceGUI method)</a>
+</li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.soda_lime">soda_lime (in module optrace.tracer.presets.refraction_index)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_image">source_image() (optrace.tracer.raytracer.Raytracer method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_image">source_image() (optrace.gui.trace_gui.TraceGUI method)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_image">(optrace.tracer.raytracer.Raytracer method)</a>
 </li>
+      </ul></li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_names">source_names (optrace.gui.trace_gui.TraceGUI attribute)</a>
+</li>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.source_numbers">source_numbers() (optrace.tracer.ray_storage.RayStorage method)</a>
+</li>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_profile">source_profile() (optrace.gui.trace_gui.TraceGUI method)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.source_sections">source_sections() (optrace.tracer.ray_storage.RayStorage method)</a>
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection">source_selection (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_spectrum">source_spectrum() (optrace.tracer.raytracer.Raytracer method)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_spectrum">source_spectrum() (optrace.gui.trace_gui.TraceGUI method)</a>
+
+      <ul>
+        <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.source_spectrum">(optrace.tracer.raytracer.Raytracer method)</a>
+</li>
+      </ul></li>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.spectral_colormap">spectral_colormap (optrace.global_options.ClassGlobalOptions attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.srgb.spectral_colormap">spectral_colormap() (in module optrace.tracer.color.srgb)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.Spectralite">Spectralite (in module optrace.tracer.presets.refraction_index)</a>
 </li>
       <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum">Spectrum (class in optrace.tracer.spectrum.spectrum)</a>
@@ -2269,8 +2432,6 @@ document.write(`
         <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.spectrum_types">(optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection">sphere_projection() (optrace.tracer.geometry.surface.spherical_surface.SphericalSurface method)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods">sphere_projection_methods (optrace.tracer.geometry.surface.spherical_surface.SphericalSurface attribute)</a>
@@ -2321,21 +2482,19 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard">standard (in module optrace.tracer.presets.light_spectrum)</a>
 </li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard_fl">standard_fl (in module optrace.tracer.presets.light_spectrum)</a>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard_f">standard_f (in module optrace.tracer.presets.light_spectrum)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard_led">standard_led (in module optrace.tracer.presets.light_spectrum)</a>
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.light_spectrum.standard_natural">standard_natural (in module optrace.tracer.presets.light_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.storage_size">storage_size() (optrace.tracer.ray_storage.RayStorage static method)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface">Surface (class in optrace.tracer.geometry.surface.surface)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element.surface">surface (optrace.tracer.geometry.element.Element property)</a>
 </li>
       <li><a href="library/optrace_plots.html#optrace.plots.misc_plots.surface_profile_plot">surface_profile_plot() (in module optrace.plots.misc_plots)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.sx">sx (optrace.tracer.r_image.RImage property)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.sy">sy (optrace.tracer.r_image.RImage property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2349,8 +2508,6 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.test_images">test_images (in module optrace.tracer.presets.image)</a>
 </li>
-      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.test_screen">test_screen (in module optrace.tracer.presets.image)</a>
-</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.thread_rays">thread_rays() (optrace.tracer.ray_storage.RayStorage method)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface">TiltedSurface (class in optrace.tracer.geometry.surface.tilted_surface)</a>
@@ -2359,8 +2516,6 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.TIR">TIR (optrace.tracer.raytracer.Raytracer.INFOS attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA">TMA (class in optrace.tracer.transfer_matrix_analysis)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.tma">tma() (optrace.tracer.geometry.group.Group method)</a>
@@ -2369,6 +2524,8 @@ document.write(`
         <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens.tma">(optrace.tracer.geometry.lens.Lens method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.tma_legend">tma_legend (optrace.gui.property_browser.PropertyBrowser attribute)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.trace">trace() (optrace.tracer.raytracer.Raytracer method)</a>
@@ -2377,9 +2534,15 @@ document.write(`
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI">TraceGUI (class in optrace.gui.trace_gui)</a>
 </li>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.tracing_snapshot">tracing_snapshot() (optrace.tracer.raytracer.Raytracer method)</a>
+</li>
       <li><a href="library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.tracing_surfaces">tracing_surfaces (optrace.tracer.geometry.group.Group property)</a>
 </li>
       <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum">TransmissionSpectrum (class in optrace.tracer.spectrum.transmission_spectrum)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.tv_testcard1">tv_testcard1() (in module optrace.tracer.presets.image)</a>
+</li>
+      <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.image.tv_testcard2">tv_testcard2() (in module optrace.tracer.presets.image)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2387,6 +2550,8 @@ document.write(`
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.ui_dark_mode">ui_dark_mode (optrace.global_options.ClassGlobalOptions attribute)</a>
+</li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.uniform">uniform() (in module optrace.tracer.misc)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.misc.uniform2">uniform2() (in module optrace.tracer.misc)</a>
@@ -2405,6 +2570,8 @@ document.write(`
 </li>
       <li><a href="library/optrace_gui.html#optrace.gui.property_browser.PropertyBrowser.update_dict">update_dict() (optrace.gui.property_browser.PropertyBrowser method)</a>
 </li>
+      <li><a href="library/optrace_global_module.html#optrace.metadata.url">url (in module optrace.metadata)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -2414,6 +2581,8 @@ document.write(`
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.vacuum">vacuum (in module optrace.tracer.presets.refraction_index)</a>
 </li>
       <li><a href="library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface.values">values() (optrace.tracer.geometry.surface.surface.Surface method)</a>
+</li>
+      <li><a href="library/optrace_global_module.html#optrace.metadata.version">version (in module optrace.metadata)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.vertex_points">vertex_points (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
 </li>
@@ -2435,17 +2604,17 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.w_list">w_list (optrace.tracer.ray_storage.RayStorage attribute)</a>
 </li>
+      <li><a href="library/optrace_global_module.html#optrace.warnings.warning">warning() (in module optrace.warnings)</a>
+</li>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.refraction_index.water">water (in module optrace.tracer.presets.refraction_index)</a>
+</li>
+      <li><a href="library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.wavelength_range">wavelength_range (optrace.global_options.ClassGlobalOptions attribute)</a>
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.tools.wavelengths">wavelengths() (in module optrace.tracer.color.tools)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.wireframe_surfaces">wireframe_surfaces (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.wl">wl (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.tools.WL_BOUNDS">WL_BOUNDS (in module optrace.tracer.color.tools)</a>
+      <li><a href="library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.wl">wl (optrace.tracer.transfer_matrix_analysis.TMA attribute)</a>
 </li>
       <li><a href="library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.wl_list">wl_list (optrace.tracer.ray_storage.RayStorage attribute)</a>
 </li>
@@ -2469,11 +2638,9 @@ document.write(`
 </li>
       <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.xyz.xyY_to_xyz">xyY_to_xyz() (in module optrace.tracer.color.xyz)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.r_image.RImage.xyz">xyz() (optrace.tracer.r_image.RImage method)</a>
+      <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.xyz">xyz() (optrace.tracer.spectrum.light_spectrum.LightSpectrum method)</a>
 
       <ul>
-        <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum.xyz">(optrace.tracer.spectrum.light_spectrum.LightSpectrum method)</a>
-</li>
         <li><a href="library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.xyz">(optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum method)</a>
 </li>
       </ul></li>
@@ -2511,13 +2678,11 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="library/optrace_tracer_presets.html#optrace.tracer.presets.spectrum.z">z (in module optrace.tracer.presets.spectrum)</a>
 </li>
-      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det">z_det (optrace.gui.trace_gui.TraceGUI attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.observers.z_observer">z_observer() (in module optrace.tracer.color.observers)</a>
+      <li><a href="library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det">z_det (optrace.gui.trace_gui.TraceGUI attribute)</a>
 </li>
-      <li><a href="library/optrace_tracer.html#optrace.tracer.load.zmx">zmx() (in module optrace.tracer.load)</a>
+      <li><a href="library/optrace_tracer_color.html#optrace.tracer.color.observers.z_observer">z_observer() (in module optrace.tracer.color.observers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2528,29 +2693,17 @@ document.write(`
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer d-print-none">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
-<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
-<!--(similar to page-toc.html)--></div>
-
-</div></div>
               
             
           </div>
@@ -2563,8 +2716,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2572,17 +2725,19 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
-      © Copyright 2022, Damian Mendroch.
+      © Copyright 2025, Damian Mendroch.
       <br/>
     
   </p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -2590,10 +2745,13 @@ document.write(`
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

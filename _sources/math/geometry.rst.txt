@@ -3,92 +3,8 @@
 Geometric Features
 ********************
 
-Point
-===============
-
-Defined by its coordinate :math:`x_0,~y_0,~z_0` and is only defined there.
-
-Line
-===============
-
-:math:`R` be half the length of the line and :math:`\alpha` its angle relative to the x-axis.
-
-The random cartesian coordinates are then
-
-The line is then defined for :math:`r \in [-R, ~R]`
-
-.. math::
-   x =&~ x_0 + r \cos \alpha\\ 
-   y =&~ y_0 + r \sin \alpha\\ 
-   z =&~ z_0
-   :label: line_formula
-
-
-Surfaces
-===============
-
-.. _conic_surface:
-
-Conic
---------------------
-
-.. math::
-   :label: conic
-
-   z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}}
-
-
-with
-
-.. math::
-   r^2 = (x-x_0)^2 + (y-y_0)^2
-   :label: asphere_r
-
-and the surface center
-
-.. math::
-   \vec{q} = (x_0, y_0, z_0)
-
-
-Sphere
---------------------
-
-Handled as conic with :math:`k=0`
-
-.. _aspheric_surface:
-
-Asphere
----------------------------
-
-An aspheric surface is a conic surface with additional :math:`m` even order polynomial components :math:`a_1, ..., a_m`.
-
-.. math::
-   :label: asphere
-
-   z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}} + \sum_{i=1}^{m} a_i \cdot r^{2i}
-
-Rectangle
---------------------
-
-Surface with function :math:`z(x,~y)=z_0` and rectangular extent in the xy-plane,
-while its sides are parallel to the x and y-axis.
-Its center lies at :math:`\vec{q} = (x_0, y_0, z_0)`.
-
-Ring
--------------
-
-Surface with function :math:`z(x,~y)=z_0` and being defined by a circular area around
-:math:`\vec{q} = (x_0, y_0, z_0)` with radius :math:`r` and inner radius :math:`0 < r_i < r`
-
-
-Circle
--------------
-
-Ring with :math:`r_i = 0`.
-
-
-Tilted Surface
---------------------
+TiltedSurface Equation
+============================
 
 .. math::
    \text{normal vector:}~~~~   \vec{n} &= (n_x, n_y, n_z)\\
@@ -112,8 +28,6 @@ can be rearranged to the surface function for :math:`n_z \neq 0`:
 .. math::
    z(x, y) = z_0 - (x - x_0) \cdot \frac{n_x}{n_z} - (y- y_0) \cdot \frac{n_y}{n_z}
    :label: tilted_surface
-
-
 
 .. _analytical_hit_find:
 
@@ -205,9 +119,10 @@ Surface Extension
 --------------------
 
 
-.. figure:: ../images/Oberflächen_Erweiterung.svg
-   :width: 700
+.. figure:: ../images/surface_extension.svg
+   :width: 900
    :align: center
+   :class: dark-light
 
    Surface Extension
 
@@ -608,9 +523,20 @@ Implemented as ring with :math:`r_\text{i} = 0`.
 Related: :footcite:`WolframDiskPicking`.
 
 
+Flipping and Rotation
+=======================
 
-.. TODO part about rotation and flipping
+Flipping a surface is implemented as a 180 degree rotation around the x-axis.
 
+This is equivalent to negating its relative shape :math:`z_r` to an offset :math:`z_0` and mirroring the y-component: :math:`z_0 + z_r(x, y) \Rightarrow z_0 - z(x, -y)`.
+For a surface with rotational symmetry this simplifies to :math:`z_0 + z_r(r) \Rightarrow z_0 - z(r)`
+
+Rotation is done by changing the accessing coordinates through a rotation of the coordinate system:
+
+:math:`z(x, y) \Rightarrow z(x_0 + r \cos \alpha, y_0 + r \sin \alpha)` with :math:`r = \sqrt{(x-x_0)^2 + (y - y_0)^2}`.
+Here :math:`x_0,\; y_0` are the rotation center coordinates and :math:`\alpha` is the rotation angle.
+
+By simply changing the value of the rotation angle the surface values can be rotated without actually rotating the surface.
 
 ------------
 

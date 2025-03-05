@@ -1,77 +1,71 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../" data-theme="dark">
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>8.6. Changelog &#8212; optrace 1.4.3 documentation</title>
+    <title>7.5. Changelog &#8212; optrace 1.6.4 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=964979e3" />
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'development/changelog';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="8.5. Future Features" href="future_features.html" />
+    <link rel="prev" title="7.4. Notes" href="notes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+  <div id="pst-scroll-pixel-helper"></div>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -79,7 +73,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -87,18 +80,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -107,88 +109,78 @@
   
   
   
-    <p class="title logo__title">optrace 1.4.3 documentation</p>
+  
+    <p class="title logo__title">optrace 1.6.4 documentation</p>
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="development.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -200,28 +192,24 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -232,8 +220,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -243,29 +231,28 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -274,80 +261,63 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../overview.html">
-                        Overview
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../quickstart.html">
-                        Quickstart
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage/usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Example Gallery
-                      </a>
-                    </li>
-                
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../math/math.html">
-                        Implementation Details
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../library/library.html">
-                        Code Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="development.html">
-                        Development
-                      </a>
-                    </li>
-                
-                </div>
-            </div>
-            
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../math/math.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../library/library.html">
+    Code Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="development.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -356,17 +326,14 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
-  </button>
-`);
-</script></div>
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -377,8 +344,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -386,32 +353,51 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="testing.html">7.1. Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notes.html">7.4. Notes</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">7.5. Changelog</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -419,9 +405,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">8. </span>Development</a></li>
+    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">8.6. </span>Changelog</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.5. </span>Changelog</span></li>
   </ul>
 </nav>
 </div>
@@ -436,12 +422,90 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="changelog">
-<h1><span class="section-number">8.6. </span>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h1>
+<h1><span class="section-number">7.5. </span>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span> Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.6.3   |   2025-02-28   |  New custom UI elements that can be assigned before starting the GUI.   
+  1.6.2   |   2025-02-04   |  Support for python 3.13   
+  1.6.1   |   2024-11-27   |  New IOL_pinhole_imaging example.   
+  1.6.0   |   2024-11-20   |  Licensed with MIT License   
+  1.5.12  |   2024-11-19   |  Replaced PyQt5 dependency with PySide6   
+  1.5.11  |   2024-10-16   |  New LED-BH1, LED-RGB1, LED-V1, LED-V2 standard illuminants.   
+  1.5.10  |   2024-10-10   |  numpy 2.0 support. In Perceptual RI remaining out-of-gamut colors are handled with Absolute RI   
+  1.5.9   |   2024-08-23   |  Dark mode options for GUI and pyplots. Everything is now dark by default.   
+  1.5.8   |   2024-04-17   |  Function select_rays for manually selecting custom rays for the scene.   
+  1.5.7   |   2024-03-21   |  Support for Python 3.12 and vtk 9.3.   
+  1.5.6   |   2024-02-28   |  Migrated from setup.py to pyproject.toml. There&#39;s now a ray RAM limit.   
+  1.5.5   |   2024-01-10   |  Removed tracing with absorb_missing=False. Renamed multiple TraceGUI traits.   
+  1.5.4   |   2024-01-09   |  detector_image() and detector_cut() in TraceGUI now support extent parameter. New pick_ray(), pick_ray_section() and reset_picking() functions in TraceGUI.   
+  1.5.3   |   2024-01-05   |  New LinearImage, RGBImage classes. RImage renamed to RenderImage. RaySource now supports LinearImage.   
+  1.5.2   |   2023-12-29   |  Replaced Pillow by cv. New GUI automation and keratoconus example. Convolution now supports slicing and padding. New Image class. Options are now defined in optrace.global_options.   
+  1.5.1   |   2023-12-08   |  Output texts are now warnings. Threading, warning and figure parameters are now set globally. Hide_labels property in TraceGUI. Improved microscope example.   
+  1.5.0   |   2023-11-29   |  TraceGUI has now set_camera, get_camera and screenshot functions. Picked ray is highlighted in the scene. All plots in optrace.plots now can be saved by providing a path.   
+  1.4.7   |   2023-08-17   |  New &#39;converging&#39; ray source orientation mode.   
+  1.4.6   |   2023-08-16   |  New Siemens Star and TV test card image presets.   
+  1.4.5   |   2023-08-06   |  Replaced image presets with better ones.   
+  1.4.4   |   2023-06-19   |  New parameters for sRGB Perceptual RI. Resolution filter is now an Airy disc.   
+  1.4.3   |   2023-04-12   |  Support for convolution of both colored PSF and image.   
+  1.4.2   |   2023-03-21   |  Rewrite of convolution functionality. Now faster and more robust.   
+  1.4.1   |   2023-03-21   |  New PSF presets.   
+  1.4.0   |   2023-03-02   |  New image convolution feature.   
+  1.3.7   |   2023-02-07   |  New Volume classes to plot orientation volumes in the gui. Moved markers to their own submodule.   
+  1.3.6   |   2023-02-03   |  TraceGUI command window now has the option to copy the history to the clipboard. Better documentation dark mode support.   
+  1.3.5   |   2023-02-03   |  Qt UI theme can now be set using a TraceGUI parameter.   
+  1.3.4   |   2023-02-01   |  Theme and configuration changes for the documentation.   
+  1.3.3   |   2023-01-31   |  Documentation restructuring. Renamed names &#39;chromacity&#39; to &#39;chromaticity&#39;.   
+  1.3.2   |   2023-01-25   |  Added ideal_camera geometry preset.   
+  1.3.1   |   2023-01-23   |  Renamed Marker to PointMarker. New LineMarker element class.   
+  1.3.0   |   2023-01-20   |  New wavelength (peak_wavelength, fwhm, ...) and spectrum characteristics (peak, power, ...) for LightSpectrum. Units are now enforced. New property view for rendered spectra in TraceGUI. Renamed some functions.   
+  1.2.6   |   2023-01-17   |  Clearer TMA names. New &quot;optical_center&quot; property in TMA.   
+  1.2.5   |   2023-01-16   |  Removed pooch dependency. Now there are multiple scene image presets available (cell, group photo, interior, landscape).   
+  1.2.4   |   2023-01-13   |  New functions pupil_position and pupil_magnification in TMA for calculating entrance and exit pupil.   
+  1.2.3   |   2023-01-11   |  New functions &quot;image_magnification&quot; and &quot;object_magnification&quot; in ray transfer matrix analysis.   
+  1.2.2   |   2023-01-10   |  A Group now has an ambient refraction index.   
+  1.2.1   |   2023-01-09   |  New TraceGUI keyboard shortcut &quot;F11&quot; toggling fullscreen. vertical_labels option changing Element label orientation.   
+  1.2.0   |   2023-01-06   |  scipy.misc has been moved to scipy.datasets. optrace now requires pooch dependency for this work. Added scipy&gt;=1.10 requirement.   
+  1.1.5   |   2023-01-06   |  Improved documentation. TransmissionSpectrum now has a &quot;inverse&quot; parameter, that turns the transmission into absorption.   
+  1.1.4   |   2023-01-02   |  Improved TraceGUI picking multithreading. Better CommandWindow, PropertyBrowser UI (fonts, legends).   
+  1.1.3   |   2022-12-22   |  FunctionSurface renamed to FunctionSurface2D. New FunctionSurface1D class. New ray coloring mode &quot;Refractive Index&quot; in TraceGUI.   
+  1.1.2   |   2022-12-19   |  New polarization modes &quot;List&quot; and &quot;Function&quot;.   
+  1.1.1   |   2022-12-19   |  Removed center artefacts for direction distributions. Improved Changelog. Running commands in TraceGUI is now done in a separate window.   
+  1.1.0   |   2022-12-16   |  Simplified numeric tracing. Removed FunctionSurface hit_func. RImage export_png now can export in different resolutions and rescaling modes. New Raytracer.absorb_missing behavior: no restictions, but not-lens-hitting-rays at medium transition get absorbed.   
+  1.0.7   |   2022-12-15   |  Improved documentation. Ring and Circle sampling now without artefacts at the center.   
+  1.0.6   |   2022-12-02   |  Removed colorio dependency from tests. sRGB primaries are now strictly 0 beyond visible range. Improved testing and documentation.   
+  1.0.5   |   2022-11-25   |  Fixed polarization calculation bug. Surface collisions are now plotted inside GUI. More tests.   
+  1.0.4   |   2022-11-18   |  DataSurface has been renamed to DataSurface2D. New DataSurface1D class for radial data profiles.   
+  1.0.3   |   2022-11-16   |  New Orthographic sphere projection method.   
+  1.0.2   |   2022-11-16   |  Surface/geometry reverse() changed to a flip() function that flips around the x-axis. rotate() operation to rotate around z-axis.   
+  1.0.1   |   2022-11-09   |  Minor UI improvements. Index Boxes are now joined if the spacing between them is small.   
+  1.0.0   |   2022-11-04   |  Import of agf and zmx files. New Group class, raytracer is a subclass of this. Reverse() action on elements, surfaces and group. GUI high contrast mode. Surface types now have their own classes. New aspheric surface type. Optional gaussian filter to simulate diffraction limit in RImages.   
+  0.9.9   |   2022-10-10   |  RImage now has an odd number of pixels. New Group class. New color submodule.   
+  0.9.8   |   2022-09-23   |  New: Ray transfer matrix analysis. Different sphere projection methods. Markers for tracing geometry. Removed colorio dependency. New LED standard illuminants. More examples.   
+  0.9.7   |   2022-08-02   |  Improved GUI and new UI actions. More tests. Package installing tools.   
+  0.9.6   |   2022-07-23   |  Preset restructuring. Eye model geometry presets and examples. Improved multithreading in TraceGUI. Now possible to run commands via TCP from UI.   
+  0.9.5   |   2022-07-08   |  Improved RImage saving. Added optional RImage offset. More plot and backend tests.   
+  0.9.4   |   2022-05-29   |  Project restructuring. New RefractionIndex Presets. New AbbePlot.   
+  0.9.3   |   2022-05-28   |  Project restructuring   
+  0.9.2   |   2022-05-28   |  New RefractionIndex presets. Functions for plotting RefractionIndex, Spectrum and chromaticity diagrams. Functions for creating spectra at Detector and RaySource. Plots for Image cuts. iterativeDetectorImage is now iterativeRender, also renders RaySource Images.   
+  0.9.1   |   2022-05-10   |  Spectrum class for Filter and RaySource. Common BaseClass for almost all optrace.tracer classes. Spectral line presets. Two new RefractionIndex Formulas and mutiple new presets. DetectorImage now possible for selected source only.   
+  0.9.0   |   2022-04-26   |  Image now can be saved and loaded. Holds higher resolution version internally, that can be rescaled to. New sRGB Rendering Intents. New Image modes (Outside Gamut, Lightness, Hue, Chroma, Saturation). RaySource for autofocus can be selected.   
+  0.8.9   |   2022-04-09   |  Information messages are now displayed combined from all tracing threads. RaySource rays are now created in threads.   
+  0.8.8   |   2022-04-08   |  Project restructuring 2.   
+  0.8.7   |   2022-04-08   |  Backend now has a progress bar for operations.   
+  0.8.6   |   2022-04-07   |  Project restructuring.   
+  0.8.5   |   2022-04-06   |  New &#39;Cleaner View&#39;-option in GUI. Simpler and more cleaned up GUI code. Minor bug fixes.   
+  0.8.4   |   2022-04-05   |  TCP Server for controlling the GUI. Automatic RT change detection and GUI replotting. New restrictions to when the user can define or assign some class properties.   
+  0.8.3   |   2022-04-01   |  Improvement of Autofocus and Debug Plot. Opacity simulation of filter in GUI. RaySource Color adapts to Ray Coloring Mode. GUI now has an advanced picking mode.   
+  0.8.2   |   2022-03-31   |  GUI shell interface and interface functions. Additional GUI Tests.   
+  0.8.1   |   2022-03-29   |  List of RaySources now belongs to Raytracer. Renamed RaySourceList to RayStorage. Globally defined wavelength range. Own Misc.calc() instead of numexpr.evaluate().   
+  0.8.0   |   2022-03-28   |  Restructuring: Lens, Filter, Detector, RaySource now have a common parent class &#39;SObject&#39;   
+  0.7.4   |   2022-03-28   |  GUI class: Now plotting with a common function for RaySource, Filter, Detector   
+  0.7.3   |   2022-03-28   |  GUI Object Labels are now centered.   
+  0.7.1   |   2022-03-28   |  First named version   
+  0.7.2   |   2022-03-28   |  Testing: More GUI Tests added. GUI class: Minor Cleanup.   
 </pre></div>
 </div>
 </section>
@@ -451,54 +515,26 @@ document.write(`
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer d-print-none">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="future_features.html"
+       href="notes.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">8.5. </span>Future Features</p>
+        <p class="prev-next-title"><span class="section-number">7.4. </span>Notes</p>
       </div>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-  <div class="sidebar-secondary-item"><!--adapted version of the sidebar-nav-bs.html of the PyDataTheme-->
-<!--it is changed such that the navigation title and navigation are only shown if there are elements included-->
-<!--(similar to page-toc.html)-->
-<nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">
-    Section Navigation
-  </p>
-  <div class="bd-toc-item navbar-nav">
-    <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="guidelines.html">8.1. General Guidelines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="testing.html">8.2. Testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">8.3. Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packaging.html">8.4. Packaging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="future_features.html">8.5. Future Features</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">8.6. Changelog</a></li>
-</ul>
-
-  </div>
-</nav></div>
-
-</div></div>
               
             
           </div>
@@ -511,8 +547,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -520,17 +556,19 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
-      © Copyright 2022, Damian Mendroch.
+      © Copyright 2025, Damian Mendroch.
       <br/>
     
   </p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -538,10 +576,13 @@ document.write(`
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
