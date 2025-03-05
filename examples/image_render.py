@@ -62,7 +62,7 @@ RT.add(Det)
 sim = TraceGUI(RT, ray_count=5000000, ray_opacity=0.05)
 sim.add_custom_value("Aperture radius (1 - 3mm)", ap0, 
                      lambda ap: change_ray_source_and_aperture(RT, source_aperture_properties[0], ap))
-sim.add_custom_selection("Test Image", ["Testcard", "Grid", "Siemens Star"], "Testcard", 
+sim.add_custom_selection("Test Image", ["Testcard", "Grid"], "Testcard", 
                          lambda name: change_ray_source_and_aperture(RT, name, source_aperture_properties[1]))
 # add buttons for easier access to image rendering
 sim.add_custom_button("Source Image", sim.source_image)
