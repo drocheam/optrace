@@ -56,10 +56,12 @@ The image is automatically centered at :python:`x=0` and :python:`y=0`
 
 Alternatively the edge positions are described using the :python:`extent` parameter.
 It defines the x- and y- position of the edges as four element list.
-For instance, :python:`extent=[-1, 2, 3, 5]` describes that the geometry of the image reaches from :python:`x=-1` to :python:`x=2` and :python:`y=3` to :python:`y=5`.
+For instance, :python:`extent=[-1, 2, 3, 5]` describes that the geometry of the image reaches from :python:`x=-1`
+to :python:`x=2` and :python:`y=3` to :python:`y=5`.
 
 The data argument must be a numpy array with either two dimensions (|LinearImage|) or three dimensions (|RGBImage|).
-In both cases, the data should be non-negative and in the case of the |RGBImage| lie inside the value range of :python:`[0, 1]`.
+In both cases, the data should be non-negative and in the case of the |RGBImage| 
+lie inside the value range of :python:`[0, 1]`.
 
 The following example creates a random |LinearImage| using a numpy array and the :python:`s` argument:
 
@@ -146,7 +148,8 @@ The below snippet generates a geometry with multiple sources and detectors.
 
 **Source Image**
 
-Rendering a source image is done with the :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` method of the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` class. 
+Rendering a source image is done with the :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` 
+method of the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` class. 
 Note that the scene must be traced before.
 
 Example:
@@ -156,7 +159,8 @@ Example:
    simg = RT.source_image()
 
 This renders an |RenderImage| for the first source.
-The following code renders it for the second source (since index counting starts at zero) and additionally provides the resolution limit :python:`limit` parameter of 3 µm.
+The following code renders it for the second source (since index counting starts at zero) and additionally provides 
+the resolution limit :python:`limit` parameter of 3 µm.
 
 .. testcode::
 
@@ -171,7 +175,8 @@ Calculating a :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector
 
    dimg = RT.detector_image()
 
-Compared to :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`, you can not only provide a :python:`detector_index`, but also a :python:`source_index`, which limits the rendering to the light from this source. 
+Compared to :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`, you can not only provide a 
+:python:`detector_index`, but also a :python:`source_index`, which limits the rendering to the light from this source. 
 By default all sources are used for image generation.
 
 .. testcode::
@@ -179,13 +184,16 @@ By default all sources are used for image generation.
    dimg = RT.detector_image(detector_index=0, source_index=1)
 
 For spherical surface detectors a :python:`projection_method` can be chosen. 
-Moreover, the extent of the detector can be limited with the :python:`extent` parameter, that is provided as :python:`[x0, x1, y0, y1]` with :math:`x_0 < x_1, ~ y_0 < y_1`. 
+Moreover, the extent of the detector can be limited with the :python:`extent` parameter, that is provided as 
+:python:`[x0, x1, y0, y1]` with :math:`x_0 < x_1, ~ y_0 < y_1`. 
 By default, the extent gets adjusted automatically to contain all rays hitting the detector.
-The :python:`limit` parameter can also be provided, as for :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`.
+The :python:`limit` parameter can also be provided, 
+as for :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`.
 
 .. testcode::
 
-   dimg = RT.detector_image(detector_index=0, source_index=1, extent=[0, 1, 0, 1], limit=3, projection_method="Orthographic")
+   dimg = RT.detector_image(detector_index=0, source_index=1, extent=[0, 1, 0, 1], limit=3,
+                            projection_method="Orthographic")
 
 
 .. _rimage_iterative_render:
@@ -196,15 +204,18 @@ _______________________
 When tracing, the amount of rays is limited by the system's available RAM. 
 Many million rays would not fit in the finite working memory.
 
-The function :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` exists to allow the usage of even more rays.
+The function :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` exists 
+to allow the usage of even more rays.
 It does multiple traces and iteratively adds up the image components to a summed image. 
 In this way there is no upper bound on the ray count. 
 With enough available user time, images can be rendered with many billion rays.
 
 Parameter :python:`N` provides the overall number of rays for raytracing.
-The returned value of :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` is a list of rendered detector images.
+The returned value of :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>`
+is a list of rendered detector images.
 
-If the detector position parameter :python:`pos` is not provided, a single detector image is rendered at the position of the detector specified by :python:`detector_index`.
+If the detector position parameter :python:`pos` is not provided, 
+a single detector image is rendered at the position of the detector specified by :python:`detector_index`.
 
 .. testcode::
 
@@ -216,27 +227,34 @@ If :python:`pos` is provided as coordinate, the detector is moved before tracing
 
    rimg_list = RT.iterative_render(N=10000, pos=[0, 1, 0], detector_index=1) 
 
-If :python:`pos` is a list, :python:`len(pos)` detector images are rendered. All other parameters are either automatically
-repeated :python:`len(pos)` times or can be specified as list with the same length as :python:`pos`.
+If :python:`pos` is a list, :python:`len(pos)` detector images are rendered. 
+All other parameters are either automatically repeated :python:`len(pos)` times or can be specified 
+as list with the same length as :python:`pos`.
 
 Exemplary calls:
 
 .. testcode::
 
    rimg_list = RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1) 
-   rimg_list = RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 0], limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
+   rimg_list = RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 0], 
+                                   limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
 
 
 **Tips for Faster Rendering**
 
 With large rendering times, even small speed-up amounts add up significantly:
 
-* Setting the raytracer option :python:`RT.no_pol` skips the calculation of the light polarization. Note that depending on the geometry the polarization direction can have an influence of the amount of light transmission at different surfaces. It is advised to experiment beforehand, if the parameter seems to have any effect on the image.
+* Setting the raytracer option :python:`RT.no_pol` skips the calculation of the light polarization. 
+  Note that depending on the geometry the polarization direction can have an influence of the amount 
+  of light transmission at different surfaces. It is advised to experiment beforehand, 
+  if the parameter seems to have any effect on the image.
   Depending on the geometry, :python:`no_pol=True` can lead to a speed-up of 10-30%.
 * Prefer inbuilt surface types to data or function surfaces
 * try to limit the light through the geometry to rays hitting all lenses. For instance:
-    - Moving the color filters to the front of the system avoids the calculation of ray refractions that get absorbed at a later stage.
-    - Orienting the ray direction cone of the source towards the setup, therefore maximizing rays hitting all lenses. See the :ref:`example_arizona_eye_model` example on how this could be done. 
+    - Moving the color filters to the front of the system avoids the calculation of ray refractions 
+      that get absorbed at a later stage.
+    - Orienting the ray direction cone of the source towards the setup, therefore maximizing rays hitting all lenses.
+      See the :ref:`example_arizona_eye_model` example on how this could be done. 
 
 Saving and Loading a RenderImage
 ___________________________________________
@@ -257,7 +275,8 @@ This function **overrides files** and throws an exception when saving failed.
 
 **Loading**
 
-The static method :meth:`load <optrace.tracer.image.render_image.RenderImage.load>` from the |RenderImage| loads the saved file. 
+The static method :meth:`load <optrace.tracer.image.render_image.RenderImage.load>` 
+from the |RenderImage| loads the saved file. 
 It requires a path and returns the |RenderImage| object arguments.
 
 .. code-block:: python
@@ -297,7 +316,8 @@ The available methods are:
      - Area preserving projection :footcite:`EqualAreaProjWiki`
 
 .. list-table::
-    `Tissot's indicatrices <https://en.wikipedia.org/wiki/Tissot%27s_indicatrix>`__ for different projection methods. All circles should have the same size, shape and brightness. Taken from the :ref:`example_sphere_projections` example
+    `Tissot's indicatrices <https://en.wikipedia.org/wiki/Tissot%27s_indicatrix>`__ for different projection methods. 
+   All circles should have the same size, shape and brightness. Taken from the :ref:`example_sphere_projections` example
    :class: table-borderless
 
 
@@ -327,9 +347,11 @@ Resolution Limit Filter
 ___________________________
 
 Unfortunately, optrace does not take wave optics into account when simulating. 
-To estimate the effect of a resolution limit the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` class provides a limit parameter. 
+To estimate the effect of a resolution limit the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` 
+class provides a limit parameter. 
 For a given limit value a corresponding Airy disc is created, that is convolved with the image.
-This parameter describes the Rayleigh limit, being half the size of the Airy disc core (zeroth order), known from the equation:
+This parameter describes the Rayleigh limit, being half the size of the Airy disc core (zeroth order), 
+known from the equation:
 
 .. math::
    :label: eq_rayleigh
@@ -346,7 +368,10 @@ Only the first two diffraction orders (core + 2 rings) are used, higher orders s
    | The simulation neither knows the actual limit nor takes into interference and diffraction.
 
 
-.. list-table:: Images of the focus in the :ref:`example_achromat` example. From left to right: No filter, filter with 1 µm size, filter with 5 µm size. For a setup with a resolution limit of 5 µm we are clearly inside the limit, but even for 1 µm we are diffraction limited.   
+.. list-table:: Images of the focus in the :ref:`example_achromat` example. From left to right: 
+   No filter, filter with 1 µm size, filter with 5 µm size. 
+   For a setup with a resolution limit of 5 µm we are clearly inside the limit, 
+   but even for 1 µm we are diffraction limited.   
    :class: table-borderless
 
    * - .. figure:: ../images/rimage_limit_off.webp
@@ -364,7 +389,9 @@ Only the first two diffraction orders (core + 2 rings) are used, higher orders s
           :height: 300
           :class: dark-light
 
-The limit parameter can be applied while either creating the |RenderImage| (:python:`ot.RenderImage(..., limit=5)`) or by providing it to methods the create an |RenderImage| (:python:`Raytracer.detector_image(..., limit=1)`, :python:`Raytracer.iterative_render(..., limit=2.5)`.
+The limit parameter can be applied while either creating the |RenderImage| (:python:`ot.RenderImage(..., limit=5)`) 
+or by providing it to methods the create an |RenderImage| (:python:`Raytracer.detector_image(..., limit=1)`, 
+:python:`Raytracer.iterative_render(..., limit=2.5)`.
 
 
 Generating Images from RenderImage
@@ -372,10 +399,12 @@ _____________________________________
 
 **Usage**
 
-From a |RenderImage| multiple image modes can be generated with the :meth:`get <optrace.tracer.image.render_image.RenderImage.get>` method.
+From a |RenderImage| multiple image modes can be generated with the 
+:meth:`get <optrace.tracer.image.render_image.RenderImage.get>` method.
 The function takes an optional pixel size parameter, that determines the pixel count for the smaller image size.
-Internally the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` stores its data with a pixel count of 945 for the smaller side, while the larger side is either 1, 3 or 5 times this size, depending on the side length ratio.
-Therefore no interpolation takes place that would falsify the results.
+Internally the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` stores its data with a 
+pixel count of 945 for the smaller side, while the larger side is either 1, 3 or 5 times this size, 
+depending on the side length ratio. Therefore no interpolation takes place that would falsify the results.
 To only join full bins, the available sizes are reduced to:
 
 .. doctest::
@@ -385,12 +414,16 @@ To only join full bins, the available sizes are reduced to:
 
 As can be seen, all sizes are integer factors of 945.
 All sizes are odd, so there is always a pixel/line/row for the image center.
-Without a center pixel/line/row the center position would be badly defined, either being offset or jumping around depending on numerical errors.
+Without a center pixel/line/row the center position would be badly defined, either being offset 
+or jumping around depending on numerical errors.
 
-In the function :meth:`get <optrace.tracer.image.render_image.RenderImage.get>` the nearest value from :attr:`RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` to the user selected value is chosen.
-Let us assume the :python:`dimg` has a side length of :python:`s=[1, 2.63]`, so it was rendered in a resolution of 945x2835. 
-This is the case because the nearest side factor to 2.63 is 3 and because 945 is the size for all internally rendered images.
-From this resolution the image can be scaled to 315x945 189x567 135x405 105x315 63x189 45x135 35x105 27x81 21x63 15x45 9x27 7x21 5x15 3x9 1x3.
+In the function :meth:`get <optrace.tracer.image.render_image.RenderImage.get>` the nearest value from 
+:attr:`RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` to the user selected value is chosen.
+Let us assume the :python:`dimg` has a side length of :python:`s=[1, 2.63]`, 
+so it was rendered in a resolution of 945x2835. This is the case because the nearest side factor to 2.63 is 3 and
+because 945 is the size for all internally rendered images.
+From this resolution the image can be scaled to 315x945 189x567 135x405 105x315 63x189 45x135 35x105 27x81 21x63 15x45
+9x27 7x21 5x15 3x9 1x3.
 The user image is then scaled into size 315x945, as it is the nearest to a size of 500.
 
 These restricted pixel sizes lead to typically non-square pixels.
@@ -404,11 +437,12 @@ To get a Illuminance image with 315 pixels we can write:
 
    img = dimg.get("Illuminance", 500)
 
-Only for image modes :python:`"sRGB (Perceptual RI)"` and :python:`"sRGB (Absolute RI)"` the returned object type is :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` .
+Only for image modes :python:`"sRGB (Perceptual RI)"` and :python:`"sRGB (Absolute RI)"` the returned object type 
+is :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` .
 For all other modes it is of type :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`.
 
-For mode :python:`"sRGB (Perceptual RI)"` there are two optional additional parameters :python:`L_th` and :python:`chroma_scale`.
-See :numref:`usage_color` for more details.
+For mode :python:`"sRGB (Perceptual RI)"` there are two optional additional parameters :python:`L_th` 
+and :python:`chroma_scale`. See :numref:`usage_color` for more details.
 
 
 **Image Modes**
@@ -424,9 +458,11 @@ See :numref:`usage_color` for more details.
    * - :python:`"Illuminance"`
      - Image of luminous power per area
    * - :python:`"sRGB (Absolute RI)"`
-     - A human vision approximation of the image. Colors outside the gamut are chroma-clipped. Preferred sRGB-Mode for "natural"/"everyday" scenes.
+     - A human vision approximation of the image. Colors outside the gamut are chroma-clipped. 
+       Preferred sRGB-Mode for "natural"/"everyday" scenes.
    * - :python:`"sRGB (Perceptual RI)"`
-     - Similar to sRGB (Absolute RI), but with uniform chroma-scaling. Preferred mode for scenes with monochromatic sources or highly dispersive optics.
+     - Similar to sRGB (Absolute RI), but with uniform chroma-scaling. 
+       Preferred mode for scenes with monochromatic sources or highly dispersive optics.
    * - :python:`"Outside sRGB Gamut"`
      - Pixels outside the sRGB gamut are shown in white
    * - :python:`"Lightness (CIELUV)"`
@@ -434,15 +470,19 @@ See :numref:`usage_color` for more details.
    * - :python:`"Hue (CIELUV)"`
      - Hue image from the CIELUV colorspace
    * - :python:`"Chroma (CIELUV)"`
-     - Chroma image from the CIELUV colorspace. Depicts how colorful an area seems compared to a similar illuminated grey area.
+     - Chroma image from the CIELUV colorspace. Depicts how colorful an area seems compared
+       to a similar illuminated grey area.
    * - :python:`"Saturation (CIELUV)"`
-     - Saturation image from the CIELUV colorspace. How colorful an area seems compared to its brightness. Quotient of Chroma and Lightness. 
+     - Saturation image from the CIELUV colorspace. How colorful an area seems compared to its brightness. 
+       Quotient of Chroma and Lightness. 
 
 The difference between chroma and saturation is more thoroughly explained in :footcite:`BriggsChroma`. 
 An example for the difference of both sRGB modes is seen in :numref:`color_dispersive1`. 
 
 
-.. list-table:: Renderes images from the :ref:`example_image_render` example. From left to right, top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.
+.. list-table:: Renderes images from the :ref:`example_image_render` example. From left to right, 
+   top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, 
+   Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.
    :class: table-borderless
 
    * - .. figure:: ../images/rgb_render_srgb1.webp
@@ -562,12 +602,19 @@ Depending on the file type ,there can be additional saving parameters provided, 
    img.save("image_render_srgb.jpg", params=[cv2.IMWRITE_PNG_COMPRESSION, 1], flip=True)
 
 
-See `cv2.ImwriteFlags <https://docs.opencv.org/4.x/d8/d6a/group__imgcodecs__flags.html#ga292d81be8d76901bff7988d18d2b42ac>`_ for more information.
-The image is automatically interpolated so the exported image has the same side length ratio as the |RGBImage| or |LinearImage| object.
+See 
+`cv2.ImwriteFlags <https://docs.opencv.org/4.x/d8/d6a/group__imgcodecs__flags.html#ga292d81be8d76901bff7988d18d2b42ac>`_ 
+for more information.
+The image is automatically interpolated so the exported image has the same side length ratio
+as the |RGBImage| or |LinearImage| object.
 
 .. note::
 
-   While the Image has arbitrary, generally non-square pixels, for the export the image is rescaled to have square pixels. However, in many cases there is no exact ratio that matches the side ratio with integer pixel counts. For instance, an image with sides 12.532 x 3.159 mm and a desired export size of 105 pixels for the smaller side leads to an image of 417 x 105 pixels. This matches the ratio approximately, but is still off by -0.46 pixels (around -13.7 µm). This error gets larger the smaller the resolution is.
+   While the Image has arbitrary, generally non-square pixels, for the export the image is 
+   rescaled to have square pixels. However, in many cases there is no exact ratio that matches the side ratio with 
+   integer pixel counts. For instance, an image with sides 12.532 x 3.159 mm and a desired export size of 105 pixels 
+   for the smaller side leads to an image of 417 x 105 pixels. This matches the ratio approximately, 
+   but is still off by -0.46 pixels (around -13.7 µm). This error gets larger the smaller the resolution is.
 
 Plotting Images
 _________________
@@ -582,7 +629,8 @@ ________________________
 
 Classes |LinearImage|, |RenderImage|, |RGBImage| share property methods.
 These include geometry information and metadata.
-When a |LinearImage| or |RGBImage| is created from a |RenderImage|, the metadata and geometry is automatically propagated into the new object.
+When a |LinearImage| or |RGBImage| is created from a |RenderImage|, the metadata and geometry 
+is automatically propagated into the new object.
 
 **Size Properties**
 
@@ -661,14 +709,16 @@ Below you can find preset images that can be used as ray source.
           :align: center
           :height: 300
 
-          Cell image for microscope examples (`Source <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__). 
+          Cell image for microscope examples 
+          (`Source <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__). 
           Usable as :obj:`ot.presets.image.cell <optrace.tracer.presets.image.cell>`.
    
      - .. figure:: ../../../optrace/resources/images/fruits.webp
           :align: center
           :width: 400
         
-          Photo of different fruits on a tray (`Source <https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/>`__).
+          Photo of different fruits on a tray 
+          (`Source <https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/>`__).
           Usable as :obj:`ot.presets.image.fruits <optrace.tracer.presets.image.fruits>`.
    
    * - .. figure:: ../../../optrace/resources/images/interior.webp
@@ -682,28 +732,32 @@ Below you can find preset images that can be used as ray source.
           :align: center
           :width: 400
           
-          Landscape image of a mountain and water scene (`Source <https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/>`__).
+          Landscape image of a mountain and water scene 
+          (`Source <https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/>`__).
           Usable as :obj:`ot.presets.image.landscape  <optrace.tracer.presets.image.landscape>`
    
    * - .. figure:: ../../../optrace/resources/images/documents.webp
           :align: center
           :width: 400
           
-          Photo of a keyboard and documents on a desk (`Source <https://www.pexels.com/photo/documents-on-wooden-surface-95916/>`__).
+          Photo of a keyboard and documents on a desk 
+          (`Source <https://www.pexels.com/photo/documents-on-wooden-surface-95916/>`__).
           Usable as :obj:`ot.presets.image.documents <optrace.tracer.presets.image.documents>`.
      
      - .. figure:: ../../../optrace/resources/images/group_photo.webp
           :align: center
           :width: 400
           
-          Photo of a group of people in front of a blackboard (`Source <https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/>`__).
+          Photo of a group of people in front of a blackboard 
+          (`Source <https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/>`__).
           Usable as :obj:`ot.presets.image.group_photo <optrace.tracer.presets.image.group_photo>`
    
    * - .. figure:: ../../../optrace/resources/images/hong_kong.webp
           :align: center
           :width: 350
 
-          Photo of a Hong Kong street at night (`Source <https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/>`__).
+          Photo of a Hong Kong street at night 
+          (`Source <https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/>`__).
           Usable as :obj:`ot.presets.image.hong_kong <optrace.tracer.presets.image.hong_kong>`.
    
      -  
@@ -746,7 +800,8 @@ Below you can find preset images that can be used as ray source.
           :align: center
           :width: 400
 
-          Color checker chart (`Source <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__).
+          Color checker chart 
+          (`Source <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__).
           Usage with :obj:`ot.presets.image.color_checker <optrace.tracer.presets.image.color_checker>`
      
      - .. figure:: ../../../optrace/resources/images/eye_test_vintage.webp

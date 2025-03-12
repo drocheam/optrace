@@ -51,8 +51,8 @@ class Raytracer(Group):
         OUTLINE_INTERSECTION = 4
     """enum for info messages in raytracing"""
 
-    focus_search_methods: list[str, str, str] = ['Position Variance', 'Airy Disc Weighting',
-                                                 'Irradiance Variance', 'Irradiance Maximum', 'Image Sharpness']
+    focus_search_methods: list[str, str, str] = ['RMS Spot Size', 'Irradiance Variance',
+                                                 'Image Sharpness', 'Image Center Sharpness']
     """available focus_search methods"""
 
     def __init__(self,
@@ -1111,7 +1111,8 @@ class Raytracer(Group):
         repeated len(pos) times or can be specified as list with the same length as pos.
         Exemplary calls:
         >> RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1)
-        >> RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], extent=[None, [-2, 2, -2, 2]])
+        >> RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], \
+        extent=[None, [-2, 2, -2, 2]])
 
         N_px_S can also be provided as list, note however, that when provided as list it needs
         to have the same length as the number of sources.
@@ -1316,9 +1317,7 @@ class Raytracer(Group):
                                      mode:    str,
                                      pa:      np.ndarray,
                                      sb:      np.ndarray,
-                                     w:       np.ndarray,
-                                     r0:      float = 1e-3,
-                                     ret_pos: bool = False)\
+                                     w:       np.ndarray)\
             -> float | tuple[float, tuple[float, float, float]]:
         """
         Calculate the cost function value at this z position.
@@ -1329,73 +1328,97 @@ class Raytracer(Group):
         :param pa: auxiliary ray position
         :param sb: auxiliary ray direction
         :param w: ray weights
-        :param r0: estimated airy radius
-        :param ret_pos: if a second parameter contaning a 3D coordinate tuple should be returned
-        :return: cost value (ret_pos=False) or cost value and focus position (ret_pos=True)
+        :return: cost value
         """
         # hit position at virtual xy-plane detector
         ph = pa + sb*z_pos
         x, y = ph[:, 0], ph[:, 1]
 
-        if mode == "Airy Disc Weighting" or ret_pos:
-            xm = np.average(x, weights=w)
-            ym = np.average(y, weights=w)
+        if mode == "RMS Spot Size":
+            var_x = np.cov(x, aweights=w)
+            var_y = np.cov(y, aweights=w)
+            return np.sqrt(var_x + var_y)
 
-        match mode:
+        # adapt pixel number, so we have less noise for few rays,
+        # but can see more image details and information for a larger number of rays
+        # N rays are distributed on a square area,
+        # scale default number by (1 + sqrt(N))
+        N_px = 100*int(1 + np.sqrt(w.shape[0])/1000)
+        N_px = N_px if N_px % 2 else N_px + 1  # enforce odd number
+    
+        # render power image
+        Im, x_bin, y_bin = np.histogram2d(x, y, weights=w, bins=[N_px, N_px])
 
-            # not enough rays, return cost of 1 and invalid position
-            case _ if w.shape[0] <= 1:
-                cost = 1
-                xm, ym, z_pos = np.nan, np.nan, np.nan
+        if mode in ["Image Sharpness", "Image Center Sharpness"]:
 
-            case "Airy Disc Weighting":
-                expr = ne.evaluate("w * exp(-0.5*((x - xm)**2 + (y-ym)**2)/ (0.42*r0)**2)")
-                cost =  1 - np.sum(expr)/np.sum(w)
-
-            case "Position Variance":
-                var_x = np.cov(x, aweights=w)
-                var_y = np.cov(y, aweights=w)
-                cost = np.sqrt(var_x + var_y)
-
-            case ("Irradiance Variance" | "Irradiance Maximum" | "Image Sharpness"):
-                # adapt pixel number, so we have less noise for few rays,
-                # but can see more image details and information for a larger number of rays
-                # N rays are distributed on a square area,
-                # scale default number by (1 + sqrt(N))
-                # this equals 100 pixels per image side for a low amount of rays
-                # and 350 pixel for 4 million rays
-                N_px = 100*int(1 + np.sqrt(w.shape[0])/800)
-                N_px = N_px if N_px % 2 else N_px + 1  # enforce odd number
+            Y, X = np.mgrid[-1:1:N_px*1j, -1:1:N_px*1j]
+            R2 = X**2 + Y**2
+            R2[R2 > 1] = 1
             
-                # render power image
-                Im, x_bin, y_bin = np.histogram2d(x, y, weights=w, bins=[N_px, N_px])
+            w2 = 1 - R2
+            Im0 = Im*w2**2 if mode == "Image Center Sharpness" else Im
+            
+            if (Im0s := np.sum(Im0)):
+                Im0 /= Im0s
 
-                if mode == "Image Sharpness":
-                    Im = np.abs(np.fft.fft2(Im))
-                    Im = np.fft.fftshift(Im)
+            Im = np.abs(np.fft.fft2(Im0))
+            Im = np.fft.fftshift(Im)
 
-                    Y, X = np.mgrid[-1:1:N_px*1j, -1:1:N_px*1j]
-                    cost = 1/np.mean((X**2 + Y**2)*Im)
-                else:
-                    Im = Im[Im > 0]  # exclude empty pixels
-                    Ap = (x_bin[1] - x_bin[0]) * (y_bin[1] - y_bin[0])  # pixel area
+            rsm = np.mean(R2*Im)
+            return 1/rsm**0.5 if rsm else 1
 
-                    if mode == "Irradiance Variance":
-                        cost = np.sqrt(Ap/np.std(Im))  # sqrt for better value range
+        else:  # Irradiance Variance
+            Im = Im[Im > 0]  # exclude empty pixels
+            Ap = (x_bin[1] - x_bin[0]) * (y_bin[1] - y_bin[0])  # pixel area
+            Imstd = np.std(Im)
+            return np.sqrt(Ap/Imstd) if Imstd else 1  # sqrt for better value range
+              
+    def __focus_rms_spot_direct_solution(self, pa: np.ndarray, sb: np.ndarray, w: np.ndarray, bounds: tuple)\
+            -> scipy.optimize.OptimizeResult:
+        """
+        Direct RMS spot size solution from
+        https://www.thepulsar.be/article/-devoptical-part-19--a-quick-focus-algorithm/
+        my version is extended to include ray weights
 
-                    else: # mode == "Irradiance Maximum":
-                        cost = 1/np.sqrt(np.max(Im)/Ap)  # sqrt for better data range
-                
-        if not ret_pos:
-            return cost
+        :param pa: auxiliary ray position
+        :param sb: auxiliary ray direction
+        :param w: ray weights
+        :param bounds: search bounds
+        :return: scipy optimize result
+        """
+        # mean position at search bounds
+        pb0 = np.average(pa + sb*bounds[0], axis=0, weights=w)
+        pb1 = np.average(pa + sb*bounds[1], axis=0, weights=w)
 
-        return cost, (xm, ym, z_pos)
+        # direction of mean position
+        vx = pb1[0] - pb0[0]
+        vy = pb1[1] - pb0[1]
+        vz = bounds[1] - bounds[0]
 
+        # relative ray starting position
+        dx = pa[:, 0] - pb0[0]
+        dy = pa[:, 1] - pb0[1]
+
+        # relative ray directions
+        dtx = sb[:, 0] - vx/vz
+        dty = sb[:, 1] - vy/vz
+
+        # calculate solution
+        w2 = w**2
+        dnorm = np.sum(w2*dtx**2 + w2*dty**2)
+        d = -np.sum(dtx*dx*w2 + dty*dy*w2) / dnorm if dnorm else np.mean(bounds)
+
+        # mock scipy optimize result
+        res = scipy.optimize.OptimizeResult()
+        res.x = d
+        res.fun = self.__focus_search_cost_function(d, "RMS Spot Size", pa, sb, w)
+        return res
+
+    # TODO don't ignore apertures and filters
     def focus_search(self,
                      method:           str,
                      z_start:          float,
                      source_index:     int = None,
-                     N:                int = 100000,
                      return_cost:      bool = False)\
             -> tuple[scipy.optimize.OptimizeResult, dict]:
         """
@@ -1406,10 +1429,8 @@ class Raytracer(Group):
         :param method: focussing method from "focus_search_methods"
         :param z_start: starting position z (float)
         :param source_index: source number, defaults to None, so rays from all sources are used
-        :param N: maximum number of rays to evaluate for modes "Position Variance" and "Airy Disc Weighting"
-        :param return_cost: False, if costly calculation of cost function array
-                can be skipped in mode "Position Variance".
-                In other modes it is generated on the way anyway
+        :param return_cost: If a cost function value array should be included in the output dictionary.
+            Needed for plotting of the cost function. Deactivate to increase performance for some methods.
         :return: scipy optimize result and property dictionary
         """
 
@@ -1419,9 +1440,6 @@ class Raytracer(Group):
 
         if method not in self.focus_search_methods:
             raise ValueError(f"Invalid method '{method}', should be one of {self.focus_search_methods}.")
-
-        if N < 1:
-            raise ValueError(f"N needs to be a positive value, but is {N}")
 
         if not self.rays.N:
             raise RuntimeError("No rays traced.")
@@ -1446,14 +1464,11 @@ class Raytracer(Group):
         # default bounds, left starts at end of all ray sources, right ends at outline
         b0 = self.N_EPS + np.max([rs.extent[5] for rs in self.ray_sources])
         b1 = self.outline[5] - self.N_EPS
-        n_ambient = self.n0(550)
 
         # find region between lenses
         for i, lens in enumerate(lenses):
             if z_start < lens.pos[2]:
                 b1 = lens.extent[4]
-                n_ambient_ = lenses[i-1].n2 if i > 0 and lenses[i-1].n2 is not None else self.n0
-                n_ambient = n_ambient_(550)
                 break
             b0 = lens.extent[5]
 
@@ -1468,11 +1483,11 @@ class Raytracer(Group):
         # start progress bar
         ################################################################################################################
 
-        Nt = 1024  # cost function sampling points, divisible by 2, 4, 8, 16, 32 threads
+        Nt = 320  # cost function sampling points, good if divisible by 2, 4, 8, 16, 32 threads
         N_th = ne.detect_number_of_cores() if global_options.multithreading else 1
         N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
-        steps = int(Nt/64)
-        steps += 2  # progressbas steps
+        steps = int(Nt/32) if return_cost or method in ["Image Sharpness", "Image Center Sharpness"] else 0
+        steps += 3  # progressbars steps
         bar = ProgressBar(fd=sys.stdout, prefix="Finding Focus: ", max_value=steps).start()\
             if global_options.show_progressbar else None
 
@@ -1485,6 +1500,7 @@ class Raytracer(Group):
         rays_pos = np.zeros(self.rays.N, dtype=bool)
         pos = np.zeros(self.rays.N, dtype=int)
         rays_pos[Ns:Ne] = True
+
         # find section index for each ray for focussing search range
         z = bounds[0] + self.N_EPS
         pos[Ns:Ne] = np.argmax(z < self.rays.p_list[rays_pos, :, 2], axis=1) - 1
@@ -1496,27 +1512,19 @@ class Raytracer(Group):
         rays_pos[pos == -1] = False
 
         # make sure we have enough rays
-        N_act = np.count_nonzero(rays_pos)
-        N_use = min(N, N_act) if method in ["Position Variance", "Airy Disc Weighting"] else N_act
+        N_use = np.count_nonzero(rays_pos)
         if N_use < 1000:  # throw error when no rays are present
             warning(f"WARNING: Less than 1000 rays for focus_search ({N_use}).")
 
         # no rays are used, return placeholder variables
-        if N_use == 0:
+        if N_use <= 1:
             return scipy.optimize.OptimizeResult(),\
                 dict(pos=[np.nan, np.nan, np.nan], bounds=bounds, z=np.full(Nt, np.nan),
                      cost=np.full(Nt, np.nan), N=N_use)
 
-        # select random rays from all valid
+        # select valid positions and get ray parts
         rp = np.where(rays_pos)[0]
-        rp2 = np.random.choice(rp, N_use, replace=False)
-
-        # assign positions of random rays
-        rays_pos = np.zeros(self.rays.N, dtype=bool)
-        rays_pos[rp2] = True
-        pos = pos[rp2]
-
-        # get Ray parts
+        pos = pos[rp]
         p, s, _, weights, _, _, _ = self.rays.rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0, 0])
 
         if bar is not None:
@@ -1528,31 +1536,17 @@ class Raytracer(Group):
         # parameters for function hit position = pa + sb * z_pos
         pa = p - s/s[:, 2, np.newaxis]*p[:, 2, np.newaxis]
         sb = s/s[:, 2, np.newaxis]
+            
+        # sample cost function
+        if return_cost or method in  ["Image Sharpness", "Image Center Sharpness"]:
 
-        if method == "Position Variance":
-            res = scipy.optimize.minimize_scalar(self.__focus_search_cost_function,
-                                                 args=("Position Variance", pa, sb, weights),
-                                                 options={'maxiter': 500, 'xatol':1e-6},
-                                                 bounds=bounds, method='Bounded')
-
-        if method == "Airy Disc Weighting":
-            # calculate size of airy disc for method Airy Disc Weighting
-            s_z = np.nanquantile(s[:, 2], 0.95)
-            sin_alpha = np.sin(np.arccos(s_z))  # neglect outliers
-
-            # lambda / Fnum, default to 3µm when sin_alpha = 0
-            r0 = 550e-6 / (sin_alpha * n_ambient) if sin_alpha != 0 else 3e-3
-        else:
-            r0 = 3e-3
-
-        if method != "Position Variance" or return_cost:
-            r = np.linspace(bounds[0], bounds[1], Nt)
+            r = misc.uniform(bounds[0], bounds[1], Nt, shuffle=False)
             vals = np.zeros_like(r)
 
             def threaded(N_th, N_is, Nt, *afargs):
                 Ns = N_is*int(Nt/N_th)
                 Ne = (N_is+1)*int(Nt/N_th) if N_is != N_th-1 else Nt
-                div = int(Nt / (steps - 2) / N_th)
+                div = int(Nt / (steps - 3) / N_th)
 
                 for i, Ni in enumerate(np.arange(Ns, Ne)):
                     if i % div == div-1 and bar is not None and not N_is:
@@ -1560,23 +1554,28 @@ class Raytracer(Group):
                     vals[Ni] = self.__focus_search_cost_function(r[Ni], *afargs)
 
             if N_th > 1:
-                threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, pa, sb, weights, r0))
+                threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, pa, sb, weights))
                            for N_is in range(N_th)]
                 [th.start() for th in threads]
                 [th.join() for th in threads]
             else:
-                threaded(1, 0, Nt, method, pa, sb, weights, r0)
+                threaded(1, 0, Nt, method, pa, sb, weights)
+       
+        # method depending handling
+        if method == "RMS Spot Size":
+            res = self.__focus_rms_spot_direct_solution(pa, sb, weights, bounds)
         else:
-            r = None
-            vals = None
+            cost_func2 = lambda z, method: self.__focus_search_cost_function(z[0], method, pa, sb, weights)
+            
+            if method == "Irradiance Variance":
+                res = scipy.optimize.minimize(cost_func2, np.mean(bounds), args=method, tol=None, callback=None,
+                                              options={'maxiter': 100}, bounds=[bounds], method="Nelder-Mead")
+                
+            elif method in ["Image Sharpness", "Image Center Sharpness"]:
+                pos = np.argmin(vals)
+                res = scipy.optimize.minimize(cost_func2, r[pos], args=method, tol=None, callback=None,
+                                              options={'maxiter': 30}, bounds=[bounds], method="COBYLA")
 
-        # find minimum for other methods, since they are susceptible to local minima
-        if method != "Position Variance":
-            # # start search at minimum of sampled data
-            pos = np.argmin(vals)
-            cost_func2 = lambda z, method: self.__focus_search_cost_function(z[0], method, pa, sb, weights, r0)
-            res = scipy.optimize.minimize(cost_func2, r[pos], args=method, tol=None, callback=None,
-                                          options={'maxiter': 300}, bounds=[bounds])
             res.x = res.x[0]
 
         if bar is not None:
@@ -1591,6 +1590,12 @@ class Raytracer(Group):
             warning("Found minimum near search bounds, "
                     "this can mean the focus is outside of the search range.")
 
-        pos = self.__focus_search_cost_function(res.x, method, pa, sb, weights, r0, ret_pos=True)[1]
+        # average ray position at focus
+        pos = tuple(np.average(pa + sb*res.x, axis=0, weights=weights))
+
+        if not return_cost:
+            r = None
+            vals = None
 
         return res, dict(pos=pos, bounds=bounds, z=r, cost=vals, N=N_use)
+

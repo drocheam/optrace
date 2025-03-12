@@ -38,8 +38,10 @@ def timer(func: Callable) -> Any:
 
     return _time_it
 
+# TODO test shuffle option of uniform and uniform2
+# TODO better names, something like stratified_sampling etc.
 
-def uniform2(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray, np.ndarray]:
+def uniform2(a: float, b: float, c: float, d: float, N: int, shuffle: bool = True) -> tuple[np.ndarray, np.ndarray]:
     """
     Stratified Sampling 2D. 
     Lower discrepancy than scipy.stats.qmc.LatinHypercube.
@@ -49,6 +51,7 @@ def uniform2(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray
     :param c: lower y-bound
     :param d: upper y-bound
     :param N: number of values
+    :param shuffle: shuffle order of values
     :return: tuple of random values inside [a, b] and [c, d]
     """
     # return np.random.uniform(a, b, N), np.random.uniform(c, d, N)
@@ -73,6 +76,9 @@ def uniform2(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray
     x = np.concatenate((X.ravel(), random().uniform(a, b, dN)))
     y = np.concatenate((Y.ravel(), random().uniform(c, d, dN)))
 
+    if not shuffle:
+        return x, y
+
     # shuffle order
     ind = np.arange(N)
     random().shuffle(ind)
@@ -80,13 +86,14 @@ def uniform2(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray
     return x[ind], y[ind]
 
 
-def uniform(a: float, b: float, N: int) -> np.ndarray:   
+def uniform(a: float, b: float, N: int, shuffle: bool = True) -> np.ndarray:   
     """
     Stratified Sampling 1D.
 
     :param a: lower bound
     :param b: upper bound
     :param N: number of values
+    :param shuffle: shuffle order of values
     :return: random values
     """
     # return np.random.uniform(a, b, N)
@@ -96,7 +103,8 @@ def uniform(a: float, b: float, N: int) -> np.ndarray:
     dba = (b-a)/N  # grid spacing
     x = np.linspace(a, b - dba, N) + random().uniform(0., dba, N)  # grid + dither
 
-    random().shuffle(x)
+    if shuffle:
+        random().shuffle(x)
     return x
 
 def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.ndarray, np.ndarray]:

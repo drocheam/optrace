@@ -229,7 +229,7 @@ def _get_labels(im:             RGBImage | LinearImage,
                 else f"{yname} = {cut_pos_val:.5g} {yunit}")
     
     zname, zunit, zlabel = mode, "", mode
-    zlabel += ", Logarithmic" if log and mode.startswith("sRGB") else ""
+    zlabel += ", Logarithmic" if log and mode in ["sRGB (Perceptual RI)", "sRGB (Absolute RI)", "Lightness (CIELUV)"] else ""
 
     if zlabel != "":
         text += f"\nMode: {zlabel}"

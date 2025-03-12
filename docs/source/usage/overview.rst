@@ -44,10 +44,13 @@ ___________________
      - :ref:`usage_convolution`
 
    * - **General Geometrical Optics and Image/Spectrum Simulation**
-     - Sequential Raytracing of optical setups. Analysis of ray paths, simulation of detector images and spectra, focus finding.
-     - :class:`optrace.Raytracer <optrace.tracer.raytracer.Raytracer>`, :class:`optrace.RenderImage <optrace.tracer.image.render_image.RenderImage>`, 
+     - Sequential Raytracing of optical setups. Analysis of ray paths, 
+       simulation of detector images and spectra, focus finding.
+     - :class:`optrace.Raytracer <optrace.tracer.raytracer.Raytracer>`, 
+       :class:`optrace.RenderImage <optrace.tracer.image.render_image.RenderImage>`, 
        :class:`optrace.LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>`
-     - :ref:`Raytracer <usage_raytracer>`, :ref:`usage_image`, :ref:`usage_spectrum`, :ref:`usage_focus`, :ref:`usage_ray_access`
+     - :ref:`Raytracer <usage_raytracer>`, :ref:`usage_image`, 
+       :ref:`usage_spectrum`, :ref:`usage_focus`, :ref:`usage_ray_access`
 
    * - **Image, Surface, Spectrum and Refractive Index Plotting**
      - Display images, spectra, surfaces and refractive indices graphically
@@ -56,7 +59,8 @@ ___________________
    
    * - **Image color conversion**
      - Convert or access image colors
-     - :mod:`optrace.color <optrace.tracer.color>` and :class:`optrace.RenderImage <optrace.tracer.image.render_image.RenderImage>`
+     - :mod:`optrace.color <optrace.tracer.color>` and 
+       :class:`optrace.RenderImage <optrace.tracer.image.render_image.RenderImage>`
      - :ref:`usage_color`, :ref:`usage_image` 
    
    * - **Graphical Setup and Visualization**
@@ -68,7 +72,8 @@ Namespaces
 ______________________
 
 :python:`optrace` s the primary namespace.
-While there is a separate sub-namespace for the tracer, called :mod:`optrace.tracer`, it is automatically included in the main namespace.
+While there is a separate sub-namespace for the tracer, called :mod:`optrace.tracer`, 
+it is automatically included in the main namespace.
 
 .. testcode::
 
@@ -94,12 +99,14 @@ Only the |TraceGUI| class is relevant there, so it can be directly imported in t
 Global Options
 ______________________
 
-Global options are controlled through the attributes of the class :class:`optrace.global_options <optrace.global_options>`.
+Global options are controlled through the attributes of the 
+class :class:`optrace.global_options <optrace.global_options>`.
 
 Progressbar
 ###################
 
-For calculation-intensive tasks a progress bar is displayed inside the terminal that displays the progress and estimated remaining time.
+For calculation-intensive tasks a progress bar is displayed inside the terminal 
+that displays the progress and estimated remaining time.
 It can be turned off globally by:
 
 .. testcode::
@@ -116,7 +123,8 @@ There is also a context manager available for turning it off temporarily:
 Warnings
 ###################
 
-optrace outputs warnings of type :exc:`OptraceWarning <optrace.warnings.OptraceWarning>` (which are a custom subclass of :exc:`UserWarning`). These can be filtered using the :mod:`warnings` python module.
+optrace outputs warnings of type :exc:`OptraceWarning <optrace.warnings.OptraceWarning>` 
+(which are a custom subclass of :exc:`UserWarning`). These can be filtered using the :mod:`warnings` python module.
 A simple way to silence them, for example when doing many automated tasks, is by writing:
 
 .. testcode::
@@ -158,7 +166,8 @@ This can lead to issues when using these presets.
 Spectral Colormap
 ######################
 
-Spectral plots (spectrum, refractive index, ray coloring) use a spectral colormap that maps wavelength values to their corresponding colors.
+Spectral plots (spectrum, refractive index, ray coloring) use a spectral colormap 
+that maps wavelength values to their corresponding colors.
 For the visible range, this leads to a rainbow-like mapping.
 
 When working in the infrared or ultraviolet region, they would be mapped to a similar hue and a nearly black color.
@@ -171,8 +180,11 @@ One example could be:
    
    ot.global_options.spectral_colormap = lambda wl: plt.cm.viridis((wl-300)/800)
 
-In this example the colormap is adapted to use the `viridis colormap from pyplot <https://matplotlib.org/stable/users/explain/colors/colormaps.html#sequential>`_, where 300 is mapped to the lowest value of 0 and 800 to the highest value of 1.
-The specified function should take a wavelength numpy array (of some length N) as argument and return a two dimensional array with RGBA values between 0-1 and shape (N, 4).
+In this example the colormap is adapted to use the 
+`viridis colormap from pyplot <https://matplotlib.org/stable/users/explain/colors/colormaps.html#sequential>`_,
+where 300 is mapped to the lowest value of 0 and 800 to the highest value of 1.
+The specified function should take a wavelength numpy array (of some length N) as argument 
+and return a two dimensional array with RGBA values between 0-1 and shape (N, 4).
 
 The colormap can be reset by setting it to :python:`None`.
 

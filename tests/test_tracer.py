@@ -312,36 +312,34 @@ class TracerTests(unittest.TestCase):
         RT.trace(20000)
 
         for method in RT.focus_search_methods:  # all methods
-            for N in [5000, 20000, 50000]:  # N cases: less rays, all rays, more rays than simulated
-                for N_th in [1, 4, 8]:  # different thread counts
-                    RT._force_threads = N_th
-                    res, _ = RT.focus_search(method, z_start=5.0, N=N, return_cost=False)
-                    self.assertAlmostEqual(res.x, fs, delta=0.15)
+            for N_th in [1, 4, 8]:  # different thread counts
+                RT._force_threads = N_th
+                res, _ = RT.focus_search(method, z_start=5.0, return_cost=False)
+                self.assertAlmostEqual(res.x, fs, delta=0.15)
 
         # reset thread count overwrite
         RT._force_threads = None
 
         # source_index=0 with only one source leads to the same result
-        res, _, = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=0, N=N, return_cost=False)
+        res, _, = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=0, return_cost=False)
         self.assertAlmostEqual(res.x, fs, delta=0.15)
 
         RS2 = ot.RaySource(ot.Point(), divergence="Isotropic", div_angle=0.5, pos=[0, 0, -60])
         RT.add(RS2)
        
-        # enlargen outline so imaging works
+        # enlarge outline so imaging works
         # the outline was smaller before to improve focus finding
         RT.outline = [-3, 3, -3, 3, -70, 80]
         RT.trace(100000)
 
         # source_index=0 with two raysources should lead to the same result as if the second RS was missing
-        res, _ = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=0, N=N, return_cost=False)
+        res, _ = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=0, return_cost=False)
         self.assertAlmostEqual(res.x, fs, delta=0.15)
 
         # 1/f = 1/b + 1/g with f=33.08, g=60 should lead to b=73.73
-        res, _ = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=1, N=N, return_cost=False)
+        res, _ = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=1, return_cost=False)
         self.assertAlmostEqual(res.x, 73.73, delta=0.1)
 
-        self.assertRaises(ValueError, RT.focus_search, RT.focus_search_methods[0], z_start=0, N=0)  # N too small
         self.assertRaises(ValueError, RT.focus_search, RT.focus_search_methods[0], z_start=-100)  # z_start outside outline
         self.assertRaises(ValueError, RT.focus_search, "AA", z_start=10)  # invalid mode
         self.assertRaises(IndexError, RT.focus_search, RT.focus_search_methods[0], z_start=10, source_index=-1)
@@ -360,17 +358,17 @@ class TracerTests(unittest.TestCase):
         # leads to a warning, that minimum may not be found
         
         ot.global_options.multithreading = False
-        RT.focus_search("Irradiance Variance", z_start=RT.outline[5])
+        RT.focus_search("Image Sharpness", z_start=RT.outline[5])
         ot.global_options.multithreading = True
 
         # aperture blocks all light
         RT.add(ot.Aperture(ot.CircularSurface(r=2.99), pos=[0, 0, -2.5]))
         RT.trace(200000)
-        RT.focus_search("Position Variance", z_start=10) # no rays here
+        RT.focus_search("RMS Spot Size", z_start=10) # no rays here
         
         # changing the geometry without retracing leads to a RuntimeError
         RT.add(ot.Aperture(ot.CircularSurface(r=2.99), pos=[0, 0, -2.2]))
-        self.assertRaises(RuntimeError, RT.focus_search, "Position Variance", z_start=10)
+        self.assertRaises(RuntimeError, RT.focus_search, "RMS Spot Size", z_start=10)
 
     def test_uniform_emittance(self):
         """test that surfaces in ray source emit uniformly"""

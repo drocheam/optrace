@@ -10,7 +10,7 @@ import numpy as np
 # The size of the stop and the test image are parameterizable through the "Custom" GUI tab. 
 
 # make raytracer
-RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40])
+RT = ot.Raytracer(outline=[-15, 15, -15, 15, 0, 40])
 
 source_aperture_properties = ["Testcard", 3]
 
@@ -49,7 +49,7 @@ change_ray_source_and_aperture(RT, "Testcard", ap0)
 # add Lens 1
 front = ot.SphericalSurface(r=3, R=8)
 back = ot.SphericalSurface(r=3, R=-8)
-nL1 = ot.RefractionIndex("Constant", n=1.5)
+nL1 = ot.RefractionIndex("Abbe", n=1.5, V=40)
 L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
 RT.add(L1)
 

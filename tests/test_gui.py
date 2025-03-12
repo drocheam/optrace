@@ -553,6 +553,7 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
                 N0 = sim.ray_count
                 self._set_in_main(sim, "ray_count", int(N0*1.3))
+                self._set_in_main(sim, "focus_search_method", "Image Sharpness")
                 self._do_in_main(sim.detector_image)
                 self._do_in_main(sim.source_image)
                 self._do_in_main(sim.move_to_focus)

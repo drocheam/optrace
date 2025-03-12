@@ -37,9 +37,8 @@ def focus_search_cost_plot(res:     scipy.optimize.OptimizeResult,
     pc.check_type("title", title, str)
 
     if fsdict["z"] is None or fsdict["cost"] is None:
-        warning('Parameters missing in focus dict. For mode "Position Variance" set '
-                'focus_search("Position Variance", ..., return_cost=True) when'
-                ' wanting to plot the debug plot.')
+        warning('Cost function values missing. Call focus search with '
+                'focus_search("..., return_cost=True) to include this data')
         return
 
     r, vals = fsdict["z"], fsdict["cost"]

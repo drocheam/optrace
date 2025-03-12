@@ -13,7 +13,7 @@
 <!-- TODO add coverage info (via third party site?), lines of code, comment/docstring quality etc. -->
 
 <img src="./docs/source/images/example_spherical_aberration2.png" width="18.2%"></img>
-<img src="./docs/source/images/example_rgb_render2.webp" width="17%"></img>
+<img src="./docs/source/images/example_rgb_render4.webp" width="17%"></img>
 <img src="./docs/source/images/example_legrand2.png" width="18.2%"></img>
 <img src="./docs/source/images/example_keratoconus_4.webp" width="17%"></img>
 <img src="./docs/source/images/example_brewster.png" width="18.2%"></img>

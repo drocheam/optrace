@@ -26,7 +26,7 @@ RT.add(RS)
 # add Lens 1
 front = ot.SphericalSurface(r=3, R=8)
 back = ot.SphericalSurface(r=3, R=-8)
-nL1 = ot.RefractionIndex("Constant", n=1.5)
+nL1 = ot.RefractionIndex("Abbe", n=1.5, V=40)
 L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
 RT.add(L1)
 
@@ -35,8 +35,8 @@ Det = ot.Detector(ot.RectangularSurface(dim=[16, 16]), pos=[0, 0, 36])
 RT.add(Det)
 
 # render and show detector image
-pos = [[0, 0, 27.], [0, 0, 30.], [0, 0, 33.], [0, 0, 36.]]
-Ims = RT.iterative_render(N=15e6, pos=pos)
+pos = [[0, 0, 15], [0, 0, 20], [0, 0, 25.], [0, 0, 29.], [0, 0, 31.], [0, 0, 36.]]
+Ims = RT.iterative_render(N=15e6, pos=pos, extent=[-5, 5, -5, 5])
 
 # show rendered images
 for dimg in Ims:

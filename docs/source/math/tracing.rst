@@ -239,72 +239,327 @@ Collision checks are done by first sorting the elements and then comparing posit
 After randomly sampling many points it needs to be checked if the position order in z-direction is equal.
 While this doesn't guarantee no collisions, while raytracing the sequentiality is checked for each ray and warnings are emitted.
 
+Intersection Calculation
+============================
 
-Hit Finding
-=============================
+Surface Extension
+--------------------
 
-Hit finding for analytical surfaces is described in :numref:`analytical_hit_find` and for numerical/user function surfaces in :numref:`numerical_hit_find`.
+To simplify the handling of non-intersecting rays and enforce the same number of ray sections for each ray, the surface is extended so all rays intersect a surface.
+Gaps on the surface are filled and the surface edge is extended radially towards infinity.
+A ray intersection is now calculated for the extended surface, but afterwards the ray is marked as hitting or non-hitting depending on a surface mask.
 
-
-Image Rendering
-====================
-
-Image rendering consists of two stages: 
-
- 1. Hit detection with the detector
- 2. Image calculation from ray position and weights
-
-Hit finding for a detector is more complicated as a normal surface, as there are no requirements for the detector position.
-It is therefore also possible for the detector to be inside other surfaces.
-
-Instead of calculation a surface hit once, is is calculated for all sections of a ray that are inside the z-range of the detector.
-After knowing the hit coordinates, one can check if they fall inside the region where the ray section is defined and if it is therefore is a valid hit.
-In the other case only the ray section extension hits the surface, but the ray already changed direction due to a adjacent surface.
-
-To speed things up, calculations are done in threads, while each thread gets a subset of rays. 
-Rays not reaching the detector at all, starting before it or getting absorbed before hitting the detector are sorted out as early as possible.
-
-At the end of the procedure it is known for each rays if it hits the detector and where.
-If an extent option was provided by the user, only the rays inside this extent are selected.
-Otherwise the rectangular extent gets calculated from the outermost rays.
-
-If the detector is not planar (e.g. a sphere section) the coordinates are first mapped with a projection method that are described in :numref:`sphere_projections`.
-For all hitting rays a two-dimensional histogram is generated, with a beforehand defined pixel size.
-The pixel count is higher as requested, as each image is rendered in a higher resolution to allow for resolution changes after rendering, see :numref:`rimage_rendering`.
-
-Image rendering is also done in threads.
-The created RImage object hold images for the three tristimulus values X, Y, Z, that can encompass all human-visible colors.
-The illuminance image can be directly calculated from the Y component and the pixel size, so an explicit rendering of this image is not required.
-The fourth image is an irradiance image, which is calculated from the ray powers and the pixel sizes.
-The aforementioned threads each get one of the four images.
-
-After image rendering the image is optionally filtered with an Airy-disk resolution filter and then rescaled to the desired resolution.
-
-.. figure:: ../images/DetectorPAP.svg
-   :width: 400
+.. figure:: ../images/surface_extension.svg
+   :width: 900
    :align: center
    :class: dark-light
-   
-   Detector intersection and image rendering flowchart.
+
+   Surface Extension
 
 
-Spectrum Rendering
-====================
+Intersection of a Ray with a Plane
+-----------------------------------
 
-Spectrum rendering works in a similar way to image rendering.
-Ray intersections are calculated, only hitting rays are selected and a histogram is rendered.
-But compared to an image, this is a spectral histogram within a wavelength range resulting from the rays wavelengths and powers.
-Instead of an :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` a :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` object is created with type :python:`"Histogram"`.
-
-The number of bins for the histogram is:
+The intersection of all planar surface types (**CircularSurface**, **RectangularSurface**, **RingSurface**) as well as the **TiltedSurface** can be computed analytically.
+The following definitions hold:
 
 .. math::
-   N_\text{b} = 1 + 2 \; \text{floor} \left(\frac{ \text{max}\left( 51, \frac{\sqrt{N}}{2}\right)} {2}\right)
+   \text{surface normal vector:}~~~~   \vec{n} &= (n_x, n_y, n_z)\\
+   \text{surface center vector:}~~~~ \vec{q} &= (x_0, y_0, z_0)\\
+   \text{point on ray or surface:}~~~~ \vec{p} &= (x, y, z)\\
+   \text{ray support vector:}~~~~ \vec{p_0} &= (x_{0p}, y_{0p}, z_{0p})\\
 
-This formula ensures :math:`N_\text{b}` is odd, so the center is well-defined.
-Independent of the number of rays :math:`N` the minimum of bins is set to 51 and scales with the square root of this number above a specific value.
-The latter is due to the SNR of the mean also increasing with :math:`\sqrt{N}` for normal-distributed noise.
-So the number of bins is adapted so that the SNR stays the same, but the spectrum resolution increases.
+The surface point normal equation is:
+
+.. math::
+   (\vec{p} - \vec{q})\cdot \vec{n} = 0
+   :label: plane_normal_eq_intersection
+
+The ray equation in dependence of ray paramter :math:`t` is as follows:
+
+.. math::
+   \vec{p} = \vec{p_0} + \vec{s} \cdot t
+   :label: line_equation_common
+
+Inserting these equations into each other leads to
+
+.. math::
+    (\vec{p_0} + \vec{s}\cdot t_\text{h} - \vec{q}) \cdot \vec{n} = 0
+   :label: plane_intersection_formula0
+
+Rearranging gives us the ray parameter for the hit point :math:`t_\text{h}` for case :math:`\vec{s} \cdot \vec{n} \neq 0`:
+
+.. math::
+   t_\text{h} = \frac{(\vec{q} - \vec{p_0})\cdot \vec{n}}{\vec{s} \cdot \vec{n}}
+   :label: plane_intersection_formula
+
+which can be inserted into the ray equation to get the intersection position.
+If :math:`\vec{s} \cdot \vec{n} \neq 0`, surface normal and ray direction vector are perpendicular.
+If the ray lies inside the plane, there are infinite solutions, if it doesn't there is none.
+
+Intersection of a Ray with a Conic Surface
+--------------------------------------------
+
+Intersections with a **ConicSurface** can also be calculated numerically.
+
+.. math::
+   \text{Ray support vector:}~~~~   \vec{p} &= (p_x, p_y, p_z)\\
+   \text{Ray direction vector:}~~~~ \vec{s} &= (s_x, s_y, s_z)\\
+   \text{Center of surface:}~~~~    \vec{q} &= (x_0, y_0, z_0)
+   :label: IntersectionAsphere0
+
+.. math::
+   p_z + s_z t = z_0 + \frac{\rho r^2}{1 + \sqrt{1-(k+1)\rho^2 r^2}}
+   :label: IntersectionAsphere1
+
+with
+
+.. math::
+   r^2 = (p_x + s_x t - x_0)^2 + (p_y+s_y t - y_0)^2
+   :label: IntersectionAsphere2
+
+Some work in rearranging leads to the following equation, valid for :math:`\rho \neq 0` (conic section is not a plane):
+
+.. math::
+   A t^2 + 2 B t + C = 0
+   :label: IntersectionAsphere3
+
+with
+
+.. math:: 
+   A &= 1 + k s_z^2\\
+   B &= o_x s_x + o_y s_y - \frac{s_z}{\rho} + (k+1) o_z s_z\\
+   C &= o_x^2 + o_y^2 - 2\frac{o_z}{\rho} + (k+1) o_z^2\\
+   \vec{o} &= \vec{p} - \vec{q} = (o_x, o_y, o_z)
+   :label: IntersectionAsphere4
+
+The solutions for :math:`t` are (:math:`\rho \neq 0`):
+
+.. math::
+   t = 
+   \begin{cases}
+       \frac{-B \pm \sqrt{B^2 -CA}}{A} & \text{for}~~ A \neq 0, ~~ B^2 - CA \geq 0 \\
+       -\frac{C}{2B} & \text{for}~~ A = 0, ~~B \neq 0\\
+       \{\mathbb{R}\} & \text{for}~~ A = 0, ~~B = 0, ~~C = 0\\
+       \emptyset & \text{else}
+   \end{cases}
+   :label: IntersectionAsphere5
+
+The first case produces two intersections, while in the second the ray touches the surface tangentially.
+In the fourth case there is no intersection.
+In cases one and two it has to be checked if the intersection lies inside the valid radial range of the surface, as the conic equation describes the surface for all possible :math:`r`.
+If there are still two valid intersections in the first case, the one with the lower axial position is used.
+The third case is only relevant for rays lying along a linear section of a surface, for instance a plane or a cone surface.
+This is further explained below.
+Equation :math:numref:`IntersectionAsphere5` produces the same results as :footcite:`Boussemaere_2021_8`, although in his derivation the constants :math:`A, B, C` include an additional curvature scaling and the factor 2 included in :math:`B`.
+
+In the case of :math:`\rho = 0` (plane) equation :math:numref:`IntersectionAsphere1` simplifies to :math:`p_z + s_z t = z_0`, leading to:
+
+.. math::
+   t = 
+   \begin{cases}
+       - \frac{p_z - z_0}{s_z} & \text{for}~~ s_z \neq 0 \\
+       \{\mathbb{R}\} & \text{for}~~ s_z = 0, p_z = z_0\\
+       \emptyset & \text{for}~~ s_z = 0,~p_z\neq z_0\\
+   \end{cases}
+   :label: IntersectionAsphere6
+
+The first case produces exactly one intersection and corresponds to the special case of equation :math:numref:`plane_intersection_formula` for :math:`\vec{n} = (0, 0, 1)`.
+In the second case the ray lies inside the plane, producing infinite intersection positions.
+In the third case the ray is parallel, but offset to the plane, producing no hits.
+We enforce :math:`s_z > 0` in our simulator, so only the first case is relevant.
+
+For :math:`\rho \rightarrow \infty, r \in \mathbb{R}` the conic section becomes a cone for :math:`k < -1`, a line from :math:`z = z_0` to :math:`z \rightarrow \infty` for :math:`k = -1` or a point at :math:`(x_0, y_0, z_0)` for :math:`k > -1`.
+In the first two cases the conic sections consists of long linear segments.
+Depending on the cases of equation :math:numref:`IntersectionAsphere5`, a ray can intersect once, twice, don't hit the surface or lie inside of it.
+For a point (:math:`k > -1`) there can be no hit or a single one.
+For the latter case :math:`B^2 - CA = 0` holds, producing a single intersection in the first case of equation :math:numref:`IntersectionAsphere5`.
+
+
+.. _numerical_hit_find:
+
+Numerical Hit Search
+-----------------------
+
+For the asphere equation or arbitrary analytical functions there is no analytical solution for a ray intersection.
+In such cases the solution needs be calculated iteratively.
+
+.. math::
+   \text{Ray support vector:}~~~~   \vec{p_0} &= (p_x, p_y, p_z)\\
+   \text{Ray direction vector:}~~~~ \vec{s} &= (s_x, s_y, s_z)\\
+   \text{Point on Ray:}~~~~ \vec{p_t} &= (x_t, y_t, z_t)\\
+
+Ray line equation depending on ray parameter :math:`t`:
+
+.. math::
+   \vec{p_t}(t)=\vec{p}_{0}+t \cdot \vec{s}
+   :label: pt
+
+Cost function :math:`G` with surface function :math:`f`:
+
+.. math::
+   G(t)=z_{t}-f\left(x_{t}, y_{t}\right)
+   :label: G
+
+
+The parameters :math:`x_t,y_t,z_t` can be determined from equation :math:numref:`pt`. 
+For the position determination of the hit, the root of this scalar function :math:`G` must now be found. 
+Typical optimization algorithms are suitable for this purpose. 
+
+However, these have the disadvantage that they do not have a guaranteed convergence. 
+Therefore, the ray tracer uses the Regula-Falsi method. 
+This is a simple iterative method, which is guaranteed to converge superlinearly with a slight modification. 
+The prerequisite for the procedure is, however, that an interval with a root is known.
+Since the minimum and maximum extent of the surface in the z-direction in the raytracer is known, this criterion is given, because a hit can only occur within this range. The method basically works by trying to shrink the interval including the function root in every iteration. 
+A well-written explanation can be found in :footcite:`RegulaFalsiWiki`.
+
+Now, in some cases the interval may hardly decrease in size from one iteration to the next. 
+To prevent slow convergence the procedure is therefore extended to the so called Illinois algorithm, which is explained in :footcite:`IllinoisAlgoWiki`.
+
+The implementation in optrace differs only in parallelizing the optimization and only iterating the next step with not already converged rays.
+
+Normal Calculation
+====================
+
+General
+--------------------
+
+Surface normals are required to calculate the refraction, polarization and transmittance of a ray.
+Equation for an analytical, unnormalized normal vector: :footcite:`NormalWiki`
+
+.. math::
+   \vec{n} = 
+   \begin{pmatrix}
+        -\frac{\partial z}{\partial x}\\
+        -\frac{\partial z}{\partial y}\\
+        1\\
+   \end{pmatrix}
+   :label: normal_general
+
+The vector needs to be normalized:
+
+.. math::
+   \vec{n}_0 = \frac{\vec{n}}{|| \vec{n} ||}
+   :label: normal_numerical_norm
+
+
+Planar Surfaces
+--------------------
+
+For surface types **Rectangle**, **Circle** and **Ring** :math:`n` is simply :math:`n = (0, 0, 1)`.
+Surface type **TiltedSurface** provides a user specified value for :math:`n`, which is normalized internally.
+
+Asphere 
+---------------------------
+
+The radial derivative of an asphere equation <> is
+
+.. math::
+   m_r = \frac{\partial z}{\partial r} = \frac{\rho r}{\sqrt{1 - (k+1)\rho^2 r^2}} + \sum_{i=1}^{m}  2i \cdot  a_i \cdot r^{2i - 1} = \tan \alpha
+   :label: asphere_deriv
+
+This radial component needs to be rotated around the vector :math:`(0, 0, 1)` by the angle :math:`\phi`.
+According to the general normal calculation <> the x- and y- components of the unnormalized vector are:
+
+.. math::
+    \frac{\partial z}{\partial x} &= m_r \cos \phi\\
+    \frac{\partial z}{\partial y} &= m_r \sin \phi\\
+   :label: normal_general_asph
+
+Which can be applied to equation <> above.
+
+Conic Surface
+--------------------
+
+The derivative of the conic function is a simplifcation of the asphere case, where the polynomials are missing:
+
+.. math::
+   m_r = \frac{\rho r}{\sqrt{1 - (k+1)\rho^2 r^2}}
+   :label: conic_derivative
+
+:math:`m_r` is equivalent to :math:`\tan \alpha`, the tangens of angle between surface normal and vector :math:`(0, 0, 1)`.
+By using geometrical relations, :math:`\sin \alpha` can be calculated, which provides the radial component :math:`n_r` of the normalized normal vector:
+
+.. math::
+   n_r = -\sin{\alpha} = -\frac{m_r}{\sqrt{m_r^2+1}} = -\frac{\rho r}{\sqrt{1- k\rho^2 r^2}}
+   :label: conic_nr
+
+The normalized vector :math:`n` for the **ConicSurface** is then:
+
+.. math::
+   \vec{n} = 
+   \begin{pmatrix}
+      n_r \cos \phi\\
+      n_r \sin \phi\\
+      \sqrt{1- n_r^2}
+   \end{pmatrix}
+   :label: conic_n
+
+
+For a **SphericalSurface** this simplifies further to:
+
+.. math::
+   \vec{n} = 
+   \begin{pmatrix}
+        -\rho r \cos \phi \\
+        -\rho {}r \sin \phi\\
+        \sqrt{ 1 - \rho^2 r^2}\\
+   \end{pmatrix}
+   :label: sphere_n
+
+
+FunctionSurface
+--------------------
+
+For types **FunctionSurface1D**, **FunctionSurface2D** the derivatives needed for the normal vector are calculated numerically.
+One exception is the case, where a derivative function was provided to the object.
+
+The central first derivative has the form:
+
+.. math::
+   f'(x) = \frac{f(x+\varepsilon) - f(x-\varepsilon)}{2 \varepsilon}
+   :label: central_first_deric
+    
+.. math::
+    \frac{\partial z}{\partial x} &\approx \frac{z(x + \varepsilon, ~y) - z(x - \varepsilon, ~y)}{2\varepsilon}\\
+    \frac{\partial z}{\partial y} &\approx \frac{z(x, ~y + \varepsilon) - z(x, ~y - \varepsilon)}{2\varepsilon}\\
+
+In the case of a **FunctionSurface1D** both derivatives are equal and only one value needs to be calculated.
+The step width is chosen as maximum of optimal step width :math:`\varepsilon_\text{o}` and minimal positional step width :math:`\varepsilon_\text{p}`:
+
+.. math::
+   \varepsilon = \max (\varepsilon_\text{o}, ~\varepsilon_\text{n})
+   :label: eps_selection
+
+
+The optimal step width is :footcite:`DiffIntMorken`:
+
+.. math::
+   \varepsilon_\text{o} = \sqrt[3]{3 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(3)}(x)} \right|} 
+   :label: optimal_step_width
+
+with :math:`\varepsilon_\text{f}` being the machine precision for the used floating type.
+Expecting mostly spherical surfaces, the main function component is :math:`x^2`.
+Higher polynomial orders are less prominent, so one valid assumption can be :math:`\left| \frac{f(x)}{f^{(3)}(x)} \right| = 50`. 
+While this might be different for every function, due to the forth root a quotient being 1000 times larger only leads to a change of around factor :math:`10` in :math:`\varepsilon_\text{0}`.
+With :math:`\varepsilon_\text{f} \approx 2.22\cdot 10^{-16}` for a 64bit floating point number, we get :math:`\varepsilon_\text{o} \approx 3.22 \cdot 10^{-5}`.
+Optrace units are given in millimeters, so this is equivalent to a value of :math:`32.2\,` nm.
+
+Not only differences in :math:`f` need to be representable, but :math:`x+\varepsilon` needs to be different from :math:`x`.
+For this it must be ensured, that :math:`x+ \varepsilon > x (1 + \varepsilon_\text{f})` for every coordinate :math:`x` on the surface.
+With :math:`r_\text{max}` being the largest absolute distance on the surface the minimal bound is
+
+.. math::
+   \varepsilon_\text{p} = r_\text{max} ~\varepsilon_\text{f}
+   :label: machine_eps_scaling
+
+It is recommended to center the surface at :math:`x=0` before differentiation so :math:`r_\text{max}` is minimal. 
+
+
+DataSurface
+----------------------------
+
+lorem ipsum
 
 ------------
 

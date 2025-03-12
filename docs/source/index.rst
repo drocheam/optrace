@@ -12,7 +12,7 @@ optrace - A scripting based optics simulation package with sequential raytracing
           :width: 165
           :class: dark-light
     
-     - .. figure:: images/example_rgb_render2.webp
+     - .. figure:: images/example_rgb_render4.webp
           :align: center
           :width: 155
           :class: dark-light
@@ -99,20 +99,28 @@ Similar Software
    :class: table-borderless
 
    * - Geometrical Optics
-        * `RayOptics <https://ray-optics.readthedocs.io/en/latest/>`__ by Michael Hayford. Tracing and optical design analysis tool. 
-        * `rayopt <https://github.com/quartiq/rayopt>`__ by QUARTIQ. Tracing and optical design analysis tool. 
-        * `RayTracing <https://github.com/DCC-Lab/RayTracing>`__ by DCC-Lab. Paraxial raytracer with beampath visualization.
+        * `RayOptics <https://ray-optics.readthedocs.io/en/latest/>`__ by Michael Hayford. 
+          Tracing and optical design analysis tool. 
+        * `rayopt <https://github.com/quartiq/rayopt>`__ by QUARTIQ. 
+          Tracing and optical design analysis tool. 
+        * `RayTracing <https://github.com/DCC-Lab/RayTracing>`__ by DCC-Lab. 
+          Paraxial raytracer with beampath visualization.
    
      - Wave Optics
-        * `diffractsim <https://github.com/rafael-fuente/diffractsim>`__ by Rafael de la Fuente. Waveoptics simulation of arbitrary apertures and phase holograms.
-        * `poppy <https://github.com/spacetelescope/poppy>`__ by Space Telescope Science Institute. Fraunhofer and Fresnel propagation for optics.
-        * `prysm <https://prysm.readthedocs.io/en/stable/index.html>`__ by Brandon Dube. Interferometer and diffraction calculations.
+        * `diffractsim <https://github.com/rafael-fuente/diffractsim>`__ by Rafael de la Fuente. 
+          Waveoptics simulation of arbitrary apertures and phase holograms.
+        * `poppy <https://github.com/spacetelescope/poppy>`__ by Space Telescope Science Institute. 
+          Fraunhofer and Fresnel propagation for optics.
+        * `prysm <https://prysm.readthedocs.io/en/stable/index.html>`__ by Brandon Dube. 
+          Interferometer and diffraction calculations.
    
    * - |
 
        Geometrical + Wave Optics
-        * `opticspy <http://opticspy.org/>`__ by Xing Fan. Tracing, Wave optics, aberration and Zernike polynomial analysis.
-        * `raypier <https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model>`__ by Bryan Cole. Raytracing and beamlet propagation with 3D viewer.
+        * `opticspy <http://opticspy.org/>`__ by Xing Fan. 
+          Tracing, Wave optics, aberration and Zernike polynomial analysis.
+        * `raypier <https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model>`__ by Bryan Cole. 
+          Raytracing and beamlet propagation with 3D viewer.
 
      - 
 

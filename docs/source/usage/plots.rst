@@ -20,12 +20,6 @@ You can import it in the following way:
 
    import optrace.plots as otp
 
-..And access an exemplary :python:`plotting_function` by writing:
-
-.. code-block::
-
-   otp.plotting_function(...)
-
 
 Parameters
 ______________
@@ -34,7 +28,7 @@ Most methods include a :python:`title` argument for a user defined plot title.
 
 .. code-block:: python
 
-   some_plotting_function(..., title="Name of plot")
+   otp.any_plotting_function(..., title="Name of plot")
 
 
 Legends and labels inside the figures are generated from descriptions of the objects. 
@@ -45,9 +39,10 @@ Make sure to create your objects with an expressive :python:`desc=".."` or :pyth
    obj = Object(..., desc="Abc378")
    obj2 = Object(..., long_desc="Some long description")
 
-   some_plotting_function([obj, obj2], ...)
+   otp.any_plotting_function([obj, obj2], ...)
 
-Plotting is implemented with :obj:`matplotlib`, so settings like size and dpi can be set globally with the :obj:`matplotlib.rcParams`:
+Plotting is implemented with :obj:`matplotlib`, so settings like size and dpi can be set globally 
+with the :obj:`matplotlib.rcParams`:
 
 .. testcode::
    
@@ -83,13 +78,14 @@ Note that files are **overwritten** and **not saved if the path is invalid**.
 
 .. code-block:: python
 
-   some_plotting_function(..., path="./results/image.jpeg")
+   otp.any_plotting_function(..., path="./results/image.jpeg")
 
-Additional saving parameters are specified using a dictionary called :python:`sargs` that can include parameters from :obj:`matplotlib.pyplot.savefig`.
+Additional saving parameters are specified using a dictionary called :python:`sargs` 
+that can include parameters from :obj:`matplotlib.pyplot.savefig`.
 
 .. code-block:: python
 
-   some_plotting_function(..., path="./results/image.jpeg", sargs=dict(dpi=150, pad_inches=0, transparent=True)
+   otp.any_plotting_function(..., path="./results/image.jpeg", sargs=dict(dpi=150, pad_inches=0, transparent=True))
 
 
 .. _surface_plotting:
@@ -97,11 +93,12 @@ Additional saving parameters are specified using a dictionary called :python:`sa
 Plotting Surfaces
 __________________________
 
-:func:`surface_profile_plot <optrace.plots.misc_plots.surface_profile_plot>` allows for the plotting of one or multiple surfaces.
-It takes a Surface or a list of Surfaces as argument as well as some other display options.
-The profiles are created in x-direction through the center y-coordinate.
+:func:`surface_profile_plot <optrace.plots.misc_plots.surface_profile_plot>`
+allows for the plotting of one or multiple surfaces. It takes a Surface or a list of Surfaces as argument 
+as well as some other display options. The profiles are created in x-direction through the center y-coordinate.
 Rotate the objects beforehand to slice through a different axis.
-The surface profiles are plotted with absolute coordinates, if you want to display them relative to each other provide :python:`remove_offset=True`.
+The surface profiles are plotted with absolute coordinates, if you want to display them relative 
+to each other provide :python:`remove_offset=True`.
 
 In the following example both cornea surfaces of the Arizona eye model are plotted:
 
@@ -135,7 +132,10 @@ This produces the following plot:
 Spectrum Plotting
 _____________________
 
-A :class:`Spectrum <optrace.tracer.spectrum.spectrum.Spectrum>`, :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` or :class:`TransmissionSpectrum <optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum>` is plotted with the function :func:`spectrum_plot <optrace.plots.spectrum_plots.spectrum_plot>`.
+A :class:`Spectrum <optrace.tracer.spectrum.spectrum.Spectrum>`, 
+:class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>` 
+or :class:`TransmissionSpectrum <optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum>` 
+is plotted with the function :func:`spectrum_plot <optrace.plots.spectrum_plots.spectrum_plot>`.
 It takes a single object or a list as arguments.
 
 .. testcode::
@@ -144,12 +144,13 @@ It takes a single object or a list as arguments.
 
    otp.spectrum_plot(ot.presets.light_spectrum.standard_natural)
 
-The user can provide a user-defined :python:`title`, turn off/on labels and the legend with :python:`legend_off, labels_off`. 
+The user can provide a user-defined :python:`title`, turn off/on labels 
+and the legend with :python:`legend_off, labels_off`. 
 
 .. testcode::
 
-   ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_natural, labels_off=False, title="CIE Standard Illuminants",
-                          legend_off=False)
+   ot.plots.spectrum_plot(ot.presets.light_spectrum.standard_natural, labels_off=False, 
+                          title="CIE Standard Illuminants", legend_off=False)
 
 The following figures demonstrate examples for spectral plots.
 
@@ -180,8 +181,11 @@ _____________________________________
 
 **Image**
 
-The :func:`image_plot <optrace.plots.image_plots.image_plot>` plotting function takes an :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` or :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>` as parameter.
-A :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` needs to be converted to a specific image type first.
+The :func:`image_plot <optrace.plots.image_plots.image_plot>` plotting function takes an 
+:class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` or 
+:class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>` as parameter.
+A :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` 
+needs to be converted to a specific image type first.
 
 .. testcode::
 
@@ -199,14 +203,16 @@ This is useful when the desired image is flipped due to the system's imaging.
 
 **Image Cut**
 
-For plotting an image profile the analogous function :func:`image_profile_plot <optrace.plots.image_plots.image_profile_plot>` is applied.
+For plotting an image profile the analogous function 
+:func:`image_profile_plot <optrace.plots.image_plots.image_profile_plot>` is applied.
 It additionally requires a profile parameter :python:`x` or :python:`y` that specifies the profile coordinate.
 
 .. testcode::
 
    otp.image_profile_plot(img, x=0)
 
-Supporting all the same parameters as for :func:`image_plot <optrace.plots.image_plots.image_plot>`, the following call is possible:
+Supporting all the same parameters as for :func:`image_plot <optrace.plots.image_plots.image_plot>`, 
+the following call is possible:
 
 .. testcode::
 
@@ -236,9 +242,13 @@ ________________________
 **Usage**
 
 Chromaticity plots allow for a representation of image or spectrum colors inside a chromaticity diagram.
-Both the :func:`chromaticities_cie_1931 <optrace.plots.chromaticity_plots.chromaticities_cie_1931>` or :func:`chromaticities_cie_1976 <optrace.plots.chromaticity_plots.chromaticities_cie_1976>` function are available, depending on your choice of diagram.
+Both the :func:`chromaticities_cie_1931 <optrace.plots.chromaticity_plots.chromaticities_cie_1931>`
+or :func:`chromaticities_cie_1976 <optrace.plots.chromaticity_plots.chromaticities_cie_1976>` function are available, 
+depending on your choice of diagram.
 
-It supports the plotting of :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`, :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` and :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>`.
+It supports the plotting of :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`, 
+:class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>`
+and :class:`LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>`.
 Example code for a :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`:
 
 .. code-block:: python
@@ -297,9 +307,11 @@ Chromaticity norms describe the brightness normalization for the colored diagram
    :align: left
 
    * - **Sum**
-     - Normalize the sRGB values so the channel sum equals one. Leads to a diagram with smooth color changes and approximately equal brightness.
+     - Normalize the sRGB values so the channel sum equals one. 
+       Leads to a diagram with smooth color changes and approximately equal brightness.
    * - **Euclidean** 
-     - Root-mean-square value of linear sRGB channels. A good compromise between "Largest" and "Sum", having more saturated colors than "Sum", but also smooth color changes compared to "Largest". The default option.
+     - Root-mean-square value of linear sRGB channels. A good compromise between "Largest" and "Sum",
+       having more saturated colors than "Sum", but also smooth color changes compared to "Largest". The default option.
    * - **Largest**
      - Maximum brightness for each sRGB color. Leads to colors with maximum brightness and saturation.
 
@@ -333,8 +345,9 @@ ______________________________
 
 **Index Plot**
 
-A :class:`RefractionIndex <optrace.tracer.refraction_index.RefractionIndex>` or a list of those objects can be plotted with the function :func:`refraction_index_plot <optrace.plots.spectrum_plots.refraction_index_plot>` from :mod:`optrace.plots`.
-The example below displays all glass presets in one figure.
+A :class:`RefractionIndex <optrace.tracer.refraction_index.RefractionIndex>` or a list of those objects 
+can be plotted with the function :func:`refraction_index_plot <optrace.plots.spectrum_plots.refraction_index_plot>`
+from :mod:`optrace.plots`. The example below displays all glass presets in one figure.
 
 .. testcode::
 
@@ -386,8 +399,10 @@ Focus Search Cost Function Plots
 __________________________________
 
 Cost plots are used to debug the focus search and assess how pronounced a focus or focus region is.
-Plotting the cost function and result is done by calling the :func:`focus_search_cost_plot <optrace.plots.misc_plots.focus_search_cost_plot>` method from :mod:`optrace.plots`.
-It requires the :python:`res, fsdict` parameters from the :meth:`focus_search <optrace.tracer.raytracer.Raytracer.focus_search>` function.
+Plotting the cost function and result is done by calling the 
+:func:`focus_search_cost_plot <optrace.plots.misc_plots.focus_search_cost_plot>` method from :mod:`optrace.plots`.
+It requires the :python:`res, fsdict` results from the 
+:meth:`focus_search <optrace.tracer.raytracer.Raytracer.focus_search>` function.
 
 .. code-block:: python
 
@@ -402,14 +417,14 @@ Below you can find examples for two cost function plots.
    :widths: 500 500
    :class: table-borderless
 
-   * - .. figure:: ../images/af_debug_position_variance.svg
+   * - .. figure:: ../images/focus_rms_spot_size.svg
           :align: center
           :width: 500
           :class: dark-light
 
-          Focus search for mode "Position Variance" in the :ref:`example_spherical_aberration` example.
+          Focus search for mode "RMS Spot Size" in the :ref:`example_spherical_aberration` example.
 
-     - .. figure:: ../images/af_debug_image_sharpness.svg
+     - .. figure:: ../images/focus_image_sharpness.svg
           :align: center
           :width: 500
           :class: dark-light
@@ -419,7 +434,8 @@ Below you can find examples for two cost function plots.
 .. highlight:: none
 
 
-When calling from the :class:`TraceGUI <optrace.gui.trace_gui.TraceGUI>`, it also outputs focus information inside the GUI:
+When calling from the :class:`TraceGUI <optrace.gui.trace_gui.TraceGUI>`,
+it also outputs focus information inside the GUI:
 
 ::
 

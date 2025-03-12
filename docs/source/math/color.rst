@@ -229,7 +229,7 @@ The third image shows the Perceptual Colorimetric rendering intent. One can clea
 When searching for chromaticity diagrams, a lot of negative examples can be found 
 (`Link1 <https://clarkvision.com/articles/color-cie-chromaticity-and-perception/color-rgb-xy-cie1931-diagram1g1000spjfjl1-1000-ciesrgb-axes-waveticks-c1-srgb-800.jpg>`__,
 `Link2 <https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a>`__,
-`Link3 <https://media.cheggcdn.com/study/e63/e632ad42-8674-4518-a7de-b031f2316b8a/image.png>`__,
+`Link3 <https://www.researchgate.net/publication/343625052/figure/fig1/AS:11431281108349626@1671475494103/Coordinates-of-the-hybrid-devices-in-the-CIE-1931-chromaticity-diagram.jpg>`__,
 `Link4 <https://d1hjkbq40fs2x4.cloudfront.net/2017-06-05/files/perceptual-vs-absolute-rendering-intents_1621-2.jpg>`__).
 
 In most cases negative sRGB values were simply clipped, distorting not only saturation, but also hue and brightness. For instance, colors near 510 nm get shown in deep green compared to a slightly nuanced greenish-cyan. In some cases even the representable colors inside the gamut are incorrect, which can be for instance seen as high saturated colors everywhere inside the diagram. 

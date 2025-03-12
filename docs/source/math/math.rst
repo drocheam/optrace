@@ -8,10 +8,10 @@ Implementation Details
    
    sampling
    tracing
-   geometry
-   spectrum
+   image_spectrum
    matrix_analysis
    convolution
    autofocus
    color
+   misc
 
