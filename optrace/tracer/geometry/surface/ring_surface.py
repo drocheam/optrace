@@ -105,7 +105,7 @@ class RingSurface(Surface):
         :param N: number of positions
         :return: position array, shape (N, 3)
         """
-        x, y = misc.ring_uniform(self.ri, self.r, N)
+        x, y = misc.stratified_ring_sampling(self.ri, self.r, N)
         
         p = np.tile(self.pos, (N, 1))
         p[:, 0] += x

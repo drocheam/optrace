@@ -62,10 +62,10 @@ class ColorTests(unittest.TestCase):
             self.assertAlmostEqual(RSci, WPi, delta=0.001) 
 
     def xyz_grid(self, N=1000000):
-        x, y = misc.uniform2(1e-6, 0.8, 1e-6, 0.9, N)
+        x, y = misc.stratified_rectangle_sampling(1e-6, 0.8, 1e-6, 0.9, N)
 
         # xyY -> XYZ rescales by Y/y, so multiply by y so range is [0...1]
-        Y = misc.uniform(1e-6, 1.2, x.shape[0])*y
+        Y = misc.stratified_interval_sampling(1e-6, 1.2, x.shape[0]) * y
    
         # use only values with valid z = 1 - x - y >= 0
         valid = (1 - x - y) >= 0

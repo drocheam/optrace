@@ -1540,7 +1540,7 @@ class Raytracer(Group):
         # sample cost function
         if return_cost or method in  ["Image Sharpness", "Image Center Sharpness"]:
 
-            r = misc.uniform(bounds[0], bounds[1], Nt, shuffle=False)
+            r = misc.stratified_interval_sampling(bounds[0], bounds[1], Nt, shuffle=False)
             vals = np.zeros_like(r)
 
             def threaded(N_th, N_is, Nt, *afargs):

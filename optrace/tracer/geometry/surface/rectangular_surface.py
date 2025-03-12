@@ -153,7 +153,7 @@ class RectangularSurface(Surface):
         """
         p = np.zeros((N, 3), dtype=np.float64, order='F')
         # grid for unrotated rectangle at (0, 0, 0)
-        x, y = misc.uniform2(*self._extent[:4], N)
+        x, y = misc.stratified_rectangle_sampling(*self._extent[:4], N)
 
         # rotate and add offset (=position)
         p[:, 0], p[:, 1] = self._rotate_rc(x, y, self._angle)

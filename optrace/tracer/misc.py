@@ -38,10 +38,8 @@ def timer(func: Callable) -> Any:
 
     return _time_it
 
-# TODO test shuffle option of uniform and uniform2
-# TODO better names, something like stratified_sampling etc.
 
-def uniform2(a: float, b: float, c: float, d: float, N: int, shuffle: bool = True) -> tuple[np.ndarray, np.ndarray]:
+def stratified_rectangle_sampling(a: float, b: float, c: float, d: float, N: int) -> tuple[np.ndarray, np.ndarray]:
     """
     Stratified Sampling 2D. 
     Lower discrepancy than scipy.stats.qmc.LatinHypercube.
@@ -51,10 +49,8 @@ def uniform2(a: float, b: float, c: float, d: float, N: int, shuffle: bool = Tru
     :param c: lower y-bound
     :param d: upper y-bound
     :param N: number of values
-    :param shuffle: shuffle order of values
     :return: tuple of random values inside [a, b] and [c, d]
     """
-    # return np.random.uniform(a, b, N), np.random.uniform(c, d, N)
 
     if not N:
         return np.array([], dtype=np.float64), np.array([], dtype=np.float64)
@@ -76,9 +72,6 @@ def uniform2(a: float, b: float, c: float, d: float, N: int, shuffle: bool = Tru
     x = np.concatenate((X.ravel(), random().uniform(a, b, dN)))
     y = np.concatenate((Y.ravel(), random().uniform(c, d, dN)))
 
-    if not shuffle:
-        return x, y
-
     # shuffle order
     ind = np.arange(N)
     random().shuffle(ind)
@@ -86,7 +79,7 @@ def uniform2(a: float, b: float, c: float, d: float, N: int, shuffle: bool = Tru
     return x[ind], y[ind]
 
 
-def uniform(a: float, b: float, N: int, shuffle: bool = True) -> np.ndarray:   
+def stratified_interval_sampling(a: float, b: float, N: int, shuffle: bool = True) -> np.ndarray:
     """
     Stratified Sampling 1D.
 
@@ -107,7 +100,8 @@ def uniform(a: float, b: float, N: int, shuffle: bool = True) -> np.ndarray:
         random().shuffle(x)
     return x
 
-def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.ndarray, np.ndarray]:
+
+def stratified_ring_sampling(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.ndarray, np.ndarray]:
     """
     Generate uniform random positions inside a ring area (annulus) with stratified sampling.
     This is done by equi-areal mapping from grid to disc to annulus.
@@ -119,7 +113,7 @@ def ring_uniform(ri: float, r: float, N: int, polar: bool = False) -> tuple[np.n
     :param polar: if polar coordinates should be returned instead of cartesian ones
     :return: random x and y positions (or r, phi)
     """
-    x, y = uniform2(-r, r, -r, r, N)
+    x, y = stratified_rectangle_sampling(-r, r, -r, r, N)
 
     r_ = np.zeros_like(x)
     theta = np.zeros_like(x)
@@ -234,7 +228,7 @@ def random_from_distribution(x: np.ndarray, f: np.ndarray, S: int | np.ndarray, 
         iF = scipy.interpolate.interp1d(F, x_, assume_sorted=True, kind="next", fill_value="extrapolate")
 
         # random variable, rescaled S or create new uniform variable
-        X = F[-1]*S if isinstance(S, np.ndarray) else uniform(0, F[-1], S)
+        X = F[-1]*S if isinstance(S, np.ndarray) else stratified_interval_sampling(0, F[-1], S)
 
     # use all values, linear interpolation
     else:
@@ -245,7 +239,7 @@ def random_from_distribution(x: np.ndarray, f: np.ndarray, S: int | np.ndarray, 
         iF = scipy.interpolate.interp1d(F, x, assume_sorted=True, kind="linear")
 
         # random variable, rescaled S or create new uniform variable
-        X = (F[0] + S*(F[-1] - F[0])) if isinstance(S, np.ndarray) else uniform(F[0], F[-1], S)
+        X = (F[0] + S*(F[-1] - F[0])) if isinstance(S, np.ndarray) else stratified_interval_sampling(F[0], F[-1], S)
 
     return iF(X)  # sample to get random values
 

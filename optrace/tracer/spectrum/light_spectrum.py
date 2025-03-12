@@ -95,7 +95,7 @@ class LightSpectrum(Spectrum):
                 wl0 = go.wavelength_range[0] if self.spectrum_type == "Constant" else self.wl0
                 wl1 = go.wavelength_range[1] if self.spectrum_type == "Constant" else self.wl1
 
-                wl = misc.uniform(wl0, wl1, N)
+                wl = misc.stratified_interval_sampling(wl0, wl1, N)
 
             case "Lines":
                 pc.check_type("LightSpectrum.lines", self.lines, np.ndarray | list)
@@ -109,14 +109,14 @@ class LightSpectrum(Spectrum):
 
             case "Gaussian":
                 # although scipy.stats.truncnorm exists, we want to implement this ourselves 
-                # so misc.uniform can be used as random generator
+                # so misc.stratified_interval_sampling can be used as random generator
 
                 # don't use the whole [0, 1] range for our random variable,
                 # since we only simulate wavelengths in [380, 780], but gaussian pdf is unbound
                 # therefore calculate minimal and maximal bound for the new random variable interval
                 Xl = (1 + scipy.special.erf((go.wavelength_range[0] - self.mu)/(np.sqrt(2)*self.sig)))/2
                 Xr = (1 + scipy.special.erf((go.wavelength_range[1] - self.mu)/(np.sqrt(2)*self.sig)))/2
-                X = misc.uniform(Xl, Xr, N)
+                X = misc.stratified_interval_sampling(Xl, Xr, N)
 
                 # icdf of gaussian pdf
                 wl = self.mu + np.sqrt(2)*self.sig * scipy.special.erfinv(2*X-1)

@@ -567,7 +567,7 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     rgb_sum /= np.where(rgb_sum_last, rgb_sum_last, 1)
 
     # chose x, y or z depending on in which range rgb_choice fell
-    rgb_choice = misc.uniform(0, 1, rgb.shape[0])
+    rgb_choice = misc.stratified_interval_sampling(0, 1, rgb.shape[0])
     make_r = rgb_choice < rgb_sum[:, 0]
     make_b = rgb_choice > rgb_sum[:, 1]
     make_g = ~make_r & ~make_b

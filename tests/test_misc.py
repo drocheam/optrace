@@ -249,9 +249,9 @@ class TracerMiscTests(unittest.TestCase):
     @pytest.mark.slow
     def test_misc_uniform(self):
 
-        # test uniform
+        # test stratified_interval_sampling
         for a, b, N in zip([0, -5, 8, 7, 32.3], [1, 15, 9, 7.0001, 1000], [1, 2, 100, 501, 1000]):
-            rand = misc.uniform(a, b, N)
+            rand = misc.stratified_interval_sampling(a, b, N)
             self.assertEqual(rand.shape[0], N)
 
             # check value range
@@ -262,13 +262,13 @@ class TracerMiscTests(unittest.TestCase):
             hist = np.histogram(rand, bins=N, range=[a, b])[0]
             self.assertTrue(np.allclose(hist - np.ones(N), 0))
      
-        rand = misc.uniform(0, 1, 0)  # call with N = 0
+        rand = misc.stratified_interval_sampling(0, 1, 0)  # call with N = 0
         self.assertEqual(rand.shape, (0, ))
 
-        # test uniform2
+        # test stratified_rectangle_sampling
         for a, b, c, d, N in zip([0, -5, 8, 7, 32.3], [1, 15, 9, 7.0001, 1000], 
                                  [-65, 7, 12, 32.3, -10], [0.7, 8, 90, 700.0001, 100], [1, 2, 100, 501, 1000]):
-            rand1, rand2 = misc.uniform2(a, b, c, d, N)
+            rand1, rand2 = misc.stratified_rectangle_sampling(a, b, c, d, N)
 
             # check shape
             self.assertEqual(rand1.shape[0], N)
@@ -289,47 +289,50 @@ class TracerMiscTests(unittest.TestCase):
             hist = np.histogram2d(rand1, rand2, bins=[N2, N2], range=[[a, b], [c, d]])[0]
             self.assertTrue(np.all(hist > 0))
 
-        rand1, rand2 = misc.uniform2(0, 1, 0, 1, 0)  # call with N = 0
+        rand1, rand2 = misc.stratified_rectangle_sampling(0, 1, 0, 1, 0)  # call with N = 0
         self.assertEqual(rand1.shape, (0, ))
         self.assertEqual(rand2.shape, (0, ))
 
         # the following part checks that dither and shuffling are presented
-        # since everything is random, there are constellations where all values are shuffled or have not dither
+        # since everything is random, there are constellations where all values are shuffled or have no dither
         # we test many times, so the probability become very small
         # but when we encounter any random list with correct shuffling and dither, we break the loop before
         # so we don't need to test that many cases
-        b1, b2 = False, False
-        for i in np.arange(200):
-            rand = misc.uniform(0, 1, 1000000)
-            b1 = b1 or np.std(np.diff(np.sort(rand))) > 1e-7  # check step variance (= dither)
-            b2 = b2 or np.any(np.diff(rand) < 0)  # check that not all are ascending (= sorted)
-            if b1 and b2:
-                break
+        for shuffle in [False, True]:  # check shuffled and unshuffled case
+            b1, b2 = False, False
+            for i in np.arange(200):
+                rand = misc.stratified_interval_sampling(0, 1, 1000000, shuffle=shuffle)
+                b1 = b1 or np.std(np.diff(np.sort(rand))) > 1e-7  # check step variance (= dither)
+                b2 = b2 or np.any(np.diff(rand) < 0)  # check that not all are ascending (= sorted)
+                if b1 and b2:
+                    break
 
-        self.assertTrue(b1)  # check if dithered
-        self.assertTrue(b2)  # check if shuffled
+            self.assertTrue(b1)  # check if dithered
+            self.assertTrue(b2 if shuffle else (not b2))  # check if shuffled
 
-        # same for uniform 2
+        # same for stratified_interval_sampling 2
         b1x, b1y, b2x, b2y = False, False, False, False
         N = 1000000  # position number
         N2 = int(np.sqrt(N))  # nearest downwards integer square root of N
         dN = N - N2**2  # difference between square number and desired number
         # if have e.g. A = [[0, 1, 2], [0, 1, 2], [0, 1, 2]]
         # which is of squared shape (N2, N2)
-        # in the flattend array [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2] we have therefore N2-1 negative differences between values
-        # since N from above is not an exact square number, we have additional dN random values, that also could lead to a
-        # negative difference
-        # so if values are randomly sorted, we typically (not always, since its random) should have more than N2+dN
+        # in the flattend array [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2] 
+        # we have therefore N2-1 negative differences between values
+        # since N from above is not an exact square number, we have additional dN random values, 
+        # that also could lead to a negative difference
+        # so if values are randomly sorted, we typically (not always, since its random) 
+        # should have more than N2+dN
         # negative differences between the flattened arrays
         # this is checked in the next part
         for i in np.arange(200):
-            randy, randx = misc.uniform2(0, 1, 0, 1, 1000000)
+            randy, randx = misc.stratified_rectangle_sampling(0, 1, 0, 1, 1000000)
             b1x = b1x or np.count_nonzero(np.abs(np.diff(np.sort(randx))) > 1e-9) > 2*(N2 + dN)  
             # ^-- only few zero steps between sorted values
-            b2x = b2x or (np.count_nonzero(np.diff(randx) < 0) > 2*(N2+dN)) # check that not all are ascending (= sorted)
+            b2x = b2x or (np.count_nonzero(np.diff(randx) < 0) > 2*(N2+dN)) # check that not all are ascending
             b1y = b1y or np.count_nonzero(np.abs(np.diff(np.sort(randy))) > 1e-9) > 2*(N2 + dN)  
             # ^-- only few zero steps between sorted values
-            b2y = b2y or (np.count_nonzero(np.diff(randy) < 0) > 2*(N2+dN)) # check that not all are ascending (= sorted)
+            b2y = b2y or (np.count_nonzero(np.diff(randy) < 0) > 2*(N2+dN)) # check that not all are ascending
             if b1x and b2x and b1y and b2y:
                 break
 
@@ -348,7 +351,7 @@ class TracerMiscTests(unittest.TestCase):
         d_lhc = qmc.discrepancy(sample_lhc)
 
         # samples with optrace stratified sampling
-        strat = misc.uniform2(0, 1, 0, 1, N)
+        strat = misc.stratified_rectangle_sampling(0, 1, 0, 1, N)
         strat = np.vstack(strat).T
         d_strat = qmc.discrepancy(strat)
 

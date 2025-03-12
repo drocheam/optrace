@@ -244,7 +244,7 @@ class RaySource(Element):
                 PY, PX = np.divmod(P, self._image.shape[1])  # pixel x, y position from pixel number
 
             # add random position inside pixel and calculate positions in 3D space
-            rx, ry = misc.uniform2(0, 1, 0, 1, N)
+            rx, ry = misc.stratified_rectangle_sampling(0, 1, 0, 1, N)
             xs, xe, ys, ye = self.surface.extent[:4]
             Iy, Ix = self._image.shape[:2]
 
@@ -302,25 +302,25 @@ class RaySource(Element):
             case "Lambertian" if not self.div_2d:
                 # see https://doi.org/10.1080/10867651.1997.10487479
                 # # see https://www.particleincell.com/2015/cosine-distribution/
-                r, alpha = misc.ring_uniform(0, np.sin(np.radians(self.div_angle)), N, polar=True)
+                r, alpha = misc.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
                 theta = ne.evaluate("arcsin(r)")
 
             case "Lambertian" if self.div_2d:
-                X0 = misc.uniform(0, np.sin(np.radians(self.div_angle)), N)
+                X0 = misc.stratified_interval_sampling(0, np.sin(np.radians(self.div_angle)), N)
                 theta = np.arcsin(X0)
 
             case "Isotropic" if not self.div_2d:
                 # see https://doi.org/10.1080/10867651.1997.10487479
                 # related https://mathworld.wolfram.com/SpherePointPicking.html
-                r, alpha = misc.ring_uniform(0, np.sin(np.radians(self.div_angle)), N, polar=True)
+                r, alpha = misc.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
                 theta = ne.evaluate("arccos(1 - r**2)")
             
             case "Isotropic" if self.div_2d:
-                theta = misc.uniform(0, np.radians(self.div_angle), N)
+                theta = misc.stratified_interval_sampling(0, np.radians(self.div_angle), N)
            
             case "Function" if not self.div_2d:
                 div_sin = np.sin(np.radians(self.div_angle))
-                r, alpha = misc.ring_uniform(0, div_sin, N, polar=True)
+                r, alpha = misc.stratified_ring_sampling(0, div_sin, N, polar=True)
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 # related https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
                 f = self.div_func(x, **self.div_args) * np.sin(x)
@@ -371,7 +371,7 @@ class RaySource(Element):
                     ang = np.radians(self.pol_angle)
 
                 case "Uniform":
-                    ang = misc.uniform(0, 2*np.pi, N)
+                    ang = misc.stratified_interval_sampling(0, 2 * np.pi, N)
 
                 case "List":
                     pc.check_type("RaySource.pol_angles", self.pol_angles, np.ndarray | list)
