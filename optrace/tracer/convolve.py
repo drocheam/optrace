@@ -127,7 +127,7 @@ def convolve(img:                RGBImage | LinearImage,
         psf_lin = color.xyz_to_srgb_linear(psf._data[:, :, :3], rendering_intent="Ignore")
 
         # normalize
-        if (maxi := np.max(psf_lin)):  # TODO case maxi = 0 not tested?
+        if (maxi := np.max(psf_lin)):
             psf_lin /= maxi
 
     # linear intensity image

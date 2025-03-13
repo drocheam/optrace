@@ -3,25 +3,22 @@
 import sys
 sys.path.append('.')
 
+import os
+import unittest
+import random
+
+import pytest
 import numpy as np
 from scipy.optimize import OptimizeResult
 import matplotlib.pyplot as plt
-
-import os
-import pytest
-import unittest
-import random
 
 import optrace as ot
 import optrace.plots as otp
 import optrace.tracer.color as color
 from optrace.tracer import misc as misc
 
-import matplotlib.pyplot as plt
-
 # Things that need to be checked by hand/eye:
 # applying of title and labels
-
 
 class PlotTests(unittest.TestCase):
 
@@ -127,13 +124,16 @@ class PlotTests(unittest.TestCase):
         self.assertRaises(TypeError, otp.chromaticities_cie_1976, ot.Point())  # invalid type
         self.assertRaises(TypeError, otp.chromaticities_cie_1976, [ot.presets.light_spectrum.d65,
                                                                    ot.Point()])  # invalid type in list
-        self.assertRaises(TypeError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, title=[])  # invalid title type
-        self.assertRaises(ValueError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, norm="abc")  # invalid norm
+        self.assertRaises(TypeError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, title=[])
+        # invalid title type
+        self.assertRaises(ValueError, otp.chromaticities_cie_1931, ot.presets.light_spectrum.d65, norm="abc")
+        # invalid norm
         
     @pytest.mark.slow
     def test_spectrum_plots(self):
 
-        self.assertRaises(RuntimeError, otp.spectrum_plot, ot.presets.light_spectrum.FDC)  # discrete type can't be plotted
+        self.assertRaises(RuntimeError, otp.spectrum_plot, ot.presets.light_spectrum.FDC)
+        # ^-- discrete type can't be plotted
         self.assertRaises(TypeError, otp.refraction_index_plot, ot.Point())
         self.assertRaises(TypeError, otp.spectrum_plot, ot.Point())
         self.assertRaises(TypeError, otp.refraction_index_plot, ot.presets.refraction_index.SF10, title=2)

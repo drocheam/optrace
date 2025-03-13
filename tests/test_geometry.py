@@ -13,9 +13,7 @@ import optrace.tracer.color as color
 import optrace as ot
 from optrace.tracer.geometry.element import Element
 from optrace.tracer.base_class import BaseClass as BaseClass
-
 from optrace.tracer.geometry.surface import Surface
-
 
 
 class GeometryTests(unittest.TestCase):
@@ -121,9 +119,9 @@ class GeometryTests(unittest.TestCase):
     
     def test_line_marker(self):
         
-        # init exceptions
-        self.assertRaises(TypeError, ot.LineMarker, r=3, desc="Test", pos=[0, 0, 0], line_factor="yes")  # invalid factor type
-        self.assertRaises(TypeError, ot.LineMarker, r=3, desc="Test", pos=[0, 0, 0], text_factor="yes")  # invalid factor type
+        # init exceptions for invalid facots
+        self.assertRaises(TypeError, ot.LineMarker, r=3, desc="Test", pos=[0, 0, 0], line_factor="yes")
+        self.assertRaises(TypeError, ot.LineMarker, r=3, desc="Test", pos=[0, 0, 0], text_factor="yes")
 
         LM = ot.LineMarker(r=5, angle=12, desc="hjkhkJ", pos=[5, 6, 7])
         self.assertTrue(np.allclose(LM.pos - [5, 6, 7], 0))
@@ -178,7 +176,8 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(RuntimeError, ot.Detector, ot.DataSurface2D(data=np.ones((50, 50)), r=3), pos=[0, 0, 0])  
         
         # invalid detector type
-        self.assertRaises(RuntimeError, ot.Detector, ot.AsphericSurface(r=3, R=12, k=-5, coeff=[0, 0.001]), pos=[0, 0, 0])  
+        self.assertRaises(RuntimeError, ot.Detector, ot.AsphericSurface(r=3, R=12, k=-5,
+                                                                        coeff=[0, 0.001]), pos=[0, 0, 0])
 
     def test_element(self):
 
@@ -201,8 +200,8 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(ValueError, Element, front, pos, back, d1=-1, d2=1)  # d1 negative
         self.assertRaises(ValueError, Element, front, [5, 5], back, 1, 1)  # wrong pos shape
 
-        L = ot.Lens(ot.CircularSurface(r=3), ot.SphericalSurface(r=3, R=10), n=ot.RefractionIndex("Constant", n=1.1), 
-                    pos=[0, -1, 5], d=2)
+        L = ot.Lens(ot.CircularSurface(r=3), ot.SphericalSurface(r=3, R=10),
+                    n=ot.RefractionIndex("Constant", n=1.1), pos=[0, -1, 5], d=2)
 
         self.assertTrue(L.has_back())
         self.assertTrue(np.all(L.pos == np.array([0, -1, 5])))
@@ -281,7 +280,8 @@ class GeometryTests(unittest.TestCase):
         G = ot.Group()
 
         RS = ot.RaySource(ot.Point(), pos=[0, 0, 0], spectrum=ot.presets.light_spectrum.led_b1)
-        F = ot.Filter(ot.CircularSurface(r=3, desc="a"), spectrum=ot.TransmissionSpectrum("Constant", val=1), pos=[0, 0, 5])
+        F = ot.Filter(ot.CircularSurface(r=3, desc="a"), spectrum=ot.TransmissionSpectrum("Constant", val=1),
+                      pos=[0, 0, 5])
         DET = ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 10])
         AP = ot.Aperture(ot.RingSurface(r=3, ri=0.2, desc="a"), pos=[0, 0, 10])
         M = ot.PointMarker("Test", pos=[0, 0, 10])
@@ -512,8 +512,10 @@ class GeometryTests(unittest.TestCase):
                             self.assertGreater(np.min(s[:, 2]), 0)  # ray direction in positive direction
                             self.assertGreater(np.min(weights), 0)  # no zero weight rays
                             self.assertAlmostEqual(np.sum(weights), rargs["power"])  # rays amount to power
-                            self.assertGreaterEqual(np.min(wavelengths), ot.global_options.wavelength_range[0])  # inside visible range
-                            self.assertLessEqual(np.max(wavelengths), ot.global_options.wavelength_range[1])  # inside visible range
+                            self.assertGreaterEqual(np.min(wavelengths), ot.global_options.wavelength_range[0])
+                            # ^-- inside visible range
+                            self.assertLessEqual(np.max(wavelengths), ot.global_options.wavelength_range[1])
+                            # ^-- inside visible range
 
                             # check positions
                             self.assertTrue(np.all(p[:, 2] == rargs["pos"][2]))  # rays start at correct z-position
@@ -585,7 +587,8 @@ class GeometryTests(unittest.TestCase):
         # image error handling
         self.assertRaises(RuntimeError, ot.RaySource, ot.RGBImage(np.ones((int(1.1*ot.RaySource._max_image_px), 1, 3)),
                                                                [2, 2]))  # image too large
-        self.assertRaises(ValueError, ot.RaySource, ot.RGBImage(np.zeros((100, 100, 3)), [2, 2]))  # image completely black
+        self.assertRaises(ValueError, ot.RaySource, ot.RGBImage(np.zeros((100, 100, 3)), [2, 2]))
+        # ^-- image completely black
 
     def test_ray_source_polarization(self):
             
@@ -596,15 +599,19 @@ class GeometryTests(unittest.TestCase):
         for pmode, pangle in zip(["x", "y", "Constant", "Constant", "Constant"], [0, np.pi/2, 0.2, -0.5, 3.5]):
             RS = ot.RaySource(ot.CircularSurface(r=2), polarization=pmode, pol_angle=np.degrees(pangle))
             _, _, pols, _, _ = RS.create_rays(N)
-            psx = misc.rdot(pols, sx)  # for light parallel to optical axis cos(pangle) is the scalar product between pol and x-axis
+            psx = misc.rdot(pols, sx)
+            # ^-- for light parallel to optical axis cos(pangle) is the scalar product between pol and x-axis
             self.assertTrue(np.allclose(psx - np.cos(pangle), 0))  # check if near each other
 
         # list polarization angles
-        for pmode, pangles, pprobs in zip(["xy", "List", "List"], [[0, np.pi/2], [0, 0.2], [0, 0.2]], [[1, 1], [1, 1], [1, 2]]):
+        for pmode, pangles, pprobs in zip(["xy", "List", "List"], [[0, np.pi/2], [0, 0.2], [0, 0.2]],
+                                          [[1, 1], [1, 1], [1, 2]]):
             RS = ot.RaySource(ot.CircularSurface(r=2), polarization=pmode, pol_angles=np.degrees(pangles), pol_probs=pprobs)
             _, _, pols, _, _ = RS.create_rays(N)
-            psx = misc.rdot(pols, sx)  # for light parallel to optical axis cos(pangle) is the scalar product between pol and x-axis
-            self.assertTrue(np.all((np.abs(psx - np.cos(pangles[0])) < 1e-5) | (np.abs(psx - np.cos(pangles[1])) < 1e-5)))
+            psx = misc.rdot(pols, sx)
+            # ^-- for light parallel to optical axis cos(pangle) is the scalar product between pol and x-axis
+            self.assertTrue(np.all((np.abs(psx - np.cos(pangles[0])) < 1e-5) |
+                                   (np.abs(psx - np.cos(pangles[1])) < 1e-5)))
 
             # check if expectation value matches
             mean = np.sum(np.array(pangles)*np.array(pprobs)) / np.sum(pprobs)
@@ -619,7 +626,8 @@ class GeometryTests(unittest.TestCase):
        
         # function mode
         # check if standard deviation for uniform polarization matches
-        RS = ot.RaySource(ot.CircularSurface(r=2), polarization="Function", pol_func=lambda x: np.exp(-(x-0.5)**2/2/0.03**2))
+        RS = ot.RaySource(ot.CircularSurface(r=2), polarization="Function",
+                          pol_func=lambda x: np.exp(-(x-0.5)**2/2/0.03**2))
         _, _, pols, _, _ = RS.create_rays(N)
         psx = misc.rdot(pols, sx)  
         self.assertAlmostEqual(np.degrees(np.std(np.arccos(psx))), 0.03, delta=0.001)
@@ -740,7 +748,8 @@ class GeometryTests(unittest.TestCase):
         # group with ascending order of desc strings according to z position
         G = ot.Group([
             ot.RaySource(ot.CircularSurface(r=3), pos=[0, 1, -1], desc="0"),
-            ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Constant", val=0.5), pos=[0, 0, 2], desc="1"),
+            ot.Filter(ot.CircularSurface(r=3), spectrum=ot.TransmissionSpectrum("Constant", val=0.5),
+                      pos=[0, 0, 2], desc="1"),
             ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 5], d=1, n2=n, desc="2"),
             ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 7], d=1, n2=n2, desc="3"),
             ot.Lens(ot.CircularSurface(r=5), ot.CircularSurface(r=3), n=n, pos=[0, 0, 9], n2=n3, d=1, desc="4"),

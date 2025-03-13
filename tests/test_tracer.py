@@ -179,7 +179,8 @@ class TracerTests(unittest.TestCase):
         RS = ot.RaySource(ot.Point(), pos=[0, 0, -10])
         RT.add(RS)
 
-        RT.add(ot.Lens(ot.SphericalSurface(r=3, R=-3.2), ot.CircularSurface(r=3), n=ot.presets.refraction_index.SF10, pos=[0, 0, 0], d=0.2))
+        RT.add(ot.Lens(ot.SphericalSurface(r=3, R=-3.2), ot.CircularSurface(r=3), n=ot.presets.refraction_index.SF10,
+                       pos=[0, 0, 0], d=0.2))
 
         RT.trace(10000)  # works
         self.assertFalse(RT.geometry_error)
@@ -289,7 +290,6 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.Raytracer.check_collision, ot.Point(), ot.Point())
         self.assertRaises(TypeError, ot.Raytracer.check_collision, ot.Line(), ot.Line())
 
-    @pytest.mark.slow
     def test_focus(self):
         
         RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 40], n0=ot.RefractionIndex("Constant", n=1.1))
@@ -340,7 +340,8 @@ class TracerTests(unittest.TestCase):
         res, _ = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=1, return_cost=False)
         self.assertAlmostEqual(res.x, 73.73, delta=0.1)
 
-        self.assertRaises(ValueError, RT.focus_search, RT.focus_search_methods[0], z_start=-100)  # z_start outside outline
+        self.assertRaises(ValueError, RT.focus_search, RT.focus_search_methods[0], z_start=-100)
+        # z_start outside outline
         self.assertRaises(ValueError, RT.focus_search, "AA", z_start=10)  # invalid mode
         self.assertRaises(IndexError, RT.focus_search, RT.focus_search_methods[0], z_start=10, source_index=-1)
         # index negative
@@ -350,10 +351,12 @@ class TracerTests(unittest.TestCase):
         # coverage tests
 
         RT.focus_search(RT.focus_search_methods[0], z_start=RT.outline[4]) # before all lenses, source_index=None
-        RT.focus_search(RT.focus_search_methods[0], z_start=RT.outline[4], source_index=0) # before all lenses, source_index
+        RT.focus_search(RT.focus_search_methods[0], z_start=RT.outline[4], source_index=0)
+        # before all lenses, source_index
         RT.focus_search(RT.focus_search_methods[0], z_start=RT.outline[5])  # behind all lenses
         RT.focus_search(RT.focus_search_methods[0], z_start=RT.lenses[0].extent[5] + 0.01)  # between lenses
-        RT.focus_search(RT.focus_search_methods[0], z_start=RT.lenses[-1].extent[4] - 0.01)  # between lenses with n_ambient
+        RT.focus_search(RT.focus_search_methods[0], z_start=RT.lenses[-1].extent[4] - 0.01)
+        # between lenses with n_ambient
         RT.focus_search("Irradiance Variance", z_start=RT.outline[5])
         # leads to a warning, that minimum may not be found
         
@@ -593,7 +596,8 @@ class TracerTests(unittest.TestCase):
         # equally radially spaced points on sphere should also be equally spaced in projection
         RSS0 = ot.RectangularSurface(dim=[0.0001, 0.0001])
         # add point sources with parallel rays
-        for theta in [-89.99, -60, -30, 0.001, 30, 60, 89.99]:  # slightly decentered central value so we only hit one pixel
+        for theta in [-89.99, -60, -30, 0.001, 30, 60, 89.99]:
+            # slightly decentered central value so we only hit one pixel
             RS0 = ot.RaySource(RSS0, divergence="None", div_2d=False,
                     pos=[0, 0, 0], s_sph=[theta, 0])
             RT.add(RS0)
@@ -614,7 +618,8 @@ class TracerTests(unittest.TestCase):
         for rs in RT.ray_sources.copy():
             RT.remove(rs)
 
-        # Stereographic projection: small circles on surface keep relative their shape, therefore also their side lengths
+        # Stereographic projection:
+        # small circles on surface keep relative their shape, therefore also their side lengths
         # only the overall size changes
         # in the different projections circles near the sphere edge are distorted
         # here we check the side ratio of the generated detector image for each circle
@@ -675,6 +680,7 @@ class TracerTests(unittest.TestCase):
 
         # test tracing for different number of rays, sources and different power ratios and threads
         for i in np.arange(2):  # different number of sources (1 source gets removed after each iteration)
+
             for powersi in powers:  # different power ratios
                 for N in Ns:  # different rays numbers
                     for N_th in [1, 4, 8]:  # different number of threads
@@ -711,15 +717,21 @@ class TracerTests(unittest.TestCase):
                         ch = np.random.randint(0, 2, size=N).astype(bool)
                         N2 = np.count_nonzero(ch)
                         ch2 = np.random.randint(0, RT.rays.Nt, size=N2)
+
                         for ch2li in [None, ch2]:
                             for retli in [None, [1, 0, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 0, 0]]:
                                 for normli in [False, True]:
+
                                     tup = RT.rays.rays_by_mask(ch, ch2li, retli, normli)
                                     self.assertEqual(tup[3].shape[0], N2)  # correct shape 1
                                     self.assertEqual(tup[3].ndim, (1 if ch2li is not None else 2))  # correct shape 1
-                                    self.assertTrue(retli is None or retli[1] or tup[1] is None)  # property omitted for ret[1] = 0
-                                    self.assertTrue(retli is None or retli[5] or tup[5] is None)  # property omitted for ret[5] = 0
-                                    self.assertTrue(retli is None or retli[6] or tup[6] is None)  # property omitted for ret[5] = 0
+                                    self.assertTrue(retli is None or retli[1] or tup[1] is None)
+                                    # property omitted for ret[1] = 0
+                                    self.assertTrue(retli is None or retli[5] or tup[5] is None)
+                                    # property omitted for ret[5] = 0
+                                    self.assertTrue(retli is None or retli[6] or tup[6] is None)
+                                    # property omitted for ret[5] = 0
+
                                     # check if s is normalized
                                     if normli and (retli is None or retli[1]):
                                         # mask out values that have zero vectors (due to absorption)
@@ -1221,7 +1233,8 @@ class TracerTests(unittest.TestCase):
     def test_ideal_lens_imaging(self):
 
         # an ideal lens creates an ideal image
-        # this image is exactly the same as the input image, as all rays from each pixel are mapped into the same output pixel
+        # this image is exactly the same as the input image,
+        # as all rays from each pixel are mapped into the same output pixel
         # check if the images are the same
 
         # make raytracer

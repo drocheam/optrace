@@ -469,7 +469,8 @@ class SpectrumTests(unittest.TestCase):
         
         # constant function
         spec = ot.LightSpectrum("Function", func=lambda wl: 1 + wl*0)
-        self.assertAlmostEqual(spec.fwhm(), ot.global_options.wavelength_range[1] - ot.global_options.wavelength_range[0], delta=0.01) 
+        self.assertAlmostEqual(spec.fwhm(), ot.global_options.wavelength_range[1]
+                               - ot.global_options.wavelength_range[0], delta=0.01)
         
         # only first value
         spec = ot.LightSpectrum("Function", func=lambda wl: 0 + wl==ot.global_options.wavelength_range[0])
@@ -483,7 +484,8 @@ class SpectrumTests(unittest.TestCase):
         wl = np.random.uniform(*ot.global_options.wavelength_range, 10000)
         w = np.zeros(10000)
         spec = ot.LightSpectrum.render(wl, w)
-        self.assertAlmostEqual(spec.fwhm(), ot.global_options.wavelength_range[1] - ot.global_options.wavelength_range[0], delta=0.01) 
+        self.assertAlmostEqual(spec.fwhm(), ot.global_options.wavelength_range[1]
+                               - ot.global_options.wavelength_range[0], delta=0.01)
         
         # two gaussian, fwhm is at the larger one
         spec = ot.LightSpectrum("Function", func=lambda wl: np.exp(-(wl-450)**2 / 2 / 5.3**2)\
@@ -660,10 +662,12 @@ class SpectrumTests(unittest.TestCase):
         spec = ot.LightSpectrum("Rectangle", val=0.5, wl0=400, wl1=500)
         self.assertAlmostEqual(spec.power(), spec.val*(spec.wl1 - spec.wl0), delta=1e-3)
         wl = color.wavelengths(100000)
-        self.assertAlmostEqual(spec.luminous_power(), 683*np.sum(color.y_observer(wl)*spec(wl))*(wl[1]-wl[0]), delta=1e-3)
+        self.assertAlmostEqual(spec.luminous_power(), 683*np.sum(color.y_observer(wl)*spec(wl))*(wl[1]-wl[0]),
+                               delta=1e-3)
         
         # constant function
-        spec = ot.LightSpectrum("Function", func=lambda x: 1/(ot.global_options.wavelength_range[1] - ot.global_options.wavelength_range[0]))
+        spec = ot.LightSpectrum("Function", func=lambda x: 1/(ot.global_options.wavelength_range[1]
+                                                                        - ot.global_options.wavelength_range[0]))
         self.assertAlmostEqual(spec.power(), 1, delta=1e-5)
         
         # histogram

@@ -4,30 +4,25 @@ import sys
 sys.path.append('.')
 
 import os
-from typing import Callable, Any
-
 import copy
 import unittest
 import warnings
 import time
-import numpy as np
+
+from typing import Callable, Any
 from contextlib import contextmanager  # context manager for _no_trait_action()
 
+import numpy as np
 import pytest
-
 from threading import Thread
 import matplotlib.pyplot as plt
-
 import pyautogui
-
-import optrace as ot
-from optrace.gui import TraceGUI
-
 from pyface.qt import QtGui
 from pyface.api import GUI as pyface_gui  # invoke_later() method
 
+import optrace as ot
+from optrace.gui import TraceGUI
 from rt_example import rt_example
-
 
 
 class GUITests(unittest.TestCase):
@@ -654,11 +649,13 @@ class GUITests(unittest.TestCase):
                 props = [('rays_visible', 500), ('rays_visible', 2000), ('minimalistic_view', True),
                          ('minimalistic_view', False), ('plotting_mode', "Rays"), ('plotting_mode', "Points"),
                          ('ray_opacity', 0.06), ('ray_width', 12),
-                         ('ray_opacity', 0.8), ('ray_width', 2), ('profile_position', 0), ('profile_position_dimension', 'x'),
+                         ('ray_opacity', 0.8), ('ray_width', 2), ('profile_position', 0),
+                         ('profile_position_dimension', 'x'),
                          ('profile_position_dimension', 'y'), ('hide_labels', True), ('hide_labels', False),
                          ('focus_search_single_source', False), ('focus_search_single_source', True),
                          ('detector_image_single_source', False),
-                         ('detector_image_single_source', True), ('profile_position', 0.1), ('flip_detector_image', True),
+                         ('detector_image_single_source', True), ('profile_position', 0.1),
+                         ('flip_detector_image', True),
                          ('flip_detector_image', False), ('detector_spectrum_single_source', True),
                          ('detector_image_single_source', False),
                          ('log_image', False), ('log_image', True),  ('plot_cost_function', True),
@@ -1467,7 +1464,8 @@ class GUITests(unittest.TestCase):
                 default_text = sim._plot._ray_text.text  # save default text for comparison
 
                 # ray picked -> show default infos
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
+                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
+                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)  # delay so a human user can check the text
                 text1 = sim._plot._ray_text.text
@@ -1477,7 +1475,8 @@ class GUITests(unittest.TestCase):
                 # ray picked -> show verbose info
                 pyautogui.keyDown("shiftleft")
                 time.sleep(0.1)
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
+                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
+                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
                 text2 = sim._plot._ray_text.text
@@ -1501,7 +1500,8 @@ class GUITests(unittest.TestCase):
 
                 # remove crosshair and pick a ray
                 sim._plot._crosshair = None
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
+                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
+                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
 
                 # remove crosshair and pick no ray
@@ -1523,7 +1523,8 @@ class GUITests(unittest.TestCase):
                 # space picked -> show coordinates
                 pyautogui.keyUp("shiftleft")
                 time.sleep(0.1)
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3, sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
+                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
+                                 sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
                 text3 = sim._plot._ray_text.text
@@ -1535,7 +1536,8 @@ class GUITests(unittest.TestCase):
                 pyautogui.keyDown("shiftleft")
                 time.sleep(0.1)
                 old_pos = RT.detectors[0].pos
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3, sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
+                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
+                                 sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
                 text4 = sim._plot._ray_text.text
@@ -1595,7 +1597,8 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             def pick():    
                 self._wait_for_idle(sim)
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2, sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
+                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
+                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)  # delay so a human user can check the text
 
@@ -1726,7 +1729,8 @@ class GUITests(unittest.TestCase):
 
                 # exceptions
                 id0 = id(sim._plot._ray_plot)
-                self.assertRaises(ValueError, sim._plot.select_rays, np.ones(100, dtype=bool))  # mask size not same as ray number
+                self.assertRaises(ValueError, sim._plot.select_rays, np.ones(100, dtype=bool))
+                # ^-- mask size not same as ray number
                 self.assertRaises(ValueError, sim._plot.select_rays, np.ones((N, 2), dtype=bool))  # mask not 1D
                 self.assertRaises(ValueError, sim._plot.select_rays, np.ones(N, dtype=np.uint8))  # mask not bool
                 self.assertRaises(ValueError, sim._plot.select_rays, np.zeros(N, dtype=bool))  # no elements set

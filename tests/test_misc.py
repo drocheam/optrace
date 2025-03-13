@@ -14,7 +14,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import optrace.tracer.misc as misc
-
 import optrace as ot
 import optrace.plots as otp
 from optrace.tracer.base_class import BaseClass as BaseClass

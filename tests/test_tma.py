@@ -21,8 +21,9 @@ class TMATests(unittest.TestCase):
         self.assertTrue(np.allclose(tma.abcd - np.eye(2), 0))
 
         # all other properties are set to nan
-        for val in [tma.ffl, tma.bfl, tma.efl, tma.efl_n, tma.powers, tma.powers_n, tma.focal_lengths, tma.vertex_points,
-                    tma.focal_points, tma.nodal_points, tma.principal_points, tma.d, tma.focal_lengths_n]:
+        for val in [tma.ffl, tma.bfl, tma.efl, tma.efl_n, tma.powers, tma.powers_n, tma.focal_lengths,
+                    tma.vertex_points, tma.focal_points, tma.nodal_points, tma.principal_points,
+                    tma.d, tma.focal_lengths_n]:
             self.assertTrue(np.all(np.isnan(val)))
 
     def test_tma_single_lens_efl(self):

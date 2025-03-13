@@ -23,13 +23,13 @@ An incident spectrum is evaluated and summed up with this sensitivity and genera
 The three different sensitivities of the cones are described as L, M, S (long, medium, short) 
 and together the stimuli produce the LMS color space.
 
-Typically, however, the XYZ color space is used, which can be obtained 
-from a linear combination of the L, M, S components. The XYZ values are also called tristimulus and describe
-all humanly perceivable colors. However, it must be noted that there are slight variations in spectral sensitivities 
-from person to person. In addition, these are dependent on other factors. The figure :numref:`cie_cmf` shows the 
-so-called color matching functions, which represent the average sensitivities from multiple subjects for 
-an object of 2° size, conducted in 1928 and 1931.  These are also called the CIE 1931 2° observer curves and are 
-the most commonly used throughout color conversion and management.
+Typically, however, the XYZ color space is used, which can be obtained from a linear combination of the L, M, S
+components. The XYZ values are also called tristimulus and describeall humanly perceivable colors. 
+However, it must be noted that there are slight variations in spectral sensitivities from person to person. 
+In addition, these are dependent on other factors. The figure :numref:`cie_cmf` shows the so-called color matching 
+functions, which represent the average sensitivities from multiple subjects for an object of 2° size, conducted in 
+1928 and 1931. These are also called the CIE 1931 2° observer curves and are the most commonly used throughout color 
+conversion and management.
 
 
 .. _cie_cmf:

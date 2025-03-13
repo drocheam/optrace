@@ -33,14 +33,17 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.convolve, img, psf, cargs=[])  # invalid cargs
         self.assertRaises(TypeError, ot.convolve, img, psf, padding_mode=[])  # invalid padding_mode
         self.assertRaises(TypeError, ot.convolve, img, psf, padding_value=2)  # invalid padding_value for RGBImage
-        self.assertRaises(TypeError, ot.convolve, img2, psf, padding_value=[1, 2])  # invalid padding_value for LinearImage
+        self.assertRaises(TypeError, ot.convolve, img2, psf, padding_value=[1, 2])  
+        # ^-- invalid padding_value for LinearImage
         
         # value errors
         self.assertRaises(ValueError, ot.convolve, img, psf, m=0)  # m can't be zero
         self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[0, 0])  # invalid padding_value shape
         self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[[0, 0, 0]])  # invalid padding_value shape
-        self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[0, 0, -1])  # invalid padding_value for RGBImage
-        self.assertRaises(ValueError, ot.convolve, img2, psf, padding_value=-2)  # invalid padding_value for LinearImage
+        self.assertRaises(ValueError, ot.convolve, img, psf, padding_value=[0, 0, -1])  
+        # ^-- invalid padding_value for RGBImage
+        self.assertRaises(ValueError, ot.convolve, img2, psf, padding_value=-2)  
+        # ^-- invalid padding_value for LinearImage
 
         # value errors due to projected image or psf
         img2.projection = "Orthographic"
@@ -152,7 +155,8 @@ class ConvolutionTests(unittest.TestCase):
         # with default settings ("constant" and padding_value=0) no 
         # padding takes place, as scipy.fftconvolve automatically pads with black
             for slice_ in [False, True]:
-                img2_ = ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf, s_psf), keep_size=slice_, padding_mode=padding)
+                img2_ = ot.convolve(ot.RGBImage(img, s_img), ot.LinearImage(psf, s_psf), 
+                                    keep_size=slice_, padding_mode=padding)
                 img2, s2 = img2_.data, img2_.s
 
                 # point stays at center
@@ -301,7 +305,8 @@ class ConvolutionTests(unittest.TestCase):
             # check that mean difference is small
             # we still have some deviations due to noise, incorrect magnification and not-linear aberrations
             # print(np.mean(np.abs(im_diff)))
-            delta = 0.0075 if i not in [1, 3] else 0.04  # larger errors for bright colored color checker image due too not enough rays
+            delta = 0.0075 if i not in [1, 3] else 0.04  
+            # ^-- larger errors for bright colored color checker image due too not enough rays
             # print(delta, np.mean(np.abs(im_diff)))
             self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=delta)
      
@@ -432,10 +437,16 @@ class ConvolutionTests(unittest.TestCase):
     
     def test_zero_psf(self):
         """no warnings/exceptions with zero psf"""
-
+        # zero linear_image
         img = ot.presets.image.color_checker([5, 5])
         psf = ot.LinearImage(np.zeros((200, 200)), [1, 1])
-
+        img2 = ot.convolve(img, psf)
+        self.assertEqual(np.max(img2.data), 0)
+        
+        # zero render_image
+        img = ot.presets.image.color_checker([5, 5])
+        psf = ot.RenderImage([-1, 1, -1, 1])
+        psf.render()
         img2 = ot.convolve(img, psf)
         self.assertEqual(np.max(img2.data), 0)
 

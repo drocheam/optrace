@@ -223,7 +223,7 @@ class Raytracer(Group):
 
                         case self.INFOS.ABSORB_MISSING:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"missing surface {surf} ({surf_name[surf]}), set to absorbed")
+                                    f"missing lens surface {surf} ({surf_name[surf]}), set to absorbed")
 
                         case self.INFOS.T_BELOW_TTH:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "

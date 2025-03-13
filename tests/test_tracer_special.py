@@ -14,7 +14,6 @@ from rt_example import rt_example
 
 # Tests for special cases in Raytracing
 
-
 class TracerSpecialTests(unittest.TestCase):
 
     def test_sphere_detector_range_hits(self):
@@ -44,7 +43,8 @@ class TracerSpecialTests(unittest.TestCase):
 
         RT.trace(400000)
 
-        for z in [RT.outline[4], RS.pos[2]+1, ap.pos[2]-1, ap.pos[2]+1, RS.pos[2]+1+det.surface.R, RT.outline[5]-RT.N_EPS, RT.outline[5] + 1]:
+        for z in [RT.outline[4], RS.pos[2]+1, ap.pos[2]-1, ap.pos[2]+1, RS.pos[2]+1+det.surface.R,
+                  RT.outline[5]-RT.N_EPS, RT.outline[5] + 1]:
             det.move_to([0, 0, z])
             for N_th in [1, 2, 3, 4, 8, 16]:
                 RT._force_threads = N_th
@@ -196,7 +196,8 @@ class TracerSpecialTests(unittest.TestCase):
                 surff2 = ot.FunctionSurface2D(func=func, r=r, z_min=0, z_max=func(0, r, R_), func_args=dict(R=R_))
 
                 asph1 = ot.AsphericSurface(R=R_, r=r, k=-1, coeff=[0.])  # same as conic
-                asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_])  # conic can be neglected, only polynomial part
+                asph2 = ot.AsphericSurface(R=1e9, r=r, k=-1, coeff=[1/2/R_])
+                # conic can be neglected, only polynomial part
 
                 # type "Data" with different resolutions and offsets
                 # and odd number defines a point in the center of the lens,
@@ -245,32 +246,33 @@ class TracerSpecialTests(unittest.TestCase):
                     if i + 1 < len(f_list2):
                         self.assertAlmostEqual(fl, f_list2[i+1], delta=0.001)
 
-    # def test_abnormal_rays(self):
-        # """
-        # rays that hit the lens cylinder edge in any way are absorbed
-        # case 1: ray hits lens front, but not back
-        # case 2: ray misses front, but hits back
-        # """
+    def test_abnormal_rays(self):
+        """
+        rays that hit the lens cylinder edge in any way are absorbed
+        case 1: ray hits lens front, but not back
+        case 2: ray misses front, but hits back
+        case 3: both aren't hit -> already handled by case 1
+        """
+        N = 10000
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
 
-        # RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
+        RSS = ot.CircularSurface(r=2)
+        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
+        RT.add(RS)
 
-        # RSS = ot.CircularSurface(r=2)
-        # RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
-        # RT.add(RS)
-
-        # surf1 = ot.CircularSurface(r=3)
-        # surf2 = ot.CircularSurface(r=1e-6)
-        # L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        # RT.add(L)
-
-        # N = 10000
+        surf1 = ot.CircularSurface(r=3)
+        surf2 = ot.CircularSurface(r=1e-6)
         
-        # RT.trace(N)
-        # self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_BACK, 2] / N, places=3)
+        # rays don't hit front surface
+        L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        RT.add(L)
+        RT.trace(N)
+        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 1] / N, places=3)
 
-        # RT.lenses[0] = ot.Lens(surf1, surf2, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        # RT.trace(N)
-        # self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ONLY_HIT_FRONT, 1] / N, places=3)
+        # rays don't hit back surface
+        RT.lenses[0] = ot.Lens(surf1, surf2, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        RT.trace(N)
+        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 2] / N, places=3)
        
     def test_ray_reach(self):
 

@@ -11,13 +11,13 @@ import pytest
 import cv2
 
 import optrace.tracer.color as color
-
 import optrace as ot
 
 
 class ImageTests(unittest.TestCase):
 
-    def test_r_image_misc(self):
+    def test_render_image_misc(self):
+        """miscellaneous render_image tests"""
 
         # init exceptions
         self.assertRaises(TypeError, ot.RenderImage, 5)  # invalid extent
@@ -32,7 +32,7 @@ class ImageTests(unittest.TestCase):
         self.assertFalse(img.has_image())  # no image yet
         
         # create some image
-        img, P, L = self.gen_r_image()
+        img, P, L = self.random_render_image()
        
         # now has an image
         self.assertTrue(img.has_image())
@@ -60,6 +60,7 @@ class ImageTests(unittest.TestCase):
             self.assertRaises(RuntimeError, RIm.get, mode)
     
     def test_image_profile(self):
+        """test image profiles"""
        
         for ratio in [1/6, 0.9, 3, 5]:  # different side ratios
 
@@ -103,14 +104,15 @@ class ImageTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.presets.image.cell([1, 1]).profile)
 
     @pytest.mark.slow
-    def test_r_image_render_and_rescaling(self):
+    def test_render_image_render_and_rescaling(self):
+        """test rendering and scaling of render_image"""
 
         for limit in [None, 20]:  # different resolution limits
         
             for i, ratio in enumerate([1/6, 0.38, 1, 5]):  # different side ratios
 
                 ot.global_options.multithreading = bool(i % 2)  # toggle threading
-                img, P, L = self.gen_r_image(ratio=ratio, limit=limit)
+                img, P, L = self.random_render_image(ratio=ratio, limit=limit)
 
                 # check power sum
                 P0 = img.power()
@@ -121,7 +123,8 @@ class ImageTests(unittest.TestCase):
                 ratio_act = img.shape[1] / img.shape[0]
                 # sx0, sy0 = img.s
 
-                for i, Npx in enumerate([*ot.RenderImage.SIZES, *np.random.randint(1, ot.RenderImage.SIZES[-1], 3)]):  # different side lengths
+                for i, Npx in enumerate([*ot.RenderImage.SIZES, *np.random.randint(1, ot.RenderImage.SIZES[-1], 3)]): 
+                    # ^-- different side lengths
 
                     for Q, mode in zip([P0, L0], ["Irradiance", "Illuminance"]):
 
@@ -133,17 +136,16 @@ class ImageTests(unittest.TestCase):
                         cmp_siz1 = data.shape[1] if ratio_act < 1 else data.shape[0]
                         self.assertEqual(near_siz, cmp_siz1)
 
-                        self.assertAlmostEqual(Q/np.sum(data.data)/data.Apx, 1, places=6)  # overall power stays the same even after rescaling
+                        self.assertAlmostEqual(Q/np.sum(data.data)/data.Apx, 1, places=6)  
+                        # ^-- overall power stays the same even after rescaling
                         self.assertAlmostEqual(ratio_act, data.shape[1]/data.shape[0])  # ratio stayed the same
-                    # self.assertEqual(sx0, img.s[0])  # side length stayed the same
-                    # self.assertEqual(sy0, img.s[1])  # side length stayed the same
-                    # self.assertAlmostEqual(img.s[0]*img.s[1]/img.shape[0]/img.shape[1], img.Apx)  # check pixel area
 
         ot.global_options.multithreading = True
 
         # test exceptions get
         img.render()
-        self.assertRaises(ValueError, img.get, "Irradiance", N=ot.RenderImage.MAX_IMAGE_SIDE*1.2)  # pixel number too large
+        self.assertRaises(ValueError, img.get, "Irradiance", N=ot.RenderImage.MAX_IMAGE_SIDE*1.2)  
+        # ^-- pixel number too large
         self.assertRaises(ValueError, img.get, "Irradiance", N=-2)  # pixel number negative
         self.assertRaises(ValueError, img.get, "Irradiance", N=0)  # pixel number zero
 
@@ -168,22 +170,25 @@ class ImageTests(unittest.TestCase):
         RIm.render()
         self.assertFalse(np.all(RIm.extent == Im_hasp_ext))
 
-    def gen_r_image(self, N=10000, N_px=ot.RenderImage.SIZES[6], ratio=1, limit=None):
-        # create some image
+    def random_render_image(self, N=10000, N_px=ot.RenderImage.SIZES[6], ratio=1, limit=None):
+        """example render_image"""
+
         img = ot.RenderImage([-1, 1, -1*ratio, 1*ratio])
         p = np.zeros((N, 2))
         p[:, 0] = np.random.uniform(img.extent[0], img.extent[1], N)
         p[:, 1] = np.random.uniform(img.extent[2], img.extent[3], N)
         w = np.random.uniform(1e-9, 1, N)
         wl = np.random.uniform(*ot.global_options.wavelength_range, N)
+
         img.render(p, w, wl, limit=limit)
         return img, np.sum(w), np.sum(w * color.y_observer(wl) * 683)  # 683 lm/W conversion factor
 
     @pytest.mark.os
-    def test_r_image_saving_loading(self):
+    def test_render_image_saving_loading(self):
+        """test saving and loading of render_image"""
        
         # create some image
-        img = self.gen_r_image()[0]
+        img = self.random_render_image()[0]
 
         # saving and loading for valid path
         path = "test_img.npz"
@@ -206,44 +211,9 @@ class ImageTests(unittest.TestCase):
         # throw IOError if invalid file path
         self.assertRaises(IOError, img.save, "./hsajkfhajkfhjk/hajfhsajkfhajksfhjk/ashjsafhkj")
 
-    # @pytest.mark.os
-    # def test_r_image_export(self):
-
-        # path = "export_image.png"
-        # path2 = "export_image.jpg"
-
-        # # check display modes and channels
-        # for ratio in [0.746, 1, 2.45]:
-            # img = self.gen_r_image(ratio=ratio)[0]
-            # img.rescale(90)
-                
-            # for imm in ot.RenderImage.display_modes:
-                # img.export(path, imm, log=True, flip=False)
-                # img.export(path, imm, log=False, flip=True)
-                # im3 = ot.Image(path, [1, 1]).data  # load from disk
-
-        # # check shapes
-        # for ratio in [0.746, 1, 2.45]:
-            # img = self.gen_r_image(ratio=ratio)[0]
-
-            # for Npx in [1, 9, 90, 1000]:
-
-                # img.rescale(Npx)
-                # img.export(path, imm, log=False, flip=True)
-                # im3 = ot.Image(path, [1, 1]).data  # load from disk
-                # self.assertAlmostEqual(ratio, im3.shape[0]/im3.shape[1], delta=2/Npx)  # check ratio
-        
-        # # check cv2 imwrite parameters and export as jpg
-        # img.export(path2, "Lightness (CIELUV)", [cv2.IMWRITE_JPEG_QUALITY, 3])
-        
-        # # check handling of incorrect path
-        # self.assertRaises(IOError, img.export, "hjkhjkhjkhjk.pg", "Irradiance")  # invalid format
-        # self.assertRaises(IOError, img.export, str(Path("hjkhjk") / Path("hjkhjkhjkhjk.png")), "Irradiance")  # invalid path
-
-        # os.remove(path)
-        # os.remove(path2)
 
     def test_r_image_filter(self):
+        """test resolution limit filter of render_image"""
     
         # render a point
         # airy resolution limit filter makes an airy disc from this
@@ -273,7 +243,8 @@ class ImageTests(unittest.TestCase):
                 centroid = 3.8317*np.sum(x * irr)/np.sum(irr)
 
                 # compare to limit
-                # for factor 1.10861 see https://www.wolframalpha.com/input?i=%28integrate+x*%282*J1%28x%29%2Fx%29%5E2+from+0+to+10.1735%29+%2F+%28integrate+%282*J1%28x%29%2Fx%29%5E2+from+0+to+10.1735%29%29
+                # for factor 1.10861 see 
+                # https://www.wolframalpha.com/input?i=%28integrate+x*%282*J1%28x%29%2Fx%29%5E2+from+0+to+10.1735%29+%2F+%28integrate+%282*J1%28x%29%2Fx%29%5E2+from+0+to+10.1735%29%29
                 self.assertAlmostEqual(centroid/1.10861, limit/1000, delta=0.0002)
    
         # coverage: RuntimeError when image is a projection and filter is applied
@@ -282,6 +253,7 @@ class ImageTests(unittest.TestCase):
 
     @pytest.mark.os
     def test_image_presets(self) -> None:
+        """test all image presets. Check if tracing is possible and s, extent parameters"""
 
         # tracing works
         for imgi in ot.presets.image.all_presets:
@@ -306,7 +278,8 @@ class ImageTests(unittest.TestCase):
             self.assertTrue(np.all(RSS.extent == extent))
 
     @pytest.mark.os
-    def test_image_inits(self):
+    def test_image_init_exceptions(self):
+        """test image initialization exceptions and errors"""
 
         for Image, im_data in zip([ot.RGBImage, ot.LinearImage], [np.ones((100, 100, 3)), np.ones((100, 100))]):
 
@@ -341,10 +314,12 @@ class ImageTests(unittest.TestCase):
    
         # tests only for LinearImage
         ot.LinearImage(ot.presets.image.ETDRS_chart([1, 1]).data, [1, 1])  # RGB image, but no color
-        self.assertRaises(ValueError, ot.LinearImage, ot.presets.image.color_checker([1, 1]).data, [1, 1])  # colored image
+        self.assertRaises(ValueError, ot.LinearImage, ot.presets.image.color_checker([1, 1]).data, [1, 1]) 
+        # ^-- colored image
 
     @pytest.mark.os
     def test_image_saving_loading(self):
+        """test saving and loading of LinearImage and RGBImage"""
 
         # check different file formats
         for path in ["test.png", "test.jpg", "test.bmp"]:
@@ -353,6 +328,7 @@ class ImageTests(unittest.TestCase):
             for i, img in enumerate([ot.presets.image.cell([1, 1]),
                                      ot.presets.image.ETDRS_chart([1, 1]),
                                      ot.presets.psf.airy(5),
+                                     ot.LinearImage(np.zeros((250, 250, 3)), [6, 5]), # coverage: empty image 
                                      ot.LinearImage(np.full((100, 100, 3), 150), [2, 1]),
                                      ot.LinearImage(np.full((100, 100, 3), 0.0001), [1, 2]),
                                      ot.presets.psf.circle(5)]):
@@ -364,8 +340,11 @@ class ImageTests(unittest.TestCase):
                
                 # check if normalized standard deviation stays the same.
                 # Otherwise something was clipped / not scaled correctly
-                self.assertAlmostEqual(np.std(img2.data/np.max(img2.data)),\
-                        np.std(img.data/np.max(img.data)), delta=1/256)  # delta of 1 / 256 (8bit) values
+                if np.max(img.data):  # non-zero image
+                    self.assertAlmostEqual(np.std(img2.data/np.max(img2.data)),\
+                            np.std(img.data/np.max(img.data)), delta=1/256)  # delta of 1 / 256 (8bit) values
+                else:  # zero image
+                    self.assertEqual(np.ptp(img2.data), 0)
                 
                 if not i:  # only check for first, square image. 
                     # Otherwise we can't compare because interpolation took place
@@ -394,13 +373,10 @@ class ImageTests(unittest.TestCase):
         img = ot.RGBImage(im_data, [1, 1])
 
         RT = ot.Raytracer([-2, 2, -2, 2, -10, 10])
-
         RS = ot.RaySource(img, pos=[0, 0, 0], s=[0, 0, 1], divergence="None")
         RT.add(RS)
-
         det = ot.Detector(ot.RectangularSurface([1, 1, ]), pos=[0, 0, 1])
         RT.add(det)
-
         RT.trace(10000)
 
         # render source and detector images. image pixels should map 1:1
