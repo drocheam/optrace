@@ -134,6 +134,7 @@ linkcheck_ignore = [# 'https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.r
                     'https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/',
                     # 'https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/',
                     'https://doi.org/10.1080/713818864',
+                    'https://doi.org/10.1167/8.2.13',
                     'https://doi.org/10.1080/10867651.1997.10487479']
 
 linkcheck_timeout = 15

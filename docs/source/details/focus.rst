@@ -2,7 +2,7 @@
 .. _autofocus:
 
 *******************
-Autofocus Methods
+Focus Methods
 *******************
 
 .. role:: python(code)

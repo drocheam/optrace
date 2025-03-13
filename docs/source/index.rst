@@ -132,8 +132,8 @@ Similar Software
    examples
    installation
    quickstart
-   ./usage/usage
-   ./math/math
-   ./library/library
-   ./development/development
+   ./usage/index
+   ./details/index
+   ./reference/index
+   ./development/index
 

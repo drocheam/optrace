@@ -1,12 +1,12 @@
 ################
-Code Reference
+API Reference
 ################
 
 .. toctree::
    :maxdepth: 2
    
    structure
-   optrace_global_module
+   optrace
    optrace_tracer
    optrace_tracer_color
    optrace_tracer_geometry

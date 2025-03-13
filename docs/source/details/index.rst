@@ -11,7 +11,7 @@ Implementation Details
    image_spectrum
    matrix_analysis
    convolution
-   autofocus
+   focus
    color
    misc
 
