@@ -1,5 +1,8 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.6.6   |   2025-03-16   |  Removed numexpr dependency. Performance improvements.   
+  1.6.5   |   2025-03-12   |  Removed Airy Disc Weighting and Irradiance Maximum focus methods. Renamed Position Variance to RMS Spot Size and made it more performant. New Image Center Sharpness focus mode.   
+  1.6.4   |   2025-02-28   |  Renamed focus functions, image profiles and convolution parameters.   
   1.6.3   |   2025-02-28   |  New custom UI elements that can be assigned before starting the GUI.   
   1.6.2   |   2025-02-04   |  Support for python 3.13   
   1.6.1   |   2024-11-27   |  New IOL_pinhole_imaging example.   

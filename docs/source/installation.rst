@@ -57,9 +57,6 @@ Below you can find a list of external dependencies that will be automatically in
    * - `opencv-python-headless <https://pypi.org/project/opencv-python-headless/>`_
      - image loading, saving and resizing
      - Apache 2.0
-   * - `progressbar2 <https://pypi.org/project/progressbar2/>`_
-     - animated progressbar in standard output (terminal)
-     - BSD 3-Clause
    * - `pyqtdarktheme-fork <https://pypi.org/project/pyqtdarktheme-fork/>`_
      - setting a QT dark theme
      - MIT
@@ -69,6 +66,9 @@ Below you can find a list of external dependencies that will be automatically in
    * - `scipy <https://scipy.github.io/devdocs/tutorial/index.html#user-guide>`_
      - specialized methods for interpolation and math
      - BSD 3-Clause
+   * - `tqdm <https://pypi.org/project/tqdm/>`_
+     - animated progressbar
+     - MPL-2.0 and MIT
 
 
 **Troubleshooting**

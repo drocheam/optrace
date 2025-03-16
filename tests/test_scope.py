@@ -65,6 +65,7 @@ class ScopeTests(unittest.TestCase):
         import optrace as ot
         self.assertRaises(AttributeError, eval, "ot.Element", locals())
         self.assertRaises(AttributeError, eval, "ot.BaseClass", locals())
+        self.assertRaises(AttributeError, eval, "ot.BaseImage", locals())
         self.assertRaises(AttributeError, eval, "ot.misc", locals())
         self.assertRaises(AttributeError, eval, "ot.Surface", locals())
         self.assertRaises(AttributeError, eval, "ot.ray_storage", locals())
@@ -87,15 +88,15 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(NameError, eval, "traits", loc)
         self.assertRaises(NameError, eval, "traitsui", loc)
         self.assertRaises(NameError, eval, "warnings", loc)
-        self.assertRaises(NameError, eval, "gc", loc)
         self.assertRaises(NameError, eval, "time", loc)
         self.assertRaises(NameError, eval, "contextlib", loc)
         self.assertRaises(NameError, eval, "threading", loc)
         self.assertRaises(NameError, eval, "enum", loc)
-        self.assertRaises(NameError, eval, "progressbar", loc)
+        self.assertRaises(NameError, eval, "tqdm", loc)
         self.assertRaises(NameError, eval, "cv2", loc)
+        self.assertRaises(NameError, eval, "functools", loc)
         self.assertRaises(NameError, eval, "pathlib", loc)
-        self.assertRaises(NameError, eval, "signal", loc)
+        self.assertRaises(NameError, eval, "qdarktheme", loc)
     
     def test_scope_plots(self):
         """test that internal/unneeded things in optrace.plots are not loaded"""

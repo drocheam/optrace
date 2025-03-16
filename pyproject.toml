@@ -17,7 +17,7 @@ dependencies = [
     "pyqtdarktheme-fork",
     "pyside6", 
     "matplotlib", 
-    "progressbar2",
+    "tqdm",
     "mayavi @ git+https://github.com/enthought/mayavi"
     ]
 # mayavi git version needed as PyPi version rarely gets updated

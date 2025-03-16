@@ -15,7 +15,7 @@
 ├── prism.py
 ├── psf_imaging.py
 ├── refraction_index_presets.py
-├── ressources
+├── resources
 │   ├── eyepiece
 │   │   ├── LICENSE.txt
 │   │   ├── SOURCE.txt

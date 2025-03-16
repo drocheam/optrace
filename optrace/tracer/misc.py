@@ -1,17 +1,23 @@
 
 from typing import Callable, Any  # Callable and Any types
 from functools import wraps  # wrapping of functions
+import os  # cpu count
 import time  # timing
+import sys
 
 import scipy.interpolate  # linear interpolation
 import scipy.integrate
 import numpy as np  # calculations
-import os  # cpu count
+import tqdm  # progressbar
 
+from .. import global_options
 
 random = np.random.Generator(np.random.SFC64())
 """less secure (= lower quality of randomness), but slightly faster random number generator"""
 
+
+# TODO separate files for random functions, property checker and progressbar?
+# TODO progressbar and property checker in main optrace mainspace?
 
 def cpu_count() -> int:
     """
@@ -199,6 +205,38 @@ class PropertyChecker:
     def check_if_element(key, val, list_) -> None:
         if val not in list_:
             raise ValueError(f"Invalid value '{val}' for property '{key}'. Needs to be one of {list_}, but is '{val}'.")
+
+
+class progressbar:
+
+    def __init__(self, text: str, steps: int, **kwargs):
+        """
+        progressbar wrapper class. Uses tqdm internally
+
+        :param text: text to display at front of progressbar
+        :param steps: number of steps/iterations
+        :param kwargs: additional parameters to tqdm
+        """
+
+        if global_options.show_progressbar:
+            self.bar = tqdm.tqdm(desc=text, total=steps, disable=None, 
+                                 bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]', **kwargs)
+        else:
+            self.bar = None
+
+    def update(self, condition: bool = True) -> None:
+        """
+        Increment/update the state by one.
+        
+        :param condition: only update if condition is met
+        """
+        if self.bar is not None and condition:
+            self.bar.update(1)
+
+    def finish(self) -> None:
+        """finish and close the progressbar"""
+        if self.bar is not None:
+            self.bar.close()
 
 
 def random_from_distribution(x: np.ndarray, f: np.ndarray, S: int | np.ndarray, kind="continuous") -> np.ndarray:

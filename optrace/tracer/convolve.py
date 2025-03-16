@@ -4,7 +4,6 @@ from threading import Thread
 import numpy as np
 import scipy.signal
 import cv2
-from progressbar import progressbar, ProgressBar  
 
 from . import misc
 from . import color
@@ -109,13 +108,11 @@ def convolve(img:                RGBImage | LinearImage,
 
     # function for raising the exception and finishing the progress bar
     def raise_(excp):
-        if bar is not None:
-            bar.finish()
+        bar.finish()
         raise excp
     
     # create progress bar
-    bar = ProgressBar(fd=sys.stdout, redirect_stderr=True, prefix="Convolving: ", 
-                      max_value=5).start() if global_options.show_progressbar else None
+    bar = misc.progressbar("Convolving: ", 5)
     
     # Load PSF
     ###################################################################################################################
@@ -137,14 +134,13 @@ def convolve(img:                RGBImage | LinearImage,
         if not make_linear:
             psf_lin = np.broadcast_to(psf_lin[:, :, np.newaxis], [psf_lin.shape[0], psf_lin.shape[1], 3])
 
-    if bar is not None:
-        bar.update(1)
 
     # Load image
     ###################################################################################################################
     ###################################################################################################################
 
     img0 = img.data
+    bar.update()
     
     if isinstance(img, LinearImage):
         if not make_linear:
@@ -248,9 +244,7 @@ def convolve(img:                RGBImage | LinearImage,
     # output image
     shape = (iny_+pny_-1, inx_+pnx_-1, 3) if not make_linear else (iny_+pny_-1, inx_+pnx_-1)
     img2 = np.zeros(shape, dtype=np.float64)
-
-    if bar is not None:
-        bar.update(2)
+    bar.update()
     
     # INTER_AREA downscaling leaves the power sum unchanged 
     # (therefore the color and channel ratios should stay the same). 
@@ -270,15 +264,12 @@ def convolve(img:                RGBImage | LinearImage,
     # pad psf
     shape = ((4, 4), (4, 4)) if make_linear else ((4, 4), (4, 4), (0, 0))
     psf2 = np.pad(psf2, shape, mode="constant", constant_values=0)
+    bar.update()
 
     # flip image before convolution with negative magnification
     if m < 0:
         img_lin = np.fliplr(np.flipud(img_lin))
 
-    # update progress
-    if bar is not None:
-        bar.update(3)
-    
     # Convolution
     ###################################################################################################################
     ###################################################################################################################
@@ -295,8 +286,7 @@ def convolve(img:                RGBImage | LinearImage,
         [thread.start() for thread in thread_list]
         [thread.join() for thread in thread_list]
     
-    if bar is not None:
-        bar.update(4)
+    bar.update()
 
     # Output Conversion
     ###################################################################################################################
@@ -327,9 +317,8 @@ def convolve(img:                RGBImage | LinearImage,
 
     # new image side lengths
     s2 = [(img2.shape[1]-1)*ipx, (img2.shape[0]-1)*ipy]
-
-    if bar is not None:
-        bar.finish()
+    bar.update()
+    bar.finish()
 
     # new image center is the sum of psf and old image center
     # (can be shown easily with convolution and shifting theorem of the fourier transform)

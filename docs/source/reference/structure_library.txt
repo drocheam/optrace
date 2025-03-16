@@ -14,7 +14,7 @@
 │   ├── __init__.py
 │   ├── misc_plots.py
 │   └── spectrum_plots.py
-├── ressources
+├── resources
 │   ├── illuminants.csv
 │   ├── images
 │   │   ├── cell.webp

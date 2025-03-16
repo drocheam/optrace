@@ -1,12 +1,10 @@
 
 from typing import Any  # Any type
 from threading import Thread  # threading
-import sys  # redirect progressbar to stdout
 from enum import IntEnum  # integer enum
 
 import numpy as np  # calculations
 import scipy.optimize  # numerical optimization methods
-from progressbar import progressbar, ProgressBar  # fancy progressbars
 
 # needed for raytracing geometry and functionality
 from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface,\
@@ -22,7 +20,6 @@ from ..warnings import warning
 
 from . import misc  # calculations
 from .misc import PropertyChecker as pc  # check types and values
-
 
 
 class Raytracer(Group):
@@ -284,8 +281,7 @@ class Raytracer(Group):
         msgs = [np.zeros((len(self.INFOS), nt), dtype=int) for i in range(N_threads)]
 
         # start a progressbar
-        bar = ProgressBar(fd=sys.stdout, prefix="Raytracing: ", max_value=nt).start()\
-            if global_options.show_progressbar else None
+        bar = misc.progressbar("Raytracing: ", nt)
 
         # create rays from RaySources
         self.rays.init(self.ray_sources, N, nt, self.no_pol)
@@ -293,8 +289,7 @@ class Raytracer(Group):
         def sub_trace(N_threads: int, N_t: int) -> None:
 
             p, s, pols, weights, wavelengths, ns = self.rays.thread_rays(N_threads, N_t)
-            if bar is not None and N_t == 0:
-                bar.update(1)
+            bar.update(N_t == 0)
 
             msg = msgs[N_t]
             i = 0  # surface counter
@@ -333,8 +328,7 @@ class Raytracer(Group):
                         self.__outline_intersection(p, s, weights, hwnh, i, msg)
 
                         i += 1
-                        if bar is not None and N_t == 0:
-                            bar.update(i+1)
+                        bar.update(N_t == 0)
                         p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
                         ns[:, i], ns[:, i+1] = n_l, n2_l
 
@@ -381,8 +375,7 @@ class Raytracer(Group):
                     ns[:, i+1] = ns[:, i]
 
                 i += 1
-                if bar is not None and N_t == 0:
-                    bar.update(i+1)
+                bar.update(N_t == 0)
 
         if N_threads > 1:
             thread_list = [Thread(target=sub_trace, args=(N_threads, N_t)) for N_t in np.arange(N_threads)]
@@ -395,10 +388,7 @@ class Raytracer(Group):
         # lock Storage
         self.rays.lock()
 
-        # show info messages from tracing
-        if bar is not None:
-            bar.finish()
-
+        bar.finish()
         self._set_messages(msgs)
         self._show_messages(N)
         
@@ -842,7 +832,7 @@ class Raytracer(Group):
                       source_index:      int = None,
                       extent:            list | np.ndarray = None,
                       projection_method: str = "Equidistant") \
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, misc.progressbar]:
         """
         Internal function for calculating the detector intersection positions
 
@@ -869,8 +859,7 @@ class Raytracer(Group):
         if not self.check_if_rays_are_current():
             raise RuntimeError("Tracing geometry/properties changed. Please retrace first.")
 
-        bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=4).start()\
-            if global_options.show_progressbar else None
+        bar = misc.progressbar(f"{info}: ", 4)
 
         # range for selected rays in RayStorage
         Ns, Ne = self.rays.B_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
@@ -900,14 +889,10 @@ class Raytracer(Group):
             rs2z = misc.part_mask(rs, ignore)
             rs[rs2z] = False
             rs2 = rs2[~ignore]
-
-            if bar is not None and not list_i:
-                bar.update(1)
+            bar.update(not list_i)
 
             p, s, _, w, wl, _, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 1, 0, 0], normalize=True)
-
-            if bar is not None and not list_i:
-                bar.update(2)
+            bar.update(not list_i)
 
             # init ph (position of hit) and is_hit bool array
             ph = np.zeros_like(p, dtype=np.float64, order='F')
@@ -982,8 +967,7 @@ class Raytracer(Group):
 
         hitw = ish & (w > 0)
         ph, w, wl = ph[hitw], w[hitw], wl[hitw]
-        if bar is not None:
-            bar.update(3)
+        bar.update()
 
         if isinstance(dsurf, SphericalSurface) and projection_method is not None:
             ph = dsurf.sphere_projection(ph, projection_method)
@@ -1049,8 +1033,8 @@ class Raytracer(Group):
         # init image and extent, these are the default values when no rays hit the detector
         img = RenderImage(long_desc=desc, extent=extent_out, projection=projection)
         img.render(p, w, wl, limit=limit, **kwargs)
-        if bar is not None:
-            bar.finish()
+        bar.update()
+        bar.finish()
 
         return img
 
@@ -1079,8 +1063,7 @@ class Raytracer(Group):
         desc = (f"Spectrum of RS{source_index} at " if source_index is not None else "Spectrum at ") + desc
 
         spec = LightSpectrum.render(wl, w, long_desc=desc, **kwargs)
-        if bar is not None:
-            bar.finish()
+        bar.finish()
 
         return spec
 
@@ -1170,14 +1153,11 @@ class Raytracer(Group):
 
         rays_step = self.ITER_RAYS_STEP
         iterations = max(1, int(N / rays_step))
+        bar = misc.progressbar("Rendering: ", iterations)
 
         # image list
         DIm_res = []
 
-        iter_ = range(iterations)
-        iterator = progressbar(iter_, prefix="Rendering: ", fd=sys.stdout) if global_options.show_progressbar\
-            else iter_
-     
         # check geometry
         if (status := self._pretrace_check(rays_step)):
             raise RuntimeError("Geometry checks failed. Tracing aborted. Check the warnings.")
@@ -1187,7 +1167,7 @@ class Raytracer(Group):
         msgs_cum = np.zeros((len(self.INFOS), nt), dtype=int)
 
         # for all render iterations
-        for i in iterator:
+        for i in range(iterations):
 
             # add remaining rays in last step
             if i == iterations - 1:
@@ -1219,6 +1199,7 @@ class Raytracer(Group):
                     DIm_res[j]._data += Imi._data
 
             global_options.show_progressbar = True
+            bar.update()
        
         # we didn't filter the images yet, as doing it with the finished image is faster (than doing it for each step)
         for i, DIm in enumerate(DIm_res):
@@ -1226,13 +1207,14 @@ class Raytracer(Group):
                 DIm._apply_rayleigh_filter()
 
         # show cumulative warnings
+        bar.finish()
         self._msgs = msgs_cum
         self._show_messages(N)
 
         return DIm_res
 
     def _hit_source(self, info: str, source_index: int = 0)\
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, ProgressBar]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, misc.progressbar]:
         """
         Render a source image for a traced geometry.
         Internal function.
@@ -1253,13 +1235,11 @@ class Raytracer(Group):
         if not self.check_if_rays_are_current():
             raise RuntimeError("Tracing geometry/properties changed. Please retrace first.")
 
-        bar = ProgressBar(fd=sys.stdout, prefix=f"{info}: ", max_value=2).start()\
-            if global_options.show_progressbar else None
+        bar = misc.progressbar(f"{info}: ", 2)
 
         extent = self.ray_sources[source_index].extent[:4]
         p, _, _, w, wl = self.rays.source_sections(source_index)
-        if bar is not None:
-            bar.update(1)
+        bar.update()
 
         return p, w, wl, extent, bar
 
@@ -1279,8 +1259,7 @@ class Raytracer(Group):
         desc = f"Spectrum of {RaySource.abbr}{source_index}{pname} at z = {rs.pos[2]:.5g} mm"
         
         spec = LightSpectrum.render(wl, w, long_desc=desc, **kwargs)
-        if bar is not None:
-            bar.finish()
+        bar.finish()
 
         return spec
 
@@ -1303,8 +1282,8 @@ class Raytracer(Group):
         img = RenderImage(long_desc=desc, extent=extent, projection=None)
 
         img.render(p, w, wl, limit=limit, **kwargs)
-        if bar is not None:
-            bar.finish()
+        bar.update()
+        bar.finish()
 
         return img
 
@@ -1484,8 +1463,7 @@ class Raytracer(Group):
         N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
         steps = int(Nt/32) if return_cost or method in ["Image Sharpness", "Image Center Sharpness"] else 0
         steps += 3  # progressbars steps
-        bar = ProgressBar(fd=sys.stdout, prefix="Finding Focus: ", max_value=steps).start()\
-            if global_options.show_progressbar else None
+        bar = misc.progressbar("Finding Focus: ", steps)
 
         # get rays and properties
         ################################################################################################################
@@ -1500,9 +1478,7 @@ class Raytracer(Group):
         # find section index for each ray for focussing search range
         z = bounds[0] + self.N_EPS
         pos[Ns:Ne] = np.argmax(z < self.rays.p_list[rays_pos, :, 2], axis=1) - 1
-        
-        if bar is not None:
-            bar.update(1)
+        bar.update()
 
         # exclude already absorbed rays
         rays_pos[pos == -1] = False
@@ -1522,9 +1498,7 @@ class Raytracer(Group):
         rp = np.where(rays_pos)[0]
         pos = pos[rp]
         p, s, _, weights, _, _, _ = self.rays.rays_by_mask(rays_pos, pos, ret=[1, 1, 0, 1, 0, 0, 0])
-
-        if bar is not None:
-            bar.update(2)
+        bar.update()
 
         # find focus
         ################################################################################################################
@@ -1545,9 +1519,8 @@ class Raytracer(Group):
                 div = int(Nt / (steps - 3) / N_th)
 
                 for i, Ni in enumerate(np.arange(Ns, Ne)):
-                    if i % div == div-1 and bar is not None and not N_is:
-                        bar.update(2+int(i/div + 1))
                     vals[Ni] = self.__focus_search_cost_function(r[Ni], *afargs)
+                    bar.update(i % div == div-1 and not N_is)
 
             if N_th > 1:
                 threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, pa, sb, weights))
@@ -1574,11 +1547,11 @@ class Raytracer(Group):
 
             res.x = res.x[0]
 
-        if bar is not None:
-            bar.finish()
-
         # print warning if result is near bounds
         ################################################################################################################
+        
+        bar.update()
+        bar.finish()
 
         rrl = (res.x - bounds[0]) < 10*(bounds[1] - bounds[0]) / Nt
         rrr = (bounds[1] - res.x) < 10*(bounds[1] - bounds[0]) / Nt
