@@ -3,11 +3,11 @@
 from pathlib import Path  # path of this file
 import os  # environment variables
 import sys
+import re
 
 import unittest  # testing framework
 import subprocess  # running processes
 import pytest # testing framework
-
 
 
 class ExampleTests(unittest.TestCase):
@@ -24,14 +24,31 @@ class ExampleTests(unittest.TestCase):
 
         super().__init__(*args, **kwargs)
 
-    # execute, but kill after timeout, since everything should be automated
-    # higher timeout for a human viewer to see if everything is working
     def execute(self, name, timeout=15):
+        # execute, but kill after timeout, if something is hanging
+        # example file content needs to be replaced to allow for a simple exit, originally the execution continues
 
         path = str(Path.cwd() / "examples" / name)
 
+        # load file contents
+        with open(path) as f:
+            file = f.read()
+
+        # remove blocking plot function
+        file = file.replace("otp.block()", "")
+
+        # make standard GUI runs exit after loading
+        file = re.sub(r"((.+)\.run\()", r"\2._exit=True;\2.run(", file)
+
+        # replace __file__, as we call python with -c command option
+        file = file.replace("__file__", f"\"{path}\"")
+
+        # inject exit of GUI for GUI automation example
+        file = file.replace("sim.control(func=automated, args=(sim,))", 
+                            "sim.control(func=lambda a: (automated(a), a.close()), args=(sim,))")
+
         # start process. ignore warnings and redirect stdout to null
-        process = subprocess.Popen(["python", "-W", "ignore", path], stdout=subprocess.DEVNULL, env=self.env)
+        process = subprocess.Popen(["python", "-W", "ignore", "-c", file], stdout=subprocess.DEVNULL, env=self.env)
         try:
             process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
@@ -48,23 +65,18 @@ class ExampleTests(unittest.TestCase):
     def test_presets_refraction_index(self):
         self.execute("refraction_index_presets.py", 10)
     
-    @pytest.mark.slow
     def test_legrand_eye(self):
         self.execute("legrand_eye_model.py", 10)
     
-    @pytest.mark.slow
     def test_sphere_projections(self):
         self.execute("sphere_projections.py", 15)
     
-    @pytest.mark.slow
     def test_cosine_surfaces(self):
         self.execute("cosine_surfaces.py", 15)
     
-    @pytest.mark.slow
     def test_astigmatism(self):
         self.execute("astigmatism.py", 10)
     
-    @pytest.mark.slow
     def test_spherical_aberration(self):
         self.execute("spherical_aberration.py", 10)
     
@@ -75,11 +87,9 @@ class ExampleTests(unittest.TestCase):
     def test_convolve(self):
         self.execute("psf_imaging.py", 10)
     
-    @pytest.mark.slow
     def test_double_gauss(self):
         self.execute("double_gauss.py", 15)
     
-    @pytest.mark.slow
     def test_achromat(self):
         self.execute("achromat.py", 10)
     
@@ -91,7 +101,6 @@ class ExampleTests(unittest.TestCase):
     def test_presets_spectrum(self):
         self.execute("spectrum_presets.py", 10)
     
-    @pytest.mark.slow
     def test_image_render(self):
         self.execute("image_render.py", 10)
     
@@ -99,7 +108,6 @@ class ExampleTests(unittest.TestCase):
     def test_keratoconus(self):
         self.execute("keratoconus.py", 20)
 
-    @pytest.mark.slow
     def test_prism(self):
         self.execute("prism.py", 10)
     
@@ -107,11 +115,9 @@ class ExampleTests(unittest.TestCase):
     def test_gui_automation(self):
         self.execute("gui_automation.py", 30)
 
-    @pytest.mark.slow
     def test_brewster(self):
         self.execute("brewster_polarizer.py", 10)
     
-    @pytest.mark.slow
     def test_eye_model(self):
         self.execute("arizona_eye_model.py", 15)
     
