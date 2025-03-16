@@ -288,7 +288,7 @@ class TracerTests(unittest.TestCase):
 
         # type errors
         self.assertRaises(TypeError, ot.Raytracer.check_collision, ot.Point(), ot.Point())
-        self.assertRaises(TypeError, ot.Raytracer.check_collision, ot.Line(), ot.Line())
+        self.assertRaises(TypeError, ot.Raytracer.check_collision, ot.Line(r=3), ot.Line(r=3))
 
     def test_focus(self):
         
@@ -309,7 +309,7 @@ class TracerTests(unittest.TestCase):
 
         self.assertRaises(RuntimeError, RT.focus_search, RT.focus_search_methods[0], z_start=5)  # no simulated rays
         
-        RT.trace(20000)
+        RT.trace(100000)
 
         for method in RT.focus_search_methods:  # all methods
             for N_th in [1, 4, 8]:  # different thread counts
@@ -382,9 +382,9 @@ class TracerTests(unittest.TestCase):
                     ot.RectangularSurface(dim=[1, 1]), 
                     ot.RectangularSurface(dim=[1, 0.75]), 
                     ot.RectangularSurface(dim=[1, 1/3]),
-                    ot.Line(), 
-                    ot.Line(angle=30), 
-                    ot.Line(angle=90), 
+                    ot.Line(r=3), 
+                    ot.Line(r=3, angle=30), 
+                    ot.Line(r=3, angle=90), 
                     ot.RingSurface(ri=1.5, r=2),
                     ot.RingSurface(ri=0.25, r=2)]:
 

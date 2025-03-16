@@ -66,5 +66,5 @@ class Point(BaseClass):
         :param N: number of positions
         :return: positions, shape (N, 3)
         """
-        return np.tile(self.pos, (N, 1))
+        return np.broadcast_to(self.pos, (N, 3))
 

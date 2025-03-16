@@ -69,7 +69,6 @@ Notes
 * use of multithreading
 * :mod:`numpy` where possible
 * avoid loops
-* use :mod:`numexpr` over :mod:`numpy` where there is a speed advantage
 * work with object references when possible (instead of copies)
 * use masks on arrays instead of creating new ones
 * only do calculations on elements actually needed

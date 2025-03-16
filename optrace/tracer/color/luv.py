@@ -1,5 +1,4 @@
 
-import numexpr as ne
 import numpy as np
 
 from .. import misc
@@ -59,11 +58,10 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     mask3 = misc.part_mask(mask, mask2)  # Y > 0 and t > e
     mask4 = misc.part_mask(mask, ~mask2)  # Y > 0 and t <= e
 
-    tm, tn = t[mask2], t[~mask2]
-    Luv[mask3, 0] = ne.evaluate("116*tm**(1/3) - 16")
-    Luv[mask4, 0] = k * tn
+    Luv[mask3, 0] = 116* t[mask2]**(1/3) - 16
+    Luv[mask4, 0] = k * t[~mask2]
 
-    D = ne.evaluate("1/(X + 15*Y + 3*Z)")
+    D = 1/(X + 15*Y + 3*Z)
     u = 4*X*D
     v = 9*Y*D
 
@@ -100,15 +98,14 @@ def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
     mask3 = misc.part_mask(mask, mask2)
     mask4 = misc.part_mask(mask, ~mask2)
 
-    Lm, Ln = L_[mask2], L_[~mask2]
-    XYZ[mask3, 1] = ne.evaluate("((Lm+16)/116)**3")
-    XYZ[mask4, 1] = 1/k * Ln
+    XYZ[mask3, 1] = ((L_[mask2]+16) / 116)**3
+    XYZ[mask4, 1] = 1/k * L_[~mask2]
 
     Y = XYZ[mask, 1]
     L13 = 13 * luv[mask, 0]
 
-    XYZ[mask, 0] = X = ne.evaluate("9/4*Y * (u_ + L13*un) / (v_ + L13*vn)")
-    XYZ[mask, 2] = ne.evaluate("3*Y * (L13/(v_ + L13*vn) - 5/3) - X/3")
+    XYZ[mask, 0] = X = 9/4*Y * (u_ + L13*un) / (v_ + L13*vn)
+    XYZ[mask, 2] = 3*Y * (L13/(v_ + L13*vn) - 5/3) - X/3
 
     return XYZ
 
@@ -129,8 +126,8 @@ def luv_to_u_v_l(luv: np.ndarray) -> np.ndarray:
     u_v_L[:, :, 2] = luv[:, :, 0]
 
     Lm, um, vm = luv[mi, 0], luv[mi, 1], luv[mi, 2]
-    u_v_L[mi, 0] += ne.evaluate("1/13 * um / Lm")
-    u_v_L[mi, 1] += ne.evaluate("1/13 * vm / Lm")
+    u_v_L[mi, 0] += 1/13 * um / Lm
+    u_v_L[mi, 1] += 1/13 * vm / Lm
 
     return u_v_L
 
@@ -158,8 +155,7 @@ def luv_chroma(luv: np.ndarray) -> np.ndarray:
     :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
     :return: Chroma Image, np.ndarray with shape (Ny, Nx)
     """
-    u, v = luv[:, :, 1], luv[:, :, 2]
-    return ne.evaluate("sqrt(u**2 + v**2)")
+    return np.sqrt(luv[:, :, 1]**2 + luv[:, :, 2]**2)
 
 
 def luv_hue(luv: np.ndarray) -> np.ndarray:
@@ -169,8 +165,6 @@ def luv_hue(luv: np.ndarray) -> np.ndarray:
     :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
     :return: Hue Image, np.ndarray with shape (Ny, Nx)
     """
-    pi = np.pi
-    u, v = luv[:, :, 1], luv[:, :, 2]
-    hue = ne.evaluate("arctan2(v, u)/pi*180")
+    hue = np.arctan2(luv[:, :, 2], luv[:, :, 1]) / np.pi * 180
     hue[hue < 0] += 360
     return hue

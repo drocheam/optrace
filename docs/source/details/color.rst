@@ -615,11 +615,6 @@ By doing so, each pixel gets an intensity weight that needs to be rescaled so th
         
         \text{Image} = 
         \begin{bmatrix}
-        \text{RGB1} & \text{RGB2}\\
-        \text{RGB3} & \text{RGB4}
-        \end{bmatrix}
-        =
-        \begin{bmatrix}
         [1.0, 0.0, 0.2] & [0.0, 0.0, 0.0]\\
         [0.1, 0.5, 1.0] & [1.0, 0.2, 1.0]
         \end{bmatrix}
@@ -652,8 +647,7 @@ By doing so, each pixel gets an intensity weight that needs to be rescaled so th
       0.277 & 0.470
       \end{bmatrix}
 
-   4. Chose randomly according to probability: The first six chosen pixels could be: :math:`\text{RGB1}, \text{RGB4}, 
-      \text{RGB4}, \text{RGB1}, \text{RGB3}, \text{RGB4}`
+   4. Chose randomly according to probability.
 
 
 ------------

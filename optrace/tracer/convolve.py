@@ -6,6 +6,7 @@ import scipy.signal
 import cv2
 from progressbar import progressbar, ProgressBar  
 
+from . import misc
 from . import color
 from ..tracer.misc import PropertyChecker as pc
 from ..tracer.image import RGBImage, LinearImage, RenderImage
@@ -134,7 +135,7 @@ def convolve(img:                RGBImage | LinearImage,
     else:
         psf_lin = psf.data
         if not make_linear:
-            psf_lin = np.repeat(psf_lin[:, :, np.newaxis], 3, axis=2)
+            psf_lin = np.broadcast_to(psf_lin[:, :, np.newaxis], [psf_lin.shape[0], psf_lin.shape[1], 3])
 
     if bar is not None:
         bar.update(1)
@@ -147,7 +148,7 @@ def convolve(img:                RGBImage | LinearImage,
     
     if isinstance(img, LinearImage):
         if not make_linear:
-            img0 = np.repeat(img0[:, :, np.newaxis], 3, axis=2)
+            img0 = np.broadcast_to(img0[:, :, np.newaxis], [img0.shape[0], img0.shape[1], 3])
     
     else:
         img_color = color.has_color(img0)
@@ -282,7 +283,7 @@ def convolve(img:                RGBImage | LinearImage,
     ###################################################################################################################
     ###################################################################################################################
 
-    if not global_options.multithreading or make_linear:
+    if not (global_options.multithreading and misc.cpu_count() > 2) or make_linear:
         img2 = scipy.signal.fftconvolve(img_lin, psf2, mode="full", axes=(0, 1))
 
     else:

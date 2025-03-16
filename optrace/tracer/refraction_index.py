@@ -2,7 +2,6 @@
 from typing import Any  # Any type
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from .presets import spectral_lines as Lines  # spectral lines for Abbe number
 from .spectrum import Spectrum  # parent class
@@ -70,9 +69,8 @@ class RefractionIndex(Spectrum):
         """
         wl_ = np.asarray_chkfinite(wl, dtype=np.float64)
             
-        # load coefficients into dict
         if self.coeff is not None:
-            coeff_dict = {f"c{i}": c for i, c in enumerate(self.coeff)}
+            c = self.coeff
 
         # check that they are provided
         elif self.spectrum_type not in ["Constant", "Data", "Function", "Abbe"]:
@@ -80,7 +78,7 @@ class RefractionIndex(Spectrum):
         
         # most formula use lambda^2 in µm^2
         if self.spectrum_type not in ["Constant", "Function", "Conrady"]:
-            wl2 = ne.evaluate("(wl_*1e-3)**2")
+            wl2 = (wl_*1e-3)**2
 
         match self.spectrum_type:
 
@@ -99,59 +97,55 @@ class RefractionIndex(Spectrum):
                 B = 1/self.V * (nc - 1) / (1/(l[0]**2-d) - 1/(l[2]**2-d))
                 A = nc - B/(l[1]**2-d)
 
-                ns = ne.evaluate("A + B/(wl2-d)")
+                ns = A + B/(wl2-d)
 
             case "Conrady":
                 l = wl_*1e-3
-                ns = ne.evaluate("c0 + c1/l + c2/l**3.5", local_dict=locals() | coeff_dict)
+                ns = c[0] + c[1]/l + c[2]/l**3.5
 
             case "Cauchy":
-                ns = ne.evaluate("c0 + c1/wl2 + c2/wl2**2 + c3/wl2**3", local_dict=locals() | coeff_dict)
+                ns = c[0] + c[1]/wl2 + c[2]/wl2**2 + c[3]/wl2**3
             
             case "Sellmeier1":
-                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5))",
-                                 local_dict=locals() | coeff_dict)
+                ns = np.sqrt(1 + c[0]*wl2/(wl2-c[1]) + c[2]*wl2/(wl2-c[3]) + c[4]*wl2/(wl2-c[5]))
             
             case "Sellmeier2":
-                ns = ne.evaluate("sqrt(1 + c0 + c1*wl2/(wl2-c2**2) + c3/(wl2-c4**2))", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(1 + c[0] + c[1]*wl2/(wl2-c[2]**2) + c[3]/(wl2-c[4]**2))
             
             case "Sellmeier3":
-                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5) + c6*wl2/(wl2-c7))",
-                                 local_dict=locals() | coeff_dict)
+                ns = np.sqrt(1 + c[0]*wl2/(wl2-c[1]) + c[2]*wl2/(wl2-c[3]) + c[4]*wl2/(wl2-c[5]) + c[6]*wl2/(wl2-c[7]))
             
             case "Sellmeier4":
-                ns = ne.evaluate("sqrt(c0 + c1*wl2/(wl2-c2) + c3*wl2/(wl2-c4))", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(c[0] + c[1]*wl2/(wl2-c[2]) + c[3]*wl2/(wl2-c[4]))
             
             case "Sellmeier5":
-                ns = ne.evaluate("sqrt(1 + c0*wl2/(wl2-c1) + c2*wl2/(wl2-c3) + c4*wl2/(wl2-c5)"
-                                 " + c6*wl2/(wl2-c7)+ c8*wl2/(wl2-c9))", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(1 + c[0]*wl2/(wl2-c[1]) + c[2]*wl2/(wl2-c[3]) + c[4]*wl2/(wl2-c[5])
+                               + c[6]*wl2/(wl2-c[7])+ c[8]*wl2/(wl2-c[9]))
 
             case "Schott":
-                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3 + c5/wl2**4)",
-                                 local_dict=locals() | coeff_dict)
+                ns = np.sqrt(c[0] + c[1]*wl2 + c[2]/wl2 + c[3]/wl2**2 + c[4]/wl2**3 + c[5]/wl2**4)
             
             case "Herzberger":
                 L = 1/(wl2 - 0.028)
-                ns = ne.evaluate("c0 + c1*L + c2*L**2 + c3*wl2 + c4*wl2**2 + c5*wl2**3",
-                                 local_dict=locals() | coeff_dict)
+                ns = c[0] + c[1]*L + c[2]*L**2 + c[3]*wl2 + c[4]*wl2**2 + c[5]*wl2**3
 
             case "Handbook of Optics 1":
-                ns = ne.evaluate("sqrt(c0 + c1/(wl2 - c2) - c3*wl2)", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(c[0] + c[1]/(wl2 - c[2]) - c[3]*wl2)
             
             case "Handbook of Optics 2":
-                ns = ne.evaluate("sqrt(c0 + c1*wl2/(wl2 - c2) - c3*wl2)", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(c[0] + c[1]*wl2/(wl2 - c[2]) - c[3]*wl2)
             
             case "Extended":
-                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3"
-                                 " + c5/wl2**4 + c6/wl2**5 + c7/wl2**6)", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(c[0] + c[1]*wl2 + c[2]/wl2 + c[3]/wl2**2 + c[4]/wl2**3
+                             + c[5]/wl2**4 + c[6]/wl2**5 + c[7]/wl2**6)
 
             case "Extended2":
-                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2/wl2 + c3/wl2**2 + c4/wl2**3 + c5/wl2**4"
-                                 " + c6*wl2**2 + c7*wl2**3)", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(c[0] + c[1]*wl2 + c[2]/wl2 + c[3]/wl2**2 + c[4]/wl2**3 + c[5]/wl2**4
+                             + c[6]*wl2**2 + c[7]*wl2**3)
 
             case "Extended3":
-                ns = ne.evaluate("sqrt(c0 + c1*wl2 + c2*wl2**2 + c3/wl2 + c4/wl2**2 + c5/wl2**3"
-                                 " + c6*wl2**4 + c7*wl2**5 + c8/wl2**6)", local_dict=locals() | coeff_dict)
+                ns = np.sqrt(c[0] + c[1]*wl2 + c[2]*wl2**2 + c[3]/wl2 + c[4]/wl2**2 + c[5]/wl2**3
+                             + c[6]*wl2**4 + c[7]*wl2**5 + c[8]/wl2**6)
 
             case "Data" if self._wls is not None:
                 # no extrapolation in "Data" Mode

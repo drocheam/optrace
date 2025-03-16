@@ -97,7 +97,6 @@ math_numfig = True
 intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'coverage': ('https://coverage.readthedocs.io/en/latest', None),
                        'numpy': ('http://numpy.org/doc/stable', None),
-                       'numexpr': ('https://numexpr.readthedocs.io/en/stable', None),
                        'pytest': ('https://docs.pytest.org/en/stable', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/', None),
                        'traits': ('https://docs.enthought.com/traits/', None),

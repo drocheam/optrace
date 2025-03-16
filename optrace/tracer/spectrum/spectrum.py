@@ -3,7 +3,6 @@ import copy  # deepcopy for dicts
 from typing import Callable, Any  # Callable and Any type
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from .. import color  # color conversions
 from ..base_class import BaseClass  # parent class
@@ -96,26 +95,25 @@ class Spectrum(BaseClass):
         match self.spectrum_type:
 
             case "Constant":
-                res = np.full_like(wl_, self.val, dtype=np.float64)
+                return np.broadcast_to(self.val, wl_.shape)
 
             case "Data":
                 pc.check_type("Spectrum.wls", self._wls, np.ndarray | list)
                 pc.check_type("Spectrum.vals", self._vals, np.ndarray | list)
-                res = np.interp(wl_, self._wls, self._vals, left=0, right=0)
+                return np.interp(wl_, self._wls, self._vals, left=0, right=0)
 
             case "Rectangle":
                 res = np.zeros_like(wl, dtype=np.float64)
                 res[(self.wl0 <= wl_) & (wl_ <= self.wl1)] = self.val
+                return res
 
             case "Gaussian":
                 val, mu, sig = self.val, self.mu, self.sig
-                res = ne.evaluate("val*exp(-(wl-mu)**2/(2*sig**2))")
+                return val*np.exp(-(wl-mu)**2/(2*sig**2))
 
             case "Function":  # pragma: no branch
                 pc.check_callable("Spectrum.func", self.func)
-                res = self.func(wl_, **self.func_args)
-
-        return res
+                return self.func(wl_, **self.func_args)
 
     def is_continuous(self) -> bool:
         """:return: if the spectrum is continuous, thus not discrete"""

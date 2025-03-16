@@ -3,12 +3,15 @@
 import sys
 sys.path.append('.')
 
+import os
+import subprocess
 import contextlib  # redirect stdout
 import time
 import doctest
 import unittest
 import pytest
 
+from unittest.mock import patch
 from scipy.stats import qmc
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +24,22 @@ from optrace.tracer.ray_storage import RayStorage as RayStorage
 
 
 class TracerMiscTests(unittest.TestCase):
+
+    @pytest.mark.os
+    def test_cpu_count(self):
+
+        # cpu count should handled the PYTHON_CPU_COUNT env variable correctly
+        # check by starting subprocesses with set env
+
+        cmd = "from optrace.tracer.misc import cpu_count; print(cpu_count())"
+
+        for cores in [32, 12, 9, 8, 5, 4, 2, 1]:  # include some atypical numbers
+            
+            env = os.environ.copy()
+            env["PYTHON_CPU_COUNT"] = str(cores)
+
+            result = subprocess.run(["python3", "-c", cmd], env=env, capture_output=True, text=True, check=True)
+            self.assertEqual(result.stdout[:-1], str(cores), msg=result.stdout)
 
     def test_global_options(self):
         

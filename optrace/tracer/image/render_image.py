@@ -11,6 +11,7 @@ from ..base_class import BaseClass  # parent class
 from ..misc import PropertyChecker as pc  # check types and values
 from . import RGBImage, LinearImage
 
+from .. import misc
 from .. import color  # xyz_observers curves and sRGB conversions
 
 from ...global_options import global_options
@@ -402,7 +403,7 @@ class RenderImage(BaseClass):
                                                       range=self.extent.reshape((2, 2)))
 
             # multithreading
-            if global_options.multithreading: 
+            if global_options.multithreading and misc.cpu_count() > 3: 
 
                 threads = [Thread(target=func, args=(self._data, i)) for i in np.arange(4)]
                 [thread.start() for thread in threads]

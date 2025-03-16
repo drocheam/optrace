@@ -3,7 +3,6 @@ from typing import Any, Callable  # Any and Callable type
 import copy  # for
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from ... import misc  # calculations
 from ...misc import PropertyChecker as pc  # check types and values
@@ -141,7 +140,7 @@ class FunctionSurface2D(Surface):
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
         if self._1D:
-            r = ne.evaluate("sqrt(x**2 + y**2)")
+            r = np.sqrt(x**2 + y**2)
             vals = self.func(r, **self._func_args)
 
         else:
@@ -174,7 +173,7 @@ class FunctionSurface2D(Surface):
             ym = y - self.pos[1]
        
             if self._1D:
-                rm = ne.evaluate("sqrt(xm**2 + ym**2)")
+                rm = np.sqrt(xm**2 + ym**2)
                 maskf = self.mask_func(rm, **self._mask_args)
 
             else:
@@ -215,8 +214,8 @@ class FunctionSurface2D(Surface):
             ym = y[m] - self.pos[1]
         
             if self._1D:
-                phi = ne.evaluate("arctan2(ym, xm)")
-                rm = ne.evaluate("sqrt(xm**2 + ym**2)")
+                phi = np.arctan2(ym, xm)
+                rm = np.sqrt(xm**2 + ym**2)
                 nr = self._sign*self.deriv_func(rm, **self._deriv_args)
                 
                 if not isinstance(nr, np.ndarray):
@@ -225,7 +224,7 @@ class FunctionSurface2D(Surface):
                 if nr.shape[0] and not isinstance(nr[0], np.float64):
                     raise RuntimeError("Values of deriv_func must be np.float64")
                 
-                nxn, nyn = ne.evaluate("nr*cos(phi)"), ne.evaluate("nr*sin(phi)")
+                nxn, nyn = nr*np.cos(phi), nr*np.sin(phi)
 
             else:
                 # rotate surface

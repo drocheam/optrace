@@ -11,7 +11,7 @@ from .. import misc  # for misc.stratified_interval_sampling
 class Line(BaseClass):
 
     def __init__(self,
-                 r:             float = 3.,
+                 r:             float,
                  angle:         float = 0,
                  **kwargs)\
             -> None:

@@ -77,7 +77,6 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(NameError, eval, "np", loc)
         self.assertRaises(NameError, eval, "scipy", loc)
         self.assertRaises(NameError, eval, "chardet", loc)
-        self.assertRaises(NameError, eval, "numexpr", loc)
         self.assertRaises(NameError, eval, "matplotlib", loc)
         self.assertRaises(NameError, eval, "plt", loc)
         self.assertRaises(NameError, eval, "os", loc)

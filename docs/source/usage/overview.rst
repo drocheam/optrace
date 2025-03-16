@@ -259,3 +259,4 @@ Note that changes are only applied to new :obj:`pyplot <matplotlib.pyplot>` wind
 
 .. TODO notes how to run it on wayland
 
+.. TODO notes about specifying number of cores (taskset, PYTHON_CPU_COUNT)

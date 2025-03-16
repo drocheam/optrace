@@ -4,7 +4,6 @@ from typing import Callable, Any  # Callable and Any type
 
 # external libs
 import numpy as np  # ndarray type and calculations
-import numexpr as ne  # faster calculations
 
 # geometries
 from .element import Element  # parent class
@@ -249,8 +248,8 @@ class RaySource(Element):
             Iy, Ix = self._image.shape[:2]
 
             p = np.zeros((N, 3), dtype=np.float64, order='F')
-            ne.evaluate("(xe-xs)/Ix * (PX + rx) + xs", out=p[:, 0])
-            ne.evaluate("(ye-ys)/Iy * (PY + ry) + ys", out=p[:, 1])
+            p[:, 0] = (xe-xs)/Ix * (PX + rx) + xs
+            p[:, 1] = (ye-ys)/Iy * (PY + ry) + ys
             p[:, 2] = self.pos[2]
 
             if isinstance(self._image, RGBImage):
@@ -263,7 +262,7 @@ class RaySource(Element):
         match self.orientation:
 
             case "Constant":
-                s_or = np.tile(self.s, (N, 1))
+                s_or = np.broadcast_to(self.s, (N, 3))
 
             case "Converging":
                 s_or = np.column_stack((self.conv_pos[0] - p[:, 0], 
@@ -303,7 +302,7 @@ class RaySource(Element):
                 # see https://doi.org/10.1080/10867651.1997.10487479
                 # # see https://www.particleincell.com/2015/cosine-distribution/
                 r, alpha = misc.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
-                theta = ne.evaluate("arcsin(r)")
+                theta = np.arcsin(r)
 
             case "Lambertian" if self.div_2d:
                 X0 = misc.stratified_interval_sampling(0, np.sin(np.radians(self.div_angle)), N)
@@ -313,7 +312,7 @@ class RaySource(Element):
                 # see https://doi.org/10.1080/10867651.1997.10487479
                 # related https://mathworld.wolfram.com/SpherePointPicking.html
                 r, alpha = misc.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
-                theta = ne.evaluate("arccos(1 - r**2)")
+                theta = np.arccos(1 - r**2)
             
             case "Isotropic" if self.div_2d:
                 theta = misc.stratified_interval_sampling(0, np.radians(self.div_angle), N)
@@ -334,17 +333,17 @@ class RaySource(Element):
 
         if self.divergence != "None":
             # vector perpendicular to s, created using  sy = [1, 0, 0] x s_or
+            fa = 1 / np.sqrt(1 - s_or[:, 0]**2)
             sy = np.zeros_like(s_or, dtype=np.float64, order='F')
-            s_orx, s_ory, s_orz = s_or[:, 0], s_or[:, 1], s_or[:, 2]
-            sy[:, 1] = ne.evaluate("-s_orz/sqrt(1-s_orx**2)")
-            sy[:, 2] = ne.evaluate("s_ory/sqrt(1-s_orx**2)")
+            sy[:, 1] = -s_or[:, 2] * fa
+            sy[:, 2] = s_or[:, 1] * fa
 
             # vector sx = s x sy
             sx = misc.cross(s_or, sy)
 
             # vector s has a component alpha in the sx-sy plane
             theta_, alpha_ = theta[:, np.newaxis], alpha[:, np.newaxis]
-            s = ne.evaluate("cos(theta_)*s_or + sin(theta_)*(cos(alpha_)*sx + sin(alpha_)*sy)")
+            s = np.cos(theta_)*s_or + np.sin(theta_)*(np.cos(alpha_)*sx + np.sin(alpha_)*sy)
 
         if np.any(s[:, 2] <= 0):
             raise RuntimeError("All ray divergences s need to be in positive z-divergence")
@@ -404,26 +403,25 @@ class RaySource(Element):
             # pol_ = A_ts*ps + A_tp*pp_
 
             mask = s[:, 2] != 1
+            sm = s[mask]
             pols = np.zeros_like(s, dtype=np.float64, order='F')
 
-            sm = s[mask]
-            ps = np.zeros_like(sm, dtype=np.float64, order='F')
-            s_0, s_1, s_2 = sm[:, 0], sm[:, 1], sm[:, 2]
-
             # sqrt(s0**2 + s1**2) equals sqrt(1-s2**2) for a unity vector
-            ne.evaluate("s_1/sqrt(1-s_2**2)", out=ps[:, 0])
-            ne.evaluate("-s_0/sqrt(1-s_2**2)", out=ps[:, 1])
+            fa = 1 / np.sqrt(1 - sm[:, 2]**2)
+            ps = np.zeros_like(sm, dtype=np.float64, order='F')
+            ps[:, 0] = sm[:, 1] * fa
+            ps[:, 1] = -sm[:, 0] * fa
 
-            pols[:, 0] = ne.evaluate("cos(ang)")
-            pols[:, 1] = ne.evaluate("sin(ang)")
+            pols[:, 0] = np.cos(ang)
+            pols[:, 1] = np.sin(ang)
 
             ps0, ps1 = ps[:, 0], ps[:, 1]
             pol0m, pol1m = pols[mask, 0], pols[mask, 1]
-            A_ts = ne.evaluate("ps0*pol0m + ps1*pol1m")[:, np.newaxis]
-            A_tp = ne.evaluate("ps1*pol0m - ps0*pol1m")[:, np.newaxis]
+            A_ts = ps0*pol0m + ps1*pol1m
+            A_tp = ps1*pol0m - ps0*pol1m
 
             pp_ = misc.cross(ps, sm)
-            pols[mask] = ne.evaluate("A_ts*ps + A_tp*pp_")
+            pols[mask] = ps*A_ts[:, np.newaxis] + pp_*A_tp[:, np.newaxis]
 
         ## return ray properties
         ################################################################################################################

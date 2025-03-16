@@ -89,7 +89,7 @@ class LightSpectrum(Spectrum):
         match self.spectrum_type:
 
             case "Monochromatic":
-                wl = np.full(N, self.wl, dtype=np.float32)
+                wl = np.broadcast_to(np.float32(self.wl), N)
 
             case ("Constant" | "Rectangle"):
                 wl0 = go.wavelength_range[0] if self.spectrum_type == "Constant" else self.wl0

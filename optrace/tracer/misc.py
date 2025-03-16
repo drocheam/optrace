@@ -6,12 +6,23 @@ import time  # timing
 import scipy.interpolate  # linear interpolation
 import scipy.integrate
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
+import os  # cpu count
 
 
-def random():
-    """less secure (= lower quality of randomness), but faster random number generator"""
-    return np.random.Generator(np.random.SFC64())
+random = np.random.Generator(np.random.SFC64())
+"""less secure (= lower quality of randomness), but slightly faster random number generator"""
+
+
+def cpu_count() -> int:
+    """
+    Number of logical cpu cores assigned to this process (Python >= 3.13)
+    Number of logical cpu cores (Python < 3.13)
+
+    :return: cpu count
+    """
+    count = os.process_cpu_count() if hasattr(os, "process_cpu_count") else os.cpu_count()
+    return count or 1  # count could be None, set to 1
+
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837
 # can be used as decorator @timer around a function
@@ -65,16 +76,16 @@ def stratified_rectangle_sampling(a: float, b: float, c: float, d: float, N: int
 
     # create rectangular grid and add dither
     Y, X = np.mgrid[c:d-ddc:N2*1j, a:b-dba:N2*1j]
-    X += random().uniform(0, dba, X.shape)
-    Y += random().uniform(0, ddc, Y.shape)
+    X += random.uniform(0, dba, X.shape)
+    Y += random.uniform(0, ddc, Y.shape)
 
     # add remaining elements and shuffle everything
-    x = np.concatenate((X.ravel(), random().uniform(a, b, dN)))
-    y = np.concatenate((Y.ravel(), random().uniform(c, d, dN)))
+    x = np.concatenate((X.ravel(), random.uniform(a, b, dN)))
+    y = np.concatenate((Y.ravel(), random.uniform(c, d, dN)))
 
     # shuffle order
     ind = np.arange(N)
-    random().shuffle(ind)
+    random.shuffle(ind)
 
     return x[ind], y[ind]
 
@@ -94,10 +105,10 @@ def stratified_interval_sampling(a: float, b: float, N: int, shuffle: bool = Tru
         return np.array([], dtype=np.float64)
 
     dba = (b-a)/N  # grid spacing
-    x = np.linspace(a, b - dba, N) + random().uniform(0., dba, N)  # grid + dither
+    x = np.linspace(a, b - dba, N) + random.uniform(0., dba, N)  # grid + dither
 
     if shuffle:
-        random().shuffle(x)
+        random.shuffle(x)
     return x
 
 
@@ -123,22 +134,20 @@ def stratified_ring_sampling(ri: float, r: float, N: int, polar: bool = False) -
     # see https://jcgt.org/published/0005/02/01/paper.pdf
 
     m = x2 > y2
-    r_[m] = xm = x[m]
-    ym, pi = y[m], np.pi
-    theta[m] = ne.evaluate("pi/4 * ym/xm")
+    r_[m] = x[m]
+    theta[m] = np.pi/4 * y[m]/x[m]
 
     m = (x2 <= y2) & (y2 > 0)
-    r_[m] = ym = y[m]
-    xm = x[m]
-    theta[m] = ne.evaluate("pi/2 - pi/4 * xm/ym")
+    r_[m] = y[m]
+    theta[m] = np.pi/2 - np.pi/4 * x[m] / y[m]
 
     # equi-areal disc to ring mapping
     if ri:
         # (1 - ((r < 0) << 1)) is a fast inline method for: 1 if r >= 0, -1 if r < 0
-        r_ = ne.evaluate("(1 - ((r_ < 0) << 1)) * sqrt(ri**2 + r_**2*(1 - (ri/r)**2))")
+        r_ = (1 - ((r_ < 0) << 1)) * np.sqrt(ri**2 + r_**2*(1 - (ri/r)**2))
 
     if not polar:
-        return ne.evaluate("r_*cos(theta)"), ne.evaluate("r_*sin(theta)")
+        return r_*np.cos(theta), r_*np.sin(theta)
 
     else:
         # r is signed, remove sign and convert it to an angle
@@ -214,6 +223,7 @@ def random_from_distribution(x: np.ndarray, f: np.ndarray, S: int | np.ndarray, 
     # check if cdf is non-zero and monotonically increasing
     if not np.sum(f):
         raise RuntimeError("Cumulated probability is zero.")
+
     elif np.min(f) < 0:
         raise RuntimeError("Got negative value in pdf.")
 
@@ -248,6 +258,7 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     row wise scalar product for two or three dimension.
     Coordinate values in matrix columns.
+    For (N, 2) and (N, 3) faster than np.einsum('ij,ij->i', a, b) and (a*b).sum(axis=1)
 
     :param a: 2D matrix, with shape (N, 2) or (N,  3)
     :param b: 2D matrix, with shape (N, 2) or (N,  3)
@@ -259,7 +270,6 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     >>> rdot(np.array([[2., 3.], [4., 5.]]), np.array([[-1., 2.], [8., 9.]]))
     array([ 4., 77.])
     """
-
     if a.shape[1] == 3:
         return a[:, 0]*b[:, 0] + a[:, 1]*b[:, 1] + a[:, 2]*b[:, 2]
 
@@ -298,11 +308,8 @@ def normalize(a: np.ndarray) -> np.ndarray:
     array([[...0.26726124, 0.53452248, 0.80178373],
            [...0.45584231, 0.56980288, 0.68376346]])
     """
-    nan = np.nan
-    valid = np.any(a != 0, axis=1)[:, np.newaxis]
-    x, y, z = a[:, 0, np.newaxis], a[:, 1, np.newaxis], a[:, 2, np.newaxis]
-    return ne.evaluate("a/where(valid, sqrt(x**2 + y**2 + z**2), nan)")
-
+    with np.errstate(invalid="ignore"):  # we use nan as zero division indicator, suppress warnings
+        return a / np.sqrt(a[:, 0]**2 + a[:, 1]**2 + a[:, 2]**2)[:, np.newaxis]
 
 def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
@@ -316,16 +323,10 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     array([[-12.,   0.,   4.],
            [ -3.,   6.,  -3.]])
     """
-
-    x, y, z = a[:, 0], a[:, 1], a[:, 2]
-    x2, y2, z2 = b[:, 0], b[:, 1], b[:, 2]
-
     n = np.zeros_like(a, dtype=np.float64, order='F')
-
-    # using ne is ~2x faster than np.cross
-    ne.evaluate("y*z2 - z*y2", out=n[:, 0])
-    ne.evaluate("z*x2 - x*z2", out=n[:, 1])
-    ne.evaluate("x*y2 - y*x2", out=n[:, 2])
+    n[:, 0] = a[:, 1]*b[:, 2] - a[:, 2]*b[:, 1]
+    n[:, 1] = a[:, 2]*b[:, 0] - a[:, 0]*b[:, 2]
+    n[:, 2] = a[:, 0]*b[:, 1] - a[:, 1]*b[:, 0]
 
     return n
 

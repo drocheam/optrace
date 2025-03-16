@@ -1,6 +1,5 @@
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 import scipy.interpolate  # interpolation
 
 from ... import misc  # calculations
@@ -185,9 +184,9 @@ class DataSurface2D(Surface):
             nxn, nyn = self._rotate_rc(nxn, nyn, self._angle)
         else:
             # get vector n = (n_r, n_z) and rotate n_r to get n = (nx, ny, nz)
-            phi = ne.evaluate("arctan2(ym, xm)")
+            phi = np.arctan2(ym, xm)
             nr = self._sign*self._call(xm, ym, nu=1)
-            nxn, nyn = ne.evaluate("nr*cos(phi)"), ne.evaluate("nr*sin(phi)")
+            nxn, nyn = nr*np.cos(phi), nr*np.sin(phi)
 
         # the interpolation object provides partial derivatives
         n[m, 0] = -nxn

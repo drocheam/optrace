@@ -2,7 +2,6 @@
 from typing import Any  # Any type
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from ... import misc  # calculation
 from ...misc import PropertyChecker as pc  # check types and values
@@ -95,7 +94,7 @@ class RingSurface(Surface):
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
         x0, y0, z0 = self.pos
-        r2 = ne.evaluate("(x - x0) ** 2 + (y - y0) ** 2")
+        r2 = (x - x0) ** 2 + (y - y0) ** 2
         return ((self.ri - self.N_EPS)**2 <= r2) & (r2 <= (self.r + self.N_EPS)**2)
 
     def random_positions(self, N: int) -> np.ndarray:

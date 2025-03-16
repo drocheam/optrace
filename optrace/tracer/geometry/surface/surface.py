@@ -2,7 +2,6 @@
 from typing import Any  # Any type
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from ... import misc  # calculations
 from ...base_class import BaseClass  # parent class
@@ -73,7 +72,7 @@ class Surface(BaseClass):
         phi = 2*np.pi * (1 + 5**0.5)/2 * ind
 
         # get values and mask out invalid values
-        rcos, rsin = ne.evaluate("r*cos(phi)"), ne.evaluate("r*sin(phi)")
+        rcos, rsin = r*np.cos(phi), r*np.sin(phi)
         vals = self._values(rcos, rsin)
         mask = self.mask(rcos - self.pos[0], rsin - self.pos[1])
         vals[~mask] = np.nan
@@ -144,12 +143,11 @@ class Surface(BaseClass):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        z = np.full_like(x, self.z_max, dtype=np.float64)
-        
         if self.is_flat():
-            return z
+            return np.broadcast_to(self.z_max, x.shape)
     
         else:
+            z = np.full_like(x, self.z_max, dtype=np.float64)
             inside = self.mask(x, y)
             z[inside] = self.pos[2] + self._values(x[inside] - self.pos[0], y[inside] - self.pos[1])
             r = self.r - self.N_EPS
@@ -158,7 +156,7 @@ class Surface(BaseClass):
             if np.any(~inside):
                 if not self.rotational_symmetry:
                     xni, x0, yni, y0 = x[~inside], self.pos[0], y[~inside], self.pos[1]
-                    phi = ne.evaluate("arctan2(yni - y0, xni - x0)")
+                    phi = np.arctan2(yni - y0, xni - x0)
                     z[~inside] = self.pos[2] + self._values(r * np.cos(phi), r * np.sin(phi))
                 else:
                     z[~inside] = self.pos[2] + self._values(np.array([r]), np.array([0.]))[0]
@@ -175,7 +173,7 @@ class Surface(BaseClass):
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
         assert self.is_flat(), "function not implemented for sub-class"
-        return np.zeros_like(x, dtype=np.float64)
+        return np.broadcast_to(0., x.shape)
 
     def plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -189,8 +187,7 @@ class Surface(BaseClass):
             raise ValueError("Expected at least N=10.")
 
         # rectangular grid
-        Y, X = np.mgrid[-self.r:self.r:N*1j,
-                        -self.r:self.r:N*1j]
+        Y, X = np.mgrid[-self.r:self.r:N*1j, -self.r:self.r:N*1j]
 
         # convert to polar coordinates
         R = np.sqrt(X**2 + Y**2)
@@ -231,7 +228,7 @@ class Surface(BaseClass):
         """
         # use r^2 instead of r, saves sqrt calculation for all points
         x0, y0, z0 = self.pos
-        r2 = ne.evaluate("(x - x0) ** 2 + (y - y0) ** 2")
+        r2 = (x - x0) ** 2 + (y - y0) ** 2
 
         return r2 <= (self.r + self.N_EPS)**2
 
@@ -243,11 +240,10 @@ class Surface(BaseClass):
         :param y: y-coordinates (numpy 1D array)
         :return: normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)
         """
-
-        n = np.tile([0., 0., 1.], (x.shape[0], 1))
-
         if self.is_flat():
-            return n
+            return np.broadcast_to([0., 0., 1.], (x.shape[0], 3))
+        
+        n = np.tile([0., 0., 1.], (x.shape[0], 1))
 
         # coordinates actually on surface
         m = self.mask(x, y)
@@ -294,9 +290,7 @@ class Surface(BaseClass):
         yd = self.r * np.sin(theta)
         zd = self._values(xd, yd)
 
-        return xd + self.pos[0],\
-            yd + self.pos[1],\
-            zd + self.pos[2]
+        return xd + self.pos[0], yd + self.pos[1], zd + self.pos[2]
 
     def find_hit(self, p: np.ndarray, s: np.ndarray)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -356,7 +350,7 @@ class Surface(BaseClass):
 
                 # secant root
                 t1w, t2w, f1w, f2w = t1[w], t2[w], f1[w], f2[w]
-                ts = ne.evaluate("t1w - f1w/(f2w-f1w)*(t2w-t1w)")
+                ts = t1w - f1w/(f2w-f1w)*(t2w-t1w)
 
                 # position of root on rays
                 pl = p[w] + s[w]*ts[:, np.newaxis]
@@ -421,8 +415,7 @@ class Surface(BaseClass):
         """helper function rotating surface coordinates so the surface does not need to be rotated itself"""
 
         if alpha:
-            return ne.evaluate("x*cos(alpha) - y*sin(alpha)"),\
-                ne.evaluate("x*sin(alpha) + y*cos(alpha)")
+            return x*np.cos(alpha) - y*np.sin(alpha), x*np.sin(alpha) + y*np.cos(alpha)
 
         return x, y
 

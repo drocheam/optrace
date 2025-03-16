@@ -1,5 +1,4 @@
 
-import numexpr as ne  # faster calculations
 import numpy as np  # matrix calculations
 
 from .. import misc
@@ -38,7 +37,7 @@ def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     below = np.abs(RGB) <= 0.04045
     RGB[below] *= 1 / 12.92
     RGBnb = RGB[~below]
-    RGB[~below] = np.sign(RGBnb)*ne.evaluate("((abs(RGBnb) + a) / (1 + a)) ** 2.4")
+    RGB[~below] = np.sign(RGBnb)*((abs(RGBnb) + a) / (1 + a)) ** 2.4
 
     return RGB
 
@@ -154,13 +153,12 @@ def _triangle_intersect(r, g, b, w, x, y):
     assert rx != bx
     assert gx != bx
     assert rx != gx
-    
-    phi = ne.evaluate("arctan2(y-wy, x-wx)")
+   
+    phi = np.arctan2(y-wy, x-wx)
     phi[phi < 0] += 2*np.pi  # so range is [0, 2*pi]
 
     # slope towards whitepoint and between primaries
-    aw = ne.evaluate("(wy-y)/(wx-x)")
-    aw[x == wx] = 1e10 # finite slope for x == wx
+    aw = np.tan(phi)
     abg = (gy-by)/(gx-bx)
     abr = (ry-by)/(rx-bx)
     agr = (ry-gy)/(rx-gx)
@@ -175,20 +173,20 @@ def _triangle_intersect(r, g, b, w, x, y):
     # blue-green line intersections
     is_bg = (phi <= phib) & (phi > phig)
     xbg, ybg, awbg = x[is_bg], y[is_bg], aw[is_bg]
-    x[is_bg] = t = ne.evaluate("(ybg - by - xbg*awbg + bx*abg) / (abg-awbg)")
-    y[is_bg] = ne.evaluate("by + (t - bx)*abg")
+    x[is_bg] = t = (ybg - by - xbg*awbg + bx*abg) / (abg-awbg)
+    y[is_bg] = by + (t - bx)*abg
 
     # green-red line intersections
     is_gr = (phi <= phig) & (phi > phir)
     xgr, ygr, awgr = x[is_gr], y[is_gr], aw[is_gr]
-    x[is_gr] = t = ne.evaluate("(ygr - gy - xgr*awgr + gx*agr) / (agr-awgr)")
-    y[is_gr] = ne.evaluate("gy + (t - gx)*agr")
+    x[is_gr] = t = (ygr - gy - xgr*awgr + gx*agr) / (agr-awgr)
+    y[is_gr] = gy + (t - gx)*agr
 
     # blue-red line intersections
     is_br = ~(is_bg | is_gr)
     xbr, ybr, awbr = x[is_br], y[is_br], aw[is_br]
-    x[is_br] = t = ne.evaluate("(ybr - by - xbr*awbr + bx*abr) / (abr-awbr)")
-    y[is_br] = ne.evaluate("by + (t - bx)*abr")
+    x[is_br] = t = (ybr - by - xbr*awbr + bx*abr) / (abr-awbr)
+    y[is_br] = by + (t - bx)*abr
 
 
 def _get_chroma_scale(Luv: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -225,15 +223,15 @@ def _get_chroma_scale(Luv: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         # squared chroma
         # using the squared saturation saves sqrt calculation
         # we can use the squared saturation since the ratio is minimal at the same point as the saturation ratio
-        cr0_sq = ne.evaluate("(u_-un)**2 + (v_-vn)**2")
+        cr0_sq = (u_-un)**2 + (v_-vn)**2
 
         _triangle_intersect(r, g, b, w, u_, v_)
 
         # squared chroma after clipping
-        cr1_sq = ne.evaluate("(u_-un)**2 + (v_-vn)**2")
+        cr1_sq = (u_-un)**2 + (v_-vn)**2
 
         # chroma scaling factor
-        cr_fact2 = cr1_sq/(cr0_sq+1e-9)
+        cr_fact2 = cr1_sq / (cr0_sq+1e-9)
 
         return in_gamut, cr_fact2
 
@@ -338,7 +336,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         # rescale x, y, z so the color has the same Y as original color
         k = Y/np.where(y > 0, y, np.inf)
         XYZ[inv, 0] = k*x
-        XYZ[inv, 2] = ne.evaluate("k*(1-x-y)")
+        XYZ[inv, 2] = k*(1-x-y)
 
     if rendering_intent == "Perceptual":
         XYZ[XYZ < 0] = 0
@@ -380,7 +378,7 @@ def srgb_linear_to_srgb(rgbl: np.ndarray) -> np.ndarray:
     below = np.abs(RGB) <= 0.0031308
     RGB[below] *= 12.92
     RGBnb = RGB[~below]
-    RGB[~below] = np.sign(RGBnb)*ne.evaluate("((1 + a) * abs(RGBnb) ** (1 / 2.4) - a)")
+    RGB[~below] = np.sign(RGBnb)*((1 + a) * abs(RGBnb) ** (1 / 2.4) - a)
 
     return RGB
 
@@ -442,7 +440,7 @@ def log_srgb(img: np.ndarray) -> np.ndarray:
    
     # rescale lightness logarithmically
     luv2 = luv.copy()
-    luv2[L > 0, 0] = L02 = ne.evaluate("100 - 99.5*log(L0/ lmax) / log(lmin / lmax)")
+    luv2[L > 0, 0] = L02 = 100 - 99.5 / np.log(lmin / lmax) * np.log(L0 / lmax) 
     
     # rescale uv so chromaticity stays the same
     chroma_scale = L02 / L0

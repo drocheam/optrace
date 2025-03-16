@@ -13,7 +13,7 @@ from ..warnings import warning
 from ..global_options import global_options as go
 
 from ..tracer.misc import PropertyChecker as pc
-from ..tracer.misc import part_mask, timer
+from ..tracer.misc import part_mask
 
 
 
@@ -1047,12 +1047,12 @@ class ScenePlotting:
                 title = "Ray Power\n in µW\n"
 
             case 'Source':
-                s = snum_.repeat(nt)
+                s = np.broadcast_to(snum_[:, np.newaxis], (snum_.shape[0], nt))
                 cm = "spring"
                 title = "Ray Source\nNumber"
 
             case 'Wavelength':
-                s = wl_.repeat(nt)
+                s = np.broadcast_to(wl_[:, np.newaxis], (wl_.shape[0], nt))
                 cm = "nipy_spectral"
                 title = "Wavelength\n in nm\n"
 

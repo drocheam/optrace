@@ -87,7 +87,7 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(AttributeError, l.__setattr__, "r46546", 4)  # _new_lock active
         self.assertRaises(RuntimeError, l.__setattr__, "pos", [0, 1, 0])  # object locked
         def setArrayElement():
-            ot.Line().pos[0] = 1.
+            ot.Line(r=3).pos[0] = 1.
         self.assertRaises(ValueError, setArrayElement)  # array elements read-only
 
     def test_point_marker(self):
@@ -144,7 +144,7 @@ class GeometryTests(unittest.TestCase):
                           pos=[0, 0, 0])  # spectrum is not a TransmissionSpectrum
         self.assertRaises(TypeError, ot.Filter, ot.Point(), spectrum=ot.presets.light_spectrum.d65, 
                           pos=[0, 0, 0])  # non 2D surface
-        self.assertRaises(TypeError, ot.Filter, ot.Line(), spectrum=ot.presets.light_spectrum.d65, 
+        self.assertRaises(TypeError, ot.Filter, ot.Line(r=3), spectrum=ot.presets.light_spectrum.d65, 
                           pos=[0, 0, 0])  # non 2D surface
 
         # exemplary filter
@@ -164,7 +164,7 @@ class GeometryTests(unittest.TestCase):
 
         # test inits
         self.assertRaises(TypeError, ot.Detector, ot.Point(), pos=[0, 0, 0])  # non 2D surface
-        self.assertRaises(TypeError, ot.Detector, ot.Line(), pos=[0, 0, 0])  # non 2D surface
+        self.assertRaises(TypeError, ot.Detector, ot.Line(r=3), pos=[0, 0, 0])  # non 2D surface
 
         # _new_lock active
         self.assertRaises(AttributeError, ot.Detector(ot.CircularSurface(r=3), pos=[0, 0, 0]).__setattr__, "aaa", 1)
@@ -428,7 +428,7 @@ class GeometryTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.Lens, front, back, n, pos=[0, 0, 0], d1=1)  # d2 missing
         self.assertRaises(ValueError, ot.Lens, front, back, n, pos=[0, 0, 0], d2=1)  # d1 missing
         self.assertRaises(TypeError, ot.Lens, front, ot.Point(), n, pos=[0, 0, 0])  # non 2D surface
-        self.assertRaises(TypeError, ot.Lens, front, ot.Line(), n, pos=[0, 0, 0])  # non 2D surface
+        self.assertRaises(TypeError, ot.Lens, front, ot.Line(r=3), n, pos=[0, 0, 0])  # non 2D surface
         
         # define some lenses
         L = [ot.Lens(front, back, n, pos=[0, 0, 0], de=0.),
@@ -491,7 +491,7 @@ class GeometryTests(unittest.TestCase):
                      pol_func=lambda x: x, pol_angles=[10, 30], pol_probs=[1, 2], conv_pos=[1, 2, 10])
        
         # possible surface types
-        Surfaces = [ot.Point(), ot.Line(), ot.CircularSurface(r=2), ot.presets.image.color_checker([2, 2]), 
+        Surfaces = [ot.Point(), ot.Line(r=3), ot.CircularSurface(r=2), ot.presets.image.color_checker([2, 2]), 
                     ot.RectangularSurface(dim=[2, 2]), ot.RingSurface(r=2, ri=0.2), ot.presets.psf.airy(1000)]
 
         # check most RaySource combinations

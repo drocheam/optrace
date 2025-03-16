@@ -1,7 +1,6 @@
 from typing import Any  # "Any" type
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from .function_surface_1d import FunctionSurface1D  # parent class
 from ...misc import PropertyChecker as pc  # check values and types
@@ -58,7 +57,7 @@ class AsphericSurface(FunctionSurface1D):
         """
         # conic section function
         rho, k = 1/self.R, self.k
-        z = ne.evaluate("rho * r**2 /(1 + sqrt(1 - (k+1) * rho**2 * r**2))")
+        z = rho * r**2 /(1 + np.sqrt(1 - (k+1) * rho**2 * r**2))
 
         # polynomial part
         z += np.polyval(self._np_coeff, r)
@@ -74,7 +73,7 @@ class AsphericSurface(FunctionSurface1D):
         """
         # derivative of conic section in regards to r
         k, rho = self.k, 1/self.R
-        fr = ne.evaluate("r*rho / sqrt(1 - (k+1) * rho**2 *r**2)")
+        fr = r*rho / np.sqrt(1 - (k+1) * rho**2 *r**2)
 
         # add derivative of polynomial part
         der_coeff = np.polyder(self._np_coeff)

@@ -2,7 +2,7 @@
 name = "optrace"
 """project title"""
 
-version = "1.6.5"
+version = "1.6.6"
 """project version"""
 
 author = "Damian Mendroch"

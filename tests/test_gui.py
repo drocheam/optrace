@@ -1061,7 +1061,7 @@ class GUITests(unittest.TestCase):
         RT.add(RS)
         
         # add Raysource2
-        RSS = ot.Line()
+        RSS = ot.Line(r=3)
         RS2 = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.d65,
                            pos=[0, 0, 0], s=[0, 0, 1])
         RT.add(RS2)

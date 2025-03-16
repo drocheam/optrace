@@ -5,7 +5,6 @@ import sys  # redirect progressbar to stdout
 from enum import IntEnum  # integer enum
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations and core count
 import scipy.optimize  # numerical optimization methods
 from progressbar import progressbar, ProgressBar  # fancy progressbars
 
@@ -23,7 +22,6 @@ from ..warnings import warning
 
 from . import misc  # calculations
 from .misc import PropertyChecker as pc  # check types and values
-
 
 
 
@@ -278,7 +276,7 @@ class Raytracer(Group):
                                 " the number of rays, surfaces or do an iterative render. If your system can handle"
                                 " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")
 
-        cores = ne.detect_number_of_cores()
+        cores = misc.cpu_count()
         N_threads = max(1, min(cores, int(N/30000))) if global_options.multithreading else 1
         N_threads = self._force_threads if self._force_threads is not None else N_threads  # overwrite if forced
 
@@ -600,23 +598,20 @@ class Raytracer(Group):
         # check if examine points pe are inside outlines
         xs, xe, ys, ye, zs, ze = self.outline
         x, y, z = p[hw, i+1, 0], p[hw, i+1, 1], p[hw, i+1, 2]
-        inside = ne.evaluate("(xs < x) & (x < xe) & (ys < y) & (y < ye) & (zs < z) & (z < ze)")
+        inside = (xs < x) & (x < xe) & (ys < y) & (y < ye) & (zs < z) & (z < ze)
 
         # number of rays going outside
-        n_out = np.count_nonzero(~inside)
-
-        if n_out:
+        if (n_out := np.count_nonzero(~inside)):
 
             hwi = misc.part_mask(hw, ~inside)
 
-            OT = np.tile(self.outline, (n_out, 1))  # tile outline for every outside ray
+            OT = np.broadcast_to(self.outline, (n_out, 6)) # outline for every outside ray
             P = p[hwi, i].repeat(2).reshape(n_out, 6)  # repeat each column once
             S = s[hwi].repeat(2).reshape(n_out, 6)  # repeat each column once
 
             # calculate t Parameter for every outline coordinate and ray
-            # replace zeros with nan for division
-            nan = np.nan
-            T_arr = ne.evaluate("(OT-P)/where(S != 0, S, nan)")
+            with np.errstate(divide="ignore"):
+                T_arr = (OT-P) /  S
 
             # exclude negative t
             T_arr[T_arr <= 0] = np.nan
@@ -674,7 +669,7 @@ class Raytracer(Group):
         s[hwh] = misc.normalize(s[hwh]) * np.sign(f)  # sign so it points always in +z
 
         # calculate polarization
-        n = np.tile([0., 0., 1.], (x.shape[0], 1))
+        n = np.broadcast_to([0., 0., 1.], (x.shape[0], 3))
         self.__compute_polarization(s0, s[hwh], n, pols, i, hwh)
 
     def __refraction(self,
@@ -721,9 +716,9 @@ class Raytracer(Group):
         N = n1_h/n2_h  # ray wise refraction index quotient
 
         # rays with TIR mean an imaginary W, we'll handle this later
-        W = ne.evaluate("sqrt(1 - N**2 * (1-ns**2))")
-        N_m, ns_m, W_m = N[:, np.newaxis], ns[:, np.newaxis], W[:, np.newaxis]
-        s_ = ne.evaluate("s_h*N_m - n*(N_m*ns_m - W_m)")
+        with np.errstate(invalid="ignore"):
+            W = np.sqrt(1 - N**2 * (1-ns**2))
+            s_ = s_h*N[:, np.newaxis] - n*(N*ns - W)[:, np.newaxis]
 
         # rotate polarization vectors and calculate amplitude components in s and p plane
         A_ts, A_tp = self.__compute_polarization(s, s_, n, pols, i, hwh)
@@ -733,9 +728,11 @@ class Raytracer(Group):
         # see https://de.wikipedia.org/wiki/Fresnelsche_Formeln#Spezialfall:_gleiche_magnetische_Permeabilit.C3.A4t
         #####
         cos_alpha, cos_beta = ns, W
-        ts = ne.evaluate("2 * n1_h*cos_alpha / (n1_h*cos_alpha + n2_h*cos_beta)")
-        tp = ne.evaluate("2 * n1_h*cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)")
-        T = ne.evaluate("n2_h*cos_beta / (n1_h*cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)")
+        n1_h_cos_alpha = n1_h*cos_alpha
+        n2_h_cos_beta = n2_h*cos_beta
+        ts = 2 * n1_h_cos_alpha / (n1_h_cos_alpha + n2_h_cos_beta)
+        tp = 2 * n1_h_cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)
+        T = n2_h_cos_beta / (n1_h_cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)
 
         # handle rays with total internal reflection
         TIR = ~np.isfinite(W)
@@ -763,7 +760,7 @@ class Raytracer(Group):
         :param n: surface normal
         :param pols: initial polarization
         :param i: surface number
-        :param hwh: have-weight-and-hit-surface boolean array
+        eparam hwh: have-weight-and-hit-surface boolean array
         :return: amplitude components in s and p polarization direction
         """
            
@@ -798,8 +795,7 @@ class Raytracer(Group):
 
         # new polarization vector after refraction
         pp_ = misc.cross(ps, s_m)  # ps and s_m are unity vectors and perpendicular, so we need no normalization
-        A_tsm, A_tpm = A_ts[mask, np.newaxis], A_tp[mask, np.newaxis]
-        pols[mask2, i+1] = ne.evaluate("ps*A_tsm + pp_*A_tpm")
+        pols[mask2, i+1] = ps*A_ts[mask, np.newaxis] + pp_*A_tp[mask, np.newaxis]
 
         # return amplitude components
         return A_ts, A_tp
@@ -955,7 +951,7 @@ class Raytracer(Group):
 
             list_[list_i] = [ph, w, wl, ish]
 
-        N_th = ne.detect_number_of_cores() if global_options.multithreading and Ne-Ns > 100000 else 1
+        N_th = misc.cpu_count() if global_options.multithreading and Ne-Ns > 100000 else 1
         N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
 
         threads = []
@@ -1484,7 +1480,7 @@ class Raytracer(Group):
         ################################################################################################################
 
         Nt = 320  # cost function sampling points, good if divisible by 2, 4, 8, 16, 32 threads
-        N_th = ne.detect_number_of_cores() if global_options.multithreading else 1
+        N_th = misc.cpu_count() if global_options.multithreading else 1
         N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
         steps = int(Nt/32) if return_cost or method in ["Image Sharpness", "Image Center Sharpness"] else 0
         steps += 3  # progressbars steps

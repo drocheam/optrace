@@ -2,7 +2,6 @@
 from typing import Any  # "Any" type
 
 import numpy as np  # calculations
-import numexpr as ne  # faster calculations
 
 from ...misc import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
@@ -64,10 +63,9 @@ class ConicSurface(Surface):
         :param y: y-coordinate array (numpy 1D or 2D array)
         :return: z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)
         """
-        x0, y0, z0 = self.pos
         k, rho = self.k, 1/self.R
-        r2 = ne.evaluate("x**2 + y**2")
-        return ne.evaluate("rho * r2 /(1 + sqrt(1 - (k+1) * rho**2 *r2))")
+        r2 = x**2 + y**2
+        return rho * r2 / (1 + np.sqrt(1 - (k+1) * rho**2 * r2))
 
     def normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
@@ -84,9 +82,9 @@ class ConicSurface(Surface):
         xm, ym = x[m], y[m]
 
         x0, y0, z0 = self.pos
-        k, rho = self.k, 1/self.R
-        r = ne.evaluate("sqrt((xm-x0)**2 + (ym-y0)**2)")
-        phi = ne.evaluate("arctan2(ym-y0, xm-x0)")
+        rho = 1/self.R
+        r_2 = (xm-x0)**2 + (ym-y0)**2
+        phi = np.arctan2(ym-y0, xm-x0)
 
         # the derivative of a conic section formula is
         #       m := dz/dr = r*rho / sqrt(1 - (k+1) * rho**2 *r**2)
@@ -99,12 +97,12 @@ class ConicSurface(Surface):
         # since n = [n_r, n_z] is a unity vector
         #       n_z = +sqrt(1 - n_r**2)
         # this holds true since n_z is always positive in our raytracer
-        n_r = ne.evaluate("-rho * r  / sqrt(1 - k* rho**2 * r**2 )")
+        n_r = -rho * np.sqrt(r_2) / np.sqrt(1 - self.k * rho**2 * r_2)
 
         # n_r is rotated by phi to get n_x, n_y
-        n[m, 0] = ne.evaluate("n_r*cos(phi)")
-        n[m, 1] = ne.evaluate("n_r*sin(phi)")
-        n[m, 2] = ne.evaluate("sqrt(1 - n_r**2)")
+        n[m, 0] = n_r*np.cos(phi)
+        n[m, 1] = n_r*np.sin(phi)
+        n[m, 2] = np.sqrt(1 - n_r**2)
 
         return n
 
@@ -123,29 +121,29 @@ class ConicSurface(Surface):
         sx, sy, sz = s[:, 0], s[:, 1], s[:, 2]
         k, rho = self.k, 1/self.R
 
-        with np.errstate(invalid='ignore'):  # suppresses nan warnings for now
+        with np.errstate(invalid='ignore', divide='ignore'):  # suppresses nan and div by 0 warnings for now
 
-            A = ne.evaluate("1 + k*sz**2") if k else 1.0
-            B = ne.evaluate("sx*ox + sy*oy + sz*(oz*(k+1) - 1/rho)")
-            C = ne.evaluate("oy**2 + ox**2 + oz*(oz*(k+1) - 2/rho)")
+            A = 1 + k*sz**2 if k else 1.0
+            B = sx*ox + sy*oy + sz*(oz*(k+1) - 1/rho)
+            C = oy**2 + ox**2 + oz*(oz*(k+1) - 2/rho)
 
             # if there are not hits, this term gets imaginary
             # we'll handle this case afterwards
-            D = ne.evaluate("sqrt(B**2 - C*A)")
+            D = np.sqrt(B**2 - C*A)
 
             # we get two possible ray parameters
             # nan values for A == 0, we'll handle them later
-            t1 = ne.evaluate("(-B - D) / A")
-            t2 = ne.evaluate("(-B + D) / A")
+            t1 = (-B - D) / A 
+            t2 = (-B + D) / A
 
             # choose t that leads to z-position inside z-range of surface and 
             # to a larger z-position than starting point (since for us rays only propagate in +z direction)
-            z1 = p[:, 2] + sz*t1
-            z2 = p[:, 2] + sz*t2
             z = p[:, 2]
+            z1 = z + sz*t1
+            z2 = z + sz*t2
             z_min, z_max = self.z_min - self.N_EPS, self.z_max + self.N_EPS
-            t = ne.evaluate("where((z_min <= z1) & (z1 <= z_max) & (z1 >= z) &"\
-                            " ~((z_min <= z2) & (z2 <= z_max) & (z2 >= z) & (t2 < t1)), t1, t2)")
+            t = np.where((z_min <= z1) & (z1 <= z_max) & (z1 >= z) &
+                          ~((z_min <= z2) & (z2 <= z_max) & (z2 >= z) & (t2 < t1)), t1, t2)
             # chose the smaller one of t1, t2 that produces a z-value inside the surface extent
             # and a hit point behind the starting point
 
@@ -179,7 +177,7 @@ class ConicSurface(Surface):
                 is_hit[nh] = False
 
         # set hit to current position when ray starts after surface
-        m = p[:, 2] > self.z_max
+        m = z > self.z_max
         p_hit[m] = p[m]
         is_hit[m] = False
 

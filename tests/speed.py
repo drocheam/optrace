@@ -73,7 +73,7 @@ def func2(N2):
 
     start = time.time()    
     RT.trace(N=N2)
-    # Im = RT.detector_image(500, extent=None)
+    Im = RT.detector_image()
     print(time.time()-start)
 
 

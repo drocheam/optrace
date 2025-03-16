@@ -51,9 +51,6 @@ Below you can find a list of external dependencies that will be automatically in
    * - `matplotlib <https://matplotlib.org/stable/users/index>`_
      - 2D plotting library
      - PSF
-   * - `numexpr <https://numexpr.readthedocs.io/en/latest/>`_
-     - sped-up and optimized calculations
-     - MIT
    * - `numpy <https://numpy.org/doc/stable/user/index.html#user>`_
      - matrix calculations
      - BSD 3-Clause

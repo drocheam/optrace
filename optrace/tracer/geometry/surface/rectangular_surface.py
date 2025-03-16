@@ -95,7 +95,7 @@ class RectangularSurface(Surface):
         x2, y2 = self._rotate_rc(X.flatten(), Y.flatten(), self._angle)
         X, Y = self.pos[0] + x2.reshape(X.shape), self.pos[1] + y2.reshape(Y.shape)
 
-        Z = np.full_like(Y, self.pos[2], dtype=np.float64)
+        Z = np.broadcast_to(np.float64(self.pos[2]), Y.shape)
 
         return X, Y, Z
 
