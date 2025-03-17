@@ -1,11 +1,10 @@
-
 from typing import Any  # Any type
 
 import numpy as np  # calculations
 
 from ..base_class import BaseClass  # parent class
-from ..misc import PropertyChecker as pc  # check types and values
-from .. import misc  # for misc.stratified_interval_sampling
+from ...property_checker import PropertyChecker as pc  # check types and values
+from .. import random  # stratified sampling
 
 
 class Line(BaseClass):
@@ -89,7 +88,7 @@ class Line(BaseClass):
         p = np.zeros((N, 3), dtype=np.float64, order='F')
 
         ang = np.deg2rad(self.angle)
-        t = misc.stratified_interval_sampling(-self.r, self.r, N)
+        t = random.stratified_interval_sampling(-self.r, self.r, N)
         p[:, 0] = self.pos[0] + np.cos(ang)*t
         p[:, 1] = self.pos[1] + np.sin(ang)*t
         p[:, 2] = self.pos[2]

@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.special
 
-from ..misc import PropertyChecker as pc
+from ...property_checker import PropertyChecker as pc
 from ..image.linear_image import LinearImage
 
 

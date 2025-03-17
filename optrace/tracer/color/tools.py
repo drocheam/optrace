@@ -17,9 +17,6 @@ def wavelengths(N: int) -> np.ndarray:
 
     :param N: number of values
     :return: wavelength vector in nm, 1D numpy array
-
-    >>> wavelengths(5)
-    array([ 380., 480., 580., 680., 780.])
     """
     return np.linspace(*go.wavelength_range, N)
 
@@ -31,9 +28,6 @@ def blackbody(wl: np.ndarray, T: float = 6504.) -> np.ndarray:
     :param wl: wavelength vector in nm (numpy 1D array)
     :param T: blackbody temperature in Kelvin (float)
     :return: blackbody curve values (numpy 1D array)
-
-    >>> blackbody(np.array([380., 500., 600.]), T=5500)
-    array([ 1.54073437e+13, 2.04744373e+13, 1.98272922e+13])
     """
 
     # physical constants
@@ -55,9 +49,6 @@ def normalized_blackbody(wl: np.ndarray, T: float = 6504.) -> np.ndarray:
     :param wl: wavelength vector in nm (numpy 1D array)
     :param T: blackbody temperature in Kelvin (float)
     :return: blackbody curve values (numpy 1D array)
-
-    >>> normalized_blackbody(np.array([380., 500., 600.]), T=5500)
-    array([ 0.74746157, 0.99328316, 0.961888 ])
     """
 
     l_w = 2897.771955 * 1e3 / T

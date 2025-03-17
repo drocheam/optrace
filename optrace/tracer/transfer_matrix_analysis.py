@@ -3,7 +3,7 @@ import numpy as np  # matrix calculations
 from .refraction_index import RefractionIndex  # media of and media between lenses
 from .base_class import BaseClass  # parent class
 
-from .misc import PropertyChecker as pc  # type checking
+from ..property_checker import PropertyChecker as pc  # type checking
 from ..global_options import global_options as go
 
 # Some Sources

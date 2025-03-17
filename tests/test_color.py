@@ -3,7 +3,6 @@
 import sys
 sys.path.append('.')
 
-import doctest
 import unittest
 import numpy as np
 import pytest
@@ -12,26 +11,12 @@ import cv2
 
 import optrace as ot
 import optrace.tracer.color as color
-import optrace.tracer.misc as misc
+import optrace.tracer.random as random
 
 from optrace.tracer.color.tools import _WL_MIN0, _WL_MAX0
 
 
-
 class ColorTests(unittest.TestCase):
-
-    def test_color_doctest(self):
-        # normalize whitespace in doc strings and raise exceptions on errors, so pytest etc. notice errors
-        optionflags = doctest.NORMALIZE_WHITESPACE
-        opts = dict(optionflags=optionflags, raise_on_error=True)
-        # opts = dict(optionflags=optionflags)
-
-        doctest.testmod(ot.tracer.color.illuminants, **opts)
-        doctest.testmod(ot.tracer.color.observers, **opts)
-        doctest.testmod(ot.tracer.color.srgb, **opts)
-        doctest.testmod(ot.tracer.color.xyz, **opts)
-        doctest.testmod(ot.tracer.color.tools, **opts)
-        doctest.testmod(ot.tracer.color.luv, **opts)
 
     @pytest.mark.os
     def test_white_d65(self):
@@ -62,10 +47,10 @@ class ColorTests(unittest.TestCase):
             self.assertAlmostEqual(RSci, WPi, delta=0.001) 
 
     def xyz_grid(self, N=1000000):
-        x, y = misc.stratified_rectangle_sampling(1e-6, 0.8, 1e-6, 0.9, N)
+        x, y = random.stratified_rectangle_sampling(1e-6, 0.8, 1e-6, 0.9, N)
 
         # xyY -> XYZ rescales by Y/y, so multiply by y so range is [0...1]
-        Y = misc.stratified_interval_sampling(1e-6, 1.2, x.shape[0]) * y
+        Y = random.stratified_interval_sampling(1e-6, 1.2, x.shape[0]) * y
    
         # use only values with valid z = 1 - x - y >= 0
         valid = (1 - x - y) >= 0

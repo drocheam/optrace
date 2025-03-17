@@ -5,7 +5,7 @@ from typing import Any  # Any type
 from .element import Element  # parent class
 from .surface import Surface  # Surface type
 from ..spectrum.transmission_spectrum import TransmissionSpectrum  # for transmission
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 
 
 class Filter(Element):

@@ -3,8 +3,8 @@ from typing import Any  # Any type
 
 import numpy as np  # calculations
 
-from ... import misc  # calculation
-from ...misc import PropertyChecker as pc  # check types and values
+from ... import random  # calculation
+from ....property_checker import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
 
 
@@ -104,7 +104,7 @@ class RingSurface(Surface):
         :param N: number of positions
         :return: position array, shape (N, 3)
         """
-        x, y = misc.stratified_ring_sampling(self.ri, self.r, N)
+        x, y = random.stratified_ring_sampling(self.ri, self.r, N)
         
         p = np.tile(self.pos, (N, 1))
         p[:, 0] += x

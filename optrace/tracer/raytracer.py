@@ -18,8 +18,10 @@ from .image.render_image import RenderImage
 from ..global_options import global_options
 from ..warnings import warning
 
+from . import random
+from ..progress_bar import ProgressBar
 from . import misc  # calculations
-from .misc import PropertyChecker as pc  # check types and values
+from ..property_checker import PropertyChecker as pc  # check types and values
 
 
 class Raytracer(Group):
@@ -280,8 +282,8 @@ class Raytracer(Group):
         # will hold info messages from each thread
         msgs = [np.zeros((len(self.INFOS), nt), dtype=int) for i in range(N_threads)]
 
-        # start a progressbar
-        bar = misc.progressbar("Raytracing: ", nt)
+        # start a progress bar
+        bar = ProgressBar("Raytracing: ", nt)
 
         # create rays from RaySources
         self.rays.init(self.ray_sources, N, nt, self.no_pol)
@@ -304,11 +306,11 @@ class Raytracer(Group):
                 if isinstance(element, Lens):
 
                     p[hw, i+1], hit_front, ill = element.front.find_hit(p[hw, i], s[hw])
-                    hwh = misc.part_mask(hw, hit_front)  # rays having power and hitting lens front
+                    hwh = misc.masked_assign(hw, hit_front)  # rays having power and hitting lens front
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
 
                     # absorb rays not hitting surface
-                    miss_mask = misc.part_mask(hw, ~hit_front)
+                    miss_mask = misc.masked_assign(hw, ~hit_front)
                     weights[miss_mask, i+1] = 0
                     msg[self.INFOS.ABSORB_MISSING, i+1] += np.count_nonzero(miss_mask)
 
@@ -324,7 +326,7 @@ class Raytracer(Group):
                         self.__refraction(element.front, p, s, weights, n1_l, n_l, pols, hwh, i, msg)
                         
                         # treat rays that go outside outline
-                        hwnh = misc.part_mask(hw, ~hit_front)  # rays having power and not hitting lens front
+                        hwnh = misc.masked_assign(hw, ~hit_front)  # rays having power and not hitting lens front
                         self.__outline_intersection(p, s, weights, hwnh, i, msg)
 
                         i += 1
@@ -337,12 +339,12 @@ class Raytracer(Group):
                         msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
                     
                         # absorb rays not hitting surface
-                        miss_mask = misc.part_mask(hw, ~hit_back)
+                        miss_mask = misc.masked_assign(hw, ~hit_back)
                         weights[miss_mask, i+1] = 0
                         p[miss_mask, i+1] = p[miss_mask, i]  # rays should be absorbed at front surface of lens
                         msg[self.INFOS.ABSORB_MISSING, i+1] += np.count_nonzero(miss_mask)
                    
-                        hwb = misc.part_mask(hw, hit_back)  # rays having power and hitting lens back
+                        hwb = misc.masked_assign(hw, hit_back)  # rays having power and hitting lens back
                         self.__refraction(element.back, p, s, weights, n_l, n2_l, pols, hwb, i, msg)
 
                     else:
@@ -351,7 +353,7 @@ class Raytracer(Group):
                         hit_back = hit_front
                     
                     # # treat rays that go outside outline
-                    hwnb = misc.part_mask(hw, ~hit_back)  # rays having power and not hitting lens back
+                    hwnb = misc.masked_assign(hw, ~hit_back)  # rays having power and not hitting lens back
                     self.__outline_intersection(p, s, weights, hwnb, i, msg)
 
                     # index after lens is index before lens in the next iteration
@@ -361,7 +363,7 @@ class Raytracer(Group):
 
                     p[hw, i+1], hit, ill = element.surface.find_hit(p[hw, i], s[hw])
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
-                    hwh = misc.part_mask(hw, hit)  # rays having power and hitting filter
+                    hwh = misc.masked_assign(hw, hit)  # rays having power and hitting filter
 
                     if isinstance(element, Filter):
                         self.__filter(element, weights, wavelengths, hwh, i, msg)
@@ -369,7 +371,7 @@ class Raytracer(Group):
                         weights[hwh, i+1] = 0
 
                     # treat rays that go outside outline
-                    hwnh = misc.part_mask(hw, ~hit)  # rays having power and not hitting filter
+                    hwnh = misc.masked_assign(hw, ~hit)  # rays having power and not hitting filter
                     self.__outline_intersection(p, s, weights, hwnh, i, msg)
                     
                     ns[:, i+1] = ns[:, i]
@@ -593,7 +595,7 @@ class Raytracer(Group):
         # number of rays going outside
         if (n_out := np.count_nonzero(~inside)):
 
-            hwi = misc.part_mask(hw, ~inside)
+            hwi = misc.masked_assign(hw, ~inside)
 
             OT = np.broadcast_to(self.outline, (n_out, 6)) # outline for every outside ray
             P = p[hwi, i].repeat(2).reshape(n_out, 6)  # repeat each column once
@@ -761,7 +763,7 @@ class Raytracer(Group):
         # exclude rays where direction did not change
         # these are the rays where p and s plane are not defined and the polarization stays the same
         mask = np.any(s[hwh] != s_, axis=1)
-        mask2 = misc.part_mask(hwh, mask)
+        mask2 = misc.masked_assign(hwh, mask)
         sm = s[mask2]
 
         # reduce slicing by storing separately
@@ -832,7 +834,7 @@ class Raytracer(Group):
                       source_index:      int = None,
                       extent:            list | np.ndarray = None,
                       projection_method: str = "Equidistant") \
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, misc.progressbar]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
         """
         Internal function for calculating the detector intersection positions
 
@@ -842,7 +844,7 @@ class Raytracer(Group):
         :param extent: extent to detect the intersections in as [x0, x1, y0, y1].
                 Defaults to None, meaning the whole detector are is used
         :param projection_method: sphere projection method for a SphericalSurface detector
-        :return: hit, weights, wavelengths, actual extent, actual projection_method, progressbar
+        :return: hit, weights, wavelengths, actual extent, actual projection_method, ProgressBar
         """
         if not self.detectors:
             raise RuntimeError("Detector Missing")
@@ -859,7 +861,7 @@ class Raytracer(Group):
         if not self.check_if_rays_are_current():
             raise RuntimeError("Tracing geometry/properties changed. Please retrace first.")
 
-        bar = misc.progressbar(f"{info}: ", 4)
+        bar = ProgressBar(f"{info}: ", 4)
 
         # range for selected rays in RayStorage
         Ns, Ne = self.rays.B_list[source_index:source_index + 2] if source_index is not None else (0, self.rays.N)
@@ -886,7 +888,7 @@ class Raytracer(Group):
             rs2[rs2 < 0] = 0
 
             # exclude rays that start behind detector or end before it
-            rs2z = misc.part_mask(rs, ignore)
+            rs2z = misc.masked_assign(rs, ignore)
             rs[rs2z] = False
             rs2 = rs2[~ignore]
             bar.update(not list_i)
@@ -916,9 +918,9 @@ class Raytracer(Group):
                 # these rays have no intersection with the detector, since they end at the last outline surface
 
                 if not np.all(val):
-                    rs = misc.part_mask(rs, val)  # only use valid rays
-                    rsi = misc.part_mask(rs3, ~val)  # current rays that are not valid
-                    rs3 = misc.part_mask(rs3, val)  # current rays that are valid
+                    rs = misc.masked_assign(rs, val)  # only use valid rays
+                    rsi = misc.masked_assign(rs3, ~val)  # current rays that are not valid
+                    rs3 = misc.masked_assign(rs3, val)  # current rays that are valid
                     w[rsi] = 0  # set invalid to weight of zero
                     p, s, rs2 = p[val], s[val], rs2[val]  # only use valid rays
 
@@ -927,8 +929,8 @@ class Raytracer(Group):
 
                 p2z = self.rays.p_list[rs, rs2, 2]
                 rs4 = ph[rs3, 2] > p2z + dsurf.C_EPS  # hit point behind next surface intersection -> no valid hit
-                rs3 = misc.part_mask(rs3, rs4)
-                rs = misc.part_mask(rs, rs4)
+                rs3 = misc.masked_assign(rs3, rs4)
+                rs = misc.masked_assign(rs, rs4)
 
                 if np.any(rs):
                     rs2 = rs2[rs4]
@@ -1033,7 +1035,6 @@ class Raytracer(Group):
         # init image and extent, these are the default values when no rays hit the detector
         img = RenderImage(long_desc=desc, extent=extent_out, projection=projection)
         img.render(p, w, wl, limit=limit, **kwargs)
-        bar.update()
         bar.finish()
 
         return img
@@ -1153,7 +1154,7 @@ class Raytracer(Group):
 
         rays_step = self.ITER_RAYS_STEP
         iterations = max(1, int(N / rays_step))
-        bar = misc.progressbar("Rendering: ", iterations)
+        bar = ProgressBar("Rendering: ", iterations)
 
         # image list
         DIm_res = []
@@ -1175,7 +1176,7 @@ class Raytracer(Group):
 
             # turn off warnings and progress bar for the subtracing
             with global_options.no_warnings():
-                with global_options.no_progressbar():
+                with global_options.no_progress_bar():
                     self.trace(N=rays_step)
                     msgs_cum += self._msgs  # add to cumulative warnings
 
@@ -1184,7 +1185,7 @@ class Raytracer(Group):
                
                 self.detectors[detector_index[j]].move_to(pos[j])
             
-                with global_options.no_progressbar():
+                with global_options.no_progress_bar():
                     Imi = self.detector_image(detector_index=detector_index[j],
                                               extent=extentc[j], limit=limit[j], _dont_filter=True,
                                               projection_method=projection_method[j])
@@ -1198,7 +1199,7 @@ class Raytracer(Group):
                 else:
                     DIm_res[j]._data += Imi._data
 
-            global_options.show_progressbar = True
+            global_options.show_progress_bar = True
             bar.update()
        
         # we didn't filter the images yet, as doing it with the finished image is faster (than doing it for each step)
@@ -1214,14 +1215,14 @@ class Raytracer(Group):
         return DIm_res
 
     def _hit_source(self, info: str, source_index: int = 0)\
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, misc.progressbar]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, ProgressBar]:
         """
         Render a source image for a traced geometry.
         Internal function.
 
         :param N: number of image pixels in the smaller dimension
         :param source_index: source number, defaults to 0
-        :return: positions, weights, wavelengths, actual extent, progressbar
+        :return: positions, weights, wavelengths, actual extent, ProgressBar
         """
         if not self.ray_sources:
             raise RuntimeError("Ray Sources Missing.")
@@ -1235,7 +1236,7 @@ class Raytracer(Group):
         if not self.check_if_rays_are_current():
             raise RuntimeError("Tracing geometry/properties changed. Please retrace first.")
 
-        bar = misc.progressbar(f"{info}: ", 2)
+        bar = ProgressBar(f"{info}: ", 2)
 
         extent = self.ray_sources[source_index].extent[:4]
         p, _, _, w, wl = self.rays.source_sections(source_index)
@@ -1282,7 +1283,6 @@ class Raytracer(Group):
         img = RenderImage(long_desc=desc, extent=extent, projection=None)
 
         img.render(p, w, wl, limit=limit, **kwargs)
-        bar.update()
         bar.finish()
 
         return img
@@ -1463,7 +1463,7 @@ class Raytracer(Group):
         N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
         steps = int(Nt/32) if return_cost or method in ["Image Sharpness", "Image Center Sharpness"] else 0
         steps += 3  # progressbars steps
-        bar = misc.progressbar("Finding Focus: ", steps)
+        bar = ProgressBar("Finding Focus: ", steps)
 
         # get rays and properties
         ################################################################################################################
@@ -1510,7 +1510,7 @@ class Raytracer(Group):
         # sample cost function
         if return_cost or method in  ["Image Sharpness", "Image Center Sharpness"]:
 
-            r = misc.stratified_interval_sampling(bounds[0], bounds[1], Nt, shuffle=False)
+            r = random.stratified_interval_sampling(bounds[0], bounds[1], Nt, shuffle=False)
             vals = np.zeros_like(r)
 
             def threaded(N_th, N_is, Nt, *afargs):
@@ -1550,7 +1550,6 @@ class Raytracer(Group):
         # print warning if result is near bounds
         ################################################################################################################
         
-        bar.update()
         bar.finish()
 
         rrl = (res.x - bounds[0]) < 10*(bounds[1] - bounds[0]) / Nt

@@ -1,7 +1,7 @@
 
 import numpy as np  # calculations
 
-from ... import misc  # calculations
+from ... import random  # calculations
 from .surface import Surface  # parent class
 
 
@@ -36,8 +36,7 @@ class CircularSurface(Surface):
         :param N: number of positions
         :return: position array, shape (N, 3)
         """
-        # x, y = misc.stratified_ring_sampling(0, self.r, N)
-        x, y = misc.stratified_ring_sampling(0, self.r, N)
+        x, y = random.stratified_ring_sampling(0, self.r, N)
 
         p = np.tile(self.pos, (N, 1))
         p[:, 0] += x

@@ -3,7 +3,7 @@ from typing import Any  # "Any" type
 
 import numpy as np  # calculations
 
-from ...misc import PropertyChecker as pc  # check types and values
+from ....property_checker import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
 
 

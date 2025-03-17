@@ -7,7 +7,7 @@ from ..tracer.spectrum import Spectrum, LightSpectrum
 from ..tracer.refraction_index import RefractionIndex
 from .misc_plots import _show_grid, _save_or_show
 
-from ..tracer.misc import PropertyChecker as pc
+from ..property_checker import PropertyChecker as pc
 from ..global_options import global_options as go
 
 

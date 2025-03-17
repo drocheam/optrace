@@ -9,7 +9,7 @@ import numpy as np
 from scipy.special import erf
 import colour
 
-import optrace.tracer.misc as misc
+import optrace.tracer.random as random
 import optrace.tracer.color as color
 import optrace as ot
 
@@ -404,7 +404,7 @@ class SpectrumTests(unittest.TestCase):
         
         # check if spectrum is rendered correctly
         for N in [3000, 30000, 3000000]:
-            wlr = misc.stratified_interval_sampling(*ot.global_options.wavelength_range, N)
+            wlr = random.stratified_interval_sampling(*ot.global_options.wavelength_range, N)
             w = color.d65_illuminant(wlr)
             spec = ot.LightSpectrum.render(wlr, w)
 

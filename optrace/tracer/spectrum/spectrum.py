@@ -6,7 +6,7 @@ import numpy as np  # calculations
 
 from .. import color  # color conversions
 from ..base_class import BaseClass  # parent class
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 from ...global_options import global_options as go
 
 

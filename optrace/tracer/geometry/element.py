@@ -33,7 +33,7 @@ import numpy as np  # calculations
 from . import Surface, Point, Line  # base shapes for element
 
 from ..base_class import BaseClass  # parent class
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 
 
 

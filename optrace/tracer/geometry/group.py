@@ -10,7 +10,7 @@ from ..base_class import BaseClass  # parent class
 
 from ..transfer_matrix_analysis import TMA  # paraxial analysis
 from ..refraction_index import RefractionIndex  # ambient media
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 from ...warnings import warning
 
 

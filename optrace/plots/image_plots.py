@@ -7,7 +7,7 @@ import numpy as np  # calculations
 from .misc_plots import _show_grid, _save_or_show
 
 from ..tracer.image import RGBImage, LinearImage
-from ..tracer.misc import PropertyChecker as pc  # check types and values
+from ..property_checker import PropertyChecker as pc  # check types and values
 from ..tracer import color
 from .. import global_options
 

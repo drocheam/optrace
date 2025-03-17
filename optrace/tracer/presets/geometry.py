@@ -6,7 +6,7 @@ from ..geometry import Aperture, Detector, Lens, IdealLens, SphericalSurface,\
     # Elements and Surfaces in the preset geometries
 from ..refraction_index import RefractionIndex  # media in the geometries
 
-from ..misc import PropertyChecker as pc
+from ...property_checker import PropertyChecker as pc
 
 
 # helper tools

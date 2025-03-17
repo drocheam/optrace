@@ -3,7 +3,7 @@ import numpy as np  # calculations
 import scipy.interpolate  # interpolation
 
 from ... import misc  # calculations
-from ...misc import PropertyChecker as pc  # check types and values
+from ....property_checker import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
 from ....warnings import warning
 

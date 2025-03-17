@@ -5,7 +5,7 @@ import numpy as np  # calculations
 
 from ... import misc  # calculations
 from ...base_class import BaseClass  # parent class
-from ...misc import PropertyChecker as pc  # check types and values
+from ....property_checker import PropertyChecker as pc  # check types and values
 from ....warnings import warning
 
 # NOTE for classes Surface, Point, Line, reverse returns a reversed version at [0, 0, 0]
@@ -363,22 +363,22 @@ class Surface(BaseClass):
 
                 # case 1: fts, f2 different sign => change [t1, t2] interval to [t2, ts]
                 mask = prod < 0
-                wm = misc.part_mask(w, mask)
+                wm = misc.masked_assign(w, mask)
                 t1[wm], t2[wm], f1[wm], f2[wm] = t2[wm], ts[mask], f2[wm], fts[mask]
 
                 # case 2: fts, f2 same sign => change [t1, t2] interval to [t1, ts]
                 mask = prod > 0
-                wm = misc.part_mask(w, mask)
+                wm = misc.masked_assign(w, mask)
                 t2[wm], f1[wm], f2[wm] = ts[mask], m*f1[wm], fts[mask]
 
                 # case 3: fts or f2 is zero => ts and fts are the found solution
                 mask = prod == 0
-                wm = misc.part_mask(w, mask)
+                wm = misc.masked_assign(w, mask)
                 t1[wm], t2[wm], f1[wm], f2[wm] = ts[mask], ts[mask], fts[mask], fts[mask]
 
                 # masks for rays converged in this iteration
                 cn = np.abs(t2[w]-t1[w]) < self.C_EPS/10
-                wcn = misc.part_mask(w, cn)
+                wcn = misc.masked_assign(w, cn)
 
                 # assign found hits and update bool arrays
                 p_hit[wcn] = pl[cn]

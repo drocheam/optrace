@@ -17,16 +17,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import optrace.tracer.misc as misc
+import optrace.tracer.random as random
 import optrace as ot
 import optrace.plots as otp
 from optrace.tracer.base_class import BaseClass as BaseClass
 from optrace.tracer.ray_storage import RayStorage as RayStorage
+from optrace.property_checker import PropertyChecker as pc
+from optrace.progress_bar import ProgressBar
 
+# Test tracer.random, tracer.misc, tracer.base_class
+# tracer.ray_storage global_options, warnings, property_checker, progress_bar
 
 class TracerMiscTests(unittest.TestCase):
 
     @pytest.mark.os
-    def test_cpu_count(self):
+    def test_misc_cpu_count(self):
 
         # cpu count should handled the PYTHON_CPU_COUNT env variable correctly
         # check by starting subprocesses with set env
@@ -44,8 +49,8 @@ class TracerMiscTests(unittest.TestCase):
     def test_global_options(self):
         
         # test settings of options
-        ot.global_options.show_progressbar = False
-        ot.global_options.show_progressbar = True
+        ot.global_options.show_progress_bar = False
+        ot.global_options.show_progress_bar = True
         ot.global_options.multithreading = False
         ot.global_options.multithreading = True
         ot.global_options.show_warnings = False
@@ -71,7 +76,7 @@ class TracerMiscTests(unittest.TestCase):
 
         # Type Errors
         self.assertRaises(TypeError, ot.global_options.__setattr__, "multithreading", [])
-        self.assertRaises(TypeError, ot.global_options.__setattr__, "show_progressbar", [])
+        self.assertRaises(TypeError, ot.global_options.__setattr__, "show_progress_bar", [])
         self.assertRaises(TypeError, ot.global_options.__setattr__, "show_warnings", [])
         self.assertRaises(TypeError, ot.global_options.__setattr__, "wavelength_range", 2)
         self.assertRaises(TypeError, ot.global_options.__setattr__, "plot_dark_mode", 2)
@@ -97,16 +102,16 @@ class TracerMiscTests(unittest.TestCase):
         self.assertFalse(ot.global_options.show_warnings)
         
         # context manager for no progressbar. Case 1: True before
-        ot.global_options.show_progressbar = True
-        with ot.global_options.no_progressbar():
-            self.assertFalse(ot.global_options.show_progressbar)
-        self.assertTrue(ot.global_options.show_progressbar)
+        ot.global_options.show_progress_bar = True
+        with ot.global_options.no_progress_bar():
+            self.assertFalse(ot.global_options.show_progress_bar)
+        self.assertTrue(ot.global_options.show_progress_bar)
         
         # context manager for no progressbar. Case 2: False before
-        ot.global_options.show_progressbar = False
-        with ot.global_options.no_progressbar():
-            self.assertFalse(ot.global_options.show_progressbar)
-        self.assertFalse(ot.global_options.show_progressbar)
+        ot.global_options.show_progress_bar = False
+        with ot.global_options.no_progress_bar():
+            self.assertFalse(ot.global_options.show_progress_bar)
+        self.assertFalse(ot.global_options.show_progress_bar)
 
     @pytest.mark.os
     def test_ray_storage(self):
@@ -162,8 +167,6 @@ class TracerMiscTests(unittest.TestCase):
 
     def test_property_checker(self):
 
-        pc = misc.PropertyChecker
-
         # type checking
         self.assertRaises(TypeError, pc.check_type, "", 5, bool)  # 5 not bool
         self.assertRaises(TypeError, pc.check_type, "", 5, str)  # 5 not string
@@ -199,12 +202,13 @@ class TracerMiscTests(unittest.TestCase):
         pc.check_if_element("", "test", ["test", "test2"])  # valid
         self.assertRaises(ValueError, pc.check_if_element, "", "test", ["test1", "test2"])  # not an element of
 
-    def test_misc_doctest(self):
+    def test_misc_random_doctest(self):
         # normalize whitespace in doc strings and raise exceptions on errors, so pytest etc. notice errors
         optionflags = doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
-        opts = dict(optionflags=optionflags, raise_on_error=True)
+        opts = dict(optionflags=optionflags, raise_on_error=False)
 
-        doctest.testmod(ot.tracer.misc,optionflags=optionflags)
+        res = doctest.testmod(ot.tracer.misc, optionflags=optionflags)
+        self.assertEqual(res.failed, 0)
 
     def test_misc_timer(self):
         # test timer
@@ -216,13 +220,13 @@ class TracerMiscTests(unittest.TestCase):
             func(1)  # s output
             func(0.01)  # ms output
 
-    def test_misc_random_from_distribution(self):
+    def test_random_inverse_transform_sampling(self):
 
         # discrete mode
         
         x = np.array([-1, 4, 5, 20])
         f = np.array([0.5, 7, 3, 0.1])
-        F = misc.random_from_distribution(x, f, 100001, kind="discrete")
+        F = random.inverse_transform_sampling(x, f, 100001, kind="discrete")
 
         # checks if values in F are all each an element of list x (discrete values)
         self.assertTrue(np.all(np.any(np.abs(F[:, np.newaxis] - x) < 1e-10, axis=1)))
@@ -236,7 +240,7 @@ class TracerMiscTests(unittest.TestCase):
         self.assertAlmostEqual(np.std(F), std_val, delta=0.005)
 
         # call with N=0
-        rand = misc.random_from_distribution(x, f, 0, kind="discrete")
+        rand = random.inverse_transform_sampling(x, f, 0, kind="discrete")
         self.assertEqual(rand.shape, (0, ))
         
         # continuous mode
@@ -244,7 +248,7 @@ class TracerMiscTests(unittest.TestCase):
         func = lambda x: np.exp(-(x-1)**2)
         x = np.linspace(-4, 5, 1000)
         f = func(x)
-        F = misc.random_from_distribution(x, f, 10000)
+        F = random.inverse_transform_sampling(x, f, 10000)
 
         # range correct
         self.assertTrue(np.all(F <= x[-1]))
@@ -255,21 +259,21 @@ class TracerMiscTests(unittest.TestCase):
         self.assertAlmostEqual(np.std(F), 1/np.sqrt(2), delta=0.005)
 
         # error raising
-        self.assertRaises(RuntimeError, misc.random_from_distribution, np.array([0, 1]), np.array([0, 0]), 10)  
+        self.assertRaises(RuntimeError, random.inverse_transform_sampling, np.array([0, 1]), np.array([0, 0]), 10)
         # cdf zero
-        self.assertRaises(RuntimeError, misc.random_from_distribution, np.array([0, 1]), np.array([0, -1]), 10)  
+        self.assertRaises(RuntimeError, random.inverse_transform_sampling, np.array([0, 1]), np.array([0, -1]), 10)
         # pdf < 0
 
         # call with N=0
-        rand = misc.random_from_distribution(x, f, 0)
+        rand = random.inverse_transform_sampling(x, f, 0)
         self.assertEqual(rand.shape, (0, ))
 
     @pytest.mark.slow
-    def test_misc_uniform(self):
+    def test_random_stratified_sampling(self):
 
         # test stratified_interval_sampling
         for a, b, N in zip([0, -5, 8, 7, 32.3], [1, 15, 9, 7.0001, 1000], [1, 2, 100, 501, 1000]):
-            rand = misc.stratified_interval_sampling(a, b, N)
+            rand = random.stratified_interval_sampling(a, b, N)
             self.assertEqual(rand.shape[0], N)
 
             # check value range
@@ -280,13 +284,13 @@ class TracerMiscTests(unittest.TestCase):
             hist = np.histogram(rand, bins=N, range=[a, b])[0]
             self.assertTrue(np.allclose(hist - np.ones(N), 0))
      
-        rand = misc.stratified_interval_sampling(0, 1, 0)  # call with N = 0
+        rand = random.stratified_interval_sampling(0, 1, 0)  # call with N = 0
         self.assertEqual(rand.shape, (0, ))
 
         # test stratified_rectangle_sampling
         for a, b, c, d, N in zip([0, -5, 8, 7, 32.3], [1, 15, 9, 7.0001, 1000], 
                                  [-65, 7, 12, 32.3, -10], [0.7, 8, 90, 700.0001, 100], [1, 2, 100, 501, 1000]):
-            rand1, rand2 = misc.stratified_rectangle_sampling(a, b, c, d, N)
+            rand1, rand2 = random.stratified_rectangle_sampling(a, b, c, d, N)
 
             # check shape
             self.assertEqual(rand1.shape[0], N)
@@ -307,7 +311,7 @@ class TracerMiscTests(unittest.TestCase):
             hist = np.histogram2d(rand1, rand2, bins=[N2, N2], range=[[a, b], [c, d]])[0]
             self.assertTrue(np.all(hist > 0))
 
-        rand1, rand2 = misc.stratified_rectangle_sampling(0, 1, 0, 1, 0)  # call with N = 0
+        rand1, rand2 = random.stratified_rectangle_sampling(0, 1, 0, 1, 0)  # call with N = 0
         self.assertEqual(rand1.shape, (0, ))
         self.assertEqual(rand2.shape, (0, ))
 
@@ -319,7 +323,7 @@ class TracerMiscTests(unittest.TestCase):
         for shuffle in [False, True]:  # check shuffled and unshuffled case
             b1, b2 = False, False
             for i in np.arange(200):
-                rand = misc.stratified_interval_sampling(0, 1, 1000000, shuffle=shuffle)
+                rand = random.stratified_interval_sampling(0, 1, 1000000, shuffle=shuffle)
                 b1 = b1 or np.std(np.diff(np.sort(rand))) > 1e-7  # check step variance (= dither)
                 b2 = b2 or np.any(np.diff(rand) < 0)  # check that not all are ascending (= sorted)
                 if b1 and b2:
@@ -344,7 +348,7 @@ class TracerMiscTests(unittest.TestCase):
         # negative differences between the flattened arrays
         # this is checked in the next part
         for i in np.arange(200):
-            randy, randx = misc.stratified_rectangle_sampling(0, 1, 0, 1, 1000000)
+            randy, randx = random.stratified_rectangle_sampling(0, 1, 0, 1, 1000000)
             b1x = b1x or np.count_nonzero(np.abs(np.diff(np.sort(randx))) > 1e-9) > 2*(N2 + dN)  
             # ^-- only few zero steps between sorted values
             b2x = b2x or (np.count_nonzero(np.diff(randx) < 0) > 2*(N2+dN)) # check that not all are ascending
@@ -369,12 +373,27 @@ class TracerMiscTests(unittest.TestCase):
         d_lhc = qmc.discrepancy(sample_lhc)
 
         # samples with optrace stratified sampling
-        strat = misc.stratified_rectangle_sampling(0, 1, 0, 1, N)
+        strat = random.stratified_rectangle_sampling(0, 1, 0, 1, N)
         strat = np.vstack(strat).T
         d_strat = qmc.discrepancy(strat)
 
         # stratified sampling has smaller discrepancy
         self.assertTrue(d_strat < d_lhc)
+    
+    def test_progress_bar_class(self):
+
+        for active in [False, True]:
+
+            ot.global_options.show_progress_bar = active
+
+            for finish in [False, True]:
+                for iter_ in [0, 5, 10, 15]:
+                    bar = ProgressBar("abc", 10)
+
+                    for i in range(iter_):
+                        bar.update()
+                    if finish:
+                        bar.finish()
 
     def test_misc_calc(self):
        
@@ -389,14 +408,14 @@ class TracerMiscTests(unittest.TestCase):
         self.assertTrue(np.all(misc.rdot(empty2, empty2) == empty0))  # empty 2D 
         self.assertTrue(np.all(misc.rdot(empty3, empty3) == empty0))  # empty 3D
 
-        # test part_mask
+        # test masked_assign
         true5 = np.ones(5, dtype=bool)
         false5 = np.zeros(5, dtype=bool)
         empty_bool = np.zeros((0, ), dtype=bool)
-        self.assertTrue(np.all(misc.part_mask(true5, true5) == true5))  # everything true
-        self.assertTrue(np.all(misc.part_mask(true5, false5) == false5))  # everything false
-        self.assertTrue(np.all(misc.part_mask(false5, empty_bool) == false5)) # everything false
-        self.assertTrue(np.all(misc.part_mask(empty_bool, empty_bool) == empty_bool))  # empty arrays
+        self.assertTrue(np.all(misc.masked_assign(true5, true5) == true5))  # everything true
+        self.assertTrue(np.all(misc.masked_assign(true5, false5) == false5))  # everything false
+        self.assertTrue(np.all(misc.masked_assign(false5, empty_bool) == false5)) # everything false
+        self.assertTrue(np.all(misc.masked_assign(empty_bool, empty_bool) == empty_bool))  # empty arrays
 
         # test normalize
         self.assertTrue(np.all(misc.normalize(empty3) == empty3))  # works with empty

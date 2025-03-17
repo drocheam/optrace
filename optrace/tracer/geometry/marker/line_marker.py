@@ -2,7 +2,7 @@ from typing import Any  # Any type
 
 import numpy as np  # for ndarray type
 
-from ...misc import PropertyChecker as pc  # check types and values
+from ....property_checker import PropertyChecker as pc  # check types and values
 from ..element import Element  # parent class
 from ..line import Line  # front object of the Marker
 

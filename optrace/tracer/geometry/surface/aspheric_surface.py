@@ -3,7 +3,7 @@ from typing import Any  # "Any" type
 import numpy as np  # calculations
 
 from .function_surface_1d import FunctionSurface1D  # parent class
-from ...misc import PropertyChecker as pc  # check values and types
+from ....property_checker import PropertyChecker as pc  # check values and types
 
 
 class AsphericSurface(FunctionSurface1D):

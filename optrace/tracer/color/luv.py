@@ -55,8 +55,8 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     t = 1/Yn * Y
 
     mask2 = t > e  # t > e for L > 0
-    mask3 = misc.part_mask(mask, mask2)  # Y > 0 and t > e
-    mask4 = misc.part_mask(mask, ~mask2)  # Y > 0 and t <= e
+    mask3 = misc.masked_assign(mask, mask2)  # Y > 0 and t > e
+    mask4 = misc.masked_assign(mask, ~mask2)  # Y > 0 and t <= e
 
     Luv[mask3, 0] = 116* t[mask2]**(1/3) - 16
     Luv[mask4, 0] = k * t[~mask2]
@@ -95,8 +95,8 @@ def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
     k = 903.3
     e = 0.008856
     mask2 = L_ > k*e
-    mask3 = misc.part_mask(mask, mask2)
-    mask4 = misc.part_mask(mask, ~mask2)
+    mask3 = misc.masked_assign(mask, mask2)
+    mask4 = misc.masked_assign(mask, ~mask2)
 
     XYZ[mask3, 1] = ((L_[mask2]+16) / 116)**3
     XYZ[mask4, 1] = 1/k * L_[~mask2]

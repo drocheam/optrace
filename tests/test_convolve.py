@@ -95,7 +95,7 @@ class ConvolutionTests(unittest.TestCase):
         # check that call is correct, also tests threading and progressbar
         for bar in [False, True]:
             for threading in [False, True]:
-                ot.global_options.show_progressbar = bar
+                ot.global_options.show_progress_bar = bar
                 ot.global_options.multithreading = threading
                 ot.convolve(img, psf)
 

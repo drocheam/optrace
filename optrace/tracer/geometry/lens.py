@@ -6,7 +6,7 @@ import numpy as np  # calculations and ndarray type
 from ..refraction_index import RefractionIndex  # material refraction index
 from .surface import Surface  # Surface type
 from .element import Element  # parent class
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 from ..transfer_matrix_analysis import TMA  # paraxial analysis
 
 

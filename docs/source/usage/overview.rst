@@ -117,7 +117,7 @@ There is also a context manager available for turning it off temporarily:
 
 .. code-block:: python
 
-   with ot.global_options.no_progressbar():
+   with ot.global_options.no_progress_bar():
        do_something()
 
 Warnings

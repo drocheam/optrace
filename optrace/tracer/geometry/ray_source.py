@@ -16,8 +16,9 @@ from .. import color  # for random_wavelengths_from_srgb() and _power_from_srgb(
 from ..presets.light_spectrum import d65 as d65_spectrum  # default light spectrum
 
 # misc
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 from .. import misc  # calculations
+from .. import random
 from ..image.rgb_image import RGBImage
 from ..image.linear_image import LinearImage
 
@@ -238,12 +239,12 @@ class RaySource(Element):
                 PY, PX = np.zeros(N, dtype=np.int32), np.zeros(N, dtype=np.int32)
             else:
                 # get random pixel number, the pixel brightness is the probability
-                P = misc.random_from_distribution(np.arange(self._pIf.shape[0]),
-                                                  self._pIf, N, kind="discrete").astype(int)
+                P = random.inverse_transform_sampling(np.arange(self._pIf.shape[0]),
+                                                      self._pIf, N, kind="discrete").astype(int)
                 PY, PX = np.divmod(P, self._image.shape[1])  # pixel x, y position from pixel number
 
             # add random position inside pixel and calculate positions in 3D space
-            rx, ry = misc.stratified_rectangle_sampling(0, 1, 0, 1, N)
+            rx, ry = random.stratified_rectangle_sampling(0, 1, 0, 1, N)
             xs, xe, ys, ye = self.surface.extent[:4]
             Iy, Ix = self._image.shape[:2]
 
@@ -288,7 +289,7 @@ class RaySource(Element):
         if self.div_2d:
             t = np.radians(self.div_axis_angle).repeat(2) + [0, np.pi]
             P = np.array([1., 1.], dtype=np.float64)
-            alpha = misc.random_from_distribution(t, P, N, kind="discrete")
+            alpha = random.inverse_transform_sampling(t, P, N, kind="discrete")
 
         if self.divergence == "Function":
             pc.check_callable("RaySource.div_func", self.div_func)
@@ -301,35 +302,35 @@ class RaySource(Element):
             case "Lambertian" if not self.div_2d:
                 # see https://doi.org/10.1080/10867651.1997.10487479
                 # # see https://www.particleincell.com/2015/cosine-distribution/
-                r, alpha = misc.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
+                r, alpha = random.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
                 theta = np.arcsin(r)
 
             case "Lambertian" if self.div_2d:
-                X0 = misc.stratified_interval_sampling(0, np.sin(np.radians(self.div_angle)), N)
+                X0 = random.stratified_interval_sampling(0, np.sin(np.radians(self.div_angle)), N)
                 theta = np.arcsin(X0)
 
             case "Isotropic" if not self.div_2d:
                 # see https://doi.org/10.1080/10867651.1997.10487479
                 # related https://mathworld.wolfram.com/SpherePointPicking.html
-                r, alpha = misc.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
+                r, alpha = random.stratified_ring_sampling(0, np.sin(np.radians(self.div_angle)), N, polar=True)
                 theta = np.arccos(1 - r**2)
             
             case "Isotropic" if self.div_2d:
-                theta = misc.stratified_interval_sampling(0, np.radians(self.div_angle), N)
+                theta = random.stratified_interval_sampling(0, np.radians(self.div_angle), N)
            
             case "Function" if not self.div_2d:
                 div_sin = np.sin(np.radians(self.div_angle))
-                r, alpha = misc.stratified_ring_sampling(0, div_sin, N, polar=True)
+                r, alpha = random.stratified_ring_sampling(0, div_sin, N, polar=True)
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 # related https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
                 f = self.div_func(x, **self.div_args) * np.sin(x)
                 X0 = r**2 / div_sin**2
-                theta = misc.random_from_distribution(x, f, X0, kind="continuous")
+                theta = random.inverse_transform_sampling(x, f, X0, kind="continuous")
 
             case "Function" if self.div_2d:  # pragma: no branch
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 f = self.div_func(x, **self.div_args)
-                theta = misc.random_from_distribution(x, f, N, kind="continuous")
+                theta = random.inverse_transform_sampling(x, f, N, kind="continuous")
 
         if self.divergence != "None":
             # vector perpendicular to s, created using  sy = [1, 0, 0] x s_or
@@ -364,26 +365,26 @@ class RaySource(Element):
                     ang = np.pi/2
 
                 case "xy":      
-                    ang = misc.random_from_distribution(np.array([0, np.pi/2]), np.ones(2), N, kind="discrete")
+                    ang = random.inverse_transform_sampling(np.array([0, np.pi / 2]), np.ones(2), N, kind="discrete")
 
                 case "Constant":   
                     ang = np.radians(self.pol_angle)
 
                 case "Uniform":
-                    ang = misc.stratified_interval_sampling(0, 2 * np.pi, N)
+                    ang = random.stratified_interval_sampling(0, 2 * np.pi, N)
 
                 case "List":
                     pc.check_type("RaySource.pol_angles", self.pol_angles, np.ndarray | list)
                     if self.pol_probs is None:
                         self.pol_probs = np.ones_like(self.pol_angles)
-                    ang = misc.random_from_distribution(self.pol_angles, self.pol_probs, N, kind="discrete")
+                    ang = random.inverse_transform_sampling(self.pol_angles, self.pol_probs, N, kind="discrete")
                     ang = np.radians(ang)
 
                 case "Function":  # pragma: no branch
                     pc.check_callable("RaySource.pol_func", self.pol_func)
                     x = np.linspace(0, 2*np.pi, 5000)
                     f = self.pol_func(x, **self.pol_args)
-                    ang = misc.random_from_distribution(x, f, N, kind="continuous")
+                    ang = random.inverse_transform_sampling(x, f, N, kind="continuous")
                     ang = np.radians(ang)
 
             # pol is rotated by an axis perpendicular to the plane of base divergence s = [0, 0, 1]

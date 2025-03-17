@@ -8,7 +8,7 @@ import scipy.constants  # for luminous efficacy
 import scipy.special  # bessel functions
 
 from ..base_class import BaseClass  # parent class
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 from . import RGBImage, LinearImage
 
 from .. import misc

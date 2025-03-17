@@ -6,7 +6,7 @@ import numpy as np  # calculations
 import os
 
 from ..base_class import BaseClass  # parent class
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 from ..geometry.surface import SphericalSurface
 
 

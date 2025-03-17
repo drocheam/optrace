@@ -4,7 +4,7 @@ from typing import Any  # Any type
 
 import numpy as np  # calculations
 
-from .misc import PropertyChecker as pc  # type checking
+from ..property_checker import PropertyChecker as pc  # type checking
 import time
 
 class BaseClass:

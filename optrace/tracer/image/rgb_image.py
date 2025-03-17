@@ -4,7 +4,7 @@ from typing import Any  # Callable and Any type
 import numpy as np  # calculations
 
 from .base_image import BaseImage
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 
 
 

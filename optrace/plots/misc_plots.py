@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt  # actual plotting
 from ..tracer.refraction_index import RefractionIndex
 from ..tracer.geometry import Surface
 from ..tracer.presets import spectral_lines as Lines  # spectral lines for AbbePlot
-from ..tracer.misc import PropertyChecker as pc
+from ..property_checker import PropertyChecker as pc
 from ..warnings import warning
 from ..global_options import global_options
 

@@ -5,7 +5,7 @@ from ..refraction_index import RefractionIndex  # material refraction index
 from .surface import CircularSurface  # Surface type
 from .lens import Lens  # parent class
 
-from ..misc import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc  # check types and values
 
 
 class IdealLens(Lens):

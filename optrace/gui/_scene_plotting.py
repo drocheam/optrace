@@ -12,8 +12,8 @@ from ..tracer import *
 from ..warnings import warning
 from ..global_options import global_options as go
 
-from ..tracer.misc import PropertyChecker as pc
-from ..tracer.misc import part_mask
+from ..property_checker import PropertyChecker as pc
+from ..tracer.misc import masked_assign
 
 
 
@@ -1280,7 +1280,7 @@ class ScenePlotting:
             sub = np.zeros(true_val, dtype=bool)
             indices = np.random.choice(true_val, size=bound, replace=False)
             sub[indices] = True
-            self.ray_selection = part_mask(mask, sub) 
+            self.ray_selection = masked_assign(mask, sub)
 
         else:
             self.ray_selection = mask

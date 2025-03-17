@@ -21,7 +21,7 @@ class ClassGlobalOptions:
     multithreading: bool = True
     """enable/disable multithreading in the backend. For the GUI threading is always enabled"""
 
-    show_progressbar: bool = True
+    show_progress_bar: bool = True
     """show a progressbar for backend activities (rendering, tracing, convolving, focussing, ...)"""
 
     show_warnings: bool = True
@@ -42,7 +42,6 @@ class ClassGlobalOptions:
     plot_dark_mode: bool = True
     """dark mode for the pyplots. Background is dark and black and white colors are inverted."""
 
-
     def __init__(self):
         # apply default settings
         self._ui_org_palette = QtCore.QCoreApplication.instance().palette()
@@ -50,14 +49,14 @@ class ClassGlobalOptions:
         self.ui_dark_mode = self.ui_dark_mode
     
     @contextmanager
-    def no_progressbar(self) -> None:
+    def no_progress_bar(self) -> None:
         """context manager that toggles the progressbar off"""
-        old_setting = self.show_progressbar
-        self.show_progressbar = False
+        old_setting = self.show_progress_bar
+        self.show_progress_bar = False
         try:
             yield
         finally:
-            self.show_progressbar = old_setting
+            self.show_progress_bar = old_setting
     
     @contextmanager
     def no_warnings(self) -> None:
@@ -71,7 +70,7 @@ class ClassGlobalOptions:
 
     def __setattr__(self, key, val):
 
-        if key in ["show_progressbar", "show_warnings", "multithreading"]:
+        if key in ["show_progress_bar", "show_warnings", "multithreading"]:
             if not isinstance(val, bool):
                 raise TypeError(f"Property '{key}' needs to be of type bool, but is {type(val)}.")
 
@@ -84,7 +83,7 @@ class ClassGlobalOptions:
 
             # qdarktheme.enable_hi_dpi()
             
-            if val == True:
+            if val:
                 qdarktheme.setup_theme("dark")
                 # set button palette explicitly so pyplot qt toolbar icons get colored correctly
                 pal = QtCore.QCoreApplication.instance().palette()
@@ -100,15 +99,12 @@ class ClassGlobalOptions:
                 pal.setColor(QtGui.QPalette.ButtonText, QtGui.QColor("black"))
                 QtCore.QCoreApplication.instance().setPalette(pal)
 
-                # TODO for some reason the QDialog color is not set to white
-                # in the pyplot "edit plot parameters" window background
-
         if key == "plot_dark_mode":
 
             if not isinstance(val, bool):
                 raise TypeError(f"Property '{key}' needs to be of type bool, but is {type(val)}.")
 
-            if val == True:
+            if val:
                 matplotlib.style.use("dark_background")
                 matplotlib.rcParams['figure.facecolor'] ='#333'
                 matplotlib.rcParams['savefig.facecolor'] ='#333'

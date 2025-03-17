@@ -131,6 +131,6 @@ Notes
 
 * some actions need time, but the program should still appear active and responsive. Hence, we need to notify the user with:
    * a message that something has been started / processed/ approved
-   * a progressbar indicating the progress and estimated remaining time. Also distracts the user, lowering the subjective waiting time
+   * a progress bar indicating the progress and estimated remaining time. Also distracts the user, lowering the subjective waiting time
 * TraceGUI actions like tracing, focussing etc. need to run in background threads, so the scene and main UI thread are responsive
 

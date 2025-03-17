@@ -7,8 +7,9 @@ import cv2
 
 from . import misc
 from . import color
-from ..tracer.misc import PropertyChecker as pc
-from ..tracer.image import RGBImage, LinearImage, RenderImage
+from ..progress_bar import ProgressBar
+from ..property_checker import PropertyChecker as pc
+from .image import RGBImage, LinearImage, RenderImage
 from .. import global_options
 from ..warnings import warning
 
@@ -105,14 +106,8 @@ def convolve(img:                RGBImage | LinearImage,
         pval = float(padding_value) if padding_value is not None else 0.
         pc.check_not_below("padding_value", pval, 0)
 
-
-    # function for raising the exception and finishing the progress bar
-    def raise_(excp):
-        bar.finish()
-        raise excp
-    
     # create progress bar
-    bar = misc.progressbar("Convolving: ", 5)
+    bar = ProgressBar("Convolving: ", 5)
     
     # Load PSF
     ###################################################################################################################
@@ -173,26 +168,24 @@ def convolve(img:                RGBImage | LinearImage,
     ppx, ppy = psx/(pnx-1), psy/(pny-1)  # psf pixel sizes
       
     if psx > 2*isx or psy > 2*isy:
-        raise_(ValueError(f"m-scaled image size [{isx:.5g}, {isy:.5g}] is more than two times " 
-                          f"smaller than PSF size [{psx:.5g}, {psy:.5g}]."))
+        raise ValueError(f"m-scaled image size [{isx:.5g}, {isy:.5g}] is more than two times " 
+                         f"smaller than PSF size [{psx:.5g}, {psy:.5g}].")
 
     if pnx*pny > 4e6:
-        raise_(ValueError("PSF needs to be smaller than 4MP"))
+        raise ValueError("PSF needs to be smaller than 4MP")
 
     if inx*iny > 4e6:
-        raise_(ValueError("Image needs to be smaller than 4MP"))
+        raise ValueError("Image needs to be smaller than 4MP")
 
     if ppx > ipx or ppy > ipy:
         warning(f"WARNING: PSF pixel sizes [{ppx:.5g}, {ppy:.5g}] larger than image pixel sizes"
-                      f" [{ipx:.5g}, {ipy:.5g}], generally you want a PSF in a higher resolution")
+                f" [{ipx:.5g}, {ipy:.5g}], generally you want a PSF in a higher resolution")
 
     if pnx < 50 or pny < 50:
-        raise_(ValueError(f"PSF too small with shape {psf.shape}, "
-                          "needs to have at least 50 values in each dimension."))
+        raise ValueError(f"PSF too small with shape {psf.shape}, needs to have at least 50 values in each dimension.")
     
     if inx < 50 or iny < 50:
-        raise_(ValueError(f"Image too small with shape {img.shape}, "
-                          "needs to have at least 50 values in each dimension."))
+        raise ValueError(f"Image too small with shape {img.shape}, needs to have at least 50 values in each dimension.")
     
     if inx*iny < 2e4:
         warning(f"WARNING: Low resolution image.")
@@ -317,7 +310,6 @@ def convolve(img:                RGBImage | LinearImage,
 
     # new image side lengths
     s2 = [(img2.shape[1]-1)*ipx, (img2.shape[0]-1)*ipy]
-    bar.update()
     bar.finish()
 
     # new image center is the sum of psf and old image center

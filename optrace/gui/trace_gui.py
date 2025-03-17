@@ -24,7 +24,7 @@ from .property_browser import PropertyBrowser  # dictionary browser
 from .command_window import CommandWindow
 from ._scene_plotting import ScenePlotting
 
-from ..tracer.misc import PropertyChecker as pc
+from ..property_checker import PropertyChecker as pc
 from ..warnings import warning
 from ..global_options import global_options
 from .. import metadata

@@ -3,11 +3,7 @@
 import sys
 sys.path.append('.')
 
-# add PYTHONPATH to env, so the examples can find optrace
 import os
-
-if "TOX_ENV_DIR" not in os.environ:
-    os.environ["PYTHONPATH"] = "."
 
 import unittest
 import subprocess
@@ -20,19 +16,21 @@ import pytest
 # no external libraries like numpy, scipy should be in the global namespace
 # internal classes like Surface, Element, RayStorage, ... are not in the same namespace
 
-
 class ScopeTests(unittest.TestCase):
 
-    def _run_command(self, command, timeout=40):
+    def __init__(self, *args, **kwargs):
+
+        # add PYTHONPATH to env, so the examples can find optrace
+        if "TOX_ENV_DIR" not in os.environ:
+            os.environ["PYTHONPATH"] = "."
+
+        super().__init__(*args, **kwargs)
+
+    def _run_command(self, command, timeout=10):
         """run a subprocess and get exit code"""
 
         # we need to run a seperate process so that the script is in a default state without libraries loaded
-        process = subprocess.Popen(["python", "-c", command], stdout=subprocess.DEVNULL, env=os.environ)
-        try:
-            process.wait(timeout=timeout)
-        except subprocess.TimeoutExpired:
-            process.kill()
-
+        process = subprocess.run(["python", "-c", command], env=os.environ, timeout=timeout)
         return process.returncode
 
     def test_scope_partial_load(self):
@@ -67,6 +65,10 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "ot.BaseClass", locals())
         self.assertRaises(AttributeError, eval, "ot.BaseImage", locals())
         self.assertRaises(AttributeError, eval, "ot.misc", locals())
+        self.assertRaises(AttributeError, eval, "ot.random", locals())
+        self.assertRaises(AttributeError, eval, "ot._random", locals())
+        self.assertRaises(AttributeError, eval, "ot.ProgressBar", locals())
+        self.assertRaises(AttributeError, eval, "ot.PropertyChecker", locals())
         self.assertRaises(AttributeError, eval, "ot.Surface", locals())
         self.assertRaises(AttributeError, eval, "ot.ray_storage", locals())
         self._test_scope_ext_libs(locals())

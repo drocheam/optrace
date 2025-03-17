@@ -826,7 +826,7 @@ class TracerTests(unittest.TestCase):
         """test actions without multithreading, progressbar and tracing with no_pol"""
         RT = rt_example()
         ot.global_options.multithreading = False
-        ot.global_options.show_progressbar = False
+        ot.global_options.show_progress_bar = False
 
         # raytracer not silent -> outputs messages and progress bar for actions
         RT.trace(10000)
@@ -853,7 +853,7 @@ class TracerTests(unittest.TestCase):
         RT.trace(10000)
         
         ot.global_options.multithreading = True
-        ot.global_options.show_progressbar = True
+        ot.global_options.show_progress_bar = True
 
     def test_numeric_tracing(self):
         """checks RT.find_hit for a numeric surface and DataSurface """

@@ -7,8 +7,8 @@ from typing import Any  # Any type
 
 from .spectrum import Spectrum  # parent class
 from .. import color # color conversions
-from .. import misc  # random_from_distribution
-from ..misc import PropertyChecker as pc  # check types and values
+from .. import random  # inverse_transform_sampling
+from ...property_checker import PropertyChecker as pc  # check types and values
 from ...global_options import global_options as go
 
 
@@ -95,28 +95,28 @@ class LightSpectrum(Spectrum):
                 wl0 = go.wavelength_range[0] if self.spectrum_type == "Constant" else self.wl0
                 wl1 = go.wavelength_range[1] if self.spectrum_type == "Constant" else self.wl1
 
-                wl = misc.stratified_interval_sampling(wl0, wl1, N)
+                wl = random.stratified_interval_sampling(wl0, wl1, N)
 
             case "Lines":
                 pc.check_type("LightSpectrum.lines", self.lines, np.ndarray | list)
                 pc.check_type("LightSpectrum.line_vals", self.line_vals, np.ndarray | list)
-                wl = misc.random_from_distribution(self.lines, self.line_vals, N, kind="discrete")
+                wl = random.inverse_transform_sampling(self.lines, self.line_vals, N, kind="discrete")
 
             case "Data":
                 pc.check_type("LightSpectrum.wls", self._wls, np.ndarray | list)
                 pc.check_type("LightSpectrum.vals", self._vals, np.ndarray | list)
-                wl = misc.random_from_distribution(self._wls, self._vals, N)
+                wl = random.inverse_transform_sampling(self._wls, self._vals, N)
 
             case "Gaussian":
                 # although scipy.stats.truncnorm exists, we want to implement this ourselves 
-                # so misc.stratified_interval_sampling can be used as random generator
+                # so random.stratified_interval_sampling can be used as random generator
 
                 # don't use the whole [0, 1] range for our random variable,
                 # since we only simulate wavelengths in [380, 780], but gaussian pdf is unbound
                 # therefore calculate minimal and maximal bound for the new random variable interval
                 Xl = (1 + scipy.special.erf((go.wavelength_range[0] - self.mu)/(np.sqrt(2)*self.sig)))/2
                 Xr = (1 + scipy.special.erf((go.wavelength_range[1] - self.mu)/(np.sqrt(2)*self.sig)))/2
-                X = misc.stratified_interval_sampling(Xl, Xr, N)
+                X = random.stratified_interval_sampling(Xl, Xr, N)
 
                 # icdf of gaussian pdf
                 wl = self.mu + np.sqrt(2)*self.sig * scipy.special.erfinv(2*X-1)
@@ -130,7 +130,7 @@ class LightSpectrum(Spectrum):
                 cnt = 4000 if self.spectrum_type == "Blackbody" else 10000
 
                 wlr = color.wavelengths(cnt)
-                wl = misc.random_from_distribution(wlr, self(wlr), N)
+                wl = random.inverse_transform_sampling(wlr, self(wlr), N)
 
         return wl
 

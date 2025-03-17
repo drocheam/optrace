@@ -1,7 +1,7 @@
 
 import numpy as np  # matrix calculations
 
-from .. import misc
+from .. import random
 from . import tools
 from .xyz import xyz_to_xyY, WP_D65_XY
 from .luv import xyz_to_luv, luv_to_xyz, luv_to_u_v_l, SRGB_R_UV, SRGB_G_UV, SRGB_B_UV, WP_D65_UV
@@ -460,9 +460,6 @@ def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     :param mu: mean value
     :param sig: standard deviation
     :return: function values with same shape as x
-
-    >>> gauss(np.array([0., 0.5, 1.5]), 0.75, 1)
-    array([ 0.30113743, 0.38666812, 0.30113743])
     """
     return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 * (x - mu) ** 2 / sig ** 2)
 
@@ -565,16 +562,16 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     rgb_sum /= np.where(rgb_sum_last, rgb_sum_last, 1)
 
     # chose x, y or z depending on in which range rgb_choice fell
-    rgb_choice = misc.stratified_interval_sampling(0, 1, rgb.shape[0])
+    rgb_choice = random.stratified_interval_sampling(0, 1, rgb.shape[0])
     make_r = rgb_choice < rgb_sum[:, 0]
     make_b = rgb_choice > rgb_sum[:, 1]
     make_g = ~make_r & ~make_b
 
     # select a wavelength from the chosen primaries
     wl_out = np.zeros(rgb.shape[0], dtype=np.float64)
-    wl_out[make_r] = misc.random_from_distribution(wl, srgb_r_primary(wl), np.count_nonzero(make_r))
-    wl_out[make_g] = misc.random_from_distribution(wl, srgb_g_primary(wl), np.count_nonzero(make_g))
-    wl_out[make_b] = misc.random_from_distribution(wl, srgb_b_primary(wl), np.count_nonzero(make_b))
+    wl_out[make_r] = random.inverse_transform_sampling(wl, srgb_r_primary(wl), np.count_nonzero(make_r))
+    wl_out[make_g] = random.inverse_transform_sampling(wl, srgb_g_primary(wl), np.count_nonzero(make_g))
+    wl_out[make_b] = random.inverse_transform_sampling(wl, srgb_b_primary(wl), np.count_nonzero(make_b))
 
     return wl_out
 

@@ -6,7 +6,7 @@ import numpy as np  # calculations
 from .presets import spectral_lines as Lines  # spectral lines for Abbe number
 from .spectrum import Spectrum  # parent class
 from . import color  # for visible wavelength range
-from .misc import PropertyChecker as pc  # check types and values
+from ..property_checker import PropertyChecker as pc  # check types and values
 
 
 class RefractionIndex(Spectrum):

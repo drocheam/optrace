@@ -9,7 +9,7 @@ from ..tracer.image.render_image import RenderImage
 from ..tracer.image.rgb_image import RGBImage
 from ..tracer.spectrum import LightSpectrum
 from ..tracer import color  # color conversions for chromaticity plots
-from ..tracer.misc import PropertyChecker as pc
+from ..property_checker import PropertyChecker as pc
 from .misc_plots import _save_or_show
 
 # see https://www.shadertoy.com/view/7s2SDc
@@ -65,8 +65,8 @@ def chromaticities_cie_1931(img:                  RenderImage | RGBImage | Light
     _chromaticity_plot(img, conv, i_conv, r, g, b, w, ext, title, "x", "y", **kwargs)
 
 
-def chromaticities_cie_1976(img:                  RenderImage | RGBImage | LightSpectrum | list[LightSpectrum] = None,
-                            title:                str = "CIE 1976 UCS Diagram",
+def chromaticities_cie_1976(img:       RenderImage | RGBImage | LightSpectrum | list[LightSpectrum] = None,
+                            title:     str = "CIE 1976 UCS Diagram",
                             **kwargs)\
         -> None:
     """
@@ -102,20 +102,20 @@ def chromaticities_cie_1976(img:                  RenderImage | RGBImage | Light
     _chromaticity_plot(img, conv, i_conv, r, g, b, w, ext, title, "u'", "v'", **kwargs)
 
 
-def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSpectrum | list[LightSpectrum],
-                       conv:                    Callable,
-                       i_conv:                  Callable,
-                       r:                       list,
-                       g:                       list,
-                       b:                       list,
-                       w:                       list,
-                       ext:                     list,
-                       title:                   str,
-                       xl:                      str,
-                       yl:                      str,
-                       norm:                    str = "Euclidean",
-                       path:                    str = None,
-                       sargs:                   dict = {})\
+def _chromaticity_plot(img:       RenderImage | RGBImage | LightSpectrum | list[LightSpectrum],
+                       conv:      Callable,
+                       i_conv:    Callable,
+                       r:         list,
+                       g:         list,
+                       b:         list,
+                       w:         list,
+                       ext:       list,
+                       title:     str,
+                       xl:        str,
+                       yl:        str,
+                       norm:      str = "Euclidean",
+                       path:      str = None,
+                       sargs:     dict = {})\
         -> None:
     """Lower level plotting function. Don't use directly"""
 
@@ -202,7 +202,8 @@ def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSp
     # "compromise" diagram -> brighter and more saturated colors
     elif norm == "Euclidean":
         mask = ~np.all(RGB == 0, axis=2)
-        RGB[mask] /= (np.abs(RGB[mask, 0]**2 + RGB[mask, 1]**2 + RGB[mask, 2]**2)**0.5)[:, np.newaxis]  # normalize brightness
+        RGB[mask] /= (np.abs(RGB[mask, 0]**2 + RGB[mask, 1]**2 + RGB[mask, 2]**2)**0.5)[:, np.newaxis]  
+        # normalize brightness
 
     # convert to sRGB
     sRGB = color.srgb_linear_to_srgb(RGB)
@@ -225,7 +226,7 @@ def _chromaticity_plot(img:                     RenderImage | RGBImage | LightSp
     # fill upper edge part of gamut
     xf1 = np.concatenate(([x[0]],   xs[wl >= wlleft], [x[-1]]))
     yf1 = np.concatenate(([ylleft], ys[wl >= wlleft], [ys[-1]]))
-    plt.fill_between(xf1, yf1, np.ones_like(xf1)*y[-1], color="#1f2023", label='_nolegend_')  # fill region outside gamut
+    plt.fill_between(xf1, yf1, np.ones_like(xf1)*y[-1], color="#1f2023", label='_nolegend_') # fill region outside gamut
 
     # fill lower edge part of gamut
     xf2 = np.concatenate(([x[0]],   np.flip(xs[wl <= wlleft]), [xs[-1]], [x[-1]]))

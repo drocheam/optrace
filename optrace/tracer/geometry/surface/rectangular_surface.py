@@ -3,8 +3,8 @@ from typing import Any  # Any type
 
 import numpy as np  # matrix calculations
 
-from ... import misc  # calculations
-from ...misc import PropertyChecker as pc  # check types and values
+from ... import random  # stratified sampling
+from ....property_checker import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
 
 
@@ -153,7 +153,7 @@ class RectangularSurface(Surface):
         """
         p = np.zeros((N, 3), dtype=np.float64, order='F')
         # grid for unrotated rectangle at (0, 0, 0)
-        x, y = misc.stratified_rectangle_sampling(*self._extent[:4], N)
+        x, y = random.stratified_rectangle_sampling(*self._extent[:4], N)
 
         # rotate and add offset (=position)
         p[:, 0], p[:, 1] = self._rotate_rc(x, y, self._angle)
