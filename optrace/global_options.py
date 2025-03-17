@@ -1,19 +1,8 @@
 from typing import Callable
 from contextlib import contextmanager  # context managers
 
-# enforce qt backend  
-from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt'
-
-# imports needed so initial dark mode setting can be set
-import pyface.gui
-from pyface.qt import QtGui, QtCore
-import matplotlib.style
-import qdarktheme
-
 import numpy as np
 import threading
-
 
 
 class ClassGlobalOptions:
@@ -43,11 +32,9 @@ class ClassGlobalOptions:
     """dark mode for the pyplots. Background is dark and black and white colors are inverted."""
 
     def __init__(self):
-        # apply default settings
-        self._ui_org_palette = QtCore.QCoreApplication.instance().palette()
-        self.plot_dark_mode = self.plot_dark_mode
-        self.ui_dark_mode = self.ui_dark_mode
-    
+        self.plot_dark_mode_handler = None
+        self.ui_dark_mode_handler = None
+
     @contextmanager
     def no_progress_bar(self) -> None:
         """context manager that toggles the progressbar off"""
@@ -81,43 +68,16 @@ class ClassGlobalOptions:
             assert threading.current_thread() is threading.main_thread(),\
                 "Change of ui_dark_mode must be done in main thread!!!"
 
-            # qdarktheme.enable_hi_dpi()
-            
-            if val:
-                qdarktheme.setup_theme("dark")
-                # set button palette explicitly so pyplot qt toolbar icons get colored correctly
-                pal = QtCore.QCoreApplication.instance().palette()
-                pal.setColor(QtGui.QPalette.Button, QtGui.QColor("black"))
-                pal.setColor(QtGui.QPalette.ButtonText, QtGui.QColor("white"))
-                QtCore.QCoreApplication.instance().setPalette(pal)
-            else:
-                # reset the style to default fusion
-                qdarktheme.setup_theme("light", custom_colors={"foreground": "#000000", "primary": "#155bb6"})
-                # set button palette explicitly so pyplot qt toolbar icons get colored correctly
-                pal = QtCore.QCoreApplication.instance().palette()
-                pal.setColor(QtGui.QPalette.Button, QtGui.QColor("white"))
-                pal.setColor(QtGui.QPalette.ButtonText, QtGui.QColor("black"))
-                QtCore.QCoreApplication.instance().setPalette(pal)
+            if self.ui_dark_mode_handler is not None:
+                self.ui_dark_mode_handler(val)
 
         if key == "plot_dark_mode":
 
             if not isinstance(val, bool):
                 raise TypeError(f"Property '{key}' needs to be of type bool, but is {type(val)}.")
 
-            if val:
-                matplotlib.style.use("dark_background")
-                matplotlib.rcParams['figure.facecolor'] ='#333'
-                matplotlib.rcParams['savefig.facecolor'] ='#333'
-                matplotlib.rcParams['axes.facecolor'] ='#1f2023'
-                matplotlib.rcParams['axes.edgecolor'] ='#555'
-                matplotlib.rcParams['legend.facecolor'] ='#333333'
-            else:
-                matplotlib.style.use("default")
-
-            # without thisthe settings get unset for some reason (bug?)
-            matplotlib.rcParams['mathtext.fontset'] = 'stix'
-            matplotlib.rcParams['font.family'] = 'STIXGeneral'
-
+            if self.plot_dark_mode_handler is not None:
+                self.plot_dark_mode_handler(val)
 
         elif key == "wavelength_range":
             if not isinstance(val, list | tuple):

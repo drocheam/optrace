@@ -15,13 +15,10 @@ class ProgressBar:
         """
 
         if global_options.show_progress_bar:
-            self.bar = tqdm.tqdm(desc=text, total=steps, disable=None, 
-                                 bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]', **kwargs)
+            self.bar = tqdm.tqdm(desc=text, total=steps, disable=None, ascii=True,
+                                 bar_format='{l_bar}\b |{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]', **kwargs)
         else:
             self.bar = None
-
-        self.i = 0
-        self.total = steps
 
     def update(self, condition: bool = True) -> None:
         """
@@ -31,12 +28,11 @@ class ProgressBar:
         """
         if self.bar is not None and condition:
             self.bar.update()
-            self.i += 1
 
     def finish(self) -> None:
         """finish and close the progress bar"""
         if self.bar is not None:
-            if (diff := self.total - self.i) > 0:
+            if (diff := self.bar.total - self.bar.n) > 0:
                 self.update(diff)
             self.bar.close()
 

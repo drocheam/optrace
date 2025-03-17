@@ -6,6 +6,7 @@ import numpy as np  # calculations
 import cv2
 import scipy.constants  # for luminous efficacy
 import scipy.special  # bessel functions
+import scipy.signal
 
 from ..base_class import BaseClass  # parent class
 from ...property_checker import PropertyChecker as pc  # check types and values
@@ -280,7 +281,7 @@ class RenderImage(BaseClass):
         psf[R > 10.1735] = 0  # only use up to third zero at 10.1735
         psf /= np.sum(psf)
 
-        if global_options.multithreading:
+        if global_options.multithreading and misc.cpu_count() > 3:
             # for each of the XYZW channels:
             def threaded(ind, in_, psf):
                 in_[:, :, ind] = scipy.signal.fftconvolve(in_[:, :, ind], psf, mode="same")

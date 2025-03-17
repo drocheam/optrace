@@ -125,7 +125,7 @@ Notes
 
 * functions and classes output information and warnings to the terminal
 * warnings have an own type :class:`OptraceWarning <optrace.warnings.OptraceWarning>` and can be silenced with a global option :attr:`show_warnings <optrace.global_options.ClassGlobalOptions.show_warnings>`
-* the progressbar should only used for more time-intensive tasks and can be turned off with the :attr:`show_progressbar <optrace.global_options.ClassGlobalOptions.show_progressbar>` option.
+* the progressbar should only used for more time-intensive tasks and can be turned off with the :attr:`show_progressbar <optrace.global_options.ClassGlobalOptions.show_progress_bar>` option.
 
 **Responsiveness**
 

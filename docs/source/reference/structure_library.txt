@@ -14,6 +14,8 @@
 │   ├── __init__.py
 │   ├── misc_plots.py
 │   └── spectrum_plots.py
+├── progress_bar.py
+├── property_checker.py
 ├── resources
 │   ├── illuminants.csv
 │   ├── images
@@ -99,6 +101,7 @@
 │   │   ├── refraction_index.py
 │   │   ├── spectral_lines.py
 │   │   └── spectrum.py
+│   ├── random.py
 │   ├── ray_storage.py
 │   ├── raytracer.py
 │   ├── refraction_index.py
@@ -110,4 +113,4 @@
 │   └── transfer_matrix_analysis.py
 └── warnings.py
 
-14 directories, 97 files
+14 directories, 100 files
