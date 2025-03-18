@@ -9,23 +9,8 @@ keywords = ["simulation", "optics", "raytracing"]
 readme = "ReadMe.md"
 license = {text = "MIT License"}
 requires-python = ">=3.10,<3.14"
-dependencies = [
-    "numpy>2",
-    "chardet", 
-    "scipy", 
-    "opencv-python-headless",
-    "pyqtdarktheme-fork",
-    "pyside6", 
-    "matplotlib", 
-    "tqdm",
-    "mayavi @ git+https://github.com/enthought/mayavi"
-    ]
-# mayavi git version needed as PyPi version rarely gets updated
-# TODO git links lead to issues in later publishing the package on PyPi
-# see https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links
-# and https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation#comment115929654_65527149
-# or https://stackoverflow.com/a/54894359
-#
+dependencies = ["numpy>2", "chardet", "scipy", "opencv-python-headless", "pyqtdarktheme-fork", "pyside6", 
+"matplotlib", "tqdm", "mayavi @ git+https://github.com/enthought/mayavi"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -57,20 +42,8 @@ Repository = "https://www.github.com/drocheam/optrace"
 #Changelog = ""
 
 [project.optional-dependencies]
-tests = [
-    "pyautogui", 
-    "pytest",
-    "coverage",
-    "colour-science", 
-    "pytest-timeout",
-    "pytest-random-order"
-]
-docs = [
-    "tox",
-    "sphinx",
-    "sphinxcontrib-bibtex",
-    "pydata-sphinx-theme"
-]
+tests = ["pyautogui", "pytest", "coverage", "colour-science", "pytest-timeout", "pytest-random-order"]
+docs = ["tox", "sphinx", "sphinxcontrib-bibtex", "pydata-sphinx-theme"]
 
 [build-system]
 requires = ["setuptools >= 61.0", "numpy>2"]
@@ -81,5 +54,4 @@ packages.find.include =  ["optrace*"]
 include-package-data = false
 dynamic = {version = {attr = "optrace.metadata.version"}}
 package-data = {optrace = ["resources/*", "resources/images/*"]}  
-# ^--- resources would be excluded in wheel otherwise
 

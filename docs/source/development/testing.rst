@@ -26,7 +26,8 @@ Some examples include:
 * sampling of directions, color, positions produces the correct distribution on both the source and destination 
 * GUI interactions execute the expected actions
 * images are correctly loaded and saved
-* typical phenomena and aberrations of geometrical optics can be reproduced (spherical and chromatic aberration, vignetting, dispersion, astigmatism, coma, ...)
+* typical phenomena and aberrations of geometrical optics can be reproduced (spherical and chromatic aberration, 
+  vignetting, dispersion, astigmatism, coma, ...)
 * image formation by convolving produces correct results even the images must be scaled or interpolated
 * PSF convolution and raytracing produce comparable results
 * simple :bash:`.zmx` and :bash:`.agf` files are handled and imported correctly 
@@ -43,13 +44,16 @@ Some edge cases include:
 * an optical setup without lenses, filters or apertures is traced correctly
 * ... many more
 
-Test files can be found under `tests/ <https://github.com/drocheam/optrace/blob/main/tests/>`_, starting with filename :bash:`test_`
+Test files can be found under `tests/ <https://github.com/drocheam/optrace/blob/main/tests/>`_, 
+starting with filename :bash:`test_`
 Testing is performed with :mod:`pytest`.
-To ensure that it is performed on a "clean" and defined environment, it is run by `tox <https://tox.wiki/en/latest/>`_, this creates a virtual python environment where the library is installed and tested.
+To ensure that it is performed on a "clean" and defined environment, it is run by `tox <https://tox.wiki/en/latest/>`_, 
+this creates a virtual python environment where the library is installed and tested.
 With its default call, :bash:`tox` calls the testing environment that includes all test cases.
 To lower RAM usage, tox calls test groups instead of all tests at once.
 
-The workflow file `tox_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/tox_test.yml>`_ runs the functionality tests on a defined system and python version as github actions.
+The workflow file `tox_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/tox_test.yml>`_ 
+runs the functionality tests on a defined system and python version as github actions.
 By default this is done on pushed code changes, but the action can also be run manually.
 
 
@@ -70,9 +74,11 @@ Spherical surfaces are easier to trace then complex user defined ones.
 For systems with a low number of surfaces the ray generation at the source becomes dominant.
 
 The example :ref:`example_microscope` is used for testing in its default settings.
-These includes one million rays and 57 light-interacting surfaces (one ray source, one aperture, 27 lenses with front and back surface each, one outline surface of the bounding box).
+These includes one million rays and 57 light-interacting surfaces (one ray source, one aperture, 
+27 lenses with front and back surface each, one outline surface of the bounding box).
 Detectors are excluded as they don't interact with the rays unless image rendering is executed.
-From the start of the raytracing until the end 6.6 seconds pass on my system (Arch Linux 6.12, i7-1360P notebook CPU, Python 3.13), resulting in 0.12 s / surface / million rays.
+From the start of the raytracing until the end 6.6 seconds pass on my system 
+(Arch Linux 6.12, i7-1360P notebook CPU, Python 3.13), resulting in 0.12 s / surface / million rays.
 
 
 .. TODO how to handle these points:
@@ -81,17 +87,20 @@ Test Cases
 __________________
 
 * :mod:`doctest` for documentation strings in some non-class functions
-* test cases are handled with :mod:`unittest`, testing is however typically done by :mod:`pytest` that loads and executed the created TestSuites
+* test cases are handled with :mod:`unittest`, testing is however typically done by :mod:`pytest` 
+  that loads and executed the created TestSuites
 * :python:`TraceGUI` has a :python:`debug` method, which runs a separate thread, from which actions are executed:
-   * Note that each UI actions needs to be run in the main thread, for this :python:`TraceGUI` provides :python:`_do_in_main` and :python:`_set_in_main` methods
-   * generally we want to do an action, after the old one has finished. For this :python:`TraceGUI._wait_for_idle` is implemented.
+   * Note that each UI actions needs to be run in the main thread, for this :python:`TraceGUI` 
+     provides :python:`_do_in_main` and :python:`_set_in_main` methods
+   * generally we want to do an action, after the old one has finished.
+     For this :python:`TraceGUI._wait_for_idle` is implemented.
 
 
 Documentation Testing
 __________________________________
 
-The workflow file `doc_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/doc_test.yml>`_ runs multiple test environments.
-This includes:
+The workflow file `doc_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/doc_test.yml>`_ 
+runs multiple test environments. This includes:
 
 * :bash:`tox -e docsbuildcheck`: Testing of correct documentation building while not permitting warning
 * :bash:`tox -e linkcheck`: Testing of all documentation links
@@ -100,13 +109,15 @@ This includes:
 Python Version Testing
 __________________________________
 
-Testing of the compatibility with multiple python versions is done with the `pyver_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml>`_ workflow.
+Testing of the compatibility with multiple python versions is done with the 
+`pyver_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml>`_ workflow.
 It executes a subset of tests (:bash:`tox -e fast`) for multiple python main versions in an Ubuntu runner.
 
 Platform Testing
 __________________________________
 
-Platform testing is done with the `os_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml>`_ workflow.
+Platform testing is done with the 
+`os_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml>`_ workflow.
 It executes the os tox environment, which runs a subset of all available tests.
 These tests include relevant possibly platform-dependent cases, including:
 
@@ -137,7 +148,8 @@ The following test cases need to be handled manually:
 
 **Checking that** :func:`optrace.plots.block <optrace.plots.misc_plots.block>` **actually pauses the program execution**
 
-This can't be tested automatically, as it would halt testing. Maybe there is a way by using multithreading or multiprocessing and a timer?
+This can't be tested automatically, as it would halt testing. 
+Maybe there is a way by using multithreading or multiprocessing and a timer?
 What about coverage information in such cases?
 
 **Correct and nice formatting inside plots and the GUI**
@@ -163,4 +175,14 @@ ________________________________________________________________________________
 
 .. literalinclude:: ../../../tox.ini
    :language: ini
+
+**Notes**
+
+* tox-ignore-env-name-mismatch allows us to reuse the tox env for all actions
+* parallelized testing with pytest-xdist could be possible, but we wouldn't gain much from it as the heaviest
+  tasks are already multithreaded
+* when gui tests fail on wayland, first run :bash:`xhost +`
+* :bash:`LIBGL_ALWAYS_SOFTWARE = 1`, see `<https://github.com/cypress-io/cypress/issues/29521>`_
+* TODO at some point in time update the tox.ini to tox.toml, currently there are some issues
+
 
