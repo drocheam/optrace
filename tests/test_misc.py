@@ -44,7 +44,8 @@ class TracerMiscTests(unittest.TestCase):
             env["PYTHON_CPU_COUNT"] = str(cores)
 
             result = subprocess.run(["python3", "-c", cmd], env=env, capture_output=True, text=True, check=True)
-            self.assertEqual(result.stdout[:-1], str(cores), msg=result.stdout)
+            cores_compare = str(cores) if hasattr(os, "process_cpu_count") else str(os.cpu_count())
+            self.assertEqual(result.stdout[:-1], cores_compare, msg=result.stdout)
 
     def test_global_options(self):
         

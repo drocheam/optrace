@@ -48,13 +48,6 @@ class GUITests(unittest.TestCase):
             raise self.exc_info[0](self.exc_info[1]).with_traceback(self.exc_info[2])
         self.exc_info = False
 
-    # def wait_for_status(self, sim, states):
-
-        # while not any([sim._status[state] for state in states]):
-            # time.sleep(0.05)
-        # while any([sim._status[state] for state in states]):
-            # time.sleep(0.05)
-    
     def _wait_for_idle(self, sim, base=0.2, timeout=30) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
 
@@ -69,9 +62,6 @@ class GUITests(unittest.TestCase):
 
             if tsum > timeout:
                 raise TimeoutError("")
-                # keys = [key for key, val in self._status.items() if val]
-                # pyface_gui.invoke_later(raise_timeout, keys)
-                # return
     
     def _do_in_main(self, f: Callable, *args, **kw) -> None:
         """execute a function in the GUI main thread"""
