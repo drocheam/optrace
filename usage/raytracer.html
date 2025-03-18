@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.5. Raytracer &#8212; optrace 1.6.4 documentation</title>
+    <title>4.5. Raytracer &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'usage/raytracer';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -294,28 +294,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -420,7 +420,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.5. </span>Raytracer</span></li>
   </ul>
@@ -444,8 +444,8 @@
 <section id="usage-raytracer">
 <span id="id1"></span><h2><span class="section-number">4.5.1. </span>Raytracer<a class="headerlink" href="#usage-raytracer" title="Link to this heading">#</a></h2>
 <p><strong>Overview</strong></p>
-<p>The <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class provides the functionality for tracing, geometry checking, rendering spectra and images, and focusing.</p>
-<p>Since the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> is a subclass of a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a>, elements can be changed or added in the same way.</p>
+<p>The <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class provides the functionality for tracing, geometry checking, rendering spectra and images, and focusing.</p>
+<p>Since the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> is a subclass of a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a>, elements can be changed or added in the same way.</p>
 <figure class="align-center" id="id2">
 <a class="dark-light reference internal image-reference" href="../_images/example_legrand1.png"><img alt="../_images/example_legrand1.png" class="dark-light" src="../_images/example_legrand1.png" style="width: 700px;" />
 </a>
@@ -455,7 +455,7 @@
 </figure>
 <p><strong>Outline</strong></p>
 <p>All objects and rays can only exist in a three-dimensional box, the <em>outline</em>.
-When initializing the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> it is passed as <code class="code highlight python docutils literal highlight-python"><span class="n">outline</span></code> parameter.</p>
+When initializing the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> it is passed as <code class="code highlight python docutils literal highlight-python"><span class="n">outline</span></code> parameter.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -481,7 +481,7 @@ In the case of the raytracer, we can define an <code class="code highlight pytho
 A ray only hitting one surfaces must enter/leave through the lens side cylinder, that is not handled in our sequential simulation.
 Rays not hitting the lens at all are typically undesired.
 In real optical systems they would be (hopefully) absorbed by the housing of the system.</p>
-<p><strong>Parameter</strong> <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.no_pol" title="optrace.tracer.raytracer.Raytracer.no_pol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">no_pol</span></code></a></p>
+<p><strong>Parameter</strong> <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.no_pol" title="optrace.tracer.raytracer.Raytracer.no_pol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">no_pol</span></code></a></p>
 <p>The raytracer provides the functionality to trace polarization directions. Thus, not only the polarization vector for the ray and ray segment can be calculated, but also the exact transmission at each surface transition.
 Unfortunately, the calculation is comparatively computationally intensive.</p>
 <p>With the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">no_pol</span><span class="o">=</span><span class="kc">True</span></code> no polarizations are calculated and a unpolarized/uniformly polarized light is assumed everywhere. Typically this speeds up the tracing by 10-30%.
@@ -490,9 +490,9 @@ Whether you can neglect the influence of polarization depends on the exact setup
 <section id="tracing">
 <h2><span class="section-number">4.5.2. </span>Tracing<a class="headerlink" href="#tracing" title="Link to this heading">#</a></h2>
 <p><strong>Tracing the system</strong></p>
-<p>Tracing is with the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.trace" title="optrace.tracer.raytracer.Raytracer.trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.trace()</span></code></a> method of the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class.
+<p>Tracing is with the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.trace" title="optrace.tracer.raytracer.Raytracer.trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.trace()</span></code></a> method of the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class.
 It takes the number of rays <code class="code highlight python docutils literal highlight-python"><span class="n">N</span></code> as parameter.
-The method uses the current tracing geometry and stores the ray properties internally in a <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage" title="optrace.tracer.ray_storage.RayStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RayStorage</span></code></a> object.</p>
+The method uses the current tracing geometry and stores the ray properties internally in a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage" title="optrace.tracer.ray_storage.RayStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RayStorage</span></code></a> object.</p>
 <p><strong>Example</strong></p>
 <p>Below you can find an example. A eye preset is loaded and flipped around the x-axis.
 A point source is added at the retina and the geometry is traced.</p>
@@ -528,9 +528,9 @@ A point source is added at the retina and the geometry is traced.</p>
 <p>Described in <a class="reference internal" href="image.html#rimage-rendering"><span class="std std-numref">Section 4.8.3</span></a>.</p>
 <p><strong>Tracing with many rays</strong></p>
 <p>The number of rays is limited by the RAM usage.
-The RAM usage is by default limited by the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM" title="optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.MAX_RAY_STORAGE_RAM</span></code></a> parameter, the actual number of rays results from the complexity of the geometry.
-Its default value is 8GB, but it can be set for each <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> object separately.</p>
-<p>To generate images with even more rays, the method <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.iterative_render" title="optrace.tracer.raytracer.Raytracer.iterative_render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.iterative_render</span></code></a> can be applied, which traces the geometry iteratively without holding all rays in memory. More details are available in <a class="reference internal" href="image.html#rimage-iterative-render"><span class="std std-numref">Section 4.8.4</span></a>.</p>
+The RAM usage is by default limited by the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM" title="optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.MAX_RAY_STORAGE_RAM</span></code></a> parameter, the actual number of rays results from the complexity of the geometry.
+Its default value is 8GB, but it can be set for each <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> object separately.</p>
+<p>To generate images with even more rays, the method <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.iterative_render" title="optrace.tracer.raytracer.Raytracer.iterative_render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.iterative_render</span></code></a> can be applied, which traces the geometry iteratively without holding all rays in memory. More details are available in <a class="reference internal" href="image.html#rimage-iterative-render"><span class="std std-numref">Section 4.8.4</span></a>.</p>
 </section>
 </section>
 

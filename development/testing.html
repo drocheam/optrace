@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>7.1. Testing &#8212; optrace 1.6.4 documentation</title>
+    <title>7.1. Testing &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,14 +39,14 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'development/testing';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="7.2. Documentation" href="documentation.html" />
-    <link rel="prev" title="7. Development" href="development.html" />
+    <link rel="prev" title="7. Development" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="development.html">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -294,28 +294,28 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="development.html">
+  <a class="nav-link nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -410,7 +410,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.1. </span>Testing</span></li>
   </ul>
@@ -444,7 +444,8 @@ This is guaranteed by many automated test cases.</p>
 <li><p>sampling of directions, color, positions produces the correct distribution on both the source and destination</p></li>
 <li><p>GUI interactions execute the expected actions</p></li>
 <li><p>images are correctly loaded and saved</p></li>
-<li><p>typical phenomena and aberrations of geometrical optics can be reproduced (spherical and chromatic aberration, vignetting, dispersion, astigmatism, coma, …)</p></li>
+<li><p>typical phenomena and aberrations of geometrical optics can be reproduced (spherical and chromatic aberration,
+vignetting, dispersion, astigmatism, coma, …)</p></li>
 <li><p>image formation by convolving produces correct results even the images must be scaled or interpolated</p></li>
 <li><p>PSF convolution and raytracing produce comparable results</p></li>
 <li><p>simple <code class="code highlight bash docutils literal highlight-bash">.zmx</code> and <code class="code highlight bash docutils literal highlight-bash">.agf</code> files are handled and imported correctly</p></li>
@@ -461,17 +462,20 @@ This is guaranteed by many automated test cases.</p>
 <li><p>an optical setup without lenses, filters or apertures is traced correctly</p></li>
 <li><p>… many more</p></li>
 </ul>
-<p>Test files can be found under <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tests/">tests/</a>, starting with filename <code class="code highlight bash docutils literal highlight-bash">test_</code>
-Testing is performed with <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v8.3.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a>.
-To ensure that it is performed on a “clean” and defined environment, it is run by <a class="reference external" href="https://tox.wiki/en/latest/">tox</a>, this creates a virtual python environment where the library is installed and tested.
+<p>Test files can be found under <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tests/">tests/</a>,
+starting with filename <code class="code highlight bash docutils literal highlight-bash">test_</code>
+Testing is performed with <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v8.3.5)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a>.
+To ensure that it is performed on a “clean” and defined environment, it is run by <a class="reference external" href="https://tox.wiki/en/latest/">tox</a>,
+this creates a virtual python environment where the library is installed and tested.
 With its default call, <code class="code highlight bash docutils literal highlight-bash">tox</code> calls the testing environment that includes all test cases.
 To lower RAM usage, tox calls test groups instead of all tests at once.</p>
-<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/tox_test.yml">tox_test.yml</a> runs the functionality tests on a defined system and python version as github actions.
+<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/tox_test.yml">tox_test.yml</a>
+runs the functionality tests on a defined system and python version as github actions.
 By default this is done on pushed code changes, but the action can also be run manually.</p>
 </section>
 <section id="coverage-testing">
 <h2><span class="section-number">7.1.2. </span>Coverage Testing<a class="headerlink" href="#coverage-testing" title="Link to this heading">#</a></h2>
-<p><a class="reference external" href="https://coverage.readthedocs.io/en/latest/api_module.html#module-coverage" title="(in Coverage.py v7.6.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">coverage</span></code></a> is used to check if all code lines and branches were tested.
+<p><a class="reference external" href="https://coverage.readthedocs.io/en/latest/api_module.html#module-coverage" title="(in Coverage.py v7.7.0)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">coverage</span></code></a> is used to check if all code lines and branches were tested.
 It wraps around pytest inside the tox test environment and reports on executed and missing lines.
 The output gets represented as both html or as text output (inside the terminal or github action output).</p>
 </section>
@@ -481,19 +485,24 @@ The output gets represented as both html or as text output (inside the terminal 
 Spherical surfaces are easier to trace then complex user defined ones.
 For systems with a low number of surfaces the ray generation at the source becomes dominant.</p>
 <p>The example <a class="reference internal" href="../examples.html#example-microscope"><span class="std std-ref">Microscope</span></a> is used for testing in its default settings.
-These includes one million rays and 57 light-interacting surfaces (one ray source, one aperture, 27 lenses with front and back surface each, one outline surface of the bounding box).
+These includes one million rays and 57 light-interacting surfaces (one ray source, one aperture,
+27 lenses with front and back surface each, one outline surface of the bounding box).
 Detectors are excluded as they don’t interact with the rays unless image rendering is executed.
-From the start of the raytracing until the end 6.6 seconds pass on my system (Arch Linux 6.12, i7-1360P notebook CPU, Python 3.13), resulting in 0.12 s / surface / million rays.</p>
+From the start of the raytracing until the end 6.6 seconds pass on my system
+(Arch Linux 6.12, i7-1360P notebook CPU, Python 3.13), resulting in 0.12 s / surface / million rays.</p>
 </section>
 <section id="test-cases">
 <h2><span class="section-number">7.1.4. </span>Test Cases<a class="headerlink" href="#test-cases" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/library/doctest.html#module-doctest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">doctest</span></code></a> for documentation strings in some non-class functions</p></li>
-<li><p>test cases are handled with <a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a>, testing is however typically done by <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v8.3.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a> that loads and executed the created TestSuites</p></li>
+<li><p>test cases are handled with <a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a>, testing is however typically done by <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v8.3.5)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a>
+that loads and executed the created TestSuites</p></li>
 <li><dl class="simple">
 <dt><code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span></code> has a <code class="code highlight python docutils literal highlight-python"><span class="n">debug</span></code> method, which runs a separate thread, from which actions are executed:</dt><dd><ul>
-<li><p>Note that each UI actions needs to be run in the main thread, for this <code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span></code> provides <code class="code highlight python docutils literal highlight-python"><span class="n">_do_in_main</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">_set_in_main</span></code> methods</p></li>
-<li><p>generally we want to do an action, after the old one has finished. For this <code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span><span class="o">.</span><span class="n">_wait_for_idle</span></code> is implemented.</p></li>
+<li><p>Note that each UI actions needs to be run in the main thread, for this <code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span></code>
+provides <code class="code highlight python docutils literal highlight-python"><span class="n">_do_in_main</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">_set_in_main</span></code> methods</p></li>
+<li><p>generally we want to do an action, after the old one has finished.
+For this <code class="code highlight python docutils literal highlight-python"><span class="n">TraceGUI</span><span class="o">.</span><span class="n">_wait_for_idle</span></code> is implemented.</p></li>
 </ul>
 </dd>
 </dl>
@@ -502,8 +511,8 @@ From the start of the raytracing until the end 6.6 seconds pass on my system (Ar
 </section>
 <section id="documentation-testing">
 <h2><span class="section-number">7.1.5. </span>Documentation Testing<a class="headerlink" href="#documentation-testing" title="Link to this heading">#</a></h2>
-<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/doc_test.yml">doc_test.yml</a> runs multiple test environments.
-This includes:</p>
+<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/doc_test.yml">doc_test.yml</a>
+runs multiple test environments. This includes:</p>
 <ul class="simple">
 <li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>docsbuildcheck</code>: Testing of correct documentation building while not permitting warning</p></li>
 <li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>linkcheck</code>: Testing of all documentation links</p></li>
@@ -512,12 +521,14 @@ This includes:</p>
 </section>
 <section id="python-version-testing">
 <h2><span class="section-number">7.1.6. </span>Python Version Testing<a class="headerlink" href="#python-version-testing" title="Link to this heading">#</a></h2>
-<p>Testing of the compatibility with multiple python versions is done with the <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml">pyver_comp.yml</a> workflow.
+<p>Testing of the compatibility with multiple python versions is done with the
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml">pyver_comp.yml</a> workflow.
 It executes a subset of tests (<code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>fast</code>) for multiple python main versions in an Ubuntu runner.</p>
 </section>
 <section id="platform-testing">
 <h2><span class="section-number">7.1.7. </span>Platform Testing<a class="headerlink" href="#platform-testing" title="Link to this heading">#</a></h2>
-<p>Platform testing is done with the <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml">os_comp.yml</a> workflow.
+<p>Platform testing is done with the
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml">os_comp.yml</a> workflow.
 It executes the os tox environment, which runs a subset of all available tests.
 These tests include relevant possibly platform-dependent cases, including:</p>
 <ul class="simple">
@@ -544,8 +555,9 @@ Linux is not included, as all other workflows already run on Ubuntu.</p>
 <h2><span class="section-number">7.1.9. </span>Manual Tests<a class="headerlink" href="#manual-tests" title="Link to this heading">#</a></h2>
 <p>Unfortunately, not all tests can be automated.
 The following test cases need to be handled manually:</p>
-<p><strong>Checking that</strong> <a class="reference internal" href="../library/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.plots.block</span></code></a> <strong>actually pauses the program execution</strong></p>
-<p>This can’t be tested automatically, as it would halt testing. Maybe there is a way by using multithreading or multiprocessing and a timer?
+<p><strong>Checking that</strong> <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.plots.block</span></code></a> <strong>actually pauses the program execution</strong></p>
+<p>This can’t be tested automatically, as it would halt testing.
+Maybe there is a way by using multithreading or multiprocessing and a timer?
 What about coverage information in such cases?</p>
 <p><strong>Correct and nice formatting inside plots and the GUI</strong></p>
 <p>Can only be tested by a human viewer.</p>
@@ -574,27 +586,20 @@ What about coverage information in such cases?</p>
 <span id="tox-file"></span><h2><span class="section-number">7.1.10. </span>Tox configuration in <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tox.ini">tox.ini</a><a class="headerlink" href="#tox-configuration-in-tox-ini" title="Link to this heading">#</a></h2>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[tox]</span>
 <span class="na">envlist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">py313</span>
+<span class="na">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tox-ignore-env-name-mismatch</span>
 
-<span class="c1"># we can&#39;t use pytest-xdist for parallel testing, as it seems to interfere with numexpr&gt;2.8.4</span>
-<span class="c1"># (tox -e fast fails with -n auto, KeyErrors for local/global dict etc.)</span>
-<span class="c1"># however the exact reason is not known to me</span>
-<span class="c1">#</span>
-<span class="c1"># when gui tests fail on wayland, first run &quot;xhost +&quot;</span>
-
-
-<span class="c1"># pytest options</span>
 <span class="k">[pytest]</span>
-<span class="na">markers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">slow: tests slower than 10 seconds on my machine</span>
-<span class="w">          </span><span class="na">os</span><span class="o">:</span><span class="w"> </span><span class="s">marks test relevant for testing of different operating systems</span>
-<span class="w">          </span><span class="na">gui1</span><span class="o">:</span><span class="w"> </span><span class="s">only first batch of GUI tests (separated for lower RAM usage)</span>
-<span class="w">          </span><span class="na">gui2</span><span class="o">:</span><span class="w"> </span><span class="s">only second batch of GUI tests (separated for lower RAM usage)</span>
-<span class="w">          </span><span class="na">gui3</span><span class="o">:</span><span class="w"> </span><span class="s">only third batch of GUI tests (separated for lower RAM usage)</span>
 <span class="na">testpaths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
 <span class="na">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">360</span>
 <span class="na">timeout_method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">thread</span>
 <span class="na">filterwarnings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ignore::UserWarning</span>
-<span class="na">addopts</span><span class="w"> </span><span class="o">=</span>
-<span class="c1"># --random-order</span>
+<span class="na">addopts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">--random-order</span>
+<span class="na">markers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">slow</span><span class="o">:</span><span class="w"> </span><span class="s">tests slower than 10 seconds on my machine</span>
+<span class="w">    </span><span class="na">os</span><span class="o">:</span><span class="w"> </span><span class="s">marks test relevant for testing of different operating systems</span>
+<span class="w">    </span><span class="na">gui1</span><span class="o">:</span><span class="w"> </span><span class="s">only first batch of GUI tests (separated for lower RAM usage)</span>
+<span class="w">    </span><span class="na">gui2</span><span class="o">:</span><span class="w"> </span><span class="s">only second batch of GUI tests (separated for lower RAM usage)</span>
+<span class="w">    </span><span class="na">gui3</span><span class="o">:</span><span class="w"> </span><span class="s">only third batch of GUI tests (separated for lower RAM usage)</span>
 
 <span class="k">[gh-actions]</span>
 <span class="na">python</span><span class="w"> </span><span class="o">=</span>
@@ -605,19 +610,23 @@ What about coverage information in such cases?</p>
 <span class="w">    </span>
 <span class="c1"># testing env</span>
 <span class="k">[testenv]</span>
-<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">HOME</span>
-<span class="w">          </span><span class="na">DISPLAY</span>
-<span class="w">          </span><span class="na">WAYLAND_DISPLAY</span>
-<span class="w">          </span><span class="na">QT_QPA_PLATFORM</span>
-<span class="w">          </span><span class="na">XAUTHORITY</span>
-<span class="w">          </span><span class="na">GITHUB_ACTIONS</span>
+<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">HOME</span>
+<span class="w">    </span><span class="na">DISPLAY</span>
+<span class="w">    </span><span class="na">WAYLAND_DISPLAY</span>
+<span class="w">    </span><span class="na">QT_QPA_PLATFORM</span>
+<span class="w">    </span><span class="na">XAUTHORITY</span>
+<span class="w">    </span><span class="na">GITHUB_ACTIONS</span>
+<span class="na">env_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{toxworkdir}{/}env_static</span>
+<span class="na">runner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ignore_env_name_mismatch</span>
+<span class="na">basepython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{envlist}</span>
+<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pylint</span>
+<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="na">tests </span>
+<span class="w">    </span><span class="na">docs</span>
 <span class="na">setenv</span><span class="w"> </span><span class="o">=</span>
 <span class="w">    </span><span class="na">PYTHONPATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{env:PYTHONPATH}{:}{toxinidir}{:}{envsitepackagesdir}</span>
 <span class="w">    </span><span class="na">LIBGL_ALWAYS_SOFTWARE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w">  </span>
-<span class="c1"># ^--- see https://github.com/cypress-io/cypress/issues/29521</span>
-<span class="na">basepython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{envlist}</span>
-<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
 <span class="na">commands</span><span class="w"> </span><span class="o">=</span>
 <span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest {posargs} ./tests/test_geometry.py ./tests/test_misc.py </span>\
 <span class="w">        </span><span class="s">./tests/test_image.py ./tests/test_refraction_index.py ./tests/test_scope.py ./tests/test_spectrum.py </span>\
@@ -630,75 +639,55 @@ What about coverage information in such cases?</p>
 <span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest -m gui3 {posargs} ./tests/test_gui.py</span>
 <span class="w">    </span><span class="na">coverage run -p --source</span><span class="o">=</span><span class="s">optrace --branch -m pytest {posargs} ./tests/test_examples.py</span>
 <span class="w">    </span><span class="na">coverage combine</span>
-<span class="w">    </span><span class="na">coverage html</span>
 <span class="w">    </span><span class="na">coverage report --show-missing</span>
-
-<span class="c1"># don&#39;t test slower tests (&gt; 10 seconds)</span>
-<span class="k">[testenv:fast]</span>
-<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]passenv}</span>
-<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]deps}</span>
-<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]extras}</span>
-<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pytest -m &quot;not slow&quot; {posargs}</span>
+<span class="w">    </span><span class="na">coverage erase</span>
 
 <span class="c1"># testing of system dependent functionality</span>
 <span class="k">[testenv:os]</span>
-<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]passenv}</span>
-<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]deps}</span>
-<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]extras}</span>
 <span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pytest -m os {posargs}</span>
 
-<span class="c1"># pylint</span>
-<span class="k">[testenv:pylint]</span>
-<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
-<span class="na">skip_install</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
-<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pylint</span>
-<span class="c1"># exclude some unnecessary rules</span>
-<span class="c1"># good-names-rgxs makes it possible to use one or two character names without error</span>
-<span class="c1"># extent line length to 120</span>
-<span class="c1"># allow all variable names</span>
-<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pylint ./optrace --max-line-length 120 --variable-naming-style any </span>\
-<span class="w">    </span><span class="s">--disable=W0612,W0613,W0106,W0212,E1101,R0902,R0904,R0911,R0912,R0913,R0914,R0915,R0916,C0301,C0302 </span>\
-<span class="w">    </span><span class="s">--good-names-rgxs=^[_a-z][_a-z0-9]?$</span>
+<span class="c1"># don&#39;t test slower tests (&gt; 10 seconds)</span>
+<span class="k">[testenv:fast]</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pytest -m &quot;not slow&quot; {posargs}</span>
 
-<span class="c1"># documentation</span>
+<span class="c1"># check all links in software and documentation</span>
+<span class="k">[testenv:linkcheck]</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sphinx-build -M linkcheck ./docs/source ./docs/build -j auto</span>
+
+<span class="c1"># nitpicky documentation building, turn warnings into errors</span>
+<span class="k">[testenv:docsbuildcheck]</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sphinx-build -M html ./docs/source ./docs/build/htmlcheck -n -W -j auto</span>
+
+<span class="c1"># test documentation doctest snippets</span>
+<span class="k">[testenv:doctest]</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sphinx-build -M doctest ./docs/source ./docs/build -j auto</span>
+
+<span class="c1"># create documentation and update structure and changelog</span>
 <span class="k">[testenv:docs]</span>
-<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
-<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv]passenv}</span>
-<span class="na">allowlist_externals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="w">    </span><span class="na">/usr/bin/bash</span>
-<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">docs</span>
-<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="na">allowlist_externals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/usr/bin/bash</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span>
 <span class="w">    </span><span class="na">bash ./docs/generate_changelog.sh</span>
 <span class="w">    </span><span class="na">bash ./docs/generate_bib_structure.sh</span>
 <span class="w">    </span><span class="na">sphinx-build -M html ./docs/source ./docs/build -n -j auto</span>
 
-<span class="c1"># documentation link check</span>
-<span class="k">[testenv:linkcheck]</span>
-<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
-<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]passenv}</span>
-<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]deps}</span>
-<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]extras}</span>
-<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="w">    </span><span class="na">sphinx-build -M linkcheck ./docs/source ./docs/build -j auto</span>
-
-<span class="c1"># documentation link check</span>
-<span class="k">[testenv:doctest]</span>
-<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]passenv}</span>
-<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]deps}</span>
-<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]extras}</span>
-<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="w">    </span><span class="na">sphinx-build -M doctest ./docs/source ./docs/build -j auto</span>
-
-<span class="c1"># check that html documentation builds without warnings and errors</span>
-<span class="k">[testenv:docsbuildcheck]</span>
-<span class="na">skipsdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
-<span class="na">passenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]passenv}</span>
-<span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]deps}</span>
-<span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{[testenv:docs]extras}</span>
-<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="w">    </span><span class="na">sphinx-build ./docs/source ./docs/build/htmlcheck -n -W -j auto</span>
+<span class="c1"># pylint</span>
+<span class="c1"># exclude some unnecessary rules</span>
+<span class="k">[testenv:pylint]</span>
+<span class="na">skip_install</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<span class="na">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pylint ./optrace -j 0 --max-line-length 120 --variable-naming-style any </span>\
+<span class="w">    </span><span class="s">--disable=W0612,W0613,W0106,W0212,E1101,R0902,R0904,R0911,R0912,R0913,R0914,R0915,R0916,C0301,C0302 </span>\
+<span class="w">    </span><span class="s">--good-names-rgxs=^[_a-z][_a-z0-9]?$</span>
 </pre></div>
 </div>
+<p><strong>Notes</strong></p>
+<ul class="simple">
+<li><p>tox-ignore-env-name-mismatch allows us to reuse the tox env for all actions</p></li>
+<li><p>parallelized testing with pytest-xdist could be possible, but we wouldn’t gain much from it as the heaviest
+tasks are already multithreaded</p></li>
+<li><p>when gui tests fail on wayland, first run <code class="code highlight bash docutils literal highlight-bash">xhost<span class="w"> </span>+</code></p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash"><span class="nv">LIBGL_ALWAYS_SOFTWARE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span></code>, see <a class="github reference external" href="https://github.com/cypress-io/cypress/issues/29521">cypress-io/cypress#29521</a></p></li>
+<li><p>TODO at some point in time update the tox.ini to tox.toml, currently there are some issues</p></li>
+</ul>
 </section>
 </section>
 
@@ -713,7 +702,7 @@ What about coverage information in such cases?</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="development.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">

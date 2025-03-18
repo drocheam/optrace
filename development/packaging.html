@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>7.3. Packaging &#8212; optrace 1.6.4 documentation</title>
+    <title>7.3. Packaging &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'development/packaging';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="development.html">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -290,28 +290,28 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="development.html">
+  <a class="nav-link nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -406,7 +406,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.3. </span>Packaging</span></li>
   </ul>
@@ -427,11 +427,15 @@
                   
   <section id="packaging">
 <h1><span class="section-number">7.3. </span>Packaging<a class="headerlink" href="#packaging" title="Link to this heading">#</a></h1>
-<p>The <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/release.yml">release.yml</a> workflow creates a <code class="code highlight bash docutils literal highlight-bash">.tar.gz</code> archive that can be installed with pip.
+<p>The <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/release.yml">release.yml</a> workflow
+creates a <code class="code highlight bash docutils literal highlight-bash">.tar.gz</code> archive that can be installed with pip.
 Releases are located <a class="reference external" href="https://github.com/drocheam/optrace/releases">here</a>.</p>
-<p>The compressed package should only include the library itself and metadata, while documentation and testing should be excluded.
-Unfortunately, tests are included by default and need to be explicitly excluded with a <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/MANIFEST.in">MANIFEST.in</a>.</p>
-<p>Requirements and metadata for the library are defined in the <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/pyproject.toml">pyproject.toml</a> file.
+<p>The compressed package should only include the library itself and metadata,
+while documentation and testing should be excluded.
+Unfortunately, tests are included by default and need to be explicitly
+excluded with a <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/MANIFEST.in">MANIFEST.in</a>.</p>
+<p>Requirements and metadata for the library are defined in the
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/pyproject.toml">pyproject.toml</a> file.
 This is a more modern successor to a <code class="code highlight bash docutils literal highlight-bash">setup.py</code> file.</p>
 <p><strong>Content of</strong> <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/pyproject.toml">pyproject.toml</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
@@ -445,24 +449,8 @@ This is a more modern successor to a <code class="code highlight bash docutils l
 <span class="n">readme</span> <span class="o">=</span> <span class="s2">&quot;ReadMe.md&quot;</span>
 <span class="n">license</span> <span class="o">=</span> <span class="p">{</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;MIT License&quot;</span><span class="p">}</span>
 <span class="n">requires</span><span class="o">-</span><span class="n">python</span> <span class="o">=</span> <span class="s2">&quot;&gt;=3.10,&lt;3.14&quot;</span>
-<span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;numpy&gt;2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;numexpr&gt;=2.10&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;chardet&quot;</span><span class="p">,</span> 
-    <span class="s2">&quot;scipy&quot;</span><span class="p">,</span> 
-    <span class="s2">&quot;opencv-python-headless&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pyqtdarktheme-fork&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pyside6&quot;</span><span class="p">,</span> 
-    <span class="s2">&quot;matplotlib&quot;</span><span class="p">,</span> 
-    <span class="s2">&quot;progressbar2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mayavi @ git+https://github.com/enthought/mayavi&quot;</span>
-    <span class="p">]</span>
-<span class="c1"># mayavi git version needed as PyPi version rarely gets updated</span>
-<span class="c1"># TODO git links lead to issues in later publishing the package on PyPi</span>
-<span class="c1"># see https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links</span>
-<span class="c1"># and https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation#comment115929654_65527149</span>
-<span class="c1"># or https://stackoverflow.com/a/54894359</span>
-<span class="c1">#</span>
+<span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;numpy&gt;2&quot;</span><span class="p">,</span> <span class="s2">&quot;chardet&quot;</span><span class="p">,</span> <span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="s2">&quot;opencv-python-headless&quot;</span><span class="p">,</span> <span class="s2">&quot;pyqtdarktheme-fork&quot;</span><span class="p">,</span> <span class="s2">&quot;pyside6&quot;</span><span class="p">,</span> 
+<span class="s2">&quot;matplotlib&quot;</span><span class="p">,</span> <span class="s2">&quot;tqdm&quot;</span><span class="p">,</span> <span class="s2">&quot;mayavi @ git+https://github.com/enthought/mayavi&quot;</span><span class="p">]</span>
 <span class="n">classifiers</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;Development Status :: 4 - Beta&quot;</span><span class="p">,</span>
     <span class="s2">&quot;Intended Audience :: Developers&quot;</span><span class="p">,</span>
@@ -494,20 +482,8 @@ This is a more modern successor to a <code class="code highlight bash docutils l
 <span class="c1">#Changelog = &quot;&quot;</span>
 
 <span class="p">[</span><span class="n">project</span><span class="o">.</span><span class="n">optional</span><span class="o">-</span><span class="n">dependencies</span><span class="p">]</span>
-<span class="n">tests</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;pyautogui&quot;</span><span class="p">,</span> 
-    <span class="s2">&quot;pytest&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;coverage&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;colour-science&quot;</span><span class="p">,</span> 
-    <span class="s2">&quot;pytest-timeout&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pytest-random-order&quot;</span>
-<span class="p">]</span>
-<span class="n">docs</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;tox&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sphinx&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sphinxcontrib-bibtex&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pydata-sphinx-theme&quot;</span>
-<span class="p">]</span>
+<span class="n">tests</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pyautogui&quot;</span><span class="p">,</span> <span class="s2">&quot;pytest&quot;</span><span class="p">,</span> <span class="s2">&quot;coverage&quot;</span><span class="p">,</span> <span class="s2">&quot;colour-science&quot;</span><span class="p">,</span> <span class="s2">&quot;pytest-timeout&quot;</span><span class="p">,</span> <span class="s2">&quot;pytest-random-order&quot;</span><span class="p">]</span>
+<span class="n">docs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tox&quot;</span><span class="p">,</span> <span class="s2">&quot;sphinx&quot;</span><span class="p">,</span> <span class="s2">&quot;sphinxcontrib-bibtex&quot;</span><span class="p">,</span> <span class="s2">&quot;pydata-sphinx-theme&quot;</span><span class="p">]</span>
 
 <span class="p">[</span><span class="n">build</span><span class="o">-</span><span class="n">system</span><span class="p">]</span>
 <span class="n">requires</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;setuptools &gt;= 61.0&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&gt;2&quot;</span><span class="p">]</span>
@@ -518,10 +494,19 @@ This is a more modern successor to a <code class="code highlight bash docutils l
 <span class="n">include</span><span class="o">-</span><span class="n">package</span><span class="o">-</span><span class="n">data</span> <span class="o">=</span> <span class="n">false</span>
 <span class="n">dynamic</span> <span class="o">=</span> <span class="p">{</span><span class="n">version</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span> <span class="o">=</span> <span class="s2">&quot;optrace.metadata.version&quot;</span><span class="p">}}</span>
 <span class="n">package</span><span class="o">-</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">optrace</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;resources/*&quot;</span><span class="p">,</span> <span class="s2">&quot;resources/images/*&quot;</span><span class="p">]}</span>  
-<span class="c1"># ^--- resources would be excluded in wheel otherwise</span>
 
 </pre></div>
 </div>
+<p><strong>Notes</strong></p>
+<ul class="simple">
+<li><p>mayavi git version needed as PyPi version rarely gets updated
+see <a class="reference external" href="https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links">https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links</a>
+and <a class="reference external" href="https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation#comment115929654_65527149">https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation#comment115929654_65527149</a>
+or <a class="reference external" href="https://stackoverflow.com/a/54894359">https://stackoverflow.com/a/54894359</a></p></li>
+<li><p>MANIFEST.in with content <code class="code highlight bash docutils literal highlight-bash">recursive-exclude<span class="w"> </span>tests<span class="w"> </span>*</code> required,
+so tests directory gets excluded from dist. See <a class="reference external" href="https://stackoverflow.com/a/72821651">https://stackoverflow.com/a/72821651</a>
+and <a class="reference external" href="https://stackoverflow.com/a/48912748">https://stackoverflow.com/a/48912748</a> at comment from bogeymin</p></li>
+</ul>
 </section>
 
 

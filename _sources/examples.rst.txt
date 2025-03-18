@@ -6,7 +6,8 @@ Example Gallery
 
 
 | This gallery showcases all optrace examples.
-| You can download the full examples.zip archive `here <https://github.com/drocheam/optrace/releases/latest/download/examples.zip>`__.
+| You can download the full examples.zip archive 
+  `here <https://github.com/drocheam/optrace/releases/latest/download/examples.zip>`__.
 
 .. _example_achromat:
 
@@ -15,10 +16,12 @@ Achromat
 
 **File**: `examples/achromat.py <https://github.com/drocheam/optrace/blob/main/examples/achromat.py>`_
 
-This example demonstrates the effect of an `achromatic doublet <https://en.wikipedia.org/wiki/Achromatic_lens>`__ on the dispersion. 
+This example demonstrates the effect of 
+an `achromatic doublet <https://en.wikipedia.org/wiki/Achromatic_lens>`__ on the dispersion. 
 Ray sources consist of different monochromatic spectral lines to show the different focal lengths.
 The "Use achromatic doublet" option in the "Custom" GUI tab toggles the use of this doublet.
-In the unchecked case a standard doublet with same optical power of 30 D is simulated, showing significant longitudinal chromatic aberration (LCA).
+In the unchecked case a standard doublet with same optical power of 30 D is simulated, 
+showing significant longitudinal chromatic aberration (LCA).
 
 .. figure:: ./images/example_achromat1.png
    :width: 720
@@ -52,8 +55,9 @@ Arizona Eye Model
 **File**: `examples/arizona_eye_model.py <https://github.com/drocheam/optrace/blob/main/examples/arizona_eye_model.py>`_
 
 This example is a demonstration of human eye vision with adaptation at a distance of 66 cm. 
-The `Arizona eye model <https://support.photonengr.com/article/154-arizona-eye-model>`__ is employed to simulate a resolution chart.
-This eye model accurately matches on- and off-axis aberration levels from clinical data and accounts for wavelength and adaptation dependencies. 
+The `Arizona eye model <https://support.photonengr.com/article/154-arizona-eye-model>`__ 
+is employed to simulate a resolution chart. This eye model accurately matches on- and off-axis aberration levels 
+from clinical data and accounts for wavelength and adaptation dependencies. 
 
 In the "Custom" tab of the GUI there are options available to change the pupil diameter and adaptation of the eye.
 
@@ -64,7 +68,8 @@ In the "Custom" tab of the GUI there are options available to change the pupil d
 
    The Arizona eye model inside the raytracer.
 
-.. list-table:: Original resolution chart (left) at 66cm distance imaged with the correctly adapted eye with 1.67 D and a pupil of 4mm diameter (right).
+.. list-table:: Original resolution chart (left) at 66cm distance imaged with the correctly adapted eye 
+   with 1.67 D and a pupil of 4mm diameter (right).
    :class: table-borderless
 
    * - .. figure:: images/example_arizona_render1.webp
@@ -102,7 +107,8 @@ Astigmatism
 
 This script showcases astigmatism by simulating sagittal and meridional off-axis rays.
 You can control their angle by changing their setting in the "Custom" Tab in the GUI.
-Sagittal (blue) and meridional (red) rays are highlighted in different colors, making their focal positions easier to visualize.
+Sagittal (blue) and meridional (red) rays are highlighted in different colors,
+making their focal positions easier to visualize.
 
 .. figure:: ./images/example_astigmatism0.png
    :width: 720
@@ -131,9 +137,11 @@ Sagittal (blue) and meridional (red) rays are highlighted in different colors, m
 Brewster Polarizer
 ----------------------
 
-**File**: `examples/brewster_polarizer.py <https://github.com/drocheam/optrace/blob/main/examples/brewster_polarizer.py>`_
+**File**: 
+`examples/brewster_polarizer.py <https://github.com/drocheam/optrace/blob/main/examples/brewster_polarizer.py>`_
 
-A setup with three different light rays impinging on multiple planar surfaces with an incident angle equal to the `Brewster angle <https://en.wikipedia.org/wiki/Brewster%27s_angle>`__. 
+A setup with three different light rays impinging on multiple planar surfaces 
+with an incident angle equal to the `Brewster angle <https://en.wikipedia.org/wiki/Brewster%27s_angle>`__. 
 Depending on the polarization direction we can see a huge difference in the light's transmission.
 
 
@@ -189,7 +197,8 @@ Example simulation of the double gauss Nikkor Wakamiya, 100mm, f1.4 objective.
 The simulation traces point sources from a distance of -50m and renders their PSF.
 Each point source is shown in a different color.
 
-.. table:: Elements of the objective, see `here <https://nbviewer.org/github/quartiq/rayopt-notebooks/blob/master/Nikkor-Wakamiya-50mmf1.4_Ex1.ipynb>`__
+.. table:: Elements of the objective, see 
+   `here <https://nbviewer.org/github/quartiq/rayopt-notebooks/blob/master/Nikkor-Wakamiya-50mmf1.4_Ex1.ipynb>`__
    :widths: 80 80 80 80 80 80 80 80 80
    :width: 800px
 
@@ -366,14 +375,17 @@ The size of the stop and the test image are parameterizable through the "Custom"
           :class: dark-light
           
           Detector image with a 1.5 mm stop radius.
-     
+    
+Note that the paraxial image distance and the best fitting image distance for a high aberration setup differ.
+This is why you should move the detector to larger z-positions when decreasing the stop size.
      
 .. _example_image_render_many_rays:
 
 Image Render Many Rays
 -------------------------
 
-**File**: `examples/image_render_many_rays.py <https://github.com/drocheam/optrace/blob/main/examples/image_render_many_rays.py>`_
+**File**: 
+`examples/image_render_many_rays.py <https://github.com/drocheam/optrace/blob/main/examples/image_render_many_rays.py>`_
 
 Comparable to the :ref:`example_image_render` example. 
 Same lens setup, but it is traced with many more rays by using the iterative render functionality.
@@ -387,39 +399,57 @@ This is done for multiple image distances and without needing to start a GUI.
           :width: 400
           :class: dark-light
 
-          Detector image at 27 mm.
+          Detector image at z = 15 mm.
 
      - .. figure:: images/example_rgb_render2.webp
           :align: center
           :width: 400
           :class: dark-light
           
-          Detector image at 30 mm.
+          Detector image at z = 20 mm.
 
    * - .. figure:: images/example_rgb_render3.webp
           :align: center
           :width: 400
           :class: dark-light
           
-          Detector image at 33 mm.
+          Detector image at z = 25 mm.
 
      - .. figure:: images/example_rgb_render4.webp
           :align: center
           :width: 400
           :class: dark-light
           
-          Detector image at 36 mm.
+          Detector image at z = 29 mm.
+   
+   * - .. figure:: images/example_rgb_render5.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+         
+          Detector image at z = 31 mm.
+
+     - .. figure:: images/example_rgb_render6.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+          
+          Detector image at z = 36 mm.
 
 .. _example_iol_pinhole_imaging:
 
 IOL Pinhole Imaging
 -------------------------
 
-**File**: `examples/IOL_pinhole_imaging.py <https://github.com/drocheam/optrace/blob/main/examples/IOL_pinhole_imaging.py>`_
+**File**: 
+`examples/IOL_pinhole_imaging.py <https://github.com/drocheam/optrace/blob/main/examples/IOL_pinhole_imaging.py>`_
 
-Simulation of an Alcon IQ intraocular lens (IOL) in the Arizona Eye Model. A pinhole is rendered for three different viewing distances. 
+Simulation of an Alcon IQ intraocular lens (IOL) in the Arizona Eye Model. 
+A pinhole is rendered for three different viewing distances. 
 
-.. For more details see the publication *Damian Mendroch, Stefan Altmeyer, Uwe Oberheide; „Polychromatic Virtual Retinal Imaging of Two Extended-Depth-of-Focus Intraocular Lenses“. Trans. Vis. Sci. Tech. 2025*.
+.. For more details see the publication *Damian Mendroch, Stefan Altmeyer, Uwe Oberheide; 
+   „Polychromatic Virtual Retinal Imaging of Two Extended-Depth-of-Focus Intraocular Lenses“. 
+   Trans. Vis. Sci. Tech. 2025*.
 
 
 .. list-table::
@@ -453,7 +483,8 @@ Keratoconus
 
 **File**: `examples/keratoconus.py <https://github.com/drocheam/optrace/blob/main/examples/keratoconus.py>`_
 
-A simulation of vision through a patient's eye with progressing levels of `keratoconus <https://en.wikipedia.org/wiki/Keratoconus>`__. 
+A simulation of vision through a patient's eye with 
+progressing levels of `keratoconus <https://en.wikipedia.org/wiki/Keratoconus>`__. 
 Parameters are taken from the work of `Tan et al. (2008) <https://doi.org/10.1167/8.2.13>`__.
 
 .. list-table::
@@ -496,7 +527,8 @@ Microscope
 **File**: `examples/microscope.py <https://github.com/drocheam/optrace/blob/main/examples/microscope.py>`_
 
 A more complex microscope setup with a objective, tubus and eyepiece group as well as the human eye as imaging system. 
-The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files that are were built from patent data.
+The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files
+that are were built from patent data.
 
 
 .. figure:: images/example_microscope0.png
@@ -625,7 +657,8 @@ Demonstrates image formation by convolution of a resolution chart and a halo PSF
 Refraction Index Presets
 --------------------------
 
-**File**: `examples/refraction_index_presets.py <https://github.com/drocheam/optrace/blob/main/examples/refraction_index_presets.py>`_
+**File**: 
+`examples/refraction_index_presets.py <https://github.com/drocheam/optrace/blob/main/examples/refraction_index_presets.py>`_
 
 This example displays different plots for the refraction index presets.
 
@@ -727,11 +760,13 @@ An example loading multiple light spectrum plots, including the sRGB primaries a
 Sphere Projections
 ----------------------
 
-**File**: `examples/sphere_projections.py <https://github.com/drocheam/optrace/blob/main/examples/sphere_projections.py>`_
+**File**: 
+`examples/sphere_projections.py <https://github.com/drocheam/optrace/blob/main/examples/sphere_projections.py>`_
 
 This script demonstrates the effect of different projections methods for a spherical surface detector. 
 Multiple point sources emit an angular cone spectrum from the spherical center of a spherical detector. 
-The detector view then displays an equivalent of a `Tissot's indicatrix <https://en.wikipedia.org/wiki/Tissot%27s_indicatrix>`__.
+The detector view then displays an equivalent
+of a `Tissot's indicatrix <https://en.wikipedia.org/wiki/Tissot%27s_indicatrix>`__.
 
 .. figure:: images/example_sphere_projections.png
    :align: center
@@ -777,9 +812,11 @@ The detector view then displays an equivalent of a `Tissot's indicatrix <https:/
 Spherical Aberration
 ----------------------
 
-**File**: `examples/spherical_aberration.py <https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py>`_
+**File**: 
+`examples/spherical_aberration.py <https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py>`_
 
-The example demonstrates the refractive error of a spherical sources by tracing a paraxial and a non-paraxial light beam for comparison.
+The example demonstrates the refractive error of a spherical sources by tracing a paraxial
+and a non-paraxial light beam for comparison.
 This is the :ref:`quickstart` example with many explanations in the code's comments.
 
 

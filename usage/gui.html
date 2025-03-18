@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.13. GUI Interaction &#8212; optrace 1.6.4 documentation</title>
+    <title>4.13. GUI Interaction &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'usage/gui';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -294,28 +294,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -420,7 +420,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.13. </span>GUI Interaction</span></li>
   </ul>
@@ -444,7 +444,7 @@
 <section id="loading-the-gui">
 <h2><span class="section-number">4.13.1. </span>Loading the GUI<a class="headerlink" href="#loading-the-gui" title="Link to this heading">#</a></h2>
 <p><strong>Initializing the GUI</strong></p>
-<p>First, we need to import into the <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> into the current namespace:</p>
+<p>First, we need to import into the <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> into the current namespace:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optrace.gui.trace_gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceGUI</span>
 </pre></div>
 </div>
@@ -459,7 +459,7 @@
 <span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eye</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>To create a <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a>, we need to pass the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> as argument:</p>
+<p>To create a <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a>, we need to pass the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> as argument:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -482,7 +482,7 @@ To set the scene to high contrast mode and increase the amount of rays, we can c
                <span class="n">initial_camera</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">direction</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">roll</span><span class="o">=-</span><span class="mi">120</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>These properties are directly passed to the <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a> function.
+<p>These properties are directly passed to the <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a> function.
 You can read more about the camera settings in <a class="reference internal" href="gui_automation.html#gui-camera"><span class="std std-numref">Section 4.14.4</span></a>.</p>
 </section>
 <section id="ui-overview">
@@ -502,7 +502,7 @@ Inside the scene in the bottom left you can find orientation axes, that display 
 When an action/tasks is running, you are informed by a status text in the bottom right.
 A list of keyboard shortcuts is provided below.</p>
 <div class="pst-scrollable-table-container"><table class="table table-center" id="id3">
-<caption><span class="caption-number">Table 4.19 </span><span class="caption-text">Available keyboards shortcuts inside the scene</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
+<caption><span class="caption-number">Table 4.21 </span><span class="caption-text">Available keyboards shortcuts inside the scene</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 75.0%" />
@@ -703,67 +703,67 @@ These will be discussed in <a class="reference internal" href="#gui-windows"><sp
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Rays</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_count" title="optrace.gui.trace_gui.TraceGUI.ray_count"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_count</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_count" title="optrace.gui.trace_gui.TraceGUI.ray_count"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_count</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">int</span><span class="p">,</span> <span class="mi">0</span> <span class="o">-</span> <span class="mi">6000000</span></code></p></td>
 <td><p>number of rays for raytracing</p></td>
 </tr>
 <tr class="row-odd"><td><p>Plotting</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_mode" title="optrace.gui.trace_gui.TraceGUI.plotting_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">plotting_mode</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plotting_mode" title="optrace.gui.trace_gui.TraceGUI.plotting_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">plotting_mode</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;Rays&#39;</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;Points&#39;</span></code></p></td>
 <td><p>visulation type of the rays</p></td>
 </tr>
 <tr class="row-even"><td><p>Coloring</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_mode" title="optrace.gui.trace_gui.TraceGUI.coloring_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">coloring_mode</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.coloring_mode" title="optrace.gui.trace_gui.TraceGUI.coloring_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">coloring_mode</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;Plain&#39;</span><span class="p">,</span> <span class="s1">&#39;Power&#39;</span><span class="p">,</span> <span class="s1">&#39;Wavelength&#39;</span><span class="p">,</span> <span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;Polarization xz&#39;</span><span class="p">,</span> <span class="s1">&#39;Polarization yz&#39;</span><span class="p">,</span> <span class="s1">&#39;Refractive Index&#39;</span></code></p></td>
 <td><p>Quantity for color mapping</p></td>
 </tr>
 <tr class="row-odd"><td><p>Count</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">rays_visible</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">rays_visible</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">int</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">1000</span></code></p></td>
 <td><p>number of visible rays in the scene</p></td>
 </tr>
 <tr class="row-even"><td><p>Opacity</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_opacity" title="optrace.gui.trace_gui.TraceGUI.ray_opacity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_opacity</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_opacity" title="optrace.gui.trace_gui.TraceGUI.ray_opacity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_opacity</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span><span class="p">,</span> <span class="mf">1e-05</span> <span class="o">-</span> <span class="mf">1.0</span></code></p></td>
 <td><p>opacity of the rays/points</p></td>
 </tr>
 <tr class="row-odd"><td><p>Width</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_width" title="optrace.gui.trace_gui.TraceGUI.ray_width"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_width</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_width" title="optrace.gui.trace_gui.TraceGUI.ray_width"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ray_width</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">20.0</span></code></p></td>
 <td><p>ray width/ point size</p></td>
 </tr>
 <tr class="row-even"><td><p>More Minimalistic Scene</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.minimalistic_view" title="optrace.gui.trace_gui.TraceGUI.minimalistic_view"><code class="xref py py-attr docutils literal notranslate"><span class="pre">minimalistic_view</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.minimalistic_view" title="optrace.gui.trace_gui.TraceGUI.minimalistic_view"><code class="xref py py-attr docutils literal notranslate"><span class="pre">minimalistic_view</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>should axis labels and long descriptions be hidden</p></td>
 </tr>
 <tr class="row-odd"><td><p>Maximize Scene</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.maximize_scene" title="optrace.gui.trace_gui.TraceGUI.maximize_scene"><code class="xref py py-attr docutils literal notranslate"><span class="pre">maximize_scene</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.maximize_scene" title="optrace.gui.trace_gui.TraceGUI.maximize_scene"><code class="xref py py-attr docutils literal notranslate"><span class="pre">maximize_scene</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>should tool- and side bar be hidden</p></td>
 </tr>
 <tr class="row-even"><td><p>High Contrast Mode</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.high_contrast" title="optrace.gui.trace_gui.TraceGUI.high_contrast"><code class="xref py py-attr docutils literal notranslate"><span class="pre">high_contrast</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.high_contrast" title="optrace.gui.trace_gui.TraceGUI.high_contrast"><code class="xref py py-attr docutils literal notranslate"><span class="pre">high_contrast</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>plot dark elements on white background</p></td>
 </tr>
 <tr class="row-odd"><td><p>Vertical Labels</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.vertical_labels" title="optrace.gui.trace_gui.TraceGUI.vertical_labels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vertical_labels</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.vertical_labels" title="optrace.gui.trace_gui.TraceGUI.vertical_labels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vertical_labels</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>if object labels are justified vertically (in lateral direction)</p></td>
 </tr>
 <tr class="row-even"><td><p>Hide Labels</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.hide_labels" title="optrace.gui.trace_gui.TraceGUI.hide_labels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">hide_labels</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.hide_labels" title="optrace.gui.trace_gui.TraceGUI.hide_labels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">hide_labels</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>if object labels should be hidden</p></td>
 </tr>
 <tr class="row-odd"><td><p>Open Property Browser</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_property_browser" title="optrace.gui.trace_gui.TraceGUI.open_property_browser"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open_property_browser()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_property_browser" title="optrace.gui.trace_gui.TraceGUI.open_property_browser"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open_property_browser()</span></code></a></p></td>
 <td></td>
 <td><p>opens the property browser</p></td>
 </tr>
 <tr class="row-even"><td><p>Open Command Window</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_command_window" title="optrace.gui.trace_gui.TraceGUI.open_command_window"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open_command_window()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.open_command_window" title="optrace.gui.trace_gui.TraceGUI.open_command_window"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open_command_window()</span></code></a></p></td>
 <td></td>
 <td><p>opens the command window</p></td>
 </tr>
@@ -789,87 +789,87 @@ These will be discussed in <a class="reference internal" href="#gui-windows"><sp
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Source</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code></p></td>
 <td><p>selection of the ray source</p></td>
 </tr>
 <tr class="row-odd"><td><p>Detector</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code></p></td>
 <td><p>selection of the detector</p></td>
 </tr>
 <tr class="row-even"><td><p>z_det</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det" title="optrace.gui.trace_gui.TraceGUI.z_det"><code class="xref py py-attr docutils literal notranslate"><span class="pre">z_det</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det" title="optrace.gui.trace_gui.TraceGUI.z_det"><code class="xref py py-attr docutils literal notranslate"><span class="pre">z_det</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>position of the currently selected detector</p></td>
 </tr>
 <tr class="row-odd"><td><p>Image Mode</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_mode" title="optrace.gui.trace_gui.TraceGUI.image_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">image_mode</span></code></a></p></td>
-<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>, one of <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.image_modes" title="optrace.tracer.image.render_image.RenderImage.image_modes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RenderImage.image_modes</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_mode" title="optrace.gui.trace_gui.TraceGUI.image_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">image_mode</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>, one of <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.image_modes" title="optrace.tracer.image.render_image.RenderImage.image_modes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RenderImage.image_modes</span></code></a></p></td>
 <td><p>image rendering mode</p></td>
 </tr>
 <tr class="row-even"><td><p>Projection Method</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.projection_method" title="optrace.gui.trace_gui.TraceGUI.projection_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">projection_method</span></code></a></p></td>
-<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>, one of <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods" title="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SphericalSurface.sphere_projection_methods</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.projection_method" title="optrace.gui.trace_gui.TraceGUI.projection_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">projection_method</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>, one of <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods" title="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SphericalSurface.sphere_projection_methods</span></code></a></p></td>
 <td><p>sphere projection method for spherical detectors</p></td>
 </tr>
 <tr class="row-odd"><td><p>Pixels_xy</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_pixels" title="optrace.gui.trace_gui.TraceGUI.image_pixels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">image_pixels</span></code></a></p></td>
-<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">int</span></code>, one of <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.SIZES" title="optrace.tracer.image.render_image.RenderImage.SIZES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.SIZES</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.image_pixels" title="optrace.gui.trace_gui.TraceGUI.image_pixels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">image_pixels</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">int</span></code>, one of <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage.SIZES" title="optrace.tracer.image.render_image.RenderImage.SIZES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RImage.SIZES</span></code></a></p></td>
 <td><p>number of pixels in smaller image dimension</p></td>
 </tr>
 <tr class="row-even"><td><p>Logarithmic Scaling</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.log_image" title="optrace.gui.trace_gui.TraceGUI.log_image"><code class="xref py py-attr docutils literal notranslate"><span class="pre">log_image</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.log_image" title="optrace.gui.trace_gui.TraceGUI.log_image"><code class="xref py py-attr docutils literal notranslate"><span class="pre">log_image</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>if image values should be scaled logarithmically</p></td>
 </tr>
 <tr class="row-odd"><td><p>Flip Detector Image</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.flip_detector_image" title="optrace.gui.trace_gui.TraceGUI.flip_detector_image"><code class="xref py py-attr docutils literal notranslate"><span class="pre">flip_detector_image</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.flip_detector_image" title="optrace.gui.trace_gui.TraceGUI.flip_detector_image"><code class="xref py py-attr docutils literal notranslate"><span class="pre">flip_detector_image</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>if the detector image should be flipped (rotated by 180 degrees)</p></td>
 </tr>
 <tr class="row-even"><td><p>Rays from Selected Source Only</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image_single_source" title="optrace.gui.trace_gui.TraceGUI.detector_image_single_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_image_single_source</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image_single_source" title="optrace.gui.trace_gui.TraceGUI.detector_image_single_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_image_single_source</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>if only the selected ray source should contribute to the image</p></td>
 </tr>
 <tr class="row-odd"><td><p>Source Image</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_image" title="optrace.gui.trace_gui.TraceGUI.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_image()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_image" title="optrace.gui.trace_gui.TraceGUI.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_image()</span></code></a></p></td>
 <td></td>
 <td><p>renders a source image with the given settings</p></td>
 </tr>
 <tr class="row-even"><td><p>Detector Image</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image" title="optrace.gui.trace_gui.TraceGUI.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_image()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image" title="optrace.gui.trace_gui.TraceGUI.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_image()</span></code></a></p></td>
 <td></td>
 <td><p>renders a detector image with the given settings</p></td>
 </tr>
 <tr class="row-odd"><td><p>Cut at</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.profile_position_dimension" title="optrace.gui.trace_gui.TraceGUI.profile_position_dimension"><code class="xref py py-attr docutils literal notranslate"><span class="pre">profile_position_dimension</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.profile_position_dimension" title="optrace.gui.trace_gui.TraceGUI.profile_position_dimension"><code class="xref py py-attr docutils literal notranslate"><span class="pre">profile_position_dimension</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span></code></p></td>
 <td><p>image profile dimension</p></td>
 </tr>
 <tr class="row-even"><td><p>Cut Value</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.profile_position" title="optrace.gui.trace_gui.TraceGUI.profile_position"><code class="xref py py-attr docutils literal notranslate"><span class="pre">profile_position</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.profile_position" title="optrace.gui.trace_gui.TraceGUI.profile_position"><code class="xref py py-attr docutils literal notranslate"><span class="pre">profile_position</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>image profile value for the chosen dimension</p></td>
 </tr>
 <tr class="row-odd"><td><p>Source Image Cut</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_profile" title="optrace.gui.trace_gui.TraceGUI.source_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_profile()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_profile" title="optrace.gui.trace_gui.TraceGUI.source_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_profile()</span></code></a></p></td>
 <td></td>
 <td><p>renders a source image profile</p></td>
 </tr>
 <tr class="row-even"><td><p>Detector Image Cut</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_profile" title="optrace.gui.trace_gui.TraceGUI.detector_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_profile()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_profile" title="optrace.gui.trace_gui.TraceGUI.detector_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_profile()</span></code></a></p></td>
 <td></td>
 <td><p>renders a detector image profile</p></td>
 </tr>
 <tr class="row-odd"><td><p>Activate Filter</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.activate_filter" title="optrace.gui.trace_gui.TraceGUI.activate_filter"><code class="xref py py-attr docutils literal notranslate"><span class="pre">activate_filter</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.activate_filter" title="optrace.gui.trace_gui.TraceGUI.activate_filter"><code class="xref py py-attr docutils literal notranslate"><span class="pre">activate_filter</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>activate the smoothing / resolution limit filter</p></td>
 </tr>
 <tr class="row-even"><td><p>Resolution Limit</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.filter_constant" title="optrace.gui.trace_gui.TraceGUI.filter_constant"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filter_constant</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.filter_constant" title="optrace.gui.trace_gui.TraceGUI.filter_constant"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filter_constant</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span><span class="p">,</span> <span class="mf">0.3</span> <span class="o">-</span> <span class="mi">40</span></code></p></td>
 <td><p>resolution filter filter constant</p></td>
 </tr>
@@ -889,32 +889,32 @@ These will be discussed in <a class="reference internal" href="#gui-windows"><sp
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Source</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code></p></td>
 <td><p>the selected ray source</p></td>
 </tr>
 <tr class="row-odd"><td><p>Detector</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code></p></td>
 <td><p>the selected detector</p></td>
 </tr>
 <tr class="row-even"><td><p>z_det</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det" title="optrace.gui.trace_gui.TraceGUI.z_det"><code class="xref py py-attr docutils literal notranslate"><span class="pre">z_det</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det" title="optrace.gui.trace_gui.TraceGUI.z_det"><code class="xref py py-attr docutils literal notranslate"><span class="pre">z_det</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>position of the selected detector</p></td>
 </tr>
 <tr class="row-odd"><td><p>Source Spectrum</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_spectrum" title="optrace.gui.trace_gui.TraceGUI.source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_spectrum()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_spectrum" title="optrace.gui.trace_gui.TraceGUI.source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">source_spectrum()</span></code></a></p></td>
 <td></td>
 <td><p>render a source spectrum for the chosen source</p></td>
 </tr>
 <tr class="row-even"><td><p>Rays from Selected Source Only</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source" title="optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_spectrum_single_source</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source" title="optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_spectrum_single_source</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>if only the selected ray source should contribute to the detector spectrum</p></td>
 </tr>
 <tr class="row-odd"><td><p>Detector Spectrum</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum" title="optrace.gui.trace_gui.TraceGUI.detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_spectrum()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum" title="optrace.gui.trace_gui.TraceGUI.detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detector_spectrum()</span></code></a></p></td>
 <td></td>
 <td><p>render a detector image</p></td>
 </tr>
@@ -939,37 +939,37 @@ These will be discussed in <a class="reference internal" href="#gui-windows"><sp
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Source</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_selection" title="optrace.gui.trace_gui.TraceGUI.source_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">source_selection</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code></p></td>
 <td><p>the selected source</p></td>
 </tr>
 <tr class="row-odd"><td><p>Detector</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_selection" title="optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detector_selection</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code></p></td>
 <td><p>the selected detector</p></td>
 </tr>
 <tr class="row-even"><td><p>z_det</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det" title="optrace.gui.trace_gui.TraceGUI.z_det"><code class="xref py py-attr docutils literal notranslate"><span class="pre">z_det</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.z_det" title="optrace.gui.trace_gui.TraceGUI.z_det"><code class="xref py py-attr docutils literal notranslate"><span class="pre">z_det</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>position of the selected detector</p></td>
 </tr>
 <tr class="row-odd"><td><p>Focus Mode</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_search_method" title="optrace.gui.trace_gui.TraceGUI.focus_search_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focus_search_method</span></code></a></p></td>
-<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>, one of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.focus_search_methods" title="optrace.tracer.raytracer.Raytracer.focus_search_methods"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.focus_search_methods</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_search_method" title="optrace.gui.trace_gui.TraceGUI.focus_search_method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focus_search_method</span></code></a></p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>, one of <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.focus_search_methods" title="optrace.tracer.raytracer.Raytracer.focus_search_methods"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.focus_search_methods</span></code></a></p></td>
 <td><p>mode for focus search</p></td>
 </tr>
 <tr class="row-even"><td><p>Rays From Selected Source Only</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_search_single_source" title="optrace.gui.trace_gui.TraceGUI.focus_search_single_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focus_search_single_source</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.focus_search_single_source" title="optrace.gui.trace_gui.TraceGUI.focus_search_single_source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focus_search_single_source</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>only use the rays from the selected source for focus search</p></td>
 </tr>
 <tr class="row-odd"><td><p>Plot Cost Function</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plot_cost_function" title="optrace.gui.trace_gui.TraceGUI.plot_cost_function"><code class="xref py py-attr docutils literal notranslate"><span class="pre">plot_cost_function</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.plot_cost_function" title="optrace.gui.trace_gui.TraceGUI.plot_cost_function"><code class="xref py py-attr docutils literal notranslate"><span class="pre">plot_cost_function</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code></p></td>
 <td><p>plots the evaluated cost function</p></td>
 </tr>
 <tr class="row-even"><td><p>Find Focus and move the currently selected detector to it</p></td>
-<td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.move_to_focus" title="optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_to_focus()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.move_to_focus" title="optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_to_focus()</span></code></a></p></td>
 <td></td>
 <td><p>execute the focus search</p></td>
 </tr>
@@ -996,19 +996,19 @@ The following functions are available:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_value</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_value</span></code></a></p></td>
 <td><p>title (<code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>), default value (<code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code>), callable function</p></td>
 <td><p>a textfield for setting a floating point value</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_button</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_button</span></code></a></p></td>
 <td><p>title (<code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>), callable function</p></td>
 <td><p>a custom button that executes an action</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_selection</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_selection</span></code></a></p></td>
 <td><p>title (<code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>), options (<code class="code highlight python docutils literal highlight-python"><span class="nb">list</span></code> of <code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>), default value (<code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>), callable function</p></td>
 <td><p>a text selection field</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_checkbox</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.add_custom_checkbox</span></code></a></p></td>
 <td><p>title (<code class="code highlight python docutils literal highlight-python"><span class="nb">str</span></code>), default state (<code class="code highlight python docutils literal highlight-python"><span class="nb">bool</span></code>), callable function</p></td>
 <td><p>a checkbox boolean option</p></td>
 </tr>
@@ -1046,7 +1046,7 @@ This can be useful when using a field as setting for another action.</p>
 <span class="n">sim</span><span class="o">.</span><span class="n">add_custom_checkbox</span><span class="p">(</span><span class="s2">&quot;Print Ray Info&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">toggle_ray_info</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>After that, the TraceGUI can be run normally with <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a>.
+<p>After that, the TraceGUI can be run normally with <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a>.
 Accessing or assigning these properties at runtime is described in <a class="reference internal" href="gui_automation.html#gui-automation-custom-ui"><span class="std std-numref">Section 4.14.9</span></a>.</p>
 </section>
 </section>
@@ -1056,7 +1056,7 @@ Accessing or assigning these properties at runtime is described in <a class="ref
 <h3><span class="section-number">4.13.4.1. </span>Pipeline View<a class="headerlink" href="#pipeline-view" title="Link to this heading">#</a></h3>
 <p>The pipeline of the mayavi scene allows for the viewing and alteration of different geometry objects of the visible scene.
 For instance, you can change the colors or representation of different elements.
-Note that editing the visualization objects inside the scene is different from changing the geometry objects inside the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a>.
+Note that editing the visualization objects inside the scene is different from changing the geometry objects inside the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a>.
 The former does not update the underlying geometry and does not update the rays.</p>
 <p>A more detailed information about the <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/pipeline.html">pipeline view</a> and the <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html">different objects populating the view</a> are available in the mayavi documentation.</p>
 <figure class="align-center">
@@ -1070,10 +1070,10 @@ The former does not update the underlying geometry and does not update the rays.
 <ul class="simple">
 <li><p>properties about the rays/points currently shown</p></li>
 <li><p>cardinal points and other paraxial properties of the lenses and the whole lens setup</p></li>
-<li><p>properties of the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class</p></li>
+<li><p>properties of the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class</p></li>
 <li><p>available presets</p></li>
-<li><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> properties</p></li>
-<li><p><a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> scene properties</p></li>
+<li><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> properties</p></li>
+<li><p><a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> scene properties</p></li>
 </ul>
 <p>All displayed property values are a read-only snapshot.
 To update the values, click on the <code class="docutils literal notranslate"><span class="pre">Update</span></code> button.
@@ -1085,8 +1085,8 @@ Navigate the tabs to switch to different trees.</p>
 </section>
 <section id="command-window">
 <h3><span class="section-number">4.13.4.3. </span>Command Window<a class="headerlink" href="#command-window" title="Link to this heading">#</a></h3>
-<p>Inside this window commands can run from inside the <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> class.
-Scripting on the GUI or change <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> properties is possible, like adding, changing or removing geometries.</p>
+<p>Inside this window commands can run from inside the <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a> class.
+Scripting on the GUI or change <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> properties is possible, like adding, changing or removing geometries.</p>
 <p>After entering a command in the upper text field the <code class="docutils literal notranslate"><span class="pre">Run</span></code>-button needs to be pressed.
 Note that the command is only run, if the GUI is idle, therefore not doing any other tasks.</p>
 <p>After running the command, the scene is automatically updated and the geometry is retraced if the option “Retrace and replot automatically” is set.
@@ -1103,7 +1103,7 @@ To avoid race conditions and issues with scene rendering, all actions are run se
 This leads to the UI being unresponsive while running the command.</p>
 <p>There are multiple object aliases available to simplify coding inside the command window</p>
 <div class="pst-scrollable-table-container"><table class="table table-center" id="id5" style="width: 600px">
-<caption><span class="caption-number">Table 4.20 </span><span class="caption-text">Some object aliases</span><a class="headerlink" href="#id5" title="Link to this table">#</a></caption>
+<caption><span class="caption-number">Table 4.22 </span><span class="caption-text">Some object aliases</span><a class="headerlink" href="#id5" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 75.0%" />

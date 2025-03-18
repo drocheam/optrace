@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>7.4. Notes &#8212; optrace 1.6.4 documentation</title>
+    <title>7.4. Notes &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'development/notes';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="development.html">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -290,28 +290,28 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="development.html">
+  <a class="nav-link nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -406,7 +406,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.4. </span>Notes</span></li>
   </ul>
@@ -461,7 +461,7 @@ ever needing to install this heavy libraries when they are never needed.</p></li
 <li><p>use LaTeX formatted equations/labels</p></li>
 <li><p>highlight more important elements by colors, font size or boldness</p></li>
 <li><p>axes, minor and major grid lines, titles and legend are a must</p></li>
-<li><p><a class="reference internal" href="../library/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">block</span></code></a> function allows for halting the rest of the program when plotting</p></li>
+<li><p><a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">block</span></code></a> function allows for halting the rest of the program when plotting</p></li>
 <li><p>options for hiding some visual elements (labels, axes in GUI, legend entries)</p></li>
 <li><p>prefer svg for self-created figures, png for screenshots and webp for rendered images</p></li>
 <li><p>use tinypng to shrink pngs for the webpage, vecta.io for pyplot svgs</p></li>
@@ -480,9 +480,9 @@ ever needing to install this heavy libraries when they are never needed.</p></li
 </li>
 <li><p>all worker and background threads need to terminate immediately when the main thread has ended
 This is ensured by providing <code class="code highlight python docutils literal highlight-python"><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span></code> while creating the <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> object.</p></li>
-<li><p>multithreading should be controlled with a <a class="reference internal" href="../library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.multithreading" title="optrace.global_options.ClassGlobalOptions.multithreading"><code class="xref py py-attr docutils literal notranslate"><span class="pre">multithreading</span></code></a> global option</p></li>
+<li><p>multithreading should be controlled with a <a class="reference internal" href="../reference/optrace.html#optrace.global_options.ClassGlobalOptions.multithreading" title="optrace.global_options.ClassGlobalOptions.multithreading"><code class="xref py py-attr docutils literal notranslate"><span class="pre">multithreading</span></code></a> global option</p></li>
 <li><dl class="simple">
-<dt>threading rules for <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a>, with some ideas from <a class="reference external" href="https://traits-futures.readthedocs.io/en/latest/guide/threading.html">traits Futures</a></dt><dd><ul>
+<dt>threading rules for <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a>, with some ideas from <a class="reference external" href="https://traits-futures.readthedocs.io/en/latest/guide/threading.html">traits Futures</a></dt><dd><ul>
 <li><p>GUI changes only in main thread</p></li>
 <li><p>GUI must be responsive at all costs</p></li>
 <li><p>simplified Read/Write access model: only one thread can read and write</p></li>
@@ -497,7 +497,6 @@ This is ensured by providing <code class="code highlight python docutils literal
 <li><p>use of multithreading</p></li>
 <li><p><a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> where possible</p></li>
 <li><p>avoid loops</p></li>
-<li><p>use <a class="reference external" href="https://numexpr.readthedocs.io/en/stable/api.html#module-numexpr" title="(in numexpr v2.6)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numexpr</span></code></a> over <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> where there is a speed advantage</p></li>
 <li><p>work with object references when possible (instead of copies)</p></li>
 <li><p>use masks on arrays instead of creating new ones</p></li>
 <li><p>only do calculations on elements actually needed</p></li>
@@ -568,15 +567,15 @@ which is faster than indexing by index list (<code class="code highlight python 
 <p><strong>Standard Output</strong></p>
 <ul class="simple">
 <li><p>functions and classes output information and warnings to the terminal</p></li>
-<li><p>warnings have an own type <a class="reference internal" href="../library/optrace_global_module.html#optrace.warnings.OptraceWarning" title="optrace.warnings.OptraceWarning"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptraceWarning</span></code></a> and can be silenced with a global option <a class="reference internal" href="../library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.show_warnings" title="optrace.global_options.ClassGlobalOptions.show_warnings"><code class="xref py py-attr docutils literal notranslate"><span class="pre">show_warnings</span></code></a></p></li>
-<li><p>the progressbar should only used for more time-intensive tasks and can be turned off with the <a class="reference internal" href="../library/optrace_global_module.html#optrace.global_options.ClassGlobalOptions.show_progressbar" title="optrace.global_options.ClassGlobalOptions.show_progressbar"><code class="xref py py-attr docutils literal notranslate"><span class="pre">show_progressbar</span></code></a> option.</p></li>
+<li><p>warnings have an own type <a class="reference internal" href="../reference/optrace.html#optrace.warnings.OptraceWarning" title="optrace.warnings.OptraceWarning"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptraceWarning</span></code></a> and can be silenced with a global option <a class="reference internal" href="../reference/optrace.html#optrace.global_options.ClassGlobalOptions.show_warnings" title="optrace.global_options.ClassGlobalOptions.show_warnings"><code class="xref py py-attr docutils literal notranslate"><span class="pre">show_warnings</span></code></a></p></li>
+<li><p>the progressbar should only used for more time-intensive tasks and can be turned off with the <a class="reference internal" href="../reference/optrace.html#optrace.global_options.ClassGlobalOptions.show_progress_bar" title="optrace.global_options.ClassGlobalOptions.show_progress_bar"><code class="xref py py-attr docutils literal notranslate"><span class="pre">show_progressbar</span></code></a> option.</p></li>
 </ul>
 <p><strong>Responsiveness</strong></p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>some actions need time, but the program should still appear active and responsive. Hence, we need to notify the user with:</dt><dd><ul>
 <li><p>a message that something has been started / processed/ approved</p></li>
-<li><p>a progressbar indicating the progress and estimated remaining time. Also distracts the user, lowering the subjective waiting time</p></li>
+<li><p>a progress bar indicating the progress and estimated remaining time. Also distracts the user, lowering the subjective waiting time</p></li>
 </ul>
 </dd>
 </dl>

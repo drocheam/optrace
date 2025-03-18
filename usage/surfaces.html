@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.2. Base Shapes (Surface, Line, Point) &#8212; optrace 1.6.4 documentation</title>
+    <title>4.2. Base Shapes (Surface, Line, Point) &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -112,7 +112,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -148,14 +148,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -169,14 +169,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -295,28 +295,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -421,7 +421,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.2. </span>Base Shapes (Surface, Line, Point)</span></li>
   </ul>
@@ -444,13 +444,13 @@
 <h1><span class="section-number">4.2. </span>Base Shapes (Surface, Line, Point)<a class="headerlink" href="#base-shapes-surface-line-point" title="Link to this heading">#</a></h1>
 <section id="overview">
 <h2><span class="section-number">4.2.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
-<p>Surfaces, points and lines are the base component for all <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> classes. They describe a geometrical behavior relative to their center (marked as “x” in the following figures).
+<p>Surfaces, points and lines are the base component for all <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> classes. They describe a geometrical behavior relative to their center (marked as “x” in the following figures).
 They have no absolute position in three-dimensional space, their actual position is assigned and managed by their owner Element.
 All lengths are given in millimeters and angles in degrees.</p>
 </section>
 <section id="point-and-line">
 <h2><span class="section-number">4.2.2. </span>Point and Line<a class="headerlink" href="#point-and-line" title="Link to this heading">#</a></h2>
-<p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a> and <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a> are the simplest geometry types.
+<p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a> and <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a> are the simplest geometry types.
 Both types have no extent in z-direction, therefore lie exclusively on a  xy-plane.</p>
 <div class="pst-scrollable-table-container"><table class="table-borderless table">
 <tbody>
@@ -486,8 +486,8 @@ Both types have no extent in z-direction, therefore lie exclusively on a  xy-pla
 <section id="planar-surfaces">
 <h2><span class="section-number">4.2.3. </span>Planar Surfaces<a class="headerlink" href="#planar-surfaces" title="Link to this heading">#</a></h2>
 <p>Planar surfaces are purely two-dimensional and have no extent in z-direction, therefore being parallel to the xy-plane.
-<a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.circular_surface.CircularSurface" title="optrace.tracer.geometry.surface.circular_surface.CircularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircularSurfaces</span></code></a> is often used for plan-concave or plan-convex lenses or color filters.
-<a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RingSurfaces</span></code></a> is typically found for Apertures, and <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurfaces</span></code></a> for detectors or object images.</p>
+<a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.circular_surface.CircularSurface" title="optrace.tracer.geometry.surface.circular_surface.CircularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircularSurfaces</span></code></a> is often used for plan-concave or plan-convex lenses or color filters.
+<a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RingSurfaces</span></code></a> is typically found for Apertures, and <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurfaces</span></code></a> for detectors or object images.</p>
 <div class="pst-scrollable-table-container"><table class="table-borderless table">
 <tbody>
 <tr class="row-odd"><td><figure class="align-center" id="id5">
@@ -535,7 +535,7 @@ For a side length in x-direction of 4 mm and 5 mm in y-direction we write:</p>
 <section id="height-surfaces">
 <h2><span class="section-number">4.2.4. </span>Height Surfaces<a class="headerlink" href="#height-surfaces" title="Link to this heading">#</a></h2>
 <p><strong>Tilted Surface</strong></p>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface" title="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">TiltedSurface</span></code></a> has a circular projection in the xy-plane, but has a surface normal that is not parallel to the optical axis (z-direction).
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface" title="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">TiltedSurface</span></code></a> has a circular projection in the xy-plane, but has a surface normal that is not parallel to the optical axis (z-direction).
 It can be used for creating prisms or tilted glass plates.</p>
 <figure class="align-center" id="id8">
 <a class="dark-light reference internal image-reference" href="../_images/tilted_surface.svg"><img alt="../_images/tilted_surface.svg" class="dark-light" src="../_images/tilted_surface.svg" style="width: 600px;" />
@@ -553,7 +553,7 @@ The following examples both describe the same surface:</p>
 </pre></div>
 </div>
 <p><strong>Spherical Surface</strong></p>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface" title="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphericalSurface</span></code></a> is the most common surface type for lenses.
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface" title="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphericalSurface</span></code></a> is the most common surface type for lenses.
 It is defined by a curvature radius <span class="math notranslate nohighlight">\(R\)</span>, which is positive when the center of the curvature circle lies behind the surface and negative otherwise.
 This is illustrated in figure <a class="reference internal" href="#spherical-surface-fig"><span class="std std-numref">Fig. 4.11</span></a>.</p>
 <figure class="align-center" id="id9">
@@ -605,7 +605,7 @@ Depending on this constant the type of conic section differs:</p>
 An aspheric surface has a small additional rotationally symmetric polynomial added.</span><a class="headerlink" href="#id10" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<p>Compared to the spherical surface, a <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface" title="optrace.tracer.geometry.surface.conic_surface.ConicSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConicSurface</span></code></a> takes another parameter, the conical constant <code class="code highlight python docutils literal highlight-python"><span class="n">k</span></code>:</p>
+<p>Compared to the spherical surface, a <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface" title="optrace.tracer.geometry.surface.conic_surface.ConicSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConicSurface</span></code></a> takes another parameter, the conical constant <code class="code highlight python docutils literal highlight-python"><span class="n">k</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conic</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">ConicSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">23.8</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -614,7 +614,7 @@ An aspheric surface has a small additional rotationally symmetric polynomial add
 <p>An aspheric surface is a conic surface with additional <span class="math notranslate nohighlight">\(m\)</span> even order polynomial components <span class="math notranslate nohighlight">\(a_1, ..., a_m\)</span>.</p>
 <div class="math notranslate nohighlight" id="equation-asphere">
 <span class="eqno">(4.2)<a class="headerlink" href="#equation-asphere" title="Link to this equation">#</a></span>\[z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}} + \sum_{i=1}^{m} a_i \cdot r^{2i}\]</div>
-<p>An <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface" title="optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsphericSurface</span></code></a> has additional polynomial components <span class="math notranslate nohighlight">\(a_0 r^2 + a_1 r^4 + \dots\)</span>, where <span class="math notranslate nohighlight">\(a_0,~a_1,\dots\)</span> are the polynomical coefficients given in powers of millimeters.</p>
+<p>An <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface" title="optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsphericSurface</span></code></a> has additional polynomial components <span class="math notranslate nohighlight">\(a_0 r^2 + a_1 r^4 + \dots\)</span>, where <span class="math notranslate nohighlight">\(a_0,~a_1,\dots\)</span> are the polynomical coefficients given in powers of millimeters.</p>
 <p>For <span class="math notranslate nohighlight">\(a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}\)</span> the surface is created by:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">asph</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">AsphericSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">12.37</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">2.03</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="mf">3.2e-7</span><span class="p">])</span>
 </pre></div>
@@ -623,8 +623,8 @@ An aspheric surface has a small additional rotationally symmetric polynomial add
 <section id="user-functions">
 <h2><span class="section-number">4.2.5. </span>User Functions<a class="headerlink" href="#user-functions" title="Link to this heading">#</a></h2>
 <p><strong>Overview</strong></p>
-<p>The <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D" title="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionSurface2D</span></code></a> class allows us to define custom surfaces, defined by a mathematical function depending on x and y.
-For functions with rotational symmetry we can also use the <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D" title="optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionSurface1D</span></code></a> class, where the values are only dependent on the radial distance r.</p>
+<p>The <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D" title="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionSurface2D</span></code></a> class allows us to define custom surfaces, defined by a mathematical function depending on x and y.
+For functions with rotational symmetry we can also use the <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D" title="optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionSurface1D</span></code></a> class, where the values are only dependent on the radial distance r.</p>
 <figure class="align-center" id="id11">
 <a class="dark-light reference internal image-reference" href="../_images/function_surface.svg"><img alt="../_images/function_surface.svg" class="dark-light" src="../_images/function_surface.svg" style="width: 600px;" />
 </a>
@@ -699,7 +699,7 @@ Note that we need to use the FunctionSurface2D class, as there is no rotational 
 <section id="data-surfaces">
 <h2><span class="section-number">4.2.6. </span>Data Surfaces<a class="headerlink" href="#data-surfaces" title="Link to this heading">#</a></h2>
 <p><strong>DataSurface2D</strong></p>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D" title="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSurface2D</span></code></a> is defined by a height dataset in a square matrix.
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D" title="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSurface2D</span></code></a> is defined by a height dataset in a square matrix.
 This square set is cut into a circular disc after initialization.
 Together with this set, the radius of the disc is required.</p>
 <p>It is recommended to have 200x200 element or even larger matrices.
@@ -716,7 +716,7 @@ Values between data cells are interpolated with a polynomial of forth order for 
 <p>Note that we can also add the parameters <code class="code highlight python docutils literal highlight-python"><span class="n">z_min</span><span class="o">=...</span></code>, <code class="code highlight python docutils literal highlight-python"><span class="n">z_max</span><span class="o">=</span></code>, <code class="code highlight python docutils literal highlight-python"><span class="n">parax_roc</span></code>, as for the FunctionSurface class.</p>
 <p><strong>DataSurface1D</strong></p>
 <p>For a surface with rotational symmetry one radial vector is sufficient.
-For this we utilize the <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D" title="optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSurface1D</span></code></a> class:</p>
+For this we utilize the <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D" title="optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSurface1D</span></code></a> class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">r0</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span>
@@ -745,7 +745,7 @@ It is accessed by:</p>
 </div>
 <p><strong>Moving</strong></p>
 <p>Moving/setting its initial position of the surface/point/line is handled by its parent object
-(typically a subclass of <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a>, see <a class="reference internal" href="elements.html#usage-elements"><span class="std std-ref">Elements (Lens, Ray Source,  …)</span></a>).</p>
+(typically a subclass of <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a>, see <a class="reference internal" href="elements.html#usage-elements"><span class="std std-ref">Elements (Lens, Ray Source,  …)</span></a>).</p>
 <p><strong>Rotation</strong></p>
 <p>Using the <code class="code highlight python docutils literal highlight-python"><span class="n">rotate</span></code> function the surface/point/line is rotated by 180 degrees around its center around the z-axis.
 The function takes a rotation angle in degrees:</p>

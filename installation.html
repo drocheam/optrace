@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2. Installation &#8212; optrace 1.6.4 documentation</title>
+    <title>2. Installation &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=8ea99608"></script>
+    <script src="_static/documentation_options.js?v=b9511c62"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'installation';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="usage/usage.html">
+  <a class="nav-link nav-internal" href="usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="math/math.html">
+  <a class="nav-link nav-internal" href="details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="development/index.html">
     Development
   </a>
 </li>
@@ -290,28 +290,28 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="usage/usage.html">
+  <a class="nav-link nav-internal" href="usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="math/math.html">
+  <a class="nav-link nav-internal" href="details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="development/development.html">
+  <a class="nav-link nav-internal" href="development/index.html">
     Development
   </a>
 </li>
@@ -420,9 +420,11 @@
 <p>Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system</p>
 <p><strong>Installing the latest official release</strong></p>
 <ol class="arabic simple">
-<li><p>Download the optrace .tar.gz archive from the <a class="reference external" href="https://github.com/drocheam/optrace/releases/latest">latest release</a></p></li>
+<li><p>Download the optrace .tar.gz archive
+from the <a class="reference external" href="https://github.com/drocheam/optrace/releases/latest">latest release</a></p></li>
 <li><p>Open a terminal</p></li>
-<li><p>Run <code class="code highlight bash docutils literal highlight-bash">pip<span class="w"> </span>install<span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>archive&gt;</code>, where <code class="code highlight bash docutils literal highlight-bash">&lt;path<span class="w"> </span>to<span class="w"> </span>archive&gt;</code> is the path to the archive downloaded in the first step</p></li>
+<li><p>Run <code class="code highlight bash docutils literal highlight-bash">pip<span class="w"> </span>install<span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>archive&gt;</code>,
+where <code class="code highlight bash docutils literal highlight-bash">&lt;path<span class="w"> </span>to<span class="w"> </span>archive&gt;</code> is the path to the archive downloaded in the first step</p></li>
 </ol>
 <p><strong>Installing the current git version</strong></p>
 <ol class="arabic simple">
@@ -458,21 +460,13 @@
 <td><p>2D plotting library</p></td>
 <td><p>PSF</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="https://numexpr.readthedocs.io/en/latest/">numexpr</a></p></td>
-<td><p>sped-up and optimized calculations</p></td>
-<td><p>MIT</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference external" href="https://numpy.org/doc/stable/user/index.html#user">numpy</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="https://numpy.org/doc/stable/user/index.html#user">numpy</a></p></td>
 <td><p>matrix calculations</p></td>
 <td><p>BSD 3-Clause</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="https://pypi.org/project/opencv-python-headless/">opencv-python-headless</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="https://pypi.org/project/opencv-python-headless/">opencv-python-headless</a></p></td>
 <td><p>image loading, saving and resizing</p></td>
 <td><p>Apache 2.0</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference external" href="https://pypi.org/project/progressbar2/">progressbar2</a></p></td>
-<td><p>animated progressbar in standard output (terminal)</p></td>
-<td><p>BSD 3-Clause</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://pypi.org/project/pyqtdarktheme-fork/">pyqtdarktheme-fork</a></p></td>
 <td><p>setting a QT dark theme</p></td>
@@ -486,15 +480,24 @@
 <td><p>specialized methods for interpolation and math</p></td>
 <td><p>BSD 3-Clause</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://pypi.org/project/tqdm/">tqdm</a></p></td>
+<td><p>animated progressbar</p></td>
+<td><p>MPL-2.0 and MIT</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <p><strong>Troubleshooting</strong></p>
 <ul class="simple">
-<li><p>When <a class="reference external" href="https://pypi.org/project/mayavi/">mayavi</a> fails installing <a class="reference external" href="https://pypi.org/project/vtk/">vtk</a>, try to install vtk first</p></li>
-<li><p>When the installation of vtk fails, try to install from a list of other wheels as described <a class="reference external" href="https://docs.vtk.org/en/latest/advanced/available_python_wheels.html">here</a>.</p></li>
-<li><p>Consult the <a class="reference external" href="https://github.com/enthought/mayavi/issues">mayavi issues</a>, <a class="reference external" href="https://gitlab.kitware.com/vtk/vtk/-/issues">vtk issues</a> or <a class="reference external" href="https://bugreports.qt.io/projects/PYSIDE/issues/">PySide issues</a> for current problems and solutions</p></li>
-<li><p>In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. The syntax is: <code class="code highlight bash docutils literal highlight-bash">pip<span class="w"> </span>install<span class="w"> </span>--force-reinstall<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;some-package==1.2.2&quot;</span></code>.
+<li><p>When <a class="reference external" href="https://pypi.org/project/mayavi/">mayavi</a> fails installing <a class="reference external" href="https://pypi.org/project/vtk/">vtk</a>,
+try to install vtk first</p></li>
+<li><p>When the installation of vtk fails, try to install from a list of other wheels
+as described <a class="reference external" href="https://docs.vtk.org/en/latest/advanced/available_python_wheels.html">here</a>.</p></li>
+<li><p>Consult the <a class="reference external" href="https://github.com/enthought/mayavi/issues">mayavi issues</a>,
+<a class="reference external" href="https://gitlab.kitware.com/vtk/vtk/-/issues">vtk issues</a>
+or <a class="reference external" href="https://bugreports.qt.io/projects/PYSIDE/issues/">PySide issues</a> for current problems and solutions</p></li>
+<li><p>In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases.
+The syntax is: <code class="code highlight bash docutils literal highlight-bash">pip<span class="w"> </span>install<span class="w"> </span>--force-reinstall<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;some-package==1.2.2&quot;</span></code>.
 Often older releases are hosted outside of PyPi, so you might try to locate the packages first.</p></li>
 </ul>
 </section>

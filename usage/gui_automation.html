@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.14. GUI Automation &#8212; optrace 1.6.4 documentation</title>
+    <title>4.14. GUI Automation &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'usage/gui_automation';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -294,28 +294,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -420,7 +420,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.14. </span>GUI Automation</span></li>
   </ul>
@@ -454,7 +454,7 @@
 </ul>
 <section id="the-control-method">
 <h2><span class="section-number">4.14.1. </span>The Control Method<a class="headerlink" href="#the-control-method" title="Link to this heading">#</a></h2>
-<p>To do automated tasks, the <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.control" title="optrace.gui.trace_gui.TraceGUI.control"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.control</span></code></a> method needs to be used instead of <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a>.
+<p>To do automated tasks, the <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.control" title="optrace.gui.trace_gui.TraceGUI.control"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.control</span></code></a> method needs to be used instead of <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a>.
 It requires an automation function as well as an argument tuple.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">GUI</span><span class="p">):</span>
 
@@ -477,9 +477,9 @@ During this time, the GUI is unresponsive, as the automation function is run in 
 <p>Available TraceGUI properties are discussed in <a class="reference internal" href="gui.html#gui-tabs"><span class="std std-numref">Section 4.13.3</span></a>.
 All these can be set programmatically.</p>
 <p>While the variables are set, the TraceGUI does not execute the functions or actions that react to these changes automatically.
-This is in contrast to the standard <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a> method,
+This is in contrast to the standard <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a> method,
 where a setting is applied subsequently (for instance, changing the ray color setting updates the color in the scene automatically).</p>
-<p>To process all pending events <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> must be called.
+<p>To process all pending events <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> must be called.
 This is not needed after every property change, but only if the changes should be visible/executed at this point.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">GUI</span><span class="p">):</span>
 
@@ -499,17 +499,17 @@ This is not needed after every property change, but only if the changes should b
 <span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
 </pre></div>
 </div>
-<p>Note that some functions, like <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot" title="optrace.gui.trace_gui.TraceGUI.replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.replot</span></code></a> also call <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> internally.</p>
+<p>Note that some functions, like <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot" title="optrace.gui.trace_gui.TraceGUI.replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.replot</span></code></a> also call <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> internally.</p>
 </section>
 <section id="replotting">
 <h2><span class="section-number">4.14.3. </span>Replotting<a class="headerlink" href="#replotting" title="Link to this heading">#</a></h2>
-<p>While <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> reacts to changes in the TraceGUI itself, it does not handle changes of the raytracer or tracing geometry.</p>
+<p>While <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> reacts to changes in the TraceGUI itself, it does not handle changes of the raytracer or tracing geometry.</p>
 <p>When changing the geometry, the changes are not automatically applied to the scene.
 The geometry is also not automatically raytraced.</p>
-<p>To force the redrawing and retracing of the full scene, you can call <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot" title="optrace.gui.trace_gui.TraceGUI.replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.replot</span></code></a>.</p>
-<p>With the context manager <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a> it is possible to only update changed objects.
+<p>To force the redrawing and retracing of the full scene, you can call <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot" title="optrace.gui.trace_gui.TraceGUI.replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.replot</span></code></a>.</p>
+<p>With the context manager <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a> it is possible to only update changed objects.
 For instance, if a detector is moved, there is no need for updating the lenses inside the geometry or retracing the scene.
-<a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a> handles the detection of changes and updating automatically.</p>
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a> handles the detection of changes and updating automatically.</p>
 <p>Here is an example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">GUI</span><span class="p">):</span>
 
@@ -527,11 +527,11 @@ For instance, if a detector is moved, there is no need for updating the lenses i
 </pre></div>
 </div>
 <p>When controlling the TraceGUI through the CommandWindow of the GUI, there is also the option to replot all objects automatically.
-The implementation is done internally in the same way by using <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a>.</p>
+The implementation is done internally in the same way by using <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a>.</p>
 </section>
 <section id="controlling-the-camera">
 <span id="gui-camera"></span><h2><span class="section-number">4.14.4. </span>Controlling the Camera<a class="headerlink" href="#controlling-the-camera" title="Link to this heading">#</a></h2>
-<p>Controlling the camera is done with the functions <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a> and <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.get_camera" title="optrace.gui.trace_gui.TraceGUI.get_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.get_camera</span></code></a>.
+<p>Controlling the camera is done with the functions <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a> and <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.get_camera" title="optrace.gui.trace_gui.TraceGUI.get_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.get_camera</span></code></a>.
 The former sets the properties, while the latter one returns a dictionary of the current settings.</p>
 <p>The following settings are available:</p>
 <div class="pst-scrollable-table-container"><table class="table table-left">
@@ -578,14 +578,14 @@ The former sets the properties, while the latter one returns a dictionary of the
 </pre></div>
 </div>
 <p>Applying camera properties at startup is possible using the <code class="code highlight python docutils literal highlight-python"><span class="n">initial_camera</span></code> parameter of the TraceGUI class.
-This parameter is a dictionary that can include all possible parameters of function <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a>.</p>
+This parameter is a dictionary that can include all possible parameters of function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">initial_camera</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">roll</span><span class="o">=</span><span class="mi">45</span><span class="p">))</span>
 </pre></div>
 </div>
 </section>
 <section id="taking-screenshots">
 <h2><span class="section-number">4.14.5. </span>Taking Screenshots<a class="headerlink" href="#taking-screenshots" title="Link to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.screenshot" title="optrace.gui.trace_gui.TraceGUI.screenshot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.screenshot</span></code></a> function make it possible to capture screenshots of the scene.
+<p>The <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.screenshot" title="optrace.gui.trace_gui.TraceGUI.screenshot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.screenshot</span></code></a> function make it possible to capture screenshots of the scene.
 A path string is required for this function.
 The file type is determined automatically from the file name.</p>
 <p>Internally, the <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#mayavi.mlab.savefig" title="(in mayavi v4.8.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mayavi.mlab.savefig</span></code></a> function from <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi">mayavi</a> is utilized, therefore supporting this function’s additional parameters.</p>
@@ -606,13 +606,13 @@ The file type is determined automatically from the file name.</p>
 </section>
 <section id="selecting-rays">
 <span id="usage-gui-selecting-rays"></span><h2><span class="section-number">4.14.6. </span>Selecting Rays<a class="headerlink" href="#selecting-rays" title="Link to this heading">#</a></h2>
-<p>By default, a random selection of rays is displayed inside the scene where the number is specified by <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.rays_visible</span></code></a>.
-A custom selection can be set using the function <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.select_rays" title="optrace.gui.trace_gui.TraceGUI.select_rays"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.select_rays</span></code></a>.
+<p>By default, a random selection of rays is displayed inside the scene where the number is specified by <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.rays_visible</span></code></a>.
+A custom selection can be set using the function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.select_rays" title="optrace.gui.trace_gui.TraceGUI.select_rays"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.select_rays</span></code></a>.
 It takes a <code class="code highlight python docutils literal highlight-python"><span class="n">mask</span></code> parameter, which is a one-dimensional boolean <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code></a>, and an optional <code class="code highlight python docutils literal highlight-python"><span class="n">max_show</span></code> parameter, that specified the maximum amount of rays to display.
-Parameter <code class="code highlight python docutils literal highlight-python"><span class="n">mask</span></code> must have the same length as there are rays simulated, which is set by <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_count" title="optrace.gui.trace_gui.TraceGUI.ray_count"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_count</span></code></a>
-Note that there is a maximum amount of rays that can be displayed (specified by the maximum value of <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.rays_visible</span></code></a>, by default <code class="code highlight python docutils literal highlight-python"><span class="mi">50000</span></code>).
+Parameter <code class="code highlight python docutils literal highlight-python"><span class="n">mask</span></code> must have the same length as there are rays simulated, which is set by <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_count" title="optrace.gui.trace_gui.TraceGUI.ray_count"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_count</span></code></a>
+Note that there is a maximum amount of rays that can be displayed (specified by the maximum value of <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.rays_visible</span></code></a>, by default <code class="code highlight python docutils literal highlight-python"><span class="mi">50000</span></code>).
 If the <code class="code highlight python docutils literal highlight-python"><span class="n">mask</span></code> includes more values, a random subset is selected.
-Accessing <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a> returns the boolean array for the currently displayed rays.</p>
+Accessing <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a> returns the boolean array for the currently displayed rays.</p>
 <p>Typical useful scenarios are debugging or ray analysis.
 For instance, only rays from a specific source, region or wavelength range can be selected and displayed.
 See <a class="reference internal" href="advanced.html#usage-ray-access"><span class="std std-ref">Accessing Ray Properties</span></a> to learn how to access ray properties.
@@ -638,16 +638,16 @@ You can find examples for ray selections below.</p>
 </section>
 <section id="picking-manually">
 <h2><span class="section-number">4.14.7. </span>Picking Manually<a class="headerlink" href="#picking-manually" title="Link to this heading">#</a></h2>
-<p>The function <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray" title="optrace.gui.trace_gui.TraceGUI.pick_ray"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.pick_ray</span></code></a> highlights a full ray.
+<p>The function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray" title="optrace.gui.trace_gui.TraceGUI.pick_ray"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.pick_ray</span></code></a> highlights a full ray.
 An integer <code class="code highlight python docutils literal highlight-python"><span class="n">index</span></code> is required as to select a given ray.
-Only currently displayed rays are pickable, which are defined by <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a>, see <a class="reference internal" href="#usage-gui-selecting-rays"><span class="std std-ref">Selecting Rays</span></a>.
-So an <code class="code highlight python docutils literal highlight-python"><span class="n">index</span><span class="o">=</span><span class="mi">50</span></code> means that the 50th <code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> value of <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a> is picked.</p>
-<p>Function <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray_section" title="optrace.gui.trace_gui.TraceGUI.pick_ray_section"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.pick_ray_section</span></code></a> highlights a ray at a given intersection.
+Only currently displayed rays are pickable, which are defined by <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a>, see <a class="reference internal" href="#usage-gui-selecting-rays"><span class="std std-ref">Selecting Rays</span></a>.
+So an <code class="code highlight python docutils literal highlight-python"><span class="n">index</span><span class="o">=</span><span class="mi">50</span></code> means that the 50th <code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> value of <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a> is picked.</p>
+<p>Function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray_section" title="optrace.gui.trace_gui.TraceGUI.pick_ray_section"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.pick_ray_section</span></code></a> highlights a ray at a given intersection.
 The ray is highlighted, a crosshair is shown at the intersection position and a ray information text is shown inside the scene.
 Compared to the previous function, an additional integer <code class="code highlight python docutils literal highlight-python"><span class="n">section</span></code> parameter is needed.
 An optional parameter <code class="code highlight python docutils literal highlight-python"><span class="n">detailed</span></code> defines if more detailed information should be shown.
 This would be equivalent to picking a section manually in the scene with the Shift key held.</p>
-<p>To deactivate the ray highlighting, information text and cross hair, <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.reset_picking" title="optrace.gui.trace_gui.TraceGUI.reset_picking"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.reset_picking</span></code></a> needs to be called.</p>
+<p>To deactivate the ray highlighting, information text and cross hair, <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.reset_picking" title="optrace.gui.trace_gui.TraceGUI.reset_picking"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.reset_picking</span></code></a> needs to be called.</p>
 <p>Here is an example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
 
@@ -671,10 +671,10 @@ This would be equivalent to picking a section manually in the scene with the Shi
 </section>
 <section id="showing-plots">
 <h2><span class="section-number">4.14.8. </span>Showing Plots<a class="headerlink" href="#showing-plots" title="Link to this heading">#</a></h2>
-<p>Available plotting functions include <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_image" title="optrace.gui.trace_gui.TraceGUI.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_image</span></code></a> , <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_profile" title="optrace.gui.trace_gui.TraceGUI.source_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_profile</span></code></a>,
-<a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image" title="optrace.gui.trace_gui.TraceGUI.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_image</span></code></a>, <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_profile" title="optrace.gui.trace_gui.TraceGUI.detector_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_profile</span></code></a>,
-<a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum" title="optrace.gui.trace_gui.TraceGUI.detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_spectrum</span></code></a>, <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_spectrum" title="optrace.gui.trace_gui.TraceGUI.source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_spectrum</span></code></a>,
-<a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.move_to_focus" title="optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.move_to_focus</span></code></a>.</p>
+<p>Available plotting functions include <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_image" title="optrace.gui.trace_gui.TraceGUI.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_image</span></code></a> , <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_profile" title="optrace.gui.trace_gui.TraceGUI.source_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_profile</span></code></a>,
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image" title="optrace.gui.trace_gui.TraceGUI.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_image</span></code></a>, <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_profile" title="optrace.gui.trace_gui.TraceGUI.detector_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_profile</span></code></a>,
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum" title="optrace.gui.trace_gui.TraceGUI.detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_spectrum</span></code></a>, <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_spectrum" title="optrace.gui.trace_gui.TraceGUI.source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_spectrum</span></code></a>,
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.move_to_focus" title="optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.move_to_focus</span></code></a>.</p>
 <p>There are more settings available than through the GUI.
 For example, it is possible to save a image to the disk.
 Additionally, a custom detector/source extent can be specified, a setting not available through the GUI.</p>
@@ -719,7 +719,7 @@ To button action is called with a special function.</p>
 </section>
 <section id="closing-down">
 <span id="gui-automation-close"></span><h2><span class="section-number">4.14.10. </span>Closing Down<a class="headerlink" href="#closing-down" title="Link to this heading">#</a></h2>
-<p>To close the GUI down programmatically, the function <a class="reference internal" href="../library/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.close</span></code></a> can be called:</p>
+<p>To close the GUI down programmatically, the function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.close</span></code></a> can be called:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
 
     <span class="c1"># do some things</span>

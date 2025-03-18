@@ -1,0 +1,990 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5.2. Tracing Procedure &#8212; optrace 1.6.7 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=964979e3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'details/tracing';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5.3. Image and Spectrum Rendering" href="image_spectrum.html" />
+    <link rel="prev" title="5.1. Property Sampling" href="sampling.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5.2. Tracing Procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image_spectrum.html">5.3. Image and Spectrum Rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">5.4. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolution.html">5.5. PSF Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="focus.html">5.6. Focus Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">5.7. Color Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">5.8. Miscellaneous</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">5. </span>Implementation Details</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">5.2. </span>Tracing Procedure</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="tracing-procedure">
+<h1><span class="section-number">5.2. </span>Tracing Procedure<a class="headerlink" href="#tracing-procedure" title="Link to this heading">#</a></h1>
+<section id="tracing-process">
+<h2><span class="section-number">5.2.1. </span>Tracing Process<a class="headerlink" href="#tracing-process" title="Link to this heading">#</a></h2>
+<p>Main steps of the tracing process are surface hit detection, refraction index and direction calculation as well as handling of non-hitting rays.
+For ideal lenses, filters and apertures only one surface hit detection takes place, while a normal lens requires two.
+Doing almost all calculations in threads speeds up the computations.
+Every thread gets some rays assigned which are only processed within the same thread.
+This includes the ray creation and propagation through the whole system.
+While not explicitly mentioned, new ray polarization and weights are calculated in the refraction calculation function.</p>
+<figure class="align-center" id="id13">
+<a class="dark-light reference internal image-reference" href="../_images/TracePAP.svg"><img alt="../_images/TracePAP.svg" class="dark-light" src="../_images/TracePAP.svg" style="width: 400px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.6 </span><span class="caption-text">Tracing process flowchart.</span><a class="headerlink" href="#id13" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="refraction">
+<h2><span class="section-number">5.2.2. </span>Refraction<a class="headerlink" href="#refraction" title="Link to this heading">#</a></h2>
+<p>Commonly found forms of the law of refraction are composed of an input and output angle. For the tracing process a form having only vectors as parameters, as well as circumventing the calculation of any angles, would be more convenient.</p>
+<p>The following figure shows the refraction of a ray on a curved surface.</p>
+<figure class="align-center" id="id14">
+<a class="dark-light reference internal image-reference" href="../_images/refraction_interface.svg"><img alt="../_images/refraction_interface.svg" class="dark-light" src="../_images/refraction_interface.svg" style="width: 400px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.7 </span><span class="caption-text">Refraction on a curved interface.</span><a class="headerlink" href="#id14" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p><span class="math notranslate nohighlight">\(n_1, n_2\)</span> are the refractive indices of the media, <span class="math notranslate nohighlight">\(s,s'\)</span> input and output propagation vectors. Both these vectors, as well as the normal vector <span class="math notranslate nohighlight">\(n\)</span>, need to be normalized for subsequent calculations. Note that <span class="math notranslate nohighlight">\(s\)</span> and <span class="math notranslate nohighlight">\(n\)</span> need to point in the same half space direction, meaning <span class="math notranslate nohighlight">\(s \cdot n \geq 0\)</span>.</p>
+<p>An equation for such a form of the refraction law can be found in <a class="footnote-reference brackets" href="#footcite-optikhaferkorn" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> or <a class="footnote-reference brackets" href="#footcite-greve-2006" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
+<div class="math notranslate nohighlight" id="equation-refraction">
+<span class="eqno">(5.19)<a class="headerlink" href="#equation-refraction" title="Link to this equation">#</a></span>\[s^{\prime}=\frac{n_1}{n_2} s-n\left\{\frac{n_1}{n_2}(n s)-\sqrt{1-\left(\frac{n_1}{n_2}\right)^{2}\left[1-(n s)^{2}\right]}\right\}\]</div>
+<p>In case of total internal reflection (TIR) the root argument becomes negative. In optrace TIR rays get absorbed, as reflections are not modelled, and the user is notified with a message.</p>
+</section>
+<section id="polarization">
+<span id="tracing-pol"></span><h2><span class="section-number">5.2.3. </span>Polarization<a class="headerlink" href="#polarization" title="Link to this heading">#</a></h2>
+<p>The following calculations are similar to <a class="footnote-reference brackets" href="#footcite-yun-11" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<p>The polarization vector <span class="math notranslate nohighlight">\(E\)</span> can be decomposed into a <span class="math notranslate nohighlight">\(E_\text{p}\)</span> -component, lying in the surface normal - incidence vector plane, and a <span class="math notranslate nohighlight">\(E_\text{s}\)</span> -component lying perpendicular to this plane. With refraction on an interface the component <span class="math notranslate nohighlight">\(E_\text{s}\)</span> is equal for both ray vectors <span class="math notranslate nohighlight">\(s, s'\)</span>, while <span class="math notranslate nohighlight">\(E_\text{p}\)</span> is rotated around <span class="math notranslate nohighlight">\(E_\text{s}\)</span> towards <span class="math notranslate nohighlight">\(s'\)</span> creating the new component <span class="math notranslate nohighlight">\(E_\text{p}'\)</span>.
+Note that for our calculations all vectors are unity vectors, while length information of the polarization components is contained in the scaling factors <span class="math notranslate nohighlight">\(A_\text{tp}, A_\text{ts}\)</span>.</p>
+<figure class="align-center" id="id15">
+<a class="dark-light reference internal image-reference" href="../_images/refraction_interface_polarization.svg"><img alt="../_images/refraction_interface_polarization.svg" class="dark-light" src="../_images/refraction_interface_polarization.svg" style="width: 700px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.8 </span><span class="caption-text">Ray polarization components before and after refraction.</span><a class="headerlink" href="#id15" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p><strong>Case 1</strong>:</p>
+<p>For <span class="math notranslate nohighlight">\(s \parallel s'\)</span> the new polarization vector is equal to the old one.</p>
+<p><strong>Case 2</strong></p>
+<p>For <span class="math notranslate nohighlight">\(s \nparallel s'\)</span> the new polarization vector differs from the old one.</p>
+<p>According to optics the polarization and polarization components need to be orthogonal to the propagation direction.
+Additionally, both polarization components are perpendicular to each other. Assuming all mentioned vectors are unity vectors, we can calculate:</p>
+<div class="math notranslate nohighlight" id="equation-pol-e">
+<span class="eqno">(5.20)<a class="headerlink" href="#equation-pol-e" title="Link to this equation">#</a></span>\[\begin{split}\begin{align}
+E_\text{s} &amp;= \frac{s' \times s}{|| s' \times s ||}\\
+E_\text{p} &amp;= E_\text{s} \times s\\
+E_\text{p}' &amp;= E_\text{s} \times s'\\
+\end{align}\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(||E_\text{p}|| = ||E_\text{s}|| = ||E|| = 1\)</span> the amplitude components are then:</p>
+<div class="math notranslate nohighlight" id="equation-pol-a">
+<span class="eqno">(5.21)<a class="headerlink" href="#equation-pol-a" title="Link to this equation">#</a></span>\[\begin{split}\begin{align}
+     A_\text{tp} &amp;= E_\text{p} \cdot E\\
+     A_\text{ts} &amp;= E_\text{s} \cdot E\\
+\end{align}\end{split}\]</div>
+<p>For the new polarization unity vector, which also composed of two components, we finally get</p>
+<div class="math notranslate nohighlight" id="equation-pol-e2">
+<span class="eqno">(5.22)<a class="headerlink" href="#equation-pol-e2" title="Link to this equation">#</a></span>\[E' = A_\text{ps} E_\text{s} + A_\text{tp} E_\text{p}'\]</div>
+</section>
+<section id="transmission">
+<h2><span class="section-number">5.2.4. </span>Transmission<a class="headerlink" href="#transmission" title="Link to this heading">#</a></h2>
+<p>The new ray powers are calculated from the transmission which in turn can be calculated from already derived properties in refraction calculation.</p>
+<p>According to the Fresnel equations the transmission of light is dependent on the polarization direction.
+The subsequent equations describe this behavior <a class="footnote-reference brackets" href="#footcite-fresnelwiki" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p>
+<div class="math notranslate nohighlight" id="equation-ts-coeff">
+<span class="eqno">(5.23)<a class="headerlink" href="#equation-ts-coeff" title="Link to this equation">#</a></span>\[t_{\mathrm{s}}=\frac{2\, n_{1} \cos \varepsilon}{n_{1} \cos \varepsilon+n_{2} \cos \varepsilon'}\]</div>
+<div class="math notranslate nohighlight" id="equation-tp-coeff">
+<span class="eqno">(5.24)<a class="headerlink" href="#equation-tp-coeff" title="Link to this equation">#</a></span>\[t_{\mathrm{p}}=\frac{2\, n_{1} \cos \varepsilon}{n_{2} \cos \varepsilon+n_{1} \cos \varepsilon'}\]</div>
+<div class="math notranslate nohighlight" id="equation-t">
+<span class="eqno">(5.25)<a class="headerlink" href="#equation-t" title="Link to this equation">#</a></span>\[T=\frac{n_{2} \cos \varepsilon'}{n_{1} \cos \varepsilon} \left( (A_\text{ts} t_\text{s})^2  + (A_\text{tp} t_\text{p})^2 \right)\]</div>
+<p><span class="math notranslate nohighlight">\(A_\text{ts}\)</span> and <span class="math notranslate nohighlight">\(A_\text{tp}\)</span> are the polarization components from equations <a class="reference internal" href="#equation-pol-a">(5.21)</a>. Occurring cosine terms are calculated from the direction and normal vectors as <span class="math notranslate nohighlight">\(\cos \varepsilon = n \cdot s\)</span> and <span class="math notranslate nohighlight">\(\cos \varepsilon' = n \cdot s'\)</span>.</p>
+<p>For light hitting the surface perpendicular this yields an expression independent of the polarization: <a class="footnote-reference brackets" href="#footcite-kaschke2014" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-t-special">
+<span class="eqno">(5.26)<a class="headerlink" href="#equation-t-special" title="Link to this equation">#</a></span>\[T_{\varepsilon=0} = \frac{4 n_1 n_2 }{(n_1 + n_2)^2}\]</div>
+</section>
+<section id="refraction-at-an-ideal-lens">
+<h2><span class="section-number">5.2.5. </span>Refraction at an Ideal Lens<a class="headerlink" href="#refraction-at-an-ideal-lens" title="Link to this heading">#</a></h2>
+<p>Ray with unnormalized direction vector <span class="math notranslate nohighlight">\(s_0\)</span> and intersection <span class="math notranslate nohighlight">\(P = (x_0, y_0, 0)\)</span> on the lens with focal length <span class="math notranslate nohighlight">\(f\)</span> and the corresponding point on the focal plane <span class="math notranslate nohighlight">\(P_f = (x_f, y_f, f)\)</span>.
+Optics tells us that ideally parallel rays meet in the same position in the focal plane. Therefore a ray with the same direction, but hitting the lens at the optical axis, can used to determine position <span class="math notranslate nohighlight">\(P_f\)</span>.</p>
+<figure class="align-center" id="id16">
+<span id="image-ideal-refraction"></span><a class="dark-light reference internal image-reference" href="../_images/ideal_refraction.svg"><img alt="../_images/ideal_refraction.svg" class="dark-light" src="../_images/ideal_refraction.svg" style="width: 500px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.9 </span><span class="caption-text">Geometry for refraction on an ideal lens.</span><a class="headerlink" href="#id16" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p><strong>Cartesian Representation</strong></p>
+<p>Calculating positions <span class="math notranslate nohighlight">\(x_f,~y_f\)</span> is simply done calculating the linear ray equations <span class="math notranslate nohighlight">\(x(z), y(z)\)</span> at <span class="math notranslate nohighlight">\(z=f\)</span>.
+For <span class="math notranslate nohighlight">\(x_f\)</span> we get:</p>
+<div class="math notranslate nohighlight" id="equation-refraction-ideal-xf">
+<span class="eqno">(5.27)<a class="headerlink" href="#equation-refraction-ideal-xf" title="Link to this equation">#</a></span>\[x_f = \frac{s_{0x}}{s_{0z}} f\]</div>
+<p>Similarly for <span class="math notranslate nohighlight">\(y_f\)</span></p>
+<div class="math notranslate nohighlight" id="equation-refraction-ideal-yf">
+<span class="eqno">(5.28)<a class="headerlink" href="#equation-refraction-ideal-yf" title="Link to this equation">#</a></span>\[y_f = \frac{s_{0y}}{s_{0z}} f\]</div>
+<p><span class="math notranslate nohighlight">\(s_{0z} = 0\)</span> is prohibited by forcing all rays to have a positive z-direction component.</p>
+<p>Knowing point <span class="math notranslate nohighlight">\(P_f\)</span> the outgoing propagation vector <span class="math notranslate nohighlight">\(s_0'\)</span> is calculated.</p>
+<div class="math notranslate nohighlight" id="equation-refraction-ideal-s0">
+<span class="eqno">(5.29)<a class="headerlink" href="#equation-refraction-ideal-s0" title="Link to this equation">#</a></span>\[\begin{split}s_0' = P_f - P = \begin{pmatrix} \frac{s_{0x}}{s_{0z}}f - x_0 \\ \frac{s_{0y}}{s_{0z}}f - y_0 \\ f \end{pmatrix}\end{split}\]</div>
+<p>Normalizing gets us:</p>
+<div class="math notranslate nohighlight" id="equation-refraction-ideal-s0-normalized">
+<span class="eqno">(5.30)<a class="headerlink" href="#equation-refraction-ideal-s0-normalized" title="Link to this equation">#</a></span>\[s' = \frac{s_0'}{||s_0'||}\]</div>
+<p><strong>Angular Representation</strong></p>
+<p>Taking the x-component of the propagation vector</p>
+<div class="math notranslate nohighlight">
+\[s_{0x}' = \frac{s_{0x}}{s_{0z}}f - x_0\]</div>
+<p>and dividing it by <span class="math notranslate nohighlight">\(f\)</span> gives us</p>
+<div class="math notranslate nohighlight">
+\[\frac{s_{0x}'}{f} = \frac{s_{0x}}{s_{0z}} - \frac{x_0}{f}\]</div>
+<p>From <a class="reference internal" href="#image-ideal-refraction"><span class="std std-numref">Fig. 5.9</span></a> follows <span class="math notranslate nohighlight">\(\tan \varepsilon_x' = \frac{s_{0x}}{f}\)</span> and <span class="math notranslate nohighlight">\(\tan \varepsilon_x = \frac{s_{0x}}{s_{0z}}\)</span> and therefore</p>
+<div class="math notranslate nohighlight">
+\[\tan \varepsilon_x' = \tan \varepsilon_x - \frac{x_0}{f}\]</div>
+<p>Analogously in y-direction we get</p>
+<div class="math notranslate nohighlight">
+\[\tan \varepsilon_y' = \tan \varepsilon_y - \frac{y_0}{f}\]</div>
+<p>This angular representation is a formulation also found in <a class="footnote-reference brackets" href="#footcite-bruls2015659" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="filtering">
+<h2><span class="section-number">5.2.6. </span>Filtering<a class="headerlink" href="#filtering" title="Link to this heading">#</a></h2>
+<p>When passing through a filter a ray with power <span class="math notranslate nohighlight">\(P_i\)</span> and wavelength <span class="math notranslate nohighlight">\(\lambda_i\)</span> gets attenuated according to the filter’s transmission function <span class="math notranslate nohighlight">\(T_\text{F}(\lambda)\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-filtering">
+<span class="eqno">(5.31)<a class="headerlink" href="#equation-eq-filtering" title="Link to this equation">#</a></span>\[\begin{split}P_{i+1} =
+\begin{cases}
+     P_{i}~ T_\text{F}(\lambda_i) &amp; \text{for}~~ T_\text{F}(\lambda_i) &gt; T_\text{th}\\
+     0  &amp; \text{else}\\
+\end{cases}\end{split}\]</div>
+<p>Additionally, ray powers get set to zero if the transmission falls below a specific threshold <span class="math notranslate nohighlight">\(T_\text{th}\)</span>. By doing so, <em>ghost rays</em> are avoided, these are rays that still need to be propagated while raytracing, but hold only little power. Because their contribution to image forming is negligible, they should be absorbed as soon as possible to speed up tracing.</p>
+<p>As a side note, apertures are also implemnted as filters, but with <span class="math notranslate nohighlight">\(T_\text{F}(\lambda) = 0\)</span> for all wavelengths.</p>
+</section>
+<section id="geometry-checks">
+<h2><span class="section-number">5.2.7. </span>Geometry Checks<a class="headerlink" href="#geometry-checks" title="Link to this heading">#</a></h2>
+<p>Geometry checks before tracing include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>all tracing revelant elements must be inside the outline</p></li>
+<li><p>no object collisions</p></li>
+<li><p>defined, sequential order</p></li>
+<li><p>raysources available</p></li>
+<li><p>all raysources come before all other kinds of elements</p></li>
+</ul>
+</div></blockquote>
+<p>Collision checks are done by first sorting the elements and then comparing positions on adjacent surfaces.
+After randomly sampling many points it needs to be checked if the position order in z-direction is equal.
+While this doesn’t guarantee no collisions, while raytracing the sequentiality is checked for each ray and warnings are emitted.</p>
+</section>
+<section id="intersection-calculation">
+<h2><span class="section-number">5.2.8. </span>Intersection Calculation<a class="headerlink" href="#intersection-calculation" title="Link to this heading">#</a></h2>
+<section id="surface-extension">
+<h3><span class="section-number">5.2.8.1. </span>Surface Extension<a class="headerlink" href="#surface-extension" title="Link to this heading">#</a></h3>
+<p>To simplify the handling of non-intersecting rays and enforce the same number of ray sections for each ray, the surface is extended so all rays intersect a surface.
+Gaps on the surface are filled and the surface edge is extended radially towards infinity.
+A ray intersection is now calculated for the extended surface, but afterwards the ray is marked as hitting or non-hitting depending on a surface mask.</p>
+<figure class="align-center" id="id17">
+<a class="dark-light reference internal image-reference" href="../_images/surface_extension.svg"><img alt="../_images/surface_extension.svg" class="dark-light" src="../_images/surface_extension.svg" style="width: 900px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.10 </span><span class="caption-text">Surface Extension</span><a class="headerlink" href="#id17" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="intersection-of-a-ray-with-a-plane">
+<h3><span class="section-number">5.2.8.2. </span>Intersection of a Ray with a Plane<a class="headerlink" href="#intersection-of-a-ray-with-a-plane" title="Link to this heading">#</a></h3>
+<p>The intersection of all planar surface types (<strong>CircularSurface</strong>, <strong>RectangularSurface</strong>, <strong>RingSurface</strong>) as well as the <strong>TiltedSurface</strong> can be computed analytically.
+The following definitions hold:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{surface normal vector:}~~~~   \vec{n} &amp;= (n_x, n_y, n_z)\\
+\text{surface center vector:}~~~~ \vec{q} &amp;= (x_0, y_0, z_0)\\
+\text{point on ray or surface:}~~~~ \vec{p} &amp;= (x, y, z)\\
+\text{ray support vector:}~~~~ \vec{p_0} &amp;= (x_{0p}, y_{0p}, z_{0p})\\\end{split}\]</div>
+<p>The surface point normal equation is:</p>
+<div class="math notranslate nohighlight" id="equation-plane-normal-eq-intersection">
+<span class="eqno">(5.32)<a class="headerlink" href="#equation-plane-normal-eq-intersection" title="Link to this equation">#</a></span>\[(\vec{p} - \vec{q})\cdot \vec{n} = 0\]</div>
+<p>The ray equation in dependence of ray paramter <span class="math notranslate nohighlight">\(t\)</span> is as follows:</p>
+<div class="math notranslate nohighlight" id="equation-line-equation-common">
+<span class="eqno">(5.33)<a class="headerlink" href="#equation-line-equation-common" title="Link to this equation">#</a></span>\[\vec{p} = \vec{p_0} + \vec{s} \cdot t\]</div>
+<p>Inserting these equations into each other leads to</p>
+<div class="math notranslate nohighlight" id="equation-plane-intersection-formula0">
+<span class="eqno">(5.34)<a class="headerlink" href="#equation-plane-intersection-formula0" title="Link to this equation">#</a></span>\[(\vec{p_0} + \vec{s}\cdot t_\text{h} - \vec{q}) \cdot \vec{n} = 0\]</div>
+<p>Rearranging gives us the ray parameter for the hit point <span class="math notranslate nohighlight">\(t_\text{h}\)</span> for case <span class="math notranslate nohighlight">\(\vec{s} \cdot \vec{n} \neq 0\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-plane-intersection-formula">
+<span class="eqno">(5.35)<a class="headerlink" href="#equation-plane-intersection-formula" title="Link to this equation">#</a></span>\[t_\text{h} = \frac{(\vec{q} - \vec{p_0})\cdot \vec{n}}{\vec{s} \cdot \vec{n}}\]</div>
+<p>which can be inserted into the ray equation to get the intersection position.
+If <span class="math notranslate nohighlight">\(\vec{s} \cdot \vec{n} \neq 0\)</span>, surface normal and ray direction vector are perpendicular.
+If the ray lies inside the plane, there are infinite solutions, if it doesn’t there is none.</p>
+</section>
+<section id="intersection-of-a-ray-with-a-conic-surface">
+<h3><span class="section-number">5.2.8.3. </span>Intersection of a Ray with a Conic Surface<a class="headerlink" href="#intersection-of-a-ray-with-a-conic-surface" title="Link to this heading">#</a></h3>
+<p>Intersections with a <strong>ConicSurface</strong> can also be calculated numerically.</p>
+<div class="math notranslate nohighlight" id="equation-intersectionasphere0">
+<span class="eqno">(5.36)<a class="headerlink" href="#equation-intersectionasphere0" title="Link to this equation">#</a></span>\[\begin{split}\text{Ray support vector:}~~~~   \vec{p} &amp;= (p_x, p_y, p_z)\\
+\text{Ray direction vector:}~~~~ \vec{s} &amp;= (s_x, s_y, s_z)\\
+\text{Center of surface:}~~~~    \vec{q} &amp;= (x_0, y_0, z_0)\end{split}\]</div>
+<div class="math notranslate nohighlight" id="equation-intersectionasphere1">
+<span class="eqno">(5.37)<a class="headerlink" href="#equation-intersectionasphere1" title="Link to this equation">#</a></span>\[p_z + s_z t = z_0 + \frac{\rho r^2}{1 + \sqrt{1-(k+1)\rho^2 r^2}}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight" id="equation-intersectionasphere2">
+<span class="eqno">(5.38)<a class="headerlink" href="#equation-intersectionasphere2" title="Link to this equation">#</a></span>\[r^2 = (p_x + s_x t - x_0)^2 + (p_y+s_y t - y_0)^2\]</div>
+<p>Some work in rearranging leads to the following equation, valid for <span class="math notranslate nohighlight">\(\rho \neq 0\)</span> (conic section is not a plane):</p>
+<div class="math notranslate nohighlight" id="equation-intersectionasphere3">
+<span class="eqno">(5.39)<a class="headerlink" href="#equation-intersectionasphere3" title="Link to this equation">#</a></span>\[A t^2 + 2 B t + C = 0\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight" id="equation-intersectionasphere4">
+<span class="eqno">(5.40)<a class="headerlink" href="#equation-intersectionasphere4" title="Link to this equation">#</a></span>\[\begin{split}A &amp;= 1 + k s_z^2\\
+B &amp;= o_x s_x + o_y s_y - \frac{s_z}{\rho} + (k+1) o_z s_z\\
+C &amp;= o_x^2 + o_y^2 - 2\frac{o_z}{\rho} + (k+1) o_z^2\\
+\vec{o} &amp;= \vec{p} - \vec{q} = (o_x, o_y, o_z)\end{split}\]</div>
+<p>The solutions for <span class="math notranslate nohighlight">\(t\)</span> are (<span class="math notranslate nohighlight">\(\rho \neq 0\)</span>):</p>
+<div class="math notranslate nohighlight" id="equation-intersectionasphere5">
+<span class="eqno">(5.41)<a class="headerlink" href="#equation-intersectionasphere5" title="Link to this equation">#</a></span>\[\begin{split}t =
+\begin{cases}
+    \frac{-B \pm \sqrt{B^2 -CA}}{A} &amp; \text{for}~~ A \neq 0, ~~ B^2 - CA \geq 0 \\
+    -\frac{C}{2B} &amp; \text{for}~~ A = 0, ~~B \neq 0\\
+    \{\mathbb{R}\} &amp; \text{for}~~ A = 0, ~~B = 0, ~~C = 0\\
+    \emptyset &amp; \text{else}
+\end{cases}\end{split}\]</div>
+<p>The first case produces two intersections, while in the second the ray touches the surface tangentially.
+In the fourth case there is no intersection.
+In cases one and two it has to be checked if the intersection lies inside the valid radial range of the surface, as the conic equation describes the surface for all possible <span class="math notranslate nohighlight">\(r\)</span>.
+If there are still two valid intersections in the first case, the one with the lower axial position is used.
+The third case is only relevant for rays lying along a linear section of a surface, for instance a plane or a cone surface.
+This is further explained below.
+Equation <a class="reference internal" href="#equation-intersectionasphere5">(5.41)</a> produces the same results as <a class="footnote-reference brackets" href="#footcite-boussemaere-2021-8" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>, although in his derivation the constants <span class="math notranslate nohighlight">\(A, B, C\)</span> include an additional curvature scaling and the factor 2 included in <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<p>In the case of <span class="math notranslate nohighlight">\(\rho = 0\)</span> (plane) equation <a class="reference internal" href="#equation-intersectionasphere1">(5.37)</a> simplifies to <span class="math notranslate nohighlight">\(p_z + s_z t = z_0\)</span>, leading to:</p>
+<div class="math notranslate nohighlight" id="equation-intersectionasphere6">
+<span class="eqno">(5.42)<a class="headerlink" href="#equation-intersectionasphere6" title="Link to this equation">#</a></span>\[\begin{split}t =
+\begin{cases}
+    - \frac{p_z - z_0}{s_z} &amp; \text{for}~~ s_z \neq 0 \\
+    \{\mathbb{R}\} &amp; \text{for}~~ s_z = 0, p_z = z_0\\
+    \emptyset &amp; \text{for}~~ s_z = 0,~p_z\neq z_0\\
+\end{cases}\end{split}\]</div>
+<p>The first case produces exactly one intersection and corresponds to the special case of equation <a class="reference internal" href="#equation-plane-intersection-formula">(5.35)</a> for <span class="math notranslate nohighlight">\(\vec{n} = (0, 0, 1)\)</span>.
+In the second case the ray lies inside the plane, producing infinite intersection positions.
+In the third case the ray is parallel, but offset to the plane, producing no hits.
+We enforce <span class="math notranslate nohighlight">\(s_z &gt; 0\)</span> in our simulator, so only the first case is relevant.</p>
+<p>For <span class="math notranslate nohighlight">\(\rho \rightarrow \infty, r \in \mathbb{R}\)</span> the conic section becomes a cone for <span class="math notranslate nohighlight">\(k &lt; -1\)</span>, a line from <span class="math notranslate nohighlight">\(z = z_0\)</span> to <span class="math notranslate nohighlight">\(z \rightarrow \infty\)</span> for <span class="math notranslate nohighlight">\(k = -1\)</span> or a point at <span class="math notranslate nohighlight">\((x_0, y_0, z_0)\)</span> for <span class="math notranslate nohighlight">\(k &gt; -1\)</span>.
+In the first two cases the conic sections consists of long linear segments.
+Depending on the cases of equation <a class="reference internal" href="#equation-intersectionasphere5">(5.41)</a>, a ray can intersect once, twice, don’t hit the surface or lie inside of it.
+For a point (<span class="math notranslate nohighlight">\(k &gt; -1\)</span>) there can be no hit or a single one.
+For the latter case <span class="math notranslate nohighlight">\(B^2 - CA = 0\)</span> holds, producing a single intersection in the first case of equation <a class="reference internal" href="#equation-intersectionasphere5">(5.41)</a>.</p>
+</section>
+<section id="numerical-hit-search">
+<span id="numerical-hit-find"></span><h3><span class="section-number">5.2.8.4. </span>Numerical Hit Search<a class="headerlink" href="#numerical-hit-search" title="Link to this heading">#</a></h3>
+<p>For the asphere equation or arbitrary analytical functions there is no analytical solution for a ray intersection.
+In such cases the solution needs be calculated iteratively.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{Ray support vector:}~~~~   \vec{p_0} &amp;= (p_x, p_y, p_z)\\
+\text{Ray direction vector:}~~~~ \vec{s} &amp;= (s_x, s_y, s_z)\\
+\text{Point on Ray:}~~~~ \vec{p_t} &amp;= (x_t, y_t, z_t)\\\end{split}\]</div>
+<p>Ray line equation depending on ray parameter <span class="math notranslate nohighlight">\(t\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-pt">
+<span class="eqno">(5.43)<a class="headerlink" href="#equation-pt" title="Link to this equation">#</a></span>\[\vec{p_t}(t)=\vec{p}_{0}+t \cdot \vec{s}\]</div>
+<p>Cost function <span class="math notranslate nohighlight">\(G\)</span> with surface function <span class="math notranslate nohighlight">\(f\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-g">
+<span class="eqno">(5.44)<a class="headerlink" href="#equation-g" title="Link to this equation">#</a></span>\[G(t)=z_{t}-f\left(x_{t}, y_{t}\right)\]</div>
+<p>The parameters <span class="math notranslate nohighlight">\(x_t,y_t,z_t\)</span> can be determined from equation <a class="reference internal" href="#equation-pt">(5.43)</a>.
+For the position determination of the hit, the root of this scalar function <span class="math notranslate nohighlight">\(G\)</span> must now be found.
+Typical optimization algorithms are suitable for this purpose.</p>
+<p>However, these have the disadvantage that they do not have a guaranteed convergence.
+Therefore, the ray tracer uses the Regula-Falsi method.
+This is a simple iterative method, which is guaranteed to converge superlinearly with a slight modification.
+The prerequisite for the procedure is, however, that an interval with a root is known.
+Since the minimum and maximum extent of the surface in the z-direction in the raytracer is known, this criterion is given, because a hit can only occur within this range. The method basically works by trying to shrink the interval including the function root in every iteration.
+A well-written explanation can be found in <a class="footnote-reference brackets" href="#footcite-regulafalsiwiki" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>.</p>
+<p>Now, in some cases the interval may hardly decrease in size from one iteration to the next.
+To prevent slow convergence the procedure is therefore extended to the so called Illinois algorithm, which is explained in <a class="footnote-reference brackets" href="#footcite-illinoisalgowiki" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>.</p>
+<p>The implementation in optrace differs only in parallelizing the optimization and only iterating the next step with not already converged rays.</p>
+</section>
+</section>
+<section id="normal-calculation">
+<h2><span class="section-number">5.2.9. </span>Normal Calculation<a class="headerlink" href="#normal-calculation" title="Link to this heading">#</a></h2>
+<section id="general">
+<h3><span class="section-number">5.2.9.1. </span>General<a class="headerlink" href="#general" title="Link to this heading">#</a></h3>
+<p>Surface normals are required to calculate the refraction, polarization and transmittance of a ray.
+Equation for an analytical, unnormalized normal vector: <a class="footnote-reference brackets" href="#footcite-normalwiki" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-normal-general">
+<span class="eqno">(5.45)<a class="headerlink" href="#equation-normal-general" title="Link to this equation">#</a></span>\[\begin{split}\vec{n} =
+\begin{pmatrix}
+     -\frac{\partial z}{\partial x}\\
+     -\frac{\partial z}{\partial y}\\
+     1\\
+\end{pmatrix}\end{split}\]</div>
+<p>The vector needs to be normalized:</p>
+<div class="math notranslate nohighlight" id="equation-normal-numerical-norm">
+<span class="eqno">(5.46)<a class="headerlink" href="#equation-normal-numerical-norm" title="Link to this equation">#</a></span>\[\vec{n}_0 = \frac{\vec{n}}{|| \vec{n} ||}\]</div>
+</section>
+<section id="planar-surfaces">
+<h3><span class="section-number">5.2.9.2. </span>Planar Surfaces<a class="headerlink" href="#planar-surfaces" title="Link to this heading">#</a></h3>
+<p>For surface types <strong>Rectangle</strong>, <strong>Circle</strong> and <strong>Ring</strong> <span class="math notranslate nohighlight">\(n\)</span> is simply <span class="math notranslate nohighlight">\(n = (0, 0, 1)\)</span>.
+Surface type <strong>TiltedSurface</strong> provides a user specified value for <span class="math notranslate nohighlight">\(n\)</span>, which is normalized internally.</p>
+</section>
+<section id="asphere">
+<h3><span class="section-number">5.2.9.3. </span>Asphere<a class="headerlink" href="#asphere" title="Link to this heading">#</a></h3>
+<p>The radial derivative of an asphere equation &lt;&gt; is</p>
+<div class="math notranslate nohighlight" id="equation-asphere-deriv">
+<span class="eqno">(5.47)<a class="headerlink" href="#equation-asphere-deriv" title="Link to this equation">#</a></span>\[m_r = \frac{\partial z}{\partial r} = \frac{\rho r}{\sqrt{1 - (k+1)\rho^2 r^2}} + \sum_{i=1}^{m}  2i \cdot  a_i \cdot r^{2i - 1} = \tan \alpha\]</div>
+<p>This radial component needs to be rotated around the vector <span class="math notranslate nohighlight">\((0, 0, 1)\)</span> by the angle <span class="math notranslate nohighlight">\(\phi\)</span>.
+According to the general normal calculation &lt;&gt; the x- and y- components of the unnormalized vector are:</p>
+<div class="math notranslate nohighlight" id="equation-normal-general-asph">
+<span class="eqno">(5.48)<a class="headerlink" href="#equation-normal-general-asph" title="Link to this equation">#</a></span>\[\begin{split}\frac{\partial z}{\partial x} &amp;= m_r \cos \phi\\
+ \frac{\partial z}{\partial y} &amp;= m_r \sin \phi\\\end{split}\]</div>
+<p>Which can be applied to equation &lt;&gt; above.</p>
+</section>
+<section id="conic-surface">
+<h3><span class="section-number">5.2.9.4. </span>Conic Surface<a class="headerlink" href="#conic-surface" title="Link to this heading">#</a></h3>
+<p>The derivative of the conic function is a simplifcation of the asphere case, where the polynomials are missing:</p>
+<div class="math notranslate nohighlight" id="equation-conic-derivative">
+<span class="eqno">(5.49)<a class="headerlink" href="#equation-conic-derivative" title="Link to this equation">#</a></span>\[m_r = \frac{\rho r}{\sqrt{1 - (k+1)\rho^2 r^2}}\]</div>
+<p><span class="math notranslate nohighlight">\(m_r\)</span> is equivalent to <span class="math notranslate nohighlight">\(\tan \alpha\)</span>, the tangens of angle between surface normal and vector <span class="math notranslate nohighlight">\((0, 0, 1)\)</span>.
+By using geometrical relations, <span class="math notranslate nohighlight">\(\sin \alpha\)</span> can be calculated, which provides the radial component <span class="math notranslate nohighlight">\(n_r\)</span> of the normalized normal vector:</p>
+<div class="math notranslate nohighlight" id="equation-conic-nr">
+<span class="eqno">(5.50)<a class="headerlink" href="#equation-conic-nr" title="Link to this equation">#</a></span>\[n_r = -\sin{\alpha} = -\frac{m_r}{\sqrt{m_r^2+1}} = -\frac{\rho r}{\sqrt{1- k\rho^2 r^2}}\]</div>
+<p>The normalized vector <span class="math notranslate nohighlight">\(n\)</span> for the <strong>ConicSurface</strong> is then:</p>
+<div class="math notranslate nohighlight" id="equation-conic-n">
+<span class="eqno">(5.51)<a class="headerlink" href="#equation-conic-n" title="Link to this equation">#</a></span>\[\begin{split}\vec{n} =
+\begin{pmatrix}
+   n_r \cos \phi\\
+   n_r \sin \phi\\
+   \sqrt{1- n_r^2}
+\end{pmatrix}\end{split}\]</div>
+<p>For a <strong>SphericalSurface</strong> this simplifies further to:</p>
+<div class="math notranslate nohighlight" id="equation-sphere-n">
+<span class="eqno">(5.52)<a class="headerlink" href="#equation-sphere-n" title="Link to this equation">#</a></span>\[\begin{split}\vec{n} =
+\begin{pmatrix}
+     -\rho r \cos \phi \\
+     -\rho {}r \sin \phi\\
+     \sqrt{ 1 - \rho^2 r^2}\\
+\end{pmatrix}\end{split}\]</div>
+</section>
+<section id="functionsurface">
+<h3><span class="section-number">5.2.9.5. </span>FunctionSurface<a class="headerlink" href="#functionsurface" title="Link to this heading">#</a></h3>
+<p>For types <strong>FunctionSurface1D</strong>, <strong>FunctionSurface2D</strong> the derivatives needed for the normal vector are calculated numerically.
+One exception is the case, where a derivative function was provided to the object.</p>
+<p>The central first derivative has the form:</p>
+<div class="math notranslate nohighlight" id="equation-central-first-deric">
+<span class="eqno">(5.53)<a class="headerlink" href="#equation-central-first-deric" title="Link to this equation">#</a></span>\[f'(x) = \frac{f(x+\varepsilon) - f(x-\varepsilon)}{2 \varepsilon}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\frac{\partial z}{\partial x} &amp;\approx \frac{z(x + \varepsilon, ~y) - z(x - \varepsilon, ~y)}{2\varepsilon}\\
+\frac{\partial z}{\partial y} &amp;\approx \frac{z(x, ~y + \varepsilon) - z(x, ~y - \varepsilon)}{2\varepsilon}\\\end{split}\]</div>
+<p>In the case of a <strong>FunctionSurface1D</strong> both derivatives are equal and only one value needs to be calculated.
+The step width is chosen as maximum of optimal step width <span class="math notranslate nohighlight">\(\varepsilon_\text{o}\)</span> and minimal positional step width <span class="math notranslate nohighlight">\(\varepsilon_\text{p}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eps-selection">
+<span class="eqno">(5.54)<a class="headerlink" href="#equation-eps-selection" title="Link to this equation">#</a></span>\[\varepsilon = \max (\varepsilon_\text{o}, ~\varepsilon_\text{n})\]</div>
+<p>The optimal step width is <a class="footnote-reference brackets" href="#footcite-diffintmorken" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a>:</p>
+<div class="math notranslate nohighlight" id="equation-optimal-step-width">
+<span class="eqno">(5.55)<a class="headerlink" href="#equation-optimal-step-width" title="Link to this equation">#</a></span>\[\varepsilon_\text{o} = \sqrt[3]{3 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(3)}(x)} \right|}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\varepsilon_\text{f}\)</span> being the machine precision for the used floating type.
+Expecting mostly spherical surfaces, the main function component is <span class="math notranslate nohighlight">\(x^2\)</span>.
+Higher polynomial orders are less prominent, so one valid assumption can be <span class="math notranslate nohighlight">\(\left| \frac{f(x)}{f^{(3)}(x)} \right| = 50\)</span>.
+While this might be different for every function, due to the forth root a quotient being 1000 times larger only leads to a change of around factor <span class="math notranslate nohighlight">\(10\)</span> in <span class="math notranslate nohighlight">\(\varepsilon_\text{0}\)</span>.
+With <span class="math notranslate nohighlight">\(\varepsilon_\text{f} \approx 2.22\cdot 10^{-16}\)</span> for a 64bit floating point number, we get <span class="math notranslate nohighlight">\(\varepsilon_\text{o} \approx 3.22 \cdot 10^{-5}\)</span>.
+Optrace units are given in millimeters, so this is equivalent to a value of <span class="math notranslate nohighlight">\(32.2\,\)</span> nm.</p>
+<p>Not only differences in <span class="math notranslate nohighlight">\(f\)</span> need to be representable, but <span class="math notranslate nohighlight">\(x+\varepsilon\)</span> needs to be different from <span class="math notranslate nohighlight">\(x\)</span>.
+For this it must be ensured, that <span class="math notranslate nohighlight">\(x+ \varepsilon &gt; x (1 + \varepsilon_\text{f})\)</span> for every coordinate <span class="math notranslate nohighlight">\(x\)</span> on the surface.
+With <span class="math notranslate nohighlight">\(r_\text{max}\)</span> being the largest absolute distance on the surface the minimal bound is</p>
+<div class="math notranslate nohighlight" id="equation-machine-eps-scaling">
+<span class="eqno">(5.56)<a class="headerlink" href="#equation-machine-eps-scaling" title="Link to this equation">#</a></span>\[\varepsilon_\text{p} = r_\text{max} ~\varepsilon_\text{f}\]</div>
+<p>It is recommended to center the surface at <span class="math notranslate nohighlight">\(x=0\)</span> before differentiation so <span class="math notranslate nohighlight">\(r_\text{max}\)</span> is minimal.</p>
+</section>
+<section id="datasurface">
+<h3><span class="section-number">5.2.9.6. </span>DataSurface<a class="headerlink" href="#datasurface" title="Link to this heading">#</a></h3>
+<p>lorem ipsum</p>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id12">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-optikhaferkorn" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Heinz Haferkorn. <em>Optik - physikalisch-technische Grundlagen und Anwendungen</em>. Wiley-VCH, 4 edition, 2008.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-greve-2006" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Bram de Greve. Reflections and refractions in ray tracing. 11 2006. URL: <a class="reference external" href="https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf">https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006–degreve–reflection_refraction.pdf</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-yun-11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Garam Yun, Karlton Crabtree, and Russell A. Chipman. Three-dimensional polarization ray-tracing calculus I: definition and diattenuation. <em>Appl. Opt.</em>, 50(18):2855–2865, Jun 2011. URL: <a class="reference external" href="https://opg.optica.org/ao/abstract.cfm?URI=ao-50-18-2855">https://opg.optica.org/ao/abstract.cfm?URI=ao-50-18-2855</a>, <a class="reference external" href="https://doi.org/10.1364/AO.50.002855">doi:10.1364/AO.50.002855</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-fresnelwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Fresnelsche Formeln. 2021. URL: <a class="reference external" href="https://de.wikipedia.org/wiki/Fresnelsche_Formeln">https://de.wikipedia.org/wiki/Fresnelsche_Formeln</a> (visited on 2021-10-14).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-kaschke2014" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>Michael Kaschke, Karl-Heinz Donnerhacke, and Michael Stefan Rill. A: Basics of Optics. In <em>Optical Devices in Ophthalmology and Optometry</em>, pages 481–548. Wiley-VCH Verlag GmbH &amp; Co. KGaA, mar 2014. <a class="reference external" href="https://doi.org/10.1002/9783527648962.app1">doi:10.1002/9783527648962.app1</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-bruls2015659" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p>G.J.C.L. Bruls. Exact formulas for a thin-lens system with an arbitrary number of lenses. <em>Optik</em>, 126(6):659–662, 2015. <a class="reference external" href="https://doi.org/https://doi.org/10.1016/j.ijleo.2015.01.035">doi:https://doi.org/10.1016/j.ijleo.2015.01.035</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-boussemaere-2021-8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">7</a><span class="fn-bracket">]</span></span>
+<p>Luc Boussemaere. #DevOptical Part 8: raytracing 101. 2021. URL: <a class="reference external" href="https://www.thepulsar.be/article/-devoptical-part-8--raytracing-101/">https://www.thepulsar.be/article/-devoptical-part-8–raytracing-101/</a> (visited on 2025-03-11).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-regulafalsiwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">8</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Regula falsi. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Regula_falsi">https://en.wikipedia.org/wiki/Regula_falsi</a> (visited on 2022-12-05).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-illinoisalgowiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">9</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Illinois-, Pegasus- und Anderson/Björck-Verfahren. 2022. URL: <a class="reference external" href="https://de.wikipedia.org/wiki/Regula_falsi#Illinois-,_Pegasus-_und_Anderson/Bj%C3%B6rck-Verfahren">https://de.wikipedia.org/wiki/Regula_falsi#Illinois-,_Pegasus-_und_Anderson/Bj%C3%B6rck-Verfahren</a> (visited on 2022-12-05).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-normalwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">10</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Normal (geometry). 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Normal_(geometry)">https://en.wikipedia.org/wiki/Normal_(geometry)</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-diffintmorken" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">11</a><span class="fn-bracket">]</span></span>
+<p>Knut Martin Mørken. Numerical Differentiation and Integration. 2008. URL: <a class="reference external" href="https://web.archive.org/web/20241122223920/https://www.uio.no/studier/emner/matnat/math/MAT-INF1100/h08/kompendiet/diffint.pdf">https://web.archive.org/web/20241122223920/https://www.uio.no/studier/emner/matnat/math/MAT-INF1100/h08/kompendiet/diffint.pdf</a> (visited on 2025-03-05).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sampling.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">5.1. </span>Property Sampling</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="image_spectrum.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">5.3. </span>Image and Spectrum Rendering</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-process">5.2.1. Tracing Process</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refraction">5.2.2. Refraction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#polarization">5.2.3. Polarization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transmission">5.2.4. Transmission</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refraction-at-an-ideal-lens">5.2.5. Refraction at an Ideal Lens</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#filtering">5.2.6. Filtering</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometry-checks">5.2.7. Geometry Checks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intersection-calculation">5.2.8. Intersection Calculation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#surface-extension">5.2.8.1. Surface Extension</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intersection-of-a-ray-with-a-plane">5.2.8.2. Intersection of a Ray with a Plane</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intersection-of-a-ray-with-a-conic-surface">5.2.8.3. Intersection of a Ray with a Conic Surface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-hit-search">5.2.8.4. Numerical Hit Search</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#normal-calculation">5.2.9. Normal Calculation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#general">5.2.9.1. General</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#planar-surfaces">5.2.9.2. Planar Surfaces</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#asphere">5.2.9.3. Asphere</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conic-surface">5.2.9.4. Conic Surface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#functionsurface">5.2.9.5. FunctionSurface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datasurface">5.2.9.6. DataSurface</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Damian Mendroch.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

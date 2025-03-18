@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.3. Elements (Lens, Ray Source, …) &#8212; optrace 1.6.4 documentation</title>
+    <title>4.3. Elements (Lens, Ray Source, …) &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -112,7 +112,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -148,14 +148,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -169,14 +169,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -295,28 +295,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -421,7 +421,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.3. </span>Elements (Lens, Ray Source,  …)</span></li>
   </ul>
@@ -446,7 +446,7 @@
 <h2><span class="section-number">4.3.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <section id="types">
 <h3><span class="section-number">4.3.1.1. </span>Types<a class="headerlink" href="#types" title="Link to this heading">#</a></h3>
-<p>In optrace the class <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> denotes an object which has 0-2 surfaces and belongs to the tracing geometry.</p>
+<p>In optrace the class <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> denotes an object which has 0-2 surfaces and belongs to the tracing geometry.</p>
 <p><strong>Tracing Elements</strong></p>
 <p>Tracing elements are Elements with direct ray interaction:</p>
 <div class="pst-scrollable-table-container"><table class="table table-left">
@@ -455,19 +455,19 @@
 <col style="width: 80.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a></p></td>
 <td><p>An element with a light emitting surface</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a></p></td>
 <td><p>An element with two surfaces on which light is refracted.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a></p></td>
 <td><p>A Lens, except that it has a planar surface and refracts light without aberrations</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p></td>
 <td><p>Element with a surface on which wavelength-dependent filtering takes place.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture" title="optrace.tracer.geometry.aperture.Aperture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aperture</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture" title="optrace.tracer.geometry.aperture.Aperture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aperture</span></code></a></p></td>
 <td><p>Similar to a Filter, except that incident light is completely absorbed.</p></td>
 </tr>
 </tbody>
@@ -481,7 +481,7 @@
 <col style="width: 80.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector" title="optrace.tracer.geometry.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Detector</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector" title="optrace.tracer.geometry.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Detector</span></code></a></p></td>
 <td><p>Element with a single surface on which images or spectra can be rendered</p></td>
 </tr>
 </tbody>
@@ -495,10 +495,10 @@
 <col style="width: 80.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.point_marker.PointMarker" title="optrace.tracer.geometry.marker.point_marker.PointMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointMarker</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.point_marker.PointMarker" title="optrace.tracer.geometry.marker.point_marker.PointMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointMarker</span></code></a></p></td>
 <td><p>Element consisting of a point and a label</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker" title="optrace.tracer.geometry.marker.line_marker.LineMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LineMarker</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker" title="optrace.tracer.geometry.marker.line_marker.LineMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LineMarker</span></code></a></p></td>
 <td><p>Element consisting of a line and a label</p></td>
 </tr>
 </tbody>
@@ -512,13 +512,13 @@
 <col style="width: 80.0%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume" title="optrace.tracer.geometry.volume.box_volume.BoxVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoxVolume</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume" title="optrace.tracer.geometry.volume.box_volume.BoxVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoxVolume</span></code></a></p></td>
 <td><p>Volume of a box or cube</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume" title="optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">CylinderVolume</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume" title="optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">CylinderVolume</span></code></a></p></td>
 <td><p>Cylinder volume with the symmetry axis in direction of the optical axis</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.sphere_volume.SphereVolume" title="optrace.tracer.geometry.volume.sphere_volume.SphereVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphereVolume</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.sphere_volume.SphereVolume" title="optrace.tracer.geometry.volume.sphere_volume.SphereVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphereVolume</span></code></a></p></td>
 <td><p>A spherical volume</p></td>
 </tr>
 </tbody>
@@ -527,7 +527,7 @@
 </section>
 <section id="shared-functions-properties">
 <span id="element-geometry-props"></span><h3><span class="section-number">4.3.1.2. </span>Shared Functions/Properties<a class="headerlink" href="#shared-functions-properties" title="Link to this heading">#</a></h3>
-<p>All subclasses of <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> share the following methods and properties.</p>
+<p>All subclasses of <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> share the following methods and properties.</p>
 <p><strong>Position</strong></p>
 <p>The position of the element is accessed using:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pos</span> <span class="o">=</span> <span class="n">El</span><span class="o">.</span><span class="n">pos</span>
@@ -568,7 +568,7 @@ Doing so, the order of front and back surface is reversed and each surface also 
 <h2><span class="section-number">4.3.2. </span>RaySource<a class="headerlink" href="#raysource" title="Link to this heading">#</a></h2>
 <section id="id1">
 <h3><span class="section-number">4.3.2.1. </span>Overview<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a> defines the properties for rays it creates, including</p>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a> defines the properties for rays it creates, including</p>
 <ul class="simple">
 <li><p>Emitting surface/point/line</p></li>
 <li><p>Light distribution on this area</p></li>
@@ -636,7 +636,7 @@ This parameter takes two numpy arrays containing the x and y-position and return
 </section>
 <section id="spectrum-parameter">
 <h3><span class="section-number">4.3.2.6. </span>Spectrum Parameter<a class="headerlink" href="#spectrum-parameter" title="Link to this heading">#</a></h3>
-<p>A <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object is provided with the <code class="code highlight python docutils literal highlight-python"><span class="n">spectrum</span></code> parameter.
+<p>A <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object is provided with the <code class="code highlight python docutils literal highlight-python"><span class="n">spectrum</span></code> parameter.
 For instance, this can be a predefined spectrum:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d75</span><span class="p">)</span>
 </pre></div>
@@ -677,8 +677,8 @@ This function must take angular values in radians up to <code class="code highli
 <section id="image-parameter">
 <h3><span class="section-number">4.3.2.8. </span>Image Parameter<a class="headerlink" href="#image-parameter" title="Link to this heading">#</a></h3>
 <p>Alternatively to a uniformly emitting area, there is a way to provide light distributions (modelled by images).</p>
-<p>This emitting surface needs to be a <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> or <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> object.
-A <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a> emitting this image will be created automatically.
+<p>This emitting surface needs to be a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> or <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> object.
+A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a> emitting this image will be created automatically.
 Its size will be equal to the side lengths of the image.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">image</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">landscape</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
@@ -692,7 +692,7 @@ Its size will be equal to the side lengths of the image.</p>
 <span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Every image color generates a specific physical spectrum matching its color. This spectrum is a linear combination of the sRGB primaries in <a class="reference internal" href="../math/color.html#random-srgb"><span class="std std-numref">Section 5.8.5</span></a>.</p>
+<p>Every image color generates a specific physical spectrum matching its color. This spectrum is a linear combination of the sRGB primaries in <a class="reference internal" href="../details/color.html#random-srgb"><span class="std std-numref">Section 5.7.5</span></a>.</p>
 <p>With <code class="code highlight python docutils literal highlight-python"><span class="n">image</span></code> specified the <code class="code highlight python docutils literal highlight-python"><span class="n">spectrum</span></code> parameter won’t be used.</p>
 </section>
 <section id="polarization-parameter">
@@ -725,7 +725,7 @@ The polarization direction is defined by an angle inside the plane perpendicular
 </div>
 <p>Lastly, a user defined function is set with  <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span></code> and the <code class="code highlight python docutils literal highlight-python"><span class="n">pol_func</span></code> parameter.
 This parameter takes angles in range <span class="math notranslate nohighlight">\([0, ~2 \pi]\)</span> and returns a normalized or unnormalized probability.</p>
-<p>Above we talked how for instance for <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;x&quot;</span></code> the rays are parallel to the x-axis. However, depending on their actual ray orientation this isn’t always the case. Read about what the angles mean for rays not parallel to the optical axis in <a class="reference internal" href="../math/sampling.html#polarization-sampling"><span class="std std-numref">Section 5.1.13</span></a>.</p>
+<p>Above we talked how for instance for <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;x&quot;</span></code> the rays are parallel to the x-axis. However, depending on their actual ray orientation this isn’t always the case. Read about what the angles mean for rays not parallel to the optical axis in <a class="reference internal" href="../details/sampling.html#polarization-sampling"><span class="std std-numref">Section 5.1.8</span></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">pol_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ang</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">ang</span> <span class="o">-</span> <span class="mi">30</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -735,7 +735,7 @@ This parameter takes angles in range <span class="math notranslate nohighlight">
 <span id="usage-lens"></span><h2><span class="section-number">4.3.3. </span>Lens<a class="headerlink" href="#lens" title="Link to this heading">#</a></h2>
 <section id="id2">
 <h3><span class="section-number">4.3.3.1. </span>Overview<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> consists of two surfaces and a medium with a <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex" title="optrace.tracer.refraction_index.RefractionIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">RefractionIndex</span></code></a> inbetween.
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> consists of two surfaces and a medium with a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex" title="optrace.tracer.refraction_index.RefractionIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">RefractionIndex</span></code></a> inbetween.
 Additionally, the position and a thickness parameter is required.</p>
 </section>
 <section id="example">
@@ -817,7 +817,7 @@ With a Lens object you can also access the thickness parameters:</p>
 <h3><span class="section-number">4.3.3.4. </span>Paraxial Properties<a class="headerlink" href="#paraxial-properties" title="Link to this heading">#</a></h3>
 <p>Paraxial analysis by using transfer matrix is described in <a class="reference internal" href="tma.html#usage-tma"><span class="std std-numref">Section 4.10</span></a>.
 As for a setup of many lenses, we can also do paraxial analysis on a simple lens.
-To create a ray transfer matrix analysis object (<a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object) we call the member function <code class="code highlight python docutils literal highlight-python"><span class="n">tma</span><span class="p">()</span></code>.</p>
+To create a ray transfer matrix analysis object (<a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object) we call the member function <code class="code highlight python docutils literal highlight-python"><span class="n">tma</span><span class="p">()</span></code>.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">tma</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">efl</span>
 <span class="go">12.749973...</span>
@@ -835,7 +835,7 @@ By default, a constant refractive index of 1 is assumed, but can be overwritten 
 </section>
 <section id="ideal-lens">
 <h2><span class="section-number">4.3.4. </span>Ideal Lens<a class="headerlink" href="#ideal-lens" title="Link to this heading">#</a></h2>
-<p>An <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a> focusses and images light perfectly and without aberrations according to the imaging equation. The geometry is an infinitesimal thin circular area with radius <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code>.
+<p>An <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a> focusses and images light perfectly and without aberrations according to the imaging equation. The geometry is an infinitesimal thin circular area with radius <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code>.
 Additionally, the optical power <code class="code highlight python docutils literal highlight-python"><span class="n">D</span></code> and a position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> need to be provided.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">IL</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">IdealLens</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">9.5</span><span class="p">])</span>
 </pre></div>
@@ -849,8 +849,8 @@ Note that this does not change the optical power or focal length, as they are co
 </section>
 <section id="filter">
 <h2><span class="section-number">4.3.5. </span>Filter<a class="headerlink" href="#filter" title="Link to this heading">#</a></h2>
-<p>When light hits a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a>, the ray power is transmitted according to the filter’s transmittance function.</p>
-<p>A Filter is defined by a Surface, a position and the <a class="reference internal" href="../library/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a>.</p>
+<p>When light hits a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a>, the ray power is transmitted according to the filter’s transmittance function.</p>
+<p>A Filter is defined by a Surface, a position and the <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="n">wl0</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">wl1</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="n">circ</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">23.93</span><span class="p">],</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">spec</span><span class="p">)</span>
@@ -874,8 +874,8 @@ An example are rays far outside of a normal distribution.</p>
 </section>
 <section id="aperture">
 <h2><span class="section-number">4.3.6. </span>Aperture<a class="headerlink" href="#aperture" title="Link to this heading">#</a></h2>
-<p>An <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture" title="optrace.tracer.geometry.aperture.Aperture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aperture</span></code></a> is just a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a> that absorbs light completely for rays that hit it.
-In the most common use cases a <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RingSurface</span></code></a> is employed as Aperture surface.
+<p>An <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture" title="optrace.tracer.geometry.aperture.Aperture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aperture</span></code></a> is just a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a> that absorbs light completely for rays that hit it.
+In the most common use cases a <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RingSurface</span></code></a> is employed as Aperture surface.
 As for all other elements, we also need to specify the position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ring</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RingSurface</span><span class="p">(</span><span class="n">ri</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">AP</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Aperture</span><span class="p">(</span><span class="n">ring</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">10.1</span><span class="p">])</span>
@@ -884,7 +884,7 @@ As for all other elements, we also need to specify the position <code class="cod
 </section>
 <section id="detector">
 <h2><span class="section-number">4.3.7. </span>Detector<a class="headerlink" href="#detector" title="Link to this heading">#</a></h2>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector" title="optrace.tracer.geometry.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Detector</span></code></a> enables the rendering of images and spectra on its geometry.
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector" title="optrace.tracer.geometry.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Detector</span></code></a> enables the rendering of images and spectra on its geometry.
 But by itself, it has no effect on raytracing.</p>
 <p>It takes a surface parameter and the position parameter as arguments.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rect</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RectangularSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">])</span>
@@ -896,9 +896,9 @@ But by itself, it has no effect on raytracing.</p>
 <h2><span class="section-number">4.3.8. </span>Markers<a class="headerlink" href="#markers" title="Link to this heading">#</a></h2>
 <section id="pointmarker">
 <h3><span class="section-number">4.3.8.1. </span>PointMarker<a class="headerlink" href="#pointmarker" title="Link to this heading">#</a></h3>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.point_marker.PointMarker" title="optrace.tracer.geometry.marker.point_marker.PointMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointMarker</span></code></a> annotates positions or elements inside the tracing geometry.
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.point_marker.PointMarker" title="optrace.tracer.geometry.marker.point_marker.PointMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointMarker</span></code></a> annotates positions or elements inside the tracing geometry.
 As all markers, is has no influence on the tracing process.</p>
-<p>In the simplest case a <code class="code highlight python docutils literal highlight-python"><span class="n">PointMarker</span></code> is defined with a text string and a position for the <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>.</p>
+<p>In the simplest case a <code class="code highlight python docutils literal highlight-python"><span class="n">PointMarker</span></code> is defined with a text string and a position for the <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">PointMarker</span><span class="p">(</span><span class="s2">&quot;Text132&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -917,7 +917,7 @@ As all markers, is has no influence on the tracing process.</p>
 </section>
 <section id="linemarker">
 <h3><span class="section-number">4.3.8.2. </span>LineMarker<a class="headerlink" href="#linemarker" title="Link to this heading">#</a></h3>
-<p>Similarly, a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker" title="optrace.tracer.geometry.marker.line_marker.LineMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LineMarker</span></code></a> is a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a> in the xy-plane with a text annotation.</p>
+<p>Similarly, a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker" title="optrace.tracer.geometry.marker.line_marker.LineMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LineMarker</span></code></a> is a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a> in the xy-plane with a text annotation.</p>
 <p>In the simplest case a <code class="code highlight python docutils literal highlight-python"><span class="n">LineMarker</span></code> is defined by a text string, radius, angle and a position.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LineMarker</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Text132&quot;</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
 </pre></div>
@@ -936,7 +936,7 @@ As all markers, is has no influence on the tracing process.</p>
 <h2><span class="section-number">4.3.9. </span>Volumes<a class="headerlink" href="#volumes" title="Link to this heading">#</a></h2>
 <section id="boxvolume">
 <h3><span class="section-number">4.3.9.1. </span>BoxVolume<a class="headerlink" href="#boxvolume" title="Link to this heading">#</a></h3>
-<p>As for a <a class="reference internal" href="../library/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a>, the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">dim</span></code> defines the x- and y-side lengths in the lateral plane. Parameter <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> describes the center of this rectangle. For a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume" title="optrace.tracer.geometry.volume.box_volume.BoxVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoxVolume</span></code></a> this surface gets extended by length <code class="code highlight python docutils literal highlight-python"><span class="n">length</span></code> in positive z-direction, forming a three-dimensional volume.</p>
+<p>As for a <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a>, the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">dim</span></code> defines the x- and y-side lengths in the lateral plane. Parameter <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> describes the center of this rectangle. For a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume" title="optrace.tracer.geometry.volume.box_volume.BoxVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoxVolume</span></code></a> this surface gets extended by length <code class="code highlight python docutils literal highlight-python"><span class="n">length</span></code> in positive z-direction, forming a three-dimensional volume.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ot</span><span class="o">.</span><span class="n">BoxVolume</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">length</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -947,7 +947,7 @@ As all markers, is has no influence on the tracing process.</p>
 </section>
 <section id="spherevolume">
 <h3><span class="section-number">4.3.9.2. </span>SphereVolume<a class="headerlink" href="#spherevolume" title="Link to this heading">#</a></h3>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.sphere_volume.SphereVolume" title="optrace.tracer.geometry.volume.sphere_volume.SphereVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphereVolume</span></code></a> is defined by its center position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> and the sphere radius <code class="code highlight python docutils literal highlight-python"><span class="n">R</span></code>:</p>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.sphere_volume.SphereVolume" title="optrace.tracer.geometry.volume.sphere_volume.SphereVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphereVolume</span></code></a> is defined by its center position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> and the sphere radius <code class="code highlight python docutils literal highlight-python"><span class="n">R</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ot</span><span class="o">.</span><span class="n">SphereVolume</span><span class="p">(</span><span class="n">R</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -958,7 +958,7 @@ As all markers, is has no influence on the tracing process.</p>
 </section>
 <section id="cylindervolume">
 <h3><span class="section-number">4.3.9.3. </span>CylinderVolume<a class="headerlink" href="#cylindervolume" title="Link to this heading">#</a></h3>
-<p>A <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume" title="optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">CylinderVolume</span></code></a> is defined by its front surface center position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> and the cylinder radius <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code>:</p>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume" title="optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">CylinderVolume</span></code></a> is defined by its front surface center position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> and the cylinder radius <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ot</span><span class="o">.</span><span class="n">CylinderVolume</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -969,7 +969,7 @@ As all markers, is has no influence on the tracing process.</p>
 </section>
 <section id="custom-volumes">
 <h3><span class="section-number">4.3.9.4. </span>Custom Volumes<a class="headerlink" href="#custom-volumes" title="Link to this heading">#</a></h3>
-<p>A custom <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.volume.Volume" title="optrace.tracer.geometry.volume.volume.Volume"><code class="xref py py-class docutils literal notranslate"><span class="pre">Volume</span></code></a> makes it possible to define user-defined volumes. It requires a front and back surface as parameter, as well as a position and the thickness distances <code class="code highlight python docutils literal highlight-python"><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span></code>. These have the same meaning as for a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> in <a class="reference internal" href="#usage-lens-thickness"><span class="std std-numref">Section 4.3.3.3</span></a>.</p>
+<p>A custom <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.volume.Volume" title="optrace.tracer.geometry.volume.volume.Volume"><code class="xref py py-class docutils literal notranslate"><span class="pre">Volume</span></code></a> makes it possible to define user-defined volumes. It requires a front and back surface as parameter, as well as a position and the thickness distances <code class="code highlight python docutils literal highlight-python"><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span></code>. These have the same meaning as for a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> in <a class="reference internal" href="#usage-lens-thickness"><span class="std std-numref">Section 4.3.3.3</span></a>.</p>
 <p>You can find an example below:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">front</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">ConicSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">back</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RectangularSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>

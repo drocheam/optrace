@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>7.2. Documentation &#8212; optrace 1.6.4 documentation</title>
+    <title>7.2. Documentation &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'development/documentation';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="development.html">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -294,28 +294,28 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../usage/usage.html">
+  <a class="nav-link nav-internal" href="../usage/index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="development.html">
+  <a class="nav-link nav-internal" href="index.html">
     Development
   </a>
 </li>
@@ -410,7 +410,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="development.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.2. </span>Documentation</span></li>
   </ul>
@@ -517,7 +517,6 @@ The Sphinx configuration can be found below.</p>
         <span class="s1">&#39;sphinx.ext.mathjax&#39;</span><span class="p">,</span>
         <span class="s1">&#39;sphinx.ext.doctest&#39;</span><span class="p">,</span>
         <span class="s1">&#39;sphinxcontrib.bibtex&#39;</span><span class="p">,</span>
-        <span class="c1"># &#39;sphinxcontrib.inkscapeconverter&#39;,  # convert svg to pdf for latex output</span>
 <span class="p">]</span>
 
 <span class="c1"># Add any paths that contain templates here, relative to this directory.</span>
@@ -574,7 +573,6 @@ The Sphinx configuration can be found below.</p>
 <span class="n">intersphinx_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;python&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;http://docs.python.org/3&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                        <span class="s1">&#39;coverage&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;https://coverage.readthedocs.io/en/latest&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                        <span class="s1">&#39;numpy&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;http://numpy.org/doc/stable&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-                       <span class="s1">&#39;numexpr&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;https://numexpr.readthedocs.io/en/stable&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                        <span class="s1">&#39;pytest&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;https://docs.pytest.org/en/stable&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                        <span class="s1">&#39;scipy&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;http://docs.scipy.org/doc/scipy/&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                        <span class="s1">&#39;traits&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;https://docs.enthought.com/traits/&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
@@ -600,18 +598,20 @@ The Sphinx configuration can be found below.</p>
 <span class="c1"># -- Misc Options -------------------------------------------------</span>
 
 <span class="c1"># ignore links that seemingly only work in a browser and not in automated tests</span>
-<span class="n">linkcheck_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="c1"># &#39;https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.html&#39;,</span>
-                    <span class="s1">&#39;https://doi.org/10.1002/9783527648962.app1&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://www.publicdomainpictures.net/en/view-image.php&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://www.pexels.com/photo/green-2-seat-sofa-1918291/&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://www.pexels.com/photo/documents-on-wooden-surface-95916/&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/&#39;</span><span class="p">,</span>
-                    <span class="c1"># &#39;https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/&#39;,</span>
-                    <span class="s1">&#39;https://doi.org/10.1080/713818864&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;https://doi.org/10.1080/10867651.1997.10487479&#39;</span><span class="p">]</span>
+<span class="n">linkcheck_ignore</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;https://doi.org/10.1002/9783527648962.app1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://www.publicdomainpictures.net/en/view-image.php&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://www.pexels.com/photo/green-2-seat-sofa-1918291/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://www.pexels.com/photo/documents-on-wooden-surface-95916/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://doi.org/10.1080/713818864&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://doi.org/10.1167/8.2.13&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;https://doi.org/10.1080/10867651.1997.10487479&#39;</span>
+<span class="p">]</span>
 
 <span class="n">linkcheck_timeout</span> <span class="o">=</span> <span class="mi">15</span>
 <span class="n">linkcheck_workers</span> <span class="o">=</span> <span class="mi">10</span>

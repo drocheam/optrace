@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.11. PSF Convolution &#8212; optrace 1.6.4 documentation</title>
+    <title>4.11. PSF Convolution &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -112,7 +112,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -148,14 +148,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -169,14 +169,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -295,28 +295,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -421,7 +421,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.11. </span>PSF Convolution</span></li>
   </ul>
@@ -460,15 +460,15 @@ In cases where convolution would be viable a possible approach would be to rende
 </ul>
 <p>Both colored objects and PSFs are supported.
 Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible solutions.
-See the details in section <a class="reference internal" href="../math/convolution.html#psf-color-handling"><span class="std std-numref">Section 5.6.2</span></a>.</p>
+See the details in section <a class="reference internal" href="../details/convolution.html#psf-color-handling"><span class="std std-numref">Section 5.5.2</span></a>.</p>
 </section>
 <section id="usage">
 <h2><span class="section-number">4.11.2. </span>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
 <p><strong>Simple Calls</strong></p>
-<p>A simple call to <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> required the object and PSF, as well as the magnification factor.</p>
-<p>The object should be either of type <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>, while the PSF should be either <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> or <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>.
+<p>A simple call to <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> required the object and PSF, as well as the magnification factor.</p>
+<p>The object should be either of type <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>, while the PSF should be either <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> or <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>.
 For more details on image classes see <a class="reference internal" href="image.html#id1"><span class="std std-numref">Section 4.8.1</span></a>.
-Colored PSFs can be only used with class <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>, as all human visible colors are required for convolution.
+Colored PSFs can be only used with class <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>, as all human visible colors are required for convolution.
 The image objects include the information about their size and position.</p>
 <p>This magnification factor is equivalent the magnification factor known from geometrical optics.
 Therefore <span class="math notranslate nohighlight">\(\lvert m \rvert &gt; 1\)</span> means a magnification and <span class="math notranslate nohighlight">\(\lvert m\rvert &lt; 1\)</span> an image shrinking.
@@ -478,13 +478,13 @@ Therefore <span class="math notranslate nohighlight">\(\lvert m \rvert &gt; 1\)<
 <span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">halo</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You can then call <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> in the following way:</p>
+<p>You can then call <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The function returns the convolved image object <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code>.
-When <code class="code highlight python docutils literal highlight-python"><span class="n">img</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">psf</span></code> are of type <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>, <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is also a <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>.
-For all other cases color information is generated and <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is a <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>.</p>
+When <code class="code highlight python docutils literal highlight-python"><span class="n">img</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">psf</span></code> are of type <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>, <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is also a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a>.
+For all other cases color information is generated and <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>.</p>
 <p><strong>Slicing and Padding</strong></p>
 <p>While doing a convolution, the output image grows in size by half the PSF size in each direction.
 By providing <code class="code highlight python docutils literal highlight-python"><span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span></code> the padded data can be neglected for the resulting image.</p>
@@ -514,13 +514,13 @@ By default it is set to <code class="code highlight python docutils literal high
 </div>
 <p>The above command overrides the <code class="code highlight python docutils literal highlight-python"><span class="n">rendering_intent</span></code> while leaving the other default options unchanged.</p>
 <p><strong>Normalization</strong></p>
-<p>When convolving two <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> objects it is recommended to normalize the PSF integral to 1.
+<p>When convolving two <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.linear_image.LinearImage" title="optrace.tracer.image.linear_image.LinearImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearImage</span></code></a> objects it is recommended to normalize the PSF integral to 1.
 Doing so, the overall power of the image is preserved.</p>
 </section>
 <section id="restrictions">
 <h2><span class="section-number">4.11.3. </span>Restrictions<a class="headerlink" href="#restrictions" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>it is not possible to convolve two <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or two <a class="reference internal" href="../library/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a></p></li>
+<li><p>it is not possible to convolve two <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or two <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a></p></li>
 <li><p>image and PSF resolutions must be between 50x50 pixels and 4 megapixels</p></li>
 <li><p>the PSF needs to be twice as large as the image scaled with the magnification factor</p></li>
 <li><p>when convolving two colored images, the resulting image is only one possible solution of many</p></li>
@@ -532,7 +532,7 @@ Doing so, the overall power of the image is preserved.</p>
 <h2><span class="section-number">4.11.4. </span>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
 <p><strong>Image Example</strong></p>
 <div class="pst-scrollable-table-container"><table class="table-borderless table" id="id1">
-<caption><span class="caption-number">Table 4.14 </span><span class="caption-text">Image convolution from the <a class="reference internal" href="../examples.html#example-psf-imaging"><span class="std std-ref">PSF Imaging</span></a> example</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<caption><span class="caption-number">Table 4.16 </span><span class="caption-text">Image convolution from the <a class="reference internal" href="../examples.html#example-psf-imaging"><span class="std std-ref">PSF Imaging</span></a> example</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
 <tbody>
 <tr class="row-odd"><td><figure class="align-center">
 <a class="dark-light reference internal image-reference" href="../_images/example_psf1.webp"><img alt="../_images/example_psf1.webp" class="dark-light" src="../_images/example_psf1.webp" style="width: 400px;" />
@@ -619,7 +619,7 @@ Parameter <span class="math notranslate nohighlight">\(a\)</span> describes the 
 <section id="preset-gallery">
 <span id="psf-preset-gallery"></span><h2><span class="section-number">4.11.6. </span>Preset Gallery<a class="headerlink" href="#preset-gallery" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table-borderless table" id="id2">
-<caption><span class="caption-number">Table 4.15 </span><span class="caption-text">PSF presets with default parameters. Plotted with human brightness perception.</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
+<caption><span class="caption-number">Table 4.17 </span><span class="caption-text">PSF presets with default parameters. Plotted with human brightness perception.</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
 <tbody>
 <tr class="row-odd"><td><figure class="align-center" id="id3">
 <a class="dark-light reference internal image-reference" href="../_images/psf_circle.svg"><img alt="../_images/psf_circle.svg" class="dark-light" src="../_images/psf_circle.svg" style="width: 400px;" />

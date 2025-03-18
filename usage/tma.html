@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.10. Paraxial Analysis &#8212; optrace 1.6.4 documentation</title>
+    <title>4.10. Paraxial Analysis &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'usage/tma';</script>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -294,28 +294,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -420,7 +420,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.10. </span>Paraxial Analysis</span></li>
   </ul>
@@ -443,14 +443,14 @@
 <span id="usage-tma"></span><h1><span class="section-number">4.10. </span>Paraxial Analysis<a class="headerlink" href="#paraxial-analysis" title="Link to this heading">#</a></h1>
 <section id="overview">
 <h2><span class="section-number">4.10.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
-<p>A ray transfer matrix analysis object <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> allows for the analysis of the paraxial properties of a lens or lens setups.
+<p>A ray transfer matrix analysis object <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> allows for the analysis of the paraxial properties of a lens or lens setups.
 It is computed for the current state of the geometry and stores the properties for a specific wavelength.
 These for instance include focal lengths, nodal points, optical powers and more.</p>
 </section>
 <section id="defining-the-geometry-for-the-analysis">
 <h2><span class="section-number">4.10.2. </span>Defining the Geometry for the Analysis<a class="headerlink" href="#defining-the-geometry-for-the-analysis" title="Link to this heading">#</a></h2>
 <p><strong>Group/Raytracer</strong></p>
-<p>From a <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> with a specific geometry the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object is calculated with the member function <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.tma" title="optrace.tracer.geometry.group.Group.tma"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tma()</span></code></a>.</p>
+<p>From a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> with a specific geometry the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object is calculated with the member function <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.tma" title="optrace.tracer.geometry.group.Group.tma"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tma()</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tma</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">tma</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -458,13 +458,13 @@ These for instance include focal lengths, nodal points, optical powers and more.
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tma</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">tma</span><span class="p">(</span><span class="mi">780</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>For a <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a> object this works in the same way:</p>
+<p>For a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a> object this works in the same way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">arizona_eye</span><span class="p">()</span>
 <span class="n">tma</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">tma</span><span class="p">()</span>
 </pre></div>
 </div>
 <p><strong>Single Lens</strong></p>
-<p>We can also create the analysis object for a single <a class="reference internal" href="../library/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a>:</p>
+<p>We can also create the analysis object for a single <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">front</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">back</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">R</span><span class="o">=-</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refraction_index</span><span class="o">.</span><span class="n">K5</span>
@@ -474,7 +474,7 @@ These for instance include focal lengths, nodal points, optical powers and more.
 </pre></div>
 </div>
 <p>While a single Lens defines the subsequent ambient medium, it has no knowledge on the preceding medium.
-Normally it will be assigned by either the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> or the previous lens.
+Normally it will be assigned by either the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> or the previous lens.
 The same is the case for the medium <code class="code highlight python docutils literal highlight-python"><span class="n">n0</span></code> of the raytracer, which defines all undefined <code class="code highlight python docutils literal highlight-python"><span class="n">Lens</span><span class="o">.</span><span class="n">n2</span></code> media.
 To define it for the TMA, we can provide a <code class="code highlight python docutils literal highlight-python"><span class="n">n0</span></code> parameter.
 Otherwise it defaults to the vacuum properties.</p>
@@ -483,7 +483,7 @@ Otherwise it defaults to the vacuum properties.</p>
 </pre></div>
 </div>
 <p><strong>Multiple Lenses</strong></p>
-<p>Without a specific geometry, we can also create the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object by providing a list of lenses.</p>
+<p>Without a specific geometry, we can also create the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object by providing a list of lenses.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">back2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">R</span><span class="o">=-</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">front2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">n2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refraction_index</span><span class="o">.</span><span class="n">F2</span>
@@ -501,9 +501,9 @@ Otherwise it defaults to the vacuum properties.</p>
 <section id="paraxial-properties">
 <h2><span class="section-number">4.10.3. </span>Paraxial Properties<a class="headerlink" href="#paraxial-properties" title="Link to this heading">#</a></h2>
 <p>The following table provides an overview of supported TMA properties.
-Details on their meaning and calculation are documented in <a class="reference internal" href="../math/matrix_analysis.html#ray-matrix-analysis"><span class="std std-numref">Section 5.5</span></a> and more information on the different definitions for focal lengths and powers in <a class="reference internal" href="../math/matrix_analysis.html#ray-power-def"><span class="std std-numref">Section 5.5.10</span></a>.</p>
+Details on their meaning and calculation are documented in <a class="reference internal" href="../details/matrix_analysis.html#ray-matrix-analysis"><span class="std std-numref">Section 5.4</span></a> and more information on the different definitions for focal lengths and powers in <a class="reference internal" href="../details/matrix_analysis.html#ray-power-def"><span class="std std-numref">Section 5.4.10</span></a>.</p>
 <div class="pst-scrollable-table-container"><table class="table table-center" id="id1">
-<caption><span class="caption-number">Table 4.13 </span><span class="caption-text">Properties of a <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<caption><span class="caption-number">Table 4.15 </span><span class="caption-text">Properties of a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 20.0%" />
 <col style="width: 16.0%" />
@@ -518,92 +518,92 @@ Details on their meaning and calculation are documented in <a class="reference i
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.n1" title="optrace.tracer.transfer_matrix_analysis.TMA.n1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">n1</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.n1" title="optrace.tracer.transfer_matrix_analysis.TMA.n1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">n1</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>refractive index value before the lens setup</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.n2" title="optrace.tracer.transfer_matrix_analysis.TMA.n2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">n2</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.n2" title="optrace.tracer.transfer_matrix_analysis.TMA.n2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">n2</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>refractive index value after the lens setup</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.vertex_points" title="optrace.tracer.transfer_matrix_analysis.TMA.vertex_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vertex_points</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.vertex_points" title="optrace.tracer.transfer_matrix_analysis.TMA.vertex_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">vertex_points</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>front and back position of vertices of the system</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.d" title="optrace.tracer.transfer_matrix_analysis.TMA.d"><code class="xref py py-attr docutils literal notranslate"><span class="pre">d</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.d" title="optrace.tracer.transfer_matrix_analysis.TMA.d"><code class="xref py py-attr docutils literal notranslate"><span class="pre">d</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>thickness, distance between vertex points</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.abcd" title="optrace.tracer.transfer_matrix_analysis.TMA.abcd"><code class="xref py py-attr docutils literal notranslate"><span class="pre">abcd</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.abcd" title="optrace.tracer.transfer_matrix_analysis.TMA.abcd"><code class="xref py py-attr docutils literal notranslate"><span class="pre">abcd</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape (2, 2)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>ABCD matrix</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.principal_points" title="optrace.tracer.transfer_matrix_analysis.TMA.principal_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">principal_points</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.principal_points" title="optrace.tracer.transfer_matrix_analysis.TMA.principal_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">principal_points</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>principal points (z-positions)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.nodal_points" title="optrace.tracer.transfer_matrix_analysis.TMA.nodal_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodal_points</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.nodal_points" title="optrace.tracer.transfer_matrix_analysis.TMA.nodal_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodal_points</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>nodal points (z-positions)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.optical_center" title="optrace.tracer.transfer_matrix_analysis.TMA.optical_center"><code class="xref py py-attr docutils literal notranslate"><span class="pre">optical_center</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.optical_center" title="optrace.tracer.transfer_matrix_analysis.TMA.optical_center"><code class="xref py py-attr docutils literal notranslate"><span class="pre">optical_center</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>optical center (z-position)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_points" title="optrace.tracer.transfer_matrix_analysis.TMA.focal_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focal_points</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_points" title="optrace.tracer.transfer_matrix_analysis.TMA.focal_points"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focal_points</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>focal points (z-positions)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths" title="optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focal_lengths</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths" title="optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focal_lengths</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>focal lengths</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n" title="optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focal_lengths_n</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n" title="optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">focal_lengths_n</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>focal lengths, scaled with refractive index</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.powers" title="optrace.tracer.transfer_matrix_analysis.TMA.powers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">powers</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.powers" title="optrace.tracer.transfer_matrix_analysis.TMA.powers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">powers</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>dpt</p></td>
 <td><p>optical powers of the system</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.powers_n" title="optrace.tracer.transfer_matrix_analysis.TMA.powers_n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">powers_n</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.powers_n" title="optrace.tracer.transfer_matrix_analysis.TMA.powers_n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">powers_n</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code></p></td>
 <td><p>dpt</p></td>
 <td><p>optical powers, scaled with the refractive index</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.efl" title="optrace.tracer.transfer_matrix_analysis.TMA.efl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">efl</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.efl" title="optrace.tracer.transfer_matrix_analysis.TMA.efl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">efl</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>effective focal length of the system</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.efl_n" title="optrace.tracer.transfer_matrix_analysis.TMA.efl_n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">efl_n</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.efl_n" title="optrace.tracer.transfer_matrix_analysis.TMA.efl_n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">efl_n</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>effective focal length, scaled by the refractive index</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.bfl" title="optrace.tracer.transfer_matrix_analysis.TMA.bfl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bfl</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.bfl" title="optrace.tracer.transfer_matrix_analysis.TMA.bfl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bfl</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>back focal length</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.ffl" title="optrace.tracer.transfer_matrix_analysis.TMA.ffl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ffl</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.ffl" title="optrace.tracer.transfer_matrix_analysis.TMA.ffl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ffl</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>mm</p></td>
 <td><p>front focal length</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.wl" title="optrace.tracer.transfer_matrix_analysis.TMA.wl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">wl</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.wl" title="optrace.tracer.transfer_matrix_analysis.TMA.wl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">wl</span></code></a></p></td>
 <td><p><code class="code highlight python docutils literal highlight-python"><span class="nb">float</span></code></p></td>
 <td><p>nm</p></td>
 <td><p>wavelength for the analysis</p></td>
@@ -624,14 +624,14 @@ Details on their meaning and calculation are documented in <a class="reference i
 </section>
 <section id="calculating-image-and-object-distance">
 <h2><span class="section-number">4.10.4. </span>Calculating Image and Object Distance<a class="headerlink" href="#calculating-image-and-object-distance" title="Link to this heading">#</a></h2>
-<p>The method <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.image_position" title="optrace.tracer.transfer_matrix_analysis.TMA.image_position"><code class="xref py py-meth docutils literal notranslate"><span class="pre">image_position</span></code></a> allows for the calculation of an image position.
+<p>The method <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.image_position" title="optrace.tracer.transfer_matrix_analysis.TMA.image_position"><code class="xref py py-meth docutils literal notranslate"><span class="pre">image_position</span></code></a> allows for the calculation of an image position.
 You need to provide an object position:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">image_position</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">)</span>
 <span class="go">72.87925720752206</span>
 </pre></div>
 </div>
 <p>Both input and output value are absolute positions at the optical axis in millimeters.</p>
-<p>Conversely, we can calculate an object position from a known image position with <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.object_position" title="optrace.tracer.transfer_matrix_analysis.TMA.object_position"><code class="xref py py-meth docutils literal notranslate"><span class="pre">object_position</span></code></a>:</p>
+<p>Conversely, we can calculate an object position from a known image position with <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.object_position" title="optrace.tracer.transfer_matrix_analysis.TMA.object_position"><code class="xref py py-meth docutils literal notranslate"><span class="pre">object_position</span></code></a>:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">object_position</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
 <span class="go">-33.84654855214077</span>
 </pre></div>
@@ -658,9 +658,9 @@ For the image position at infinity we get:</p>
 </div>
 <p>A positive factor corresponds to an upright image, a negative to an inverted one.
 A magnitude larger than one implies magnification, a smaller number a size decrease.</p>
-<p>Details on the implementation are described in <a class="reference internal" href="../math/matrix_analysis.html#ray-image-object-distances"><span class="std std-numref">Section 5.5.12</span></a>.</p>
+<p>Details on the implementation are described in <a class="reference internal" href="../details/matrix_analysis.html#ray-image-object-distances"><span class="std std-numref">Section 5.4.12</span></a>.</p>
 <p>Another feature is the calculation of the ABCD matrix for a specific object and image distance.
-The corresponding <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.matrix_at" title="optrace.tracer.transfer_matrix_analysis.TMA.matrix_at"><code class="xref py py-meth docutils literal notranslate"><span class="pre">matrix_at</span></code></a> method requires the object and image position:</p>
+The corresponding <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.matrix_at" title="optrace.tracer.transfer_matrix_analysis.TMA.matrix_at"><code class="xref py py-meth docutils literal notranslate"><span class="pre">matrix_at</span></code></a> method requires the object and image position:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">matrix_at</span><span class="p">(</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span> <span class="mf">80.2</span><span class="p">)</span>
 <span class="go">array([[ -1.16560585, -19.55567495],</span>
 <span class="go">       [ -0.03263119,  -1.40538498]])</span>
@@ -670,20 +670,20 @@ The corresponding <a class="reference internal" href="../library/optrace_tracer.
 <section id="calculation-of-entrance-and-exit-pupils">
 <h2><span class="section-number">4.10.5. </span>Calculation of Entrance and Exit Pupils<a class="headerlink" href="#calculation-of-entrance-and-exit-pupils" title="Link to this heading">#</a></h2>
 <p>Methods for calculating the entrance and exit pupil position and magnifications are also available.
-Details on the math are found in <a class="reference internal" href="../math/matrix_analysis.html#pupil-calculation"><span class="std std-numref">Section 5.5.14</span></a>.</p>
-<p>The following example loads the paraxial eye model from <a class="reference internal" href="../library/optrace_tracer_presets.html#optrace.tracer.presets.geometry.legrand_eye" title="optrace.tracer.presets.geometry.legrand_eye"><code class="xref py py-func docutils literal notranslate"><span class="pre">legrand_eye()</span></code></a> and creates the TMA object:</p>
+Details on the math are found in <a class="reference internal" href="../details/matrix_analysis.html#pupil-calculation"><span class="std std-numref">Section 5.4.14</span></a>.</p>
+<p>The following example loads the paraxial eye model from <a class="reference internal" href="../reference/optrace_tracer_presets.html#optrace.tracer.presets.geometry.legrand_eye" title="optrace.tracer.presets.geometry.legrand_eye"><code class="xref py py-func docutils literal notranslate"><span class="pre">legrand_eye()</span></code></a> and creates the TMA object:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">eye</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">legrand_eye</span><span class="p">()</span>
 <span class="n">aps</span> <span class="o">=</span> <span class="n">eye</span><span class="o">.</span><span class="n">apertures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="n">tma</span> <span class="o">=</span> <span class="n">eye</span><span class="o">.</span><span class="n">tma</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The function <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.pupil_position" title="optrace.tracer.transfer_matrix_analysis.TMA.pupil_position"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pupil_position</span></code></a> requires an aperture stop position argumentand returns a tuple of entrance and exit pupil position along the optical axis.
+<p>The function <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.pupil_position" title="optrace.tracer.transfer_matrix_analysis.TMA.pupil_position"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pupil_position</span></code></a> requires an aperture stop position argumentand returns a tuple of entrance and exit pupil position along the optical axis.
 The aperture can lie inside, behind or in front of the lens setup.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">pupil_position</span><span class="p">(</span><span class="n">aps</span><span class="p">)</span>
 <span class="go">(3.037565216550855, 3.6821114369501466)</span>
 </pre></div>
 </div>
-<p>The method <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification" title="optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pupil_magnification</span></code></a> calculates the pupil magnifications:</p>
+<p>The method <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification" title="optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pupil_magnification</span></code></a> calculates the pupil magnifications:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">pupil_magnification</span><span class="p">(</span><span class="n">aps</span><span class="p">)</span>
 <span class="go">(1.1310996628960361, 1.0410557184750733)</span>
 </pre></div>
@@ -693,9 +693,9 @@ The aperture can lie inside, behind or in front of the lens setup.</p>
 <h2><span class="section-number">4.10.6. </span>Miscellaneous Properties<a class="headerlink" href="#miscellaneous-properties" title="Link to this heading">#</a></h2>
 <p>The calculation is currently limited to these properties.
 Unfortunately pupil sizes, numerical apertures, f-numbers, airy disk diameters are not available.
-This is due to the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object not having any information about the lens diameters or ray characteristics.</p>
+This is due to the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object not having any information about the lens diameters or ray characteristics.</p>
 <p>In some cases the properties can be estimated using the interactive GUI and ray picking.
-For instance, the pupil sizes can be calculated from the pupil positions from the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> and the radial distance of the outermost traced rays at this position.</p>
+For instance, the pupil sizes can be calculated from the pupil positions from the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> and the radial distance of the outermost traced rays at this position.</p>
 </section>
 </section>
 

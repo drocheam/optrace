@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>4.15. Advanced Topics &#8212; optrace 1.6.4 documentation</title>
+    <title>4.15. Advanced Topics &#8212; optrace 1.6.7 documentation</title>
   
   
   
@@ -39,13 +39,13 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=8ea99608"></script>
+    <script src="../_static/documentation_options.js?v=b9511c62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'usage/advanced';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="5. Implementation Details" href="../math/math.html" />
+    <link rel="next" title="5. Implementation Details" href="../details/index.html" />
     <link rel="prev" title="4.14. GUI Automation" href="gui_automation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">optrace 1.6.4 documentation</p>
+    <p class="title logo__title">optrace 1.6.7 documentation</p>
   
 </a></div>
     
@@ -147,14 +147,14 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
@@ -168,14 +168,14 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/development.html">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -294,28 +294,28 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="usage.html">
+  <a class="nav-link nav-internal" href="index.html">
     Usage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../math/math.html">
+  <a class="nav-link nav-internal" href="../details/index.html">
     Implementation Details
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../library/library.html">
-    Code Reference
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/development.html">
+  <a class="nav-link nav-internal" href="../development/index.html">
     Development
   </a>
 </li>
@@ -420,7 +420,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="usage.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.15. </span>Advanced Topics</span></li>
   </ul>
@@ -446,7 +446,7 @@
 <p>The raytracer emits warnings and errors while simulating.
 Internally these are characterized by flags, which can be found below:</p>
 <div class="pst-scrollable-table-container"><table class="table table-left" id="id1" style="width: 900px">
-<caption><span class="caption-number">Table 4.21 </span><span class="caption-text">List of raytracing messages</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<caption><span class="caption-number">Table 4.23 </span><span class="caption-text">List of raytracing messages</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 14.3%" />
 <col style="width: 85.7%" />
@@ -457,26 +457,26 @@ Internally these are characterized by flags, which can be found below:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING" title="optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.ABSORB_MISSING</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING" title="optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.ABSORB_MISSING</span></code></a></p></td>
 <td><p>Rays are absorbed because they miss a lens surface.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.TIR" title="optrace.tracer.raytracer.Raytracer.INFOS.TIR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.TIR</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.TIR" title="optrace.tracer.raytracer.Raytracer.INFOS.TIR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.TIR</span></code></a></p></td>
 <td><p>Total inner reflection. Reflections are not simulated, so the ray is treated as being absorbed at the surface intersection</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.T_BELOW_TTH" title="optrace.tracer.raytracer.Raytracer.INFOS.T_BELOW_TTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.T_BELOW_TTH</span></code></a></p></td>
-<td><p>A filter transmittivity is below the <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.T_TH" title="optrace.tracer.raytracer.Raytracer.T_TH"><code class="xref py py-attr docutils literal notranslate"><span class="pre">T_TH</span></code></a> threshold of the raytracer and the ray is therefore absorbed. Avoids ‘ghost rays’ that need to be traced, but don’t contribute to an image.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.T_BELOW_TTH" title="optrace.tracer.raytracer.Raytracer.INFOS.T_BELOW_TTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.T_BELOW_TTH</span></code></a></p></td>
+<td><p>A filter transmittivity is below the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.T_TH" title="optrace.tracer.raytracer.Raytracer.T_TH"><code class="xref py py-attr docutils literal notranslate"><span class="pre">T_TH</span></code></a> threshold of the raytracer and the ray is therefore absorbed. Avoids ‘ghost rays’ that need to be traced, but don’t contribute to an image.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND" title="optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.ILL_COND</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND" title="optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.ILL_COND</span></code></a></p></td>
 <td><p>Ill-conditioned rays for hit finding of a numerical, custom surface. In almost all cases the intersection will be wrong. This can happen if the surface is badly defined numerically or geometrically, there are surface collisions or a ray hits the surface multiple times. Please check the geometry of the raytracer and the surface definition.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION" title="optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.OUTLINE_INTERSECTION</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION" title="optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Raytracer.INFOS.OUTLINE_INTERSECTION</span></code></a></p></td>
 <td><p>Rays that would leave the outline are absorbed at the outline intersection</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>The raytracer also provides a <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.geometry_error" title="optrace.tracer.raytracer.Raytracer.geometry_error"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.geometry_error</span></code></a> flag that gets set when tracing was aborted due to issues with the geometry.
-Geometry checks are only executed while tracing, so <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.trace" title="optrace.tracer.raytracer.Raytracer.trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.trace</span></code></a> must be called first.</p>
+<p>The raytracer also provides a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.geometry_error" title="optrace.tracer.raytracer.Raytracer.geometry_error"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.geometry_error</span></code></a> flag that gets set when tracing was aborted due to issues with the geometry.
+Geometry checks are only executed while tracing, so <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.trace" title="optrace.tracer.raytracer.Raytracer.trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.trace</span></code></a> must be called first.</p>
 <p>When using the GUI, a subset of surface collision points will also be displayed in the geometry.</p>
 </section>
 <section id="accessing-ray-properties">
@@ -497,7 +497,7 @@ Direction and polarization are then undefined.</p>
 Some of those are attributes that are stored while tracing, while others are functions, as these properties must be calculated from other attributes first.
 They are intentionally kept as functions and are not exposed as properties, so an computational overhead is communicated to the user.</p>
 <div class="pst-scrollable-table-container"><table class="table table-left" id="id2" style="width: 900px">
-<caption><span class="caption-number">Table 4.22 </span><span class="caption-text">List of ray properties</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
+<caption><span class="caption-number">Table 4.24 </span><span class="caption-text">List of ray properties</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 11.8%" />
 <col style="width: 11.8%" />
@@ -515,49 +515,49 @@ They are intentionally kept as functions and are not exposed as properties, so a
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Position</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.p_list" title="optrace.tracer.ray_storage.RayStorage.p_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">p_list</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.p_list" title="optrace.tracer.ray_storage.RayStorage.p_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">p_list</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float64</span></code></a> of shape (N, Nt, 3)</p></td>
 <td><p>mm</p></td>
 <td><p>3D starting position for all ray sections</p></td>
 </tr>
 <tr class="row-odd"><td><p>Direction vectors</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.direction_vectors" title="optrace.tracer.ray_storage.RayStorage.direction_vectors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">direction_vectors()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.direction_vectors" title="optrace.tracer.ray_storage.RayStorage.direction_vectors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">direction_vectors()</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float64</span></code></a> of shape (N, Nt, 3)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>normalized (with <code class="code highlight python docutils literal highlight-python"><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span></code>) or unnormalized direction vectors for each ray section</p></td>
 </tr>
 <tr class="row-even"><td><p>Section lengths</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.ray_lengths" title="optrace.tracer.ray_storage.RayStorage.ray_lengths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ray_lengths()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.ray_lengths" title="optrace.tracer.ray_storage.RayStorage.ray_lengths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ray_lengths()</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float64</span></code></a> of shape (N, Nt)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>geometrical length of each ray section</p></td>
 </tr>
 <tr class="row-odd"><td><p>Optical section lengths</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.optical_lengths" title="optrace.tracer.ray_storage.RayStorage.optical_lengths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optical_lengths()</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.optical_lengths" title="optrace.tracer.ray_storage.RayStorage.optical_lengths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optical_lengths()</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float64</span></code></a> of shape (N, Nt)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>optical length of each ray section (geometrical length multiplied by refractive index)</p></td>
 </tr>
 <tr class="row-even"><td><p>Polarization</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.pol_list" title="optrace.tracer.ray_storage.RayStorage.pol_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pol_list</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.pol_list" title="optrace.tracer.ray_storage.RayStorage.pol_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pol_list</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float32</span></code></a> of shape (N, Nt, 3)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>unity 3D polarization vector</p></td>
 </tr>
 <tr class="row-odd"><td><p>Power</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.w_list" title="optrace.tracer.ray_storage.RayStorage.w_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">w_list</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.w_list" title="optrace.tracer.ray_storage.RayStorage.w_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">w_list</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float32</span></code></a> of shape (N, Nt)</p></td>
 <td><p>W</p></td>
 <td><p>ray power</p></td>
 </tr>
 <tr class="row-even"><td><p>Refractive Index</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.n_list" title="optrace.tracer.ray_storage.RayStorage.n_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">n_list</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.n_list" title="optrace.tracer.ray_storage.RayStorage.n_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">n_list</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float64</span></code></a> of shape (N, Nt)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
 <td><p>refractive indices for all ray sections</p></td>
 </tr>
 <tr class="row-odd"><td><p>Wavelength</p></td>
-<td><p><a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.wl_list" title="optrace.tracer.ray_storage.RayStorage.wl_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">wl_list</span></code></a></p></td>
+<td><p><a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.wl_list" title="optrace.tracer.ray_storage.RayStorage.wl_list"><code class="xref py py-attr docutils literal notranslate"><span class="pre">wl_list</span></code></a></p></td>
 <td><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of type <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="(in NumPy v2.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">numpy.float32</span></code></a> of shape N</p></td>
 <td><p>nm</p></td>
 <td><p>wavelength of the ray</p></td>
@@ -609,7 +609,7 @@ Number of rays and sections per ray is accessible through <code class="code high
 <section id="masking">
 <h3><span class="section-number">4.15.2.3. </span>Masking<a class="headerlink" href="#masking" title="Link to this heading">#</a></h3>
 <p>For more control over accessing ray properties masking methods of the RayStorage class can be applied.
-A call of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.rays_by_mask" title="optrace.tracer.ray_storage.RayStorage.rays_by_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rays_by_mask</span></code></a> without parameters is:</p>
+A call of <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.rays_by_mask" title="optrace.tracer.ray_storage.RayStorage.rays_by_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rays_by_mask</span></code></a> without parameters is:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RT</span><span class="o">.</span><span class="n">rays</span><span class="o">.</span><span class="n">rays_by_mask</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -639,12 +639,12 @@ This parameter is a seven element bool list that marks all needed properties:</p
 </pre></div>
 </div>
 <p>The function still returns a tuple of 7 elements, but undesired elements have value <code class="code highlight python docutils literal highlight-python"><span class="kc">None</span></code> instead of an array.
-See the code reference of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.rays_by_mask" title="optrace.tracer.ray_storage.RayStorage.rays_by_mask"><code class="xref py py-func docutils literal notranslate"><span class="pre">rays_by_mask</span></code></a> for more detail.</p>
+See the code reference of <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage.rays_by_mask" title="optrace.tracer.ray_storage.RayStorage.rays_by_mask"><code class="xref py py-func docutils literal notranslate"><span class="pre">rays_by_mask</span></code></a> for more detail.</p>
 </section>
 </section>
 <section id="object-descriptions">
 <h2><span class="section-number">4.15.3. </span>Object Descriptions<a class="headerlink" href="#object-descriptions" title="Link to this heading">#</a></h2>
-<p>Child classes of <a class="reference internal" href="../library/optrace_tracer.html#optrace.tracer.base_class.BaseClass" title="optrace.tracer.base_class.BaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClass</span></code></a> include parameters <code class="code highlight python docutils literal highlight-python"><span class="n">desc</span><span class="p">,</span> <span class="n">long_desc</span></code>.
+<p>Child classes of <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.base_class.BaseClass" title="optrace.tracer.base_class.BaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClass</span></code></a> include parameters <code class="code highlight python docutils literal highlight-python"><span class="n">desc</span><span class="p">,</span> <span class="n">long_desc</span></code>.
 The former should be a short descriptive string and the latter a more verbose one.
 These descriptions can be user provided and are used in for plotting and text output.</p>
 </section>
@@ -669,13 +669,13 @@ Such changes should only be applicable through specific functions that update ev
 <span id="usage-color"></span><h2><span class="section-number">4.15.5. </span>Color Conversions<a class="headerlink" href="#color-conversions" title="Link to this heading">#</a></h2>
 <p>Color conversion are supported via the namespace <code class="code highlight python docutils literal highlight-python"><span class="n">optrace</span><span class="o">.</span><span class="n">color</span></code>.
 optrace provides conversions for the colorspaces XYZ, sRGB, linear SRGB, CIELUV and xyY as well as some color properties like Saturation and Hue in CIELUV.</p>
-<p>Check the <a class="reference internal" href="../math/color.html#color-management"><span class="std std-ref">Color Handling</span></a> section for a technical and fundamental descriptions of color processing and calculation.
-Go to the code reference section <a class="reference internal" href="../library/optrace_tracer_color.html#module-optrace.tracer.color" title="optrace.tracer.color"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optrace.tracer.color</span></code></a> for information on the usage of implemented functions.</p>
+<p>Check the <a class="reference internal" href="../details/color.html#color-management"><span class="std std-ref">Color Handling</span></a> section for a technical and fundamental descriptions of color processing and calculation.
+Go to the code reference section <a class="reference internal" href="../reference/optrace_tracer_color.html#module-optrace.tracer.color" title="optrace.tracer.color"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optrace.tracer.color</span></code></a> for information on the usage of implemented functions.</p>
 <p>For the sRGB Perceptual Rendering Intent there a extra parameters available.
-For instance, a fixed saturation scaling can be set using the <code class="code highlight python docutils literal highlight-python"><span class="n">chroma_scale</span></code> parameter of the <a class="reference internal" href="../library/optrace_tracer_color.html#optrace.tracer.color.srgb.xyz_to_srgb_linear" title="optrace.tracer.color.srgb.xyz_to_srgb_linear"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.tracer.color.xyz_to_srgb_linear</span></code></a> function.
-A suitable scaling factor can be calculated using <a class="reference internal" href="../library/optrace_tracer_color.html#optrace.tracer.color.srgb.get_chroma_scale" title="optrace.tracer.color.srgb.get_chroma_scale"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.tracer.color.get_saturation_scale</span></code></a>.
+For instance, a fixed saturation scaling can be set using the <code class="code highlight python docutils literal highlight-python"><span class="n">chroma_scale</span></code> parameter of the <a class="reference internal" href="../reference/optrace_tracer_color.html#optrace.tracer.color.srgb.xyz_to_srgb_linear" title="optrace.tracer.color.srgb.xyz_to_srgb_linear"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.tracer.color.xyz_to_srgb_linear</span></code></a> function.
+A suitable scaling factor can be calculated using <a class="reference internal" href="../reference/optrace_tracer_color.html#optrace.tracer.color.srgb.get_chroma_scale" title="optrace.tracer.color.srgb.get_chroma_scale"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.tracer.color.get_saturation_scale</span></code></a>.
 This is useful for viable comparison between images, as the saturation scaling factor is the same.
-The function <a class="reference internal" href="../library/optrace_tracer_color.html#optrace.tracer.color.srgb.xyz_to_srgb_linear" title="optrace.tracer.color.srgb.xyz_to_srgb_linear"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.tracer.color.xyz_to_srgb_linear</span></code></a> provides the <code class="code highlight python docutils literal highlight-python"><span class="n">chroma_scale</span></code> parameter to override the best matching one.
+The function <a class="reference internal" href="../reference/optrace_tracer_color.html#optrace.tracer.color.srgb.xyz_to_srgb_linear" title="optrace.tracer.color.srgb.xyz_to_srgb_linear"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.tracer.color.xyz_to_srgb_linear</span></code></a> provides the <code class="code highlight python docutils literal highlight-python"><span class="n">chroma_scale</span></code> parameter to override the best matching one.
 Alternatively, a relative lightness threshold can be set using the <code class="code highlight python docutils literal highlight-python"><span class="n">L_th</span></code> parameter, which excludes colors of darker image regions to calculate/apply the factor in both functions.
 This is helpful when the scaling factor is largely affected by color values that are mostly invisible.
 If there still colors outside the gamut after the operation (for instance, because they were below <code class="code highlight python docutils literal highlight-python"><span class="n">L_th</span></code> or the user set <code class="code highlight python docutils literal highlight-python"><span class="n">chroma_scale</span></code> value was insufficient), they are projected onto the gamut edge as for the absolute rendering intent.
@@ -703,7 +703,7 @@ See the docstring of both functions for further information.</p>
       </div>
     </a>
     <a class="right-next"
-       href="../math/math.html"
+       href="../details/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
