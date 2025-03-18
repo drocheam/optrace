@@ -29,7 +29,7 @@ class ExampleTests(unittest.TestCase):
         cmd = re.sub(r"((.+)\.run\()", r"\2._exit=True;\2.run(", cmd)
 
         # replace __file__, as we call python with -c command option
-        cmd = cmd.replace("__file__", f"\"{path}\"")
+        cmd = cmd.replace("__file__", f"r\"{path}\"")
 
         # inject exit of GUI for GUI automation example
         cmd = cmd.replace("sim.control(func=automated, args=(sim,))", 

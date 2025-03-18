@@ -2,7 +2,6 @@ import os.path  # working with paths
 import numpy as np  # np.ndarray type
 import chardet  # detection of text file encoding
 
-
 # media
 from .refraction_index import RefractionIndex
 
@@ -18,9 +17,8 @@ from ..warnings import warning
 
 
 _agf_modes = ["Schott", "Sellmeier1", "Herzberger", "Sellmeier2", "Conrady", "Sellmeier3", "Handbook of Optics 1",
-"Handbook of Optics 2", "Sellmeier4", "Extended", "Sellmeier5", "Extended2", "Extended3"]
-"""List of ZEMAX agf material file formula modes. The position in the list corresponds to the number code.
-don't mess with the order of this list!!"""
+              "Handbook of Optics 2", "Sellmeier4", "Extended", "Sellmeier5", "Extended2", "Extended3"]
+"""List of ZEMAX agf material file formula modes. The position in the list corresponds to the number code."""
 
 
 def _read_lines(path: str) -> list[str]:
@@ -84,7 +82,7 @@ def load_agf(path: str) -> dict:
             # check if valid mode. According to documentation mode numbers go from 1-12
             ind = int(float(linw[2]))-1
             if ind < 0 or ind > len(_agf_modes) - 1:
-                warning(f"Unknown index formula mode number {ind+1}, skipping material {name}.")
+                warning(f"{name}: Unknown index formula mode number {ind+1}, skipping.")
                 skip = True  # skip further steps, since we don't know what to do with this material
                 continue
             
@@ -110,10 +108,10 @@ def load_agf(path: str) -> dict:
                 wl0 = float(linw[0])*1000
                 wl1 = float(linw[1])*1000
 
-                # for infrared materials there is no overlap with the visible range
-                if wl0 > go.wavelength_range[1] or wl1 < go.wavelength_range[0]:
-                    warning(f"Wavelength range for material {name} (in nm) [{wl0}, {wl1}] has no overlap "
-                                  f"with raytracer range {go.wavelength_range}.")
+                # no spectral overlap for testing (e.g. infrared materials)
+                if wl0 > spectral_lines.FdC[0] or wl1 < spectral_lines.FdC[2]:
+                    warning(f"{name} wavelength range [{wl0}, {wl1}]nm does not overlap with "
+                            f"testing wavelengths {spectral_lines.FdC}nm, skipping index and Abbe number checks.")
                 
                 else:
                     nc1 = n(spectral_lines.d)
@@ -121,15 +119,13 @@ def load_agf(path: str) -> dict:
 
                     # index deviation
                     if np.abs(nc1 - nc) > 1e-4:
-                        warning(f"Index from file is {nc} while index of the loaded material is {nc1}"
-                                      f" for material {name}. "
-                                       "This can be due to different probe wavelengths or no data in those regions.")
+                        warning(f"{name}: Index from file is {nc}, but calculated index is {nc1}. "
+                                 "This can be due to different probe wavelengths.")
 
                     # abbe number deviation
                     elif np.abs(V1 - V) > 0.3:
-                        warning(f"The Abbe number from file is {V} while that of the loaded material is {V1}"
-                                      f" for material {name}. "
-                                      "This can be due to different probe wavelengths or no data in those regions.")
+                        warning(f"{name}: The Abbe number from file is {V}, but calculated is {V1}. "
+                                "This can be due to different probe wavelengths.")
 
                 # assign to material dict
                 n_dict[name] = n
@@ -282,7 +278,8 @@ def _zmx_to_surface_dicts(lines:  list[str],
                 nc, V = [float(a) for a in l.split()[4:6]] if len(l.split()) > 6 else [None, None]
 
                 if material == "___BLANK":
-                    # materials missing in n_dict can be approximated if n and V are provided instead and name is __BLANK
+                    # materials missing in n_dict can be approximated if n and V are provided 
+                    # instead and name is __BLANK
                     surf["n"] = RefractionIndex("Abbe", n=nc, V=V)
 
                 elif material not in n_dict.keys():
