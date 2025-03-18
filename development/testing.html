@@ -585,8 +585,9 @@ What about coverage information in such cases?</p>
 <section id="tox-configuration-in-tox-ini">
 <span id="tox-file"></span><h2><span class="section-number">7.1.10. </span>Tox configuration in <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tox.ini">tox.ini</a><a class="headerlink" href="#tox-configuration-in-tox-ini" title="Link to this heading">#</a></h2>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[tox]</span>
-<span class="na">envlist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">py313</span>
+<span class="na">env_list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">py{310,311,312,313}</span>
 <span class="na">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tox-ignore-env-name-mismatch</span>
+<span class="na">skip_missing_interpreters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
 
 <span class="k">[pytest]</span>
 <span class="na">testpaths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
@@ -619,7 +620,6 @@ What about coverage information in such cases?</p>
 <span class="w">    </span><span class="na">GITHUB_ACTIONS</span>
 <span class="na">env_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{toxworkdir}{/}env_static</span>
 <span class="na">runner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ignore_env_name_mismatch</span>
-<span class="na">basepython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{envlist}</span>
 <span class="na">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pylint</span>
 <span class="na">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
 <span class="w">    </span><span class="na">tests </span>
