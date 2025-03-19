@@ -48,6 +48,9 @@ class TracerTests(unittest.TestCase):
         L = ot.Lens(ot.CircularSurface(r=3), ot.CircularSurface(r=3),
                        n=ot.RefractionIndex("Constant", n=1.2), pos=[0, 0, 10])
 
+        # no snapshot/tracing yet
+        self.assertFalse(RT.check_if_rays_are_current())
+
         # test actions for different element types
         for el, list_, ckey in zip([RS, L, AP, DET, F, M], 
                 [RT.ray_sources, RT.lenses, RT.apertures, RT.detectors, RT.filters, RT.markers],

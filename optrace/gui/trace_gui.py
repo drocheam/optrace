@@ -13,6 +13,7 @@ from pyface.qt import QtGui, QtCore  # closing UI elements
 from traitsui.api import Group as TGroup
 from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeEditor
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool, String
+from traits.observation.api import TraitChangeEvent
 
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 
@@ -873,11 +874,11 @@ class TraceGUI(HasTraits):
         self.configure_traits()
 
     @observe('scene:closing', dispatch="ui")  # needed so this gets also called when clicking x on main window
-    def close(self, event=None) -> None:
+    def close(self, event: TraitChangeEvent = None) -> None:
         """
         Close the whole application.
         
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if self._property_browser_view is not None and self._property_browser_view.control is not None:
             self._property_browser_view.control.window().close()
@@ -960,25 +961,25 @@ class TraceGUI(HasTraits):
     
     def custom_button_action_1(self) -> Callable:
         """:return: function assigned with custom button 1"""
-        return self._custom_button_functions[0]() if len(self._custom_button_functions) else None
+        return self._handle_custom_buttons(TraitChangeEvent(object=None, old=None, new=None, name="custom_button_1"))
 
     def custom_button_action_2(self) -> Callable:
-        """:return: function assigned with custom button 1"""
-        return self._custom_button_functions[1]() if len(self._custom_button_functions) > 1 else None
+        """:return: function assigned with custom button 2"""
+        return self._handle_custom_buttons(TraitChangeEvent(object=None, old=None, new=None, name="custom_button_2"))
     
     def custom_button_action_3(self) -> Callable:
-        """:return: function assigned with custom button 1"""
-        return self._custom_button_functions[2]() if len(self._custom_button_functions) > 2 else None
+        """:return: function assigned with custom button 3"""
+        return self._handle_custom_buttons(TraitChangeEvent(object=None, old=None, new=None, name="custom_button_3"))
 
     ####################################################################################################################
     # Trait handlers.
 
     @observe('custom_checkbox_1, custom_checkbox_2, custom_checkbox_3', dispatch="ui")
-    def _handle_custom_checkboxes(self, event=None) -> None:
+    def _handle_custom_checkboxes(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the checkbox.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if ((box := int(float(event.name[-1]))) < len(self._custom_checkbox_functions)+1
                 and not self._no_trait_action_flag):
@@ -994,11 +995,11 @@ class TraceGUI(HasTraits):
                 self._sequential = False
     
     @observe('_custom_button_1, _custom_button_2, _custom_button_3', dispatch="ui")
-    def _handle_custom_buttons(self, event=None) -> None:
+    def _handle_custom_buttons(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the button.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if (button := int(float(event.name[-1]))) < len(self._custom_button_functions)+1:
 
@@ -1010,11 +1011,11 @@ class TraceGUI(HasTraits):
                 self._sequential = False
     
     @observe('custom_value_1, custom_value_2, custom_value_3', dispatch="ui")
-    def _handle_custom_values(self, event=None) -> None:
+    def _handle_custom_values(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the value field.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if (val := int(float(event.name[-1]))) < len(self._custom_value_functions)+1 and not self._no_trait_action_flag:
 
@@ -1029,11 +1030,11 @@ class TraceGUI(HasTraits):
                 self._sequential = False
 
     @observe('custom_selection_1, custom_selection_2, custom_selection_3', dispatch="ui")
-    def _handle_custom_selections(self, event=None) -> None:
+    def _handle_custom_selections(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the selection field.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if ((sel := int(float(event.name[-1]))) < len(self._custom_selection_functions)+1 and
                 not self._no_trait_action_flag):
@@ -1049,18 +1050,18 @@ class TraceGUI(HasTraits):
                 self._sequential = False
 
     @observe('high_contrast', dispatch="ui")
-    def _change_contrast(self, event=None) -> None:
+    def _change_contrast(self, event: TraitChangeEvent = None) -> None:
         """
         change the high contrast mode
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._status["Drawing"] += 1
         self._plot.change_contrast()
         self._status["Drawing"] -= 1
 
     @observe('rays_visible', dispatch="ui")
-    def replot_rays(self, event=None, mask: np.ndarray = None, max_show: int = None) -> None:
+    def replot_rays(self, event: TraitChangeEvent = None, mask: np.ndarray = None, max_show: int = None) -> None:
         """
         choose a subset of all raytracer rays and plot them with :`TraceGUI._plot_rays`.
 
@@ -1068,7 +1069,7 @@ class TraceGUI(HasTraits):
         When mask and max_show (both optional) are provided, a specific subset is displayed.
         See TraceGUI.select_rays.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param mask: boolean array for which rays to display. Shape must equal the number of currently traced rays.
         :param max_show: maximum number of rays to display
         """
@@ -1145,11 +1146,11 @@ class TraceGUI(HasTraits):
         return self._plot.ray_selection
 
     @observe('ray_count', dispatch="ui")
-    def retrace(self, event=None) -> None:
+    def retrace(self, event: TraitChangeEvent = None) -> None:
         """
         raytrace in separate thread, after that call `TraceGUI.replot_rays`.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
 
         if self._no_trait_action_flag:
@@ -1210,39 +1211,39 @@ class TraceGUI(HasTraits):
             pyface_gui.invoke_later(self._set_gui_loaded)
 
     @observe('ray_opacity', dispatch="ui")
-    def _change_ray_opacity(self, event=None) -> None:
+    def _change_ray_opacity(self, event: TraitChangeEvent = None) -> None:
         """
         change opacity of visible rays.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._plot.set_ray_opacity()
 
     @observe("coloring_mode", dispatch="ui")
-    def _change_ray_and_source_colors(self, event=None) -> None:
+    def _change_ray_and_source_colors(self, event: TraitChangeEvent = None) -> None:
         """
         change ray coloring mode.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._plot.color_rays()
         self._plot.color_ray_sources()
 
     @observe("plotting_mode", dispatch="ui")
-    def _change_ray_representation(self, event=None) -> None:
+    def _change_ray_representation(self, event: TraitChangeEvent = None) -> None:
         """
         change ray view to connected lines or points only.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._plot.set_ray_representation()
 
     @observe('detector_selection', dispatch="ui")
-    def _change_detector(self, event=None) -> None:
+    def _change_detector(self, event: TraitChangeEvent = None) -> None:
         """
         change detector selection
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
 
         if not self._no_trait_action_flag and self.raytracer.detectors:
@@ -1268,11 +1269,11 @@ class TraceGUI(HasTraits):
             self._start_action(background)
 
     @observe('z_det', dispatch="ui")
-    def _move_detector(self, event=None) -> None:
+    def _move_detector(self, event: TraitChangeEvent = None) -> None:
         """
         Move current detector.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if not self._no_trait_action_flag and self.raytracer.detectors:
 
@@ -1305,7 +1306,7 @@ class TraceGUI(HasTraits):
         """
         Plot a detector image profile.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param extent: image extent, see Raytracer.detector_image()
         :param kwargs: additional keyword arguments for image_profile_plot
         """
@@ -1321,7 +1322,7 @@ class TraceGUI(HasTraits):
         """
         Render a detector image at the chosen Detector, uses a separate thread.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param profile: if a Image profile image is plotted
         :param extent: image extent, see Raytracer.detector_image()
         :param kwargs: additional keyword arguments for r_image_plot
@@ -1385,11 +1386,11 @@ class TraceGUI(HasTraits):
             self._start_action(background)
 
     @observe('_detector_spectrum_button', dispatch="ui")
-    def detector_spectrum(self, event=None, extent: list | np.ndarray = None, **kwargs) -> None:
+    def detector_spectrum(self, event: TraitChangeEvent = None, extent: list | np.ndarray = None, **kwargs) -> None:
         """
         Render a Detector Spectrum for the chosen Source, uses a separate thread.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param extent: image extent, see Raytracer.detector_image()
         :param kwargs: additional keyword arguments for spectrum_plot
         """
@@ -1427,7 +1428,7 @@ class TraceGUI(HasTraits):
         """
         Plot a source image profile.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param kwargs: additional keyword arguments for image_profile_plot
         """
         self.source_image(event, profile=True, **kwargs)
@@ -1451,11 +1452,11 @@ class TraceGUI(HasTraits):
         return stats
 
     @observe('_source_spectrum_button', dispatch="ui")
-    def source_spectrum(self, event=None, **kwargs) -> None:
+    def source_spectrum(self, event: TraitChangeEvent = None, **kwargs) -> None:
         """
         render a Source Spectrum for the chosen Source, uses a separate thread.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param kwargs: additional keyword arguments for spectrum_plot
         """
 
@@ -1489,7 +1490,7 @@ class TraceGUI(HasTraits):
         """
         Render a source image for the chosen Source, uses a separate thread
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param profile: if an Image profile plot is plotted
         :param kwargs: additional keyword arguments for image_plot
         """
@@ -1542,14 +1543,14 @@ class TraceGUI(HasTraits):
             self._start_action(background)
 
     @observe('_focus_search_button', dispatch="ui")
-    def move_to_focus(self, event=None, **kwargs) -> None:
+    def move_to_focus(self, event: TraitChangeEvent = None, **kwargs) -> None:
         """
         Find a Focus.
         The chosen Detector defines the search range for focus finding.
         Searches are always between lenses or the next outline.
         Search takes place in a separate thread, after that the Detector is moved to the focus
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         :param kwargs: additional keyword arguments for focus_search_cost_plot
         """
 
@@ -1605,11 +1606,11 @@ class TraceGUI(HasTraits):
             self._start_action(background)
 
     @observe('scene:activated', dispatch="ui")
-    def _plot_scene(self, event=None) -> None:
+    def _plot_scene(self, event: TraitChangeEvent = None) -> None:
         """
         Initialize the GUI. Inits a variety of things.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._plot.init_crosshair()
         self._plot.init_ray_info()
@@ -1622,20 +1623,20 @@ class TraceGUI(HasTraits):
         self._status["InitScene"] = 0
         
     @observe('_status:items', dispatch="ui")
-    def _change_status(self, event=None) -> None:
+    def _change_status(self, event: TraitChangeEvent = None) -> None:
         """
         Update the status info text.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._plot.set_status(self._status)
 
     @observe('minimalistic_view', dispatch="ui")
-    def _change_minimalistic_view(self, event=None) -> None:
+    def _change_minimalistic_view(self, event: TraitChangeEvent = None) -> None:
         """
         change the minimalistic ui view option.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if not self._status["InitScene"]:
             self._status["Drawing"] += 1
@@ -1643,11 +1644,11 @@ class TraceGUI(HasTraits):
             self._status["Drawing"] -= 1
     
     @observe('hide_labels', dispatch="ui")
-    def _change_hide_labels(self, event=None) -> None:
+    def _change_hide_labels(self, event: TraitChangeEvent = None) -> None:
         """
         Hide or show object labels.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if not self._status["InitScene"]:
             self._status["Drawing"] += 1
@@ -1655,51 +1656,51 @@ class TraceGUI(HasTraits):
             self._status["Drawing"] -= 1
 
     @observe('vertical_labels', dispatch="ui")
-    def _change_label_orientation(self, event=None) -> None:
+    def _change_label_orientation(self, event: TraitChangeEvent = None) -> None:
         """
         Make element labels horizontal or vertical
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._status["Drawing"] += 1
         self._plot.change_label_orientation()
         self._status["Drawing"] -= 1
 
     @observe("maximize_scene", dispatch="ui")
-    def _change_maximize_scene(self, event=None) -> None:
+    def _change_maximize_scene(self, event: TraitChangeEvent = None) -> None:
         """
         change maximize scene, hide side menu and toolbar"
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._scene_not_maximized = not bool(self.maximize_scene)
         self.scene.scene_editor._tool_bar.setVisible(self._scene_not_maximized)
 
     @observe('ray_width', dispatch="ui")
-    def _change_ray_width(self, event=None) -> None:
+    def _change_ray_width(self, event: TraitChangeEvent = None) -> None:
         """
         set the ray width for the visible rays.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._plot.set_ray_width()
 
     @observe('source_selection', dispatch="ui")
-    def _change_selected_ray_source(self, event=None) -> None:
+    def _change_selected_ray_source(self, event: TraitChangeEvent = None) -> None:
         """
         Updates the Detector Selection and the corresponding properties.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if self.raytracer.ray_sources:
             self._source_ind = int(self.source_selection.split(":", 1)[0].split("RS")[1])
 
     @observe('_command_window_button', dispatch="ui")
-    def open_command_window(self, event=None) -> None:
+    def open_command_window(self, event: TraitChangeEvent = None) -> None:
         """
         Open the command window for executing code.
         
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if self._command_window_view is None or self._command_window_view.destroyed:
             self._command_window_view = self.command_window.edit_traits()
@@ -1712,11 +1713,11 @@ class TraceGUI(HasTraits):
                 setStyleSheet(f"QAbstractScrollArea{{font-family: monospace; background-color: {bgcolor}; color: black}}")
 
     @observe('_property_browser_button', dispatch="ui")
-    def open_property_browser(self, event=None) -> None:
+    def open_property_browser(self, event: TraitChangeEvent = None) -> None:
         """
         Open a property browser for the gui, the scene, the raytracer, shown rays and cardinal points.
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
 
         if self._property_browser_view is None or self._property_browser_view.destroyed:
@@ -1756,10 +1757,10 @@ class TraceGUI(HasTraits):
     # this is the only trait so far that does not work with @observe, like:
     # unfortunately size:items:value does not work, this way it gets called for every assignment of size
     @observe("scene:_renwin:size", dispatch="ui")
-    def _resize_scene_elements(self, event=None) -> None:
+    def _resize_scene_elements(self, event: TraitChangeEvent = None) -> None:
         """
         Handles GUI window size changes. Fixes incorrect scaling by mayavi.
 
-        :param event: event from traits observe decorator
+        :param event: optional trait change event
         """
         self._plot.resize_scene_elements()

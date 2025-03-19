@@ -4,6 +4,7 @@ import numpy as np  # numpy ndarray type
 
 from traitsui.api import View, Item, ValueEditor, Group
 from traits.api import HasTraits, observe, Button, Dict, Str
+from traits.observation.api import TraitChangeEvent
 
 from ..tracer.presets import spectral_lines as spec_lines
 from ..tracer.base_class import BaseClass  # BaseClass type
@@ -90,11 +91,11 @@ class PropertyBrowser(HasTraits):
         super().__init__()
 
     @observe('update_button')
-    def update_dict(self, event=None) -> None:
+    def update_dict(self, event: TraitChangeEvent = None) -> None:
         """
         Update the dictionaries in all ValueEditor()
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self.raytracer_dict = self._gen_dict_repr(self.raytracer.__dict__)
         self.ray_dict = self._gen_dict_repr(self.gui._plot._ray_property_dict)

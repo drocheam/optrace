@@ -3,6 +3,7 @@ from __future__ import annotations
 from traitsui.api import View, Item, ValueEditor, Group, CodeEditor, ListStrEditor, CheckListEditor, HSplit
 from traits.api import HasTraits, observe, Button, Dict, Str, List, Enum
 from pyface.qt import QtGui  # copying to clipboard 
+from traits.observation.api import TraitChangeEvent
 
 from ..warnings import warning
 
@@ -81,18 +82,18 @@ class CommandWindow(HasTraits):
         super().__setattr__(key, val)
 
     @observe('_clear_button', dispatch="ui")
-    def clear_history(self, event=None) -> None:
+    def clear_history(self, event: TraitChangeEvent = None) -> None:
         """
         clear command history
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self._history = []
     
     @observe('_clipboard_button', dispatch="ui")
-    def copy_history(self, event=None) -> None:
+    def copy_history(self, event: TraitChangeEvent = None) -> None:
         """
         copy the full history to the clipboard
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         output = ""
         for el in self._history:
@@ -107,20 +108,20 @@ class CommandWindow(HasTraits):
             warning("Copying to clipboard failed. This can be an library or system issue.\n")  # pragma: no cover
     
     @observe('_replot_button', dispatch="ui")
-    def replot(self, event=None) -> None:
+    def replot(self, event: TraitChangeEvent = None) -> None:
         """
         Replots the TraceGUI
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         self.gui.replot()
 
     @observe('_run_button', dispatch="ui")
-    def send_command(self, event=None) -> None:
+    def send_command(self, event: TraitChangeEvent = None) -> None:
         """
         Execute a command in the TraceGUI
 
-        :param event: optional event from traits observe decorator
+        :param event: optional trait change event
         """
         if self._cmd:
             self.gui.run_command(self._cmd)

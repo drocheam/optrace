@@ -1,5 +1,6 @@
 #!/bin/env python3
 
+import sys
 import os
 import copy
 import unittest
@@ -802,7 +803,7 @@ class GUITests(unittest.TestCase):
     # os test because clipboard is system dependent
     @pytest.mark.os
     @pytest.mark.slow
-    @pytest.mark.gui3
+    @pytest.mark.gui
     def test_run_command(self):
         """test command setting and sending as well as automatic replotting (also tests TraceGUI.smart_replot()"""
 
@@ -859,6 +860,7 @@ class GUITests(unittest.TestCase):
                 sim.command_window.automatic_replot = False
                 id0 = id(sim._plot._ray_property_dict["p"])
                 send("RT.remove(LL[0])")
+                # time.sleep(5)
                 id1 = id(sim._plot._ray_property_dict["p"])
                 self.assertEqual(id0, id1)  # same ID -> not retraced
                 
@@ -1145,6 +1147,8 @@ class GUITests(unittest.TestCase):
 
                 # open property browser with cardinal points, although we now don't have rotational symmetry
                 RT.lenses[0].move_to([0, 0.02, 2])
+                # coverage for property browser: must unroll single ndarray element
+                sim.abc = np.array([1.]) 
                 self._do_in_main(sim.open_property_browser)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.open_property_browser) # reopen
@@ -1778,6 +1782,13 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(sim.rays_visible, np.count_nonzero(mask))
                 id6 = id(sim._plot._ray_plot)
                 self.assertNotEqual(id5, id6)
+                
+                # coverage: trace and try applying a selection
+                self._set_in_main(sim, "ray_count", 1000000)
+                while(not sim._status["Tracing"]):
+                    time.sleep(0.01)
+                sim.select_rays(np.zeros(10, dtype=bool))
+                self._wait_for_idle(sim)
         
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
@@ -1967,7 +1978,7 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.os
     @pytest.mark.gui1
-    def test_0custom_ui(self) -> None:
+    def test_custom_ui(self) -> None:
         """test if custom UI elements are correctly created, initialized and execute their action"""
 
         RT = rt_example()

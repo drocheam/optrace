@@ -112,6 +112,10 @@ class TracerMiscTests(unittest.TestCase):
             self.assertFalse(ot.global_options.show_progress_bar)
         self.assertFalse(ot.global_options.show_progress_bar)
 
+    def test_warnings_explicitly(self):
+        # call explicitly as coverage does not seem to catch the execution of this function
+        ot.warnings.simplified_warning("abcdefj nm ", None, None, None)
+
     @pytest.mark.os
     def test_ray_storage(self):
 
