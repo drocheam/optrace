@@ -43,7 +43,7 @@ Repository = "https://www.github.com/drocheam/optrace"
 
 [project.optional-dependencies]
 tests = ["pyautogui", "pytest", "coverage", "colour-science", "pytest-timeout", "pytest-random-order"]
-docs = ["tox", "sphinx", "sphinxcontrib-bibtex", "pydata-sphinx-theme"]
+docs = ["sphinx", "sphinxcontrib-bibtex", "pydata-sphinx-theme"]
 
 [build-system]
 requires = ["setuptools >= 61.0", "numpy>2"]
@@ -55,3 +55,19 @@ include-package-data = false
 dynamic = {version = {attr = "optrace.metadata.version"}}
 package-data = {optrace = ["resources/*", "resources/images/*"]}  
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 360
+timeout_method = "thread"
+filterwarnings = ["ignore::UserWarning"]
+addopts = "--random-order"
+markers = [
+    "slow: tests slower than 10 seconds on my machine",
+    "os: marks test relevant for testing of different operating systems",
+    "gui1: only first batch of GUI tests (separated for lower RAM usage)",
+    "gui2: only second batch of GUI tests (separated for lower RAM usage)",
+    "gui3: only third batch of GUI tests (separated for lower RAM usage)"
+]
+
+[tool.gh_actions]
+python = { "3.10" = "py310", "3.11" = "py311", "3.12" = "py312", "3.13" = "py313" }
