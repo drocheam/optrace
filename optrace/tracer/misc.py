@@ -3,7 +3,6 @@ from typing import Callable, Any  # Callable and Any types
 from functools import wraps  # wrapping of functions
 import os  # cpu count
 import time  # timing
-import sys
 
 import numpy as np  # calculations
 

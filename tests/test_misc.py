@@ -1,8 +1,5 @@
 #!/bin/env python3
 
-import sys
-sys.path.append('.')
-
 import os
 import subprocess
 import contextlib
@@ -44,7 +41,7 @@ class TracerMiscTests(unittest.TestCase):
             env["PYTHON_CPU_COUNT"] = str(cores)
             env["PYTHONPATH"] = str(Path.cwd())  # so subprocess finds optrace
             
-            result = subprocess.run(["python3", "-c", cmd], env=env, capture_output=True, text=True, check=True)
+            result = subprocess.run(["python", "-c", cmd], env=env, capture_output=True, text=True, check=True)
             cores_compare = str(cores) if hasattr(os, "process_cpu_count") else str(os.cpu_count())
             self.assertEqual(result.stdout[:-1], cores_compare, msg=result.stdout)
 

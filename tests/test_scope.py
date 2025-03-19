@@ -1,11 +1,8 @@
 #!/bin/env python3
 
-import sys
-sys.path.append('.')
-
 import os
-
 from pathlib import Path  # path of this file
+
 import unittest
 import subprocess
 import pytest

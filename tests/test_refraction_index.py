@@ -1,8 +1,5 @@
 #!/bin/env python3
 
-import sys
-sys.path.append('.')
-
 import unittest
 import numpy as np
 

@@ -1,8 +1,5 @@
 #!/bin/env python3
 
-import sys
-sys.path.append('.')
-
 from pathlib import Path
 import os
 import unittest
