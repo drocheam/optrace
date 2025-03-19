@@ -170,10 +170,10 @@ Can only be tested by a human viewer.
 
 .. _tox_file:
 
-Tox configuration in `tox.ini <https://github.com/drocheam/optrace/blob/main/tox.ini>`_
-________________________________________________________________________________________
+Tox configuration in `tox.toml <https://github.com/drocheam/optrace/blob/main/tox.toml>`_
+___________________________________________________________________________________________
 
-.. literalinclude:: ../../../tox.ini
+.. literalinclude:: ../../../tox.toml
    :language: ini
 
 **Notes**
@@ -182,7 +182,5 @@ ________________________________________________________________________________
 * parallelized testing with pytest-xdist could be possible, but we wouldn't gain much from it as the heaviest
   tasks are already multithreaded
 * when gui tests fail on wayland, first run :bash:`xhost +`
-* :bash:`LIBGL_ALWAYS_SOFTWARE = 1`, see `<https://github.com/cypress-io/cypress/issues/29521>`_
-* TODO at some point in time update the tox.ini to tox.toml, currently there are some issues
 
 
