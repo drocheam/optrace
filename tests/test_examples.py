@@ -71,7 +71,7 @@ class ExampleTests(unittest.TestCase):
     
     def test_double_gauss(self):
         self._run_file("double_gauss.py")
-    
+   
     def test_achromat(self):
         self._run_file("achromat.py")
     
@@ -100,6 +100,7 @@ class ExampleTests(unittest.TestCase):
     def test_brewster(self):
         self._run_file("brewster_polarizer.py")
     
+    @pytest.mark.os
     def test_eye_model(self):
         self._run_file("arizona_eye_model.py")
     

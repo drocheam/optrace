@@ -5,13 +5,13 @@ sys.path.append('.')
 
 import os
 import subprocess
-import contextlib  # redirect stdout
+import contextlib
 import time
 import doctest
 import unittest
 import pytest
 
-from unittest.mock import patch
+from pathlib import Path
 from scipy.stats import qmc
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,7 +42,8 @@ class TracerMiscTests(unittest.TestCase):
             
             env = os.environ.copy()
             env["PYTHON_CPU_COUNT"] = str(cores)
-
+            env["PYTHONPATH"] = str(Path.cwd())  # so subprocess finds optrace
+            
             result = subprocess.run(["python3", "-c", cmd], env=env, capture_output=True, text=True, check=True)
             cores_compare = str(cores) if hasattr(os, "process_cpu_count") else str(os.cpu_count())
             self.assertEqual(result.stdout[:-1], cores_compare, msg=result.stdout)

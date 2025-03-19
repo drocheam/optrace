@@ -5,6 +5,7 @@ sys.path.append('.')
 
 import os
 
+from pathlib import Path  # path of this file
 import unittest
 import subprocess
 import pytest
@@ -18,21 +19,15 @@ import pytest
 
 class ScopeTests(unittest.TestCase):
 
-    def __init__(self, *args, **kwargs):
-
-        # add PYTHONPATH to env, so the examples can find optrace
-        if "TOX_ENV_DIR" not in os.environ:
-            os.environ["PYTHONPATH"] = "."
-
-        super().__init__(*args, **kwargs)
-
     def _run_command(self, command, timeout=10):
         """run a subprocess and get exit code"""
-
+        
         # we need to run a seperate process so that the script is in a default state without libraries loaded
-        process = subprocess.run(["python", "-c", command], env=os.environ, timeout=timeout)
+        env = os.environ | {"PYTHONPATH": str(Path.cwd())}  # needed to find optrace
+        process = subprocess.run(["python", "-c", command], env=env, timeout=timeout)
         return process.returncode
 
+    @pytest.mark.os
     def test_scope_partial_load(self):
         """test that importing optrace does not import optrace.plots and optrace.gui by default"""
         
@@ -124,6 +119,7 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "otg.CommandWindow", locals())
         self._test_scope_ext_libs(locals())
 
+    @pytest.mark.os
     def test_init_order(self):
 
         eval_str = "import optrace as ot; import optrace.plots as otp; import optrace.gui as otg"

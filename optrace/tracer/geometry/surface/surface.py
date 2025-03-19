@@ -387,7 +387,7 @@ class Surface(BaseClass):
 
                 # timeout
                 if it == 200:  # how to check a timeout? # pragma: no cover
-                    raise TimeoutError(f"Timeout after {it} iterations in hit finding.") 
+                    raise TimeoutError(f"Timeout after {it} iterations in hit finding. Try retracing.") 
                 it += 1
 
             # check if hit is an actual hit. For this the surface needs to be defined at this x and y
