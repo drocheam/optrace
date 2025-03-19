@@ -526,7 +526,7 @@ Microscope
 
 **File**: `examples/microscope.py <https://github.com/drocheam/optrace/blob/main/examples/microscope.py>`_
 
-A more complex microscope setup with a objective, tubus and eyepiece group as well as the human eye as imaging system. 
+A more complex microscope setup with a objective, tube and eyepiece group as well as the human eye as imaging system. 
 The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files
 that are were built from patent data.
 

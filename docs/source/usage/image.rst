@@ -248,7 +248,7 @@ With large rendering times, even small speed-up amounts add up significantly:
   Note that depending on the geometry the polarization direction can have an influence of the amount 
   of light transmission at different surfaces. It is advised to experiment beforehand, 
   if the parameter seems to have any effect on the image.
-  Depending on the geometry, :python:`no_pol=True` can lead to a speed-up of 10-30%.
+  Depending on the geometry, :python:`no_pol=True` can lead to a speed-up of 10-40%.
 * Prefer inbuilt surface types to data or function surfaces
 * try to limit the light through the geometry to rays hitting all lenses. For instance:
     - Moving the color filters to the front of the system avoids the calculation of ray refractions 

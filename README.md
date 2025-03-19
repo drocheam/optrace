@@ -35,7 +35,7 @@
   * presets and user defined surface shapes, ray sources and media
   * an additional GUI for visualization
   * programming/scripting approach to simulation
-  * high performance of 0.1 s / surface / million rays
+  * high performance of 0.11 s / surface / million rays
   * free and open source software
 
 <!--  ^--- TODO add benchmarking details when documentation is online-->

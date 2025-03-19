@@ -6,7 +6,7 @@ import pathlib
 import optrace as ot
 from optrace.gui import TraceGUI
 
-# A more complex setup with a objective, tubus and eyepiece group as well as the human eye as imaging system. 
+# A more complex setup with a objective, tube and eyepiece group as well as the human eye as imaging system. 
 # The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files
 # that are were built from patent data.
 
@@ -24,7 +24,7 @@ RS = ot.RaySource(RSS, divergence="Lambertian",
 RT.add(RS)
 
 # load material files 
-with ot.global_options.no_warnings():  # ignore import warnings
+with ot.global_options.no_warnings(): # suppress warnings 
     schott = ot.load_agf(str(resource_dir / "materials" / "schott.agf"))
     ohara = ot.load_agf(str(resource_dir / "materials" / "ohara.agf"))
     hikari = ot.load_agf(str(resource_dir / "materials" / "hikari.agf"))
@@ -101,8 +101,6 @@ RT.add(ot.PointMarker("Eye", [0, -50, np.mean(eye.extent[4:])], label_only=True,
 vol = ot.CylinderVolume(r=15.9, length=eyepiece.extent[5]-objective.extent[4]-1.3, 
                         pos=[0, 0, objective.extent[4]+1.3], color=(0.0, 0.0, 0.0))
 RT.add(vol)
-
-RT.tracing_snapshot()
 
 # run the simulator
 sim = TraceGUI(RT, ray_count=1000000, vertical_labels=True, minimalistic_view=True)

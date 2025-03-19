@@ -73,12 +73,18 @@ Tracing performance depends on the number of surfaces and rays as well as the co
 Spherical surfaces are easier to trace then complex user defined ones.
 For systems with a low number of surfaces the ray generation at the source becomes dominant.
 
-The example :ref:`example_microscope` is used for testing in its default settings.
-These includes one million rays and 57 light-interacting surfaces (one ray source, one aperture, 
-27 lenses with front and back surface each, one outline surface of the bounding box).
-Detectors are excluded as they don't interact with the rays unless image rendering is executed.
-From the start of the raytracing until the end 6.6 seconds pass on my system 
-(Arch Linux 6.12, i7-1360P notebook CPU, Python 3.13), resulting in 0.12 s / surface / million rays.
+The benchmarking file `tests/benchmark.py <https://github.com/drocheam/optrace/blob/main/tests/benchmark.py>`_
+is an adapted version of the :ref:`example_microscope` example.
+It includes 57 light-interacting surfaces (one ray source, one aperture, 27 lenses with front and back surface each, 
+one outline surface of the bounding box). Detectors are excluded as they don't interact with the rays unless
+image rendering is executed.
+Turning off the polarization calculation (with :attr:`Raytracer.no_pol <optrace.tracer.raytracer.Raytracer.no_pol>`)
+leads to a significant speedup.
+
+The raytracing on my system Arch Linux 6.12, i7-1360P notebook CPU, 16GB RAM, Python 3.13) results in:
+
+* 0.109 s / surface / million rays  (with polarization calculation)
+* 0.067 s / surface / million rays  (without polarization calculation)
 
 
 .. TODO how to handle these points:

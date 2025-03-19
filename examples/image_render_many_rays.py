@@ -11,7 +11,7 @@ import numpy as np
 RSS = ot.presets.image.tv_testcard2([4, 3])
 
 # make raytracer
-RT = ot.Raytracer(outline=[-8, 8, -8, 8, 0, 40])
+RT = ot.Raytracer(outline=[-8, 8, -8, 8, 0, 40], no_pol=True)  # speed up by neglecting polarization dependence
 
 # add Raysource
 # orient the light direction cone from each object point towards the lens with orientation="Converging",
@@ -36,7 +36,7 @@ RT.add(Det)
 
 # render and show detector image
 pos = [[0, 0, 15], [0, 0, 20], [0, 0, 25.], [0, 0, 29.], [0, 0, 31.], [0, 0, 36.]]
-Ims = RT.iterative_render(N=15e6, pos=pos, extent=[-5, 5, -5, 5])
+Ims = RT.iterative_render(N=20e6, pos=pos, extent=[-5, 5, -5, 5])
 
 # show rendered images
 for dimg in Ims:
