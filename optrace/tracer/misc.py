@@ -11,11 +11,24 @@ def cpu_count() -> int:
     """
     Number of logical cpu cores assigned to this process (Python >= 3.13)
     Number of logical cpu cores (Python < 3.13)
+    Can be overriden by setting the PYTHON_CPU_COUNT environment variable or running python -X cpucores
+    Setting by PYTHON_CPU_COUNT must be between 1-64.
 
     :return: cpu count
     """
     count = os.process_cpu_count() if hasattr(os, "process_cpu_count") else os.cpu_count()
-    return count or 1  # count could be None, set to 1
+    count = count or 1
+
+    # while cpu_count and process_cpu_count handle the PYTHON_CPU_COUNT by now,
+    # this was not the case for Python < 3.13
+    # additionally, it also does not seem to work when the env variable is set at runtime?
+    if "PYTHON_CPU_COUNT" in os.environ:
+        count = int(os.environ["PYTHON_CPU_COUNT"])
+
+    if not (1 <= count <= 64):
+        raise RuntimeError(f"Invalid core count {count}, must be between 1 and 64.")
+
+    return count
 
 
 # with the help of https://stackoverflow.com/questions/51503672/decorator-for-timeit-timeit-method/51503837#51503837

@@ -228,9 +228,7 @@ class Surface(BaseClass):
         """
         # use r^2 instead of r, saves sqrt calculation for all points
         x0, y0, z0 = self.pos
-        r2 = (x - x0) ** 2 + (y - y0) ** 2
-
-        return r2 <= (self.r + self.N_EPS)**2
+        return (x - x0) ** 2 + (y - y0) ** 2 <= (self.r + self.N_EPS)**2
 
     def normals(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
@@ -243,11 +241,8 @@ class Surface(BaseClass):
         if self.is_flat():
             return np.broadcast_to([0., 0., 1.], (x.shape[0], 3))
         
-        n = np.tile([0., 0., 1.], (x.shape[0], 1))
-
         # coordinates actually on surface
         m = self.mask(x, y)
-        xm, ym = x[m], y[m]
 
         # approximate optimal step width for differentiation  for a second derivative
         # of form (f(x+h) - f(x-h)) / (2h) the optimal h is
@@ -263,13 +258,15 @@ class Surface(BaseClass):
         # uz is the surface change in x direction, vz in y-direction, the normal vector
         # of derivative vectors u = (2*ds, 0, uz) and v = (0, 2*ds, vz) is n = (-2*uz*ds, -2*ds*vz, 4*ds*ds)
         # this can be rescaled to n = (-uz, -vz, 2*ds)
-        x_, y_ = xm - self.pos[0], ym - self.pos[1]  # use coordinates relative to center
-        n[m, 0] = self._values(x_ - eps, y_) - self._values(x_ + eps, y_)  # -uz
-        n[m, 1] = self._values(x_, y_ - eps) - self._values(x_, y_ + eps)  # -vz
-        n[m, 2] = 2*eps
+        x_, y_ = x - self.pos[0], y  - self.pos[1]  # use coordinates relative to center
+        n = np.zeros((x.shape[0], 3), order="F", dtype=np.float64)
+        n[:, 0] = self._values(x_ - eps, y_) - self._values(x_ + eps, y_)  # -uz
+        n[:, 1] = self._values(x_, y_ - eps) - self._values(x_, y_ + eps)  # -vz
+        n[:, 2] = 2*eps
+        n[~m] = [0, 0, 1]
 
         # normalize vectors
-        n[m] = misc.normalize(n[m])
+        n = misc.normalize(n)
 
         return n
 
@@ -291,6 +288,7 @@ class Surface(BaseClass):
         zd = self._values(xd, yd)
 
         return xd + self.pos[0], yd + self.pos[1], zd + self.pos[2]
+
 
     def find_hit(self, p: np.ndarray, s: np.ndarray)\
             -> tuple[np.ndarray, np.ndarray, np.ndarray]:

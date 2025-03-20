@@ -752,10 +752,9 @@ class Raytracer(Group):
         :param n: surface normal
         :param pols: initial polarization
         :param i: surface number
-        eparam hwh: have-weight-and-hit-surface boolean array
+        :param hwh: have-weight-and-hit-surface boolean array
         :return: amplitude components in s and p polarization direction
         """
-           
         # no polarization -> don't set anything and return equal amplitude components
         if self.no_pol:
             return 1/np.sqrt(2), 1/np.sqrt(2)

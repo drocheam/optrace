@@ -149,6 +149,8 @@ Multithreading can be turned off with:
 
    ot.global_options.multi_threading = False
 
+.. TODO mention options of setting PYTHON_CPU_COUNT
+.. TODO not all actions use all numbers of threads
 
 Wavelength Range
 ###################

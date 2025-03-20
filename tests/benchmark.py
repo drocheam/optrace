@@ -67,8 +67,10 @@ RT.add(eye)
 
 # benchmark info
 snum = len(RT.tracing_surfaces)
+N = 1000000
 print(f"Number of surfaces:                           {snum}")
 print(f"Number of threads for tracing:                {cpu_count()}")
+print(f"Number of rays:                               {N}")
 
 # run both polarization cases
 for i, no_pol in enumerate([False, True]):
@@ -78,10 +80,10 @@ for i, no_pol in enumerate([False, True]):
     # trace
     time0 = time.time()
     RT.no_pol = no_pol
-    RT.trace(1000000)
+    RT.trace(N)
     time1 = time.time()
 
-    print(f"Performance (seconds / surf / million rays):  {(time1-time0)/snum:.3f}")
+    print(f"Performance (seconds / surf / million rays):  {(time1-time0)/snum/N*1e6:.3f}")
 
     # cool down before next test
     if not i:

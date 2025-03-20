@@ -70,7 +70,7 @@ Overview
         * presets and user defined surface shapes, ray sources and media
         * an additional GUI for visualization
         * programming/scripting approach to simulation
-        * high performance of 0.1 s / surface / million rays (:ref:`details <benchmarking>`)
+        * high performance of 0.11 s / surface / million rays (:ref:`details <benchmarking>`)
         * free and open source software
 
      - **What it CAN'T do**

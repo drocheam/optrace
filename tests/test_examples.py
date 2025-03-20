@@ -69,6 +69,7 @@ class ExampleTests(unittest.TestCase):
         self._run_file(Path.cwd() / "examples" / "psf_imaging.py")
     
     @pytest.mark.slow
+    @pytest.mark.skip(reason="Don't really required as test, test on demand")
     def test_benchmark(self):
         self._run_file(Path.cwd() / "tests" / "benchmark.py", 45)
     

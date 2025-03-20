@@ -266,10 +266,7 @@ class RaySource(Element):
                 s_or = np.broadcast_to(self.s, (N, 3))
 
             case "Converging":
-                s_or = np.column_stack((self.conv_pos[0] - p[:, 0], 
-                                        self.conv_pos[1] - p[:, 1], 
-                                        self.conv_pos[2] - p[:, 2]))
-                s_or = misc.normalize(s_or)
+                s_or = misc.normalize(self.conv_pos - p)
 
             case "Function":  # pragma: no branch
                 pc.check_callable("RaySource.or_func", self.or_func)
@@ -353,7 +350,7 @@ class RaySource(Element):
         ################################################################################################################
 
         if no_pol:
-            pols = np.full_like(p, np.nan, np.float64, order='F')
+            pols = np.full_like(p, np.nan, np.float16, order='F')
 
         else:
             match self.polarization:

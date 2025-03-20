@@ -81,11 +81,27 @@ image rendering is executed.
 Turning off the polarization calculation (with :attr:`Raytracer.no_pol <optrace.tracer.raytracer.Raytracer.no_pol>`)
 leads to a significant speedup.
 
-The raytracing on my system Arch Linux 6.12, i7-1360P notebook CPU, 16GB RAM, Python 3.13) results in:
+The raytracing on my system (Arch Linux 6.13, i7-1360P notebook CPU, 16GB RAM, Python 3.13) results in:
 
-* 0.109 s / surface / million rays  (with polarization calculation)
-* 0.067 s / surface / million rays  (without polarization calculation)
+.. table:: Performance Comparison. Result values are in seconds / surface / million rays.
+   :widths: 60 110 110
+   :width: 600px
 
+   +-------+----------------------+---------------------+
+   | Cores | Without Polarization | With Polarization   |
+   +=======+======================+=====================+
+   |   1   |        0.262         |        0.417        |
+   +-------+----------------------+---------------------+
+   |   2   |        0.122         |        0.171        |
+   +-------+----------------------+---------------------+
+   |   4   |        0.069         |        0.125        |
+   +-------+----------------------+---------------------+
+   |   8   |        0.059         |        0.108        |
+   +-------+----------------------+---------------------+
+   |  16   |        0.057         |        0.101        |
+   +-------+----------------------+---------------------+
+
+So there is not much gain in using 16 over 8 cores.
 
 .. TODO how to handle these points:
 

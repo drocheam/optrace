@@ -75,16 +75,29 @@ class ConicSurface(Surface):
         :param y: y-coordinates (numpy 1D array)
         :return: normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)
         """
-        n = np.tile(np.array([0., 0., 1.], dtype=np.float64), (x.shape[0], 1))
 
         # coordinates actually on surface
         m = self.mask(x, y)
-        xm, ym = x[m], y[m]
 
         x0, y0, z0 = self.pos
         rho = 1/self.R
-        r_2 = (xm-x0)**2 + (ym-y0)**2
-        phi = np.arctan2(ym-y0, xm-x0)
+
+        # simplified case for spherical surface
+        if not self.k:
+            
+            n = np.zeros((x.shape[0], 3), order="F", dtype=np.float64)
+            n[:, 0] = -rho*(x-x0)
+            n[:, 1] = -rho*(y-y0)
+            
+            with np.errstate(divide="ignore", invalid="ignore"):
+                n[:, 2] = np.sqrt(1 - rho**2*(x-x0)**2 - rho**2*(y-y0)**2)
+            
+            n[~m] = [0, 0, 1]
+            
+            return n
+
+        r = np.sqrt((x-x0)**2 + (y-y0)**2)
+        phi = np.arctan2(y-y0, x-x0)
 
         # the derivative of a conic section formula is
         #       m := dz/dr = r*rho / sqrt(1 - (k+1) * rho**2 *r**2)
@@ -97,12 +110,17 @@ class ConicSurface(Surface):
         # since n = [n_r, n_z] is a unity vector
         #       n_z = +sqrt(1 - n_r**2)
         # this holds true since n_z is always positive in our raytracer
-        n_r = -rho * np.sqrt(r_2) / np.sqrt(1 - self.k * rho**2 * r_2)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            n_r = -rho * r / np.sqrt(1 - self.k * rho**2 * r**2)
 
-        # n_r is rotated by phi to get n_x, n_y
-        n[m, 0] = n_r*np.cos(phi)
-        n[m, 1] = n_r*np.sin(phi)
-        n[m, 2] = np.sqrt(1 - n_r**2)
+            # n_r is rotated by phi to get n_x, n_y
+            n = np.zeros((x.shape[0], 3), order="F", dtype=np.float64)
+            n[:, 0] = n_r*np.cos(phi)
+            n[:, 1] = n_r*np.sin(phi)
+
+            n[:, 2] = np.sqrt(1 - n_r**2)
+        
+        n[~m] = [0, 0, 1]
 
         return n
 

@@ -36,7 +36,7 @@ RT.add(Det)
 
 # render and show detector image
 pos = [[0, 0, 15], [0, 0, 20], [0, 0, 25.], [0, 0, 29.], [0, 0, 31.], [0, 0, 36.]]
-Ims = RT.iterative_render(N=20e6, pos=pos, extent=[-5, 5, -5, 5])
+Ims = RT.iterative_render(N=20e6, pos=pos)
 
 # show rendered images
 for dimg in Ims:

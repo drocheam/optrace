@@ -34,16 +34,30 @@ class TracerMiscTests(unittest.TestCase):
         # check by starting subprocesses with set env
 
         cmd = "from optrace.tracer.misc import cpu_count; print(cpu_count())"
+        env0 = os.environ.copy()
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(Path.cwd())  # so subprocess finds optrace
 
+        # setting from external env
         for cores in [32, 12, 9, 8, 5, 4, 2, 1]:  # include some atypical numbers
             
-            env = os.environ.copy()
             env["PYTHON_CPU_COUNT"] = str(cores)
-            env["PYTHONPATH"] = str(Path.cwd())  # so subprocess finds optrace
-            
             result = subprocess.run(["python", "-c", cmd], env=env, capture_output=True, text=True, check=True)
-            cores_compare = str(cores) if hasattr(os, "process_cpu_count") else str(os.cpu_count())
-            self.assertEqual(result.stdout[:-1], cores_compare, msg=result.stdout)
+            correct_cores = str(cores) if 1 <= cores <= 64 else "1"
+            self.assertEqual(result.stdout[:-1], correct_cores, msg=result.stdout)
+        
+        # setting env at runtime
+        for cores in [128, 32, 12, 9, 8, 5, 4, 2, 1, 0, -1]:
+       
+            os.environ["PYTHON_CPU_COUNT"] = str(cores)
+           
+            if 1 <= cores <= 64:
+                self.assertEqual(cores, misc.cpu_count())
+            else:
+                self.assertRaises(RuntimeError, misc.cpu_count)
+
+        # reset env
+        os.environ = env0
 
     def test_global_options(self):
         
