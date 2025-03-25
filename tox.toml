@@ -5,7 +5,8 @@ skip_missing_interpreters = true
 
 [env_run_base]
 description = "Main testing environment"
-pass_env = ["HOME", "DISPLAY", "WAYLAND_DISPLAY", "QT_QPA_PLATFORM", "XAUTHORITY", "GITHUB_ACTIONS", "PYTHON_CPU_COUNT"]
+pass_env = ["HOME", "DISPLAY", "WAYLAND_DISPLAY", "QT_QPA_PLATFORM", "XAUTHORITY", "GITHUB_ACTIONS", "PYTHON_CPU_COUNT",
+            "XDG_SESSION_TYPE", "XDG_SESSION_DESKTOP"]
 env_dir = "{toxworkdir}{/}env_static"
 runner = "ignore_env_name_mismatch"
 deps = ["pylint"]
@@ -23,6 +24,9 @@ commands = [
     ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_plots.py"
     ],
+    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+        "pytest", {replace="posargs", extend=true}, "tests{/}test_examples.py"
+    ],
     ["coverage", "run", "-p", "--source=optrace", "--branch", "-m",
         "pytest", {replace="posargs", extend=true}, "-m", "gui1", "tests{/}test_gui.py"
     ],
@@ -31,9 +35,6 @@ commands = [
     ],
     ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
         "pytest", {replace="posargs", extend=true}, "-m", "gui3", "tests{/}test_gui.py"
-    ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
-        "pytest", {replace="posargs", extend=true}, "tests{/}test_examples.py"
     ],
     ["coverage", "combine"],
     ["coverage", "report", "--show-missing"],

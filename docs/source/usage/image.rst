@@ -819,7 +819,7 @@ Below you can find preset images that can be used as ray source.
           White grid on black background with 10x10 cells. Useful for distortion characterization.
           Usage with :obj:`ot.presets.image.grid <optrace.tracer.presets.image.grid>`
 
-     - .. figure:: ../../../optrace/resources/images/siemens_star.webp
+     - .. figure:: ../../../optrace/resources/images/siemens_star.png
           :align: center
           :width: 300
 

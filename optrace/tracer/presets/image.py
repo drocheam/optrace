@@ -151,7 +151,7 @@ def siemens_star(s: np.ndarray | list = None, extent: list | np.ndarray = None) 
     :param extent: image extent in the form [xs, xe, ys, ye]
     :return: RGBImage object
     """
-    return RGBImage(str(image_dir / "siemens_star.webp"), s, extent, desc="Siemens Star")
+    return RGBImage(str(image_dir / "siemens_star.png"), s, extent, desc="Siemens Star")
 
 def tv_testcard1(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """

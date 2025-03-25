@@ -90,7 +90,7 @@ class RenderImage(BaseClass):
     def __check_for_image(self) -> None:
         """throw exception when image is missing"""
         if not self.has_image():
-            raise RuntimeError("Image was not calculated.")
+            raise RuntimeError("Image was not calculated/rendered yet.")
 
     @property
     def s(self) -> list[float, float]:
@@ -106,6 +106,7 @@ class RenderImage(BaseClass):
     @property
     def data(self) -> numpy.ndarray:
         """image data array"""
+        self.__check_for_image()
         return self._data.copy()
 
     @property

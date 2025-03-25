@@ -28,18 +28,15 @@ def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     :param rgb: RGB values (numpy 1D, 2D or 3D array)
     :return: linear RGB values, array with same shape as input
     """
-
-    RGB = rgb.copy()
-
     # remove gamma correction (sRGB -> RGBLinear)
     # Source: https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
+    # optimize for default case: rgb > 0.04045
     a = 0.055
-    below = np.abs(RGB) <= 0.04045
-    RGB[below] *= 1 / 12.92
-    RGBnb = RGB[~below]
-    RGB[~below] = np.sign(RGBnb)*((abs(RGBnb) + a) / (1 + a)) ** 2.4
+    below = np.abs(rgb) <= 0.04045
+    rgb_lin = np.sign(rgb)*((abs(rgb) + a) / (1 + a)) ** 2.4
+    rgb_lin[below] = rgb[below] / 12.92
 
-    return RGB
+    return rgb_lin
 
 
 def srgb_linear_to_xyz(rgbl: np.ndarray) -> np.ndarray:
@@ -528,6 +525,8 @@ _SRGB_R_PRIMARY_POWER_FACTOR = 0.885651229244
 _SRGB_G_PRIMARY_POWER_FACTOR = 1.000000000000
 _SRGB_B_PRIMARY_POWER_FACTOR = 0.775993481741
 
+SRGB_PRIMARY_POWER_FACTORS = [_SRGB_R_PRIMARY_POWER_FACTOR, _SRGB_G_PRIMARY_POWER_FACTOR, _SRGB_B_PRIMARY_POWER_FACTOR]
+
 ########################################################################################################################
 
 
@@ -576,16 +575,15 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
     return wl_out
 
 
-def _power_from_srgb(rgb: np.ndarray) -> np.ndarray:
+def power_from_srgb_linear(rgbl: np.ndarray) -> np.ndarray:
     """
     Get a measure of pixel power/probability with the sRGB primaries above.
 
-    :param rgb: sRGB image (2D, with channels in third dimension)
+    :param rgbl: linear sRGB image (2D, with channels in third dimension)
     :return: power/probability image with two dimensions
     """
-    RGBL = srgb_to_srgb_linear(rgb)  # physical brightness is proportional to RGBLinear signal
-    P = _SRGB_R_PRIMARY_POWER_FACTOR * RGBL[:, :, 0] + _SRGB_G_PRIMARY_POWER_FACTOR * RGBL[:, :, 1] \
-        + _SRGB_B_PRIMARY_POWER_FACTOR * RGBL[:, :, 2]
+    P = _SRGB_R_PRIMARY_POWER_FACTOR * rgbl[:, :, 0] + _SRGB_G_PRIMARY_POWER_FACTOR * rgbl[:, :, 1] \
+        + _SRGB_B_PRIMARY_POWER_FACTOR * rgbl[:, :, 2]
     return P
 
 ########################################################################################################################

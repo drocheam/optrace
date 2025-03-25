@@ -27,6 +27,7 @@ class ImageTests(unittest.TestCase):
 
         img = ot.RenderImage([-1, 1, -2, 2])
         self.assertFalse(img.has_image())  # no image yet
+        self.assertRaises(RuntimeError, lambda: img.data)  # no image yet
         
         # create some image
         img, P, L = self.random_render_image()
@@ -273,6 +274,13 @@ class ImageTests(unittest.TestCase):
         for imgi in ot.presets.image.all_presets:
             RSS = imgi(extent=extent)
             self.assertTrue(np.all(RSS.extent == extent))
+
+        # check that uncolored images get detected as uncolored.
+        # required so image convolution detects it as spectral homogeneous
+        for preset in [ot.presets.image.ETDRS_chart, ot.presets.image.ETDRS_chart_inverted, 
+                       ot.presets.image.siemens_star, ot.presets.image.grid]:
+            img = preset([1, 1])
+            self.assertFalse(color.has_color(img.data), msg=img.desc)
 
     @pytest.mark.os
     def test_image_init_exceptions(self):

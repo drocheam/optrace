@@ -702,6 +702,8 @@ class GUITests(unittest.TestCase):
    
     @pytest.mark.slow
     @pytest.mark.gui3
+    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland", 
+                        reason="KDE Wayland wants remote authentication")
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
@@ -1436,6 +1438,8 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui2
+    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland", 
+                        reason="KDE Wayland wants remote authentication")
     def test_picker(self):
         """
         test picker interaction in the scene

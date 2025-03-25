@@ -12,7 +12,7 @@ from .surface.rectangular_surface import RectangularSurface
 
 # spectrum and color
 from ..spectrum.light_spectrum import LightSpectrum  # spectrum of source
-from .. import color  # for random_wavelengths_from_srgb() and _power_from_srgb()
+from .. import color  # for random_wavelengths_from_srgb() and power_from_srgb_linear()
 from ..presets.light_spectrum import d65 as d65_spectrum  # default light spectrum
 
 # misc
@@ -121,13 +121,13 @@ class RaySource(Element):
             self._image = surface
                 
             # calculate pixel probability from relative power for each pixel
-            If = color._power_from_srgb(self._image.data).ravel()
+            sRGBL = color.srgb_to_srgb_linear(self._image._data)
+            If = color.power_from_srgb_linear(sRGBL).flatten()
             Ifs = np.sum(If)
             self._pIf = 1/Ifs*If
 
             # calculate mean image color, needed for self.color
             # mean color needs to calculated in a linear colorspace, hence sRGBLinear
-            sRGBL = color.srgb_to_srgb_linear(self._image.data)
             sRGBL_mean = np.mean(sRGBL, axis=(0, 1))
             sRGB_mean = color.srgb_linear_to_srgb(np.array([[[*sRGBL_mean]]]))
             self._mean_img_color = sRGB_mean[0, 0]

@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 import scipy.interpolate
 import scipy.ndimage
+import cv2
 
 import optrace as ot
 from optrace.tracer import color
@@ -47,7 +48,17 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.convolve, img2, psf)  # can't convolve an image that has been projected 
         img2.projection = None
         psf.projection = "Orthographic"
-        self.assertRaises(ValueError, ot.convolve, img2, psf)  # can't convolve with a psf that has been projected 
+        self.assertRaises(ValueError, ot.convolve, img2, psf)  # can't convolve with a psf that has been projected
+
+        # test exceptions for colored image and colored psf
+        rimg = ot.RenderImage([-1, 1, -1, 1])
+        rimg.render()
+        rimg2 = ot.RenderImage([-1, 1, 0, 1])
+        rimg2.render()
+        self.assertRaises(TypeError, ot.convolve, img, rimg)  # color img and psf require R, G, B psf list
+        self.assertRaises(TypeError, ot.convolve, img, [rimg, rimg])  # see above, but must be explicitly 3 elements
+        self.assertRaises(TypeError, ot.convolve, img, [rimg, img2, rimg])  # one element has the wrong type
+        self.assertRaises(ValueError, ot.convolve, img, [rimg, rimg2, rimg])  # extents are not the same
             
     def test_resolution_exceptions(self):
 
@@ -83,8 +94,16 @@ class ConvolutionTests(unittest.TestCase):
     def test_coverage(self):
         """Some additional coverage testing"""
 
+        # check different threading and progressbar constellations
+        # needs to test simple and RGB psf
+
         img = ot.presets.image.color_checker([5, 6])
         psf = ot.presets.psf.halo()
+        
+        rimg = ot.RenderImage([-2.3, 1, -1, 1])
+        rimg.data = np.random.sample(rimg.shape)
+        psf2 = [rimg, rimg, rimg]
+
         psf.extent = [-0.05, 0.05, -0.15, 0.15]
         s_img = img.s
         s_psf = psf.s
@@ -92,11 +111,12 @@ class ConvolutionTests(unittest.TestCase):
         # check that call is correct, also tests threading and progressbar
         for bar in [False, True]:
             for threading in [False, True]:
-                ot.global_options.show_progress_bar = bar
-                ot.global_options.multithreading = threading
-                ot.convolve(img, psf)
+                for psfi in [psf, psf2]:
+                    ot.global_options.show_progress_bar = bar
+                    ot.global_options.multithreading = threading
+                    ot.convolve(img, psfi)
 
-        # coverage tests
+        # additional coverage tests
         #############################################
         img = ot.presets.image.color_checker([1, 1]).data
 
@@ -195,7 +215,6 @@ class ConvolutionTests(unittest.TestCase):
             img2 = img2[:, :, 0]
 
             # resulting gaussian with convolution
-            # s2 += np.array([s2[0]/img2.shape[1], s2[1]/img2.shape[0]])
             Y, X = np.mgrid[-s2[0]/2:s2[0]/2:img2.shape[1]*1j, -s2[1]/2:s2[1]/2:img2.shape[0]*1j]
             R2 = X**2 + Y**2
             Z = np.exp(-3.265306122449e6*(R2))
@@ -213,6 +232,7 @@ class ConvolutionTests(unittest.TestCase):
             # similar to an integration error that becomes smaller and smaller for a larger resolution
 
 
+    @pytest.mark.conv
     @pytest.mark.slow
     @pytest.mark.timeout(600)
     def test_tracing_consistency(self):
@@ -220,92 +240,107 @@ class ConvolutionTests(unittest.TestCase):
         checks that psf convolution produces the same result as tracing.
         This function also checks the behavior and correctness of a colored PSF
         """
-
         # i == 0: colored psf and bw image
         # i == 1: bw psf and colored image
         # i == 2: both bw
         # i == 3: both colored
         # i == 4: colored psf and linear image
         for i in range(5):
+            with self.subTest(i=i):
 
-            # raytracer and raysource
-            RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 40], no_pol=True)
-            RS = ot.RaySource(ot.Point(), divergence="Lambertian", div_angle=2, s=[0, 0, 1], pos=[0, 0, 0])
-            RT.add(RS)
+                # raytracer and raysource
+                RT = ot.Raytracer(outline=[-5, 5, -5, 5, 0, 100], no_pol=True)
+                RS_args = dict(surface=ot.Point(), divergence="Isotropic", div_angle=2, s=[0, 0, 1], pos=[0, 0, 0]) 
 
-            # add Lens
-            front = ot.SphericalSurface(r=3, R=8)
-            back = ot.SphericalSurface(r=3, R=-8)
-            nL1 = ot.RefractionIndex("Abbe", n=1.5, V=120) if (i == 0 or i == 3)\
-                    else ot.RefractionIndex("Constant", n=1.5)
-            L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
-            RT.add(L1)
+                if i in [1, 2, 3]:
+                    for spec in [ot.presets.light_spectrum.srgb_r, ot.presets.light_spectrum.srgb_g, 
+                                 ot.presets.light_spectrum.srgb_b]:
+                        RS = ot.RaySource(**RS_args, spectrum=spec)
+                        RT.add(RS)
+                else:
+                    RS = ot.RaySource(**RS_args)
+                    RT.add(RS)
 
-            # add Detector
-            DetS = ot.RectangularSurface(dim=[10, 10])
-            Det = ot.Detector(DetS, pos=[0, 0, 36.95])
-            Det.move_to([0, 0, 38.571])
-            RT.add(Det)
+                # add Lens
+                front = ot.SphericalSurface(r=3, R=8)
+                back = ot.SphericalSurface(r=3, R=-8)
+                nL1 = ot.RefractionIndex("Abbe", n=1.5, V=80) if i in [0, 3, 4]\
+                        else ot.RefractionIndex("Constant", n=1.5)
+                L1 = ot.Lens(front, back, de=0.1, pos=[0.2, -0.3, 12], n=nL1)  # some asymmetry
+                RT.add(L1)
 
-            # render PSF
-            RT.trace(2000000)
-            img = RT.detector_image(extent=[-0.07, 0.07, -0.07, 0.07])
-            psf = img.copy()
+                # more asymmetry
+                RT.add(ot.Aperture(ot.RingSurface(r=0.3, ri=0.2), pos=[0.1, 0, L1.back.z_max]))
 
-            # image
-            if i in [0, 2]:
-                img = ot.presets.image.ETDRS_chart_inverted 
-            elif i == 4:
-                img = lambda x: ot.presets.psf.gaussian(x[0]*1000/5/2)
-            else: 
-                img = ot.presets.image.color_checker
+                # add Detector
+                DetS = ot.RectangularSurface(dim=[10, 10])
+                Det = ot.Detector(DetS, pos=[0, 0, 36.95])
+                Det.move_to([0, 0, RT.tma().image_position(0)])
+                RT.add(Det)
 
-            s_img = [0.07, 0.07]
+                # render PSF
+                RT.trace(1000000)
+                psf = RT.detector_image()
+                s_img = np.array(psf.s)
 
-            # swap old source for image source
-            RT.remove(RS)
-            RS = ot.RaySource(img(s_img), divergence="Lambertian", div_angle=2, s=[0, 0, 1], pos=[0, 0, 0])
-            RT.add(RS)
+                if i in [1, 2, 3]:
+                    psf_r = RT.detector_image(source_index=0, extent=psf.extent)
+                    psf_g = RT.detector_image(source_index=1, extent=psf.extent)
+                    psf_b = RT.detector_image(source_index=2, extent=psf.extent)
+                    psf = [psf_r, psf_g, psf_b]
+                
+                # image
+                if i in [0, 2]:
+                    img = ot.presets.image.ETDRS_chart_inverted 
+                elif i == 4:
+                    img = lambda x: ot.presets.psf.airy(x[0]*1000/5/2)
+                else: 
+                    img = ot.presets.image.tv_testcard2
 
-            # rendered image
-            det_im = RT.iterative_render(30e6, extent=[-0.12, 0.12, -0.12, 0.12])
-            img_ren0 = det_im[0]
-            img_ren = img_ren0.get("sRGB (Absolute RI)", 189).data
-            s_img_ren = [img_ren0.extent[1]-img_ren0.extent[0], img_ren0.extent[3]-img_ren0.extent[2]]
+                # swap old source for image source
+                # make ray cone converge to lens center, so we are still somewhat in the paraxial case
+                RT.remove(RT.ray_sources)
+                RS = ot.RaySource(img(s_img), divergence="Isotropic", div_angle=2, pos=[0, 0, 0], 
+                                  orientation="Converging", conv_pos=[0, 0, 12])
+                RT.add(RS)
 
-            # convolution image
-            mag = 2.232751
-            mag = 2.222751
-            img_conv_ = ot.convolve(img([s_img[0]*mag, s_img[1]*mag]), psf)
-            img_conv, s_img_conv  = img_conv_.data, img_conv_.s
+                # convolution image
+                mag = RT.tma().image_magnification(0)
+                img_conv_ = ot.convolve(img(s_img), psf, m=mag)
+                img_conv, s_img_conv = img_conv_.data, img_conv_.s
+                
+                # rendered image
+                det_im = RT.iterative_render(30e6, extent=img_conv_.extent)
+                img_ren0 = det_im[0]
+                img_ren = img_ren0.get("sRGB (Absolute RI)", 189).data
 
-            # plot
-            # import optrace.plots as otp
-            # otp.image_plot(img_conv_)
-            # otp.image_plot(img_ren0.get("sRGB (Absolute RI)", 189), flip=True)
+                # interpolate on convolved image and subtract from rendered one channel-wise
+                img_ren = color.srgb_to_srgb_linear(img_ren)
+                img_conv = color.srgb_to_srgb_linear(img_conv)
+                img_conv = cv2.resize(img_conv, [img_ren.shape[1], img_ren.shape[0]], interpolation=cv2.INTER_AREA)
+                img_conv /= np.mean(img_conv)
+                img_ren /= np.mean(img_ren)
+                im_diff = img_ren - img_conv
+                im_diff -= np.mean(im_diff)
+                res = np.mean(np.abs(im_diff/np.max(img_conv)))  # mean absolute deviation
+                mean_ratio = np.mean(img_ren, axis=(0, 1)) / np.mean(img_conv, axis=(0, 1)) # ratio of mean rgb values
 
-            # spacing vectors
-            x = np.linspace(-s_img_conv[0]/2, s_img_conv[0]/2, img_conv.shape[1])
-            y = np.linspace(-s_img_conv[1]/2, s_img_conv[1]/2, img_conv.shape[0])
-            xi = np.linspace(-s_img_ren[0]/2, s_img_ren[0]/2, img_ren.shape[1])
-            yi = np.linspace(-s_img_ren[1]/2, s_img_ren[1]/2, img_ren.shape[0])
+                # import optrace.plots as otp
+                # text = f"{res:.2g} f{np.max(np.abs(mean_ratio-1)):.2g}"
+                # otp.image_plot(ot.RGBImage(img_ren/np.max(img_ren), [1, 1]), title="rendered")
+                # otp.image_plot(ot.RGBImage(img_conv/np.max(img_conv), [1, 1]), title="conv")
+                # otp.image_plot(ot.RGBImage(np.abs(img_conv/np.max(img_conv)-img_ren/np.max(img_ren)), [1, 1]), 
+                               # title=text)
+                # otp.block()
 
-            # interpolate on convolved image and subtract from rendered one channel-wise
-            img_ren = color.srgb_to_srgb_linear(img_ren)
-            img_conv = color.srgb_to_srgb_linear(img_conv)
-            im_diff = np.fliplr(np.flipud(img_ren)).copy()
-            im_diff[:, :, 0] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 0].T, kx=1, ky=1)(xi, yi).T
-            im_diff[:, :, 1] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 1].T, kx=1, ky=1)(xi, yi).T
-            im_diff[:, :, 2] -= scipy.interpolate.RectBivariateSpline(x, y, img_conv[:, :, 2].T, kx=1, ky=1)(xi, yi).T
-            im_diff -= np.mean(im_diff)
+                # different error tolerances for each case, derived/estimated empirically
+                err_mean = [0.0018, 0.013, 0.006, 0.0085, 0.0004]
+                err_color = [0.008, 0.0015, 0.0015, 0.0015, 0.005]
 
-            # check that mean difference is small
-            # we still have some deviations due to noise, incorrect magnification and not-linear aberrations
-            # print(np.mean(np.abs(im_diff)))
-            delta = 0.0075 if i not in [1, 3] else 0.04  
-            # ^-- larger errors for bright colored color checker image due too not enough rays
-            # print(delta, np.mean(np.abs(im_diff)))
-            self.assertAlmostEqual(np.mean(np.abs(im_diff)), 0, delta=delta)
+                # check that mean difference is small
+                # we still have some deviations due to noise, incorrect magnification and not-linear aberrations
+                self.assertAlmostEqual(res, 0, delta=err_mean[i], msg=f"case={i}")
+                self.assertAlmostEqual(np.max(np.abs(mean_ratio-1)), 0, delta=err_color[i], msg=f"case={i}")
      
     def test_white_balance(self):
         """
@@ -344,15 +379,13 @@ class ConvolutionTests(unittest.TestCase):
             img = ot.presets.image.group_photo(s_img)
 
             # convolve and convert to linear sRGB
-            img2_ = ot.convolve(img, rimg, cargs=dict(normalize=normalize))
+            img2_ = ot.convolve(img, [rimg, rimg, rimg], cargs=dict(normalize=normalize), keep_size=True)
             img2, s2 = img2_.data, img2_.s
+            img2l = color.srgb_to_srgb_linear(img2)
 
-            # mean color of new image should be almost the same (small difference because of image padding)
-            # sum of all color channels should be roughly the same before and after convolution
-            csum = np.sum(np.sum(color.srgb_to_srgb_linear(img.data), axis=0), axis=0)
-            csum2 = np.sum(np.sum(color.srgb_to_srgb_linear(img2), axis=0), axis=0)
-            # compare std. dev. of ratio so normalization has no impact
-            self.assertAlmostEqual(np.std(csum2/csum), 0, delta=1e-6)
+            # every r, g, b psf produces white -> overall image must also be black and white regardless of mean color
+            cerr = np.std(np.mean(img2l, axis=(0, 1)))
+            self.assertAlmostEqual(cerr, 0, delta=1e-6)
 
     @pytest.mark.slow
     def test_size_consistency(self):
@@ -441,10 +474,17 @@ class ConvolutionTests(unittest.TestCase):
         self.assertEqual(np.max(img2.data), 0)
         
         # zero render_image
-        img = ot.presets.image.color_checker([5, 5])
+        img = ot.presets.image.siemens_star([5, 5])
         psf = ot.RenderImage([-1, 1, -1, 1])
         psf.render()
         img2 = ot.convolve(img, psf)
+        self.assertEqual(np.max(img2.data), 0)
+        
+        # zero three render_images
+        img = ot.presets.image.color_checker([5, 5])
+        psf = ot.RenderImage([-1, 1, -1, 1])
+        psf.render()
+        img2 = ot.convolve(img, [psf, psf, psf])
         self.assertEqual(np.max(img2.data), 0)
 
     def test_m_behavior(self):
@@ -474,24 +514,28 @@ class ConvolutionTests(unittest.TestCase):
 
     def test_channel_orthogonality(self):
         """
-        Checks that a red image convolved with a PSF missing red produces a zero image.
-        Also tests that normalize=False leads to small values
+        Checks that a red image convolved with RGB PSFs all missing red produces a zero image.
+        Checks that there is no "bleeding" from the other channels into red through color conversions etc.
+        Also tests that normalize=False does not normalize the resultant small values.
         """
-
-        # generate PSF with missing red component
+        # G and B render image PSF are equal and miss red component
+        # R PSF is zero
         rimg = ot.RenderImage([-1e-6, 1e-6, -1e-6, 1e-6])
         rimg.render()
         rimg._data[:, :] = 1
         rimg._data[:, :, 0] = 0
         rimg._data[:, :, :3] = color.srgb_linear_to_xyz(rimg._data[:, :, :3])  # convert to XYZ
-
-        # convolve with red noise image
+        rimg_g = rimg_b = rimg.copy()
+        rimg._data *= 0
+        rimg_r = rimg
+        
+        # create red noise image
         img0 = np.random.sample((1000, 1000, 3))
         img0[:, :, 1:] = 0
         img = ot.RGBImage(img0, [1, 1])
 
         # convolve while not normalizing the output values
-        img2 = ot.convolve(img, rimg, cargs=dict(normalize=False))
+        img2 = ot.convolve(img, [rimg_r, rimg_g, rimg_b], cargs=dict(normalize=False))
 
         # check that image is almost empty (besides numerical errors)
         self.assertAlmostEqual(np.mean(img2.data), 0, delta=1e-06)
@@ -701,6 +745,9 @@ class ConvolutionTests(unittest.TestCase):
                 P0 = np.sum(img.data)*np.sum(psf.data)
                 Pref = max(Pres, P0, 1)  # make sure Pref as divisor can't be zero
                 self.assertAlmostEqual((P0 - Pres)/Pref, 0, delta=1e-6)
+
+
+    # def test_non_square_images()
 
 
 if __name__ == '__main__':
