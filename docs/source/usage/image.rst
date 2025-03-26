@@ -43,6 +43,8 @@ ______________
        | This object allows for the creation of |RGBImage| and |LinearImage| objects.
 
 
+.. TODO there is a new GrayscaleImage class
+
 Creation of LinearImage and RGBImage
 _____________________________________
 

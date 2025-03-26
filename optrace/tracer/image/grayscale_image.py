@@ -1,34 +1,30 @@
 from __future__ import annotations
 from typing import Any  # Callable and Any type
 
-import cv2
 import numpy as np  # calculations
 
 from .base_image import BaseImage
 from ...property_checker import PropertyChecker as pc  # check types and values
-from ..color.srgb import srgb_to_xyz, srgb_linear_to_srgb
+from .. import color
 
 
 
-class RGBImage(BaseImage):
+class GrayscaleImage(BaseImage):
 
     def __init__(self,
-                 data:        numpy.ndarray | str,
-                 s:           list | numpy.ndarray = None,
-                 extent:      (list | numpy.ndarray) = None,
+                 data:              numpy.ndarray | str,
+                 s:                 list | numpy.ndarray = None,
+                 extent:            (list | numpy.ndarray) = None,
                  **kwargs)\
             -> None:
         """
-        Init a RGBImage object.
-
-        When provided as numpy array, the image data must have values in range [0, 1] and three channels
-        in the third dimension.
-        When provided as image path, the image is loaded with three channels regardless of colorspace.
+        Init a GrayscaleImage object.
+        The difference to a LinearImage is that the brightness is scaled according to the sRGB gamma compression.
 
         When parameter 'data' is provided as array, 
         element [0, 0] defines the lower left corner (negative x, negative y)
 
-        :param data: Image filepath or three dimensional numpy array.
+        :param data: Image filepath or two dimensional numpy array.
         :param s: image side lengths, x-dimension first
         :param extent: image extent in the form [xs, xe, ys, ye]
         :param kwargs: additional keyword arguments for the BaseImage and BaseClass class. 
@@ -38,23 +34,15 @@ class RGBImage(BaseImage):
 
         super().__init__(data, s, extent, **kwargs)
         self._new_lock = True
-    
-    def to_grayscale_image(self) -> 'GrayscaleImage':
+
+    def to_rgb_image(self) -> 'RGBImage':
         """
-        Create an GrayscaleImage from this object. Channel values are averaged.
-
-        :return: GrayscaleImage
+        Create an RGBImage from this object.
+        :return: RGBImage
         """
-        from .grayscale_image import GrayscaleImage
-
-        # convert to grayscale
-        xyz_y = srgb_to_xyz(self._data)[:, :, 1] # y channel of CIE XYZ
-        gray_srgb = srgb_linear_to_srgb(xyz_y)  # gamma compression of y
-        gray_srgb = np.clip(gray_srgb, 0, 1)
-
-        return GrayscaleImage(gray_srgb, extent=self.extent, desc=self.desc, 
-                              long_desc=self.long_desc, quantity=self.quantity, projection=self.projection, 
-                              limit=self.limit)
+        from .rgb_image import RGBImage
+        return RGBImage(np.repeat(self._data, 3, axis=2), extent=self.extent, desc=self.desc, long_desc=self.long_desc,
+                        quantity=self.quantity, projection=self.projection, limit=self.limit)
 
     def __setattr__(self, key: str, val: Any) -> None:
         """
@@ -68,9 +56,12 @@ class RGBImage(BaseImage):
                 pc.check_type(key, val, np.ndarray)
                 val2 = np.asarray_chkfinite(val, dtype=np.float64)
 
-                if val2.ndim != 3 or val2.shape[2] != 3:
-                    raise ValueError(f"Image needs to have three dimensions with 3 elements"
-                                     f" (RGB) in the third dimension, but has shape {val2.shape}.")
+                if val2.ndim == 3:
+                    raise ValueError("Image needs to have only two dimensions."
+                                     " Create an RGBImage for color information")
+
+                elif val2.ndim != 2:
+                    raise ValueError(f"Image needs to have two dimensions but has shape {val2.shape}.")
 
                 if (min_ := np.min(val2)) < 0.0:
                     raise ValueError(f"There is a negative value of {min_} inside the image. "

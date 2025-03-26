@@ -20,7 +20,7 @@ from ...property_checker import PropertyChecker as pc  # check types and values
 from .. import misc  # calculations
 from .. import random
 from ..image.rgb_image import RGBImage
-from ..image.linear_image import LinearImage
+from ..image.grayscale_image import GrayscaleImage
 
 
 
@@ -43,7 +43,7 @@ class RaySource(Element):
     def __init__(self,
 
                  # Surface Parameters
-                 surface:           Surface | Line | Point | LinearImage | RGBImage,
+                 surface:           Surface | Line | Point | GrayscaleImage | RGBImage,
                  pos:               (list | np.ndarray) = None,
 
                  # Divergence Parameters
@@ -81,12 +81,12 @@ class RaySource(Element):
 
         * When a 'surface' is provided as Surface (RectangularSurface, RingSurface, Point, Line, CircularSurface),
           there will be uniform emittance over the surface and the spectrum can be set by the 'spectrum' parameter.
-        * When 'surface' is provided as LinearImage, the emittance follows the image intensity distribution,
+        * When 'surface' is provided as GrayscaleImage, the emittance follows the image intensity distribution,
           the spectrum can be set by the 'spectrum' parameter.
         * When 'surface' is provided as RGBImage,
           the spectrum and brightness for each pixel is generated from three primaries so it matches the pixel color.
 
-        :param surface: emitting Surface, Point, Line, RGBImage or LinearImage object
+        :param surface: emitting Surface, Point, Line, RGBImage or GrayscaleImage object
         :param divergence: divergence type, see "divergences" list
         :param orientation: orientation type, see "orientations" list
         :param polarization: polarization type, see "polarizations" list
@@ -132,13 +132,13 @@ class RaySource(Element):
             sRGB_mean = color.srgb_linear_to_srgb(np.array([[[*sRGBL_mean]]]))
             self._mean_img_color = sRGB_mean[0, 0]
         
-        # LinearImage -> distribution according to values, spectrum user-defined
-        elif isinstance(surface, LinearImage):
+        # GrayscaleImage -> distribution according to values, spectrum user-defined
+        elif isinstance(surface, GrayscaleImage):
             surface_ = RectangularSurface(dim=surface.s)
             self._image = surface
             self._mean_img_color = None
             
-            If = surface.data.ravel()
+            If = color.srgb_to_srgb_linear(surface.data).ravel()
             Ifs = np.sum(If)
             self._pIf = 1/Ifs*If
         
@@ -232,7 +232,7 @@ class RaySource(Element):
         if self._image is None:
             p = self.surface.random_positions(N)
 
-        # RGBImage or LinearImage
+        # RGBImage or GrayscaleImage
         else:
             # special case image with only one pixel
             if self._image.shape[0] == 1 and self._image.shape[1] == 1:
@@ -255,7 +255,7 @@ class RaySource(Element):
 
             if isinstance(self._image, RGBImage):
                 wavelengths = color.random_wavelengths_from_srgb(self._image.data[PY, PX])
-            # for LinearImage the wavelengths were already generated from the LightSpectrum
+            # for GrayscaleImage the wavelengths were already generated from the LightSpectrum
 
         ## Generate orientations
         ################################################################################################################

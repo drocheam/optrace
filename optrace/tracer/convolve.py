@@ -9,7 +9,7 @@ from . import misc
 from . import color
 from ..progress_bar import ProgressBar
 from ..property_checker import PropertyChecker as pc
-from .image import RGBImage, LinearImage, RenderImage
+from .image import RGBImage, GrayscaleImage, RenderImage
 from .. import global_options
 from ..warnings import warning
 
@@ -38,43 +38,39 @@ class ConvShapes:
 class ConvFlags:
 
     custom_padding: bool
+    make_grayscale: bool
     three_psf:      bool
     psf_color:      bool
     img_color:      bool
-    make_linear:    bool
     keep_size:      bool
 
 
-def convolve(img:                RGBImage | LinearImage,
-             psf:                LinearImage | RenderImage | list[RenderImage],
+
+def convolve(img:                RGBImage | GrayscaleImage,
+             psf:                GrayscaleImage | RenderImage | list[RenderImage],
              m:                  float = 1,
              keep_size:          bool = False,
              padding_mode:       str = "constant",
              padding_value:      list | float = None,
              cargs:              dict = {})\
-        -> RGBImage | LinearImage:
+        -> RGBImage | GrayscaleImage:
     """
     Convolve an image with a point spread function.
 
+    Different convolution cases:
+    1. Grayscale image and PSF: Img and PSF are GrayscaleImage -> result is also GrayscaleImage
+    2. Image grayscale or spectrally homogeneous, PSF has color information: Img GrayscaleImage, PSF RenderImage
+       -> result is RGBImage
+    3. Image has color information, PSF is color independent: Image RGBImage, PSF GrayscaleImage
+       -> result is RGBImage
+    4. Image has color information, PSF has color information: Image RGBImage, PSF list of R, G, B RenderImage rendered
+       for the sRGB primary R, G, B preset spectra with the correct power ratios
+       -> result is RGBImage
+    
     The system magnification factor m scales the image before convolution.
     abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
     m < 0 image flipping, m > 0 an upright image.
 
-    Different convolution cases:
-    1. Img and PSF are linear intensity -> img: LinearImage, psf: LinearImage
-    2. Img is human vision colored or black and white, PSF is linear, color independent intensity
-        -> img: RGBImage, psf: LinearImage
-    3. Img is human vision black and white scene, PSF has color information -> img: RGBImage, psf: RenderImage
-    4. Img is human vision color image, PSF has color information -> img: RGBImage, psf: list of RenderImage, see below
-
-    If img and psf are both LinearImages, the result is LinearImage.
-    In all other cases a RGBImage is returned.
-
-    In the case of both colored RGBImage and PSF, three different PSF RenderImages are required for physically correct
-    results. Render a point spread function for three different same power light sources, one with a sRGB R primary
-    spectrum, one for the G and B primary. Render a detector_image with the same extent size option for all images.
-    Provide all three as list in the correct R, G, B order to this function.
-    Note that in the case that both are colored the convolution is only one possible solution of many.
     See the documentation for more details.
 
     As the convolution requires values outside the initial image, a suitable padding method must be set.
@@ -85,6 +81,9 @@ def convolve(img:                RGBImage | LinearImage,
     If a result with the same side lengths and pixel count as the input is desired,
     parameter `keep_size` must be set to True so the image is cropped back to its original shape.
 
+    Provide cargs=dict(normalize=False) so the output image intensities are not normalized automatically.
+    Useful for images without bright regions.
+
     In the internals of this function the convolution is done in linear sRGB values, 
     while also using values outside the sRGB gamut.
     To remove this out-of-gamut colors in the resulting image, color transformations are performed.
@@ -92,11 +91,8 @@ def convolve(img:                RGBImage | LinearImage,
     dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None).
     For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged
 
-    When convolving two LinearImages it is recommended to normalize the PSF sum to 1, 
-    so the sum of the input image and output image is preserved (with the sum for instance corresponding to the power).
-    
-    :param img: initial image as either RGBImage or LinearImage
-    :param psf: point spread function, LinearImage, RenderImage or three element list of R, G, B RenderImage
+    :param img: initial image as either RGBImage or GrayscaleImage
+    :param psf: point spread function, GrayscaleImage, RenderImage or three element list of R, G, B RenderImage
     :param m: magnification factor
     :param keep_size: if output image should be cropped back to size of the input image
     :param padding_mode: padding mode (from numpy.pad) for image padding before convolution.
@@ -105,7 +101,7 @@ def convolve(img:                RGBImage | LinearImage,
     :param cargs: overwrite for parameters for color.xyz_to_srgb. By default these parameters are:
      dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None).
      For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged
-    :return: LinearImage or RGBImage, see above 
+    :return: GrayscaleImage or RGBImage, see above 
     """
     # check types (image and psf are checked separately)
     pc.check_type("m", m, int | float)
@@ -116,7 +112,8 @@ def convolve(img:                RGBImage | LinearImage,
     # important flags
     flags = ConvFlags()
     flags.keep_size = keep_size
-    flags.make_linear = isinstance(psf, LinearImage) and isinstance(img, LinearImage)
+    flags.img_color = isinstance(img, RGBImage)
+    flags.make_linear = isinstance(psf, GrayscaleImage) and isinstance(img, GrayscaleImage)
     flags.three_psf = isinstance(psf, list) and len(psf) == 3
     flags.psf_color = isinstance(psf, RenderImage) or flags.three_psf
     flags.threading = global_options.multithreading and misc.cpu_count() > 2 and not flags.make_linear
@@ -152,12 +149,12 @@ def convolve(img:                RGBImage | LinearImage,
     bar.finish()
 
     if flags.make_linear:
-        return LinearImage(img3, extent=s.i4e, quantity=img.quantity)
-    else:
-        return RGBImage(img3, extent=s.i4e)
+        return GrayscaleImage(img3, extent=s.i4e)
+
+    return RGBImage(img3, extent=s.i4e)
 
 
-def _check_and_load_image(img:              LinearImage | RGBImage,
+def _check_and_load_image(img:              GrayscaleImage | RGBImage,
                           padding_mode:     str,
                           padding_value:    float | list[float],
                           flags:            ConvFlags)\
@@ -167,7 +164,7 @@ def _check_and_load_image(img:              LinearImage | RGBImage,
     Returns a img data array and padding_value in linear sRGB for a RGBImage img.
     Setting the flags.custom_padding flag.
     """
-    pc.check_type("img", img, RGBImage | LinearImage)
+    pc.check_type("img", img, RGBImage | GrayscaleImage)
     
     # check if image or psf are sphere projected
     if img.projection is not None:
@@ -186,37 +183,34 @@ def _check_and_load_image(img:              LinearImage | RGBImage,
         if np.any(pval < 0):
             raise ValueError(f"value in 'padding_value' needs to be non-negative.")
 
-        flags.img_color = color.has_color(img.data)
-
-        if flags.img_color and flags.psf_color:
-            warning("Using an image with color variation in combination with a colored PSF. "
-                    "As there many possible results depending on the spectral and local distributions on the object, "
-                    "the scene will be rendered as one seen on a sRGB monitor.")
-
         pval_lin = color.srgb_to_srgb_linear(pval[np.newaxis, np.newaxis, :])[0, 0]
         img_lin = color.srgb_to_srgb_linear(img.data)
 
     else:
         pc.check_type("padding_value", padding_value, int | float | None)
-        pval_lin = float(padding_value) if padding_value is not None else 0.
-        pc.check_not_below("padding_value", pval_lin, 0)
+        pval = float(padding_value) if padding_value is not None else 0.
+        pc.check_not_below("padding_value", pval, 0)
+        pval = np.array([pval, pval, pval], dtype=np.float64)
 
-        img_lin = img.data
-        flags.img_color = False
+        pval_lin = color.srgb_to_srgb_linear(pval[np.newaxis, np.newaxis, :])[0, 0]
+        img_lin = color.srgb_to_srgb_linear(img.data)
+
         if not flags.make_linear:
             img_lin = np.broadcast_to(img_lin[:, :, np.newaxis], [*img_lin.shape[:2], 3])
+        else:
+            pval_lin = pval_lin[0]
 
     flags.custom_padding = not (padding_mode == "constant" and np.sum(pval_lin) == 0)
     return img_lin, pval_lin
 
 
-def _check_and_load_psf(psf: LinearImage | RenderImage | list[RenderImage], flags: ConvFlags)\
-        -> tuple[list[np.ndarray], list[LinearImage | RenderImage]]:
+def _check_and_load_psf(psf: GrayscaleImage | RenderImage | list[RenderImage], flags: ConvFlags)\
+        -> tuple[list[np.ndarray], list[GrayscaleImage | RenderImage]]:
     """
     Load the PSFs.
     Checks their type and correctness regarding extent and projection type.
     Returns a list of PSFs converted to a linear sRGB array, as well as a list of PSF objects.
-    In the case of a single LinearImage or RenderImage PSF a single element list is returned.
+    In the case of a single GrayscaleImage or RenderImage PSF a single element list is returned.
     """
     if flags.psf_color:
         psfs = [psf] if not flags.three_psf else psf
@@ -225,6 +219,9 @@ def _check_and_load_psf(psf: LinearImage | RenderImage | list[RenderImage], flag
         if flags.img_color and not flags.three_psf:
             raise TypeError("A list of a R, G, B RenderImage PSF is required for convolving"
                             " a colored image with a colored PSF.")
+        
+        if not flags.img_color and flags.three_psf:
+            raise TypeError("A single colored RenderImage is sufficient for a grayscale image.")
 
         psf_lins = []
         for i, psfi in enumerate(psfs):
@@ -236,14 +233,25 @@ def _check_and_load_psf(psf: LinearImage | RenderImage | list[RenderImage], flag
 
             psf_lins.append(color.xyz_to_srgb_linear(psfi.data[:, :, :3], rendering_intent="Ignore", normalize=False))
 
+       
+        # normalize PSF
+        if psum := sum([np.sum(psfl) for psfl in psf_lins]):
+            for psfl in psf_lins:
+                psfl /= psum / 3
+
     else:
-        pc.check_type("psf", psf, LinearImage)
+        pc.check_type("psf", psf, GrayscaleImage)
         psfs = [psf]
+        psf_lin = color.srgb_to_srgb_linear(psf.data)
+
+        # normalize PSF
+        if (psum := np.sum(psf_lin)):
+            psf_lin /= psum
 
         if flags.make_linear:
-            psf_lins = [psf.data]
+            psf_lins = [psf_lin]
         else:
-            psf_lins = [np.broadcast_to(psf._data[:, :, np.newaxis], [*psf.shape[:2], 3])]
+            psf_lins = [np.broadcast_to(psf_lin[:, :, np.newaxis], [*psf.shape[:2], 3])]
 
     for psfi in psfs:
         if psfi.projection is not None:
@@ -253,8 +261,8 @@ def _check_and_load_psf(psf: LinearImage | RenderImage | list[RenderImage], flag
     return psf_lins, psfs
 
 
-def _check_and_calculate_sizes(img:     RGBImage | LinearImage, 
-                               psfs:    list[RenderImage | LinearImage], 
+def _check_and_calculate_sizes(img:     RGBImage | GrayscaleImage, 
+                               psfs:    list[RenderImage | GrayscaleImage], 
                                flags:   ConvFlags, 
                                m:       float)\
         -> ConvShapes:
@@ -396,33 +404,32 @@ def _convolve_each(img_lin: list[np.ndarray], psf_lins: list[np.ndarray], s: Con
     # init output image
     out_shape = (s.i3N[1], s.i3N[0], 3) if not flags.make_linear else (s.i3N[1], s.i3N[0])
     img2 = np.zeros(out_shape, dtype=np.float64)
+    img2_tmp = img2.copy()
 
     def threaded(img, psf, img_out, i):
         img_out[:, :, i] = scipy.signal.fftconvolve(img, psf, mode="full")
 
     if flags.three_psf:
             
-        img2s = []
         for i, psf_lin in enumerate(psf_lins):
         
             if not flags.threading:
-                img2s.append(scipy.signal.fftconvolve(img_lin[:, :, i, np.newaxis], psf_lin, mode="full", axes=(0, 1)))
+                img2 += scipy.signal.fftconvolve(img_lin[:, :, i, np.newaxis], psf_lin, mode="full", axes=(0, 1))
 
             else:
                 thread_list = []
                 for j in range(3):
-                    thread_list.append(Thread(target=threaded, args=(img_lin[:, :, i], psf_lin[:, :, j], img2, j)))
+                    thread_list.append(Thread(target=threaded, args=(img_lin[:, :, i], psf_lin[:, :, j], img2_tmp, j)))
             
                 [thread.start() for thread in thread_list]
                 [thread.join() for thread in thread_list]
-                
-                img2s.append(img2.copy())
-
-        srgbf = color.SRGB_PRIMARY_POWER_FACTORS
-        img2 = img2s[0]*srgbf[0] + img2s[1]*srgbf[1] + img2s[2]*srgbf[2]
+                img2 += img2_tmp
 
     else:
-        if not flags.threading:
+        if flags.make_linear:
+            img2 = scipy.signal.fftconvolve(img_lin, psf_lins[0], mode="full")
+
+        elif not flags.threading:
             img2 = scipy.signal.fftconvolve(img_lin, psf_lins[0], mode="full", axes=(0, 1))
 
         else:
@@ -447,13 +454,16 @@ def _slice_and_convert_output_image(img2: np.ndarray, cargs: dict, s: ConvShapes
     if flags.keep_size:
         i2sl = (s.i3N - s.i2N) // 2
         img2 = img2[i2sl[1]:i2sl[1] + s.iN[1], i2sl[0]:i2sl[0] + s.iN[0]]
-
+ 
     if flags.make_linear:
-        img2 = np.clip(img2, 0, None)
-    else:
-        # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
-        img2 = color.srgb_linear_to_xyz(img2)
-        cargs0 = dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None)
-        img2 = color.xyz_to_srgb(img2, **(cargs0 | cargs))
+        if "normalize" in cargs and cargs["normalize"] and (imax := np.max(img2)):
+            img2 /= imax
+        img2 = np.clip(img2, 0, 1)
+        return color.srgb_linear_to_srgb(img2)
+    
+    # map color into sRGB gamut by converting from sRGB linear to XYZ to sRGB
+    img2 = color.srgb_linear_to_xyz(img2)
+    cargs0 = dict(rendering_intent="Absolute", normalize=True, clip=True, L_th=0, chroma_scale=None)
+    img2 = color.xyz_to_srgb(img2, **(cargs0 | cargs))
 
     return img2

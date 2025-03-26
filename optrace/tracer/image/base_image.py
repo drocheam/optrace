@@ -23,7 +23,7 @@ class BaseImage(BaseClass):
                  **kwargs)\
             -> None:
         """
-        Init an Image object. Parent class of LinearImage and RGBImage
+        Init an Image object. Parent class of LinearImage, GrayscaleImage and RGBImage
 
         Image dimensions should be either provided by the s or extent parameter.
 
@@ -77,8 +77,12 @@ class BaseImage(BaseClass):
             raise IOError(f"Can't find/process file {path}")
 
         image = cv2.imread(path, flags=cv2.IMREAD_COLOR)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) / 255.0
-        return np.flipud(image)  # flip so element 0 is in the lower left corner
+        image = np.flipud(image) #  # flip so element 0 is in the lower left corner
+
+        if self.__class__.__name__ == "RGBImage":
+            return cv2.cvtColor(image, cv2.COLOR_BGR2RGB) / 255.0
+        else:
+            return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) / 255.0
 
     @property
     def shape(self) -> tuple[int, int, int]:
@@ -100,6 +104,7 @@ class BaseImage(BaseClass):
         """area per pixel in mm^2"""
         return float(self.s[0] * self.s[1] / (self.shape[1] * self.shape[0]))
 
+    # TODO different logic for grayscale image ?
     def save(self, 
              path:    str,
              params:  list = [],

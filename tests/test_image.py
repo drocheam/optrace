@@ -11,6 +11,10 @@ import optrace.tracer.color as color
 import optrace as ot
 
 
+# TODO new type GrayscaleImage
+
+
+
 class ImageTests(unittest.TestCase):
 
     def test_render_image_misc(self):
@@ -64,6 +68,7 @@ class ImageTests(unittest.TestCase):
 
             # Linear and RGBImage
             for img in [ot.presets.image.color_checker([1, ratio]), 
+                        ot.presets.image.siemens_star([1, ratio]), 
                         ot.LinearImage(ot.presets.psf.airy(1).data, [1, ratio])]:
 
                 for p in [-0.1, 0, 0.163485, 1, 1.01]: # different relative position inside image
@@ -275,18 +280,12 @@ class ImageTests(unittest.TestCase):
             RSS = imgi(extent=extent)
             self.assertTrue(np.all(RSS.extent == extent))
 
-        # check that uncolored images get detected as uncolored.
-        # required so image convolution detects it as spectral homogeneous
-        for preset in [ot.presets.image.ETDRS_chart, ot.presets.image.ETDRS_chart_inverted, 
-                       ot.presets.image.siemens_star, ot.presets.image.grid]:
-            img = preset([1, 1])
-            self.assertFalse(color.has_color(img.data), msg=img.desc)
-
     @pytest.mark.os
     def test_image_init_exceptions(self):
         """test image initialization exceptions and errors"""
 
-        for Image, im_data in zip([ot.RGBImage, ot.LinearImage], [np.ones((100, 100, 3)), np.ones((100, 100))]):
+        for Image, im_data in zip([ot.RGBImage, ot.LinearImage, ot.GrayscaleImage],
+                                  [np.ones((100, 100, 3)), np.ones((100, 100)), np.ones((100, 100))]):
 
             # type errors
             self.assertRaises(TypeError, Image, 1, [2, 2])  # invalid image type
@@ -317,14 +316,14 @@ class ImageTests(unittest.TestCase):
         # tests only for RGBImage
         self.assertRaises(ValueError, ot.RGBImage, np.ones((100, 100, 3))*1.001, [2, 2])  # data above 1
    
-        # tests only for LinearImage
-        ot.LinearImage(ot.presets.image.ETDRS_chart([1, 1]).data, [1, 1])  # RGB image, but no color
+        # tests only for LinearImage and GrayscaleImage
         self.assertRaises(ValueError, ot.LinearImage, ot.presets.image.color_checker([1, 1]).data, [1, 1]) 
+        self.assertRaises(ValueError, ot.GrayscaleImage, ot.presets.image.color_checker([1, 1]).data, [1, 1]) 
         # ^-- colored image
 
     @pytest.mark.os
     def test_image_saving_loading(self):
-        """test saving and loading of LinearImage and RGBImage"""
+        """test saving and loading of LinearImage, GrayscaleImage and RGBImage"""
 
         # check different file formats
         for path in ["test.png", "test.jpg", "test.bmp"]:
@@ -333,14 +332,16 @@ class ImageTests(unittest.TestCase):
             for i, img in enumerate([ot.presets.image.cell([1, 1]),
                                      ot.presets.image.ETDRS_chart([1, 1]),
                                      ot.presets.psf.airy(5),
-                                     ot.LinearImage(np.zeros((250, 250, 3)), [6, 5]), # coverage: empty image 
-                                     ot.LinearImage(np.full((100, 100, 3), 150), [2, 1]),
-                                     ot.LinearImage(np.full((100, 100, 3), 0.0001), [1, 2]),
+                                     ot.LinearImage(np.zeros((250, 250)), [6, 5]), # coverage: empty image 
+                                     ot.GrayscaleImage(np.zeros((250, 250)), [6, 5]), # coverage: empty image 
+                                     ot.LinearImage(np.full((100, 100), 150), [2, 1]),
+                                     ot.LinearImage(np.full((100, 100), 0.0001), [1, 2]),
                                      ot.presets.psf.circle(5)]):
 
                 img.save(path)
                 img2 = ot.RGBImage(path, [1, 1]) if isinstance(img, ot.RGBImage)\
-                        else ot.LinearImage(path, [1, 1]) # check if loads correctly
+                        else ot.LinearImage(path, [1, 1]) if isinstance(img, ot.LinearImage)\
+                        else ot.GrayscaleImage(path, [1, 1]) # check if loads correctly
                 os.remove(path)
                
                 # check if normalized standard deviation stays the same.

@@ -8,6 +8,7 @@ from ...property_checker import PropertyChecker as pc  # check types and values
 from .. import color
 
 
+
 class LinearImage(BaseImage):
 
     def __init__(self,
@@ -49,12 +50,9 @@ class LinearImage(BaseImage):
                 pc.check_type(key, val, np.ndarray)
                 val2 = np.asarray_chkfinite(val, dtype=np.float64)
 
-                if val2.ndim == 3 and val2.shape[2] == 3:
-                    if color.has_color(val2):
-                        raise ValueError("Image can't have color information. "
-                                         "Either use a RGBImage or remove color information.")
-                    else:
-                        val2 = val2[:, :, 1]
+                if val2.ndim == 3:
+                    raise ValueError("Image can't have color information. "
+                                     "Either use a RGBImage or remove color information.")
 
                 elif val2.ndim != 2:
                     raise ValueError(f"Image needs to have two dimensions but has shape {val2.shape}.")

@@ -1,4 +1,4 @@
-from .tools import wavelengths, blackbody, normalized_blackbody, has_color
+from .tools import wavelengths, blackbody, normalized_blackbody
 
 from .illuminants import a_illuminant, c_illuminant, d50_illuminant, d55_illuminant, d65_illuminant, d75_illuminant,\
     e_illuminant, f2_illuminant, f7_illuminant, f11_illuminant, led_b1_illuminant, led_b2_illuminant,\

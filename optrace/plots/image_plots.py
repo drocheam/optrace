@@ -6,13 +6,13 @@ import numpy as np  # calculations
 
 from .misc_plots import _show_grid, _save_or_show
 
-from ..tracer.image import RGBImage, LinearImage
+from ..tracer.image import RGBImage, LinearImage, GrayscaleImage
 from ..property_checker import PropertyChecker as pc  # check types and values
 from ..tracer import color
 from .. import global_options
 
 
-def image_plot(im:       LinearImage | RGBImage,
+def image_plot(im:       LinearImage | GrayscaleImage | RGBImage,
                log:      bool = False,
                flip:     bool = False,
                title:    str = None,
@@ -106,7 +106,7 @@ def image_plot(im:       LinearImage | RGBImage,
     _save_or_show(path, sargs)
 
 
-def image_profile_plot(im:       RGBImage | LinearImage,
+def image_profile_plot(im:       RGBImage | LinearImage | GrayscaleImage,
                        log:      bool = False,
                        flip:     bool = False,
                        title:    str = None,
@@ -196,13 +196,13 @@ def image_profile_plot(im:       RGBImage | LinearImage,
 
 def _check_types(im, log, flip, title) -> None:
     """check types for r_image plots"""
-    pc.check_type("im", im, LinearImage | RGBImage)
+    pc.check_type("im", im, LinearImage | RGBImage | GrayscaleImage)
     pc.check_type("flip", flip, bool)
     pc.check_type("log", log, bool)
     pc.check_type("title", title, str | None)
 
 
-def _get_labels(im:             RGBImage | LinearImage, 
+def _get_labels(im:             RGBImage | LinearImage | GrayscaleImage, 
                 mode:           str, 
                 log:            bool, 
                 cut_pos_dim:    str = None, 
@@ -229,7 +229,8 @@ def _get_labels(im:             RGBImage | LinearImage,
                 else f"{yname} = {cut_pos_val:.5g} {yunit}")
     
     zname, zunit, zlabel = mode, "", mode
-    zlabel += ", Logarithmic" if log and mode in ["sRGB (Perceptual RI)", "sRGB (Absolute RI)", "Lightness (CIELUV)"] else ""
+    zlabel += ", Logarithmic" if log and mode in ["sRGB (Perceptual RI)", "sRGB (Absolute RI)", "Lightness (CIELUV)"]\
+            else ""
 
     if zlabel != "":
         text += f"\nMode: {zlabel}"

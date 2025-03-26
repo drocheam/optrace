@@ -19,6 +19,7 @@ PSF Convolution
 
 .. TODO Teil überarbeiten
 
+.. TODO nennen, dass PSF presets sind GrayscaleImage
 
 Overview
 _______________

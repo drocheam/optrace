@@ -8,6 +8,7 @@ import cv2
 import optrace as ot
 from optrace.tracer import misc
 from optrace.tracer.geometry.surface import Surface
+import optrace.tracer.color as color
 
 from rt_example import rt_example
 
@@ -1341,16 +1342,16 @@ class TracerTests(unittest.TestCase):
         m = ~np.isnan(polpol)
         self.assertTrue(np.allclose(polpol[m], 1))  # length is 1
 
-    def test_linear_image_source(self):
+    def test_grayscale_image_source(self):
         """
-        test that the LinearImage as source is treated linearly, the spectrum is applied correctly
+        test that the GrayscaleImage as source is treated linearly, the spectrum is applied correctly
         and the resulting emittance matches the distribution inside the Image
         """
 
-        # create some LinearImage
+        # create some GrayscaleImage
         X, Y = np.mgrid[-1:1:63j, -1:1:63j]
         Z = np.sin(5*X+Y)**2
-        img = ot.LinearImage(Z, [1, 1])
+        img = ot.GrayscaleImage(Z, [1, 1])
 
         # test different spectra
         for spec in [ot.presets.light_spectrum.d65, ot.LightSpectrum("Monochromatic", wl=540),
@@ -1375,7 +1376,8 @@ class TracerTests(unittest.TestCase):
 
             # normalize images
             img2_data = img2.data / np.max(img2.data)
-            img_data = img.data / np.max(img.data)
+            img_data = color.srgb_to_srgb_linear(img.data)
+            img_data = img_data / np.max(img_data)
 
             # mean absolute deviation should be very small
             mad = np.mean(np.abs(img2_data - img_data))

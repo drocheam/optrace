@@ -57,15 +57,3 @@ def normalized_blackbody(wl: np.ndarray, T: float = 6504.) -> np.ndarray:
 
     return blackbody(wl, T) / p_max
 
-def has_color(rgb: np.ndarray, th: float = 1e-6) -> bool:
-    """
-    Check if color information are present in an RGB image.
-
-    Calculated the channelwise standard deviation for each pixel.
-    If it is above the threshold anywhere, the function returns true.
-
-    :param rgb: RGB array shape (Ny, Nx, 3)
-    :param th: threshold
-    :return: boolean value if color information are found
-    """
-    return np.any(np.std(rgb, axis=2) > th)

@@ -1,6 +1,6 @@
 import pathlib  # loading files in relative path
 import numpy as np  # np.ndarray | list type
-from ..image import RGBImage
+from ..image import RGBImage, GrayscaleImage
 
 # path of the image library folder
 image_dir = pathlib.Path(__file__).resolve().parent.parent.parent / "resources" / "images"
@@ -99,15 +99,15 @@ def color_checker(s: np.ndarray | list = None, extent: list | np.ndarray = None)
     """
     return RGBImage(str(image_dir / "color_checker.webp"), s, extent, desc="Color Checker Chart")
 
-def ETDRS_chart(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
+def ETDRS_chart(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> GrayscaleImage:
     """
     ETDRS Chart standard
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
-    :return: RGBImage object
+    :return: GrayscaleImage object
     """
-    return RGBImage(str(image_dir / "ETDRS_chart.png"), s, extent, desc="ETDRS Chart")
+    return RGBImage(str(image_dir / "ETDRS_chart.png"), s, extent, desc="ETDRS Chart").to_grayscale_image()
 
 def ETDRS_chart_inverted(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
@@ -115,9 +115,10 @@ def ETDRS_chart_inverted(s: np.ndarray | list = None, extent: list | np.ndarray 
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
-    :return: RGBImage object
+    :return: GrayscaleImage object
     """
-    return RGBImage(str(image_dir / "ETDRS_chart_inverted.png"), s, extent, desc="ETDRS Chart Inverted")
+    return RGBImage(str(image_dir / "ETDRS_chart_inverted.png"), 
+                    s, extent, desc="ETDRS Chart Inverted").to_grayscale_image()
 
 def eye_test_vintage(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """
@@ -129,29 +130,29 @@ def eye_test_vintage(s: np.ndarray | list = None, extent: list | np.ndarray = No
     """
     return RGBImage(str(image_dir / "eye_test_vintage.webp"), s, extent, desc="Eye Test Vintage")
 
-def grid(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
+def grid(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> GrayscaleImage:
     """
     White grid on black background with 10x10 cells.
     Useful for distortion characterization.
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
-    :return: RGBImage object
+    :return: GrayscaleImage object
     """
-    grid = np.zeros((301, 301, 3))
+    grid = np.zeros((301, 301))
     grid[::30] = 1
     grid[:, ::30] = 1
-    return RGBImage(grid, s, extent, desc="Grid")
+    return GrayscaleImage(grid, s, extent, desc="Grid")
 
-def siemens_star(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
+def siemens_star(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> GrayscaleImage:
     """
     Siemens Star Image.
 
     :param s: image side lengths list in mm (x length, y length)
     :param extent: image extent in the form [xs, xe, ys, ye]
-    :return: RGBImage object
+    :return: GrayscaleImage object
     """
-    return RGBImage(str(image_dir / "siemens_star.png"), s, extent, desc="Siemens Star")
+    return RGBImage(str(image_dir / "siemens_star.png"), s, extent, desc="Siemens Star").to_grayscale_image()
 
 def tv_testcard1(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:
     """

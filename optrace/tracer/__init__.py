@@ -57,5 +57,6 @@ from . import color
 
 # images
 from .image.rgb_image import RGBImage
+from .image.grayscale_image import GrayscaleImage
 from .image.linear_image import LinearImage
 from .image.render_image import RenderImage
