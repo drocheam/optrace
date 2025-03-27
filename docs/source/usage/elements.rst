@@ -307,7 +307,7 @@ Image Parameter
 
 Alternatively to a uniformly emitting area, there is a way to provide light distributions (modelled by images).
 
-This emitting surface needs to be a :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>` or :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` object.
+This emitting surface needs to be a :class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>` or :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` object.
 A :class:`RectangularSurface <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>` emitting this image will be created automatically.
 Its size will be equal to the side lengths of the image.
 

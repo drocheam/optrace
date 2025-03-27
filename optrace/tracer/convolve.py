@@ -60,12 +60,12 @@ def convolve(img:                RGBImage | GrayscaleImage,
     Different convolution cases:
     1. Grayscale image and PSF: Img and PSF are GrayscaleImage -> result is also GrayscaleImage
     2. Image grayscale or spectrally homogeneous, PSF has color information: Img GrayscaleImage, PSF RenderImage
-       -> result is RGBImage
+    -> result is RGBImage
     3. Image has color information, PSF is color independent: Image RGBImage, PSF GrayscaleImage
-       -> result is RGBImage
+    -> result is RGBImage
     4. Image has color information, PSF has color information: Image RGBImage, PSF list of R, G, B RenderImage rendered
-       for the sRGB primary R, G, B preset spectra with the correct power ratios
-       -> result is RGBImage
+    for the sRGB primary R, G, B preset spectra with the correct power ratios
+    -> result is RGBImage
     
     The system magnification factor m scales the image before convolution.
     abs(m) > 1 means enlargement, abs(m) < 1 size reduction,
@@ -166,11 +166,6 @@ def _check_and_load_image(img:              GrayscaleImage | RGBImage,
     """
     pc.check_type("img", img, RGBImage | GrayscaleImage)
     
-    # check if image or psf are sphere projected
-    if img.projection is not None:
-        raise ValueError(f"Image projection is {img.projection}. "
-                         "Convolving a sphere projected image make no geometrical sense.")
-
     # check padding_values
     if isinstance(img, RGBImage):
         pc.check_type("padding_value", padding_value, list | np.ndarray | None)
@@ -233,17 +228,11 @@ def _check_and_load_psf(psf: GrayscaleImage | RenderImage | list[RenderImage], f
 
             psf_lins.append(color.xyz_to_srgb_linear(psfi.data[:, :, :3], rendering_intent="Ignore", normalize=False))
 
-       
-        # normalize PSF
-        if psum := sum([np.sum(psfl) for psfl in psf_lins]):
-            for psfl in psf_lins:
-                psfl /= psum / 3
-
     else:
         pc.check_type("psf", psf, GrayscaleImage)
         psfs = [psf]
         psf_lin = color.srgb_to_srgb_linear(psf.data)
-
+        
         # normalize PSF
         if (psum := np.sum(psf_lin)):
             psf_lin /= psum
@@ -252,11 +241,6 @@ def _check_and_load_psf(psf: GrayscaleImage | RenderImage | list[RenderImage], f
             psf_lins = [psf_lin]
         else:
             psf_lins = [np.broadcast_to(psf_lin[:, :, np.newaxis], [*psf.shape[:2], 3])]
-
-    for psfi in psfs:
-        if psfi.projection is not None:
-            raise ValueError(f"PSF projection is {psfi.projection}. "
-                             "Convolving with a sphere projected psf make no geometrical sense.")
 
     return psf_lins, psfs
 

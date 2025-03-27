@@ -43,13 +43,6 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.convolve, img2, psf, padding_value=-2)  
         # ^-- invalid padding_value for GrayscaleImage
 
-        # value errors due to projected image or psf
-        img2.projection = "Orthographic"
-        self.assertRaises(ValueError, ot.convolve, img2, psf)  # can't convolve an image that has been projected 
-        img2.projection = None
-        psf.projection = "Orthographic"
-        self.assertRaises(ValueError, ot.convolve, img2, psf)  # can't convolve with a psf that has been projected
-
         # test exceptions for colored image and colored psf
         rimg = ot.RenderImage([-1, 1, -1, 1])
         rimg.render()
@@ -473,7 +466,7 @@ class ConvolutionTests(unittest.TestCase):
     
     def test_zero_psf(self):
         """no warnings/exceptions with zero psf"""
-        # zero linear_image
+        # zero grayscale_image
         img = ot.presets.image.color_checker([5, 5])
         psf = ot.GrayscaleImage(np.zeros((200, 200)), [1, 1])
         img2 = ot.convolve(img, psf)
@@ -620,71 +613,6 @@ class ConvolutionTests(unittest.TestCase):
                             + np.mean(img5.data[:, 0]) + np.mean(img5.data[:, -1]))/4
                     self.assertAlmostEqual(val, 0.3, delta=0.00001)
 
-
-    @pytest.mark.norm
-    def test_unnormalized_color_and_grayscale(self):
-        """
-        test convolving without normalization of a single colored image leads to the same colored images
-        this means that the psf is correctly normalized
-        """
-        # random white render_image
-        psf_rimg = ot.RenderImage([-1, 1, -1, 1])
-        psf_rimg.render()
-        wrand = np.random.sample(psf_rimg.shape[:2])
-        wrand3 = np.repeat(wrand[:, :, np.newaxis], 3, axis=2)
-        psf_rimg._data[:, :, :3] = 8.3*color.srgb_linear_to_xyz(wrand3)
-        
-        # color image and greyscale PSF
-        # colored images
-        rgb_images = []
-        for rgb in [[0, 1, 0], [0.2, 0.3, 0.5], [0.1, 0.1, 0.1]]:
-            data = np.tile(rgb, (100, 100, 1))
-            img4 = ot.RGBImage(data, [1, 1])
-            rgb_images.append(img4)
-
-        # color image and greyscale PSF
-        for img4 in rgb_images:
-
-            psf = ot.presets.psf.circle(60)
-            img5 = ot.convolve(img4, psf, keep_size=True, padding_mode="edge", cargs=dict(normalize=False))
-
-            for i in range(3):
-                val = np.mean(img5.data[:, :, i])
-                self.assertAlmostEqual(val, img4.data[0, 0, i], delta=0.00001)
-            
-            img4_lin = color.srgb_to_srgb_linear(img4.data)
-            img5_lin = color.srgb_to_srgb_linear(img5.data)
-            self.assertAlmostEqual(np.sum(img4_lin), np.sum(img5_lin), delta=0.01, msg=img4.data[0, 0])
-
-        # color image and color PSF
-        for img4 in rgb_images:
-
-            img5 = ot.convolve(img4, [psf_rimg, psf_rimg, psf_rimg], keep_size=True, 
-                               padding_mode="edge", cargs=dict(normalize=False))
-
-            img4_lin = color.srgb_to_srgb_linear(img4.data)
-            img5_lin = color.srgb_to_srgb_linear(img5.data)
-            self.assertAlmostEqual(np.sum(img4_lin), np.sum(img5_lin), delta=0.01, msg=img4.data[0, 0])
-        
-        # greyscale image and color PSF
-        for gv in [0.3, 0., 1.0, 0.297]:
-
-            img4 = ot.GrayscaleImage(np.full((100, 100), gv), [1, 1])
-            img5 = ot.convolve(img4, psf_rimg, keep_size=True, padding_mode="edge", cargs=dict(normalize=False))
-
-            for i in range(3):
-                val = np.mean(img5.data[:, :, i])
-                self.assertAlmostEqual(val, gv, delta=0.00001)
-       
-        # greyscale image and greyscale PSF
-        for gv in [0.3, 0., 1.0, 0.297]:
-
-            img4 = ot.GrayscaleImage(np.full((100, 100), gv), [1, 1])
-            psf = ot.presets.psf.circle(60)
-            
-            img5 = ot.convolve(img4, psf, keep_size=True, padding_mode="edge", cargs=dict(normalize=False))
-            self.assertAlmostEqual(np.mean(img5.data), gv, delta=0.00001)
-
     def test_extent_shifting(self):
         """test that image extent/position is handled correctly when PSF or image (or both) are shifted"""
 
@@ -765,6 +693,36 @@ class ConvolutionTests(unittest.TestCase):
         self.assertTrue(cm[0] > 0.7)
         self.assertTrue(cm[1] > 0.7)
 
+    @pytest.mark.norm
+    def test_unnormalized_color_and_grayscale(self):
+        """
+        test convolving without normalization of a single colored image leads to the same colored images
+        this means that the psf is correctly normalized
+        """
+        # color image and greyscale PSF
+        for rgb in [[0, 1, 0], [0.2, 0.3, 0.5], [0.1, 0.1, 0.1]]:
+            data = np.tile(rgb, (100, 100, 1))
+            img4 = ot.RGBImage(data, [1, 1])
+
+            psf = ot.presets.psf.circle(60)
+            img5 = ot.convolve(img4, psf, keep_size=True, padding_mode="edge", cargs=dict(normalize=False))
+
+            for i in range(3):
+                val = np.mean(img5.data[:, :, i])
+                self.assertAlmostEqual(val, img4.data[0, 0, i], delta=0.00001)
+            
+            img4_lin = color.srgb_to_srgb_linear(img4.data)
+            img5_lin = color.srgb_to_srgb_linear(img5.data)
+            self.assertAlmostEqual(np.sum(img4_lin), np.sum(img5_lin), delta=0.01, msg=str(rgb))
+       
+        # greyscale image and greyscale PSF
+        for gv in [0.3, 0., 1.0, 0.297]:
+
+            img4 = ot.GrayscaleImage(np.full((100, 100), gv), [1, 1])
+            psf = ot.presets.psf.circle(60)
+            
+            img5 = ot.convolve(img4, psf, keep_size=True, padding_mode="edge", cargs=dict(normalize=False))
+            self.assertAlmostEqual(np.mean(img5.data), gv, delta=0.00001)
 
 if __name__ == '__main__':
     unittest.main()

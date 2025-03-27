@@ -4,7 +4,8 @@ PSF Convolution
 ------------------------------------------------------------------------
 
 .. |RenderImage| replace:: :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`
-.. |LinearImage| replace:: :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`
+.. |ScalarImage| replace:: :class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>`
+.. |GrayscaleImage| replace:: :class:`GrayscaleImage <optrace.tracer.image.grayscale_image.GrayscaleImage>`
 .. |RGBImage| replace:: :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>`
 
 .. role:: python(code)
@@ -17,43 +18,212 @@ PSF Convolution
    import optrace as ot
    ot.global_options.show_progressbar = False
 
-.. TODO Teil überarbeiten
-
-.. TODO nennen, dass PSF presets sind GrayscaleImage
 
 Overview
 _______________
 
-Convolution can speed up image formation significantly by parallelizing the effect of a PSF (point spread function) for every object point.
-This results in a nearly noise-free image in a small fraction of the time normally required.
-A PSF is nothing different than the impulse response of the optical system for the given object and image distance combination.
-It changes spatially, but for a small angular range it can be assumed constant.
-However this also implies that many aberration can't be simulated this way (astigmatism, coma, vignette, distortion, ...).
-In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF to an object using the convolution functionality in optrace.
+Convolution can speed up image formation significantly by parallelizing the effect of 
+a PSF (point spread function) for every object point. This results in a nearly noise-free image in a small 
+fraction of the time normally required. A PSF is nothing different than the impulse response of the optical system 
+for the given object and image distance combination. It changes spatially, but for a small angular range it can 
+be assumed constant. However, this also implies that many aberration can't be simulated this way 
+(astigmatism, coma, vignette, distortion, ...).
+In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF 
+to an object using the convolution functionality in optrace.
 
 The convolution approach requires:
 
-* the PSF
-* the object image to convolve
-* PSF size
-* object size
-* the system's magnification factor
+* the image and its size parameters
+* the PSF and its size parameters
+* a magnification factor
+* optional parameters for padding and slicing
+* optional parameters for the output color conversion
 
-Both colored objects and PSFs are supported.
-Note however, that without knowing the correct spectral distribution on both (instead only the values in a color space) the convolution only simulates one of many possible solutions. 
+Both colored objects and PSFs are supported. However, there are some limitations and restrictions, that will be
+explained in the following.
+
+
+Grayscale and color image convolution
+________________________________________________
+
 See the details in section :numref:`psf_color_handling`.
+A call to :func:`convolve <optrace.tracer.convolve.convolve>` requires the image and PSF as arguments.
+Generally, the convolution must be done on a per-wavelength basis to be physically correct, as each wavelength
+has their own PSF. See the details in section :numref:`psf_color_handling`.
 
-Usage
-____________
+However, there are special cases, where this is not required.
+One import term will be *spectral homogenity* which describes an object that emits the same spectrum everywhere,
+only differing by an intensity factor.
+Such objects appear to have the same color everywhere, only differing in their brightness.
+Note that that the inverse is not true, objects with the same color don't necessarily mean a spectral homogeneous
+object, as multiple spectra can produce the same color impression.
 
-**Simple Calls**
+As mentioned in section :numref:`image_classes`, values of the pixels of the |RGBImage| and |GrayscaleImage| 
+are not linear to the physical intensities of the color, but scaled non-linearly to account for the human perception.
+The :func:`convolve <optrace.tracer.convolve.convolve>` converts the images to linear values and does the convolution
+on these linear color space coordinates. At the end, the linear image is converted back 
+to a |RGBImage| or |GrayscaleImage|.
 
-A simple call to :func:`convolve <optrace.tracer.convolve.convolve>` required the object and PSF, as well as the magnification factor. 
+**Grayscale Image and grayscale PSF**
 
-The object should be either of type |RGBImage| or |LinearImage|, while the PSF should be either |LinearImage| or |RenderImage|.
-For more details on image classes see :numref:`image_classes`.
-Colored PSFs can be only used with class |RenderImage|, as all human visible colors are required for convolution.
-The image objects include the information about their size and position.
+The typical case would be a black-and-white image and colorless, wavelength-independent PSF:
+
+.. testcode::
+                   
+    img = ot.presets.image.grid([1, 1]) #  type GrayscaleImage
+    psf = ot.presets.psf.airy(8)  # type GrayscaleImage
+    img2 = ot.convolve(img, psf)  # type GrayscaleImage
+
+However, this also works for a more general case: Spectral homogeneous image and spectral homogeneous PSF.
+For instance, this is also true for a intensity distribution emitting a blue spectrum every on the source area,
+and a PSF that has the same spectrum everywhere.
+It does not need to be the same spectrum as the source image, for instance the PSF can only include violet wavelengths,
+because the optical system absorbed the more blueish wavelengths of the spectrum.
+
+To model this, simulate and render a PSF by creating a point source with the image spectrum.
+Then convert both the image and the PSF to a |GrayscaleImage| and convolve them.
+The result is also a |GrayscaleImage|, showing the intensity distribution.
+
+.. code:: python
+                   
+    # raytracer
+    RT = ot.Raytracer(...)
+
+    # create R, G, B sRGB primary spectra with the correct power ratios
+    # create image spectrum and point source
+    my_spectrum = ot.LightSpectrum(...)
+    RS = ot.RaySource(ot.Point(), spectrum=my_spectrum, pos=...)
+    RT.add(RS)
+
+    # add more geometries and detector
+    ...
+
+    # trace
+    RT.trace(10000)
+
+    # render detector image
+    psf = RT.detector_image()
+    psf_srgb = psf.get("sRGB (Absolute RI)")  # convert RenderImage to sRGB
+    psf_gray = psf_srgb.to_grayscale_image()  # convert sRGB to grayscale
+
+    # convolve
+    img_gray = ot.Grayscale(...)  # image emitting my_spectrum
+    img2 = ot.convolve(img_gray, psf_gray, ...)
+
+
+**Colored Image and grayscale PSF**
+
+Here, the image is an |RGBImage| and the PSF is wavelength-independent, given as |GrayscaleImage|.
+Each R, G, B channel is convolved separately with the PSF and the result is an |RGBImage|.
+
+.. testcode::
+                   
+    img = ot.presets.image.fruits([0.3, 0.4]) #  type RGBImage
+    psf = ot.presets.psf.airy(8)  # type GrayscaleImage
+    img2 = ot.convolve(img, psf)  # type RGBImage
+
+**Grayscale Image and colored PSF**
+
+Spectral homogeneous image and colored PSF.
+The image is a |GrayscaleImage| indicating the human visible intensities.
+The PSF must be a |RenderImage|, so it includes all human visible colors.
+The PSF must be rendered for the desired source spectrum.
+If the image should emit a D65 spectrum, it should be traced and rendered with the D65 spectrum.
+If it should emit a blue spectrum, it should be traced and rendered with the same blue spectrum.
+Doing so, the color information is included in the PSF and will be applied in convolution.
+The result is an |RGBImage|.
+
+.. code:: python
+                   
+    # raytracer
+    RT = ot.Raytracer(...)
+
+    # create R, G, B sRGB primary spectra with the correct power ratios
+    # create image spectrum and point source
+    my_spectrum = ot.LightSpectrum(...)
+    RS = ot.RaySource(ot.Point(), spectrum=my_spectrum, pos=...)
+    RT.add(RS)
+
+    # add more geometries and detector
+    ...
+
+    # trace
+    RT.trace(10000)
+
+    # render detector image
+    psf = RT.detector_image()
+
+    # convolve
+    img_gray = ot.Grayscale(...)  # image emitting my_spectrum
+    img2 = ot.convolve(img_gray, psf, ...)
+
+**Colored Image and colored PSF**
+
+Colored image and PSF only work correctly in one special case:
+The image is simulated as emitting a combination of R, G, B sRGB primary spectra for each pixel.
+And three PSF were rendered for each R, G, B primary with the correct power ratios.
+Only then will the convolution approach be correct.
+
+In general, there are infinite possible resolutions, as many spectra can produce the same sRGB color and spectra produce
+different PSF due to absorption or dispersion.
+This solution, assuming a composition of sRGB primary spectra, will be just one of many.
+
+The image should be an |RGBImage|, while the PSF is provided as list of R, G, B |RenderImage|.
+As described above, they need to be rendered with a specific spectrum and power and the images need to have the same 
+size. Below you can find an example.
+
+.. code:: python
+                   
+    # raytracer
+    RT = ot.Raytracer(...)
+
+    # create R, G, B sRGB primary spectra with the correct power ratios
+    RS_args = dict(surface=ot.Point(), pos=[0, 0, 0], ...)
+    RS_R = ot.RaySource(**RS_args, spectrum=ot.presets.light_spectrum.srgb_r, 
+                        power=ot.presets.light_spectrum.srgb_r_power_factor)
+    RS_G = ot.RaySource(**RS_args, spectrum=ot.presets.light_spectrum.srgb_g, 
+                        power=ot.presets.light_spectrum.srgb_g_power_factor)
+    RS_B = ot.RaySource(**RS_args, spectrum=ot.presets.light_spectrum.srgb_b, 
+                        power=ot.presets.light_spectrum.srgb_b_power_factor)
+    RT.add([RS_R, RS_G, RS_B)
+
+    # add more geometries and detector
+    ...
+
+    # trace
+    RT.trace(10000)
+
+    # render detector images, index 0 is R, index 1 is G, index 2 is B
+    psf0 = RT.detector_image()  # needed so we know the spatial extent
+    psf_r = RT.detector_image(source_index=0, extent=psf0.extent)
+    psf_g = RT.detector_image(source_index=1, extent=psf0.extent)
+    psf_b = RT.detector_image(source_index=2, extent=psf0.extent)
+    psf = [psf_r, psf_g, psf_b]
+
+    # convolve
+    img = ot.presets.image.color_checker([1, 1])
+    img2 = ot.convolve(img, psf, ...)
+
+Restrictions
+_______________________
+
+* convolution is done on image objects that contain data about the geometry, and not on data arrays
+* it is not possible to convolve two |RGBImage| or two |RenderImage|
+* image and PSF resolutions must be between 50x50 pixels and 4 megapixels
+* the PSF needs to be twice as large as the image scaled with the magnification factor
+* when convolving two colored images, the resulting image is only one possible solution of many
+* when R, G, B |RenderImage| are provided for polychromatic convolution, they all need to have the same spatial extent
+* :func:`scipy.signal.fftconvolve` is involved, so small numerical errors in dark image regions can appear
+
+The convolution function does not check if the convolution of the underlying image *makes sense*.
+This includes cases, where either the image or PSF showcase a different physical quantity, 
+were rendered with different resolution limit settings or one of them is a sphere projection, 
+where distances, areas or angles are non-linear.
+
+Additional Function Parameters
+_____________________________________
+
+**Magnification Factor**
 
 This magnification factor is equivalent the magnification factor known from geometrical optics.
 Therefore :math:`\lvert m \rvert > 1` means a magnification and :math:`\lvert m\rvert < 1` an image shrinking.
@@ -73,7 +243,7 @@ You can then call :func:`convolve <optrace.tracer.convolve.convolve>` in the fol
    img2 = ot.convolve(img, psf, m=0.5)
 
 The function returns the convolved image object :python:`img2`.
-When :python:`img` and :python:`psf` are of type |LinearImage|, :python:`img2` is also a |LinearImage|.
+When :python:`img` and :python:`psf` are of type |GrayscaleImage|, :python:`img2` is also a |GrayscaleImage|.
 For all other cases color information is generated and :python:`img2` is a |RGBImage|.
 
 **Slicing and Padding**
@@ -93,10 +263,10 @@ For instance, padding with white is done in the following fashion:
 
 .. testcode::
 
-   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="constant", padding_value=[1, 1, 1])
+   img2 = ot.convolve(img, psf, m=0.5, keep_size=True, padding_mode="constant", padding_value=1)
 
 :python:`padding_value` specifies the values used for constant padding for each channel.
-Depending on type of :python:`img`, it needs to have three or only one element.
+Depending on type of :python:`img`, it needs to be a single number of a list of three values.
 
 To reduce boundary effects, edge padding is a viable choice:
 
@@ -120,23 +290,16 @@ The above command overrides the :python:`rendering_intent` while leaving the oth
 
 **Normalization**
 
-When convolving two |LinearImage| objects it is recommended to normalize the PSF integral to 1.
-Doing so, the overall power of the image is preserved.
+For a |GrayscaleImage| PSF, the PSF is automatically normalized inside the convolution function
+so the overall power is one. By also setting :python:`cargs=dict(normalize=False)` the output image won't be 
+normalized, meaning brightness/color values are not rescaled automatically.
+This is useful when the input image does not include bright areas.
 
-Restrictions
-_______________________
+However, this is only supported for |GrayscaleImage| PSF.
 
-* it is not possible to convolve two |RGBImage| or two |RenderImage|
-* image and PSF resolutions must be between 50x50 pixels and 4 megapixels
-* the PSF needs to be twice as large as the image scaled with the magnification factor
-* when convolving two colored images, the resulting image is only one possible solution of many
-* :func:`scipy.signal.fftconvolve` is involved, so small numerical errors in dark image regions can appear
-* convolution of sphere projected images (see :numref:`image_sphere_projections`) is prohibited, as distances are non-linear
 
-Examples
+Image Examples
 __________________________
-
-**Image Example**
 
 
 .. list-table:: Image convolution from the :ref:`example_psf_imaging` example
@@ -156,39 +319,38 @@ __________________________
 
 .. figure:: ../images/example_psf3.webp
    :align: center
-   :width: 400
+   :width: 600
    :class: dark-light
 
 
+.. list-table:: Image convolution from the :ref:`example_keratoconus` example
+   :class: table-borderless
 
-**Code Example**
+   * - .. figure:: ../images/example_keratoconus_0.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+
+   
+     - .. figure:: ../images/example_keratoconus_8.webp
+          :align: center
+          :width: 400
+          :class: dark-light
 
 
-The following example loads an image preset and convolves it with a square PSF created as a numpy array.
-
-.. testcode::
-  
-   import numpy as np
-
-   # load image preset
-   img = ot.presets.image.ETDRS_chart_inverted([0.9, 0.9])
-
-   # square psf
-   psf_data = np.zeros((200, 200))
-   psf_data[50:150, 50:150] = 1
-
-   psf = ot.LinearImage(psf_data, [0.1, 0.08])
-
-   # convolution
-   img2 = ot.convolve(img, psf, m=-1.75)
+.. figure:: ../images/example_keratoconus_4.webp
+   :align: center
+   :width: 600
+   :class: dark-light
 
 
 Presets
 _____________________
 
 The are multiple PSF presets available.
-
-All presets are normalized such that the integral image sum equals 1.
+All functions return a |GrayscaleImage|, meaning the data values don't correspond to a physical intensity,
+but they are preprocessed for a human vision representation.
+For convolution, they are automatically converted to intensities inside the convolution function.
 
 **Circle**
 
@@ -238,7 +400,8 @@ Parameter :math:`a` describes the relative intensity of the larger one.
 
 .. math::
 
-  I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
+  I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) 
+  + a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)
 
 .. testcode::
 
@@ -253,7 +416,8 @@ A halo is modelled as a central Gaussian and annular Gaussian function around :m
 
 .. math::
 
-   I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right) +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
+   I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right)
+   +  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right) 
 
 .. testcode::
 

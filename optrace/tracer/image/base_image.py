@@ -23,7 +23,7 @@ class BaseImage(BaseClass):
                  **kwargs)\
             -> None:
         """
-        Init an Image object. Parent class of LinearImage, GrayscaleImage and RGBImage
+        Init an Image object. Parent class of ScalarImage, GrayscaleImage and RGBImage
 
         Image dimensions should be either provided by the s or extent parameter.
 

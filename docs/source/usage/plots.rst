@@ -183,7 +183,7 @@ _____________________________________
 
 The :func:`image_plot <optrace.plots.image_plots.image_plot>` plotting function takes an 
 :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` or 
-:class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>` as parameter.
+:class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>` as parameter.
 A :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` 
 needs to be converted to a specific image type first.
 

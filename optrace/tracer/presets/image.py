@@ -152,6 +152,8 @@ def siemens_star(s: np.ndarray | list = None, extent: list | np.ndarray = None) 
     :param extent: image extent in the form [xs, xe, ys, ye]
     :return: GrayscaleImage object
     """
+    # creating a Siemens Star is easy mathematically, but the Anti-Aliasing is the hard part
+    # load a finished image instead
     return RGBImage(str(image_dir / "siemens_star.png"), s, extent, desc="Siemens Star").to_grayscale_image()
 
 def tv_testcard1(s: np.ndarray | list = None, extent: list | np.ndarray = None) -> RGBImage:

@@ -4,7 +4,8 @@ Image Classes
 ---------------------------------
 
 .. |RenderImage| replace:: :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`
-.. |LinearImage| replace:: :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`
+.. |ScalarImage| replace:: :class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>`
+.. |GrayscaleImage| replace:: :class:`GrayscaleImage <optrace.tracer.image.grayscale_image.GrayscaleImage>`
 .. |RGBImage| replace:: :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>`
 
 .. role:: python(code)
@@ -34,22 +35,27 @@ ______________
 
    * - |RGBImage|
      - Image object containing three channel sRGB data as well as geometry information. 
+   
+   * - |GrayscaleImage|
+     - Grayscale version of |RGBImage|, useful for black and white images. 
+       Indicates image intensities with sRGB gamma correction.
 
-   * - |LinearImage| 
+   * - |ScalarImage|
      - Image object with only a single channel modeling a physical or physiological property.
 
    * - |RenderImage|
      - | Raytracer created image that holds raw XYZ colorspace and power data. 
-       | This object allows for the creation of |RGBImage| and |LinearImage| objects.
+       | This object allows for the creation of |RGBImage| and |ScalarImage| objects.
+
+For both |RGBImage| and |GrayscaleImage| the pixel values don't correspond the physical intensities,
+but non-linearly scaled values for human perception.
 
 
-.. TODO there is a new GrayscaleImage class
-
-Creation of LinearImage and RGBImage
-_____________________________________
+Creation of ScalarImage, GrayscaleImage and RGBImage
+_________________________________________________________
 
 
-Both |LinearImage| and |RGBImage| require a data argument and a geometry argument.
+|ScalarImage|, |GrayscaleImage| and |RGBImage| require a data argument and a geometry argument.
 The latter can be either provided as side length list :python:`s` or a positional :python:`extent` parameter.
 
 :python:`s` is a two element list describing the side lengths of the image. 
@@ -61,19 +67,19 @@ It defines the x- and y- position of the edges as four element list.
 For instance, :python:`extent=[-1, 2, 3, 5]` describes that the geometry of the image reaches from :python:`x=-1`
 to :python:`x=2` and :python:`y=3` to :python:`y=5`.
 
-The data argument must be a numpy array with either two dimensions (|LinearImage|) or three dimensions (|RGBImage|).
-In both cases, the data should be non-negative and in the case of the |RGBImage| 
+The data argument must be a numpy array with either two dimensions (|ScalarImage| and |GrayscaleImage|) 
+or three dimensions (|RGBImage|). In both cases, the data should be non-negative and in the case of the |RGBImage| 
 lie inside the value range of :python:`[0, 1]`.
 
-The following example creates a random |LinearImage| using a numpy array and the :python:`s` argument:
+The following example creates a random |GrayscaleImage| using a numpy array and the :python:`s` argument:
 
 .. testcode::
   
    import numpy as np
 
-   img_data = np.random.uniform(0, 6, (200, 200))
+   img_data = np.random.uniform(0, 0.5, (200, 200))
 
-   img = ot.LinearImage(img_data, s=[0.1, 0.08])
+   img = ot.GrayscaleImage(img_data, s=[0.1, 0.08])
 
 
 While a random, spatially offset |RGBImage| is created with:
@@ -95,14 +101,14 @@ For this, the data is specified as relative or absolute path string:
    img = ot.RGBImage("image_file.png", extent=[-0.2, 0.3, 0.08, 0.15])
 
 
-Load a LinearImage is also possible.
+Loading a |GrayscaleImage| or |ScalarImage| is also possible.
 However, in the case of a three channel image file, there can't be any significant coloring.
 An exception gets thrown in that case.
 If this is the case, either remove color information or convert it to an achromatic color space.
 
 
-|RGBImage| presets are available in :numref:`image_presets`. 
-For convolution there are multiple PSF |LinearImage| presets, see :numref:`psf_preset_gallery`.
+|RGBImage| and |GrayscaleImage| presets are available in :numref:`image_presets`. 
+For convolution there are multiple PSF |GrayscaleImage| presets, see :numref:`psf_preset_gallery`.
 
 .. _rimage_rendering:
 
@@ -441,7 +447,7 @@ To get a Illuminance image with 315 pixels we can write:
 
 Only for image modes :python:`"sRGB (Perceptual RI)"` and :python:`"sRGB (Absolute RI)"` the returned object type 
 is :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` .
-For all other modes it is of type :class:`LinearImage <optrace.tracer.image.linear_image.LinearImage>`.
+For all other modes it is of type :class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>`.
 
 For mode :python:`"sRGB (Perceptual RI)"` there are two optional additional parameters :python:`L_th` 
 and :python:`chroma_scale`. See :numref:`usage_color` for more details.
@@ -551,6 +557,16 @@ An example for the difference of both sRGB modes is seen in :numref:`color_dispe
           Saturation (CIELUV)
 
 
+Converting between GrayscaleImage and RGBImage
+___________________________________________________
+
+Use :meth:`RGBImage.to_grayscale_image() <optrace.tracer.image.rgb_image.RGBImage.to_grayscale_image>` to convert a
+colored |RGBImage| to a grayscale image. 
+The channels are weighted according to their luminance, see question 9 of :footcite:`Poynton_1997`.
+Use :meth:`GrayscaleImage.to_rgb_image() <optrace.tracer.image.grayscale_image.GrayscaleImage.to_rgb_image>` 
+to convert a |GrayscaleImage| to an RGB image. All grayscale values are repeated for the R, G, B channels.
+Both methods require no parameters and return the other image object type.
+
 Image Profile
 _____________________________________
 
@@ -580,7 +596,7 @@ Saving Images
 ___________________________________________
 
 
-|LinearImage| and |RGBImage| can be saved to disk in the following way:
+|ScalarImage| and |RGBImage| can be saved to disk in the following way:
 
 .. code-block:: python
 
@@ -608,7 +624,7 @@ See
 `cv2.ImwriteFlags <https://docs.opencv.org/4.x/d8/d6a/group__imgcodecs__flags.html#ga292d81be8d76901bff7988d18d2b42ac>`_ 
 for more information.
 The image is automatically interpolated so the exported image has the same side length ratio
-as the |RGBImage| or |LinearImage| object.
+as the |RGBImage| or |ScalarImage| object.
 
 .. note::
 
@@ -629,9 +645,9 @@ ________________________
 
 **Overview**
 
-Classes |LinearImage|, |RenderImage|, |RGBImage| share property methods.
+Classes |ScalarImage|, |RenderImage|, |RGBImage| share property methods.
 These include geometry information and metadata.
-When a |LinearImage| or |RGBImage| is created from a |RenderImage|, the metadata and geometry 
+When a |ScalarImage| or |RGBImage| is created from a |RenderImage|, the metadata and geometry
 is automatically propagated into the new object.
 
 **Size Properties**
@@ -688,7 +704,7 @@ Power in W and luminous power in lm:
    dimg.power()
    dimg.luminous_power()
 
-**Image Mode (RGBImage/LinearImage only)**
+**Image Mode (RGBImage/GrayscaleImage/ScalarImage only)**
 
 .. doctest::
    
@@ -701,6 +717,7 @@ Power in W and luminous power in lm:
 Image Presets
 ____________________
 
+.. TODO explain how to call these functions
 
 Below you can find preset images that can be used as ray source.
 
@@ -766,7 +783,8 @@ Below you can find preset images that can be used as ray source.
 
 
 
-.. list-table:: Test images for color, resolution or distortion
+.. list-table:: Test images for color, resolution or distortion. The ETDRS chart images, Siemens star and grid methods
+   return |GrayscaleImage|, all other images |RGBImage|.
    :class: table-borderless
 
    

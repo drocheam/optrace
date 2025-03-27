@@ -10,7 +10,7 @@ from optrace.tracer import misc
 from optrace.tracer.geometry.surface import Surface
 import optrace.tracer.color as color
 
-from rt_example import rt_example
+from tracing_geometry import tracing_geometry
 
 
 # lens maker equation
@@ -104,7 +104,7 @@ class TracerTests(unittest.TestCase):
     def test_raytracer_misc(self):
         """checks tma, clear, extent and pos"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
 
         # check extent and pos
         self.assertTrue(np.allclose(RT.extent - RT.outline, 0))  # extent is outline
@@ -669,7 +669,7 @@ class TracerTests(unittest.TestCase):
     @pytest.mark.slow
     def test_ray_storage(self):
         
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.add(ot.RaySource(ot.Point(), spectrum=ot.LightSpectrum("Monochromatic", wl=550), pos=[0, 0, 0]))
         
         # we want the ray sources to be two and have different powers
@@ -742,7 +742,7 @@ class TracerTests(unittest.TestCase):
 
             RT.remove(RT.ray_sources[-1])
 
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.trace(100000)
 
         # coverage: test that direction_vectors produce the same result as rays_by_mask
@@ -818,14 +818,14 @@ class TracerTests(unittest.TestCase):
         # coverage tests
 
         # warns that there are sources without rays
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.ray_sources[0].power = 0.000001
         RT.ray_sources[1].power = 1
         RT.trace(10000)
 
     def test_raytracer_output_threading_nopol(self):
         """test actions without multithreading, progressbar and tracing with no_pol"""
-        RT = rt_example()
+        RT = tracing_geometry()
         ot.global_options.multithreading = False
         ot.global_options.show_progress_bar = False
 
@@ -992,7 +992,7 @@ class TracerTests(unittest.TestCase):
 
     def test_image_render_parameter(self):
 
-        RT = rt_example()
+        RT = tracing_geometry()
 
         self.assertRaises(RuntimeError, RT.detector_image)  # no rays traced
         self.assertRaises(RuntimeError, RT.detector_spectrum)  # no rays traced
@@ -1028,7 +1028,7 @@ class TracerTests(unittest.TestCase):
 
     @pytest.mark.slow
     def test_iterative_render(self):
-        RT = rt_example()
+        RT = tracing_geometry()
         # RT.no_pol = True
 
         # testing only makes sense with multiple sources and detectors
@@ -1115,7 +1115,7 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(RuntimeError, RT.iterative_render, 10000)
 
         # raise on geometry error
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.lenses[0].move_to(RT.lenses[1].pos)  # collision
         self.assertRaises(RuntimeError, RT.iterative_render, 1000)
        
@@ -1218,7 +1218,7 @@ class TracerTests(unittest.TestCase):
         # hit_detector special cases are tested in test_tracer_special
 
         # change geometry without retracing. Leads to a RuntimeError
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.trace(10000)
         RT.remove(RT.lenses[0])
         self.assertRaises(RuntimeError, RT.detector_image)
@@ -1227,7 +1227,7 @@ class TracerTests(unittest.TestCase):
         self.assertRaises(RuntimeError, RT.source_spectrum)
 
         # coverage: limit and extent defined, should emit a warning
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.trace(100000)
         RT.detector_image(limit=4, extent=[-0.01, 0.01, -0.01, 0.01])
 
@@ -1330,7 +1330,7 @@ class TracerTests(unittest.TestCase):
     def test_polarization(self):
         """test polarization in a more complex setup"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.trace(200000)
 
         _, s, pol, _, _, _, _ = RT.rays.rays_by_mask(ret=[0, 1, 1, 0, 0, 0, 0])

@@ -727,6 +727,11 @@ class SpectrumTests(unittest.TestCase):
             self.assertNotEqual(spec.desc, "")
             self.assertNotEqual(spec.long_desc, "")
 
+        r = ot.presets.light_spectrum.srgb_r_power_factor
+        g = ot.presets.light_spectrum.srgb_g_power_factor
+        b = ot.presets.light_spectrum.srgb_b_power_factor
+        self.assertEqual([r, g, b], color.SRGB_PRIMARY_POWER_FACTORS)
+
     def test_spectrum_outside_definition(self):
         """check that all spectrum presets are zero outside the visible range"""
         # check that spectrum presets have constant 0 beyond their definition

@@ -115,6 +115,8 @@ srgb_w: LightSpectrum = LightSpectrum("Function", func=lambda wl: color.srgb_r_p
                                       desc="W", long_desc="sRGB White Spectrum")
 """Exemplary sRGB White Spectrum"""
 
+srgb_r_power_factor, srgb_g_power_factor, srgb_b_power_factor = color.SRGB_PRIMARY_POWER_FACTORS
+"""Power ratios for white mixing from sRGB primaries"""
 
 srgb: list = [srgb_r, srgb_g, srgb_b, srgb_w]
 """sRGB channel and white presets in one list"""

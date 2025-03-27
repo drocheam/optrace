@@ -4,7 +4,7 @@ import numpy as np
 import optrace as ot
 
 
-def rt_example() -> ot.Raytracer:
+def tracing_geometry() -> ot.Raytracer:
     
     # this geometry has multiple detector, sources, lenses
     # as well as a filter, aperture and a marker and regions with different ambient n

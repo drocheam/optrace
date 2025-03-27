@@ -11,8 +11,6 @@ import optrace.tracer.color as color
 import optrace as ot
 
 
-# TODO new type GrayscaleImage
-
 
 
 class ImageTests(unittest.TestCase):
@@ -67,9 +65,9 @@ class ImageTests(unittest.TestCase):
         for ratio in [1/6, 0.9, 3, 5]:  # different side ratios
 
             # Linear and RGBImage
-            for img in [ot.presets.image.color_checker([1, ratio]), 
-                        ot.presets.image.siemens_star([1, ratio]), 
-                        ot.LinearImage(ot.presets.psf.airy(1).data, [1, ratio])]:
+            for img in [ot.presets.image.color_checker([1, ratio]),
+                        ot.presets.image.siemens_star([1, ratio]),
+                        ot.ScalarImage(ot.presets.psf.airy(1).data, [1, ratio])]:
 
                 for p in [-0.1, 0, 0.163485, 1, 1.01]: # different relative position inside image
                     for cut_ in ["x", "y"]:
@@ -284,7 +282,7 @@ class ImageTests(unittest.TestCase):
     def test_image_init_exceptions(self):
         """test image initialization exceptions and errors"""
 
-        for Image, im_data in zip([ot.RGBImage, ot.LinearImage, ot.GrayscaleImage],
+        for Image, im_data in zip([ot.RGBImage, ot.ScalarImage, ot.GrayscaleImage],
                                   [np.ones((100, 100, 3)), np.ones((100, 100)), np.ones((100, 100))]):
 
             # type errors
@@ -313,34 +311,35 @@ class ImageTests(unittest.TestCase):
             assert os.path.exists("pyproject.toml")
             self.assertRaises(IOError, Image, "pyproject.toml", [2, 2])  # invalid format
            
-        # tests only for RGBImage
+        # data outside sRGB range
         self.assertRaises(ValueError, ot.RGBImage, np.ones((100, 100, 3))*1.001, [2, 2])  # data above 1
+        self.assertRaises(ValueError, ot.GrayscaleImage, np.ones((100, 100))*1.001, [2, 2])  # data above 1
    
-        # tests only for LinearImage and GrayscaleImage
-        self.assertRaises(ValueError, ot.LinearImage, ot.presets.image.color_checker([1, 1]).data, [1, 1]) 
+        # three channels for scalar image
+        self.assertRaises(ValueError, ot.ScalarImage, ot.presets.image.color_checker([1, 1]).data, [1, 1])
         self.assertRaises(ValueError, ot.GrayscaleImage, ot.presets.image.color_checker([1, 1]).data, [1, 1]) 
         # ^-- colored image
 
     @pytest.mark.os
     def test_image_saving_loading(self):
-        """test saving and loading of LinearImage, GrayscaleImage and RGBImage"""
+        """test saving and loading of ScalarImage, GrayscaleImage and RGBImage"""
 
         # check different file formats
         for path in ["test.png", "test.jpg", "test.bmp"]:
 
-            # check linear and RGBImage. LinearImage should have different value scales.
+            # check linear and RGBImage. ScalarImage should have different value scales.
             for i, img in enumerate([ot.presets.image.cell([1, 1]),
                                      ot.presets.image.ETDRS_chart([1, 1]),
                                      ot.presets.psf.airy(5),
-                                     ot.LinearImage(np.zeros((250, 250)), [6, 5]), # coverage: empty image 
-                                     ot.GrayscaleImage(np.zeros((250, 250)), [6, 5]), # coverage: empty image 
-                                     ot.LinearImage(np.full((100, 100), 150), [2, 1]),
-                                     ot.LinearImage(np.full((100, 100), 0.0001), [1, 2]),
+                                     ot.ScalarImage(np.zeros((250, 250)), [6, 5]),  # coverage: empty image
+                                     ot.GrayscaleImage(np.zeros((250, 250)), [6, 5]),  # coverage: empty image
+                                     ot.ScalarImage(np.full((100, 100), 150), [2, 1]),
+                                     ot.ScalarImage(np.full((100, 100), 0.0001), [1, 2]),
                                      ot.presets.psf.circle(5)]):
 
                 img.save(path)
                 img2 = ot.RGBImage(path, [1, 1]) if isinstance(img, ot.RGBImage)\
-                        else ot.LinearImage(path, [1, 1]) if isinstance(img, ot.LinearImage)\
+                        else ot.ScalarImage(path, [1, 1]) if isinstance(img, ot.ScalarImage)\
                         else ot.GrayscaleImage(path, [1, 1]) # check if loads correctly
                 os.remove(path)
                
@@ -369,6 +368,32 @@ class ImageTests(unittest.TestCase):
         # IOError, invalid type
         self.assertRaises(IOError, img.save, "hjkhjkhjkhjk.ggg")  # invalid format
         self.assertRaises(IOError, img.save, str(Path("hjkhjk") / Path("hjkhjkhjkhjk.png")))  # invalid path
+
+    def test_rgb_image_grayscale_image_conversions(self):
+
+        # gray image to rgb image
+        gray_image_array = 0.5*np.random.sample((100, 100))
+        gray_image = ot.GrayscaleImage(gray_image_array, extent=[-2, 1, 5.3, 5.9])
+        rgb_image = gray_image.to_rgb_image()
+        self.assertTrue(np.all(gray_image.extent == rgb_image.extent))
+        self.assertAlmostEqual(np.mean(np.std(rgb_image.data, axis=2)), 0, delta=1e-14)
+
+        # rgb image to gray image
+        rgb_image_array = 0.5*np.random.sample((100, 100, 3))
+        rgb_image = ot.RGBImage(rgb_image_array, extent=[-2, 1, 5.3, 5.9])
+        gray_image = rgb_image.to_grayscale_image()
+        xyz_y = color.srgb_to_xyz(rgb_image_array)[:, :, 1]
+        gray_srgb = color.srgb_linear_to_srgb(xyz_y)
+        gray_srgb = np.clip(gray_srgb, 0, 1)
+        self.assertTrue(np.allclose(gray_image.extent - rgb_image.extent, 0))
+        self.assertTrue(np.allclose(gray_image.data-gray_srgb, 0, atol=1e-6))
+
+        # gray to rgb to gray
+        gray_image_array = 0.5*np.random.sample((100, 100))
+        gray_image = ot.GrayscaleImage(gray_image_array, extent=[-2, 1, 5.3, 5.9])
+        rgb_image = gray_image.to_rgb_image()
+        gray_image2 = rgb_image.to_grayscale_image()
+        self.assertTrue(np.allclose(gray_image2.data - gray_image_array, 0, atol=1e-6))
 
     def test_image_orientation(self):
         """check that pixel and image positions are consistent for image, rendered image and ray starting positions"""

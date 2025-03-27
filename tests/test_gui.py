@@ -20,7 +20,7 @@ from pyface.api import GUI as pyface_gui  # invoke_later() method
 
 import optrace as ot
 from optrace.gui import TraceGUI
-from rt_example import rt_example
+from tracing_geometry import tracing_geometry
 
 
 class GUITests(unittest.TestCase):
@@ -307,7 +307,7 @@ class GUITests(unittest.TestCase):
 
                 self._set_in_main(sim, "rays_visible", 500)
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
         self.raise_thread_exceptions()
@@ -399,7 +399,7 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
                 self.assertEqual(rc0, sim.ray_count)
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
         sim.debug(func=interact2, args=(sim,))
         plt.close('all')
@@ -441,7 +441,7 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.detector_profile)
                 self._wait_for_idle(sim)
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
         sim.debug(interact3, args=(sim,))
         plt.close('all')
@@ -500,7 +500,7 @@ class GUITests(unittest.TestCase):
             self.raise_thread_exceptions()
             time.sleep(1)
 
-        RT = rt_example()
+        RT = tracing_geometry()
 
         [RT.remove(F) for F in RT.filters.copy()]
         self.assertTrue(not RT.filters)
@@ -528,7 +528,7 @@ class GUITests(unittest.TestCase):
     def test_action_spam(self):
         """spam the gui with many possible actions to check threading locks and for race conditions"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
 
         def interact(sim):
@@ -579,7 +579,7 @@ class GUITests(unittest.TestCase):
     def test_replot_combinations(self):
         """check replotting by setting random combinations inside the change dictionary for replot()"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
 
         def interact(sim):
@@ -624,7 +624,7 @@ class GUITests(unittest.TestCase):
         # could be due to locks
         # I couldn't reproduce this by clicking and interacting with the UI itself
 
-        RT = rt_example()
+        RT = tracing_geometry()
 
         sim = TraceGUI(RT)
 
@@ -713,7 +713,7 @@ class GUITests(unittest.TestCase):
         plt.figure()
         # plt.show(block=False)
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
 
         def send_key(sim, key):
@@ -809,7 +809,7 @@ class GUITests(unittest.TestCase):
     def test_run_command(self):
         """test command setting and sending as well as automatic replotting (also tests TraceGUI.smart_replot()"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
 
         def send(cmd):
@@ -950,7 +950,7 @@ class GUITests(unittest.TestCase):
         * resizing to initial state resizes everything back to normal
         """
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
 
         def interact(sim):
@@ -1075,7 +1075,7 @@ class GUITests(unittest.TestCase):
     def test_additional_coverage_1(self):
         """additionial coverage tests"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
 
         def interact(sim):
@@ -1127,7 +1127,7 @@ class GUITests(unittest.TestCase):
     def test_additional_coverage_2(self):
         """additionial coverage tests"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
 
         def interact(sim):
@@ -1215,7 +1215,7 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.gui2
     def test_run(self):
-        RT = rt_example()
+        RT = tracing_geometry()
         sim = TraceGUI(RT)
         sim._exit = True  # leads to run() exiting directly after load
         sim.run()
@@ -1225,7 +1225,7 @@ class GUITests(unittest.TestCase):
     # that aren't handled and the program is blocked. See NOTE 5 below
     def test_control(self):
 
-        RT = rt_example()
+        RT = tracing_geometry()
         
         def automated(GUI):
 
@@ -1341,7 +1341,7 @@ class GUITests(unittest.TestCase):
     def test_point_marker(self):
         """test marker plotting, replotting, removal and properties in scene"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.remove(RT.markers)
         
         def interact(sim):
@@ -1396,7 +1396,7 @@ class GUITests(unittest.TestCase):
     def test_line_marker(self):
         """test marker plotting, replotting, removal and properties in scene"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.remove(RT.markers)
         
         def interact(sim):
@@ -1448,7 +1448,7 @@ class GUITests(unittest.TestCase):
         only the pick handling is checked here
         """
 
-        RT = rt_example()
+        RT = tracing_geometry()
         
         def interact(sim):
             with self._try(sim):
@@ -1642,7 +1642,7 @@ class GUITests(unittest.TestCase):
     def test_picker_command(self):
         """test calling of picker commands pick_ray, pick_ray_section, reset_picking"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         
         def interact(sim):
             with self._try(sim):
@@ -1709,7 +1709,7 @@ class GUITests(unittest.TestCase):
         Therefore also checks ScenePlotting.select_rays, ScenePlotting.ray_selection, TraceGUI.replot_rays
         """
         
-        RT = rt_example()
+        RT = tracing_geometry()
         N = 500000
         RT.trace(N)
         
@@ -1802,7 +1802,7 @@ class GUITests(unittest.TestCase):
     def test_volumes(self):
         """plot volume plotting and handling"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         RT.clear()
         
         def interact(sim):
@@ -1860,7 +1860,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.gui2
     def test_set_get_camera(self) -> None:
         
-        RT = rt_example()
+        RT = tracing_geometry()
         
         def interact(sim):
             with self._try(sim):
@@ -1950,7 +1950,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.gui2
     def test_screenshot(self) -> None:
         
-        RT = rt_example()
+        RT = tracing_geometry()
         
         def interact(sim):
             with self._try(sim):
@@ -1985,7 +1985,7 @@ class GUITests(unittest.TestCase):
     def test_custom_ui(self) -> None:
         """test if custom UI elements are correctly created, initialized and execute their action"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         
         val1 = [0]
         val2 = [0]
@@ -2106,7 +2106,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.gui3
     def test_plots_passdown(self) -> None:
         
-        RT = rt_example()
+        RT = tracing_geometry()
         path = "screenshot.png"
         
         def interact(sim):

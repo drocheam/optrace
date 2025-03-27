@@ -7,7 +7,7 @@ import numpy as np
 import optrace as ot
 
 from test_tracer import lens_maker
-from rt_example import rt_example
+from tracing_geometry import tracing_geometry
 
 # Tests for special cases in Raytracing
 
@@ -273,7 +273,7 @@ class TracerSpecialTests(unittest.TestCase):
        
     def test_ray_reach(self):
 
-        RT = rt_example()
+        RT = tracing_geometry()
 
         # blocking aperture
         RT.apertures[0] = ot.Aperture(ot.CircularSurface(r=5), pos=RT.apertures[0].pos)
@@ -385,7 +385,7 @@ class TracerSpecialTests(unittest.TestCase):
     def test_few_rays_action(self):
         """test how the raytracer handles few or no rays"""
 
-        RT = rt_example()
+        RT = tracing_geometry()
         AP = RT.apertures[0]
 
         # add ideal lens

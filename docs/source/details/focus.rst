@@ -87,7 +87,7 @@ This leads to a solution of:
 **Position Weighted RMS**
 
 Using other strictly monotonically increasing functions depending on 
-:math:`r = \left(x_i^*-x_c^*\right)^2+\left(y_i^*-y_c^*\right)^2` has no additional benefit.
+:math:`r^2 = \left(x_i^*-x_c^*\right)^2+\left(y_i^*-y_c^*\right)^2` has no additional benefit.
 They all share the same position for the minimum, but could have numerical issues or could be harder to calculate.
 
 

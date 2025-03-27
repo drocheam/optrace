@@ -1165,7 +1165,10 @@ class TraceGUI(HasTraits):
                         " GB RAM requested. Either decrease the number of rays, surfaces or do an iterative render. "
                         "If your system can handle"
                         " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")
+                # set the ray_count to old value, as it could be set in the textfield
+                # textfield value seems to only be updated by using set_trait_later
                 pyface_gui.set_trait_later(self, "ray_count", event.old)
+                pyface_gui.process_events()
                 return
 
             self._status["Tracing"] += 1

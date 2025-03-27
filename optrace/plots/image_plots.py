@@ -6,13 +6,13 @@ import numpy as np  # calculations
 
 from .misc_plots import _show_grid, _save_or_show
 
-from ..tracer.image import RGBImage, LinearImage, GrayscaleImage
+from ..tracer.image import RGBImage, ScalarImage, GrayscaleImage
 from ..property_checker import PropertyChecker as pc  # check types and values
 from ..tracer import color
 from .. import global_options
 
 
-def image_plot(im:       LinearImage | GrayscaleImage | RGBImage,
+def image_plot(im: ScalarImage | GrayscaleImage | RGBImage,
                log:      bool = False,
                flip:     bool = False,
                title:    str = None,
@@ -106,7 +106,7 @@ def image_plot(im:       LinearImage | GrayscaleImage | RGBImage,
     _save_or_show(path, sargs)
 
 
-def image_profile_plot(im:       RGBImage | LinearImage | GrayscaleImage,
+def image_profile_plot(im: RGBImage | ScalarImage | GrayscaleImage,
                        log:      bool = False,
                        flip:     bool = False,
                        title:    str = None,
@@ -196,16 +196,16 @@ def image_profile_plot(im:       RGBImage | LinearImage | GrayscaleImage,
 
 def _check_types(im, log, flip, title) -> None:
     """check types for r_image plots"""
-    pc.check_type("im", im, LinearImage | RGBImage | GrayscaleImage)
+    pc.check_type("im", im, ScalarImage | RGBImage | GrayscaleImage)
     pc.check_type("flip", flip, bool)
     pc.check_type("log", log, bool)
     pc.check_type("title", title, str | None)
 
 
-def _get_labels(im:             RGBImage | LinearImage | GrayscaleImage, 
-                mode:           str, 
-                log:            bool, 
-                cut_pos_dim:    str = None, 
+def _get_labels(im: RGBImage | ScalarImage | GrayscaleImage,
+                mode:           str,
+                log:            bool,
+                cut_pos_dim:    str = None,
                 cut_pos_val:    float = None)\
         -> tuple[str, str, str, str, str, str, str, str, str, str]:
     """get plot labels and title"""

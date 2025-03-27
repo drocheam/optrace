@@ -4,6 +4,9 @@
 Example Gallery
 ################
 
+.. role:: python(code)
+  :language: python
+  :class: highlight
 
 | This gallery showcases all optrace examples.
 | You can download the full examples.zip archive 
@@ -487,7 +490,7 @@ A simulation of vision through a patient's eye with
 progressing levels of `keratoconus <https://en.wikipedia.org/wiki/Keratoconus>`__. 
 Parameters are taken from the work of `Tan et al. (2008) <https://doi.org/10.1167/8.2.13>`__.
 
-.. list-table::
+.. list-table:: Simulated images for different keratoconus stages.
    :class: table-borderless
 
    * - .. figure:: ./images/example_keratoconus_1.webp
@@ -518,6 +521,39 @@ Parameters are taken from the work of `Tan et al. (2008) <https://doi.org/10.116
 
           Severe keratoconus.
 
+Inside the python script you can set the option :python:`show_psf=True` to also plot die PSF for each case.
+
+
+.. list-table:: PSFs for each case. Note the different scale.
+   :class: table-borderless
+
+   * - .. figure:: ./images/example_keratoconus_5.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+
+          PSF for the healthy eye.
+
+     - .. figure:: ./images/example_keratoconus_6.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+     
+          PSF for mild keratoconus.
+
+   * - .. figure:: ./images/example_keratoconus_7.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+          
+          PSF for advanced keratoconus.
+    
+     - .. figure:: ./images/example_keratoconus_8.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+
+          PSF for severe keratoconus.
 
 .. _example_microscope:
 

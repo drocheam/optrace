@@ -16,6 +16,7 @@ image = ot.presets.image.ETDRS_chart_inverted  # test image
 position = "far"  # keratoconus cone position (see "positions" dictionary below)
 cases = [0, 4, 7, 14]  # cases to simulate (see "gauss_params" list below)
 delta_A = 0 # 1.5  # relative eye adaption / refractive error from correct focus
+show_psf = False  # activate to also plot the PSF
 
 # Table 1 of Tan et. al (2008) (https://jov.arvojournals.org/article.aspx?articleid=2158188)
 #   h0     sigma_x  sigma_y  Number       Category 
@@ -81,6 +82,9 @@ def cornea_ant_func(x, y, cornea_front, gauss_param, position):
 old_cornea = RT.lenses[0]
 cornea = old_cornea
 
+# input image
+otp.image_plot(image([2*G_size, 2*G_size]))
+
 for num in cases:
    
     # remove old cornea
@@ -107,8 +111,13 @@ for num in cases:
     # convolve with PSF
     img_conv = ot.convolve(img, psf, m=m, keep_size=True)
     
-    # show image
+    # show resulting image
     otp.image_plot(img_conv, flip=True)
+
+    # show psf in perceptual RI. 
+    # Ignore colors for low lightness values of 1% for the calculation of the chroma scaling
+    if show_psf:
+        otp.image_plot(psf.get("sRGB (Perceptual RI)", L_th=0.01), flip=True)
 
 # make plots blocking
 otp.block()

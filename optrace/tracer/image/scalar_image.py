@@ -9,7 +9,7 @@ from .. import color
 
 
 
-class LinearImage(BaseImage):
+class ScalarImage(BaseImage):
 
     def __init__(self,
                  data:              numpy.ndarray | str,
@@ -18,11 +18,10 @@ class LinearImage(BaseImage):
                  **kwargs)\
             -> None:
         """
-        Init a LinearImage object.
+        Init a ScalarImage object.
 
         When provided as numpy array, the image data must be non-negative and have only one channel (simple 2D array).
         When provided as image path, the image must have no color information.
-        The colorspace is not important (Greyscale, RGB, ...) as there will be a check for coloring.
 
         When parameter 'data' is provided as array, 
         element [0, 0] defines the lower left corner (negative x, negative y)

@@ -10,7 +10,7 @@ import scipy.signal
 
 from ..base_class import BaseClass  # parent class
 from ...property_checker import PropertyChecker as pc  # check types and values
-from . import RGBImage, LinearImage
+from . import RGBImage, ScalarImage
 
 from .. import misc
 from .. import color  # xyz_observers curves and sRGB conversions
@@ -135,7 +135,7 @@ class RenderImage(BaseClass):
             N:          int = 315,
             L_th:       float = 0,
             chroma_scale:  float = None)\
-            -> RGBImage | LinearImage:
+            -> RGBImage | ScalarImage:
         """
         Get a converted image with mode 'mode'. Must be one of RenderImage.image_modes.
         
@@ -144,7 +144,7 @@ class RenderImage(BaseClass):
         Rescaling is done by joining bins, so there is no interpolation.
 
         Depending on the image mode, the returned image is an RGBImage with three channels
-        or a LinearImage with one channel.
+        or a ScalarImage with one channel.
 
         Parameters L_th and chroma_scale are only needed for mode='sRGB (Perceptual RI)',
         see function color.xyz_to_srgb_linear for more details.
@@ -153,7 +153,7 @@ class RenderImage(BaseClass):
         :param N: pixel count of smaller side, nearest of RenderImage.SIZES is automatically selected
         :param L_th: lightness threshold for mode "sRGB (Perceptual RI)" 
         :param chroma_scale: chroma_scale option for mode "sRGB (Perceptual RI)"
-        :return: RGBImage or LinearImage, depending on 'mode'
+        :return: RGBImage or ScalarImage, depending on 'mode'
         """
         self.__check_for_image()
 
@@ -181,12 +181,12 @@ class RenderImage(BaseClass):
 
             case "Irradiance":
                 data = 1 / self.Apx * img[:, :, 3]
-                return LinearImage(data, **iargs)
+                return ScalarImage(data, **iargs)
 
             case "Illuminance":
                 # the Illuminance is just the unnormalized Y scaled by K = 683 lm/W and the inverse pixel area
                 data = self.K / self.Apx * img[:, :, 1]
-                return LinearImage(data, **iargs)
+                return ScalarImage(data, **iargs)
 
             case ("sRGB (Absolute RI)" |"sRGB (Perceptual RI)"):
 
@@ -199,26 +199,26 @@ class RenderImage(BaseClass):
             case "Outside sRGB Gamut":
                 # force conversion from bool to float64 so further algorithms work correctly
                 data = np.array(color.outside_srgb_gamut(img[:, :, :3]), dtype=np.float64)
-                return LinearImage(data, **iargs)
+                return ScalarImage(data, **iargs)
 
             case "Lightness (CIELUV)":
                 data = color.xyz_to_luv(img[:, :, :3])[:, :, 0]
-                return LinearImage(data, **iargs)
+                return ScalarImage(data, **iargs)
 
             case "Hue (CIELUV)":
                 luv = color.xyz_to_luv(img[:, :, :3])
                 data = color.luv_hue(luv)
-                return LinearImage(data, **iargs)
+                return ScalarImage(data, **iargs)
 
             case "Chroma (CIELUV)":
                 luv = color.xyz_to_luv(img[:, :, :3])
                 data = color.luv_chroma(luv)
-                return LinearImage(data, **iargs)
+                return ScalarImage(data, **iargs)
 
             case "Saturation (CIELUV)":
                 luv = color.xyz_to_luv(img[:, :, :3])
                 data = color.luv_saturation(luv)
-                return LinearImage(data, **iargs)
+                return ScalarImage(data, **iargs)
 
             case _ :
                 raise ValueError(f"Invalid display_mode {mode}, should be one of {self.image_modes}.")
