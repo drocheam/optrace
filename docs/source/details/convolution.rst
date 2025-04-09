@@ -2,9 +2,10 @@
 PSF Convolution
 ***********************
 
-.. TODO Teil überarbeiten und übersetzen
+.. role:: python(code)
+  :language: python
+  :class: highlight
 
-.. TODO auf :footcite:`Ravikumar_2008,Barnden_1974` eingehen
 
 .. _psf_color_handling:
 
@@ -14,7 +15,8 @@ Convolution of Colored Images
 Polychromatic Convolution
 --------------------------------------
 
-Im Allgemeinen muss man die Bildfaltung pro Wellenlänge durchführen, Bild und PSF sind dabei generell beide wellenlängenabhängig:
+In general, image convolution must be performed for each wavelength, with both the image and the PSF 
+typically being wavelength-dependent:
 
 .. math::
    \text{im}_2(x, y, \lambda) = \text{im}(x, y, \lambda) \otimes \text{psf}(x, y, \lambda)
@@ -23,25 +25,31 @@ Im Allgemeinen muss man die Bildfaltung pro Wellenlänge durchführen, Bild und 
 Special Case Spectral Homogenity
 --------------------------------------
 
-Im Falle der sogenannten spektralen Homogenität ist das Spektrum im Verlauf über das gesamte Bild das gleiche, es wird jedoch mit einem ortsabhängigem Intensitätsfaktor :math:`\text{im}_r(x, y)` skaliert.
-Für ein beispielhaftes Rotspektrum :math:`\text{im}_r(\lambda)` gilt:
+In the case of so-called spectral homogeneity, the spectrum :math:`s` is consistent across the entire image 
+but is scaled by a location-dependent intensity factor :math:`\text{im}_s(x, y)`. 
+The concept of spectral homogeneity goes back to :footcite:`Barnden_1974`,
+who also describes this mathematical simplification. 
+:footcite:`Ravikumar_2008` also uses this to generate color images.
+
+For an example :math:`\text{im}_s(\lambda)`, it holds that:
 
 .. math::
    \text{im}_2(x, y, \lambda) 
-   &= \left(\text{im}_r(\lambda) \text{im}_r(x, y)\right) \otimes \text{psf}(x, y, \lambda)\\
-   &= \text{im}_r(x, y) \otimes \left(\text{im}_r(\lambda) \text{psf}(x, y, \lambda)\right)\\
-   &= \text{im}_r(x, y) \otimes \text{psf}_r(x, y, \lambda)\\
+   &= \left(\text{im}_r(\lambda) \text{im}_s(x, y)\right) \otimes \text{psf}(x, y, \lambda)\\
+   &= \text{im}_s(x, y) \otimes \left(\text{im}_s(\lambda) \text{psf}(x, y, \lambda)\right)\\
+   &= \text{im}_s(x, y) \otimes \text{psf}_s(x, y, \lambda)\\
    :label: eq_conv_special_case_spectral_homogenity
 
-Das Spektrum ist bezogen auf den Faltungsausdruck eine Konstante, kann also auch an die PSF multipliziert werden.
-Wir definieren uns die neue, spektral gewertete PSF :math:`\text{psf}_r(x, y, \lambda)`.
+The spectrum is a constant with respect to the convolution expression and can therefore also be multiplied with the PSF. 
+We define the new spectrally weighted PSF :math:`\text{psf}_s(x, y, \lambda)`. 
 
-
-Convolution of sRGB Images
+Convolution of RGB Images
 --------------------------------------
 
-Typischerweise ist nicht der spektrale Verlauf des Bildergebnisses interessant, sondern nur die Farbkoordinaten für eine Farbdarstellung auf dem Monitor.
-Um zu errechnen, welchen Rotreiz das gefaltete Bild erzeugt, kann man es mit der color matching function :math:`r(\lambda)` multiplizieren und aufintegrieren:
+Typically, the spectral profile of the image result is not of interest, 
+but rather the color coordinates for a color representation on the monitor.
+For instance, to calculate the red stimulus produced by the convolved image,
+it can be multiplied by the sRGB red color matching function :math:`r(\lambda)` and integrated over all wavelengths:
 
 .. math::
    \text{im}_{2,r\rightarrow r}(x, y) 
@@ -50,17 +58,17 @@ Um zu errechnen, welchen Rotreiz das gefaltete Bild erzeugt, kann man es mit der
    &= \text{im}_r(x, y) \otimes \text{psf}_{r\rightarrow r}(x, y)\\
    :label: eq_conv_rgb_r_to_r
 
-Aber nur die PSF hat eine Wellenlängenabhängigkeit, also lässt sich das Bild aus dem Integralausdruck herausziehen.
-Da die Faltung unabhängig von der Wellenlänge ist, lässt sich die Integration auch vor der Faltung durchführen.
-Wir erhalten die Rot-zu-Rot PSF :math:`\text{psf}_{r\rightarrow r}(x, y)`.
+But only the PSF has a wavelength dependency, so the image can be factored out of the integral expression. 
+Since the convolution is independent of wavelength, the integration can also be performed before the convolution. 
+We obtain the red-to-red PSF :math:`\text{psf}_{r \rightarrow r}(x, y)`.
 
-Wählt man nun die Lichtspektren :math:`\text{im}_r(\lambda), \text{im}_g(\lambda), \text{im}_b(\lambda)` so, dass
-sie die gleichen Farbkoordinaten wie die Primärspektren von sRGB besitzen, so handelt es sich um linear unabhängige
-Farbkanäle, mit denen sich alle Farben innerhalb des sRGB Farbraums als Linearkombination zusammenstellen lassen.
-Man kann nur die PSF in drei Einzelkanal PSF zerlegen, die ebenfalls linear voneinander unabhängig sind.
+If the light spectra :math:`\text{im}_r(\lambda), \text{im}_g(\lambda), \text{im}_b(\lambda)` are chosen such that 
+they have the same color coordinates as the primary spectra of sRGB, they are linearly independent color channels, 
+with which all colors within the sRGB color space can be composed as a linear combination.
+The PSF can also be decomposed into three individual channel PSFs that are likewise linearly independent.
 
-Das RGB Farbbild aus dem Rotbild :math:`\text{im}_r(x, y)` mit raümlich homogenem :math:`\text{im}_r(\lambda)` 
-für die Faltung mit der PSF lässt sich dann also vereinfachen und zusammenfassen zu:
+The RGB color image from the red image :math:`\text{im}_r(x, y)` with spatially homogeneous :math:`\text{im}_r(\lambda)` 
+for convolution with the PSF can then be simplified and summarized as:
 
 .. math::
    \text{im}_{2,r\rightarrow rgb}(x, y) =
@@ -71,11 +79,12 @@ für die Faltung mit der PSF lässt sich dann also vereinfachen und zusammenfass
    \end{array}\right]
    :label: eq_conv_rgb_r_to_rgb
 
-Auch wenn das Ursprungsrotspektrum ein reines Rot in sRGB Farbraum erzeugt, so muss das durch die Faltung mit der PSF
-nicht der Fall sein. Durch starke Dispersion im System können gelbe Wellenlängen unter dem Rotspektrum achsferner sein,
-wodurch sich ein gelber Rand in der PSF und Anteile in :math:`\text{psf}_{r\rightarrow g}(x, y)` ergeben können.
+Even if the original red spectrum generates a pure red in the sRGB color space,
+this might not be the case after convolution with the PSF.
+Chromatic aberration could lead to more transversal chromatic aberration for smaller wavelengths,
+resulting in a yellow fringe in the PSF and components in :math:`\text{psf}_{r \rightarrow g}(x, y)`.
 
-Analog gilt für den G-Kanal mit der sRGB color matching function :math:`g(\lambda)`:
+Similarly, this applies to the G-channel with the sRGB color matching function :math:`g(\lambda)`:
 
 .. math::
    \text{im}_{2,g\rightarrow rgb}(x, y) =
@@ -86,7 +95,7 @@ Analog gilt für den G-Kanal mit der sRGB color matching function :math:`g(\lamb
    \end{array}\right]
    :label: eq_conv_rgb_g_to_rgb
 
-Analog gilt für den G-Kanal mit der sRGB color matching function :math:`b(\lambda)`:
+And the blue channel with matching function :math:`b(\lambda)`:
 
 .. math::
    \text{im}_{2,b\rightarrow rgb}(x, y) =
@@ -97,26 +106,28 @@ Analog gilt für den G-Kanal mit der sRGB color matching function :math:`b(\lamb
    \end{array}\right]
    :label: eq_conv_rgb_b_to_rgb
 
-Das Gesamtbild :math:`\text{im}_{2,rgb\rightarrow rgb}` aus der Summe aller gefalteten R,G,B Farbkomponenten im Bild.
-Jedoch muss man das Mischverhältnis aller Kanäle beachten:
-Sind die Farb PSFs alle mit einer Leistungs mit einem Watt simuliert worden, so entspricht das nicht dem korrekten
-Mischverhältnis für den sRGB Farbraum. Dieses muss so angepasst sein, dass gleiche Anteile 
-in :math:`\text{im}_r, \text{im}_g, \text{im}_b` weiß im Farbraum erzeugen.
+The overall image :math:`\text{im}_{2,rgb \rightarrow rgb}` is obtained from the sum of all convolved R, G, B 
+color components in the image. However, the mixing ratio of all channels must be considered: If the color PSFs
+were all simulated with a power of one watt, this does not correspond to the correct mixing ratio for white in 
+the sRGB color space. This must be adjusted so that equal parts in :math:`\text{im}_r, \text{im}_g, \text{im}_b` 
+produce white in the color space.
 
-Seien :math:`a_r, a_g, a_b` die relativen Mischfaktoren, wobei :math:`a_r + a_g + a_b = 1` gilt, so ist das Endresultat:
+Let :math:`a_r, a_g, a_b` be the relative mixing factors, then the final result is:
 
 .. math::
    \text{im}_{2,rgb\rightarrow rgb}(x, y) = a_r \text{im}_{2,r\rightarrow rgb}(x, y)
    + a_g \text{im}_{2,g\rightarrow rgb}(x, y) + a_b \text{im}_{2,b\rightarrow rgb}(x, y)
    :label: eq_conv_rgb_rgb_to_rgb
 
-Die RGB Farbspektren und Gewichtungsfaktoren sind in Abschnitt <> gezeigt.
+The RGB color spectra and weighting factors are shown in Equation :math:numref:`r_g_b_factors`. 
+Instead of applying the rescaling afterwards, the power rations could also be applied 
+to the sources used to render the PSFs, so the power ratios are included in the relative R, G, B PSFs.
 
-Convolution of a spectral homogeneous image and a sRGB PSF
+Convolution of a spectral homogeneous image and an RGB PSF
 --------------------------------------------------------------
 
-Es gibt einen Speziallfall, wenn das Ursprungsbild spektral homogen ist.
-Sei das Spektrum :math:`s`, dann gilt:
+There is a special case when the image is spectrally homogeneous. 
+Let the spectrum be :math:`s`, then:
 
 .. math::
    \text{im}_{2,s\rightarrow rgb}(x, y) =
@@ -127,70 +138,72 @@ Sei das Spektrum :math:`s`, dann gilt:
    \end{array}\right]
    :label: eq_conv_rgb_s_to_rgb
 
-Für den Spezialfall, dass das Ursprungsbild spektral homogen ist
+Here, :math:`\text{im}_s` describes the spatial distribution of the intensity 
+of the source that emits the spectrum :math:`s`.
 
-:math:`\text{im}_w(x, y)` rein schwarz-weiß ist, 
-gilt :math:`\text{im}_r(x, y) = \text{im}_g(x, y) = \text{im}_b(x, y)` und somit:
+Convolution of spectral homogenous image and PSF
+--------------------------------------------------
 
-Convolution of greyscale image and PSF
-------------------------------------------
-
-Für den Spezialfall, dass auch die PSF rein schwarz-weiß ist, gilt:
+For the special case where the PSF is also spectrally homogeneous, the following holds:
 
 .. math::
-   \text{im}_{2,w\rightarrow w}(x, y) = \text{im}_w(x, y) \otimes \text{psf}_{w\rightarrow w}(x, y)
+   \text{im}_{2,s_1\rightarrow s_2}(x, y) = \text{im}_{s_1}(x, y) \otimes \text{psf}_{s_1\rightarrow s_2}(x, y)
    :label: eq_conv_rgb_w_to_w
 
-Wobei man für eine Darstellung im RGB Farbraum dieses Bild für jeden Kanal vervielfachen müsste.
+Here, :math:`s_1` is the source spectrum and :math:`s_2` is the detector spectrum. Due to absorption,
+they do not have to be identical. As described earlier, it is only important that both the source
+and the PSF are spectrally homogeneous.
 
+A typical example is a black and white image and a wavelength-independent PSF.
 
-Vorraussetzungen
+Limitations
 =================================================
 
-Die Einschränkungen sind in Abschnitt <> beschrieben.
+Limitations are described in :numref:`convolve_limitations`.
 
-Vorgehen
+Processing Steps
 ==================
 
-1. Umwandeln von Bild und PSF zu linearen sRGB Werten, dabei negative Werte mitnehmen
-2. Falls grayscale PSF: Normieren der PSF, sodass die Summe (=Gesamtleistung) Eins entspricht
-3. PSF herunterskalieren/interpolieren, sodass die physikalischen Pixelgrößen von PSF und Bild (nach Vergrößerung/Verkleinerung mit Abbildungsmaßstab) identisch sind
-4. PSF mit Nullwerten padden um definierten Abfall auf Null zu haben
-5. Bild drehen, wenn Abbildungsmaßstab negativ ist.
-6. Bild mit gewählter Paddingmethode padden.
-7. Bilder nach Methoden von Abschnitt <> falten
-8. Bild zurück nach sRGB umwandeln, dabei gamut mapping betreiben
-9. Bild zurechtschneiden
+1. Convert the image and PSF to linear sRGB values, while including negative values.
+2. For a grayscale PSF: Normalize the PSF so that the sum (= total power) equals one.
+3. Downscale/interpolate the PSF so that the physical pixel sizes of the PSF and image 
+   (after scaling with magnification factor) are identical.
+4. Pad the PSF with zeros to ensure a defined fall-off
+5. Flip the image if the magnification factor is negative
+6. Pad the image according to the chosen padding method.
+7. Convolve image and PSF according to the methods in Section :numref:`psf_color_handling`.
+8. Convert the image back to sRGB, while performing a chosen gamut mapping.
+9. Slice the image (remove padding or even trim back to original size)
 
-Die Faltung findet in sRGB Koordinaten statt, da hier die Kanäle orthogonal zueinander sind.
-Außerdem entspricht dieser Farbraum dem Zielfarbraum von Monitoren.
-Jedoch muss die Faltung als lineare Operation in linearen sRGB Werten stattfinden (Beschreibung siehe <>).
-Auch Farben außerhalb des Farbraums (negative Koordinaten) müssen mitgenommen werden, damit die Operation linear bleibt.
-Wenn nach der Faltung immer noch negative Werte im Bild sind, kann man später gamut mapping betreiben.
+The convolution takes place in sRGB coordinates because the channels are orthogonal. 
+Furthermore, this color space corresponds to the target color space for monitors. 
+However, the convolution must be performed as a linear operation in linear sRGB values (description see <>). 
+Colors outside the color space (negative coordinates) must also be included to maintain linearity. 
+If there are still negative values in the image after convolution, gamut mapping needs to be performed.
 
-Für den Fall einer grayscale PSF wird diese automatisch normiert, sodass in Kombination mit dem ``normalize=False``
-Parameter der convolve Funktion die Helligkeits-/Farbwerte nicht automatisch normalisiert bzw. umskaliert werden.
-Für farbige PSF ist die Normalisierung viel schwieriger, da man wissen müsste, wie viel Licht von der Quelle auf dem 
-Detektor für die PSF wirklich ankam. Ließe sich zwar über Metadaten von RenderImage implementieren.
-Jedoch fraglich, ob diese Möglichkeit überhaupt relevant ist, schließlich will man meist normalisierte Bilder haben.
+In the case of a grayscale PSF, it is automatically normalized such that, 
+in combination with the :python:`normalize=False` parameter of the convolve function, the brightness/color values 
+are not automatically normalized or rescaled. For colored PSFs, normalization is much more difficult because 
+one would need to know how much light from the source actually reached the detector for the PSF. 
+This could be implemented through metadata from RenderImage. 
+However, it is questionable whether this option is even 
+relevant since normalized images are generally desired.
 
-Herunterskalieren der PSF muss so erfolgen, dass dies leistungserhaltend ist.
-Außerdem ist ein Verfahren wünschenswert, wo kein Aliasing stattfindet.
-Wir nutzen die Skalierung mit INTER_AREA Option von openCV in der resize Funktion.
-Die PSF muss so umskaliert werden, dass die physikalischen Pixeldimensionen von Bild und PSF in beide Dimension übereinstimmen.
-Dann genügt es das Bild as Pixelmatrix zu falten, auch wenn die Pixel nicht-quadratisches sind.
+Downscaling the PSF must be performed in a way that preserves energy. 
+Additionally, it's desirable to use a method where no aliasing occurs. 
+We use the scaling with the `INTER_AREA <https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html#gga5bb5a1fea74ea38e1a5445ca803ff121acf959dca2480cc694ca016b81b442ceb>`__ 
+option from OpenCV in the resize function. 
+The PSF must be rescaled so that the physical pixel dimensions of the image and the PSF match in both dimensions. 
+Then it suffices to convolve the image as a pixel matrix, even if the pixels are non-square.
 
-Die Faltung wird im Fourierraum über das Faltungstheorem durchgeführt.
-Die Funktion scipy.fftconvolve übernimmt dies für uns.
-Methodenbedingt werden Bereiche außerhalb des Bildes als schwarz angenommen.
-Somit haben wir außen einen abfallen Bereich im Ergebnisbild, wo die PSF am Rand zunehmend mit schwarz faltet.
-Dieser Übergangsbereich ist so breit wie der PSF Bereich, wo Intensitäten größer Null sind.
-Wir nehmen hierfür die gesamte PSF Breite.
-Will der Nutzer eine andere Paddingmethode, so muss das Bild mit dieser Methode zusätzlich gepadded werden.
-Einmal wegen der gewünschten Methode, und das zweite Mal, da wir wieder abfallende Ränder gegen ein Schwarzbild haben.
-
-
-
+The convolution is performed in the Fourier space using the convolution theorem.
+The Fourier transformation is calculated with the :func:`scipy.signal.fftconvolve` function. 
+Due to the nature of the method, areas outside the image are assumed to be black. 
+As a result, there is a fall-off region in the resulting image where the PSF increasingly 
+convolves with black parts from the edges. This transition area is as wide as the PSF region 
+where its intensities are above zero. For simplicity we assume the entire PSF width for this. 
+If the user wants a different padding method, the image must be padded additionally. 
+First for the user-chosen method, and a second time to avoid the dark fall-off edges.
 
 ------------
 

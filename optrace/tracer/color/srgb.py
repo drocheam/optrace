@@ -18,6 +18,13 @@ SRGB_R_XY: list[float, float] = [0.64, 0.33]  #: sRGB red primary in xy coordina
 SRGB_G_XY: list[float, float] = [0.30, 0.60]  #: sRGB green primary in xy coordinates
 SRGB_B_XY: list[float, float] = [0.15, 0.06]  #: sRGB blue primary in xy coordinates
 
+# since we select from the primaries as pdf, the area is the overall probability
+# we need to rescale the sRGB Linear channels with the area probabilities of the primary curves
+# g is kept constant, factors for the standard wavelength range are given below
+_SRGB_R_PRIMARY_POWER_FACTOR = 0.885651229244
+_SRGB_G_PRIMARY_POWER_FACTOR = 1.000000000000
+_SRGB_B_PRIMARY_POWER_FACTOR = 0.775993481741
+SRGB_PRIMARY_POWER_FACTORS = [_SRGB_R_PRIMARY_POWER_FACTOR, _SRGB_G_PRIMARY_POWER_FACTOR, _SRGB_B_PRIMARY_POWER_FACTOR]
 
 def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     """
@@ -516,16 +523,6 @@ def srgb_b_primary(wl: np.ndarray) -> np.ndarray:
     bs = 1.16364585503
     b[m] = 47.99521746361 * bs * (gauss(wlm, 454.833119, 20.1460206) + 0.184484176 * gauss(wlm, 459.658190, 71.0927568))
     return b
-
-
-# since we select from the primaries as pdf, the area is the overall probability
-# we need to rescale the sRGB Linear channels with the area probabilities of the primary curves
-# g is kept constant, factors for the standard wavelength range are given below
-_SRGB_R_PRIMARY_POWER_FACTOR = 0.885651229244
-_SRGB_G_PRIMARY_POWER_FACTOR = 1.000000000000
-_SRGB_B_PRIMARY_POWER_FACTOR = 0.775993481741
-
-SRGB_PRIMARY_POWER_FACTORS = [_SRGB_R_PRIMARY_POWER_FACTOR, _SRGB_G_PRIMARY_POWER_FACTOR, _SRGB_B_PRIMARY_POWER_FACTOR]
 
 ########################################################################################################################
 

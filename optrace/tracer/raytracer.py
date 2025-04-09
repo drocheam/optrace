@@ -73,7 +73,6 @@ class Raytracer(Group):
         self._msgs = np.array([])
         self._ignore_geometry_error = False
         self.geometry_error = False  #: if geometry checks returned an error
-        self._force_threads = None
         self._last_trace_snapshot = None
         self.fault_pos = np.array([])
 
@@ -169,7 +168,7 @@ class Raytracer(Group):
     def check_if_rays_are_current(self) -> bool:
         """Check if anything tracing relevant changed since the last trace."""
         if self._last_trace_snapshot is None:
-            return False  # TODO test this case
+            return False
 
         now = self.tracing_snapshot()
         return not self.compare_property_snapshot(self._last_trace_snapshot, now)["Any"]
@@ -277,7 +276,6 @@ class Raytracer(Group):
 
         cores = misc.cpu_count()
         N_threads = max(1, min(cores, int(N/30000))) if global_options.multithreading else 1
-        N_threads = self._force_threads if self._force_threads is not None else N_threads  # overwrite if forced
 
         # will hold info messages from each thread
         msgs = [np.zeros((len(self.INFOS), nt), dtype=int) for i in range(N_threads)]
@@ -938,8 +936,6 @@ class Raytracer(Group):
             list_[list_i] = [ph, w, wl, ish]
 
         N_th = misc.cpu_count() if global_options.multithreading and Ne-Ns > 100000 else 1
-        N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
-
         threads = []
         list_ = [[]] * N_th
 
@@ -1381,6 +1377,7 @@ class Raytracer(Group):
         w2 = w**2
         dnorm = np.sum(w2*dtx**2 + w2*dty**2)
         d = -np.sum(dtx*dx*w2 + dty*dy*w2) / dnorm if dnorm else np.mean(bounds)
+        d = np.clip(d, bounds[0], bounds[1])  # clip to search range
 
         # mock scipy optimize result
         res = scipy.optimize.OptimizeResult()
@@ -1388,7 +1385,6 @@ class Raytracer(Group):
         res.fun = self.__focus_search_cost_function(d, "RMS Spot Size", pa, sb, w)
         return res
 
-    # TODO don't ignore apertures and filters
     def focus_search(self,
                      method:           str,
                      z_start:          float,
@@ -1397,8 +1393,8 @@ class Raytracer(Group):
             -> tuple[scipy.optimize.OptimizeResult, dict]:
         """
         Find the focal point using different methods. z_start defines the starting point,
-        the search range is the region between lenses or the outline.
-        The influence of filters and apertures is neglected. Outline intersections of rays are ignored.
+        the search range is the region between a lens, filter, aperture or the outline.
+        Outline intersections of rays are ignored.
 
         :param method: focussing method from "focus_search_methods"
         :param z_start: starting position z (float)
@@ -1432,34 +1428,25 @@ class Raytracer(Group):
         # get search bounds
         ################################################################################################################
 
-        # sort list in z order
-        lenses = sorted(self.lenses, key=lambda Element: Element.pos[2])
-
         # default bounds, left starts at end of all ray sources, right ends at outline
         b0 = self.N_EPS + np.max([rs.extent[5] for rs in self.ray_sources])
         b1 = self.outline[5] - self.N_EPS
 
-        # find region between lenses
-        for i, lens in enumerate(lenses):
-            if z_start < lens.pos[2]:
-                b1 = lens.extent[4]
+        # get surface position of Lens, Aperture or Filter around starting position
+        for surf in self.tracing_surfaces:
+            if surf.z_max > z_start:
+                b1 = surf.z_min
                 break
-            b0 = lens.extent[5]
+            b0 = surf.z_max
 
         # create bounds
         bounds = [b0, b1]
-
-        # show filter warning
-        for filter_ in (self.filters + self.apertures):
-            if bounds[0] <= filter_.pos[2] <= bounds[1]:
-                warning("WARNING: The influence of the filters/apertures in the focus_search range will be ignored.")
 
         # start progress bar
         ################################################################################################################
 
         Nt = 320  # cost function sampling points, good if divisible by 2, 4, 8, 16, 32 threads
         N_th = misc.cpu_count() if global_options.multithreading else 1
-        N_th = self._force_threads if self._force_threads is not None else N_th  # overwrite option for debugging
         steps = int(Nt/32) if return_cost or method in ["Image Sharpness", "Image Center Sharpness"] else 0
         steps += 3  # progressbars steps
         bar = ProgressBar("Finding Focus: ", steps)

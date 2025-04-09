@@ -20,31 +20,23 @@ Focus Search
    RT.add(RS)
    RT.trace(1000)
 
-
-.. TODO mention need for "good" images for Image Sharpness methods
-
 Focus Modes
 ____________________
-
-Focus search can be categorized into two different categories:
-
-1. finding a focal point
-2. finding the position of an image plane
 
 The following focus methods are available:
 
 .. list-table::
-   :widths: 200 400
+   :widths: 300 500
    :align: left
 
    * - **RMS Spot Size**
-     - minimizes the variance of the lateral ray position
+     - minimal variance of the lateral ray position
    * - **Irradiance Variance**
-     - finds the positions with the highest irradiance variance
+     - highest irradiance variance
    * - **Image Sharpness**
-     - finds the position with the sharpest edges for the whole image
+     - sharpest edges for the whole image
    * - **Image Center Sharpness**
-     - finds the position with the sharpest edges in the center region
+     - sharpest edges in the center region of the image
 
 The methods use all available rays, for better results the scene should have been traced with much rays as possible.
 The methods are explained in more detail down below.
@@ -75,7 +67,7 @@ Note the different scaling of the images.
           :width: 450
           :class: dark-light
 
-**Case 2:**  Broad or no distinct focal point
+**Case 2:**  Strong aberrations or no distinct focal point
  * **Examples:** Lens with large spherical aberration, multifocal lens
  * **Preferred methods:** Irradiance Variance.
 
@@ -111,11 +103,14 @@ In the right case they merely contribute to the image, but they have large impac
           :width: 450
           :class: dark-light
 
-**Case 3:** Finding the image distance
- * **Example:** Lens setup with multiple lenses, we want to find the distance where the image has the highest sharpness
+**Case 3:** Finding the optimal image distance
+ * **Example:** Actual image position (not just the paraxial) in a multi-lens setup.
  * **Preferred methods:** Image Sharpness. 
    With large amounts of curvature of field Image Center Sharpness should be selected, 
    to find a best-fit focus for the image center region.
+
+For the image sharpness methods to work best, a source image with high contrast and sharp edges should be used.
+For instance, the grid or Siemens star presets, depicted in table :numref:`table_image_presets_aberrations`.
 
 In the following figure you can find an example for image sharpness focussing for a setup with 
 large amounts of field of curvature. While in the left case more image regions are somewhat sharp, in the right case 
@@ -140,11 +135,11 @@ the sharpness is optimized for the center region.
 Limitations
 __________________
 
-Below you can find some limitations of the focus search:
+Limitations include:
 
-* search only possible between lenses or a lens and the outline
-* the behavior of filters and apertures in the search region is ignored
-* rays absorbed in the search region by the raytracer outline are handled as unabsorbed
+* due to restrictions of the search region the search can't find a focus that lies between the maximum and minimum
+  z-value of a surface
+* rays absorbed in the search region by the raytracer outline are handled as not absorbed
 * in more complex cases only a local minimum is found
 * see the limitations of each method below. 
 
@@ -154,8 +149,10 @@ ______________
 
 For focus search you will need to trace the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` geometry.
 The :meth:`focus_search <optrace.tracer.raytracer.Raytracer.focus_search>` function is then called by 
-passing the focus mode and a starting position. Focus Search then tries to find the focus in a search region
-between the last lens (or the outline) and the next lens (or the outline).
+passing the focus mode and a starting position. 
+The search takes place around the starting point, with the search region between the largest z-position of the last
+aperture, filter, lens or ray source and the smallest z-position of the next aperture, filter, lens or outline.
+
 
 .. testcode::
 

@@ -10,8 +10,6 @@ Focus Methods
   :class: highlight
 
 
-.. TODO describe the focus finding process in more detail and the algorithms used for optimization
-
 Procedure
 =============================
 
@@ -30,6 +28,7 @@ RMS Spot Size
 
 **Standard RMS**
 
+A direct, analytical solution is available for the RMS spot size.
 The following derivation is similar to :footcite:`Boussemaere_2023_19`.
 For ray sections starting at :math:`x_i, y_i, z_0` the positions at an additional :math:`t` axial distance are:
 
@@ -90,6 +89,17 @@ Using other strictly monotonically increasing functions depending on
 :math:`r^2 = \left(x_i^*-x_c^*\right)^2+\left(y_i^*-y_c^*\right)^2` has no additional benefit.
 They all share the same position for the minimum, but could have numerical issues or could be harder to calculate.
 
+
+Optimization Methods
+====================================
+
+:func:`scipy.optimize.minimize` with its optimization methods is utilized under the hood.
+For the Irradiance Variance method the :external:ref:`Nelder-Mead <optimize.minimize-neldermead>` solver type is 
+employed directly, as the cost function seems to be smooth and easy to minimize in most cases.
+For methods Image Sharpness and Image Center Sharpness the cost function is much more noisy and can include multiple
+local minima. Here, the search region is first sampled at multiple points and then a minimization is
+started relative to the smallest found cost. Good results are achieved with the 
+:external:ref:`COBYLA <optimize.minimize-cobyla>` solver.
 
 Pixel Dimensions for Rendering Methods
 ==================================================

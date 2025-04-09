@@ -110,6 +110,16 @@ The result is also a |GrayscaleImage|, showing the intensity distribution.
     img_gray = ot.Grayscale(...)  # image emitting my_spectrum
     img2 = ot.convolve(img_gray, psf_gray, ...)
 
+The physical interpretation is that the image emits the source spectrum :python:`my_spectrum` according to 
+the spatial distribution given by :python:`img_gray` and the resulting image emits the spectrum at the detector with 
+spatial intensity given by :python:`img2`.
+You could calculate the detector spectrum from the PSF:
+
+.. code:: python
+
+   # detector image spectrum
+   img_spec = RT.detector_spectrum()
+
 
 **Colored Image and grayscale PSF**
 
@@ -122,9 +132,12 @@ Each R, G, B channel is convolved separately with the PSF and the result is an |
     psf = ot.presets.psf.airy(8)  # type GrayscaleImage
     img2 = ot.convolve(img, psf)  # type RGBImage
 
+This is only viable when the optical system treats all wavelengths the same, meaning no chromatic effect,
+including dispersion or wavelength-dependent absorption.
+
 **Grayscale Image and colored PSF**
 
-Spectral homogeneous image and colored PSF.
+This is the case for a spectral homogeneous image and colored PSF.
 The image is a |GrayscaleImage| indicating the human visible intensities.
 The PSF must be a |RenderImage|, so it includes all human visible colors.
 The PSF must be rendered for the desired source spectrum.
@@ -154,7 +167,7 @@ The result is an |RGBImage|.
     psf = RT.detector_image()
 
     # convolve
-    img_gray = ot.Grayscale(...)  # image emitting my_spectrum
+    img_gray = ot.Grayscale(...)  # spatial distribution emitting "my_spectrum" defined above
     img2 = ot.convolve(img_gray, psf, ...)
 
 **Colored Image and colored PSF**
@@ -170,7 +183,8 @@ This solution, assuming a composition of sRGB primary spectra, will be just one 
 
 The image should be an |RGBImage|, while the PSF is provided as list of R, G, B |RenderImage|.
 As described above, they need to be rendered with a specific spectrum and power and the images need to have the same 
-size. Below you can find an example.
+size. Without the power factors the white balance will be incorrect.
+Below you can find an example.
 
 .. code:: python
                    
@@ -204,6 +218,8 @@ size. Below you can find an example.
     img = ot.presets.image.color_checker([1, 1])
     img2 = ot.convolve(img, psf, ...)
 
+.. _convolve_limitations:
+
 Restrictions
 _______________________
 
@@ -215,9 +231,9 @@ _______________________
 * when R, G, B |RenderImage| are provided for polychromatic convolution, they all need to have the same spatial extent
 * :func:`scipy.signal.fftconvolve` is involved, so small numerical errors in dark image regions can appear
 
-The convolution function does not check if the convolution of the underlying image *makes sense*.
+The convolution function does not check if the convolution of the underlying image is *reasonable*.
 This includes cases, where either the image or PSF showcase a different physical quantity, 
-were rendered with different resolution limit settings or one of them is a sphere projection, 
+were rendered with different resolution limit settings or if they are sphere projections, 
 where distances, areas or angles are non-linear.
 
 Additional Function Parameters

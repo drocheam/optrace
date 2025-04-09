@@ -4,6 +4,7 @@ import pytest
 import unittest
 import numpy as np
 import cv2
+import os
 
 import optrace as ot
 from optrace.tracer import misc
@@ -310,16 +311,17 @@ class TracerTests(unittest.TestCase):
 
         self.assertRaises(RuntimeError, RT.focus_search, RT.focus_search_methods[0], z_start=5)  # no simulated rays
         
-        RT.trace(100000)
+        RT.trace(200000)
+        cpus = misc.cpu_count()
 
         for method in RT.focus_search_methods:  # all methods
             for N_th in [1, 4, 8]:  # different thread counts
-                RT._force_threads = N_th
+                os.environ["PYTHON_CPU_COUNT"] = str(N_th)
                 res, _ = RT.focus_search(method, z_start=5.0, return_cost=False)
                 self.assertAlmostEqual(res.x, fs, delta=0.15)
 
         # reset thread count overwrite
-        RT._force_threads = None
+        os.environ["PYTHON_CPU_COUNT"] = str(cpus)
 
         # source_index=0 with only one source leads to the same result
         res, _, = RT.focus_search(RT.focus_search_methods[0], z_start=5.0, source_index=0, return_cost=False)
@@ -360,7 +362,8 @@ class TracerTests(unittest.TestCase):
         # between lenses with n_ambient
         RT.focus_search("Irradiance Variance", z_start=RT.outline[5])
         # leads to a warning, that minimum may not be found
-        
+       
+        # turn off multithreading
         ot.global_options.multithreading = False
         RT.focus_search("Image Sharpness", z_start=RT.outline[5])
         ot.global_options.multithreading = True
@@ -373,6 +376,32 @@ class TracerTests(unittest.TestCase):
         # changing the geometry without retracing leads to a RuntimeError
         RT.add(ot.Aperture(ot.CircularSurface(r=2.99), pos=[0, 0, -2.2]))
         self.assertRaises(RuntimeError, RT.focus_search, "RMS Spot Size", z_start=10)
+
+    def test_focus2(self):
+        """additional focus tests"""
+
+        # setup with converging light source with focus outside of outline
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 40])
+        RSS = ot.CircularSurface(r=0.5)
+        RS = ot.RaySource(RSS, pos=[0, 0, -3], orientation="Converging", conv_pos=[0, 0, 60])
+        RT.add(RS)
+
+        # trace
+        RT.trace(10000)
+
+        # make sure RMS spot size method handles positions outside search range
+        res, _ = RT.focus_search("RMS Spot Size", z_start=10)
+        self.assertAlmostEqual(res.x, RT.extent[5], delta=0.05)
+
+        # lens, aperture or filter define search region
+        for el in [ot.Lens(RSS, RSS, d=5, pos=[0, 0, 20], n=ot.presets.refraction_index.SF10), 
+                   ot.Filter(RSS, pos=[0, 0, 20], spectrum=ot.TransmissionSpectrum("Constant", val=0.1)), 
+                   ot.Aperture(RSS, pos=[0, 0, 20])]:
+            RT.add(el)
+            RT.trace(100000)
+            res, _ = RT.focus_search("RMS Spot Size", z_start=10)
+            self.assertAlmostEqual(res.x, el.extent[4])
+            RT.remove(el)
 
     def test_uniform_emittance(self):
         """test that surfaces in ray source emit uniformly"""
@@ -678,6 +707,7 @@ class TracerTests(unittest.TestCase):
         RS0, RS1, RS2 = tuple(RT.ray_sources)
         powers = [(1, 1, 1), (2, 1, 1), (0.3456465, 4.57687168, np.pi/2)] 
         Ns = [30000, 30001, 52657]
+        cpus = misc.cpu_count()
 
         # test tracing for different number of rays, sources and different power ratios and threads
         for i in np.arange(2):  # different number of sources (1 source gets removed after each iteration)
@@ -688,7 +718,7 @@ class TracerTests(unittest.TestCase):
 
                         RS0.power, RS1.power, RS2.power = powersi
 
-                        RT._force_threads = N_th
+                        os.environ["PYTHON_CPU_COUNT"] = str(N_th)
                         RT.trace(N)
 
                         # check number of rays
@@ -742,6 +772,7 @@ class TracerTests(unittest.TestCase):
 
             RT.remove(RT.ray_sources[-1])
 
+        os.environ["PYTHON_CPU_COUNT"] = str(cpus)
         RT = tracing_geometry()
         RT.trace(100000)
 

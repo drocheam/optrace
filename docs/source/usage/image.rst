@@ -717,9 +717,15 @@ Power in W and luminous power in lm:
 Image Presets
 ____________________
 
-.. TODO explain how to call these functions
 
-Below you can find preset images that can be used as ray source.
+Below you can find different images presets.
+As for the image classes, a specification of either the :python:`s` or :python:`extent` geometry parameter is
+mandatory.
+One possible call could be:
+
+.. testcode::
+
+   img = ot.presets.image.cell(s=[0.2, 0.3])
 
 .. list-table:: Photos of natural scenes or objects
    :class: table-borderless
@@ -781,12 +787,11 @@ Below you can find preset images that can be used as ray source.
    
      -  
 
-
+.. _table_image_presets_aberrations:
 
 .. list-table:: Test images for color, resolution or distortion. The ETDRS chart images, Siemens star and grid methods
    return |GrayscaleImage|, all other images |RGBImage|.
    :class: table-borderless
-
    
    * - .. figure:: ../../../optrace/resources/images/ETDRS_chart.png
           :align: center

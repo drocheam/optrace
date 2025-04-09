@@ -3,8 +3,10 @@
 import pytest
 import unittest
 import numpy as np
+import os
 
 import optrace as ot
+import optrace.tracer.misc as misc
 
 from test_tracer import lens_maker
 from tracing_geometry import tracing_geometry
@@ -13,7 +15,7 @@ from tracing_geometry import tracing_geometry
 
 class TracerSpecialTests(unittest.TestCase):
 
-    def test_sphere_detector_range_hits(self):
+    def test_0sphere_detector_range_hits(self):
         """
         this function checks if the detector hit finding correctly handles:
         * rays starting after the detector
@@ -39,12 +41,13 @@ class TracerSpecialTests(unittest.TestCase):
         ext = np.array(ext0).repeat(4)*[-1, 1, -1, 1]
 
         RT.trace(400000)
+        cpus = misc.cpu_count()
 
         for z in [RT.outline[4], RS.pos[2]+1, ap.pos[2]-1, ap.pos[2]+1, RS.pos[2]+1+det.surface.R,
                   RT.outline[5]-RT.N_EPS, RT.outline[5] + 1]:
             det.move_to([0, 0, z])
             for N_th in [1, 2, 3, 4, 8, 16]:
-                RT._force_threads = N_th
+                os.environ["PYTHON_CPU_COUNT"] = str(N_th)
                 img = RT.detector_image(projection_method="Equidistant")
                 
                 if RT.outline[5] > z > RS.surface.pos[2]:
@@ -52,6 +55,8 @@ class TracerSpecialTests(unittest.TestCase):
                     self.assertTrue(np.allclose(img.extent-ext, 0, atol=1e-2, rtol=0))  # extent correct
                 else:
                     self.assertAlmostEqual(img.power(), 0)
+        
+        os.environ["PYTHON_CPU_COUNT"] = str(cpus)
 
     def test_offset_system_equality(self):
         """

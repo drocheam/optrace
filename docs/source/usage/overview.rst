@@ -149,8 +149,8 @@ Multithreading can be turned off with:
 
    ot.global_options.multi_threading = False
 
-.. TODO mention options of setting PYTHON_CPU_COUNT
-.. TODO not all actions use all numbers of threads
+A specific number of cores/threads can be set with the approach in Section :numref:`number_of_thread_specification`.
+
 
 Wavelength Range
 ###################
@@ -258,7 +258,39 @@ Note that changes are only applied to new :obj:`pyplot <matplotlib.pyplot>` wind
           With :python:`plot_dark_mode` disabled.
 
 
+.. _number_of_thread_specification:
 
-.. TODO notes how to run it on wayland
+Multithreading with a specific number of cores
+___________________________________________________
 
-.. TODO notes about specifying number of cores (taskset, PYTHON_CPU_COUNT)
+optrace supports setting the number of available cores, which corresponds to the maximum number of threads that will
+be used for the computations.
+The setting can be either applied as Python argument:
+
+.. code-block:: bash
+
+   python -Xcpu_count=4 ./script.py
+
+It is also possible to set the environment variable from within your script, so it is applied locally:
+
+.. code-block:: python
+
+   import os
+   os.environ["PYTHON_CPU_COUNT"] = 4
+
+   # do the computations with 4 threads
+   ...
+
+It is important to note that only some actions use multithreading, and only fewer work with all possible 
+number of cores. Setting the CPU count only provides a maximum number.
+
+Running optrace on Wayland
+_____________________________________
+
+On Linux, the vtk dependency only supports X11 but not Wayland.
+Set the following environment variable in your terminal before running Python, so X11 is used for the application:
+
+.. code-block:: bash
+
+   export QT_QPA_PLATFORM=xcb
+
