@@ -2,7 +2,7 @@
 name = "optrace"
 """project title"""
 
-version = "1.6.7"
+version = "1.6.8"
 """project version"""
 
 author = "Damian Mendroch"
@@ -14,5 +14,5 @@ license = "MIT"
 url = "https://github.com/drocheam/optrace"
 """project url"""
 
-description = "An optics simulation package with sequential raytracing, image rendering and a gui frontend" 
+description = "An optics simulation package with sequential raytracing, image rendering and a GUI frontend" 
 """short project description"""
