@@ -55,6 +55,10 @@ class TracerMiscTests(unittest.TestCase):
                 self.assertEqual(cores, misc.cpu_count())
             else:
                 self.assertRaises(RuntimeError, misc.cpu_count)
+        
+        # coverage: no PYTHON_CPU_COUNT
+        del os.environ["PYTHON_CPU_COUNT"]
+        misc.cpu_count()
 
         # reset env
         os.environ = env0

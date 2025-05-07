@@ -440,7 +440,8 @@ def _slice_and_convert_output_image(img2: np.ndarray, cargs: dict, s: ConvShapes
         img2 = img2[i2sl[1]:i2sl[1] + s.iN[1], i2sl[0]:i2sl[0] + s.iN[0]]
  
     if flags.make_linear:
-        if "normalize" in cargs and cargs["normalize"] and (imax := np.max(img2)):
+        # normalize if not set otherwise by user and if maximum exists
+        if ("normalize" not in cargs or cargs["normalize"]) and (imax := np.max(img2)):
             img2 /= imax
         img2 = np.clip(img2, 0, 1)
         return color.srgb_linear_to_srgb(img2)

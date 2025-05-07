@@ -340,7 +340,8 @@ ________________________
 
 **DataSurface2D**
 
-A :class:`DataSurface2D <optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D>` is defined by a height dataset in a square matrix.
+A :class:`DataSurface2D <optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D>` 
+is defined by a height dataset in a square matrix.
 This square set is cut into a circular disc after initialization.
 Together with this set, the radius of the disc is required.
 
@@ -359,7 +360,8 @@ The following example creates a lens with direction-dependent curvature and nois
    data2d = ot.DataSurface2D(r=r0, data=H)
 
 
-Note that we can also add the parameters :python:`z_min=...`, :python:`z_max=`, :python:`parax_roc`, as for the FunctionSurface class.
+Note that we can also add the parameters :python:`z_min=...`, :python:`z_max=`, :python:`parax_roc`, 
+as for the FunctionSurface class.
 
 **DataSurface1D**
 

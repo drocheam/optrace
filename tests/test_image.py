@@ -315,9 +315,11 @@ class ImageTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.RGBImage, np.ones((100, 100, 3))*1.001, [2, 2])  # data above 1
         self.assertRaises(ValueError, ot.GrayscaleImage, np.ones((100, 100))*1.001, [2, 2])  # data above 1
    
-        # three channels for scalar image
+        # three channels warning and invalid shape warnings for scalar and grayscale image
         self.assertRaises(ValueError, ot.ScalarImage, ot.presets.image.color_checker([1, 1]).data, [1, 1])
+        self.assertRaises(ValueError, ot.ScalarImage, np.ones((10, 10, 3, 5)), [1, 1])
         self.assertRaises(ValueError, ot.GrayscaleImage, ot.presets.image.color_checker([1, 1]).data, [1, 1]) 
+        self.assertRaises(ValueError, ot.GrayscaleImage, np.ones((10, 10, 3, 5)), [1, 1])
         # ^-- colored image
 
     @pytest.mark.os

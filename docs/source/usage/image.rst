@@ -350,6 +350,7 @@ The available methods are:
           :class: dark-light
 
 
+.. _image_airy_filter:
 
 Resolution Limit Filter
 ___________________________

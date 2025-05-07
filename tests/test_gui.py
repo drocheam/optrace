@@ -805,7 +805,7 @@ class GUITests(unittest.TestCase):
     # os test because clipboard is system dependent
     @pytest.mark.os
     @pytest.mark.slow
-    @pytest.mark.gui
+    @pytest.mark.gui1
     def test_run_command(self):
         """test command setting and sending as well as automatic replotting (also tests TraceGUI.smart_replot()"""
 
@@ -904,6 +904,7 @@ class GUITests(unittest.TestCase):
                 # clear history
                 self._do_in_main(sim.command_window.clear_history)
                 self._wait_for_idle(sim)
+                self.assertEqual(sim.command_window._history, [])
 
                 # check if setting and getting clipboard works globally
                 clipboard = QtGui.QApplication.clipboard()
@@ -912,25 +913,25 @@ class GUITests(unittest.TestCase):
                 can_copy = clipboard.text(mode=QtGui.QClipboard.Clipboard) == "a"
 
                 if not can_copy:
-                    warnings.warn("Copying to clipboard failed. Can by a system or library issue, "
-                                  "skipping additional clipboard tests.")
+                    warnings.warn("Copying to clipboard failed. Can by a system or library issue.")
                 
-                else:
-                    # check that empty strings are copied correctly in the command window
-                    self._do_in_main(sim.command_window.copy_history)
-                    self._wait_for_idle(sim)
+                # check that empty strings are copied correctly in the command window
+                self._do_in_main(sim.command_window.copy_history)
+                self._wait_for_idle(sim)
+                if can_copy:
                     self.assertEqual(clipboard.text(), "")
                    
-                    # check if full history is copied
-                    sim.command_window._cmd = "self.replot()"
-                    self._do_in_main(sim.command_window.send_command)
-                    self._wait_for_idle(sim)
-                    sim.command_window._cmd = "a=5"
-                    self._do_in_main(sim.command_window.send_command)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.command_window.copy_history)
-                    self._wait_for_idle(sim)
-                    time.sleep(0.5)  # somehow needed, maybe system handles clipboard with delay
+                # check if full history is copied
+                sim.command_window._cmd = "self.replot()"
+                self._do_in_main(sim.command_window.send_command)
+                self._wait_for_idle(sim)
+                sim.command_window._cmd = "a=5"
+                self._do_in_main(sim.command_window.send_command)
+                self._wait_for_idle(sim)
+                self._do_in_main(sim.command_window.copy_history)
+                self._wait_for_idle(sim)
+                time.sleep(0.5)  # somehow needed, maybe system handles clipboard with delay
+                if can_copy:
                     self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
 
         sim.debug(interact, args=(sim,))

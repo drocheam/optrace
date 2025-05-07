@@ -104,7 +104,6 @@ class BaseImage(BaseClass):
         """area per pixel in mm^2"""
         return float(self.s[0] * self.s[1] / (self.shape[1] * self.shape[0]))
 
-    # TODO different logic for grayscale image ?
     def save(self, 
              path:    str,
              params:  list = [],

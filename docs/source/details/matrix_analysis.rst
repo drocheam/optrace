@@ -8,7 +8,11 @@ Ray Transfer Matrix Analysis
 ABCD Matrix 
 =================================================
 
-In paraxial optics the relationships between angles :math:`\theta` and distances :math:`x` relative to the optical axis can be represented in a linear manner. A so-called ABCD-matrix includes the linear components to calculate the output parameters from input values for a system with the same matrix. This can be written as: :footcite:`IvanOptics`
+In paraxial optics, the relationships between angles :math:`\theta` and distances :math:`x` relative 
+to the optical axis can be expressed linearly. 
+The ABCD matrix, a fundamental concept in this context, encapsulates the linear components necessary
+to compute the output parameters from the input values for a system characterized by the same matrix. 
+This relationship can be represented as: :footcite:`IvanOptics`
 
 .. math::
    \left[\begin{array}{l}
@@ -25,13 +29,13 @@ In paraxial optics the relationships between angles :math:`\theta` and distances
 
 .. _TMA_elements:
 
-.. list-table:: Meaning of matrix elements :footcite:`IvanOptics`
+.. list-table:: Description of matrix elements :footcite:`IvanOptics`
    :widths: 80 300
    :header-rows: 1
    :align: center
    
    * - Element
-     - Meaning
+     - Description
    * - :math:`A`
      - positional scaling
    * - :math:`B`
@@ -42,7 +46,8 @@ In paraxial optics the relationships between angles :math:`\theta` and distances
    * - :math:`D`
      - angular scaling
 
-Zero matrix elements, as described in :numref:`TMA_zero_elements`, are of particularly importance, giving us cases of imaging and focussing.
+Zero matrix elements, as described in :numref:`TMA_zero_elements`, 
+hold particular importance as they indicate specific cases of imaging and focusing.
 
 .. _TMA_zero_elements:
 
@@ -52,7 +57,7 @@ Zero matrix elements, as described in :numref:`TMA_zero_elements`, are of partic
    :align: center
    
    * - Case
-     - Meaning
+     - Description
    * - :math:`A=0`
      - | parallel to point focussing,
        | output lies at second focal plane    
@@ -68,7 +73,9 @@ Zero matrix elements, as described in :numref:`TMA_zero_elements`, are of partic
        | input lies at first focal plane
 
 
-An important relation is that the determinant of such a ABCD-matrix, here called :math:`M`, always equals the ratio between ingoing :math:`n_i` and outgoing medium :math:`n_o`. :footcite:`pedrotti_pedrotti_pedrotti_2006`
+An important relationship is that the determinant of an ABCD matrix, denoted here as :math:`M`, 
+always equals the ratio between the refractive indices of the preceding medium :math:`n_i` 
+and the subsequent medium :math:`n_o` :footcite:`pedrotti_pedrotti_pedrotti_2006`.
 
 .. math::
    \det (M) = AD - BC = \frac{n_i}{n_o}
@@ -78,8 +85,8 @@ An important relation is that the determinant of such a ABCD-matrix, here called
 Propagation through Free Space 
 =================================================
 
-An ABCD-Matrix for free Space with distance :math:`d` has the following form: :footcite:`pedrotti_pedrotti_pedrotti_2006`
-
+An ABCD-Matrix for free space with distance :math:`d` has the following form: 
+:footcite:`pedrotti_pedrotti_pedrotti_2006`
 
 .. math::
    \text{M}_\text{s} =
@@ -92,7 +99,8 @@ An ABCD-Matrix for free Space with distance :math:`d` has the following form: :f
 Refraction on a Curved Interface 
 =================================================
 
-Refraction on a curved interface with curvature circle :math:`R`, medium :math:`n_i` before and :math:`n_o` after the interface leads to the following matrix: :footcite:`pedrotti_pedrotti_pedrotti_2006`
+An ABCD matrix for free space over a distance :math:`d` is represented as follows 
+:footcite:`pedrotti_pedrotti_pedrotti_2006` :
 
 .. math::
    \text{M}_\text{c} =
@@ -105,7 +113,8 @@ Refraction on a curved interface with curvature circle :math:`R`, medium :math:`
 Refraction on a Flat Interface 
 =================================================
 
-With :math:`R \to \infty`, being equivalent to a flat interface, the matrix becomes: :footcite:`pedrotti_pedrotti_pedrotti_2006`
+When :math:`R \to \infty`, which is equivalent to a flat interface, 
+the matrix simplifies to :footcite:`pedrotti_pedrotti_pedrotti_2006` :
 
 .. math::
    \text{M}_\text{i} =
@@ -118,11 +127,15 @@ With :math:`R \to \infty`, being equivalent to a flat interface, the matrix beco
 Thick Lens 
 =================================================
 
-Thick Lens with refraction index :math:`n`, front surface curvature :math:`R_1`, thickness :math:`d`, back surface curvature :math:`R_2`, medium with :math:`n_1` in front and medium with :math:`n_2` behind the lens.
-Using ray transfer matrix analysis this is the product of the matrix of the front surface matrix :math:`\text{M}_\text{c1}`, free space propagation matrix :math:`\text{M}_\text{s}` and back surface matrix :math:`\text{M}_\text{c2}`.
-Note that matrices are multiplied from right to left.
-The resulting matrix is then: :footcite:`Kaschke2014`
-
+For a thick lens, several parameters are to be considered: 
+The lens has a refractive index :math:`n`, front surface curvature :math:`R_1`, and back surface curvature :math:`R_2`. 
+Its thickness is :math:`d`, with a medium of refractive index :math:`n_1` 
+in front and a medium of refractive index :math:`n_2` behind. 
+Using ray transfer matrix analysis, this system is represented by the product of the front surface matrix 
+:math:`\text{M}_\text{c1}`, the free space propagation matrix :math:`\text{M}_\text{s}`, 
+and the back surface matrix :math:`\text{M}_\text{c2}`. 
+It is important to note that matrices are multiplied from right to left. 
+The resulting matrix can be expressed as: :footcite:`Kaschke2014`
 
 .. math::
    \text{M}_\text{thick} =&~~ \text{M}_\text{c2} \cdot \text{M}_\text{s} \cdot \text{M}_\text{c1}\\
@@ -142,18 +155,19 @@ The resulting matrix is then: :footcite:`Kaschke2014`
     =&~ 
    \left[\begin{array}{cc}
    1 + \frac{n_1-n}{n R_1}d & \frac{n_1}{n}d \\
-    \frac{n_1 - n}{n_2 R_1}  + \frac{n-n_2}{n_2 R_2} + \frac{n_1 - n}{n R_1}\frac{n-n_2}{n_2 R_2}d & \frac{n_1}{n_2} + \frac{n_1}{n}\frac{n - n_2}{n_2 R_2}d
+    \frac{n_1 - n}{n_2 R_1}  + \frac{n-n_2}{n_2 R_2} + \frac{n_1 - n}{n R_1}\frac{n-n_2}{n_2 R_2}d 
+    & \frac{n_1}{n_2} + \frac{n_1}{n}\frac{n - n_2}{n_2 R_2}d
    \end{array}\right]
    :label: TMA_thick_lens_complete
 
-
-With same ambient media, therefore :math:`n_0 := n_1 = n_2`, this simplifies to:
+When the surrounding media are identical, i.e., :math:`n_0 := n_1 = n_2`, the matrix simplifies to:
 
 .. math::
    \text{M}_{\text{thick},n_0}   =&~ 
    \left[\begin{array}{cc}
    1 + \frac{n_0-n}{n R_1}d & \frac{n_0}{n}d \\
-   \frac{n_0 - n}{n_0} \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{n-n_0}{n R_1 R_2}d \right) & 1 + \frac{n - n_0}{n R_2}d
+   \frac{n_0 - n}{n_0} \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{n-n_0}{n R_1 R_2}d \right) & 1
+        + \frac{n - n_0}{n R_2}d
    \end{array}\right]
    :label: TMA_thick_lens_same_media
 
@@ -161,8 +175,9 @@ With same ambient media, therefore :math:`n_0 := n_1 = n_2`, this simplifies to:
 Thin Lens
 ====================
 
-Generally element :math:`C` can be interpreted as the negative inverse focal length :math:`-\frac{1}{f}`.
-Additionally, for a thin lens :math:`d=0` holds, simplifying equation :math:numref:`TMA_thick_lens_complete` to:
+In general, the matrix element :math:`C` can be interpreted as the negative inverse focal length, 
+:math:`-\frac{1}{f}`. For a thin lens, where :math:`d=0`, equation :math:`TMA_thick_lens_complete` simplifies to:
+
 
 .. math::
     \text{M}_\text{thin} =
@@ -172,45 +187,47 @@ Additionally, for a thin lens :math:`d=0` holds, simplifying equation :math:numr
    \end{array}\right]
    :label: TMA_thin_lens
 
-With :math:`n_i = n_o`,  leading to element :math:`D=1`, the matrix is consistent with equations found in literature, as :footcite:`pedrotti_pedrotti_pedrotti_2006`
+When :math:`n_i = n_o`, resulting in :math:`D=1`, the matrix aligns with equations commonly found in the literature, 
+as referenced in :footcite:`pedrotti_pedrotti_pedrotti_2006`.
 
 
 Lensmaker Equation 
 =================================================
 
-As for the thin lens, element :math:`C` is equal to :math:`-\frac{1}{f}`.
-Negating this element from equation :math:numref:`TMA_thick_lens_complete` and applying :math:`-(n_1 - n) = (n - n_1)` gives us the focal length in forward direction:
+For the thin lens, the element :math:`C` was equal to :math:`-\frac{1}{f}`. 
+Negating this element from equation :math:numref:`TMA_thick_lens_complete` and applying :math:`-(n_1 - n) = (n - n_1)`, 
+we obtain the focal length in the forward direction:
 
 .. math::
    \frac{1}{f_2} = \frac{n-n_1}{n_2}\frac{1}{R_1} - \frac{n-n_2}{n_2}\frac{1}{R_2} + \frac{n-n_1}{n R_1}\frac{n-n_2}{n_2 R_2}d
    :label: TMA_lensmaker0
 
-Doing the same calculations with media and curvatures swapped, we get the backward focal length:
+Performing the same calculations with the media and curvatures swapped yields the backward focal length:
 
 .. math::
    f_1 = -\frac{n_1}{n_2} f_2
    :label: TMA_lensmaker_f_conv
 
-Which in written-out form is:
+In its expanded form, this is:
 
 .. math::
    \frac{1}{f_1} = -\frac{n-n_1}{n_1}\frac{1}{R_1} + \frac{n-n_2}{n_1}\frac{1}{R_2} - \frac{n-n_1}{n R_1}\frac{n-n_2}{n_1 R_2}d
    :label: TMA_lensmaker1
 
 Both equations above are consistent with :footcite:`pedrotti_pedrotti_pedrotti_2006`
-
-For :math:`n_0 := n_1 = n_2` we get:
+For :math:`n_0 := n_1 = n_2`, we derive:
 
 .. math::
    \frac{1}{f_2} = \frac{n-n_0}{n_0}\left(\frac{1}{R_1} - \frac{1}{R_2} + \frac{n-n_0}{n R_1 R_2}d \right)
    :label: TMA_lensmaker_common
 
-Which is the typical form found for the lens maker equation. :footcite:`LinsenschleiferWiki`
+This is the typical form of the lens maker equation :footcite:`LinsenschleiferWiki`.
 
 Gullstrand Equation 
 =================================================
 
-Utilizing definition :math:numref:`TMA_power_alt` and equation :math:numref:`TMA_lensmaker0` and calling :math:`D=D_2` from now on, we can write:
+Utilizing definition :math:numref:`TMA_power_alt` and equation :math:numref:`TMA_lensmaker0`, 
+and defining :math:`D` as :math:`D_2` from now on, we can express:
 
 .. math::
    D = \frac{n_2}{f_2} = \frac{n-n_1}{R_1} - \frac{n-n_2}{R_2} + \frac{n-n_1}{n R_1}\frac{n-n_2}{R_2}d
@@ -222,13 +239,14 @@ This is equivalent to
    D = \frac{n_2}{f_2} = \frac{n-n_1}{R_1}  + \left( - \frac{n-n_2}{R_2} \right) - \frac{n-n_1}{R_1} \cdot \left( - \frac{n-n_2}{R_2} \right) \frac{d}{n}
    :label: TMA_Gullstrand_step
 
-With the surface optical powers :math:`D_\text{s1} = \frac{n-n_1}{R_1}` and :math:`D_\text{s2} = -\frac{n-n_2}{R_2}` this simplifies to:
+With the surface optical powers :math:`D_\text{s1} = \frac{n-n_1}{R_1}` 
+and :math:`D_\text{s2} = -\frac{n-n_2}{R_2}` this simplifies to:
 
 .. math::
    D = D_\text{s1} + D_\text{s2} - D_\text{s1} D_\text{s2} \frac{d}{n}
    :label: TMA_Gullstrand
 
-Which is known as Gullstrand's equation. :footcite:`GullstrandHyper,EdmundFocal`
+This is known as Gullstrand's equation :footcite:`GullstrandHyper,EdmundFocal`.
 
 
 .. _ray_cardinal_points:
@@ -236,11 +254,13 @@ Which is known as Gullstrand's equation. :footcite:`GullstrandHyper,EdmundFocal`
 Cardinal Points 
 =================================================
 
-The following calculations are derived from :footcite:`DickenABCD` and :footcite:`pedrotti_pedrotti_pedrotti_2006`. Also there you can find a textual and graphical explanation of cardinal points and planes.
+The following calculations are derived from :footcite:`DickenABCD` and :footcite:`pedrotti_pedrotti_pedrotti_2006`. 
+Both sources also offer textual and graphical explanations of cardinal points and planes.
 
 **Vertex Points**
 
-The vertex points :math:`V_1` and :math:`V_2` are the position of the lens front and center at the optical axis.
+The vertex points :math:`V_1` and :math:`V_2` are positioned at the optical axis 
+and represent the front and back of the lens respectively.
 
 **Principal Points**
 
@@ -267,8 +287,6 @@ Focal lengths are given by the negative inverse of :math:`C` as well as equation
 
 **Focal Points**
 
-Both focal points are there corresponding focal lengths away from their principle plane.
-
 .. math::
    F_1 = &~ P_1 + f_1\\
    F_2 = &~ P_2 + f_2
@@ -289,16 +307,15 @@ Effective focal length (EFL), back focal length (BFL) and front focal length (FF
 Optical Power 
 =================================================
 
-The default definition in optrace is the optical power being the inverse of the geometric focal length.
+The default definition in `optrace` considers the optical power as the inverse of the geometric focal length.
 
 .. math::
    D_1 = \frac{1}{f_1}\\
    D_2 = \frac{1}{f_2}
    :label: TMA_power_base
-   
-The alternative definition below has the advantage, that :math:`D_\text{1n} = -D_\text{2n}` holds, independent of the refractive media. However, focal lengths are not the actual distance between principal plane and focal points.
-
-For :math:`n_1 = n_2 = 1` both definitions are equivalent.
+  
+The alternative definition below has the advantage that :math:`D_\text{1n} = -D_\text{2n}` holds true 
+independently of the refractive media. 
 
 .. math::
    D_\text{1n} =&~ \frac{n_1}{f_1}\\
@@ -308,11 +325,16 @@ For :math:`n_1 = n_2 = 1` both definitions are equivalent.
    \text{EFL}_n =&~ \frac{f_2}{n_2}\\
    :label: TMA_power_alt
 
+However, in this case, the focal lengths do not represent the actual distance between 
+the principal plane and the focal points.
+For :math:`n_1 = n_2 = 1`, both definitions are equivalent.
 
 Lens Setups 
 =================================================
 
-To evaluate setups of :math:`N` lenses the lens matrices :math:`\text{M}_\text{L,i}` and the free space matrices :math:`\text{M}_\text{s,j}` with :math:`i \in	\{0, 1, \dots, N\},~~ j \in \{0, 1, \dots, N-1\}` need to be multiplied.
+To evaluate setups of :math:`N` lenses, the lens matrices :math:`\text{M}_\text{L,i}` 
+and the free space matrices :math:`\text{M}_\text{s,j}` need to be multiplied. 
+Here, :math:`i \in \{0, 1, \dots, N\}` and :math:`j \in \{0, 1, \dots, N-1\}` holds.
 
 .. math::
    \text{M} = \text{M}_\text{L,N} \cdot \text{M}_\text{s,N-1} \dots \text{M}_\text{s,0} \cdot \text{M}_\text{L,0}
@@ -328,27 +350,31 @@ Optical Center
 
 **General Case**
 
+The optical center is the axial position where nodal rays intersect with the optical axis,
+as illustrated by :numref:`fig_optical_center`.
 
+.. _fig_optical_center:
 .. figure:: ../images/optical_center.svg
    :align: center
    :width: 550
    :class: dark-light
 
+   Optical center of a lens.
 
-From the yellow triangle follows that:
+For the yellow triangle, the following relation holds:
 
 .. math::
    \tan \phi = \frac{x_2 - x_1}{V_2 - V_1}
    :label: eq_oc_tan_phi1
 
-While from the green triangle follows that:
+From the green triangle, we derive:
 
 .. math::
    \tan \phi = -\frac{x_1}{o}
    :label: eq_oc_tan_phi2
 
-Note that the minus wass added so both equations have the same sign.
-Inserting :math:numref:`eq_oc_tan_phi1` into :math:numref:`eq_oc_tan_phi2` gives us:
+Note that the minus sign was added so both equations maintain the same sign. 
+Inserting :math:numref:`eq_oc_tan_phi1` into :math:numref:`eq_oc_tan_phi2` gives:
 
 .. math::
    o = - \frac{x_1}{x_2 - x_1} \left(V_2 - V_1\right)
@@ -360,7 +386,8 @@ The blue triangle leads to:
    \tan \theta_1 = -\frac{x_1}{N_1 - V_1}
    :label: eq_oc_theta1
 
-With paraxial rays :math:`\theta_1 \approx \tan \theta_1` holds. :math:`x_2` can therefore be calculated using the ABCD matrix of the setup:
+With paraxial rays, the approximation :math:`\theta_1 \approx \tan \theta_1` holds. 
+Therefore, :math:`x_2` can be calculated using the ABCD matrix of the setup:
 
 .. math::
    x_2 = A x_1 - \frac{B}{N_1 - V_1} x_1
@@ -374,30 +401,32 @@ Inserting into :math:numref:`eq_oc_o1` gives us:
   :label: eq_oc_o2
 
 
-From :math:numref:`TMA_nodal` follows that:
+From :math:numref:`TMA_nodal`, it follows that:
 
 .. math::
    N_1 - V_1 = - \frac{1 - D}{C}
    :label: eq_oc_dNV
 
 Which can also be inserted into the equation :math:numref:`eq_oc_o2`.
-After some rearranging one gets:
+After some rearranging we obtain:
 
 .. math::
    o = \frac{V_2 - V_1}{1 - A + \frac{BC}{D-1}}
    :label: eq_oc_o3
 
-
-Which needs to be added to the front vertex to get the absolute position of the optical center:
+This value needs to be added to the front vertex to get the absolute position of the optical center:
 
 .. math::
    \text{OC} = V_1 + \frac{V_2 - V_1}{1 - A + \frac{BC}{D-1}}
    :label: eq_oc_final
 
-
-The requirements that were silently assumed are that the nodal point exist (:math:`C \neq 0`) and input and output positions differ :math:`x_2 \neq x_1`.
-The only case where it makes sense to also define an optical center is for an ideal lens, where we set :math:`\text{OC} = V_1`, although a nodal ray does not cross the optical axis at that point.
-For all other cases, especially :math:`1 - A  + \frac{BC}{D - 1} = 0` or :math:`D = 1` the optical center is undefined. As mentioned before, an ideal lens (:math:`A = 1, ~B=0, ~C\neq 0, ~D=1`) is an exception.
+The requirements that were implicitly assumed include the existence of a nodal point (:math:`C \neq 0`) 
+and that the input and output positions differ (:math:`x_2 \neq x_1`). 
+The only scenario where it makes sense to define an optical center, despite these conditions, is for an ideal lens. 
+In this case, we set :math:`\text{OC} = V_1`, although a nodal ray does not cross the optical axis at that point.
+In all other cases, particularly when :math:`1 - A + \frac{BC}{D - 1} = 0` or :math:`D = 1`, 
+the optical center is undefined. 
+As mentioned previously, an ideal lens (:math:`A = 1, ~B=0, ~C\neq 0, ~D=1`) is an exception.
 
 
 **Thick Lens/Lens Combination with Same Front and Back Medium**
@@ -430,11 +459,12 @@ Leading to the final form of :math:numref:`eq_oc_final`:
 .. Simplifying this expression towards this form is quite labor-intensive but goes without any conditions or tricks.
 .. A interested reader is free to do it by themselves or trust Wolfram Alpha with the query: `Link <https://www.wolframalpha.com/input?i=1+-+A+%2B+B*C%2F%28D+-+1%29+with+A+%3D+%281+%2B+%28n_0-n%29%2F%28n+R_1%29*d%29%2C+B+%3D+%28%28n_0%29%2F%28n%29*d%29%2C+C+%3D+%28%28n_0+-+n%29%2F%28n_0+R_1%29%2B%28n-n_0%29%2F%28n_0+R_2%29%2B%28n_0+-+n%29%2F%28n+R_1%29*%28n-n_0%29%2F%28n_0+R_2%29*d%29%2C+D+%3D+%281+%2B+%28n+-+n_0%29%2F%28n+R_2%29*d%29>`__.
 
-Equation :math:numref:`eq_oc_radii` is consistent with the results in :footcite:`10.1117/12.805489`.
-As mentioned in :footcite:`jenkins2001fundamentals` for this case the optical center is completely independent of the wavelength and the material dispersion.
+Equation :math:numref:`eq_oc_radii` is consistent with the results in :footcite:`10.1117/12.805489`. 
+As mentioned in :footcite:`jenkins2001fundamentals`, in this case, the optical center is completely independent 
+of the wavelength and the material dispersion.
 
-
-In fact, doing this with two ideal lenses with focal lengths :math:`f_1` and :math:`f_2` with separation distance :math:`d` and the same ambient media, produces a similar form:
+Applying the same approach to two ideal lenses with focal lengths :math:`f_1` and :math:`f_2`, 
+separated by a distance :math:`d` and surrounded by the same ambient media, results in a similar form:
 
 .. math::
    M_\text{2L} &= \left[\begin{array}{cc}
@@ -454,7 +484,8 @@ In fact, doing this with two ideal lenses with focal lengths :math:`f_1` and :ma
    :label: eq_oc_two_lens_matrix
 
 .. math::
-   1 - A + \frac{BC}{D - 1} &= 1 - \left(1 + \frac{d}{f_1}\right) + \frac{ \frac{1}{f_1}  + \frac{1}{f_2} + \frac{d}{f_1 f_2} }{1 + \frac{d}{f_2} - 1} d\\
+   1 - A + \frac{BC}{D - 1} &= 1 - \left(1 + \frac{d}{f_1}\right) + \frac{ \frac{1}{f_1} 
+   + \frac{1}{f_2} + \frac{d}{f_1 f_2} }{1 + \frac{d}{f_2} - 1} d\\
    &= -\frac{d}{f_1} + \frac{f_2}{f_1} + 1 + \frac{d}{f_1}\\
    &= 1 + \frac{f_2}{f_1}
    :label: eq_oc_two_lenses_denom
@@ -464,7 +495,8 @@ In fact, doing this with two ideal lenses with focal lengths :math:`f_1` and :ma
    \text{OC} = V_1 + \frac{V_2 - V_1}{1 + \frac{f_2}{f_1}}
    :label: eq_oc_two_lenses
 
-For :math:`R_2 = -R_1` in :math:numref:`eq_oc_radii` or :math:`f_2 = f_1` in :math:numref:`eq_oc_two_lenses` the optical center lies at exactly the center of the lens/lens combination.
+For :math:`R_2 = -R_1` in :math:numref:`eq_oc_radii` or :math:`f_2 = f_1` in :math:numref:`eq_oc_two_lenses` 
+the optical center lies at exactly the center of the lens/lens combination.
 
 .. _image_object_distance:
 
@@ -473,7 +505,7 @@ Image and Object Distances
 
 **Positions**
 
-The matrix for additional object distance :math:`g` and image distance :math:`b` is:
+The matrix representation for additional object distance :math:`g` and image distance :math:`b` is given by:
 
 .. math::
    \text{M}_\text{b,g} = 
@@ -488,18 +520,21 @@ The matrix for additional object distance :math:`g` and image distance :math:`b`
    \end{array}\right]
    :label: TMA_image_distance_mat
 
-Where distance :math:`b` is given relative to the lens vertex point :math:`V_2` and :math:`g` relative to :math:`V_1` and both distances being positive when pointing towards positive z-direction.
+In this context, the distance :math:`b` is measured relative to the lens vertex point :math:`V_2` 
+and the distance :math:`g` is measured relative to :math:`V_1`, 
+with both distances considered positive when oriented towards the positive z-direction.
 
-For imaging element :math:`B_\text{b,g} = \text{M}_\text{b,g}[0, 1]` needs to be zero.
-This means the output ray position :math:`x_2` is independent on the input angle :math:`\theta_1` and only dependent on the input position :math:`x_1`.
+For the imaging element, it is essential that :math:`B_{b,g} = \text{M}_{b,g}[0, 1]` equals zero. 
+This condition ensures that the output ray position :math:`x_2` is independent of the input angle :math:`\theta_1`, 
+relying solely on the input position :math:`x_1`.
 
-This gives us:
+Consequently, the condition can be expressed as:
 
 .. math::
    B_\text{b,g} = g (A + C b) + B + D b = 0
    :label: TMA_image_distance_eq
 
-For :math:`b, g \in \mathbb{R}`
+For :math:`b, g \in \mathbb{R}`, the solution is represented as:
 
 .. math::
    b(g) = 
@@ -520,7 +555,7 @@ For :math:`b, g \in \mathbb{R}`
   \end{cases}
   :label: TMA_object_distance_solution
 
-For special cases around :math:`\pm\infty` we get:
+For special cases concerning limits approaching :math:`\pm\infty`, we derive:
 
 .. math::
    \lim_{g \to \pm \infty} b(g) = 
@@ -540,9 +575,11 @@ For special cases around :math:`\pm\infty` we get:
   \end{cases}
   :label: TMA_object_distance_solution_special
 
-Optrace sets all cases with :math:`\emptyset, \mathbb{R}` to NaN (not a number), since both are impractical.
+Optrace assigns NaN (not a number) in all cases of :math:`\emptyset` and :math:`\mathbb{R}`, 
+as these cases are impractical.
 
-For :math:`\text{M} = \text{M}_\text{thin}` (thin lens approximation) from equation :math:numref:`TMA_thin_lens` the equations simplify to
+For a matrix :math:`\text{M} = \text{M}_\text{thin}` representing the thin lens approximation,
+derived from equation :math:numref:`TMA_thin_lens`, the expressions simplify to:
 
 .. math::
    b(g) = \frac{fg}{g-\frac{n_i}{n_o}f}
@@ -552,38 +589,42 @@ For :math:`\text{M} = \text{M}_\text{thin}` (thin lens approximation) from equat
    g(b) = \frac{\frac{n_i}{n_o}fb}{b-f}
    :label: TMA_object_imaging_eq
 
-Which is the form known from the imaging equation:
+These expressions are consistent with the well-known imaging equation:
 
 .. math::
    \frac{n_o}{f} = \frac{n_i}{g} + \frac{n_o}{b}
    :label: TMA_imaging_eq_n
 
-And most commonly found for :math:`n_i = 1, ~~n_o = 1`: :footcite:`LinsenGleichungWiki`
+In the most common scenario, where :math:`n_i = 1` and :math:`n_o = 1`, 
+this simplifies to: :footcite:`LinsenGleichungWiki`
 
 .. math::
    \frac{1}{f} = \frac{1}{g} + \frac{1}{b}
    :label: TMA_imaging_eq_base
 
-Where :math:`f,~b,~g` are positive when measured in positive z-direction.
+Here, :math:`f`, :math:`b`, and :math:`g` are considered positive if measured in the positive z-direction.
 
 **Magnifications**
 
-With a given object and image position the combined ABCD matrix in :math:numref:`TMA_image_distance_mat` can be calculated.
-Element :math:`A` of the matrix corresponds to the magnification factor :math:`m`, as :math:`B=0` applies for this matrix.
+With a given object and image position, the combined ABCD matrix as defined in :math:numref:`TMA_image_distance_mat`
+can be computed. In this matrix, element :math:`A` corresponds to the magnification factor :math:`m`, 
+given that :math:`B=0` applies for this configuration.
 
-For a thin, ideal lens :math:`m` would be equal to :math:`b/g`.
+For a thin, ideal lens, the magnification factor :math:`m` is equivalent to :math:`b/g`.
 
-Referring to the value of this factor, :math:`A < 0` signifies an inverted image, :math:`A > 0` an upright image, :math:`\lvert A \rvert > 1` a size increase, :math:`\lvert A \rvert < 1` a size decrease.
-
+The value of this factor conveys significant optical properties. 
+Specifically, if :math:`A < 0`, the image is inverted, if :math:`A > 0`, the image is upright. 
+Furthermore, if :math:`\lvert A \rvert > 1`, the image experiences a size increase, 
+whereas if :math:`\lvert A \rvert < 1`, the image undergoes a size decrease.
 
 .. _pupil_calculation:
 
 Entrance and Exit Pupils
 =================================================
 
-
-To calculate the entrance and exit pupil for a given system and aperture stop the lens setup is separated into a front and rear group. The pupils are then the image of the aperture for the corresponding group. :footcite:`GreivenStop`
-
+To calculate the entrance and exit pupils for a given optical system and aperture stop, 
+the lens setup is conceptually divided into a front and a rear group. 
+The pupils are defined as the image of the aperture stop within the respective group. :footcite:`GreivenStop`
 
 .. figure:: ../images/pupil_calculation.svg
    :align: center
@@ -594,31 +635,38 @@ To calculate the entrance and exit pupil for a given system and aperture stop th
 
 **Aperture inside setup**
 
-
-In the case of the aperture stop being inside the lens setup, the setup and its matrix :math:`\text{M}` can be separated into three parts:
+When the aperture stop is positioned within the lens setup, the system and its matrix :math:`\text{M}` 
+can be decomposed into three distinct parts:
 
 .. math::
    \text{M} = \text{M}_\text{rear} \cdot \text{M}_\text{gap} \cdot \text{M}_\text{front}
    :label: eq_pupils_separation
 
-:math:`\text{M}_\text{front}` is the matrix for all surfaces in front of the aperture stop, :math:`\text{M}_\text{back}` for everything behind the stop. :math:`\text{M}_\text{gap}` is the distance matrix for the gap region between surfaces where the stop is positioned in and does not belong to either front or back group.
+Here, :math:`\text{M}_\text{front}` represents the matrix for all surfaces located before the aperture stop, 
+while :math:`\text{M}_\text{rear}` pertains to those surfaces positioned after the stop. 
+The matrix :math:`\text{M}_\text{gap}` accounts for the distance in the gap region where the stop is located 
+and is not associated with either the front or rear group.
 
-The entrance pupil is the result of the stop being imaged into the front group, whereas the exit pupil is the image of the aperture stop into the rear group.
+The entrance pupil is formed by imaging the stop into the front group, 
+whereas the exit pupil is the image of the aperture stop in the rear group.
 
-The object distance for the exit pupil is:
+The object distance for calculating the exit pupil is:
 
 .. math::
    g_\text{ex} = V_{1,\text{rear}} - z_\text{s}
    :label: eq_pupils_gex
 
-The exit pupil image distance :math:`b_\text{ex}` is calculated with :math:`\text{M}_{b,g} = \text{M}_\text{rear}` and the procedure in :numref:`image_object_distance`.
-The resulting :math:`z_\text{ex}` is then:
+The exit pupil image distance :math:`b_\text{ex}` is determined using :math:`\text{M}_{b,g} = \text{M}_\text{rear}` 
+and following the procedure outlined in :numref:`image_object_distance`. 
+Subsequently, the resulting position :math:`z_\text{ex}` is obtained as follows:
 
 .. math::
    z_\text{ex} = V_{2,\text{rear}} + b_\text{ex}
    :label: eq_pupils_zex
 
-For the entrance pupil, we need to image the stop in backwards direction through :math:`\text{M}_\text{front}`. This is done by inverting the matrix:
+
+For the entrance pupil, the aperture stop is imaged in the backward direction through :math:`\text{M}_\text{front}` 
+by inverting the matrix:
 
 .. math::
    \text{M}^{-1}_\text{front} &= \left[\begin{array}{cc}
@@ -637,8 +685,10 @@ The object distance is negative and calculated with the back vertex of the front
    g_\text{en} = V_{2,\text{front}} - z_\text{s}
    :label: eq_pupils_gen
 
-Calculating :math:`b_\text{en}(g_\text{en})` is done with the help of the procedure in :numref:`image_object_distance` and by setting :math:`\text{M}_{b,g} = \text{M}^{-1}_\text{front}`.
-The image distance :math:`b_\text{en}` then needs to be added to the front vertex of the front group to get the entrance pupil position:
+To compute :math:`b_\text{en}(g_\text{en})`, the procedure outlined in :numref:`image_object_distance` is utilized, 
+setting :math:`\text{M}_{b,g} = \text{M}^{-1}_\text{front}`. 
+The image distance :math:`b_\text{en}` is then added to the front vertex of the front 
+group to determine the entrance pupil position:
 
 .. math::
    z_\text{en} = V_{1,\text{front}} + b_\text{en}
@@ -647,9 +697,9 @@ The image distance :math:`b_\text{en}` then needs to be added to the front verte
 
 **Aperture in front of setup**
 
-With the stop being in front of all lenses, it itself is the entrance pupil (:math:`z_\text{en} = z_\text{s}`).
-
-The exit pupil then is the result of imaging through all elements with the matrix:
+When the aperture stop is located in front of all lenses, it directly serves as the entrance pupil, 
+thus :math:`z_\text{en} = z_\text{s}`.
+The exit pupil is then calculated by imaging through all elements using the matrix:
 
 .. math::
    \text{M}_\text{rear} = \text{M} 
@@ -657,9 +707,10 @@ The exit pupil then is the result of imaging through all elements with the matri
 
 **Aperture behind of setup**
 
-With the stop being behind all lenses, it itself is equal to the exit pupil (:math:`z_\text{ex} = z_\text{s}`).
-
-The entrance pupil then is the result of imaging backwards through all elements with the procedure above and the matrix:
+Conversely, if the aperture stop is positioned behind all lenses, 
+it equates to the exit pupil, meaning :math:`z_\text{ex} = z_\text{s}`.
+The entrance pupil in this scenario is calculated by imaging backwards through all elements, 
+employing the procedure described previously, using the matrix:
 
 .. math::
    \text{M}_\text{front} = \text{M} 

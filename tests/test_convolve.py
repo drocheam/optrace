@@ -52,6 +52,8 @@ class ConvolutionTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.convolve, img, [rimg, rimg])  # see above, but must be explicitly 3 elements
         self.assertRaises(TypeError, ot.convolve, img, [rimg, img2, rimg])  # one element has the wrong type
         self.assertRaises(ValueError, ot.convolve, img, [rimg, rimg2, rimg])  # extents are not the same
+        self.assertRaises(TypeError, ot.convolve, img2, [rimg, rimg, rimg]) 
+        # ^-- a single RenderImage PSF sufficient for grayscale image
             
     def test_resolution_exceptions(self):
 

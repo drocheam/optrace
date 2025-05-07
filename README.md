@@ -28,31 +28,46 @@
 
 ## Overview
 
+optrace is a scripting based optics simulation package, developed at the Institute for Applied Optics and Electronics 
+at the TH Köln - University of Applied Science in Cologne, Germany.
+It features sequential raytracing and image rendering capabilities, complemented by a graphical user interface.
+This tool is designed with a focus on image simulation with accurate color handling, 
+differentiating it from other raytracers that may prioritize engineering workflows.
+
+optrace is suitable for educational purposes, enabling the creation of interactive applications 
+with custom user interfaces through Python scripting and comprehensive documentation. 
+Its interactive 3D scene viewer allows for hands-on exploration of optical principles.
+
+Furthermore, optrace's automation features and extensibility, including support for custom surfaces and materials, 
+make it a viable tool for research applications. 
+
  **Features**
-  * sequential raytracing for geometrical optics
-  * rendering colored detector images
-  * paraxial analysis (matrix optics, cardinal points/planes and PSF convolution)
-  * presets and user defined surface shapes, ray sources and media
-  * an additional GUI for visualization
-  * programming/scripting approach to simulation
-  * high performance of 0.11 s / surface / million rays
-  * free and open source software
+  * Free and open source software
+  * Programming/scripting approach to simulation
+  * Sequential raytracing for geometrical optics
+  * Rendering of colored detector images
+  * Paraxial analysis (matrix optics, cardinal points/planes and PSF convolution)
+  * Includes preset and user-definable surface shapes, ray sources, and media
+  * An additional GUI with an interactive 3D scene viewer
+  * Automation capabilities
+  * High performance of 0.11 s / surface / million rays
+  * Comprehensive documentation
 
 <!--  ^--- TODO add benchmarking details when documentation is online-->
 
- **What it CAN'T do**
-  * coding-free simulations
-  * wave optics, including diffraction and interference
-  * non-sequential scenes, simulating ghost images, reflections
-  * mirror or Fresnel lens optics
-  * scattering and polarization dependent media
-  * lens optimization, aberration analysis and tolerancing
-
+ **Limitations**
+  * Coding-free simulations are not supported
+  * Wave optics effects such as diffraction and interference are not included
+  * No non-sequential raytracing for simulating ghost images and reflections
+  * Mirror or fresnel lens optics are not supported
+  * No modelling of scattering effects or polarization-dependent media
+  * No functionality for lens optimization, aberration analysis, and tolerancing
+ 
  **Purpose/Use Cases**
-  * educational purposes, demonstrating aberrations or simple optical setups
-  * introductory tool to paraxial, geometrical optics and image formation
-  * simulation of simpler systems, like a prism, the eye model or a telescope
-  * estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) is overkill for
+  * Educational purposes, demonstrating aberrations or simple optical setups
+  * Introductory tool to paraxial, geometrical optics or image formation
+  * Simulation of simpler systems: Prism, eye model, telescope, ...
+  * Estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) is overkill for
 
 ## Examples
 
@@ -92,6 +107,7 @@ This project is published under an MIT License.
    * [RayOptics](https://ray-optics.readthedocs.io/en/latest/) by Michael Hayford. Tracing and optical design analysis tool. 
    * [rayopt](https://github.com/quartiq/rayopt) by QUARTIQ. Tracing and optical design analysis tool. 
    * [RayTracing](https://github.com/DCC-Lab/RayTracing) by DCC-Lab. Paraxial raytracer with beampath visualization.
+   * [Optiland](https://optiland.readthedocs.io/en/latest/index.html) by Harrison Kramer. Optical design and analysis framework.
 
 - Wave Optics
    * [diffractsim](https://github.com/rafael-fuente/diffractsim) by Rafael de la Fuente. Waveoptics simulation of arbitrary apertures and phase holograms.

@@ -103,9 +103,8 @@ class ScopeTests(unittest.TestCase):
         self.assertRaises(AttributeError, eval, "otp._chromacity_plot", locals())
         self.assertRaises(AttributeError, eval, "otp._red_xyz", locals())
         self.assertRaises(AttributeError, eval, "otp._CONV_XYZ_NORM", locals())
-        # TODO how to hide these two:
-        # self.assertRaises(AttributeError, eval, "otp._ui_dark_mode_handler", locals())
-        # self.assertRaises(AttributeError, eval, "otp._plot_dark_mode_handler", locals())
+        self.assertRaises(AttributeError, eval, "otp._ui_dark_mode_handler", locals())
+        self.assertRaises(AttributeError, eval, "otp._plot_dark_mode_handler", locals())
         self._test_scope_ext_libs(locals())
     
     def test_scope_gui(self):

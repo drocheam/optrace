@@ -13,23 +13,27 @@ Color Management
 XYZ Color Space
 =================================================
 
-Apart from spectral wavelengths, color perception does not exist as a physically measurable property, 
-but results from the physiological characteristics of the receiver. Colors are therefore subjective. 
-Human vision has five types of photoreceptors. Retinal ganglion cells control the day and night rhythm 
-and rods cells (neuron bacilliferum) are responsible for night vision (scotopic vision). Cone cells (neuron coniferum) 
-provide color information and are responsible for day vision (photopic vision). The last three are mainly relevant 
-in color management:  When plotted against wavelength, they have different spectral sensitivities. 
-An incident spectrum is evaluated and summed up with this sensitivity and generates a receptor stimulus.
-The three different sensitivities of the cones are described as L, M, S (long, medium, short) 
-and together the stimuli produce the LMS color space.
+Color perception, unlike spectral wavelengths, is not a directly measurable physical property. 
+Instead, it arises from the physiological characteristics of the human visual system, making it inherently subjective. 
 
-Typically, however, the XYZ color space is used, which can be obtained from a linear combination of the L, M, S
-components. The XYZ values are also called tristimulus and describeall humanly perceivable colors. 
-However, it must be noted that there are slight variations in spectral sensitivities from person to person. 
-In addition, these are dependent on other factors. The figure :numref:`cie_cmf` shows the so-called color matching 
-functions, which represent the average sensitivities from multiple subjects for an object of 2° size, conducted in 
-1928 and 1931. These are also called the CIE 1931 2° observer curves and are the most commonly used throughout color 
-conversion and management.
+Human vision is mediated by five types of photoreceptors. Retinal ganglion cells regulate circadian rhythms, 
+rod cells (neuron bacilliferum) enable night vision (scotopic vision). Cone cells (neuron coniferum) 
+are responsible for color perception and daytime vision (photopic vision). Of these, the three types of cone cells 
+are most relevant in color management. Each type exhibits a distinct spectral sensitivity curve, which describes 
+how it responds to different wavelengths of light. When light strikes the retina, the incident spectrum is filtered 
+through these sensitivities to produce receptor-specific stimuli.
+
+These three cone sensitivities are commonly referred to as L (long), M (medium), and S (short). 
+The resulting signals define the LMS color space.
+
+However, in practice, the XYZ color space is typically used. It is derived through a linear transformation 
+of the L, M, and S components. The XYZ values, also known as tristimulus values, are capable of representing 
+the entire range of colors visible to the average human observer. 
+It is important to note that spectral sensitivity can vary slightly from person to person and may be influenced 
+by additional factors. The figure :numref:`cie_cmf` illustrates the standard color matching functions, which 
+represent the average sensitivities measured from a group of observers for a 2° field of view. These measurements 
+were conducted in 1928 and 1931 and form the basis of the CIE 1931 2° Standard Observer. These functions remain 
+the most widely used reference for color conversion and management.
 
 
 .. _cie_cmf:
@@ -38,11 +42,10 @@ conversion and management.
    :align: center
    :class: dark-light
 
-
    CIE 1931 2° color matching functions
 
-With a light power spectrum :math:`P(\lambda)` and the three curves from the figure above 
-we can calculate the tristimulus values :math:`X, Y, Z`.
+Using a spectral power distribution :math:`P(\lambda)` and the three color matching functions shown in 
+:numref:`cie_cmf`, the tristimulus values :math:`X`, :math:`Y`, and :math:`Z` can be computed as follows:
 
 .. math::
    X &=\int_{\lambda} P(\lambda) \cdot x(\lambda) ~d \lambda \\
@@ -50,28 +53,35 @@ we can calculate the tristimulus values :math:`X, Y, Z`.
    Z &=\int_{\lambda} P(\lambda) \cdot z(\lambda) ~d \lambda
    :label: XYZ_Calc
 
-The Y component is responsible for the brightness stimulus. Converting to the so-called luminous flux 
-:math:`\Phi_v`, which is mainly used in photometry, is simply done by rescaling by the luminous efficacy constant:
+Among these, the :math:`Y` component corresponds to the perceived brightness of the stimulus. 
+To convert this value into the luminous flux :math:`\Phi_v`, commonly used in photometry, 
+a simple scaling by the luminous efficacy constant is applied:
 
 .. math::
    \Phi_v = 683 \frac{\text{lm}}{\text{W}} ~Y
    :label: luminous_flux
 
 
-Note that :math:numref:`luminous_flux` and using Y as luminance is only valid for photopic vision, 
-for mesoscopic and scotopic vision another luminous efficiency function needs to be applied.
+It is important to note that the formula in :math:numref:`luminous_flux` and the interpretation 
+of :math:`Y` as a luminance are only valid under conditions of photopic (daylight) vision. 
+For mesopic (twilight) or scotopic (night) vision, different luminous efficiency functions 
+must be used to account for the varying sensitivity of the visual system.
 
 
 xyY Color Space
 ================
 
-Until now, all three tristimuli hold some color component. A more suited representation is the xyY representation, 
-as it isolates the color information into a two dimensional xy component, called chromaticity, 
-and the luminance information is stored in the Y channel. The point of no color, also called whitepoint, is set to the 
-color of the D65 standard illuminant. The D65 spectrum tries to model the average midday light in open air in Europe.
+Until now, each of the three tristimulus values contained a mixture of color and brightness information. 
+The CIE xyY color space offers a more convenient representation by separating chromaticity (color information) 
+into the two-dimensional *xy* components and luminance (brightness) into the *Y* component.
+The reference point for neutral color, known as the white point, is defined by the chromaticity coordinates 
+of the D65 standard illuminant. The spectral power distribution of D65 is designed to approximate average midday 
+daylight in open air in Europe.
 
-The resulting chromaticity geometry as well as the whitepoint are pictured in :numref:`chroma_1931`. 
-Spectral monochromatic wavelengths lie at the edge of the *gamut*, which describes the area of all representable colors.
+The resulting chromaticity diagram, including the D65 white point, is shown in :numref:`chroma_1931`. 
+The spectral locus, representing monochromatic light at each visible wavelength, forms the outer boundary of the gamut, 
+which encompasses all colors that can be represented within this system.
+
 
 .. _chroma_1931:
 .. figure:: ../images/chroma_1931.svg
@@ -84,9 +94,12 @@ Spectral monochromatic wavelengths lie at the edge of the *gamut*, which describ
 
 **XYZ to xyY**
 
-The following formulas are valid for :math:`X,~Y,~Z > 0`, otherwise we set :math:`x=x_r,~y=y_r,~z=z_r,~Y=0`, 
-where :math:`x_r,y_r` are the whitepoint coordinates. Typically the whitepoint D65 is used with 
-:math:`x_r=0.31272,~y_r=0.32903`, see CIE Colorimetry, 3. Edition, 2004, table 11.3.
+The following transformations convert CIE XYZ tristimulus values to CIE xyY color space components.
+These formulas are valid for :math:`X,~Y,~Z > 0`. If any of these values are not strictly positive,
+the chromaticity coordinates are set to the white point coordinates (:math:`x=x_r,~y=y_r`) and :math:`Y` is set to 0. 
+The white point coordinates are typically those of the D65 standard illuminant, 
+where :math:`x_r=0.31272` and :math:`y_r=0.32903` (see CIE Colorimetry, 3rd Edition, 2004, Table 11.3).
+
 
 .. math::
    \begin{aligned}
@@ -97,12 +110,12 @@ where :math:`x_r,y_r` are the whitepoint coordinates. Typically the whitepoint D
    \end{aligned}
    :label: eq_xyz_xyy
 
-The parameter z is given here only for the sake of completeness, 
-since its specification is redundant if x and y are given, because :math:`x+y+z=1`.
+Note that the :math:`z` component is often omitted as its value is implicitly determined by :math:`x` and :math:`y` 
+through the relationship :math:`x+y+z=1`.
 
 **xyY to XYZ**
 
-The reverse conversion is specified as follows:
+The inverse transformation from CIE xyY to CIE XYZ is given by:
 
 .. math::
    \begin{aligned}
@@ -116,27 +129,35 @@ The reverse conversion is specified as follows:
 sRGB Color Space
 =================
 
+The standard RGB (sRGB) color space serves as the most common color space for digital media. 
+Its color gamut is defined by a triangle, where any color within this triangle can be represented by a combination 
+of its three primary colors: red, green, and blue, located at the triangle's vertices. 
+Given that digital monitors also typically employ three distinct light emitters per pixel,
+the utility of such a three-primary system becomes apparent.
 
-The standard RGB (sRGB) color space is the most commonly used color space for digital media. 
-It has an triangular gamut, whereas all colors inside of it can be composed of a combination of three primaries 
-(red, green, blue) at the corner points of this triangle. With the knowledge, that monitors also typical incorporate 
-three different illuminants per pixel, one can see why such a system would prove useful.
-sRGB also uses the D65 whitepoint with coordinates :math:`X=0.95047,~Y=1,~Z=1.08883`, see :footcite:`WikiD65`.
-The gamut does not include all visible colors, it misses especially highly satured ones. 
-The gamut can be seen in :numref:`chroma_1931`.
+sRGB utilizes the D65 white point, defined by the CIE XYZ coordinates 
+:math:`X=0.95047,~Y=1,~Z=1.08883` (:footcite:`WikiD65`).
+It's important to note that the sRGB gamut does not encompass the entire spectrum of visible colors,
+particularly lacking highly saturated colors. 
+The sRGB gamut's position within the broader color space is visualized in :numref:`chroma_1931`.
 
-Color coordinates are saved with three values per pixel, one per each channel.
-With a typical bit depth of 8 bit the value count per channel is limited to 256 values. 
-Since human luminance sensitivity is non-linear, saving the values in a linear range would lead to a higher bit density
-in one region and a lower intensity in another one. With this limited range of values this would lead to visual banding.
-To counteract this, the sRGB values undergo a *gamma correction* that models the luminance of the eye, 
-matching the non-linear behavior and distributing the values uniformly according to the observer.
+Color information in sRGB is typically stored with three values per pixel, 
+each corresponding to one of the red, green, or blue channels. 
+With a common bit depth of 8 bits per channel, the intensity range for each primary is limited to 256 discrete values. 
+However, human perception of luminance is non-linear. 
+Directly encoding linear intensity values within this limited range would result in a 
+disproportionate allocation of bits, leading to fine intensity steps in some regions and coarse steps in others, 
+potentially causing visual banding artifacts.
 
+To mitigate this issue, sRGB values undergo a *gamma correction*. This non-linear transformation approximates the 
+human eye's luminance sensitivity, effectively distributing the available digital values more uniformly 
+according to perceived brightness and minimizing banding.
 
 **Conversion XYZ to sRGB**
 
-The linear, not gamma corrected, sRGB values are an linear combination of the tristimulus values.
-Conversion from XYZ to sRGB is done as follows :footcite:`BloomMatrices,sRGBWiki`:
+The linear sRGB values, prior to gamma correction, are obtained through a linear transformation of 
+the CIE XYZ tristimulus values. The conversion from CIE XYZ to linear sRGB is defined by the following 
+matrix multiplication :footcite:`BloomMatrices,sRGBWiki`:
 
 .. math::
    	\left[\begin{array}{l}
@@ -154,7 +175,7 @@ Conversion from XYZ to sRGB is done as follows :footcite:`BloomMatrices,sRGBWiki
 	\end{array}\right]
     :label: XYZ2RGB
 
-Apply gamma correction gives us:
+Applying the gamma correction results in:
 
 .. math::
    C_{\text {sRGB}}= \begin{cases}12.92\cdot C_{\text {linear}}, & C_{\text {linear}} \leq 0.0031308 \\[1.5ex] 
@@ -164,7 +185,7 @@ Apply gamma correction gives us:
 
 **Conversion sRGB to XYZ**
 
-Conversion from sRGB to XYZ is done as follows :footcite:`BloomMatrices,sRGBWiki`:
+The inverse transformation from sRGB to XYZ is performed as follows :footcite:`BloomMatrices,sRGBWiki`:
 
 .. math::
    	C_{\text {linear }}= 
@@ -191,11 +212,14 @@ Conversion from sRGB to XYZ is done as follows :footcite:`BloomMatrices,sRGBWiki
 
 **Rendering Intents**
 
-As can be seen from :numref:`chroma_1931` the sRGB gamut does not include all colors in human vision.
-There are multiple ways to represents these outside colors, while most commonly, 
-may it be due to simplicity or lacking awareness, negative sRGB values are simply clamped. 
-This leads to incorrect color and brightness.
-Multiple methods for *gamut clipping* are presented in :footcite:`OttossonClipping`.
+As illustrated in :numref:`chroma_1931`, the sRGB color gamut does not encompass the entirety of humanly visible colors. 
+Various approaches exist to handle colors that fall outside this gamut.
+The simplest is to simply clamp any negative sRGB values to zero, often resulting in inaccurate color and brightness
+representation. This approach is still commonly found, possibly
+due to its ease of implementation or a lack of awareness of better methods 
+
+:footcite:`OttossonClipping` presents several more sophisticated *gamut clipping* techniques designed 
+to minimize the visual artifacts.
 
 
 .. figure:: ../images/rendering_intents.svg
@@ -206,30 +230,37 @@ Multiple methods for *gamut clipping* are presented in :footcite:`OttossonClippi
 
    Absolute and perceptual colorimetric rendering intent in the CIE 1976 chromaticity diagram.
 
-
 Implemented Rendering Intents:
- 1. **Ignore**: Leaves color values untouched and outsources the handling of these colors. Typically this means the 
-     color values will be clamped by other methods, which can lead to large deviations in hue, 
-     saturation and brightness.
- 2. **Absolute Colorimetric**: Leaves colors inside the gamut untouched. Outside colors will be projected onto the
-     gamut edge in direction towards the white point. This is equivalent to a saturation clipping.
- 3. **Perceptual Colorimetric**: Determines the most saturated color outside the gamut. Rescales the saturation of 
-     all colors such that this color fits into into the gamut area. Equivalent to stauration rescaling.
 
-Intersecting the gamut edge for mode *Absolute Colorimetric* is done in the CIE 1931 xy chromaticity diagram and 
-towards the whitepoint of the standard illuminants D65. Determining and rescaling the saturation in 
-*Perceptual Colorimetric* mode is done in the CIE 1976 uv chromaticity diagram, 
-since this is a representation where color differences directly correspond to spatial differences.
+1.  **Ignore**: This intent leaves out-of-gamut color values unmodified, 
+    delegating their handling to subsequent processing stages. Typically, this results in these values being clamped 
+    by other methods, which can introduce significant inaccuracies in hue, saturation, and brightness.
 
-In the default configuration Perceptual Colorimetric scales the saturation such that all colors are inside the gamut.
-A fixed rescaling factor (range 0-1) can be provided as :python:`chroma_scale` parameter that can enforce 
-the same factor when for instance comparing different images. In the former adaptive case an additional :python:`L_th` 
-can be applied, which is a relative threshold and ignores values below this threshold for the calculation 
-of the scaling factor. This proves useful when dark but saturated regions are inside the image but which can be 
-neglected. See :ref:`usage_color` for more details.
+2.  **Absolute Colorimetric**: Colors that fall within the target gamut are left unchanged. Colors outside the gamut 
+    are projected onto the gamut boundary along a straight line directed towards the white point.
+    This method is equivalent to chroma clipping in the CIE 1931 xy chromaticity diagram.
 
-The effect of different rendering intents is illustrated in the next figures. The rendered images were created using 
-the double prism example from the example folder, where light is decomposed into its components. 
+3.  **Perceptual Colorimetric**: This intent identifies the most saturated color that lies outside the target gamut. 
+    It then rescales the saturation of all colors in the image proportionally, such that this most saturated 
+    out-of-gamut color is brought within the gamut boundary. This technique, equivalent to chroma rescaling, 
+    is typically performed in the CIE 1976 uv chromaticity diagram, as this color space is designed such
+    that Euclidean distances correlate well with perceived color differences.
+
+The gamut boundary intersection for the *Absolute Colorimetric* mode is calculated within the CIE 1931 xy 
+chromaticity diagram, with the projection direction determined by the white point of the D65 standard illuminant. 
+The determination and rescaling of chroma in the *Perceptual Colorimetric* mode are performed in the CIE 1976 uv 
+chromaticity diagram to better align numerical color differences with perceptual uniformity.
+
+In its default configuration, the Perceptual Colorimetric rendering intent scales the chroma of all colors to
+ensure they fall within the target gamut. Alternatively, a fixed rescaling factor (within the range 0 to 1) can be 
+supplied via the :python:`chroma_scale` parameter. This allows for consistent scaling, which can be beneficial when 
+comparing different images. In the adaptive scaling scenario, an additional :python:`L_th` parameter can be specified. 
+This parameter represents a relative luminance threshold: Colors with luminance below this threshold are excluded from 
+the calculation of the scaling factor. This can be useful for disregarding dark but saturated image regions that might 
+otherwise influence the overall chroma scaling. For more detailed information, refer to :ref:`usage_color`.
+
+The effect of different rendering intents is illustrated in the next figures. 
+The rendered images were created using the :ref:`example_prism`. 
 Since all spectral wavelengths create colors beyond the sRGB gamut, this leads to an extreme case.
 In the first image the lightness component is pictured, the following images should be the colored version of 
 this lightness image. With the Absolute Colorimetric rendering intent one can see not only the colors having different 
@@ -241,6 +272,24 @@ saturation ratios are falsified, leading to this effect behaving differently for
 The third image shows the Perceptual Colorimetric rendering intent. 
 One can clearly see a decreased saturation for all colors. 
 However, the saturation ratios are kept and the lightness gradient matches the lightness image.
+
+
+The effect of different rendering intents is illustrated in the following figures, 
+generated using the :ref:`example_prism`.This scenario represents an extreme case, due to the fact that all spectral 
+wavelengths produce colors exceeding the sRGB gamut.
+
+The first image depicts the lightness component. Subsequent images display the colored versions corresponding 
+to this lightness image. Observing the result of the Absolute Colorimetric rendering intent, one can discern not 
+only variations in color saturation but also a distinctly different lightness gradient compared to the initial image. 
+This difference is particularly noticeable in the region between :math:`x = 1.3` mm and :math:`x= 1.4` mm. 
+While the underlying lightness values remain unchanged, this subjective alteration arises from the 
+Helmholtz-Kohlrausch effect :footcite:`HelmKohlWiki`, which describes how color saturation can enhance
+perceived lightness. As the saturation was clipped and its maximum value is dependent on the spectral wavelength, 
+the saturation ratios are distorted, causing this effect to manifest differently for each color.
+
+The third image demonstrates the Perceptual Colorimetric rendering intent. 
+A clear reduction in saturation across all colors is evident. 
+However, the chroma ratios are preserved, and the lightness gradient aligns with the original lightness image.
 
 .. _color_dispersive1:
    
@@ -263,37 +312,41 @@ However, the saturation ratios are kept and the lightness gradient matches the l
           :class: dark-light
 
 
-When searching for chromaticity diagrams, a lot of negative examples can be found 
+A lot of negative examples for color representation can be found in literature  
 (`Link1 <https://clarkvision.com/articles/color-cie-chromaticity-and-perception/color-rgb-xy-cie1931-diagram1g1000spjfjl1-1000-ciesrgb-axes-waveticks-c1-srgb-800.jpg>`__,
 `Link2 <https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a>`__,
 `Link3 <https://www.faes.de/NN_in_der_Farbmetrik/NN_Erklaerung_Farbraum/cie-normfarbtafel.jpg>`__,
 `Link4 <https://d1hjkbq40fs2x4.cloudfront.net/2017-06-05/files/perceptual-vs-absolute-rendering-intents_1621-2.jpg>`__).
 
-In most cases negative sRGB values were simply clipped, distorting not only saturation, but also hue and brightness. 
-For instance, colors near 510 nm get shown in deep green compared to a slightly nuanced greenish-cyan. 
-In some cases even the representable colors inside the gamut are incorrect, 
-which can be for instance seen as high saturated colors everywhere inside the diagram. 
-On the other hand, positive examples are found here:
-`Link6 <https://commons.wikimedia.org/wiki/File:CIE1931xy_blank.svg>`__,
+In most cases, negative sRGB values were simply clipped, leading to distortions not only in saturation but also 
+in hue and brightness. For example, colors near 510 nm are rendered as deep green instead 
+of a more nuanced greenish-cyan. In some instances, even representable colors within the gamut are inaccurate,
+which can be observed as overly saturated colors throughout the diagram.
+
+Conversely, positive examples can be found at:
+`Link6 <https://commons.wikimedia.org/wiki/File:CIE1931xy_blank.svg>`__
 `Link7 <https://www.wavemetrics.com/sites/www.wavemetrics.com/files/styles/content_body/public/2019-04/Chromaticity_1931.png>`__
-Note that the positive examples have a different luminance norm, showing the colors with a higher brightness.
+
+It is important to note that these positive examples utilize a different luminance normalization, 
+displaying the colors with increased brightness.
 
 CIELUV Color Space
 ==================
 
-One problem with the XYZ color space is that color and brightness are not independent of each other. 
-Another problem is that brightness and color distances are not linear to color perception.
-Therefore, the CIE 1976 L, u, v color space (short CIELUV) was introduced as an improved color system that emerges as a 
-transformation from the XYZ color space and solves these problems.
-L is the lightness component. u corresponds to a red-green axis, v to a blue-yellow axis.
-The white point is freely selectable, but typically the D65 white point is chosen.
+A limitation of the XYZ color space lies in the interdependence of color and brightness. 
+Furthermore, the perceived distances in brightness and color are not linear within this space. 
+To address these issues, the improved CIE 1976 L, u, v color space (abbreviated as CIELUV) was developed.
 
-Similar to the XYZ color space, a chromaticity diagram can be created, the coordinates here are :math:`u',~v'`.
-This is also called the CIE 1976 UCS (uniform chromaticity scale) diagram and can be seen in 
-Figure :numref:`chroma_1976`.  As the term UCS suggests, geometric distances everywhere inside the diagramm correspond 
-to the same absolute color differences. The latter is not the case in the CIE 1931 chromaticity diagram in figure 
-:numref:`chroma_1931`, so the other diagram is also the only suitable one to see how large the color ranges are that 
-are missing in the sRGB gamut.
+In CIELUV, L represents the lightness component, while u corresponds to the red-green axis 
+and v to the blue-yellow axis. The white point can be freely chosen, although the D65 standard 
+illuminant is commonly used.
+
+Analogous to the XYZ color space, a chromaticity diagram can be derived, with coordinates denoted as :math:`u',~v'`. 
+This diagram is also known as the CIE 1976 UCS (uniform chromaticity scale) diagram and is illustrated in 
+Figure :numref:`chroma_1976`. As its name implies, the UCS diagram exhibits uniform geometric distances throughout, 
+where equal distances correspond to equal perceived color differences. This uniformity is not present in the 
+CIE 1931 chromaticity diagram shown in Figure :numref:`chroma_1931`. Consequently, the UCS diagram is the
+appropriate tool for visualizing the extent of the color ranges absent in the sRGB gamut.
 
 .. _chroma_1976:
 .. figure:: ../images/chroma_1976.svg
@@ -303,17 +356,15 @@ are missing in the sRGB gamut.
 
    u'v' chromaticity diagram with sRGB Gamut
 
-
-An also widespread CIE model is the CIELAB color space with the same lightness function but different color components. 
-For color mixing and additive colour applications CIELUV should be preferred, as it has an associated 
-chromaticity diagram (as mentioned above) and a defined expression for color saturation. :footcite:`ColorFord`
-
+Another widely adopted CIE model is the CIELAB color space, which employs the same lightness function as
+CIELUV but utilizes different color components. For color mixing and additive color applications, CIELUV is 
+generally preferred due to its associated chromaticity diagram (as previously mentioned) and a defined mathematical 
+expression for color saturation :footcite:`ColorFord`.
 
 **XYZ to CIELUV**
 
-Source for conversion: :footcite:`BloomXYZLUV`
-
-The following equations are valid for :math:`X, Y, Z > 0`, otherwise we set :math:`L = 0, ~u=0,~v=0`.
+Conversion formulas are based on :footcite:`BloomXYZLUV`. 
+These equations are valid for :math:`X, Y, Z > 0`. Otherwise, we define :math:`L = 0, ~u=0,~v=0`.
 
 .. math::
    \begin{aligned}
@@ -324,7 +375,7 @@ The following equations are valid for :math:`X, Y, Z > 0`, otherwise we set :mat
    \end{aligned}
    :label: eq_xyz_luv_eq
 
-With 
+With the following parameters: 
 
 .. math::
    \begin{aligned}
@@ -336,15 +387,15 @@ With
    \end{aligned}
    :label: eq_xyz_luv_pars
 
-:math:`Y_r` is taken from the white point coordinates :math:`(X_r,~Y_r,~Z_r)`, typically those of the standard 
-illuminant D65. On the other hand :math:`u'_r` and :math:`v'_r` are the :math:`u', ~v'` values for these 
-whitepoint coordinates.
+Here, :math:`Y_r` is derived from the white point coordinates :math:`(X_r,~Y_r,~Z_r)`, 
+typically those of the standard illuminant D65. 
+Conversely, :math:`u'_r` and :math:`v'_r` represent the :math:`u', ~v'` values calculated for 
+these white point coordinates.
 
 **CIELUV to XYZ**
 
-Source for conversion: :footcite:`BloomLUVXYZ`. However, some formulas were rewritten in a different form.
-
-The following equations are valid for :math:`L > 0`, for :math:`L = 0` all values are set as :math:`X=Y=Z=0`.
+Conversion formulas are based on :footcite:`BloomLUVXYZ`. Note that some formulas have been reformulated for clarity.
+These equations are valid for :math:`L > 0`. If :math:`L = 0`, then all values are set to :math:`X=Y=Z=0`.
 
 .. math::
    Y= \begin{cases}\left(\frac{L+16} {116}\right)^3 & \text { if } L>\kappa \epsilon \\ 
@@ -361,7 +412,7 @@ The following equations are valid for :math:`L > 0`, for :math:`L = 0` all value
 
 **CIELUV to u'v'L**
 
-The following equations are valid for :math:`L > 0`, for :math:`L = 0` we set :math:`u' = u'_r, ~v' = v'_r`.
+For :math:`L > 0`, the following equations apply. If :math:`L = 0`, we set :math:`u' = u'_r, ~v' = v'_r`.
 
 .. math::
    \begin{aligned}
@@ -373,7 +424,7 @@ The following equations are valid for :math:`L > 0`, for :math:`L = 0` we set :m
 
 **CIELUV Chroma**
 
-Calculation of chroma :footcite:`SchwiegerlingOptics`:
+Chroma calculation based on :footcite:`SchwiegerlingOptics`:
 
 .. math::
    C = \sqrt{u^2 + v^2}
@@ -381,7 +432,7 @@ Calculation of chroma :footcite:`SchwiegerlingOptics`:
 
 **CIELUV Hue**
 
-Calculation of hue :footcite:`SchwiegerlingOptics`:
+Hue calculation based on :footcite:`SchwiegerlingOptics`:
 
 .. math::
    H = \text{arctan2}(v, u)
@@ -389,14 +440,12 @@ Calculation of hue :footcite:`SchwiegerlingOptics`:
 
 **CIELUV Saturation**
 
-Calculation of saturation :footcite:`ColorfulnessWiki`:
-
-The following equations are valid for :math:`L > 0`, for :math:`L = 0` we set :math:`S=0`.
+Saturation calculation based on :footcite:`ColorfulnessWiki`:
+These equations are valid for :math:`L > 0`. If :math:`L = 0`, we set :math:`S=0`.
 
 .. math::
    S = \frac{C}{L}
    :label: eq_luv_saturation
-
 
 
 .. _random_srgb:
@@ -405,54 +454,61 @@ The following equations are valid for :math:`L > 0`, for :math:`L = 0` we set :m
 sRGB Spectral Upsampling
 =================================================
 
+While the conversion of a physical light spectrum to coordinates within a human vision color model is a frequent task,
+the reverse process is less common. In our application, this inverse conversion is employed to load digital images 
+into the raytracer and propagate spectral wavelengths throughout the tracing geometry. 
+Such an implementation facilitates straightforward simulations of diverse light and lighting scenarios.
 
-While doing the conversion of a physical light spectrum to coordinates in a human vision color model is a common task, 
-going the opposite direction is rather unusual. In our application the conversion is used to load digital images into 
-the raytracer and propagate spectral wavelengths throughout the tracing geometry. Such an implementation would enable 
-us a simple simulation of different light and lightning scenes.
+This conversion process is commonly known as *Spectral Upsampling*, *Spectral Rendering*, or *Spectral Synthesis*. 
+An implementation utilizing real LED spectral curves can be found in :footcite:`10.2312:sr.20221150`, 
+while methods for modeling sRGB reflectances are detailed in :footcite:`10.2312:sr.20191216` and :footcite:`Burns_2018`.
 
-The conversion process is commonly referred to as *Spectral Upsampling*, *Spectral Rendering* or *Spectral Synthesis*. 
-An implementation with real LED spectral curves is found in :footcite:`10.2312:sr.20221150`, while modelling 
-sRGB reflectances is found in :footcite:`10.2312:sr.20191216` or :footcite:`Burns_2018`.
-It is important to note that not all chromaticities inside the human vision and even the sRGB gamut can be modelled by 
-valid reflectance spectra, since the reflectance range is bound to :math:`[0,~1]`. 
-However, when choosing illuminant curves there is no such limitation.
-
-.. TODO macht es einen Sinn, warum die sich so auf die Farbwiedergabe fixieren? Was machen die da überhaupt?
+It is crucial to recognize that not all chromaticities within human vision, and even the sRGB gamut, 
+can be accurately modeled by valid reflectance spectra, as the reflectance range is constrained to :math:`[0,~1]`.
+However, this limitation does not apply when selecting illuminant curves.
 
 While the conversion of a spectral distribution to a color is well-defined, going backwards the conversion is not unique 
 and simply reversible. Multiple spectral distributions can create the same color stimulus, 
 an effect known as *metamerism*. In fact, there infinitely many distributions being perceived as the same color.
 With so many possibilities to choose from, we can demand some requirements for our sRGB primaries:
 
+While the conversion from a spectral distribution to a color is a well-defined process, 
+the reverse conversion is neither unique nor simply reversible. Multiple distinct spectral distributions can evoke the 
+same color perception, a phenomenon known as *metamerism*. In fact, an infinite number of spectral distributions can 
+be perceived as identical colors. Given this vast number of possibilities, we can establish certain requirements 
+for our sRGB primaries:
 
 .. topic:: Requirements
 
-     1. create illuminants with same color coordinates as the sRGB primaries
-     2. same luminance ratios as sRGB primaries
-     3. simple, smooth spectral functions
-     4. wide spectrum
-     5. relatively few light in non-visible regions (infrared and ultraviolet)
+     1. Same color coordinates as the sRGB primaries
+     2. Same luminance ratios as sRGB primaries
+     3. Simple, smooth spectral functions
+     4. Wide spectrum
+     5. Relatively few light in non-visible regions (infrared and ultraviolet)
 
-Points 1 and 2 simplify the upsampling process, since the mixing ratio of the linear sRGB values can be used directly. 
-In principle we could create a new color space and gamut, that includes the sRGB gamut but is much wider. 
-But with this we would need to add additional color space conversions. Additionally this would lead to narrower spectra, 
-contrary to point 4. Linear sRGB values need to be used, since they are proportional to the physical intensity of the 
-sRGB primaries. In contrast normal sRGB values are gamma corrected to approximate non-linear human vision.
+Points 1 and 2 simplify the spectral upsampling process because the mixing ratios of the linear sRGB values can be
+directly utilized. Although we could theoretically define a new color space and gamut that encompasses the sRGB gamut 
+but is significantly broader, this approach would necessitate additional color space conversions. 
+Furthermore, it would result in narrower spectra, which contradicts point 4. It is essential to use linear sRGB values,
+as they are proportional to the physical intensity of the sRGB primaries. In contrast, standard sRGB values are 
+gamma-corrected to approximate the non-linear response of human vision.
 
-Points 3 and 4 are needed to approximate natural illuminants close to reality. Adding all sRGB primaries together for 
-a white spectrum should lead to no missing regions in the spectral range. Such gaps would lower the color rendering 
-index (CRI) of the illuminant, which is basically the measure to quantify faithfully rendering object colors when 
-illuminated with this light. For instance, a light spectrum with a yellow gap fails to render purely yellow colors.
+Points 3 and 4 are necessary to approximate natural illuminants with a high degree of realism. Superimposing all sRGB 
+primaries to generate a white spectrum should ideally cover the entire visible spectral range without any significant
+gaps. Such gaps would reduce the color rendering index (CRI) of the illuminant. The CRI is a metric used to quantify 
+how faithfully an object's colors are rendered when illuminated by a particular light source. For example, a light 
+spectrum with a deficiency in the yellow region would fail to accurately render pure yellow colors.
 
-Point 5 ensures most of the traced light actually contributes to a rendered image. A color image in sRGB, which is a 
-color space for human vision, should lead to an image with colors in human vision. Rays with colors far outside the 
-visible spectrum would be a waste of rendering time.
+Point 5 ensures that the majority of the traced light contributes meaningfully to the final rendered image.
+Given that sRGB is a color space designed for human vision, an input color image in sRGB should ideally produce a 
+rendered image with colors perceived by humans. Tracing rays with colors far outside the visible spectrum would 
+constitute an inefficient use of rendering time.
 
-Theoretically we could use a D65 white spectrum and the reflectance curves from the aforementioned works to generate 
-spectra for the sRGB primaries. The shortcomings are that the resulting spectra are not smooth, due to D65 not being 
-smooth, and a relatively large part of the spectrum falls in the human invisible/barely visible range.
-There is also no simple mathematical descriptions for the resulting curves.
+In theory, we could derive spectra for the sRGB primaries by combining a D65 white spectrum with the reflectance
+curves described in the previously cited works. However, this approach has drawbacks: the resulting spectra would lack 
+smoothness due to the non-smooth nature of the D65 spectrum, and a significant portion of the spectrum would fall 
+within the range of human invisibility or near-invisibility. Furthermore, there are no straightforward mathematical 
+descriptions for the resulting spectral curves.
 
 .. list-table:: sRGB primary specification, see :footcite:`sRGBWikiEN`
    :widths: 50 50 50 50 50
@@ -492,18 +548,19 @@ There is also no simple mathematical descriptions for the resulting curves.
 
 **Dimensioning**
 
-The mathematical functions of choice is an gaussian function, which is defined as:
+The mathematical functions of choice is a Gaussian function, which is defined as:
 
 .. math::
    S(\lambda, \mu, \sigma)=\frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \left(-\frac{(\lambda-\mu)^{2}}{2 \sigma^{2}}\right)
    :label: Gauss_Opt
 
-A gaussian function is a suitable choice because of the smooth, bell-like shape and its widely known usage.
-The principle of maximum entropy :footcite:`Wiki_maximum_entropy` also recommends this type of function for the two 
-parameters position and width.
+A Gaussian function presents itself as a suitable choice due to its smooth, bell-shaped curve and its widespread 
+application across various fields. Moreover, the principle of maximum entropy :footcite:`Wiki_maximum_entropy` 
+advocates for this type of function when dealing with the two parameters of position and width, 
+as it represents the probability distribution that maximizes uncertainty for a given set of constraints.
 
-Utilizing optimization methods in python, the following functions were found, that have the same color stimulus as the
-primaries:
+Employing optimization methods in Python, the following Gaussian functions were derived,
+exhibiting the same color stimulus as the sRGB primaries:
 
 .. math::
     r_0(\lambda) =&~  75.1660756583 \cdot \Big[ S(\lambda, 639.854491, 30.0)\\
@@ -521,15 +578,19 @@ primaries:
    :align: center
    :class: dark-light
 
+The spectral distribution of the green primary is modeled using a single Gaussian function, 
+whereas the red and blue primaries utilize a superposition of two Gaussian functions each. 
+This choice is informed by Figure 3a in :footcite:`ClarkChromaticity`, which demonstrates that the chromaticity
+coordinates of the red primary cannot be accurately reproduced with a single Gaussian curve.
+While it is theoretically possible to represent the blue primary's chromaticity with a single Gaussian, 
+this would only be feasible for narrow illuminants characterized by a small standard deviation. 
+To allow for greater flexibility in selecting the spectrum width, 
+two Gaussian functions are also employed for the blue primary.
 
-The green primary is implemented with only one gaussian, while the other use two gaussian functions. 
-From :footcite:`ClarkChromaticity`, figure 3a, is known, that it is not possible to reach the chromaticity coordinates 
-of the red channel with only one such curve. While it is possible for the blue curve, only narrow illuminants with a 
-small standard deviation would be viable. For higher flexibility in spectrum width selection two functions are also
-applied here.
-
-However, all luminance ratios are different to the sRGB primaries. For this we need to rescale the functions to match 
-the ratio. The green curve factor is kept at a value of 1. The rescaling factors are then:
+It is important to note that the initial luminance ratios of these Gaussian approximations differ 
+from those of the standard sRGB primaries. To address this discrepancy, we need to rescale the functions to 
+match the correct luminance ratios. The scaling factor for the green curve is maintained at a value of 1, 
+and the rescaling factors for the red and blue curves are determined as follows:
 
 .. math::
     r(\lambda) =&~ 0.951190393 \cdot r_0(\lambda)\\
@@ -544,7 +605,7 @@ the ratio. The green curve factor is kept at a value of 1. The rescaling factors
    :class: dark-light
 
 
-The resulting spectrum for sRGB white (coordinates :math:`[1.0, 1.0, 1.0]`) looks as follows:
+The resulting spectrum for sRGB white (with coordinates :math:`[1.0, 1.0, 1.0]`) is illustrated in :numref:`rgb_white`.
 
 .. _rgb_white:
 .. figure:: ../images/rgb_white.svg
@@ -552,17 +613,23 @@ The resulting spectrum for sRGB white (coordinates :math:`[1.0, 1.0, 1.0]`) look
    :align: center
    :class: dark-light
 
+   Simulated sRGB white spectrum.
+
 .. topic:: Note
    
-   At :math:`\lambda = 380\,` nm and :math:`\lambda = 780\,` nm the curves are cut off mathematically. 
-   This ensures that all ratios and constants can be kept equal, even if the wavelength simulation range 
-   should be extended beyond this default range.
+   The Gaussian curves additionally include a cutoff at :math:`\lambda = 380\,` nm and :math:`\lambda = 780\,` nm. 
+   This ensures that all derived ratios and constants remain consistent, 
+   even if the simulated wavelength range is extended beyond these default boundaries.
 
-In a later step the channel primary functions are interpreted as probability distribution functions (pdf). 
-Such a pdf needs to have a normalized area such that the overall probability is 1.
-This cancels out any prefactors in the channel curves and the ratios between the channels.
-To counteract this, the channel mixing ratio is rescaled by the area of each channel curve (=being proportional to the 
-probability ratio). In that way the channel luminance is moved from the curve values to the probability itself.
+In a subsequent step, the spectral distributions of the color channel primaries are treated as 
+probability density functions (pdfs). A key property of a pdf is that its integral over the entire domain 
+(the area under the curve) must be normalized to unity, representing a total probability of 1. 
+This normalization process effectively cancels out any multiplicative factors in the channel curves, 
+as well as the relative scaling between the channels. 
+To compensate for this effect on luminance, the mixing ratio of each channel is rescaled by the area under 
+its corresponding spectral curve. Since this area is proportional to the probability ratio, 
+this rescaling effectively transfers the information about channel luminance from the absolute magnitudes of the curve
+values to the relative probabilities of the channels.
 
 The area scaling factors are:
 
@@ -572,11 +639,14 @@ The area scaling factors are:
     b_\text{P} = 0.775993481741\\
    :label: r_g_b_factors
 
-As can be seen, the r and b channel have smaller rescaling factors than the green channel, since their area is smaller. 
-This can already be seen in the figure above.
+As the calculated rescaling factors indicate, the red and blue channels have smaller factors compared 
+to the green channel. This is visually apparent in the preceding figure, 
+where the areas under the red and blue primary curves are smaller than that under the green primary curve.
 
-After choosing a channel according to the linear sRGB mixing ratios scaled with these factors, the corresponding channel 
-primary curve is interpreted as probability density distribution where a wavelength is chosen from.
+Following the selection of a color channel based on the linear sRGB mixing ratios 
+(which have been scaled by the aforementioned factors), the corresponding channel primary spectral curve 
+is then treated as a probability density function. 
+A specific wavelength is subsequently sampled from this probability distribution.
 
 
 .. topic:: Example 
@@ -586,26 +656,29 @@ primary curve is interpreted as probability density distribution where a wavelen
     1. Convert to linear sRGB: :math:`[1.000, 0.214, 0.033]`
     2. Rescale by area/probability factors :math:`r_\text{P}, g_\text{p}, b_\text{p}`: 
        We get approximately :math:`[0.886, 0.214, 0.025]`
-    3. Normalize, so sum equals 1: :math:`[0.788, 0.190, 0.022]`
-    4. Choose one of the three channels with the values from 3. being the probability: 
+    3. Normalize, so integral equals 1: :math:`[0.788, 0.190, 0.022]`
+    4. Choose one of the three channels with the values from 3. as the probability: 
        The R channel gets randomly chosen.
     5. Use the R primary curve as probability distribution, choose a random wavelength accordingly: 
        :math:`\lambda = 623.91\,` nm gets chosen.
-    6. Repeating 4. and 5. by choosing randomly, a spectrum is created, that for many rays has the same color 
-       as the sRGB from point 1.
+    6. Repeating 4. and 5. by choosing randomly, a spectrum is created, 
+       that for many rays converges to the correct sRGB color.
 
 
 **Brightness Sampling**
 
-While the procedure above creates correct colors, we also need to take into account the brightness of each pixel. 
-For representing the pixel intensity in the image correctly, each pixel gets an assigned probability. 
-This probability is proportional the pixel intensity.
+While the previously described procedure ensures accurate color representation, 
+it is also crucial to account for the brightness of each pixel in the image. 
+To correctly represent the pixel intensity, each pixel is assigned a probability proportional to its intensity.
 
-This pixel intensity is calculated by converting sRGB to linear sRGB and multiplying each channel with its 
-overall power, which is proportional to :math:`r_\text{P}, g_\text{P}, b_\text{P}`, 
-and summing these components together. 
+This pixel intensity is calculated by first converting the sRGB color values to linear sRGB 
+and then multiplying each linear channel value by its corresponding overall power,
+which is proportional to :math:`r_\text{P}, g_\text{P}, b_\text{P}`. 
+These scaled channel values are then summed together to obtain the pixel intensity.
 
-By doing so, each pixel gets an intensity weight that needs to be rescaled so the weight sum over the whole image is 1.
+Subsequently, each pixel is assigned an intensity weight based on this calculated intensity.
+To ensure proper probabilistic sampling across the entire image, 
+these intensity weights are then rescaled so that the sum over all pixels in the image equals 1.
 
 .. topic:: Example
 
@@ -647,7 +720,7 @@ By doing so, each pixel gets an intensity weight that needs to be rescaled so th
       0.277 & 0.470
       \end{bmatrix}
 
-   4. Chose randomly according to probability.
+   4. Chose randomly according to the probabilities.
 
 
 ------------
