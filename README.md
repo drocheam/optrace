@@ -30,7 +30,7 @@
 
 optrace is a scripting based optics simulation package, developed at the Institute for Applied Optics and Electronics 
 at the TH Köln - University of Applied Science in Cologne, Germany.
-It features sequential raytracing and image rendering capabilities, complemented by a graphical user interface.
+It features sequential raytracing, image rendering capabilities and a graphical user interface.
 This tool is designed with a focus on image simulation with accurate color handling, 
 differentiating it from other raytracers that may prioritize engineering workflows.
 

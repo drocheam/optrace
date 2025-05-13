@@ -938,8 +938,6 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
 
 
-    # TODO this fails in github actions, issue with headless display?
-    # for now exclude in github actions
     # @pytest.mark.os
     @pytest.mark.gui2
     @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Issues with headless display in github actions")
@@ -1794,6 +1792,11 @@ class GUITests(unittest.TestCase):
                     time.sleep(0.01)
                 sim.select_rays(np.zeros(10, dtype=bool))
                 self._wait_for_idle(sim)
+
+                # coverage: try selecting rays while tracing
+                sim._status["Tracing"] = 1
+                sim.select_rays(mask)
+                sim._status["Tracing"] = 0
         
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))

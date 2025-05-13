@@ -101,10 +101,11 @@ class TiltedSurface(Surface):
         # see https://www.scratchapixel.com/lessons/3d-basic-rendering/
         # minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
         normal = np.broadcast_to(self.normal, (p.shape[0], 3))
-        t = misc.rdot(self.pos - p, normal) / misc.rdot(s, normal)  
-        # ^-- TODO handle denominator zero (surface normal and direction perpendicular)
+        t_denom = misc.rdot(s, normal)
+        t_denom_n0 = t_denom != 0
+        t = misc.rdot(self.pos - p, normal) / np.where(t_denom_n0, t_denom, 1e-12)
         p_hit = p + s*t[:, np.newaxis]
-        is_hit = self.mask(p_hit[:, 0], p_hit[:, 1])  # rays not hitting
+        is_hit = self.mask(p_hit[:, 0], p_hit[:, 1]) & t_denom_n0  # rays not hitting
 
         # bool array for ill-conditioned rays
         ill = np.zeros(p.shape[0], dtype=bool)

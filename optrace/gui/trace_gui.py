@@ -411,7 +411,7 @@ class TraceGUI(HasTraits):
                     ),
                 resizable=True,
                 title=f"Optrace {metadata.version}",
-                # icon=""  # TODO create an icon and set the path here and in sub-windows
+                # icon=""  # NOTE create an icon and set the path here and in sub-windows
                 )
     """the UI view"""
 
@@ -1137,7 +1137,7 @@ class TraceGUI(HasTraits):
 
         if not self._status["Tracing"]:
             self.replot_rays(None, mask, max_show)
-        else:  # TODO test this case
+        else:
             warning(f"Did not apply the ray selection as the raytracer is still tracing.")
 
     @property

@@ -458,7 +458,7 @@ class Surface(BaseClass):
         brok = bet | beh
         if np.any(brok):
             brokc = np.count_nonzero(brok)
-            # TODO handle differently (return indices and let it handle by main thread?)
+            # NOTE handle differently? (return indices and let it handle by main thread?)
             warning(f"Broken sequentiality. {brokc} rays start behind the current surface. "
                      "The simulation results for these rays are most likely wrong. Check the geometry.")
 
