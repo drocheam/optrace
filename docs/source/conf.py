@@ -28,6 +28,7 @@ project = metadata["name"]
 release = metadata["version"]
 author = metadata["author"]
 copyright = f"{datetime.date.today().year}, {author}"
+language = "en"
 
 # -- General configuration ---------------------------------------------------
 
@@ -138,7 +139,9 @@ linkcheck_ignore = [
     'https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/',
     'https://doi.org/10.1080/713818864',
     'https://doi.org/10.1167/8.2.13',
-    'https://doi.org/10.1080/10867651.1997.10487479'
+    'https://doi.org/10.1080/10867651.1997.10487479',
+    'https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links',
+
 ]
 
 linkcheck_timeout = 15
