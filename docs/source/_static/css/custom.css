@@ -21,11 +21,12 @@ body {
     line-height: 1.5em;
 }
 
-/*increase page size*/
+/*increase relative page size for larger displays*/
+@media (min-width: 960px) {
 .bd-page-width {
     max-width: 90%;
+    }
 }
-
 /*set "Section Navigation" title in side bar to normal size*/
 /*nav.bd-links p.bd-links__title {*/
     /*font-size: unset;*/
@@ -48,11 +49,11 @@ body {
 /*******************************************************************/
 
 /*unset "width 100%" for a table so width gets adjusted automatically*/
-.table {
-	width: unset;
-	margin-top: 1rem;
-	margin-bottom: 2rem;
-}
+/*.table {*/
+	/*width: unset;*/
+	/*margin-top: 1rem;*/
+	/*margin-bottom: 2rem;*/
+/*}*/
 
 
 /*lower row padding in tables*/
@@ -62,9 +63,9 @@ body {
 }
 
 /*fixes lists colors in dark mode inside table cells*/
-.table dt, .table dd, .table td {
-    color: var(--pst-color-text-base);
-}
+/*.table dt, .table dd, .table td {*/
+    /*color: var(--pst-color-text-base);*/
+/*}*/
 
 /** new borderless class for image and object alignment **/
 .table-borderless {
@@ -85,24 +86,18 @@ body {
 /** Misc **/
 /****************************************************************/
 
-/**move "back to top" button down**/
-#pst-back-to-top {
-    top: 95vh;
-}
-
-/**additional padding from pydata-sphinx theme cuts parts off the mathjax box**/
+/**add padding-top so upper math part isn't cut off**/
 div.math mjx-container {
-    padding-bottom: unset;
-    overflow: unset;
+    padding-top: 0.2rem;
 }
 
 /*fix for reference links as superscript*/
-a.footnote-reference, a::before, a::after {
-    vertical-align: unset;
-    font-size: unset;
-    font-family: unset;
-    margin-right: unset;
-}
+/*a.footnote-reference, a::before, a::after {*/
+    /*vertical-align: unset;*/
+    /*font-size: unset;*/
+    /*font-family: unset;*/
+    /*margin-right: unset;*/
+/*}*/
 
 /*[>fix for badly displayed reference link part 2<]*/
 /*a::after {*/

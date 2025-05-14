@@ -77,6 +77,7 @@ html_theme_options = {
                     "logo": "",
                     "type": "fontawesome",},],
     "pygments_dark_style": "lightbulb",
+    "back_to_top_button": False,
 }
 
 html_context = {
@@ -87,6 +88,9 @@ html_context = {
 html_sidebars = {
   "**": ["sidebar-nav-bs"],
   "index": ["sidebar-nav-bs-index", "indices"],
+  "examples": ["sidebar-nav-bs-index", "indices"],
+  "quickstart": ["sidebar-nav-bs-index", "indices"],
+  "installation": ["sidebar-nav-bs-index", "indices"]
 }
 
 numfig = True

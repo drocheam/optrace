@@ -12,7 +12,7 @@ on:
 jobs:
   tox_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 70
+    timeout-minutes: 40
     strategy:
       matrix:
         python-version: ['3.13']

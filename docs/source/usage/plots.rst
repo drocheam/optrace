@@ -224,12 +224,12 @@ the following call is possible:
 
    * - .. figure:: ../images/color_dispersive2.svg
           :align: center
-          :height: 350
+          :width: 215
           :class: dark-light
    
      - .. figure:: ../images/color_dispersive1_cut.svg
           :align: center
-          :height: 350
+          :width: 400
           :class: dark-light
 
 

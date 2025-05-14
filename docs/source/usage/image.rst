@@ -385,17 +385,14 @@ Only the first two diffraction orders (core + 2 rings) are used, higher orders s
 
    * - .. figure:: ../images/rimage_limit_off.webp
           :align: center
-          :height: 300
           :class: dark-light
    
      - .. figure:: ../images/rimage_limit_on.webp
           :align: center
-          :height: 300
           :class: dark-light
      
      - .. figure:: ../images/rimage_limit_on2.webp
           :align: center
-          :height: 300
           :class: dark-light
 
 The limit parameter can be applied while either creating the |RenderImage| (:python:`ot.RenderImage(..., limit=5)`) 
@@ -733,7 +730,7 @@ One possible call could be:
 
    * - .. figure:: ../../../optrace/resources/images/cell.webp
           :align: center
-          :height: 300
+          :width: 300
 
           Cell image for microscope examples 
           (`Source <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__). 
@@ -741,7 +738,7 @@ One possible call could be:
    
      - .. figure:: ../../../optrace/resources/images/fruits.webp
           :align: center
-          :width: 400
+          :width: 300
         
           Photo of different fruits on a tray 
           (`Source <https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/>`__).
@@ -749,14 +746,14 @@ One possible call could be:
    
    * - .. figure:: ../../../optrace/resources/images/interior.webp
           :align: center
-          :width: 400
+          :width: 300
 
           Green sofa in an interior room (`Source <https://www.pexels.com/photo/green-2-seat-sofa-1918291/>`__).
           Usable as :obj:`ot.presets.image.interior <optrace.tracer.presets.image.interior>`
    
      - .. figure:: ../../../optrace/resources/images/landscape.webp
           :align: center
-          :width: 400
+          :width: 300
           
           Landscape image of a mountain and water scene 
           (`Source <https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/>`__).
@@ -764,7 +761,7 @@ One possible call could be:
    
    * - .. figure:: ../../../optrace/resources/images/documents.webp
           :align: center
-          :width: 400
+          :width: 300
           
           Photo of a keyboard and documents on a desk 
           (`Source <https://www.pexels.com/photo/documents-on-wooden-surface-95916/>`__).
@@ -772,7 +769,7 @@ One possible call could be:
      
      - .. figure:: ../../../optrace/resources/images/group_photo.webp
           :align: center
-          :width: 400
+          :width: 300
           
           Photo of a group of people in front of a blackboard 
           (`Source <https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/>`__).
@@ -780,7 +777,7 @@ One possible call could be:
    
    * - .. figure:: ../../../optrace/resources/images/hong_kong.webp
           :align: center
-          :width: 350
+          :width: 300
 
           Photo of a Hong Kong street at night 
           (`Source <https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/>`__).
@@ -817,14 +814,14 @@ One possible call could be:
    
      - .. figure:: ../../../optrace/resources/images/tv_testcard2.png
           :align: center
-          :width: 400
+          :width: 300
 
           TV test card #2 (`Source <https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png>`__).
           Usage with :obj:`ot.presets.image.tv_testcard2 <optrace.tracer.presets.image.tv_testcard2>`
    
    * - .. figure:: ../../../optrace/resources/images/color_checker.webp
           :align: center
-          :width: 400
+          :width: 300
 
           Color checker chart 
           (`Source <https://commons.wikimedia.org/wiki/File:X-rite_color_checker,_SahiFa_Braunschweig,_AP3Q0026_edit.jpg>`__).
@@ -832,7 +829,7 @@ One possible call could be:
      
      - .. figure:: ../../../optrace/resources/images/eye_test_vintage.webp
           :align: center
-          :width: 400
+          :width: 300
 
           Photo of a vintage eye test chart. 
           `Image Source <https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage>`__

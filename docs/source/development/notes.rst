@@ -134,3 +134,7 @@ Notes
    * a progress bar indicating the progress and estimated remaining time. Also distracts the user, lowering the subjective waiting time
 * TraceGUI actions like tracing, focussing etc. need to run in background threads, so the scene and main UI thread are responsive
 
+
+..  TODO add version tag, such as https://img.shields.io/github/v/tag/drocheam/optrace?label=version see https://shields.io/badges/git-hub-tag
+
+..  TODO add coverage info (via third party site?), lines of code, comment/docstring quality etc.

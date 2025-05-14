@@ -1,16 +1,11 @@
 # Optrace
-## Geometrical OPtics rayTRACEr and image simulation
 
-[![Python 3.10, 3.11, 3.12, 3.13](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/downloads/release/python-3127/)
-[![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)]()
-[![License MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/drocheam/optrace/blob/main/LICENSE)
-<!-- TODO add version tag, such as https://img.shields.io/github/v/tag/drocheam/optrace?label=version see https://shields.io/badges/git-hub-tag -->
+![Python 3.10, 3.11, 3.12, 3.13](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
+![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
+![License MIT](https://img.shields.io/badge/license-MIT-blue)
 
 [![Testing](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml)
-[![Documentation](https://github.com/drocheam/optrace/actions/workflows/gen_docs.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/gen_docs.yml)
-<!-- TODO link tag to documentation -->
-
-<!-- TODO add coverage info (via third party site?), lines of code, comment/docstring quality etc. -->
+[![Documentation](https://github.com/drocheam/optrace/actions/workflows/gen_docs.yml/badge.svg)](https://drocheam.github.io/optrace)
 
 <img src="./docs/source/images/example_spherical_aberration2.png" width="18.2%"></img>
 <img src="./docs/source/images/example_rgb_render4.webp" width="17%"></img>
@@ -24,11 +19,11 @@
 <img src="./docs/source/images/rgb_render_srgb1.webp" width="17%"></img>
 <img src="./docs/source/images/example_cosine_surfaces1.png" width="18.2%"></img>
 
-<!-- TODO images are clickable, redirect to example page -->
 
 ## Overview
 
-optrace is a scripting based optics simulation package, developed at the Institute for Applied Optics and Electronics 
+optrace (OPtics rayTRACEr) is a scripting based optics simulation package, developed at the 
+[Institute for Applied Optics and Electronics](https://www.th-koeln.de/informations-medien-und-elektrotechnik/institut-fuer-angewandte-optik-und-elektronik-aoe_14804.php) 
 at the TH Köln - University of Applied Science in Cologne, Germany.
 It features sequential raytracing, image rendering capabilities and a graphical user interface.
 This tool is designed with a focus on image simulation with accurate color handling, 
@@ -50,10 +45,9 @@ make it a viable tool for research applications.
   * Includes preset and user-definable surface shapes, ray sources, and media
   * An additional GUI with an interactive 3D scene viewer
   * Automation capabilities
-  * High performance of 0.11 s / surface / million rays
+  * High performance of 0.11 s / surface / million rays 
+    ([details](https://drocheam.github.io/optrace/development/testing.html#benchmark-testing))
   * Comprehensive documentation
-
-<!--  ^--- TODO add benchmarking details when documentation is online-->
 
  **Limitations**
   * Coding-free simulations are not supported
@@ -69,13 +63,15 @@ make it a viable tool for research applications.
   * Simulation of simpler systems: Prism, eye model, telescope, ...
   * Estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) is overkill for
 
-## Examples
-
-Coming soon.
-
 ## Documentation
 
-Coming soon.
+The [Documentation](https://drocheam.github.io/optrace) includes examples, usage information, technical details, 
+and an API reference.
+
+## Examples
+
+The documentation features an [Example Gallery](https://drocheam.github.io/optrace/examples.html) that covers a large
+range of applications.
 
 ## Installation
 
@@ -83,7 +79,7 @@ Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 
 **Installing the latest official release**
 
-1. Download the optrace .tar.gz archive from https://github.com/drocheam/optrace/releases/latest
+1. Download the optrace-xxxx.tar.gz archive from the [latest releases](https://github.com/drocheam/optrace/releases/latest)
 2. Open a terminal
 3. Run `pip install <path to archive>`, where `<path to archive>` is the path to the archive downloaded in the first step
 
@@ -94,12 +90,11 @@ Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 3. Change the directory into the cloned folder: `cd optrace`
 4. Install using `pip install .`
 
-
-<!-- ## Contributing-->
+More information are provided in the [Documentation](https://drocheam.github.io/optrace/installation.html).
 
 ## License
 
-This project is published under an MIT License.
+This project is published under the [MIT License](https://github.com/drocheam/optrace/blob/main/LICENSE).
 
 ## Similar software
 
@@ -110,7 +105,7 @@ This project is published under an MIT License.
    * [Optiland](https://optiland.readthedocs.io/en/latest/index.html) by Harrison Kramer. Optical design and analysis framework.
 
 - Wave Optics
-   * [diffractsim](https://github.com/rafael-fuente/diffractsim) by Rafael de la Fuente. Waveoptics simulation of arbitrary apertures and phase holograms.
+   * [diffractsim](https://github.com/rafael-fuente/diffractsim) by Rafael de la Fuente. Wave optics simulation of arbitrary apertures and phase holograms.
    * [poppy](https://github.com/spacetelescope/poppy) by Space Telescope Science Institute. Fraunhofer and Fresnel propagation for optics.
    * [prysm](https://prysm.readthedocs.io/en/stable/index.html) by Brandon Dube. Interferometer and diffraction calculations.
 

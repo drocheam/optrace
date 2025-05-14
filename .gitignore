@@ -1,22 +1,23 @@
-
-# dist files
+# dist and build files
 dist
 build
-
-# where does this folder even come from
-.idea
-
-# exclude sphinx builds for now
 docs/build
 
-# backups don't need to be included
+# backups, notes and temp files
 bak
 *.bkp
+temp.zmx
+tmp.png
+notes
 
+# python env and cache
 .python-version
+*__pycache__
+venv
 
-# testing and CI
+# development and testing
 .hypothesis
+.idea
 .coverage
 .coverage*
 .tox
@@ -29,17 +30,5 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-venv
-
-# personal notes
-notes
-
-# vim session file
 Session.vim
 
-# cache not needed
-*__pycache__
-
-# temporary files
-temp.zmx
-tmp.png
