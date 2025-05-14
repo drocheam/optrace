@@ -12,6 +12,7 @@
 │   ├── chromaticity_plots.py
 │   ├── image_plots.py
 │   ├── __init__.py
+│   ├── init.py
 │   ├── misc_plots.py
 │   └── spectrum_plots.py
 ├── progress_bar.py
@@ -30,7 +31,7 @@
 │   │   ├── hong_kong.webp
 │   │   ├── interior.webp
 │   │   ├── landscape.webp
-│   │   ├── siemens_star.webp
+│   │   ├── siemens_star.png
 │   │   ├── SOURCE.txt
 │   │   ├── tv_testcard1.png
 │   │   └── tv_testcard2.png
@@ -85,10 +86,11 @@
 │   │       └── volume.py
 │   ├── image
 │   │   ├── base_image.py
+│   │   ├── grayscale_image.py
 │   │   ├── __init__.py
-│   │   ├── linear_image.py
 │   │   ├── render_image.py
-│   │   └── rgb_image.py
+│   │   ├── rgb_image.py
+│   │   └── scalar_image.py
 │   ├── __init__.py
 │   ├── load.py
 │   ├── misc.py
@@ -113,4 +115,4 @@
 │   └── transfer_matrix_analysis.py
 └── warnings.py
 
-14 directories, 100 files
+14 directories, 102 files

@@ -141,7 +141,7 @@ linkcheck_ignore = [
     'https://doi.org/10.1167/8.2.13',
     'https://doi.org/10.1080/10867651.1997.10487479',
     'https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links',
-
+    'https://eyewiki.org/Lens_Material_Properties',
 ]
 
 linkcheck_timeout = 15

@@ -5,7 +5,7 @@
 
 /*font and header settings*/
 html {
-	/*--pst-header-height: 2rem;*/
+    --pst-header-height: 3.5rem;
     /*--pst-font-family-base-system: "Times New Roman", serif;*/
     /*--pst-font-size-base: 14px;*/
 	--pst-font-size-h1: 26px;
@@ -43,6 +43,9 @@ body {
     max-width: 20rem;
 }
 
+.search-button-field {
+    padding: 0.35rem;
+}
 
 
 /**Table Settings**/
