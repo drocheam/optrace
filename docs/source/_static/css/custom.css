@@ -44,7 +44,10 @@ body {
 }
 
 .search-button-field {
-    padding: 0.35rem;
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
 }
 
 
