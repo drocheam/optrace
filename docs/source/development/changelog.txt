@@ -1,5 +1,6 @@
  Version  |      Date      |                                 Description 
 -------------------------------------------------------------------------------------------------------------------------------------
+  1.6.10  |   2025-05-15   |  New button for online documentation in TraceGUI. Code refactoring.   
   1.6.9   |   2025-05-14   |  Improved readability and accessibility of the documentation.   
   1.6.8   |   2025-04-09   |  New GrayscaleImage class. Renamed LinearImage to ScalarImage. Colored convolution now handled correctly for both colored image and PSF.   
   1.6.7   |   2025-03-16   |  Replaced progressbar2 by tqdm progressbar.   

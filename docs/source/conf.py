@@ -41,6 +41,7 @@ extensions = [
         'sphinx.ext.mathjax',
         'sphinx.ext.doctest',
         'sphinxcontrib.bibtex',
+        'sphinx_sitemap'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,6 +70,7 @@ html_theme = "pydata_sphinx_theme"
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
 html_extra_path = ['robots.txt']
+html_baseurl = metadata["documentation"]
 
 html_theme_options = {
     "secondary_sidebar_items": ["page-toc"],  # add navigation to secondary sidebar
@@ -128,6 +130,14 @@ autoclass_content = "init"
 # move typehints from header to description
 autodoc_typehints = "description"
 
+# settings for sitemap generation
+sitemap_locales = [None]
+sitemap_url_scheme = "{link}"
+sitemap_excludes = [
+    "search.html",
+    "genindex.html",
+    "py-modindex.html",
+]
 
 # -- Misc Options -------------------------------------------------
 
