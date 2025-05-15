@@ -297,7 +297,10 @@ class GUITests(unittest.TestCase):
                 for type_ in sim.plotting_modes:
                     self._set_in_main(sim, "plotting_mode", type_)
                     self._wait_for_idle(sim)
-              
+             
+                # open documentation
+                self._do_in_main(sim.open_documentation)
+
                 # retrace Tests
                 self._set_in_main(sim, "ray_count", 100000)
                 self._wait_for_idle(sim)
@@ -813,7 +816,7 @@ class GUITests(unittest.TestCase):
         sim = TraceGUI(RT)
 
         def send(cmd):
-            sim.command_window._cmd = cmd
+            sim.command_window.cmd = cmd
             self._do_in_main(sim.command_window.send_command)
             self._wait_for_idle(sim)
 
@@ -871,7 +874,7 @@ class GUITests(unittest.TestCase):
 
                 # Misc tests
 
-                sim.command_window.replot()  # replot button
+                sim.command_window._replot()  # replot button
                 self._wait_for_idle(sim)
 
                 self._do_in_main(sim.open_command_window)
@@ -884,12 +887,12 @@ class GUITests(unittest.TestCase):
                 send("throw RuntimeError()")  # check if exceptions are handled
 
                 # send empty command using command window
-                sim.command_window._cmd = ""
+                sim.command_window.cmd = ""
                 self._do_in_main(sim.command_window.send_command)
                 self._wait_for_idle(sim)
 
                 # send actual command using command window
-                sim.command_window._cmd = "self.replot()"
+                sim.command_window.cmd = "self.replot()"
                 self._do_in_main(sim.command_window.send_command)
                 self._wait_for_idle(sim)
 
@@ -904,7 +907,7 @@ class GUITests(unittest.TestCase):
                 # clear history
                 self._do_in_main(sim.command_window.clear_history)
                 self._wait_for_idle(sim)
-                self.assertEqual(sim.command_window._history, [])
+                self.assertEqual(sim.command_window.history, [])
 
                 # check if setting and getting clipboard works globally
                 clipboard = QtGui.QApplication.clipboard()
@@ -922,10 +925,10 @@ class GUITests(unittest.TestCase):
                     self.assertEqual(clipboard.text(), "")
                    
                 # check if full history is copied
-                sim.command_window._cmd = "self.replot()"
+                sim.command_window.cmd = "self.replot()"
                 self._do_in_main(sim.command_window.send_command)
                 self._wait_for_idle(sim)
-                sim.command_window._cmd = "a=5"
+                sim.command_window.cmd = "a=5"
                 self._do_in_main(sim.command_window.send_command)
                 self._wait_for_idle(sim)
                 self._do_in_main(sim.command_window.copy_history)

@@ -68,6 +68,7 @@ html_theme = "pydata_sphinx_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
+html_extra_path = ['robots.txt']
 
 html_theme_options = {
     "secondary_sidebar_items": ["page-toc"],  # add navigation to secondary sidebar
@@ -150,7 +151,8 @@ linkcheck_ignore = [
 ]
 
 linkcheck_timeout = 15
-linkcheck_workers = 10
+linkcheck_workers = 3
+linkcheck_rate_limit_timeout = 15
 
 # only check doctest blocks
 doctest_test_doctest_blocks = ""

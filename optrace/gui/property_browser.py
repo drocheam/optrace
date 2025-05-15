@@ -14,61 +14,61 @@ from ..tracer import presets as otp
 
 class PropertyBrowser(HasTraits):
 
-    update_button: Button = Button(label="Update", desc="updates the browser")
+    _update_button: Button = Button(label="Update", desc="updates the browser")
 
-    unit_label:   Str = Str("Distances in mm, optical powers in dpt")
-    legend_title: Str = Str("Legend")
+    _unit_label:   Str = Str("Distances in mm, optical powers in dpt")
+    _legend_title: Str = Str("Legend")
 
-    ray_legend: Str = Str("p:      position                      s:    unity direction vector           "
-                          "s_un:  direction vector\n"
-                          "l:      ray length to next point      ol:   optical length to next point     "
-                          "pol:   polarization unity vector\n"
-                          "w:      power                         wv:   wavelength                       "
-                          "snum:  source number\n"
-                          "index:  ray index                     n:    ambient refractive index")
+    _ray_legend: Str = Str("p:      position                      s:    unity direction vector           "
+                           "s_un:   direction vector\n"
+                           "l:      ray length to next point      ol:   optical length to next point     "
+                           "pol:    polarization unity vector\n"
+                           "w:      power                         wv:   wavelength                       "
+                           "snum:   source number\n"
+                           "index:  ray index                     n:    ambient refractive index")
 
-    tma_legend: Str = Str("abcd:  ABCD Matrix                bfl:  back focal length       d:  thickness\n"
-                          "efl:   effective focal length     ffl:  front focal length\n"
-                          "n1:    index before setup         n2:   index after setup")
+    _tma_legend: Str = Str("abcd:  ABCD Matrix                bfl:  back focal length       d:  thickness\n"
+                           "efl:   effective focal length     ffl:  front focal length\n"
+                           "n1:    index before setup         n2:   index after setup")
 
 
-    scene_dict:     Dict = Dict()
-    trace_gui_dict: Dict = Dict()
-    raytracer_dict: Dict = Dict()
-    ray_dict:       Dict = Dict()
-    card_dict:      Dict = Dict()
-    preset_dict:    Dict = Dict()
+    _scene_dict:     Dict = Dict()
+    _trace_gui_dict: Dict = Dict()
+    _raytracer_dict: Dict = Dict()
+    _ray_dict:       Dict = Dict()
+    _card_dict:      Dict = Dict()
+    _preset_dict:    Dict = Dict()
 
     view = View(
-                Item('update_button', label=" Update Dictionaries"),
+                Item('_update_button', label=" Update Dictionaries"),
                 Group(
                     Group(
-                        Item('ray_dict', editor=ValueEditor(), show_label=False),
-                        Item("legend_title", show_label=False, style="readonly", emphasized=True),
-                        Item("ray_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
+                        Item('_ray_dict', editor=ValueEditor(), show_label=False),
+                        Item("_legend_title", show_label=False, style="readonly", emphasized=True),
+                        Item("_ray_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
                         label="Shown Rays",
                     ),
                     Group(
-                        Item("unit_label", show_label=False, style="readonly"),
-                        Item('card_dict', editor=ValueEditor(), show_label=False),
-                        Item("legend_title", show_label=False, style="readonly", emphasized=True),
-                        Item("tma_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
+                        Item("_unit_label", show_label=False, style="readonly"),
+                        Item('_card_dict', editor=ValueEditor(), show_label=False),
+                        Item("_legend_title", show_label=False, style="readonly", emphasized=True),
+                        Item("_tma_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
                         label="Cardinal Points",
                     ),
                     Group(
-                        Item('raytracer_dict', editor=ValueEditor(), show_label=False),
+                        Item('_raytracer_dict', editor=ValueEditor(), show_label=False),
                         label="Raytracer",
                     ),
                     Group(
-                        Item('preset_dict', editor=ValueEditor(), show_label=False),
+                        Item('_preset_dict', editor=ValueEditor(), show_label=False),
                         label="Presets",
                     ),
                     Group(
-                        Item('trace_gui_dict', editor=ValueEditor(), show_label=False),
+                        Item('_trace_gui_dict', editor=ValueEditor(), show_label=False),
                         label="TraceGUI",
                     ),
                     Group(
-                        Item('scene_dict', editor=ValueEditor(), show_label=False),
+                        Item('_scene_dict', editor=ValueEditor(), show_label=False),
                         label="TraceGUI.scene",
                     ),
                     layout="tabbed",
@@ -90,19 +90,19 @@ class PropertyBrowser(HasTraits):
 
         super().__init__()
 
-    @observe('update_button')
+    @observe('_update_button')
     def update_dict(self, event: TraitChangeEvent = None) -> None:
         """
         Update the dictionaries in all ValueEditor()
 
         :param event: optional trait change event
         """
-        self.raytracer_dict = self._gen_dict_repr(self.raytracer.__dict__)
-        self.ray_dict = self._gen_dict_repr(self.gui._plot._ray_property_dict)
-        self.scene_dict = self._gen_dict_repr(self.scene.trait_get())
-        self.trace_gui_dict = self._gen_dict_repr(self.gui.trait_get())
-        self.card_dict = self._gen_dict_repr(self._gen_cardinals())
-        self.preset_dict = self._gen_dict_repr(self._gen_pdict())
+        self._raytracer_dict = self._gen_dict_repr(self.raytracer.__dict__)
+        self._ray_dict = self._gen_dict_repr(self.gui._plot._ray_property_dict)
+        self._scene_dict = self._gen_dict_repr(self.scene.trait_get())
+        self._trace_gui_dict = self._gen_dict_repr(self.gui.trait_get())
+        self._card_dict = self._gen_dict_repr(self._gen_cardinals())
+        self._preset_dict = self._gen_dict_repr(self._gen_pdict())
 
     def _gen_dict_repr(self, val: Any) -> dict:
         """generate a dictionary containing representable elements for ValueEditor()"""

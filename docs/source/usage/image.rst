@@ -730,7 +730,7 @@ One possible call could be:
 
    * - .. figure:: ../../../optrace/resources/images/cell.webp
           :align: center
-          :width: 300
+          :width: 230
 
           Cell image for microscope examples 
           (`Source <https://lexica.art/prompt/960d8351-f474-4cc0-b84b-4e9521754064>`__). 
@@ -746,7 +746,7 @@ One possible call could be:
    
    * - .. figure:: ../../../optrace/resources/images/interior.webp
           :align: center
-          :width: 300
+          :width: 340
 
           Green sofa in an interior room (`Source <https://www.pexels.com/photo/green-2-seat-sofa-1918291/>`__).
           Usable as :obj:`ot.presets.image.interior <optrace.tracer.presets.image.interior>`
@@ -814,7 +814,7 @@ One possible call could be:
    
      - .. figure:: ../../../optrace/resources/images/tv_testcard2.png
           :align: center
-          :width: 300
+          :width: 350
 
           TV test card #2 (`Source <https://commons.wikimedia.org/wiki/File:Bulgarian_colour_testcard.png>`__).
           Usage with :obj:`ot.presets.image.tv_testcard2 <optrace.tracer.presets.image.tv_testcard2>`
@@ -831,15 +831,15 @@ One possible call could be:
           :align: center
           :width: 300
 
-          Photo of a vintage eye test chart. 
-          `Image Source <https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage>`__
+          Photo of a vintage eye test chart
+          (`Source <https://www.publicdomainpictures.net/en/view-image.php?image=284944&picture=eye-test-chart-vintage>`__).
           Usage with :obj:`ot.presets.image.eye_test_vintage <optrace.tracer.presets.image.eye_test_vintage>`.
 
    * - .. figure:: ../images/grid.png
           :align: center
           :width: 300
           
-          White grid on black background with 10x10 cells. Useful for distortion characterization.
+          White grid on black background with 10x10 cells. Useful for distortion characterization. Own creation.
           Usage with :obj:`ot.presets.image.grid <optrace.tracer.presets.image.grid>`
 
      - .. figure:: ../../../optrace/resources/images/siemens_star.png

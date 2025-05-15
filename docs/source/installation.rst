@@ -30,6 +30,8 @@ Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 #. Install using :bash:`pip install .`
 
 
+.. TODO note about limitation with PyPi
+
 **External dependencies**
 
 Below you can find a list of external dependencies that will be automatically installed. 

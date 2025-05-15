@@ -175,8 +175,11 @@ class TraceGUI(HasTraits):
     _custom_checkbox_2_visible: Bool = Bool(False)
     _custom_checkbox_3_visible: Bool = Bool(False)
     custom_checkbox_1: List = List(editor=CheckListEditor(values=["Custom Checkbox 1"], format_func=lambda x: x),)
+    """First assigned checkbox for custom UI elements"""
     custom_checkbox_2: List = List(editor=CheckListEditor(values=["Custom Checkbox 2"], format_func=lambda x: x),)
+    """Second assigned checkbox for custom UI elements"""
     custom_checkbox_3: List = List(editor=CheckListEditor(values=["Custom Checkbox 3"], format_func=lambda x: x),)
+    """Third assigned checkbox for custom UI elements"""
   
     # custom buttons
     _custom_button_1_visible: Bool = Bool(False)
@@ -200,8 +203,11 @@ class TraceGUI(HasTraits):
     _custom_selection_2_name: String = String("Custom Selection 2")
     _custom_selection_3_name: String = String("Custom Selection 3")
     custom_selection_1: Enum = Enum(values='_custom_selection_1')
+    """First assigned selection option for custom UI elements"""
     custom_selection_2: Enum = Enum(values='_custom_selection_2')
+    """Second assigned selection option for custom UI elements"""
     custom_selection_3: Enum = Enum(values='_custom_selection_3')
+    """Third assigned selection option for custom UI elements"""
     
     # custom values
     _custom_value_1_visible: Bool = Bool(False)
@@ -211,11 +217,15 @@ class TraceGUI(HasTraits):
     _custom_value_2_name: String = String("Custom Value 2")
     _custom_value_3_name: String = String("Custom Value 3")
     custom_value_1: Float = Float(0, enter_set=False, auto_set=False, label="Custom Value 1", mode='text')
+    """First assigned value field for custom UI elements"""
     custom_value_2: Float = Float(0, enter_set=False, auto_set=False, label="Custom Value 2", mode='text')
+    """Second assigned value field for custom UI elements"""
     custom_value_3: Float = Float(0, enter_set=False, auto_set=False, label="Custom Value 3", mode='text')
+    """Third assigned value field for custom UI elements"""
 
     # Buttons
 
+    _help_button:                Button = Button(label="Online Documentation", desc="Opens the documentation")
     _detector_image_button:      Button = Button(label="Detector Image", desc="Generating a Detector Image")
     _property_browser_button:    Button = Button(label="Open Property Browser", desc="property browser is opened")
     _command_window_button:      Button = Button(label="Open Command Window", desc="command window is opened")
@@ -273,26 +283,27 @@ class TraceGUI(HasTraits):
                             _separator,
                             Item("_trace_label", style='readonly', show_label=False, emphasized=True),
                             Item('ray_count'),
-                            _separator, _separator,
+                            _separator, 
                             Item("_plotting_label", style='readonly', show_label=False, emphasized=True),
                             Item("plotting_mode", label='Plotting'),
                             Item("coloring_mode", label='Coloring'),
-                            _separator, _separator,
+                            _separator, 
                             Item("_ray_visual_label", style='readonly', show_label=False, emphasized=True),
                             Item('rays_visible'),
                             Item('ray_opacity'),
                             Item('ray_width'),
-                            _separator, _separator,
+                            _separator,
                             Item("_ui_visual_label", style='readonly', show_label=False, emphasized=True),
                             Item('minimalistic_view', style="custom", show_label=False),
                             Item('maximize_scene', style="custom", show_label=False),
                             Item('high_contrast', style="custom", show_label=False),
                             Item('vertical_labels', style="custom", show_label=False),
                             Item('hide_labels', style="custom", show_label=False),
-                            _separator, _separator,
+                            _separator, _separator, 
                             Item("_property_label", style='readonly', show_label=False, emphasized=True),
                             Item('_property_browser_button', show_label=False, emphasized=True),
                             Item('_command_window_button', show_label=False, emphasized=True),
+                            Item('_help_button', show_label=False, emphasized=True),
                             _separator,
                             label="Main"
                             ),
@@ -1714,6 +1725,15 @@ class TraceGUI(HasTraits):
         bgcolor = "#aaa" if global_options.ui_dark_mode else "white"
         self._command_window_view.control.window().\
                 setStyleSheet(f"QAbstractScrollArea{{font-family: monospace; background-color: {bgcolor}; color: black}}")
+    
+    @observe('_help_button', dispatch="ui")
+    def open_documentation(self, event: TraitChangeEvent = None) -> None:
+        """
+        Open the online documentation `<https://drocheam.github.io/optrace>`_ in a browser
+
+        :param event: optional trait change event
+        """
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(metadata.documentation))
 
     @observe('_property_browser_button', dispatch="ui")
     def open_property_browser(self, event: TraitChangeEvent = None) -> None:

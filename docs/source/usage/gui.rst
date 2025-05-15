@@ -205,7 +205,7 @@ The UI elements will be discussed in the following sections.
 
    * - .. figure:: ../images/ui_main_tab.png
           :align: center
-          :width: 250
+          :width: 255
           :class: dark-light
 
      - .. figure:: ../images/ui_image_tab.png
@@ -335,6 +335,10 @@ Main Tab
      - :meth:`open_command_window() <optrace.gui.trace_gui.TraceGUI.open_command_window>`
      -
      - opens the command window
+   * - Online Documentation
+     - :meth:`open_documentation() <optrace.gui.trace_gui.TraceGUI.open_documentation>`
+     -
+     - opens the online documentation in a web browser
 
 Image Tab
 #######################

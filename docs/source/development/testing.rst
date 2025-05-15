@@ -196,7 +196,7 @@ Tox configuration in `tox.toml <https://github.com/drocheam/optrace/blob/main/to
 ___________________________________________________________________________________________
 
 .. literalinclude:: ../../../tox.toml
-   :language: ini
+   :language: toml
 
 **Notes**
 

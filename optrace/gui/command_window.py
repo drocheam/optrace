@@ -11,8 +11,8 @@ from ..warnings import warning
 
 class CommandWindow(HasTraits):
 
-    _cmd:                 Str = Str()
-    _history:             List = List()
+    cmd:                 Str = Str()  #: command to run
+    history:             List = List()  #: command history
 
     _execute_label:       Str = Str('Command:')
     _history_label:       Str = Str('History:')
@@ -27,6 +27,7 @@ class CommandWindow(HasTraits):
     automatic_replot: List = List(editor=CheckListEditor(values=['Replot and retrace automatically'], 
                                                          format_func=lambda x: x),
                                    desc="if the scene is automatically reploted and traced on changes")
+    """Option for automatic replotting/recalculating the geometry after running the command"""
 
     # code_editor = 
     view = View(
@@ -34,12 +35,12 @@ class CommandWindow(HasTraits):
                     Group(
                         Group(
                             Item("_execute_label", style='readonly', show_label=False, emphasized=True),
-                            Item('_cmd', editor=CodeEditor(), show_label=False, style="custom"),
+                            Item('cmd', editor=CodeEditor(), show_label=False, style="custom"),
                             ),
                         Item("_whitespace_label", style='readonly', show_label=False, width=563),
                         Group(
                             Item("_history_label", style='readonly', show_label=False, emphasized=True),
-                            Item("_history", editor=ListStrEditor(horizontal_lines=True), show_label=False, height=220),
+                            Item("history", editor=ListStrEditor(horizontal_lines=True), show_label=False, height=220),
                             ),
                         ),
                     Group(
@@ -87,7 +88,7 @@ class CommandWindow(HasTraits):
         clear command history
         :param event: optional trait change event
         """
-        self._history = []
+        self.history = []
     
     @observe('_clipboard_button', dispatch="ui")
     def copy_history(self, event: TraitChangeEvent = None) -> None:
@@ -96,7 +97,7 @@ class CommandWindow(HasTraits):
         :param event: optional trait change event
         """
         output = ""
-        for el in self._history:
+        for el in self.history:
             output += el + "\n"
 
         clipboard = QtGui.QApplication.clipboard()
@@ -108,7 +109,7 @@ class CommandWindow(HasTraits):
             warning("Copying to clipboard failed. This can be an library or system issue.\n")  # pragma: no cover
     
     @observe('_replot_button', dispatch="ui")
-    def replot(self, event: TraitChangeEvent = None) -> None:
+    def _replot(self, event: TraitChangeEvent = None) -> None:
         """
         Replots the TraceGUI
 
@@ -119,14 +120,14 @@ class CommandWindow(HasTraits):
     @observe('_run_button', dispatch="ui")
     def send_command(self, event: TraitChangeEvent = None) -> None:
         """
-        Execute a command in the TraceGUI
+        Execute the entered command in the TraceGUI
 
         :param event: optional trait change event
         """
-        if self._cmd:
-            self.gui.run_command(self._cmd)
+        if self.cmd:
+            self.gui.run_command(self.cmd)
 
             # add to history if something happened and if the command differs from the last one
-            if not self._history or self._cmd != self._history[-1]:
-                self._history = self._history + [self._cmd]
+            if not self.history or self.cmd != self.history[-1]:
+                self.history = self.history + [self.cmd]
 

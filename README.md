@@ -79,7 +79,7 @@ Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 
 **Installing the latest official release**
 
-1. Download the optrace-xxxx.tar.gz archive from the [latest releases](https://github.com/drocheam/optrace/releases/latest)
+1. Download the optrace-xxxx.tar.gz archive from the [latest release](https://github.com/drocheam/optrace/releases/latest)
 2. Open a terminal
 3. Run `pip install <path to archive>`, where `<path to archive>` is the path to the archive downloaded in the first step
 

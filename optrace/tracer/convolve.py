@@ -14,28 +14,28 @@ from .. import global_options
 from ..warnings import warning
 
 
-class ConvShapes:
+class _ConvShapes:
         
-    iN:  np.ndarray  # image pixel counts
-    ip:  np.ndarray  # image pixel size
-    is_: np.ndarray  # image side lengths after m scaling
+    iN:  np.ndarray  #: image pixel counts
+    ip:  np.ndarray  #: image pixel size
+    is_: np.ndarray  #: image side lengths after m scaling
 
-    ipad: np.ndarray  # image padding count
-    i2N:  np.ndarray  # padded image pixel count
-    i3N:  np.ndarray  # double padded image pixel count
-    i4N:  np.ndarray  # result image pixel count
-    i4s:  np.ndarray  # result image side lengths
-    i4e:  np.ndarray  # result image extent
+    ipad: np.ndarray  #: image padding count
+    i2N:  np.ndarray  #: padded image pixel count
+    i3N:  np.ndarray  #: double padded image pixel count
+    i4N:  np.ndarray  #: result image pixel count
+    i4s:  np.ndarray  #: result image side lengths
+    i4e:  np.ndarray  #: result image extent
 
-    pN:  np.ndarray  # psf pixel counts
-    pp:  np.ndarray  # psf pixel sizes
-    ps_: np.ndarray  # psf side lengths
+    pN:  np.ndarray  #: psf pixel counts
+    pp:  np.ndarray  #: psf pixel sizes
+    ps_: np.ndarray  #: psf side lengths
 
-    ppad: np.ndarray  # psf padding pixel count
-    p2N:  np.ndarray  # pixel count of rescaled psf
-    p3N:  np.ndarray  # pixel count of padded and rescaled psf
+    ppad: np.ndarray  #: psf padding pixel count
+    p2N:  np.ndarray  #: pixel count of rescaled psf
+    p3N:  np.ndarray  #: pixel count of padded and rescaled psf
 
-class ConvFlags:
+class _ConvFlags:
 
     custom_padding: bool
     make_grayscale: bool
@@ -110,7 +110,7 @@ def convolve(img:                RGBImage | GrayscaleImage,
     pc.check_type("keep_size", keep_size, bool)
     
     # important flags
-    flags = ConvFlags()
+    flags = _ConvFlags()
     flags.keep_size = keep_size
     flags.img_color = isinstance(img, RGBImage)
     flags.make_linear = isinstance(psf, GrayscaleImage) and isinstance(img, GrayscaleImage)
@@ -157,7 +157,7 @@ def convolve(img:                RGBImage | GrayscaleImage,
 def _check_and_load_image(img:              GrayscaleImage | RGBImage,
                           padding_mode:     str,
                           padding_value:    float | list[float],
-                          flags:            ConvFlags)\
+                          flags:            _ConvFlags)\
         -> tuple[np.ndarray, np.ndarray]:
     """
     Loads the image, checks its type and for a correct padding_value.
@@ -199,7 +199,7 @@ def _check_and_load_image(img:              GrayscaleImage | RGBImage,
     return img_lin, pval_lin
 
 
-def _check_and_load_psf(psf: GrayscaleImage | RenderImage | list[RenderImage], flags: ConvFlags)\
+def _check_and_load_psf(psf: GrayscaleImage | RenderImage | list[RenderImage], flags: _ConvFlags)\
         -> tuple[list[np.ndarray], list[GrayscaleImage | RenderImage]]:
     """
     Load the PSFs.
@@ -245,11 +245,11 @@ def _check_and_load_psf(psf: GrayscaleImage | RenderImage | list[RenderImage], f
     return psf_lins, psfs
 
 
-def _check_and_calculate_sizes(img:     RGBImage | GrayscaleImage, 
-                               psfs:    list[RenderImage | GrayscaleImage], 
-                               flags:   ConvFlags, 
+def _check_and_calculate_sizes(img:     RGBImage | GrayscaleImage,
+                               psfs:    list[RenderImage | GrayscaleImage],
+                               flags:   _ConvFlags,
                                m:       float)\
-        -> ConvShapes:
+        -> _ConvShapes:
     """Calculate image and psf shapes, sizes, extents for initial, processed and result images."""
     # grid coordinates:
     # image with side coordinates -5, 0, 5 has n = three pixels,
@@ -258,7 +258,7 @@ def _check_and_calculate_sizes(img:     RGBImage | GrayscaleImage,
     # the pixel size p is therefore s/(n-1)
     # from a known pixel size the length s is then (n-1)*p
 
-    s = ConvShapes()
+    s = _ConvShapes()
 
     # image and psf properties
     s.iN = np.array(np.flip(img.shape[:2]))  # image pixel count
@@ -331,9 +331,9 @@ def _check_and_calculate_sizes(img:     RGBImage | GrayscaleImage,
 
 
 def _flip_and_pad_image(img_lin:         np.ndarray,
-                        s:               ConvShapes,
+                        s:               _ConvShapes,
                         m:               float,
-                        flags:           ConvFlags,
+                        flags:           _ConvFlags,
                         padding_mode:    str,
                         pval_lin:        float | np.ndarray)\
         -> np.ndarray:
@@ -361,7 +361,7 @@ def _flip_and_pad_image(img_lin:         np.ndarray,
     return imgp
 
 
-def _rescale_and_pad_psf(psf_lins: list[np.ndarray], s: ConvShapes) -> list[np.ndarray]:
+def _rescale_and_pad_psf(psf_lins: list[np.ndarray], s: _ConvShapes) -> list[np.ndarray]:
     """Rescale and pad PSFs to allow for a direct convolution."""
     
     psf2s = []
@@ -381,7 +381,7 @@ def _rescale_and_pad_psf(psf_lins: list[np.ndarray], s: ConvShapes) -> list[np.n
     return psf2s
 
 
-def _convolve_each(img_lin: list[np.ndarray], psf_lins: list[np.ndarray], s: ConvShapes, flags: ConvFlags)\
+def _convolve_each(img_lin: list[np.ndarray], psf_lins: list[np.ndarray], s: _ConvShapes, flags: _ConvFlags)\
         -> np.ndarray:
     """Convolve image and PSFs."""
 
@@ -427,7 +427,7 @@ def _convolve_each(img_lin: list[np.ndarray], psf_lins: list[np.ndarray], s: Con
     return img2
 
 
-def _slice_and_convert_output_image(img2: np.ndarray, cargs: dict, s: ConvShapes, flags: ConvFlags) -> np.ndarray:
+def _slice_and_convert_output_image(img2: np.ndarray, cargs: dict, s: _ConvShapes, flags: _ConvFlags) -> np.ndarray:
     """Apply slicing and color conversions back to sRGB color space."""
 
     # remove additional padding for custom padding modes
