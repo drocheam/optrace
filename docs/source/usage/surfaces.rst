@@ -288,7 +288,8 @@ For :python:`deriv_func` it is :python:`deriv_args`.
        dr[r == 0] = 0
        return dr
 
-   func = ot.FunctionSurface1D(r=3, func=axicon, func_args=dict(a=-0.3), deriv_func=axicon_deriv, deriv_args=dict(a=-0.3))
+   func = ot.FunctionSurface1D(r=3, func=axicon, func_args=dict(a=-0.3), 
+                               deriv_func=axicon_deriv, deriv_args=dict(a=-0.3))
 
 
 **z-Range**
@@ -328,7 +329,8 @@ To define a half circular aperture with radius :math:`r=0.1`, one can write:
    def mask(x, y, r):
        return (x > 0) | (x**2 + y**2 > r**2)
 
-   func = ot.FunctionSurface2D(r=3, func=lambda x, y: np.zeros_like(x), mask_func=mask, mask_args=dict(r=0.1))
+   func = ot.FunctionSurface2D(r=3, func=lambda x, y: np.zeros_like(x), 
+                               mask_func=mask, mask_args=dict(r=0.1))
 
 
 In this case, the :python:`func`-parameter is just a plane. 

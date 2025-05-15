@@ -7,18 +7,7 @@
 [![Testing](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml)
 [![Documentation](https://github.com/drocheam/optrace/actions/workflows/gen_docs.yml/badge.svg)](https://drocheam.github.io/optrace)
 
-<img src="./docs/source/images/example_spherical_aberration2.png" width="18.2%"></img>
-<img src="./docs/source/images/example_rgb_render4.webp" width="17%"></img>
-<img src="./docs/source/images/example_legrand2.png" width="18.2%"></img>
-<img src="./docs/source/images/example_keratoconus_4.webp" width="17%"></img>
-<img src="./docs/source/images/example_brewster.png" width="18.2%"></img>
-   
-<img src="./docs/source/images/example_gui_automation_1.png" width="18.2%"></img>
-<img src="./docs/source/images/LED_illuminants.svg" width="17%"></img>
-<img src="./docs/source/images/example_double_gauss_2.png" width="18.2%"></img>
-<img src="./docs/source/images/rgb_render_srgb1.webp" width="17%"></img>
-<img src="./docs/source/images/example_cosine_surfaces1.png" width="18.2%"></img>
-
+<img src="./docs/source/images/header.webp" width="95%"></img>
 
 ## Overview
 

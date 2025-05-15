@@ -85,6 +85,7 @@ html_theme_options = {
                     "icon": "fas fa-box",
                     "logo": "",
                     "type": "fontawesome",},],
+    "pygments_light_style": "tango",
     "pygments_dark_style": "lightbulb",
     "back_to_top_button": False,
 }

@@ -7,7 +7,8 @@
 # make sure the optrace library is installed in your system
 
 # first we import the optrace package, as well as the gui
-# gui and tracer are seperated so we don't have the overhead of always loading all multiple external libraries
+# gui and tracer are seperated so we don't have the overhead of
+# always loading all multiple external libraries
 import optrace as ot
 from optrace.gui import TraceGUI
 
@@ -18,8 +19,9 @@ from optrace.gui import TraceGUI
 RT = ot.Raytracer(outline=[-10, 10, -10, 10, -25, 40])
 
 # all elements in the geometry (sources, lenses, detectors, ...) consist of Surfaces
-# a Surface object describes a specific height behaviour depending on 2D x,y-coordinates relative to the surface center
-# for the raysource we define a circle surface, which is perpendicular to the z-axis with a radius of 1
+# a Surface object describes a specific height behaviour depending on 2D x,y-coordinates relative 
+# to the surface center for the raysource we define a circle surface, which is perpendicular
+# to the z-axis with a radius of 1
 RSS0 = ot.CircularSurface(r=1)
 
 # a raysource creates the rays for raytracing, it consists of a surface, a ray divergence behaviour, 
@@ -54,8 +56,8 @@ back = ot.SphericalSurface(r=5, R=-15)
 # the creation of the lens requires both surfaces, as well as a position and a refractive index
 # there multiple ways to define the overall lens thickness, or rather the distance between both surfaces
 # in our case we provide de, which is a thickness extension between front and back surface
-# this means there is a spacing of de=0.2mm between the end of the front surface and the start of the back surface
-# the lens position defined by parameter pos is then exactly in the center of these 0.2mm
+# this means there is a spacing of de=0.2mm between the end of the front surface and the start 
+# of the back surface the lens position defined by parameter pos is then exactly in the center of these 0.2mm
 L = ot.Lens(front, back, de=0.2, pos=[0, 0, 0], n=n)
 RT.add(L)
 

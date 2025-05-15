@@ -7,13 +7,13 @@
 html {
     --pst-header-height: 3.5rem;
     /*--pst-font-family-base-system: "Times New Roman", serif;*/
-    /*--pst-font-size-base: 14px;*/
-	--pst-font-size-h1: 26px;
-	--pst-font-size-h2: 24px;
-	--pst-font-size-h3: 22px;
-	--pst-font-size-h4: 20px;
-	--pst-font-size-h5: 18px;
-	--pst-font-size-h6: 17px;
+    /*--pst-font-size-base: 16px;*/
+	--pst-font-size-h1: 25px;
+	--pst-font-size-h2: 23px;
+	--pst-font-size-h3: 21px;
+	--pst-font-size-h4: 19px;
+	--pst-font-size-h5: 17px;
+	--pst-font-size-h6: 16px;
 }
 
 /*lower the line height*/
@@ -43,6 +43,7 @@ body {
     max-width: 20rem;
 }
 
+/*Decrease padding of search field*/
 .search-button-field {
     padding-top: 0.35rem;
     padding-bottom: 0.35rem;
@@ -50,6 +51,23 @@ body {
     padding-right: 0.8rem;
 }
 
+/*word wrapping for code blocks*/
+pre {
+    white-space: pre-wrap;
+    word-break: normal;
+    overflow-wrap: anywhere
+}
+
+/*class for deactivating wrapping*/
+.prenowrap pre {
+    white-space: pre;
+    word-break: unset;
+}
+
+/*fix line number coloring in code blocks*/
+html[data-theme="dark"] .highlight span.linenos{
+    color: var(--pst-teal-400)
+}
 
 /**Table Settings**/
 /*******************************************************************/
@@ -97,13 +115,13 @@ div.math mjx-container {
     padding-top: 0.2rem;
 }
 
-/*fix for reference links as superscript*/
-/*a.footnote-reference, a::before, a::after {*/
-    /*vertical-align: unset;*/
-    /*font-size: unset;*/
-    /*font-family: unset;*/
-    /*margin-right: unset;*/
-/*}*/
+/*don't show reference links as superscript*/
+a.footnote-reference, a::before, a::after {
+    vertical-align: unset;
+    font-size: unset;
+    font-family: unset;
+    margin-right: unset;
+}
 
 /*[>fix for badly displayed reference link part 2<]*/
 /*a::after {*/

@@ -127,13 +127,16 @@ The below snippet generates a geometry with multiple sources and detectors.
 
     # add Raysources
     RSS = ot.CircularSurface(r=1)
-    RS = ot.RaySource(RSS, divergence="None", spectrum=ot.presets.light_spectrum.FDC,
+    RS = ot.RaySource(RSS, divergence="None", 
+                      spectrum=ot.presets.light_spectrum.FDC,
                       pos=[0, 0, 0], s=[0, 0, 1], polarization="y")
     RT.add(RS)
 
     RSS2 = ot.CircularSurface(r=1)
-    RS2 = ot.RaySource(RSS2, divergence="None", s=[0, 0, 1], spectrum=ot.presets.light_spectrum.d65,
-                       pos=[0, 1, -3], polarization="Constant", pol_angle=25, power=2)
+    RS2 = ot.RaySource(RSS2, divergence="None", s=[0, 0, 1], 
+                       spectrum=ot.presets.light_spectrum.d65,
+                       pos=[0, 1, -3], polarization="Constant", 
+                       pol_angle=25, power=2)
     RT.add(RS2)
 
     # add Lens 1
@@ -200,8 +203,8 @@ as for :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`.
 
 .. testcode::
 
-   dimg = RT.detector_image(detector_index=0, source_index=1, extent=[0, 1, 0, 1], limit=3,
-                            projection_method="Orthographic")
+   dimg = RT.detector_image(detector_index=0, source_index=1, extent=[0, 1, 0, 1], 
+                            limit=3, projection_method="Orthographic")
 
 
 .. _rimage_iterative_render:
@@ -243,9 +246,13 @@ Exemplary calls:
 
 .. testcode::
 
-   rimg_list = RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1) 
-   rimg_list = RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 0], 
-                                   limit=[None, 2], extent=[None, [-2, 2, -2, 2]]) 
+   rimg_list = RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1)
+
+.. testcode::
+
+   rimg_list = RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], 
+                                   detector_index=[0, 0], limit=[None, 2], 
+                                   extent=[None, [-2, 2, -2, 2]]) 
 
 
 **Tips for Faster Rendering**

@@ -16,7 +16,7 @@ Below you can find its code with detailed comments.
 **Content of** `examples/spherical_aberration.py <https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py>`_:
 
 .. literalinclude:: ../../examples/spherical_aberration.py
-
+   :linenos:
 
 **Screenshots**
 

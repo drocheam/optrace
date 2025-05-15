@@ -167,7 +167,8 @@ The result is an |RGBImage|.
     psf = RT.detector_image()
 
     # convolve
-    img_gray = ot.Grayscale(...)  # spatial distribution emitting "my_spectrum" defined above
+    img_gray = ot.Grayscale(...)  
+    # ^-- spatial distribution emitting "my_spectrum" defined above
     img2 = ot.convolve(img_gray, psf, ...)
 
 **Colored Image and colored PSF**

@@ -58,4 +58,5 @@ The Sphinx configuration can be found below.
 **Content of** `docs/source/conf.py <https://github.com/drocheam/optrace/blob/main/docs/source/conf.py>`_
 
 .. literalinclude:: ../conf.py
+   :linenos:
 

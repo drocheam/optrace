@@ -83,8 +83,9 @@ The :python:`initial_camera` parameter sets an initial camera view.
 
 .. testcode::
 
-   sim = TraceGUI(RT, high_contrast=True, ray_count=2000000,\
-                  initial_camera=dict(center=[-50, -50, 0], direction=[-1, -1, -1], height=150, roll=-120))
+   sim = TraceGUI(RT, high_contrast=True, ray_count=2000000, 
+                  initial_camera=dict(center=[-50, -50, 0], 
+                  direction=[-1, -1, -1], height=150, roll=-120))
 
 These properties are directly passed to the :meth:`TraceGUI.set_camera <optrace.gui.trace_gui.TraceGUI.set_camera>` function.
 You can read more about the camera settings in :numref:`gui_camera`.
@@ -568,8 +569,10 @@ The following examples creates a custom button, checkbox, selection and value:
    sim = TraceGUI(RT)
    
    # add UI elements to "Custom Tab" in the TraceGUI
-   sim.add_custom_value("Aperture radius (1 - 3mm)", 2.0, lambda ap: change_aperture(RT, ap))
-   sim.add_custom_selection("Test Image", ["Testcard", "Grid"], "Testcard", lambda img: change_test_image(RT, img))
+   sim.add_custom_value("Aperture radius (1 - 3mm)", 2.0, 
+                        lambda ap: change_aperture(RT, ap))
+   sim.add_custom_selection("Test Image", ["Testcard", "Grid"], "Testcard", 
+                            lambda img: change_test_image(RT, img))
    sim.add_custom_button("Detector Image", sim.detector_image)
    sim.add_custom_checkbox("Print Ray Info", False, lambda b: toggle_ray_info(RT, b))
 
@@ -587,10 +590,13 @@ Pipeline View
 
 The pipeline of the mayavi scene allows for the viewing and alteration of different geometry objects of the visible scene. 
 For instance, you can change the colors or representation of different elements.
-Note that editing the visualization objects inside the scene is different from changing the geometry objects inside the |Raytracer|.
+Note that editing the visualization objects inside the scene is 
+different from changing the geometry objects inside the |Raytracer|.
 The former does not update the underlying geometry and does not update the rays.
 
-A more detailed information about the `pipeline view <https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__ and the `different objects populating the view <https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__ are available in the mayavi documentation.
+A more detailed information about the `pipeline view <https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__ 
+and the `different objects populating the view <https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__ 
+are available in the mayavi documentation.
 
 .. figure:: ../images/ui_pipeline.png
    :align: center
@@ -629,7 +635,8 @@ Scripting on the GUI or change |Raytracer| properties is possible, like adding, 
 After entering a command in the upper text field the ``Run``-button needs to be pressed.
 Note that the command is only run, if the GUI is idle, therefore not doing any other tasks.
 
-After running the command, the scene is automatically updated and the geometry is retraced if the option "Retrace and replot automatically" is set.
+After running the command, the scene is automatically updated and the geometry is retraced if the option 
+"Retrace and replot automatically" is set.
 This can also be done manually with th ``Replot/Retrace`` Button.
 
 The command is added to the history in the lower part of the window.
@@ -675,7 +682,8 @@ There are multiple object aliases available to simplify coding inside the comman
    * - :python:`VL`
      - the volume list of the raytracer
 
-For instance, inside the command window you can write :python:`RT.remove(AL[1])` to remove the second aperture of tracing geometry.
+For instance, inside the command window you can write :python:`RT.remove(AL[1])`
+to remove the second aperture of tracing geometry.
 By default, you also have access to most optrace classes, e.g. :python:`Raytracer, RGBImage, Group, RingSurface, ...`.
 
 To include custom objects in the class, you can simply pass them to the constructor:
@@ -689,6 +697,7 @@ To include custom objects in the class, you can simply pass them to the construc
 
    sim = TraceGUI(RT, important_function=func, important_variable=var)
 
-This also makes them available for usage in the command window as :python:`GUI.important_function(), GUI.important_variable, ...`.
+This also makes them available for usage in the command window as 
+:python:`GUI.important_function(), GUI.important_variable, ...`.
 
 

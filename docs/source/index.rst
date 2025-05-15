@@ -2,58 +2,11 @@
 Optrace |version| |release| Documentation
 ============================================
 
-.. list-table:: 
-   :class: table-borderless
-
-   * - .. figure:: images/example_spherical_aberration2.png
-          :align: center
-          :width: 165
-          :class: dark-light
+.. figure:: ./images/header.webp
+  :align: center
+  :width: 100%
+  :class: dark-light
     
-     - .. figure:: images/example_rgb_render4.webp
-          :align: center
-          :width: 155
-          :class: dark-light
-  
-     - .. figure:: images/example_legrand2.png
-          :align: center
-          :width: 165
-          :class: dark-light
-     
-     - .. figure:: ./images/example_keratoconus_4.webp
-          :align: center
-          :width: 155
-          :class: dark-light
-     
-     - .. figure:: images/example_brewster.png
-          :align: center
-          :width: 165
-          :class: dark-light
-   
-   * - .. figure:: ./images/example_gui_automation_1.png
-          :align: center
-          :width: 165
-          :class: dark-light
-
-     - .. figure:: ./images/LED_illuminants.svg
-          :align: center
-          :width: 155
-          :class: dark-light
-
-     - .. figure:: images/example_double_gauss_2.png
-          :align: center
-          :width: 165
-          :class: dark-light
-     
-     - .. figure:: ./images/rgb_render_srgb1.webp
-          :align: center
-          :width: 155
-          :class: dark-light
-
-     - .. figure:: ./images/example_cosine_surfaces1.png 
-          :align: center
-          :width: 165
-          :class: dark-light
 
 Overview
 ----------------------

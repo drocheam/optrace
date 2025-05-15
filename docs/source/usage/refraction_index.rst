@@ -17,7 +17,8 @@ ________________________
 
 **Constant**
 
-In the simplest case a constant (wavelength-independent) :class:`refractive index <optrace.tracer.refraction_index.RefractionIndex>` is defined as:
+In the simplest case a constant (wavelength-independent) 
+:class:`refractive index <optrace.tracer.refraction_index.RefractionIndex>` is defined as:
 
 .. testcode::
 
@@ -71,13 +72,15 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
    * - Extended
 
      - .. math::
-          n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+ \frac{c_4} {\lambda^{6}}+ \frac{c_5} {\lambda^{8}}+ \frac{c_6} {\lambda^{10}}+\frac{c_7} {\lambda^{12}}
+          n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+ 
+          \frac{c_4} {\lambda^{6}}+ \frac{c_5} {\lambda^{8}}+ \frac{c_6} {\lambda^{10}}+\frac{c_7} {\lambda^{12}}
           :label: n_extended
 
    * - Extended2
 
      - .. math::
-          n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}+c_6 \lambda^4+c_7 \lambda^6
+          n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+\frac{c_4} 
+          {\lambda^{6}}+\frac{c_5} {\lambda^{8}}+c_6 \lambda^4+c_7 \lambda^6
           :label: n_extended2
 
    * - Handbook of Optics 1
@@ -104,7 +107,8 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
    * - Sellmeier1
 
      - .. math::
-          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}
+          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}
+          {\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}
           :label: n_sellmeier1 
 
    * - Sellmeier2
@@ -116,7 +120,8 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
    * - Sellmeier3
 
      - .. math::
-          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}
+          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+
+          \frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}
           :label: n_sellmeier3 
 
    * - Sellmeier4
@@ -128,13 +133,15 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
    * - Sellmeier5
 
      - .. math::
-          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}+\frac{c_8 \lambda^2}{\lambda^2-c_9}
+          n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+
+          \frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}+\frac{c_8 \lambda^2}{\lambda^2-c_9}
           :label: n_sellmeier5 
 
    * - Schott
 
      - .. math::
-          n^2 = c_0+c_1 \lambda^2+\frac{c_2}{ \lambda^{2}}+\frac{c_3} {\lambda^{4}}+\frac{c_4} {\lambda^{6}}+\frac{c_5} {\lambda^{8}}
+          n^2 = c_0+c_1 \lambda^2+\frac{c_2}{ \lambda^{2}}+\frac{c_3} {\lambda^{4}}+\frac{c_4}
+          {\lambda^{6}}+\frac{c_5} {\lambda^{8}}
           :label: n_schott 
 
 
@@ -157,7 +164,8 @@ Values in-between are interpolated linearly.
 
 **User Function**
 
-optrace supports custom user functions for the refractive index. The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
+optrace supports custom user functions for the refractive index. 
+The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
 
 .. testcode::
 
@@ -194,7 +202,8 @@ With a refractive index object at hand the Abbe number can be calculated with
    >>> n.abbe_number()
    44.850483919254984
 
-Alternatively the function can be called with a different spectral line combination from :mod:`ot.presets.spectral_lines <optrace.tracer.presets.spectral_lines>`:
+Alternatively the function can be called with a different spectral line combination 
+from :mod:`ot.presets.spectral_lines <optrace.tracer.presets.spectral_lines>`:
 
 .. doctest::
 
@@ -225,7 +234,8 @@ Loading material catalogues (.agf)
 _________________________________________
 
 optrace can also load .agf catalogue files containing different materials.
-The function :func:`ot.load_agf <optrace.tracer.load.load_agf>` requires a file path and returns a dictionary of media, with the key being the name and the value being the refractive index object.
+The function :func:`ot.load_agf <optrace.tracer.load.load_agf>` requires a file path and 
+returns a dictionary of media, with the key being the name and the value being the refractive index object.
 
 For instance, loading the Schott catalogue and accessing the material ``N-LAF21`` can be done as follows:
 
@@ -235,7 +245,8 @@ For instance, loading the Schott catalogue and accessing the material ``N-LAF21`
    n_laf21 = n_schott["N-LAF21"]
 
 
-Different ``.agf`` files are found in `this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`__ or `this one <https://github.com/edeforas/Astree/tree/master/glass>`__.
+Different ``.agf`` files are found in `this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`__ 
+or `this one <https://github.com/edeforas/Astree/tree/master/glass>`__.
 
 Information on the file format can be found `here <https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf>`__ and
 and `here <https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf>`__.
@@ -251,8 +262,10 @@ See :ref:`index_plots`.
 Presets
 _________________
 
-optrace comes with multiple material presets, which can be accessed using ``ot.presets.refractive_index.<name>``, where ``<name>`` is the material name.
-The materials are also grouped into multiple lists :python:`ot.presets.refractive_index.glasses, ot.presets.refractive_index.plastics, ot.presets.refractive_index.misc`. 
+optrace comes with multiple material presets, which can be accessed using ``ot.presets.refractive_index.<name>``, 
+where ``<name>`` is the material name.
+The materials are also grouped into multiple lists 
+:python:`ot.presets.refractive_index.glasses, ot.presets.refractive_index.plastics, ot.presets.refractive_index.misc`. 
 
 These groups are plotted below in an index and an Abbe plot.
 
@@ -302,7 +315,8 @@ These groups are plotted below in an index and an Abbe plot.
           :align: center
           :class: dark-light
           
-          Abbe diagram for miscellaneous presets. *Air* and *Vacuum* are missing here, because they are modelled without dispersion.
+          Abbe diagram for miscellaneous presets. *Air* and *Vacuum* are missing here, 
+          because they are modelled without dispersion.
 
 
 ------------

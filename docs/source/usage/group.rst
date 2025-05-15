@@ -51,7 +51,8 @@ It contains the following functionality:
 
 A |Group| object stores all elements in their own class lists:
 :python:`lenses, ray_sources, detectors, markers, filters, apertures, volumes`.
-Where |IdealLens| and |Lens| are included in the same list, all marker types are included in :python:`markers` and all volume types in :python:`volumes`.
+Where |IdealLens| and |Lens| are included in the same list, all marker types are included in :python:`markers` 
+and all volume types in :python:`volumes`.
 
 When adding objects, the order of objects remains the same.
 Thus :python:`lenses[2]` denotes the lens that was added third (counting starts at 0).
@@ -60,8 +61,8 @@ For clarity, it is recommended to add objects in their correct z-order.
 Geometry properties
 ###########################
 
-A group shares the same functions for geometry properties and manipulations as an element, see :ref:`element_geometry_props`.
-There are three main differences:
+A group shares the same functions for geometry properties and manipulations as an element, 
+see :ref:`element_geometry_props`. There are three main differences:
 
 **Position**
 
@@ -75,14 +76,16 @@ See :func:`Group.flip <optrace.tracer.geometry.group.Group.flip>` for details.
 
 **Rotation**
 
-For rotation, parameters :python:`x0`, :python:`y0` can be additionally provided, which also describe a position of the rotation axis.
+For rotation, parameters :python:`x0`, :python:`y0` can be additionally provided, 
+which also describe a position of the rotation axis.
 By default, both are zero.
 See :func:`Group.rotate <optrace.tracer.geometry.group.Group.rotate>`.
 
 Example
 ################
 
-The following example creates a Group consisting of an |IdealLens| and an :class:`Aperture <optrace.tracer.geometry.aperture.Aperture>`.
+The following example creates a Group consisting of an |IdealLens| and 
+an :class:`Aperture <optrace.tracer.geometry.aperture.Aperture>`.
 
 .. testcode::
 
@@ -91,9 +94,10 @@ The following example creates a Group consisting of an |IdealLens| and an :class
 
    G = ot.Group([IL, F])
 
-Next, we flip the group, reversing the z-order of the elements and flipping each element around its x-axis through the center.
-Since all elements are rotationally symmetric, this just reorders them.
-After flipping we move the group to a new position. This position is the new position for the first element (which after flipping is the filter), whereas all relative distances to all other elements are kept equal.
+Next, we flip the group, reversing the z-order of the elements and flipping each element 
+around its x-axis through the center. Since all elements are rotationally symmetric, this just reorders them.
+After flipping we move the group to a new position. This position is the new position for the first element 
+(which after flipping is the filter), whereas all relative distances to all other elements are kept equal.
 
 .. testcode::
 
@@ -107,7 +111,8 @@ The filter is the first element and has the same position as we moved the group 
    >>> G.apertures[0].pos
    array([0., 1., 0.])
 
-The lens has the same relative distance of :math:`\Delta z = 20` mm relative to the Filter, but in a different absolute position and now behind the filter.
+The lens has the same relative distance of :math:`\Delta z = 20` mm relative to the Filter, 
+but in a different absolute position and now behind the filter.
 
 .. doctest::
 
@@ -127,7 +132,9 @@ The following example loads a geometry from file ``setup.zmx`` into the raytrace
 
    RT = ot.Raytracer(outline=[-20, 20, -20, 20, -20, 200])
 
-   RS = ot.RaySource(ot.CircularSurface(r=0.05), spectrum=ot.presets.light_spectrum.d65, pos=[0, 0, -10])
+   RS = ot.RaySource(ot.CircularSurface(r=0.05), 
+                     spectrum=ot.presets.light_spectrum.d65, 
+                     pos=[0, 0, -10])
    RT.add(RS)
 
    n_schott = ot.load_agf("schott.agf")
@@ -137,22 +144,28 @@ The following example loads a geometry from file ``setup.zmx`` into the raytrace
    RT.trace(10000)
 
 
-For the materials to be loaded correctly all mentioned names in the ``.zmx`` file need to be included in the :python:`n_dict` dictionary.
+For the materials to be loaded correctly all mentioned names in the ``.zmx`` 
+file need to be included in the :python:`n_dict` dictionary.
 You can either load them from a ``.agf`` catalogue like in :numref:`agf_load` or create the dictionary manually.
 
-A list of exemplary ``.zmx`` files can be found in the following `repository <https://github.com/nzhagen/LensLibrary/tree/main/zemax_files>`_.
+A list of exemplary ``.zmx`` files can be found in the following 
+`repository <https://github.com/nzhagen/LensLibrary/tree/main/zemax_files>`_.
 
 
-Unfortunately, the support is only experimental, as there is no official documentation on the file format. Additionally, only a subset of all ZEMAX OpticStudio functionality is supported, including:
+Unfortunately, the support is only experimental, as there is no official documentation on the file format.
+Additionally, only a subset of all ZEMAX OpticStudio functionality is supported, including:
 
 * ``SEQ``-mode only
 * ``UNIT`` must be ``MM``
-* only ``STANDARD`` or ``EVENASPH`` surfaces, this is equivalent to :python:`RingSurface, CircularSurface, SphericalSurface, ConicSurface, AsphericSurface` in optrace
+* only ``STANDARD`` or ``EVENASPH`` surfaces, this is equivalent to 
+  :python:`RingSurface, CircularSurface, SphericalSurface, ConicSurface, AsphericSurface` in optrace
 * no support for coatings
 * temperature or absorption behavior of the material is neglected
 * only loads lens and aperture geometries, no support for additional objects
 
-Information on the file format can be found in :footcite:`Zemax_2000`, as well as `here <https://github.com/mjhoptics/ray-optics/blob/master/src/rayoptics/zemax/zmxread.py>`__ and `here <https://github.com/quartiq/rayopt/blob/master/rayopt/zemax.py>`__.
+Information on the file format can be found in :footcite:`Zemax_2000`, 
+as well as `here <https://github.com/mjhoptics/ray-optics/blob/master/src/rayoptics/zemax/zmxread.py>`__ 
+and `here <https://github.com/quartiq/rayopt/blob/master/rayopt/zemax.py>`__.
 
 
 Geometry Presets
@@ -164,21 +177,26 @@ Ideal Camera
 
 An ideal camera preset is included, that provides aberration-free imaging towards a detector.
 
-The preset is loaded with :func:`ot.presets.geometry.ideal_camera <optrace.tracer.presets.geometry.ideal_camera>` and returns a |Group| object consisting of a lens and a detector.
-Required parameters are the object position :python:`z_g` as well as the camera position (the position of the lens) :python:`cam_pos`, as well as the image distance :python:`b`, which in this case is just the difference distance between lens and detector.
+The preset is loaded with :func:`ot.presets.geometry.ideal_camera <optrace.tracer.presets.geometry.ideal_camera>`
+and returns a |Group| object consisting of a lens and a detector.
+Required parameters are the object position :python:`z_g` as well as the camera position (the position of the lens) 
+:python:`cam_pos`, as well as the image distance :python:`b`, 
+which in this case is just the difference distance between lens and detector.
 A visual presentation of these quantities is shown in the figure below.
 
 An exemplary call could be:
 
 .. testcode::
 
-   G = ot.presets.geometry.ideal_camera(cam_pos=[1, -2.5, 12.3], z_g=-56.06, b=10)
+   G = ot.presets.geometry.ideal_camera(cam_pos=[1, -2.5, 12.3], 
+                                        z_g=-56.06, b=10)
 
 The lens diameter parameter :python:`r` and detector radius :python:`r_det` are provided by doing the following:
 
 .. testcode::
 
-   G = ot.presets.geometry.ideal_camera(cam_pos=[1, -2.5, 12.3], z_g=-56.06, b=10, r=5, r_det=8)
+   G = ot.presets.geometry.ideal_camera(cam_pos=[1, -2.5, 12.3], 
+                                        z_g=-56.06, b=10, r=5, r_det=8)
 
 The function also supports an infinite position of :python:`z_g = -np.inf`.
 
@@ -204,7 +222,8 @@ Note that :math:`b, g`  both need to be positive for this preset to work.
 LeGrand Paraxial Eye Model
 ###############################
 
-The LeGrand full theoretical eye model is a simple model consisting of only spherical surfaces and wavelength-independent refractive indices. It models the paraxial behavior of a far-adapted eye.
+The LeGrand full theoretical eye model is a simple model consisting of only spherical surfaces 
+and wavelength-independent refractive indices. It models the paraxial behavior of a far-adapted eye.
 
 .. list-table:: LeGrand Full Theoretical Eye Model :footcite:`SchwiegerlingOptics`
    :widths: 110 75 75 75 75
@@ -249,7 +268,10 @@ The LeGrand full theoretical eye model is a simple model consisting of only sphe
      - `-`
 
 
-The preset :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` is located in :mod:`ot.presets.geometry <optrace.tracer.presets.geometry>` and is called as a function. It returns a |Group| object that can be added to a |Raytracer|. Provide a :python:`pos` parameter to position it at an other position than :python:`[0, 0, 0]`.
+The preset :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` is located in 
+:mod:`ot.presets.geometry <optrace.tracer.presets.geometry>` and is called as a function. 
+It returns a |Group| object that can be added to a |Raytracer|. Provide a :python:`pos` parameter 
+to position it at an other position than :python:`[0, 0, 0]`.
 
 .. testcode::
 
@@ -267,7 +289,9 @@ Optional parameters include a pupil diameter and a lateral detector (retina) rad
 Arizona Eye Model
 #####################
 
-A more advanced model is the :func:`arizona_eye <optrace.tracer.presets.geometry.arizona_eye>` model, which tries to match clinical levels of aberration for different adaption levels. It consists of conic surfaces, dispersive media and adaptation dependent parameters.
+A more advanced model is the :func:`arizona_eye <optrace.tracer.presets.geometry.arizona_eye>` model, 
+which tries to match clinical levels of aberration for different adaption levels. 
+It consists of conic surfaces, dispersive media and adaptation dependent parameters.
 
 .. list-table:: Arizona Eye Model :footcite:`SchwiegerlingOptics`
    :widths: 75 75 75 75 75 75
@@ -318,7 +342,8 @@ A more advanced model is the :func:`arizona_eye <optrace.tracer.presets.geometry
 
      - `-` 
 
-With an accommodation level :math:`A` in dpt the missing parameters are calculated using: :footcite:`SchwiegerlingOptics`
+With an accommodation level :math:`A` in dpt the missing parameters 
+are calculated using: :footcite:`SchwiegerlingOptics`
 
 .. math::
    \begin{array}{ll}
@@ -329,7 +354,8 @@ With an accommodation level :math:`A` in dpt the missing parameters are calculat
    \end{array}
 
 
-Accessing and adding the group works the same as for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` preset.
+Accessing and adding the group works the same as for the 
+:func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>` preset.
 
 .. testcode::
 
@@ -337,7 +363,9 @@ Accessing and adding the group works the same as for the :func:`legrand_eye <opt
    eye_model = ot.presets.geometry.arizona_eye(pos=[0.3, 0.7, 1.2])
    RT.add(eye_model)
 
-As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>`, we have the parameters :python:`pupil` and :python:`r_det`. Additionally there is an :python:`adaptation` parameter specified in diopters, which defaults to 0 dpt.
+As for the :func:`legrand_eye <optrace.tracer.presets.geometry.legrand_eye>`, we have the parameters 
+:python:`pupil` and :python:`r_det`. Additionally there is an :python:`adaptation` 
+parameter specified in diopters, which defaults to 0 dpt.
 
 .. testcode::
 
