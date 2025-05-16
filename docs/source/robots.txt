@@ -1,9 +1,0 @@
-# www.robotstxt.org/
-
-# don't crawl development notes and configuration
-# which should only be relevant for the development team
-User-agent: *
-Disallow: /development/
-
-Sitemap: https://drocheam.github.io/optrace/sitemap.xml
-

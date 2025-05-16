@@ -24,7 +24,7 @@ body {
 /*increase relative page size for larger displays*/
 @media (min-width: 960px) {
 .bd-page-width {
-    max-width: 90%;
+    max-width: 88%;
     }
 }
 /*set "Section Navigation" title in side bar to normal size*/

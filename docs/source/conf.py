@@ -41,7 +41,8 @@ extensions = [
         'sphinx.ext.mathjax',
         'sphinx.ext.doctest',
         'sphinxcontrib.bibtex',
-        'sphinx_sitemap'
+        'sphinx_sitemap',
+        'sphinx-mathjax-offline',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,7 +70,6 @@ html_theme = "pydata_sphinx_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
-html_extra_path = ['robots.txt']
 html_baseurl = metadata["documentation"]
 
 html_theme_options = {

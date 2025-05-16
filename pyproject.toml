@@ -42,7 +42,7 @@ Changelog = "https://drocheam.github.io/optrace/development/changelog.html"
 
 [project.optional-dependencies]
 tests = ["pyautogui", "pytest", "coverage", "colour-science", "pytest-timeout", "pytest-random-order"]
-docs = ["sphinx", "sphinxcontrib-bibtex", "pydata-sphinx-theme", "sphinx-sitemap"]
+docs = ["sphinx", "sphinxcontrib-bibtex", "pydata-sphinx-theme", "sphinx-sitemap", "sphinx-mathjax-offline"]
 
 [build-system]
 requires = ["setuptools >= 61.0", "numpy>2"]
