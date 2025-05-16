@@ -393,14 +393,17 @@ Only the first two diffraction orders (core + 2 rings) are used, higher orders s
    * - .. figure:: ../images/rimage_limit_off.webp
           :align: center
           :class: dark-light
+          :width: 220
    
      - .. figure:: ../images/rimage_limit_on.webp
           :align: center
           :class: dark-light
+          :width: 268
      
      - .. figure:: ../images/rimage_limit_on2.webp
           :align: center
           :class: dark-light
+          :width: 340
 
 The limit parameter can be applied while either creating the |RenderImage| (:python:`ot.RenderImage(..., limit=5)`) 
 or by providing it to methods the create an |RenderImage| (:python:`Raytracer.detector_image(..., limit=1)`, 

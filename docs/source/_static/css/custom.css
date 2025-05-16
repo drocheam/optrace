@@ -71,6 +71,13 @@ html[data-theme="dark"] .highlight span.linenos{
     color: var(--pst-teal-400)
 }
 
+/*fix inline code wrapping, especially on mobile*/
+code span.pre {
+    white-space: pre-wrap;
+    word-break: normal;
+    overflow-wrap: anywhere;
+}
+
 /**Table Settings**/
 /*******************************************************************/
 
@@ -86,8 +93,10 @@ html[data-theme="dark"] .highlight span.linenos{
 }
 
 /**no left border line for each element in row**/
+/*let cell width be 1 / N of page*/
 .table-borderless td {
     border-left: none !important;
+    max-width: 0
 }
 
 /**remove coloring for rows**/

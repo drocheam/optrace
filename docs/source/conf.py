@@ -136,7 +136,14 @@ autodoc_typehints = "description"
 sitemap_locales = [None]
 sitemap_url_scheme = "{link}"
 sitemap_excludes = [
+    "development/notes.html",
+    "development/changelog.html",
+    "development/packaging.html",
+    "development/documentation.html",
+    "development/testing.html",
+    "development/index.html",
     "search.html",
+    "impressum.html",
     "genindex.html",
     "py-modindex.html",
 ]
