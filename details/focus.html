@@ -1,0 +1,649 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5.6. Focus Methods &#8212; optrace 1.6.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c33f382b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=59eafeec"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="../_static/mathjax/tex-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'details/focus';</script>
+    <link rel="canonical" href="https://drocheam.github.io/optrace/details/focus.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5.7. Color Management" href="color.html" />
+    <link rel="prev" title="5.5. PSF Convolution" href="convolution.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image_spectrum.html">5.3. Image and Spectrum Rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">5.4. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolution.html">5.5. PSF Convolution</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5.6. Focus Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">5.7. Color Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">5.8. Miscellaneous</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">5. </span>Implementation Details</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">5.6. </span>Focus Methods</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="focus-methods">
+<span id="autofocus"></span><h1><span class="section-number">5.6. </span>Focus Methods<a class="headerlink" href="#focus-methods" title="Link to this heading">#</a></h1>
+<section id="procedure">
+<h2><span class="section-number">5.6.1. </span>Procedure<a class="headerlink" href="#procedure" title="Link to this heading">#</a></h2>
+<p>The focus search procedure is illustrated in the subsequent flowchart.</p>
+<figure class="align-center" id="id4">
+<a class="dark-light reference internal image-reference" href="../_images/FocusPAP.svg"><img alt="../_images/FocusPAP.svg" class="dark-light" src="../_images/FocusPAP.svg" style="width: 400px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.14 </span><span class="caption-text">Autofocus process flowchart.</span><a class="headerlink" href="#id4" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="rms-spot-size">
+<h2><span class="section-number">5.6.2. </span>RMS Spot Size<a class="headerlink" href="#rms-spot-size" title="Link to this heading">#</a></h2>
+<p><strong>Standard RMS</strong></p>
+<p>An analytical solution exists for the RMS spot size method.
+The following derivation closely follows <a class="footnote-reference brackets" href="#footcite-boussemaere-2023-19" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
+For ray sections that start at the coordinates <span class="math notranslate nohighlight">\(x_i, y_i, z_0\)</span>,
+their positions at an additional axial distance <span class="math notranslate nohighlight">\(t\)</span> are given by:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rms-spot-size-propagation">
+<span class="eqno">(5.130)<a class="headerlink" href="#equation-eq-rms-spot-size-propagation" title="Link to this equation">#</a></span>\[\begin{split}x_i^*&amp;=x_i+\frac{s_{x, i}}{s_{z, i}} t \\
+y_i^*&amp;=y_i+\frac{s_{y, i}}{s_{z, i}} t\end{split}\]</div>
+<p>We can define the RMS spot size relative to the center coordinates <span class="math notranslate nohighlight">\(x_c^*, y_c^*\)</span>.
+This average position also propagates, originating from <span class="math notranslate nohighlight">\(x_c, y_c\)</span> and possessing a direction vector <span class="math notranslate nohighlight">\(s_c\)</span>.
+The cost function is:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rms-spot-size-cost-function">
+<span class="eqno">(5.131)<a class="headerlink" href="#equation-eq-rms-spot-size-cost-function" title="Link to this equation">#</a></span>\[\begin{split}R_v(d) &amp;=\sqrt{\frac{1}{N} \sum_{i=1}^N\left(\left(x_i^*-x_c^*\right)^2+\left(y_i^*-y_c^*\right)^2\right)} \\
+&amp;=\sqrt{\frac{1}{N} \sum_{i=1}^N\left(\left(\Delta x_i+d \Delta \theta_{x, i}\right)^2
++\left(\Delta y_i+d \Delta \theta_{y, i}\right)^2\right)}\end{split}\]</div>
+<p>Introducing the new relative coordinates <span class="math notranslate nohighlight">\(\Delta x_i, \Delta y_i\)</span>
+and the relative direction <span class="math notranslate nohighlight">\(\Delta \theta_{x,i}, \Delta \theta_{y,i}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rms-spot-size-relative-coordinates">
+<span class="eqno">(5.132)<a class="headerlink" href="#equation-eq-rms-spot-size-relative-coordinates" title="Link to this equation">#</a></span>\[\begin{split}\Delta x_i &amp; =x_i-x_c \\
+\Delta y_i &amp; =y_i-y_c \\
+\Delta \theta_{x, i} &amp; =\frac{s_{x, i}}{s_{z, i}}-\frac{s_{x, c}}{s_{z, c}} \\
+\Delta \theta_{y, i} &amp; =\frac{s_{y, i}}{s_{z, i}}-\frac{s_{y, c}}{s_{z, c}}\end{split}\]</div>
+<p>Applying variational calculus results in <a class="footnote-reference brackets" href="#footcite-boussemaere-2023-19" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-rms-spot-size-solution">
+<span class="eqno">(5.133)<a class="headerlink" href="#equation-eq-rms-spot-size-solution" title="Link to this equation">#</a></span>\[t = -\frac{\sum_{i=1}^N \left(\Delta \theta_{x, i} \Delta x_i+\Delta \theta_{y, i} \Delta y_i \right)}
+{\sum_{i=1}^N \left(\Delta \theta_{x, i}^2+\Delta \theta_{y, i}^2 \right)}\]</div>
+<p>Thus, the focal position is located at <span class="math notranslate nohighlight">\(z_0 + t\)</span>.</p>
+<p><strong>Ray Weighted RMS</strong></p>
+<p>It is possible to include additional weights <span class="math notranslate nohighlight">\(w_i\)</span> for each ray, which can represent attributes such as ray power.</p>
+<div class="math notranslate nohighlight" id="equation-eq-weighted-rms-spot-size-cost-function">
+<span class="eqno">(5.134)<a class="headerlink" href="#equation-eq-weighted-rms-spot-size-cost-function" title="Link to this equation">#</a></span>\[\begin{split}R_v(d) =\sqrt{\frac{1}{N} \sum_{i=1}^N\left(\left(w_i\left(x_i^*-x_c^*\right)\right)^2
++\left(w_i\left(y_i^*-y_c^*\right)\right)^2\right)} \\\end{split}\]</div>
+<p>The weights <span class="math notranslate nohighlight">\(w_i\)</span> can be isolated from the rest of the expression,
+resulting in a factor of <span class="math notranslate nohighlight">\(w_i^2\)</span> for all terms. This yields a solution of:</p>
+<div class="math notranslate nohighlight" id="equation-eq-weighted-rms-spot-size-solution">
+<span class="eqno">(5.135)<a class="headerlink" href="#equation-eq-weighted-rms-spot-size-solution" title="Link to this equation">#</a></span>\[t = -\frac{\sum_{i=1}^N w_i^2 \left(\Delta \theta_{x, i} \Delta x_i+\Delta \theta_{y, i} \Delta y_i \right)}
+{\sum_{i=1}^N w_i^2 \left(\Delta \theta_{x, i}^2 + \Delta \theta_{y, i}^2 \right)}\]</div>
+<p><strong>Position Weighted RMS</strong></p>
+<p>Utilizing other strictly monotonically increasing functions that depend on
+<span class="math notranslate nohighlight">\(r^2 = \left(x_i^* - x_c^*\right)^2 + \left(y_i^* - y_c^*\right)^2\)</span> does not yield additional benefits.
+These functions all share the same position for the minimum
+but might present numerical challenges or be more complex to compute.
+Due to its simplicity and convexity optimizing just <span class="math notranslate nohighlight">\(r^2\)</span> should be preferred.</p>
+</section>
+<section id="optimization-methods">
+<h2><span class="section-number">5.6.3. </span>Optimization Methods<a class="headerlink" href="#optimization-methods" title="Link to this heading">#</a></h2>
+<p>The <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.15.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a> function, along with its optimization methods,
+is utilized under the hood for various optimization tasks.</p>
+<p>For the Irradiance Variance method, the <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-neldermead.html#optimize-minimize-neldermead" title="(in SciPy v1.15.3)"><span class="xref std std-ref">Nelder-Mead</span></a>
+solver is employed directly. This choice is based on the observation that the cost function is typically
+smooth and straightforward to minimize in most situations.</p>
+<p>In contrast, for the methods Image Sharpness and Image Center Sharpness,
+the cost function tends to be much noisier and may include numerous local minima.
+To address this challenge, the search region is initially sampled at multiple points.
+Subsequently, minimization is initiated relative to the smallest found cost.
+The <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html#optimize-minimize-cobyla" title="(in SciPy v1.15.3)"><span class="xref std std-ref">COBYLA</span></a> solver yields good results in these cases.</p>
+</section>
+<section id="pixel-dimensions-for-rendering-methods">
+<h2><span class="section-number">5.6.4. </span>Pixel Dimensions for Rendering Methods<a class="headerlink" href="#pixel-dimensions-for-rendering-methods" title="Link to this heading">#</a></h2>
+<p>Methods such as Irradiance Variance, Image Sharpness, and Image Center Sharpness render multiple images
+denoted as <span class="math notranslate nohighlight">\(P_z\)</span>, each with a pixel count of <span class="math notranslate nohighlight">\(N_\text{px} \cdot N_\text{px}\)</span>.</p>
+<p>The side length in pixels, <span class="math notranslate nohighlight">\(N_\text{px}\)</span>, is influenced by the number of rays used for focus determination.
+When working with a small number of rays, it is advantageous to keep <span class="math notranslate nohighlight">\(N_\text{px}\)</span> low to minimize noise effects.
+Conversely, as the number of rays increases, <span class="math notranslate nohighlight">\(N_\text{px}\)</span> can be gradually increased to resolve finer details.
+Distributing <span class="math notranslate nohighlight">\(N\)</span> rays over a square area necessitates increasing <span class="math notranslate nohighlight">\(N_\text{px}\)</span>
+proportionally to <span class="math notranslate nohighlight">\(\sqrt{N}\)</span> to maintain a relatively consistent Signal-to-Noise Ratio (SNR).
+The implemented formula follows the form <span class="math notranslate nohighlight">\(N_\text{px} = \text{offset} + \text{factor} \cdot \sqrt{N}\)</span>.</p>
+<p>For simplicity, the same pixel count is used for both image dimensions.</p>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id3">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-boussemaere-2023-19" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>Luc Boussemaere. #DevOptical Part 19: a quick focus algorithm. 2023. URL: <a class="reference external" href="https://www.thepulsar.be/article/-devoptical-part-19--a-quick-focus-algorithm/">https://www.thepulsar.be/article/-devoptical-part-19–a-quick-focus-algorithm/</a> (visited on 2025-03-11).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="convolution.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">5.5. </span>PSF Convolution</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="color.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">5.7. </span>Color Management</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#procedure">5.6.1. Procedure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rms-spot-size">5.6.2. RMS Spot Size</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-methods">5.6.3. Optimization Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pixel-dimensions-for-rendering-methods">5.6.4. Pixel Dimensions for Rendering Methods</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+    <div class="footer-items__start">
+        <div class="footer-item">
+          <p class="copyright">
+              &copy; 2025, Damian Mendroch &nbsp;  &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+              &nbsp; &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+              <br>
+          </p>
+        </div>
+    </div>
+    <div class="footer-items__end">
+        <div class="footer-item">
+        <p class="theme-version">
+          Built with <a href="https://www.sphinx-doc.org/" style="color: var(--pst-color-text-muted)">Sphinx</a> 8.2.3
+          and the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html" style="color: var(--pst-color-text-muted)">PyData Sphinx Theme</a> 0.16.1
+        </p>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

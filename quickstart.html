@@ -1,0 +1,648 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Quickstart &#8212; optrace 1.6.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=c33f382b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=59eafeec"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'quickstart';</script>
+    <link rel="canonical" href="https://drocheam.github.io/optrace/quickstart.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4. Usage" href="usage/index.html" />
+    <link rel="prev" title="2. Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="development/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">2. Installation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index.html">4. Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="details/index.html">5. Implementation Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">6. API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">7. Development</a></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item"><nav class="sidebar-indices-items" aria-labelledby="pst-indices-navigation-heading-2">
+  <p id="pst-indices-navigation-heading-2" class="sidebar-indices-items__title" role="heading" aria-level="1">Indices</p>
+  <ul class="indices-link">
+        <li class="toctree-l1">
+          <a class="reference internal"
+             href="genindex.html"
+             accesskey="I">General Index</a>
+        </li>
+        <li class="toctree-l1">
+          <a class="reference internal" href="py-modindex.html">Python Module Index</a>
+        </li>
+  </ul>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">3. </span>Quickstart</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="quickstart">
+<span id="id1"></span><h1><span class="section-number">3. </span>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h1>
+<p>The library comes with a variety of different example scripts that are described in <a class="reference internal" href="examples.html#examples"><span class="std std-numref">Section 1</span></a>.
+You can download the full examples.zip archive <a class="reference external" href="https://github.com/drocheam/optrace/releases/latest/download/examples.zip">here</a>.</p>
+<p>The <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py">spherical_aberration.py</a> script provides a good quickstart introduction.
+Below you can find its code with detailed comments.</p>
+<p><strong>Content of</strong> <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py">examples/spherical_aberration.py</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span><span class="c1"># ^-- shebang for simple execution on Unix systems</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="c1"># This quickstart example demonstrates some features of optrace</span>
+<span class="linenos"> 5</span><span class="c1"># The goal is to investigate the spherical aberration of a simple lens</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="c1"># make sure the optrace library is installed in your system</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="c1"># first we import the optrace package, as well as the gui</span>
+<span class="linenos">10</span><span class="c1"># gui and tracer are seperated so we don&#39;t have the overhead of</span>
+<span class="linenos">11</span><span class="c1"># always loading all multiple external libraries</span>
+<span class="linenos">12</span><span class="kn">import</span><span class="w"> </span><span class="nn">optrace</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ot</span>
+<span class="linenos">13</span><span class="kn">from</span><span class="w"> </span><span class="nn">optrace.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceGUI</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="c1"># a Raytracer object provides the raytracing functionality and also controls the tracing geometry</span>
+<span class="linenos">16</span><span class="c1"># the outline parameter specifies a three dimensional box, in which all rays and geometry are located</span>
+<span class="linenos">17</span><span class="c1"># the values are specified as [x0, x1, y0, y1, z0, z1], with x1 &gt; x0, y1 &gt; y0 and z1 &gt; z0</span>
+<span class="linenos">18</span><span class="c1"># all coordinates in the tracing geometry are specified in millimeters</span>
+<span class="linenos">19</span><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="c1"># all elements in the geometry (sources, lenses, detectors, ...) consist of Surfaces</span>
+<span class="linenos">22</span><span class="c1"># a Surface object describes a specific height behaviour depending on 2D x,y-coordinates relative </span>
+<span class="linenos">23</span><span class="c1"># to the surface center for the raysource we define a circle surface, which is perpendicular</span>
+<span class="linenos">24</span><span class="c1"># to the z-axis with a radius of 1</span>
+<span class="linenos">25</span><span class="n">RSS0</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">26</span>
+<span class="linenos">27</span><span class="c1"># a raysource creates the rays for raytracing, it consists of a surface, a ray divergence behaviour, </span>
+<span class="linenos">28</span><span class="c1"># a specific light spectrum, a specific base orientation of the rays as well as a specific polarization</span>
+<span class="linenos">29</span><span class="c1"># in our case we want parallel light (divergence=&quot;None&quot;) parallel to the z-axis, </span>
+<span class="linenos">30</span><span class="c1"># which is specified by the orientation vector s=[0, 0, 1]</span>
+<span class="linenos">31</span><span class="c1"># the light spectrum is chosen as daylight spectrum D65, which can be found in the presets submodule</span>
+<span class="linenos">32</span><span class="c1"># the absolute position of its surface is controlled by the parent object, in this case the ray source</span>
+<span class="linenos">33</span><span class="n">RS0</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">RSS0</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d65</span><span class="p">,</span>
+<span class="linenos">34</span>                  <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="linenos">35</span><span class="c1"># after creation the element needs to be added to the tracing geometry</span>
+<span class="linenos">36</span><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS0</span><span class="p">)</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span><span class="c1"># we create a similar ray source, now with a ring surface</span>
+<span class="linenos">39</span><span class="c1"># a ring is additionally parametrized by an inner circle with radius ri</span>
+<span class="linenos">40</span><span class="n">RSS1</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RingSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">4.5</span><span class="p">,</span> <span class="n">ri</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">41</span><span class="n">RS1</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">RSS1</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d65</span><span class="p">,</span>
+<span class="linenos">42</span>                  <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="linenos">43</span><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS1</span><span class="p">)</span>
+<span class="linenos">44</span>
+<span class="linenos">45</span><span class="c1"># next we define a lens</span>
+<span class="linenos">46</span><span class="c1"># the lens should have a constant refraction index of 1.5,</span>
+<span class="linenos">47</span><span class="c1"># this is specified as RefractionIndex with mode &quot;Constant&quot; and a value of 1.5</span>
+<span class="linenos">48</span><span class="c1"># generally, a RefractionIndex can also have wavelength dependent behaviour</span>
+<span class="linenos">49</span><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="linenos">50</span>
+<span class="linenos">51</span><span class="c1"># a lens consists of a front and back surface</span>
+<span class="linenos">52</span><span class="c1"># in the case of spherical lens surfaces, we need to specify a surface radius r and a curvature radius R</span>
+<span class="linenos">53</span><span class="c1"># For a biconvex lens the front has a positive curvature and the back a negative one</span>
+<span class="linenos">54</span><span class="n">front</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="linenos">55</span><span class="n">back</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">R</span><span class="o">=-</span><span class="mi">15</span><span class="p">)</span>
+<span class="linenos">56</span><span class="c1"># the creation of the lens requires both surfaces, as well as a position and a refractive index</span>
+<span class="linenos">57</span><span class="c1"># there multiple ways to define the overall lens thickness, or rather the distance between both surfaces</span>
+<span class="linenos">58</span><span class="c1"># in our case we provide de, which is a thickness extension between front and back surface</span>
+<span class="linenos">59</span><span class="c1"># this means there is a spacing of de=0.2mm between the end of the front surface and the start </span>
+<span class="linenos">60</span><span class="c1"># of the back surface the lens position defined by parameter pos is then exactly in the center of these 0.2mm</span>
+<span class="linenos">61</span><span class="n">L</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Lens</span><span class="p">(</span><span class="n">front</span><span class="p">,</span> <span class="n">back</span><span class="p">,</span> <span class="n">de</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="linenos">62</span><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="linenos">63</span>
+<span class="linenos">64</span><span class="c1"># a detector renders images inside the raytracer and is defined by a single surface</span>
+<span class="linenos">65</span><span class="c1"># in our case we want a rectangular detector with side lengths 20mm</span>
+<span class="linenos">66</span><span class="c1"># for this a RectangularSurface with a &quot;dim&quot; sides list of [20, 20] is initialized</span>
+<span class="linenos">67</span><span class="n">DETS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RectangularSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+<span class="linenos">68</span><span class="c1"># a detector takes a surface and a position as arguments</span>
+<span class="linenos">69</span><span class="n">DET</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Detector</span><span class="p">(</span><span class="n">DETS</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">23.</span><span class="p">])</span>
+<span class="linenos">70</span><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">DET</span><span class="p">)</span>
+<span class="linenos">71</span>
+<span class="linenos">72</span><span class="c1"># after the geometry definition, the optical setup must be traced next</span>
+<span class="linenos">73</span><span class="c1"># this could be done by calling RT.trace(N), with parameter N being the number of rays</span>
+<span class="linenos">74</span><span class="c1"># but we also can create a graphical frontend, that automatically traces the scene.</span>
+<span class="linenos">75</span>
+<span class="linenos">76</span><span class="c1"># For this, a TraceGUI object is needed. </span>
+<span class="linenos">77</span><span class="c1"># It takes the raytracer as parameter, while additional parameters can provide graphical settings</span>
+<span class="linenos">78</span><span class="c1"># For example, rays will be colored according to their source number by providing color_type=&quot;Source&quot;</span>
+<span class="linenos">79</span><span class="c1"># and a higher relative ray opacity is set by ray_opacity=0.2</span>
+<span class="linenos">80</span><span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">coloring_mode</span><span class="o">=</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="n">ray_opacity</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="linenos">81</span>
+<span class="linenos">82</span><span class="c1"># the frontend is now created and needs to be started explicitly</span>
+<span class="linenos">83</span><span class="n">sim</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="linenos">84</span>
+<span class="linenos">85</span><span class="c1"># You can now experiment with different features, e.g.</span>
+<span class="linenos">86</span><span class="c1"># 1. Navigate in the three dimensional geometry scene</span>
+<span class="linenos">87</span><span class="c1"># 2. Click on ray-surface intersections to display ray properties</span>
+<span class="linenos">88</span><span class="c1"># 3. Play around with visual settings in the main tab</span>
+<span class="linenos">89</span><span class="c1"># 4. Move the detector and render detector images in the Imaging-Tab</span>
+<span class="linenos">90</span><span class="c1"># 5. Focus search for each of the two sources. </span>
+<span class="linenos">91</span><span class="c1">#    In the &quot;Focus&quot; Tab select &quot;Rays From Selected Source Only&quot; and click on &quot;Find Focus&quot; Button.</span>
+<span class="linenos">92</span><span class="c1">#    Select the other ray source to find the other focus</span>
+<span class="linenos">93</span>
+</pre></div>
+</div>
+<p><strong>Screenshots</strong></p>
+<figure class="align-center">
+<a class="dark-light reference internal image-reference" href="_images/example_spherical_aberration1.png"><img alt="_images/example_spherical_aberration1.png" class="dark-light" src="_images/example_spherical_aberration1.png" style="width: 720px;" />
+</a>
+</figure>
+<figure class="align-center">
+<a class="dark-light reference internal image-reference" href="_images/example_spherical_aberration2.png"><img alt="_images/example_spherical_aberration2.png" class="dark-light" src="_images/example_spherical_aberration2.png" style="width: 720px;" />
+</a>
+</figure>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="usage/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Usage</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+    <div class="footer-items__start">
+        <div class="footer-item">
+          <p class="copyright">
+              &copy; 2025, Damian Mendroch &nbsp;  &nbsp; 
+              <a href="impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+              &nbsp; &nbsp; 
+              <a href="impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+              <br>
+          </p>
+        </div>
+    </div>
+    <div class="footer-items__end">
+        <div class="footer-item">
+        <p class="theme-version">
+          Built with <a href="https://www.sphinx-doc.org/" style="color: var(--pst-color-text-muted)">Sphinx</a> 8.2.3
+          and the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html" style="color: var(--pst-color-text-muted)">PyData Sphinx Theme</a> 0.16.1
+        </p>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

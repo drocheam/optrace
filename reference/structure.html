@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>6.1. Library Structure &#8212; optrace 1.6.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c33f382b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=59eafeec"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/structure';</script>
+    <link rel="canonical" href="https://drocheam.github.io/optrace/reference/structure.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6.2. Global Module" href="optrace.html" />
+    <link rel="prev" title="6. API Reference" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">6.1. Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">6. </span>API Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">6.1. </span>Library Structure</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="library-structure">
+<h1><span class="section-number">6.1. </span>Library Structure<a class="headerlink" href="#library-structure" title="Link to this heading">#</a></h1>
+<p><strong>Library Structure</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>./optrace
+├── __init__.py
+├── global_options.py
+├── gui
+│   ├── __init__.py
+│   ├── _scene_plotting.py
+│   ├── command_window.py
+│   ├── property_browser.py
+│   └── trace_gui.py
+├── metadata.py
+├── plots
+│   ├── __init__.py
+│   ├── chromaticity_plots.py
+│   ├── image_plots.py
+│   ├── init.py
+│   ├── misc_plots.py
+│   └── spectrum_plots.py
+├── progress_bar.py
+├── property_checker.py
+├── resources
+│   ├── SOURCE.txt
+│   ├── illuminants.csv
+│   ├── images
+│   │   ├── ETDRS_chart.png
+│   │   ├── ETDRS_chart_inverted.png
+│   │   ├── SOURCE.txt
+│   │   ├── cell.webp
+│   │   ├── color_checker.webp
+│   │   ├── documents.webp
+│   │   ├── eye_test_vintage.webp
+│   │   ├── fruits.webp
+│   │   ├── group_photo.webp
+│   │   ├── hong_kong.webp
+│   │   ├── interior.webp
+│   │   ├── landscape.webp
+│   │   ├── siemens_star.png
+│   │   ├── tv_testcard1.png
+│   │   └── tv_testcard2.png
+│   └── observers.csv
+├── tracer
+│   ├── __init__.py
+│   ├── base_class.py
+│   ├── color
+│   │   ├── __init__.py
+│   │   ├── illuminants.py
+│   │   ├── luv.py
+│   │   ├── observers.py
+│   │   ├── srgb.py
+│   │   ├── tools.py
+│   │   └── xyz.py
+│   ├── convolve.py
+│   ├── geometry
+│   │   ├── __init__.py
+│   │   ├── aperture.py
+│   │   ├── detector.py
+│   │   ├── element.py
+│   │   ├── filter.py
+│   │   ├── group.py
+│   │   ├── ideal_lens.py
+│   │   ├── lens.py
+│   │   ├── line.py
+│   │   ├── marker
+│   │   │   ├── __init__.py
+│   │   │   ├── line_marker.py
+│   │   │   └── point_marker.py
+│   │   ├── point.py
+│   │   ├── ray_source.py
+│   │   ├── surface
+│   │   │   ├── __init__.py
+│   │   │   ├── aspheric_surface.py
+│   │   │   ├── circular_surface.py
+│   │   │   ├── conic_surface.py
+│   │   │   ├── data_surface_1d.py
+│   │   │   ├── data_surface_2d.py
+│   │   │   ├── function_surface_1d.py
+│   │   │   ├── function_surface_2d.py
+│   │   │   ├── rectangular_surface.py
+│   │   │   ├── ring_surface.py
+│   │   │   ├── spherical_surface.py
+│   │   │   ├── surface.py
+│   │   │   └── tilted_surface.py
+│   │   └── volume
+│   │       ├── __init__.py
+│   │       ├── box_volume.py
+│   │       ├── cylinder_volume.py
+│   │       ├── sphere_volume.py
+│   │       └── volume.py
+│   ├── image
+│   │   ├── __init__.py
+│   │   ├── base_image.py
+│   │   ├── grayscale_image.py
+│   │   ├── render_image.py
+│   │   ├── rgb_image.py
+│   │   └── scalar_image.py
+│   ├── load.py
+│   ├── misc.py
+│   ├── presets
+│   │   ├── __init__.py
+│   │   ├── geometry.py
+│   │   ├── image.py
+│   │   ├── light_spectrum.py
+│   │   ├── psf.py
+│   │   ├── refraction_index.py
+│   │   ├── spectral_lines.py
+│   │   └── spectrum.py
+│   ├── random.py
+│   ├── ray_storage.py
+│   ├── raytracer.py
+│   ├── refraction_index.py
+│   ├── spectrum
+│   │   ├── __init__.py
+│   │   ├── light_spectrum.py
+│   │   ├── spectrum.py
+│   │   └── transmission_spectrum.py
+│   └── transfer_matrix_analysis.py
+└── warnings.py
+
+14 directories, 102 files
+</pre></div>
+</div>
+<p><strong>Example Structure</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>./examples
+├── IOL_pinhole_imaging.py
+├── achromat.py
+├── arizona_eye_model.py
+├── astigmatism.py
+├── brewster_polarizer.py
+├── cosine_surfaces.py
+├── double_gauss.py
+├── gui_automation.py
+├── image_render.py
+├── image_render_many_rays.py
+├── keratoconus.py
+├── legrand_eye_model.py
+├── microscope.py
+├── prism.py
+├── psf_imaging.py
+├── refraction_index_presets.py
+├── resources
+│   ├── eyepiece
+│   │   ├── LICENSE.txt
+│   │   ├── SOURCE.txt
+│   │   └── UK565851-1.zmx
+│   ├── materials
+│   │   ├── LICENSE.txt
+│   │   ├── SOURCE.txt
+│   │   ├── hikari.agf
+│   │   ├── hoya.agf
+│   │   ├── ohara.agf
+│   │   └── schott.agf
+│   └── microscope
+│       ├── LICENSE.txt
+│       ├── Nikon_1p25NA_60x_US7889433B2_MultiConfig_v2.zmx
+│       └── SOURCE.txt
+├── spectrum_presets.py
+├── sphere_projections.py
+└── spherical_aberration.py
+
+5 directories, 31 files
+</pre></div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>API Reference</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="optrace.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">6.2. </span>Global Module</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+    <div class="footer-items__start">
+        <div class="footer-item">
+          <p class="copyright">
+              &copy; 2025, Damian Mendroch &nbsp;  &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+              &nbsp; &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+              <br>
+          </p>
+        </div>
+    </div>
+    <div class="footer-items__end">
+        <div class="footer-item">
+        <p class="theme-version">
+          Built with <a href="https://www.sphinx-doc.org/" style="color: var(--pst-color-text-muted)">Sphinx</a> 8.2.3
+          and the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html" style="color: var(--pst-color-text-muted)">PyData Sphinx Theme</a> 0.16.1
+        </p>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

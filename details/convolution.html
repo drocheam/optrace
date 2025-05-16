@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5.5. PSF Convolution &#8212; optrace 1.6.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c33f382b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=59eafeec"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="../_static/mathjax/tex-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'details/convolution';</script>
+    <link rel="canonical" href="https://drocheam.github.io/optrace/details/convolution.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5.6. Focus Methods" href="focus.html" />
+    <link rel="prev" title="5.4. Ray Transfer Matrix Analysis" href="matrix_analysis.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image_spectrum.html">5.3. Image and Spectrum Rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix_analysis.html">5.4. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5.5. PSF Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="focus.html">5.6. Focus Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">5.7. Color Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">5.8. Miscellaneous</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">5. </span>Implementation Details</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">5.5. </span>PSF Convolution</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="psf-convolution">
+<h1><span class="section-number">5.5. </span>PSF Convolution<a class="headerlink" href="#psf-convolution" title="Link to this heading">#</a></h1>
+<section id="convolution-of-colored-images">
+<span id="psf-color-handling"></span><h2><span class="section-number">5.5.1. </span>Convolution of Colored Images<a class="headerlink" href="#convolution-of-colored-images" title="Link to this heading">#</a></h2>
+<section id="polychromatic-convolution">
+<h3><span class="section-number">5.5.1.1. </span>Polychromatic Convolution<a class="headerlink" href="#polychromatic-convolution" title="Link to this heading">#</a></h3>
+<p>In general, both the image and the PSF are wavelength-dependent and the image convolution
+must be performed individually for each wavelength:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-per-wavelength">
+<span class="eqno">(5.121)<a class="headerlink" href="#equation-eq-conv-per-wavelength" title="Link to this equation">#</a></span>\[\text{im}_2(x, y, \lambda) = \text{im}(x, y, \lambda) \otimes \text{psf}(x, y, \lambda)\]</div>
+</section>
+<section id="special-case-spectral-homogenity">
+<h3><span class="section-number">5.5.1.2. </span>Special Case Spectral Homogenity<a class="headerlink" href="#special-case-spectral-homogenity" title="Link to this heading">#</a></h3>
+<p>In the case of so-called spectral homogeneity, the spectrum <span class="math notranslate nohighlight">\(s\)</span> is consistent across the entire image
+but is scaled by a location-dependent intensity factor <span class="math notranslate nohighlight">\(\text{im}_s(x, y)\)</span>.
+The concept of spectral homogeneity goes back to <a class="footnote-reference brackets" href="#footcite-barnden-1974" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>,
+who also describes this mathematical simplification.
+<a class="footnote-reference brackets" href="#footcite-ravikumar-2008" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> also uses this to generate color images.</p>
+<p>For an example <span class="math notranslate nohighlight">\(\text{im}_s(\lambda)\)</span>, it holds that:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-special-case-spectral-homogenity">
+<span class="eqno">(5.122)<a class="headerlink" href="#equation-eq-conv-special-case-spectral-homogenity" title="Link to this equation">#</a></span>\[\begin{split}\text{im}_2(x, y, \lambda)
+&amp;= \left(\text{im}_r(\lambda) \text{im}_s(x, y)\right) \otimes \text{psf}(x, y, \lambda)\\
+&amp;= \text{im}_s(x, y) \otimes \left(\text{im}_s(\lambda) \text{psf}(x, y, \lambda)\right)\\
+&amp;= \text{im}_s(x, y) \otimes \text{psf}_s(x, y, \lambda)\\\end{split}\]</div>
+<p>The spectrum is a constant with respect to the convolution expression and can therefore
+also be multiplied with the PSF. We define the new spectrally weighted PSF <span class="math notranslate nohighlight">\(\text{psf}_s(x, y, \lambda)\)</span>.</p>
+</section>
+<section id="convolution-of-rgb-images">
+<h3><span class="section-number">5.5.1.3. </span>Convolution of RGB Images<a class="headerlink" href="#convolution-of-rgb-images" title="Link to this heading">#</a></h3>
+<p>Typically, the spectral profile of the image result is not of interest.
+Instead, the color coordinates for display on a monitor are more relevant.
+For instance, to calculate the red stimulus produced by the convolved image,
+it can be multiplied by the sRGB red color matching function <span class="math notranslate nohighlight">\(r(\lambda)\)</span> and integrated over all wavelengths:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-rgb-r-to-r">
+<span class="eqno">(5.123)<a class="headerlink" href="#equation-eq-conv-rgb-r-to-r" title="Link to this equation">#</a></span>\[\begin{split}\text{im}_{2,r\rightarrow r}(x, y)
+&amp;= \int \Big[\text{im}_r(x, y) \otimes \text{psf}_r(x, y, \lambda)\Big] r(\lambda)\;\text{d}\lambda\\
+&amp;= \text{im}_r(x, y) \otimes \int\text{psf}_r(x, y, \lambda) r(\lambda)\;\text{d}\lambda\\
+&amp;= \text{im}_r(x, y) \otimes \text{psf}_{r\rightarrow r}(x, y)\\\end{split}\]</div>
+<p>Since only the PSF has a wavelength dependency, the image can be factored out of the integral expression.
+Because the convolution is independent of wavelength, the integration can be performed prior to convolution.
+This results in the red-to-red PSF <span class="math notranslate nohighlight">\(\text{psf}_{r \rightarrow r}(x, y)\)</span>.</p>
+<p>If the light spectra <span class="math notranslate nohighlight">\(\text{im}_r(\lambda), \text{im}_g(\lambda), \text{im}_b(\lambda)\)</span>
+are selected such that they correspond to the primary spectra of sRGB, they form linearly independent color channels.
+These channels can be used to compose all colors within the sRGB color space via linear combination.
+The PSF can similarly be decomposed into three individual channel PSFs that are linearly independent.</p>
+<p>The RGB color image from the red image <span class="math notranslate nohighlight">\(\text{im}_r(x, y)\)</span> with spatially homogeneous <span class="math notranslate nohighlight">\(\text{im}_r(\lambda)\)</span>
+for convolution with the PSF can then be simplified and summarized as:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-rgb-r-to-rgb">
+<span class="eqno">(5.124)<a class="headerlink" href="#equation-eq-conv-rgb-r-to-rgb" title="Link to this equation">#</a></span>\[\begin{split}\text{im}_{2,r\rightarrow rgb}(x, y) =
+\left[\begin{array}\,
+\text{im}_r(x, y) \otimes \text{psf}_{r\rightarrow r}(x, y)\\
+\text{im}_r(x, y) \otimes \text{psf}_{r\rightarrow g}(x, y)\\
+\text{im}_r(x, y) \otimes \text{psf}_{r\rightarrow b}(x, y)\\
+\end{array}\right]\end{split}\]</div>
+<p>Even if the original red spectrum generates a pure red in the sRGB color space,
+this might not be the case after convolution with the PSF.
+Chromatic aberration could lead to more transverse chromatic aberration at smaller wavelengths,
+resulting in a yellow fringe in the PSF and introducing components in <span class="math notranslate nohighlight">\(\text{psf}_{r \rightarrow g}(x, y)\)</span>.</p>
+<p>Similarly, this applies to the G-channel with the sRGB color matching function <span class="math notranslate nohighlight">\(g(\lambda)\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-rgb-g-to-rgb">
+<span class="eqno">(5.125)<a class="headerlink" href="#equation-eq-conv-rgb-g-to-rgb" title="Link to this equation">#</a></span>\[\begin{split}\text{im}_{2,g\rightarrow rgb}(x, y) =
+\left[\begin{array}\,
+\text{im}_g(x, y) \otimes \text{psf}_{g\rightarrow r}(x, y)\\
+\text{im}_g(x, y) \otimes \text{psf}_{g\rightarrow g}(x, y)\\
+\text{im}_g(x, y) \otimes \text{psf}_{g\rightarrow b}(x, y)\\
+\end{array}\right]\end{split}\]</div>
+<p>And the blue channel with matching function <span class="math notranslate nohighlight">\(b(\lambda)\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-rgb-b-to-rgb">
+<span class="eqno">(5.126)<a class="headerlink" href="#equation-eq-conv-rgb-b-to-rgb" title="Link to this equation">#</a></span>\[\begin{split}\text{im}_{2,b\rightarrow rgb}(x, y) =
+\left[\begin{array}\,
+\text{im}_b(x, y) \otimes \text{psf}_{b\rightarrow r}(x, y)\\
+\text{im}_b(x, y) \otimes \text{psf}_{b\rightarrow g}(x, y)\\
+\text{im}_b(x, y) \otimes \text{psf}_{b\rightarrow b}(x, y)\\
+\end{array}\right]\end{split}\]</div>
+<p>The overall image <span class="math notranslate nohighlight">\(\text{im}_{2,rgb \rightarrow rgb}\)</span> is obtained from the sum of all convolved
+R, G, B color components in the image. However, the mixing ratio of all channels must be considered:
+If the color PSFs were all simulated with a power of one watt, this does not correspond to the correct mixing
+ratio for white in the sRGB color space.
+This must be adjusted so that equal parts in <span class="math notranslate nohighlight">\(\text{im}_r, \text{im}_g, \text{im}_b\)</span>
+produce white in the color space.</p>
+<p>Let <span class="math notranslate nohighlight">\(a_r, a_g, a_b\)</span> be the relative mixing factors. The final result can be expressed as:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-rgb-rgb-to-rgb">
+<span class="eqno">(5.127)<a class="headerlink" href="#equation-eq-conv-rgb-rgb-to-rgb" title="Link to this equation">#</a></span>\[\text{im}_{2,rgb\rightarrow rgb}(x, y) = a_r \text{im}_{2,r\rightarrow rgb}(x, y)
++ a_g \text{im}_{2,g\rightarrow rgb}(x, y) + a_b \text{im}_{2,b\rightarrow rgb}(x, y)\]</div>
+<p>Equation <a class="reference internal" href="color.html#equation-r-g-b-factors">(5.155)</a> illustrates the RGB color spectra and respective weighting factors.
+Rather than applying the rescaling subsequently, the power ratios might be integrated into the source rendering
+process of the PSFs. By doing this, the power ratios are inherently incorporated into the relative R, G, B PSFs.</p>
+</section>
+<section id="convolution-of-a-spectral-homogeneous-image-and-an-rgb-psf">
+<h3><span class="section-number">5.5.1.4. </span>Convolution of a spectral homogeneous image and an RGB PSF<a class="headerlink" href="#convolution-of-a-spectral-homogeneous-image-and-an-rgb-psf" title="Link to this heading">#</a></h3>
+<p>In the special case where the image is spectrally homogeneous, let the spectrum be denoted as <span class="math notranslate nohighlight">\(s\)</span>.
+The transformation can then be represented by:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-rgb-s-to-rgb">
+<span class="eqno">(5.128)<a class="headerlink" href="#equation-eq-conv-rgb-s-to-rgb" title="Link to this equation">#</a></span>\[\begin{split}\text{im}_{2,s\rightarrow rgb}(x, y) =
+\left[\begin{array}\,
+\text{im}_s(x, y) \otimes \text{psf}_{s\rightarrow r}(x, y)\\
+\text{im}_s(x, y) \otimes \text{psf}_{s\rightarrow g}(x, y)\\
+\text{im}_s(x, y) \otimes \text{psf}_{s\rightarrow b}(x, y)\\
+\end{array}\right]\end{split}\]</div>
+<p>In this context, <span class="math notranslate nohighlight">\(\text{im}_s\)</span> describes the spatial distribution of the intensity of the source,
+which emits the spectrum <span class="math notranslate nohighlight">\(s\)</span>.</p>
+</section>
+<section id="convolution-of-spectral-homogeneous-image-and-psf">
+<h3><span class="section-number">5.5.1.5. </span>Convolution of spectral homogeneous image and PSF<a class="headerlink" href="#convolution-of-spectral-homogeneous-image-and-psf" title="Link to this heading">#</a></h3>
+<p>In the special scenario where both the image and the PSF are spectrally homogeneous,
+the relationship can be defined as:</p>
+<div class="math notranslate nohighlight" id="equation-eq-conv-rgb-w-to-w">
+<span class="eqno">(5.129)<a class="headerlink" href="#equation-eq-conv-rgb-w-to-w" title="Link to this equation">#</a></span>\[\text{im}_{2,s_1\rightarrow s_2}(x, y) = \text{im}_{s_1}(x, y) \otimes \text{psf}_{s_1\rightarrow s_2}(x, y)\]</div>
+<p>In this equation, <span class="math notranslate nohighlight">\(s_1\)</span> represents the source spectrum, and <span class="math notranslate nohighlight">\(s_2\)</span> represents the detector spectrum.
+Due to potential absorption effects, these spectra do not need to be identical.
+As explained earlier, it is crucial that both the source and the PSF exhibit spectral homogeneity.
+A typical example involves a black and white image in conjunction with a wavelength-independent PSF.</p>
+</section>
+</section>
+<section id="limitations">
+<h2><span class="section-number">5.5.2. </span>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">#</a></h2>
+<p>The limitations are detailed in <a class="reference internal" href="../usage/convolve.html#convolve-limitations"><span class="std std-numref">Section 4.11.3</span></a>.</p>
+</section>
+<section id="processing-steps">
+<h2><span class="section-number">5.5.3. </span>Processing Steps<a class="headerlink" href="#processing-steps" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Convert the image and PSF to linear sRGB values, while including negative values.</p></li>
+<li><p>For a grayscale PSF, normalize the PSF so that its sum (total power) equals one.</p></li>
+<li><p>Downscale/interpolate the PSF so that the physical pixel sizes of the PSF and the image
+(after scaling with the magnification factor) are identical.</p></li>
+<li><p>Pad the PSF with zeros to ensure a defined fall-off</p></li>
+<li><p>Flip the image if the magnification factor is negative</p></li>
+<li><p>Pad the image according to the chosen padding method.</p></li>
+<li><p>Convolve image and PSF according to the methods in Section <a class="reference internal" href="#psf-color-handling"><span class="std std-numref">Section 5.5.1</span></a>.</p></li>
+<li><p>Convert the image back to sRGB, applying a selected gamut mapping.</p></li>
+<li><p>Slice the image to remove padding, or trim it back to its original size</p></li>
+</ol>
+<p>The convolution is conducted in sRGB coordinates because the channels are orthogonal, and this color space
+is the target for monitors. Nevertheless, the convolution must be executed as a linear operation using
+linear sRGB values. It is also crucial to include colors outside the color space
+(negative coordinates) to maintain linearity. If negative values persist in the image post-convolution,
+gamut mapping needs to be applied.</p>
+<p>In the case of a grayscale PSF, it is automatically normalized.
+This ensures that, when used in conjunction with the <code class="code highlight python docutils literal highlight-python"><span class="n">normalize</span><span class="o">=</span><span class="kc">False</span></code> parameter of the convolve function,
+the brightness and color values remain unchanged.
+For colored PSFs, normalization poses a greater challenge because it requires knowing the amount of light
+from the source that actually reached the detector for the PSF.
+This could potentially be achieved using metadata from RenderImage.
+Nonetheless, the relevance of this option is debatable, as normalized images are typically preferred.</p>
+<p>Downscaling the PSF needs to be executed in a manner that conserves energy.
+Moreover, it is essential to choose a method that prevents aliasing.
+We utilize the scaling with the <a class="reference external" href="https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html#gga5bb5a1fea74ea38e1a5445ca803ff121acf959dca2480cc694ca016b81b442ceb">INTER_AREA</a>
+option from OpenCV within the resize function.
+The PSF must be rescaled so that the physical pixel dimensions of the image and the PSF align in both dimensions.
+Consequently, it becomes sufficient to convolve the image as a pixel matrix, even if the pixels are not square.</p>
+<p>The convolution is performed in the Fourier space employing the convolution theorem.
+The Fourier transformation is calculated using the <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.fftconvolve.html#scipy.signal.fftconvolve" title="(in SciPy v1.15.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.signal.fftconvolve()</span></code></a> function.
+Due to the nature of this method, areas outside the image are assumed to be black.
+Consequently, a fall-off region appears in the resulting image,
+where the PSF increasingly convolves with the black portions at the edges.
+This transition area is as wide as the PSF region where its intensities exceed zero.
+For simplicity, we assume the entire PSF width for this.
+If the user desires a different padding method, additional padding must be applied to the image.
+First, the image should be padded according to the user-chosen method, and then again to prevent dark fall-off edges.</p>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id3">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-barnden-1974" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>R. Barnden. Calculation of axial polychromatic optical transfer function. <em>Optica Acta: International Journal of Optics</em>, 21(12):981–1003, dec 1974. <a class="reference external" href="https://doi.org/10.1080/713818864">doi:10.1080/713818864</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-ravikumar-2008" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Sowmya Ravikumar, Larry N. Thibos, and Arthur Bradley. Calculation of retinal image quality for polychromatic light. <em>Journal of the Optical Society of America A</em>, 25(10):2395, sep 2008. URL: <a class="reference external" href="https://doi.org/10.1364%2Fjosaa.25.002395">https://doi.org/10.1364%2Fjosaa.25.002395</a>, <a class="reference external" href="https://doi.org/10.1364/josaa.25.002395">doi:10.1364/josaa.25.002395</a>.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="matrix_analysis.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">5.4. </span>Ray Transfer Matrix Analysis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="focus.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">5.6. </span>Focus Methods</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-of-colored-images">5.5.1. Convolution of Colored Images</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#polychromatic-convolution">5.5.1.1. Polychromatic Convolution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#special-case-spectral-homogenity">5.5.1.2. Special Case Spectral Homogenity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-of-rgb-images">5.5.1.3. Convolution of RGB Images</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-of-a-spectral-homogeneous-image-and-an-rgb-psf">5.5.1.4. Convolution of a spectral homogeneous image and an RGB PSF</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-of-spectral-homogeneous-image-and-psf">5.5.1.5. Convolution of spectral homogeneous image and PSF</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">5.5.2. Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-steps">5.5.3. Processing Steps</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+    <div class="footer-items__start">
+        <div class="footer-item">
+          <p class="copyright">
+              &copy; 2025, Damian Mendroch &nbsp;  &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+              &nbsp; &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+              <br>
+          </p>
+        </div>
+    </div>
+    <div class="footer-items__end">
+        <div class="footer-item">
+        <p class="theme-version">
+          Built with <a href="https://www.sphinx-doc.org/" style="color: var(--pst-color-text-muted)">Sphinx</a> 8.2.3
+          and the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html" style="color: var(--pst-color-text-muted)">PyData Sphinx Theme</a> 0.16.1
+        </p>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

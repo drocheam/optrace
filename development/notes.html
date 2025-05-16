@@ -1,0 +1,682 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>7.4. Notes &#8212; optrace 1.6.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c33f382b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=59eafeec"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'development/notes';</script>
+    <link rel="canonical" href="https://drocheam.github.io/optrace/development/notes.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="7.5. Changelog" href="changelog.html" />
+    <link rel="prev" title="7.3. Packaging" href="packaging.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../usage/index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="testing.html">7.1. Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">7.4. Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">7.5. Changelog</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">7. </span>Development</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">7.4. </span>Notes</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="notes">
+<span id="dev-notes"></span><h1><span class="section-number">7.4. </span>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h1>
+<p><strong>Library Design</strong></p>
+<ul class="simple">
+<li><p>modular design with multiple submodules</p></li>
+<li><p>plotting and TraceGUI are independent of the tracing backend</p></li>
+<li><p>automation/scripting easily possible</p></li>
+<li><p>platform independent and open source</p></li>
+<li><p>importing only the backend tracing functionality does not import GUI and plotting libraries.
+This ensures better performance and enables us to use this functionality without
+ever needing to install this heavy libraries when they are never needed.</p></li>
+</ul>
+<p><strong>Dependencies</strong></p>
+<ul class="simple">
+<li><p>balance of minimizing dependencies while also trying not to implement too much manually</p></li>
+<li><p>outsource GUI and plotting functionality/backend to external libraries</p></li>
+<li><p>tracing, color conversion, geometry manipulations etc. are implemented in library itself</p></li>
+<li><p>prefer python standard libraries</p></li>
+<li><p>only use open source dependencies</p></li>
+</ul>
+<p><strong>Documentation Style</strong></p>
+<ul class="simple">
+<li><p>publication-like design</p></li>
+<li><p>LaTeX equations (🠪 <a class="reference external" href="https://www.mathjax.org/">MathJax</a>)</p></li>
+<li><p>citations and bibliography (ideally per webpage)</p></li>
+<li><p>clickable references to sections, table, equations, citations</p></li>
+<li><p>keyword/topic index</p></li>
+<li><p>no use of external images (so no copyright/licensing issues)</p></li>
+</ul>
+<p><strong>Graphical Outputs</strong></p>
+<ul class="simple">
+<li><p>professional, publication-like plots</p></li>
+<li><p>prefer serif fonts (e.g. Times New Roman)</p></li>
+<li><p>use LaTeX formatted equations/labels</p></li>
+<li><p>highlight more important elements by colors, font size or boldness</p></li>
+<li><p>axes, minor and major grid lines, titles and legend are a must</p></li>
+<li><p><a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">block</span></code></a> function allows for halting the rest of the program when plotting</p></li>
+<li><p>options for hiding some visual elements (labels, axes in GUI, legend entries)</p></li>
+<li><p>prefer svg for self-created figures, png for screenshots and webp for rendered images</p></li>
+<li><p>use tinypng to shrink pngs for the webpage, vecta.io for pyplot svgs</p></li>
+<li><p>in some cases there are issues with webp output in chromatic channels, export in lossless webp in these cases</p></li>
+</ul>
+<p><strong>Multithreading and Multiprocessing</strong></p>
+<ul class="simple">
+<li><p>outsource heavy tasks onto multiple cores</p></li>
+<li><dl class="simple">
+<dt>prefer threads over processes (no copying overhead). However we need to:</dt><dd><ul>
+<li><p>ensure there are no race conditions by using locks or by ensuring each thread writes on a different memory location</p></li>
+<li><p>minimize python code (because of the GIL limitation while multithreading). Use lower level libraries with like numpy</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>all worker and background threads need to terminate immediately when the main thread has ended
+This is ensured by providing <code class="code highlight python docutils literal highlight-python"><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span></code> while creating the <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> object.</p></li>
+<li><p>multithreading should be controlled with a <a class="reference internal" href="../reference/optrace.html#optrace.global_options.ClassGlobalOptions.multithreading" title="optrace.global_options.ClassGlobalOptions.multithreading"><code class="xref py py-attr docutils literal notranslate"><span class="pre">multithreading</span></code></a> global option</p></li>
+<li><dl class="simple">
+<dt>threading rules for <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a>, with some ideas from <a class="reference external" href="https://traits-futures.readthedocs.io/en/latest/guide/threading.html">traits Futures</a></dt><dd><ul>
+<li><p>GUI changes only in main thread</p></li>
+<li><p>GUI must be responsive at all costs</p></li>
+<li><p>simplified Read/Write access model: only one thread can read and write</p></li>
+<li><p>no locks in the main thread, waiting for locks only in worker threads</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Performance and Memory</strong></p>
+<ul class="simple">
+<li><p>use of multithreading</p></li>
+<li><p><a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> where possible</p></li>
+<li><p>avoid loops</p></li>
+<li><p>work with object references when possible (instead of copies)</p></li>
+<li><p>use masks on arrays instead of creating new ones</p></li>
+<li><p>only do calculations on elements actually needed</p></li>
+<li><p>pre-allocation instead of growing an array step by step</p></li>
+<li><p>use <code class="code highlight python docutils literal highlight-python"><span class="n">np</span><span class="o">.</span><span class="n">float32</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="nb">int</span></code> instead of <code class="code highlight python docutils literal highlight-python"><span class="n">np</span><span class="o">.</span><span class="n">float64</span></code> where high precision is not needed</p></li>
+<li><p>prefer analytical solutions instead of iterative numerical approximations</p></li>
+<li><p>multi-dimensional array access can be accelerated by choosing a specific memory layout of the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> (<code class="code highlight python docutils literal highlight-python"><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span></code> etc.)</p></li>
+<li><p>always keep the GUI responsive</p></li>
+<li><p>range indexing (<code class="code highlight python docutils literal highlight-python"><span class="n">array</span><span class="p">[</span><span class="mi">52</span><span class="p">:</span><span class="mi">79829</span><span class="p">]</span></code>) is faster than boolean indexing (<code class="code highlight python docutils literal highlight-python"><span class="n">array</span><span class="p">[[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]]</span></code>,
+which is faster than indexing by index list (<code class="code highlight python docutils literal highlight-python"><span class="n">array</span><span class="p">[[</span><span class="mi">52</span><span class="p">,</span> <span class="mi">456</span><span class="p">,</span> <span class="mi">897987</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span></code>)</p></li>
+<li><p>a reasonable amount of points and curves in plots</p></li>
+<li><p>limit array sizes</p></li>
+</ul>
+<p><strong>File Input/Output</strong></p>
+<ul class="simple">
+<li><p>OS independent file names</p></li>
+<li><p>store under a fallback path when files exists or can’t be written</p></li>
+<li><p>write file in one go, don’t append iteratively</p></li>
+<li><p>use external libraries for loading special files (images, spreadsheets etc.)</p></li>
+<li><p>use <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.savez.html">compressed numpy archives</a> (<code class="docutils literal notranslate"><span class="pre">.npz</span></code>) to save some space</p></li>
+<li><p>try to detect the correct text encoding before loading any clear text formats. Outsource this to <a class="reference external" href="https://github.com/chardet/chardet">chardet</a></p></li>
+</ul>
+<p><strong>Type and Value Checking</strong></p>
+<ul class="simple">
+<li><p>functions and classes that are exposed to the user should have type and value checking</p></li>
+<li><dl class="simple">
+<dt>some people will tell you “this is not the pythonic way”, however:</dt><dd><ul>
+<li><p>clear error messages are more helpful than debugging for 20 minutes</p></li>
+<li><p>some values produce results that are valid mathematically, but impossible according to physics (e.g. negative energies, zero sized geometries etc.).</p></li>
+<li><p>even I as developer do not remember the types and value ranges for all parameters and the correct function usage</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Object and Geometry Locks</strong></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Class functions change parameters of the object itself, assigning parameters directly to the object can break things. Hard to debug, very frustrating.</dt><dd><ul>
+<li><p>e.g. the surface height depends on the surface parameters. Changing one without the other leads to very weird issues</p></li>
+<li><p>This however depends on the parameters/variables and their roles.</p></li>
+<li><p>Some parameters are even read-only.</p></li>
+<li><p>a change is not propagated to the parent/child object</p></li>
+<li><p>we can’t expect the user to know where assignments are possible without side effects and where not.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>➜ restricting assignments</dt><dd><ul>
+<li><p>lock the geometry of an <code class="code highlight python docutils literal highlight-python"><span class="n">Element</span></code>, surfaces can only be assigned by special functions, the position can only be changed with a dedicated method</p></li>
+<li><p>lock objects like a <code class="code highlight python docutils literal highlight-python"><span class="n">Surface</span></code> to avoid nasty side effects</p></li>
+<li><p>allow assignments where possible</p></li>
+<li><p>make numpy arrays read-only while locking</p></li>
+<li><p>locking can still be turned off manually when knowing about the internal mechanism, but at that point the user should have noticed that changing the code in such a way was not intended by the library</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Coding Style</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CamelCase</span></code> class names, <code class="docutils literal notranslate"><span class="pre">lower_case_with_underscores</span></code> for functions, filenames, parameters. Note that the latter this is not always possible for mathematical or physical quantities with standardized symbols</p></li>
+<li><p>increased line length of 120 characters</p></li>
+<li><p>prefer writing out keyword arguments (<code class="code highlight python docutils literal highlight-python"><span class="n">function</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">1026</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">4596</span><span class="p">)</span></code>) for readability and simpler documentation</p></li>
+<li><p>use of docstrings for functions, classes and important variables</p></li>
+</ul>
+<p><strong>Standard Output</strong></p>
+<ul class="simple">
+<li><p>functions and classes output information and warnings to the terminal</p></li>
+<li><p>warnings have an own type <a class="reference internal" href="../reference/optrace.html#optrace.warnings.OptraceWarning" title="optrace.warnings.OptraceWarning"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptraceWarning</span></code></a> and can be silenced with a global option <a class="reference internal" href="../reference/optrace.html#optrace.global_options.ClassGlobalOptions.show_warnings" title="optrace.global_options.ClassGlobalOptions.show_warnings"><code class="xref py py-attr docutils literal notranslate"><span class="pre">show_warnings</span></code></a></p></li>
+<li><p>the progressbar should only used for more time-intensive tasks and can be turned off with the <a class="reference internal" href="../reference/optrace.html#optrace.global_options.ClassGlobalOptions.show_progress_bar" title="optrace.global_options.ClassGlobalOptions.show_progress_bar"><code class="xref py py-attr docutils literal notranslate"><span class="pre">show_progressbar</span></code></a> option.</p></li>
+</ul>
+<p><strong>Responsiveness</strong></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>some actions need time, but the program should still appear active and responsive. Hence, we need to notify the user with:</dt><dd><ul>
+<li><p>a message that something has been started / processed/ approved</p></li>
+<li><p>a progress bar indicating the progress and estimated remaining time. Also distracts the user, lowering the subjective waiting time</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>TraceGUI actions like tracing, focussing etc. need to run in background threads, so the scene and main UI thread are responsive</p></li>
+</ul>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="packaging.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">7.3. </span>Packaging</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="changelog.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">7.5. </span>Changelog</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+    <div class="footer-items__start">
+        <div class="footer-item">
+          <p class="copyright">
+              &copy; 2025, Damian Mendroch &nbsp;  &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+              &nbsp; &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+              <br>
+          </p>
+        </div>
+    </div>
+    <div class="footer-items__end">
+        <div class="footer-item">
+        <p class="theme-version">
+          Built with <a href="https://www.sphinx-doc.org/" style="color: var(--pst-color-text-muted)">Sphinx</a> 8.2.3
+          and the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html" style="color: var(--pst-color-text-muted)">PyData Sphinx Theme</a> 0.16.1
+        </p>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

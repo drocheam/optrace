@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4.9. Focus Search &#8212; optrace 1.6.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c33f382b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=59eafeec"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="../_static/mathjax/tex-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/focus';</script>
+    <link rel="canonical" href="https://drocheam.github.io/optrace/usage/focus.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.10. Paraxial Analysis" href="tma.html" />
+    <link rel="prev" title="4.8. Image Classes" href="image.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.9. Focus Search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.9. </span>Focus Search</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="focus-search">
+<span id="usage-focus"></span><h1><span class="section-number">4.9. </span>Focus Search<a class="headerlink" href="#focus-search" title="Link to this heading">#</a></h1>
+<section id="focus-modes">
+<h2><span class="section-number">4.9.1. </span>Focus Modes<a class="headerlink" href="#focus-modes" title="Link to this heading">#</a></h2>
+<p>The following focus methods are available:</p>
+<div class="pst-scrollable-table-container"><table class="table table-left">
+<colgroup>
+<col style="width: 37.5%" />
+<col style="width: 62.5%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>RMS Spot Size</strong></p></td>
+<td><p>minimal variance of the lateral ray position</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Irradiance Variance</strong></p></td>
+<td><p>highest irradiance variance</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Image Sharpness</strong></p></td>
+<td><p>sharpest edges for the whole image</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Image Center Sharpness</strong></p></td>
+<td><p>sharpest edges in the center region of the image</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The methods use all available rays, for better results the scene should have been traced with much rays as possible.
+The methods are explained in more detail down below.</p>
+<p>There are multiple applications for focus search, below you can find method recommendations.</p>
+<dl class="simple">
+<dt><strong>Case 1</strong>: Perfect, nearly ideal focal point</dt><dd><ul class="simple">
+<li><p><strong>Examples:</strong> Focus of an ideal lens. Paraxial illumination of a real lens</p></li>
+<li><p><strong>Preferred methods:</strong> RMS Spot Size. Irradiance Variance is also suitable, but has worse performance.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Below you can find an example.
+Both RMS Spot Size and Irradiance Variance find a similar focal position, differing only in 70 µm.
+Note the different scaling of the images.</p>
+<div class="pst-scrollable-table-container"><table class="table-borderless table" id="id1">
+<caption><span class="caption-number">Table 4.12 </span><span class="caption-text">Comparison between “RMS Spot Size” (left) and “Irradiance Variance” (right) in linear (top) and logarithmic
+lightness values (bottom).
+Example <a class="reference internal" href="../examples.html#example-double-gauss"><span class="std std-ref">Double Gauss</span></a>. Focus search for ray source 0 only. 2 million rays.</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_gauss_rms.webp"><img alt="../_images/focus_gauss_rms.webp" class="dark-light" src="../_images/focus_gauss_rms.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_gauss_var.webp"><img alt="../_images/focus_gauss_var.webp" class="dark-light" src="../_images/focus_gauss_var.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="simple">
+<dt><strong>Case 2:</strong>  Strong aberrations or no distinct focal point</dt><dd><ul class="simple">
+<li><p><strong>Examples:</strong> Lens with large spherical aberration, multifocal lens</p></li>
+<li><p><strong>Preferred methods:</strong> Irradiance Variance.</p></li>
+</ul>
+</dd>
+</dl>
+<p>In the following example there are noticeable amounts of spherical aberration.
+RMS Spot Size tries the minimize the radial distance of the outer rays, sacrificing a sharp core.
+Irradiance Variance correctly finds a suitable focal position.
+Note the logarithmic plots, that show the outer rays.
+In the right case they merely contribute to the image, but they have large impact on the RMS, why the RMS method fails.</p>
+<div class="pst-scrollable-table-container"><table class="table-borderless table" id="id2">
+<caption><span class="caption-number">Table 4.13 </span><span class="caption-text">Comparison between “RMS Spot Size” (left) and “Irradiance Variance” (right) in linear (top) and logarithmic
+lightness values (bottom).
+Example <a class="reference internal" href="../examples.html#example-spherical-aberration"><span class="std std-ref">Spherical Aberration</span></a>.</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_sphere_rms.webp"><img alt="../_images/focus_sphere_rms.webp" class="dark-light" src="../_images/focus_sphere_rms.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_sphere_var.webp"><img alt="../_images/focus_sphere_var.webp" class="dark-light" src="../_images/focus_sphere_var.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_sphere_rms_log.webp"><img alt="../_images/focus_sphere_rms_log.webp" class="dark-light" src="../_images/focus_sphere_rms_log.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_sphere_var_log.webp"><img alt="../_images/focus_sphere_var_log.webp" class="dark-light" src="../_images/focus_sphere_var_log.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="simple">
+<dt><strong>Case 3:</strong> Finding the optimal image distance</dt><dd><ul class="simple">
+<li><p><strong>Example:</strong> Actual image position (not just the paraxial) in a multi-lens setup.</p></li>
+<li><p><strong>Preferred methods:</strong> Image Sharpness.
+With large amounts of curvature of field Image Center Sharpness should be selected,
+to find a best-fit focus for the image center region.</p></li>
+</ul>
+</dd>
+</dl>
+<p>For the image sharpness methods to work best, a source image with high contrast and sharp edges should be used.
+For instance, the grid or Siemens star presets, depicted in table <a class="reference internal" href="image.html#table-image-presets-aberrations"><span class="std std-numref">Table 4.11</span></a>.</p>
+<p>In the following figure you can find an example for image sharpness focussing for a setup with
+large amounts of field of curvature. While in the left case more image regions are somewhat sharp, in the right case
+the sharpness is optimized for the center region.</p>
+<div class="pst-scrollable-table-container"><table class="table-borderless table" id="id3">
+<caption><span class="caption-number">Table 4.14 </span><span class="caption-text">Comparison between “Image Sharpness” (left) and “Image Center Sharpness” (right) for a setup with
+large amounts of field of curvature. Example <a class="reference internal" href="../examples.html#example-image-render"><span class="std std-ref">Image Render</span></a>, Grid image, pupil of 1mm, 5 million rays.</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_image_sharpness_grid.webp"><img alt="../_images/focus_image_sharpness_grid.webp" class="dark-light" src="../_images/focus_image_sharpness_grid.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/focus_image_center_sharpness_grid.webp"><img alt="../_images/focus_image_center_sharpness_grid.webp" class="dark-light" src="../_images/focus_image_center_sharpness_grid.webp" style="width: 450px;" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="limitations">
+<h2><span class="section-number">4.9.2. </span>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">#</a></h2>
+<p>Limitations include:</p>
+<ul class="simple">
+<li><p>due to restrictions of the search region the search can’t find a focus that lies between the maximum and minimum
+z-value of a surface</p></li>
+<li><p>rays absorbed in the search region by the raytracer outline are handled as not absorbed</p></li>
+<li><p>in more complex cases only a local minimum is found</p></li>
+<li><p>see the limitations of each method below.</p></li>
+</ul>
+</section>
+<section id="usage">
+<h2><span class="section-number">4.9.3. </span>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
+<p>For focus search you will need to trace the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> geometry.
+The <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.focus_search" title="optrace.tracer.raytracer.Raytracer.focus_search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">focus_search</span></code></a> function is then called by
+passing the focus mode and a starting position.
+The search takes place around the starting point, with the search region between the largest z-position of the last
+aperture, filter, lens or ray source and the smallest z-position of the next aperture, filter, lens or outline.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="p">,</span> <span class="n">fsdict</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">focus_search</span><span class="p">(</span><span class="s2">&quot;RMS Spot Size&quot;</span><span class="p">,</span> <span class="mf">12.09</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">focus_search</span></code> returns two results, where the first one is a <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult" title="(in SciPy v1.15.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.optimize.OptimizeResult</span></code></a>
+object with information on the root finding. The found z-position is accessed with <code class="code highlight python docutils literal highlight-python"><span class="n">res</span><span class="o">.</span><span class="n">x</span></code>.
+The second return value includes some additional information, for instance needed for the cost plot,
+see <a class="reference internal" href="plots.html#focus-cost-plot"><span class="std std-ref">Focus Search Cost Function Plots</span></a>.</p>
+<p>By default, rays from all sources are used to focus_search.
+Optionally a <code class="code highlight python docutils literal highlight-python"><span class="n">source_index</span></code> parameter can be provided to limit the search to a specific ray source.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="p">,</span> <span class="n">fsdict</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">focus_search</span><span class="p">(</span><span class="s2">&quot;RMS Spot Size&quot;</span><span class="p">,</span> <span class="mf">12.09</span><span class="p">,</span> <span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the output dictionary <code class="code highlight python docutils literal highlight-python"><span class="n">fsdict</span></code> should include sampled cost function values,
+the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">return_cost</span></code> must be set to <code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="p">,</span> <span class="n">fsdict</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">focus_search</span><span class="p">(</span><span class="s2">&quot;RMS Spot Size&quot;</span><span class="p">,</span> <span class="mf">12.09</span><span class="p">,</span> <span class="n">return_cost</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is required when plotting the cost function using
+<a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.focus_search_cost_plot" title="optrace.plots.misc_plots.focus_search_cost_plot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">focus_search_cost_plot</span></code></a>, see <a class="reference internal" href="plots.html#focus-cost-plot"><span class="std std-ref">Focus Search Cost Function Plots</span></a>.
+It is deactivated by default to increase the performance of methods <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;RMS Spot Size&quot;</span><span class="p">,</span> <span class="s2">&quot;Irradiance Variance&quot;</span></code></p>
+</section>
+<section id="cost-plot">
+<h2><span class="section-number">4.9.4. </span>Cost Plot<a class="headerlink" href="#cost-plot" title="Link to this heading">#</a></h2>
+<aside class="topic">
+<p class="topic-title">Note</p>
+<p>Generally it is recommended to plot the cost function of the optimization so one can see
+if there are multiple minima and how distinct the found value is.
+The TraceGUI has an option for plotting the cost function.</p>
+</aside>
+<p>See <a class="reference internal" href="plots.html#focus-cost-plot"><span class="std std-ref">Focus Search Cost Function Plots</span></a>.</p>
+<section id="rms-spot-size">
+<span id="focus-positional-methods"></span><h3><span class="section-number">4.9.4.1. </span>RMS Spot Size<a class="headerlink" href="#rms-spot-size" title="Link to this heading">#</a></h3>
+<p>Minimizing the position variance <span class="math notranslate nohighlight">\(\sigma^2\)</span> of lateral ray positions <span class="math notranslate nohighlight">\(x\)</span>
+and <span class="math notranslate nohighlight">\(y\)</span> at axial position <span class="math notranslate nohighlight">\(z\)</span>.  All positions are weighted with their power <span class="math notranslate nohighlight">\(P\)</span>
+when calculating the weighted variance <span class="math notranslate nohighlight">\(\sigma^2_P\)</span>.
+The Pythagorean sum is applied using both variances to get a simple quantity <span class="math notranslate nohighlight">\(R_\text{v}\)</span> for optimization.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-position">
+<span class="eqno">(4.19)<a class="headerlink" href="#equation-autofocus-position" title="Link to this equation">#</a></span>\[\text{minimize}~~ R_\text{v}(z) := \sqrt{\sigma^2_{x,P}(z) + \sigma^2_{y,P}(z)}\]</div>
+<p>This procedure is simple and performant.
+However, the disadvantage of this method is that it minimizes the position variance of all beams.
+For example, if there is a strong outlying halo, the method also tries to keep it as small as possible,
+which can lead to a compromise between the halo and the size of the actual focus.</p>
+</section>
+<section id="irradiance-variance">
+<h3><span class="section-number">4.9.4.2. </span>Irradiance Variance<a class="headerlink" href="#irradiance-variance" title="Link to this heading">#</a></h3>
+<p>Renders a power histogram for rays at position <span class="math notranslate nohighlight">\(z\)</span>.
+This histogram is divided by pixel area to get an irradiance image <span class="math notranslate nohighlight">\(E(z)\)</span>
+The approach then calculates the variance of the pixel values and finds the <span class="math notranslate nohighlight">\(z\)</span> with the largest variance.</p>
+<p>The most outside rays define the image dimensions, the absolute image size therefore varies along the beam path.
+This can be an issue when few rays are far away from the optical axis,
+since the resolution suffers because of these marginal rays.</p>
+<p>The variance is large when there are bright areas in the image (with much power per area)
+or if there is a large variance between pixels, which should be the case if unblurred structures are present.
+For a minimization, the variance is inverted.
+For a more smooth cost function and a better data range the square root of the variance is used.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-image">
+<span class="eqno">(4.20)<a class="headerlink" href="#equation-autofocus-image" title="Link to this equation">#</a></span>\[\text{minimize}~~ I_\text{v}(z) := \frac{1}{\sqrt[4]{\sigma_E^2(z)}}\]</div>
+</section>
+<section id="image-sharpness">
+<h3><span class="section-number">4.9.4.3. </span>Image Sharpness<a class="headerlink" href="#image-sharpness" title="Link to this heading">#</a></h3>
+<p>The power image <span class="math notranslate nohighlight">\(P(x, y, z)\)</span> is transformed into the Fourier domain, creating a Fourier power image <span class="math notranslate nohighlight">\(p_f\)</span>
+with image frequencies <span class="math notranslate nohighlight">\(f_x\)</span> and <span class="math notranslate nohighlight">\(f_y\)</span>.
+Using the Pythagorean theorem we can join the frequency components into a radial frequency.
+The radial frequency of each pixel is scaled with the corresponding pixel power.
+We want to maximize this product, which is large when there are many high frequency components
+in the original image <span class="math notranslate nohighlight">\(P_z\)</span> or when high frequency components have a high power.</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-image-sharpness-fourier">
+<span class="eqno">(4.21)<a class="headerlink" href="#equation-autofocus-image-sharpness-fourier" title="Link to this equation">#</a></span>\[P_f(f_x, f_y, z) = \mathcal{F}\left\{ P(x, y, z)\right\}\]</div>
+<div class="math notranslate nohighlight" id="equation-autofocus-image-sharpness">
+<span class="eqno">(4.22)<a class="headerlink" href="#equation-autofocus-image-sharpness" title="Link to this equation">#</a></span>\[\text{minimize}~~ F_\text{p}(z) := \frac{1}{ \sqrt{\sum_{x,y} P_f(f_x, f_y, z) \left( f^2_x + f_y^2 \right)}}\]</div>
+<p>For a minimization, the term is normalized by the pixel count <span class="math notranslate nohighlight">\(N\)</span> and inverted.
+This method is independent of the image size, as only the power image and not the irradiance map is employed.</p>
+<p>A disadvantage of this method is that it tries to maximize the sharpness of the <em>whole</em> image.
+Only a compromise solution is found for images with spatial varying blur.</p>
+</section>
+<section id="image-center-sharpness">
+<h3><span class="section-number">4.9.4.4. </span>Image Center Sharpness<a class="headerlink" href="#image-center-sharpness" title="Link to this heading">#</a></h3>
+<p>To put more emphasis on the image center, the following weighing function is applied:</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-image-center-sharpness-weighting">
+<span class="eqno">(4.23)<a class="headerlink" href="#equation-autofocus-image-center-sharpness-weighting" title="Link to this equation">#</a></span>\[\begin{split}w_r = \begin{cases} (1 - r^2)^2 &amp;~~\text{for}~ r \leq 1\\ 1 &amp; ~~\text{for}~ r &gt; 1\\ \end{cases}\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(r\)</span> is the normalized image radius with values between 0 and 1,
+describing the radial position on the pixel grid.
+The Fourier transform is then:</p>
+<div class="math notranslate nohighlight" id="equation-autofocus-image-center-sharpness-fourier">
+<span class="eqno">(4.24)<a class="headerlink" href="#equation-autofocus-image-center-sharpness-fourier" title="Link to this equation">#</a></span>\[P_{f,w}(f_x, f_y, z) = \mathcal{F}\left\{ P(x, y, z)~ w_r \right\}\]</div>
+<p>From here on, the steps are the same as for the method Image Sharpness.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="image.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4.8. </span>Image Classes</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tma.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">4.10. </span>Paraxial Analysis</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#focus-modes">4.9.1. Focus Modes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">4.9.2. Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">4.9.3. Usage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-plot">4.9.4. Cost Plot</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rms-spot-size">4.9.4.1. RMS Spot Size</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#irradiance-variance">4.9.4.2. Irradiance Variance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-sharpness">4.9.4.3. Image Sharpness</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-center-sharpness">4.9.4.4. Image Center Sharpness</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+    <div class="footer-items__start">
+        <div class="footer-item">
+          <p class="copyright">
+              &copy; 2025, Damian Mendroch &nbsp;  &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+              &nbsp; &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+              <br>
+          </p>
+        </div>
+    </div>
+    <div class="footer-items__end">
+        <div class="footer-item">
+        <p class="theme-version">
+          Built with <a href="https://www.sphinx-doc.org/" style="color: var(--pst-color-text-muted)">Sphinx</a> 8.2.3
+          and the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html" style="color: var(--pst-color-text-muted)">PyData Sphinx Theme</a> 0.16.1
+        </p>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>

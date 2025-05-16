@@ -1,0 +1,862 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4.14. GUI Automation &#8212; optrace 1.6.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=c33f382b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=59eafeec"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/gui_automation';</script>
+    <link rel="canonical" href="https://drocheam.github.io/optrace/usage/gui_automation.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.15. Advanced Topics" href="advanced.html" />
+    <link rel="prev" title="4.13. GUI Interaction" href="gui.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">optrace 1.6.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Example Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../details/index.html">
+    Implementation Details
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/drocheam/optrace/releases" title="Releases" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Releases</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4.14. GUI Automation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link"><span class="section-number">4. </span>Usage</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4.14. </span>GUI Automation</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="gui-automation">
+<span id="id1"></span><h1><span class="section-number">4.14. </span>GUI Automation<a class="headerlink" href="#gui-automation" title="Link to this heading">#</a></h1>
+<p>Some exemplary automation tasks include:</p>
+<ul class="simple">
+<li><p>changing the geometry</p></li>
+<li><p>changing camera views accurately</p></li>
+<li><p>displaying specific rays</p></li>
+<li><p>picking specific rays</p></li>
+<li><p>debugging</p></li>
+<li><p>taking automated screenshots of the scene</p></li>
+<li><p>calling functions with settings not available through the GUI</p></li>
+<li><p>…</p></li>
+</ul>
+<section id="the-control-method">
+<h2><span class="section-number">4.14.1. </span>The Control Method<a class="headerlink" href="#the-control-method" title="Link to this heading">#</a></h2>
+<p>To do automated tasks, the <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.control" title="optrace.gui.trace_gui.TraceGUI.control"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.control</span></code></a> method needs to be used instead of <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a>.
+It requires an automation function as well as an argument tuple.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">GUI</span><span class="p">):</span>
+
+    <span class="c1"># do some automation things</span>
+    <span class="o">...</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>After the control function is executed the program is kept running.
+This makes it possible to interact with the GUI.
+Closing the application automatically is described in <a class="reference internal" href="#gui-automation-close"><span class="std std-numref">Section 4.14.10</span></a></p>
+<p>To avoid race conditions, all actions inside the provided automation function are run sequentially.
+During this time, the GUI is unresponsive, as the automation function is run in the main thread (as user input would also be) so the interaction with the scene in this time will be limited.</p>
+</section>
+<section id="applying-properties">
+<h2><span class="section-number">4.14.2. </span>Applying Properties<a class="headerlink" href="#applying-properties" title="Link to this heading">#</a></h2>
+<p>Available TraceGUI properties are discussed in <a class="reference internal" href="gui.html#gui-tabs"><span class="std std-numref">Section 4.13.3</span></a>.
+All these can be set programmatically.</p>
+<p>While the variables are set, the TraceGUI does not execute the functions or actions that react to these changes automatically.
+This is in contrast to the standard <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.run" title="optrace.gui.trace_gui.TraceGUI.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.run</span></code></a> method,
+where a setting is applied subsequently (for instance, changing the ray color setting updates the color in the scene automatically).</p>
+<p>To process all pending events <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> must be called.
+This is not needed after every property change, but only if the changes should be visible/executed at this point.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">GUI</span><span class="p">):</span>
+
+    <span class="c1"># change properties</span>
+    <span class="n">GUI</span><span class="o">.</span><span class="n">minimalistic_view</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">GUI</span><span class="o">.</span><span class="n">hide_labels</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">GUI</span><span class="o">.</span><span class="n">ray_count</span> <span class="o">=</span> <span class="mi">1000</span>
+
+    <span class="c1"># GUI properties were set, but the changes need to be processed</span>
+    <span class="n">GUI</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+
+    <span class="c1"># dome some other things</span>
+    <span class="o">...</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>Note that some functions, like <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot" title="optrace.gui.trace_gui.TraceGUI.replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.replot</span></code></a> also call <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> internally.</p>
+</section>
+<section id="replotting">
+<h2><span class="section-number">4.14.3. </span>Replotting<a class="headerlink" href="#replotting" title="Link to this heading">#</a></h2>
+<p>While <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.process" title="optrace.gui.trace_gui.TraceGUI.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.process</span></code></a> reacts to changes in the TraceGUI itself, it does not handle changes of the raytracer or tracing geometry.</p>
+<p>When changing the geometry, the changes are not automatically applied to the scene.
+The geometry is also not automatically raytraced.</p>
+<p>To force the redrawing and retracing of the full scene, you can call <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.replot" title="optrace.gui.trace_gui.TraceGUI.replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.replot</span></code></a>.</p>
+<p>With the context manager <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a> it is possible to only update changed objects.
+For instance, if a detector is moved, there is no need for updating the lenses inside the geometry or retracing the scene.
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a> handles the detection of changes and updating automatically.</p>
+<p>Here is an example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">GUI</span><span class="p">):</span>
+
+    <span class="c1"># replot everything</span>
+    <span class="n">GUI</span><span class="o">.</span><span class="n">replot</span><span class="p">()</span>
+
+    <span class="c1"># do some actions and at the end replot only changed objects</span>
+    <span class="c1"># and/or retrace the geometry if needed.</span>
+    <span class="k">with</span> <span class="n">GUI</span><span class="o">.</span><span class="n">smart_replot</span><span class="p">():</span>
+        <span class="n">some_action_1</span><span class="p">()</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>When controlling the TraceGUI through the CommandWindow of the GUI, there is also the option to replot all objects automatically.
+The implementation is done internally in the same way by using <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.smart_replot" title="optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.smart_replot</span></code></a>.</p>
+</section>
+<section id="controlling-the-camera">
+<span id="gui-camera"></span><h2><span class="section-number">4.14.4. </span>Controlling the Camera<a class="headerlink" href="#controlling-the-camera" title="Link to this heading">#</a></h2>
+<p>Controlling the camera is done with the functions <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a> and <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.get_camera" title="optrace.gui.trace_gui.TraceGUI.get_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.get_camera</span></code></a>.
+The former sets the properties, while the latter one returns a dictionary of the current settings.</p>
+<p>The following settings are available:</p>
+<div class="pst-scrollable-table-container"><table class="table table-left">
+<colgroup>
+<col style="width: 27.3%" />
+<col style="width: 72.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="code highlight python docutils literal highlight-python"><span class="n">center</span></code></p></td>
+<td><p>3D coordinates of center of view in mm</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code highlight python docutils literal highlight-python"><span class="n">height</span></code></p></td>
+<td><p>half of vertical visible scene height in mm</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="code highlight python docutils literal highlight-python"><span class="n">direction</span></code></p></td>
+<td><p>camera view direction vector (direction of vector perpendicular to your monitor and in your viewing direction)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code highlight python docutils literal highlight-python"><span class="n">roll</span></code></p></td>
+<td><p>absolute camera roll angle in degrees</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>You can find example code below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+
+    <span class="c1"># store initial camera properties</span>
+    <span class="n">cam_props</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">get_camera</span><span class="p">()</span>
+
+    <span class="c1"># change the center of the view as well as the scaling</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+
+    <span class="c1"># reset to initial view</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span><span class="o">**</span><span class="n">cam_props</span><span class="p">)</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>Applying camera properties at startup is possible using the <code class="code highlight python docutils literal highlight-python"><span class="n">initial_camera</span></code> parameter of the TraceGUI class.
+This parameter is a dictionary that can include all possible parameters of function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.set_camera" title="optrace.gui.trace_gui.TraceGUI.set_camera"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.set_camera</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">initial_camera</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">roll</span><span class="o">=</span><span class="mi">45</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="taking-screenshots">
+<h2><span class="section-number">4.14.5. </span>Taking Screenshots<a class="headerlink" href="#taking-screenshots" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.screenshot" title="optrace.gui.trace_gui.TraceGUI.screenshot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.screenshot</span></code></a> function make it possible to capture screenshots of the scene.
+A path string is required for this function.
+The file type is determined automatically from the file name.</p>
+<p>Internally, the <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#mayavi.mlab.savefig" title="(in mayavi v4.8.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mayavi.mlab.savefig</span></code></a> function from <a class="reference external" href="https://docs.enthought.com/mayavi/mayavi">mayavi</a> is utilized, therefore supporting this function’s additional parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+
+    <span class="c1"># default call</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span><span class="s2">&quot;image.png&quot;</span><span class="p">)</span>
+
+    <span class="c1"># call with additional parameters</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span><span class="s2">&quot;image2.png&quot;</span><span class="p">,</span> <span class="n">magnification</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>Note that the <code class="code highlight python docutils literal highlight-python"><span class="n">magnification</span></code> parameter leads to a rescaled scene, where some elements change their relative size.</p>
+</section>
+<section id="selecting-rays">
+<span id="usage-gui-selecting-rays"></span><h2><span class="section-number">4.14.6. </span>Selecting Rays<a class="headerlink" href="#selecting-rays" title="Link to this heading">#</a></h2>
+<p>By default, a random selection of rays is displayed inside the scene where the number is specified by <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.rays_visible</span></code></a>.
+A custom selection can be set using the function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.select_rays" title="optrace.gui.trace_gui.TraceGUI.select_rays"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.select_rays</span></code></a>.
+It takes a <code class="code highlight python docutils literal highlight-python"><span class="n">mask</span></code> parameter, which is a one-dimensional boolean <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code></a>, and an optional <code class="code highlight python docutils literal highlight-python"><span class="n">max_show</span></code> parameter, that specified the maximum amount of rays to display.
+Parameter <code class="code highlight python docutils literal highlight-python"><span class="n">mask</span></code> must have the same length as there are rays simulated, which is set by <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_count" title="optrace.gui.trace_gui.TraceGUI.ray_count"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_count</span></code></a>
+Note that there is a maximum amount of rays that can be displayed (specified by the maximum value of <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.rays_visible" title="optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.rays_visible</span></code></a>, by default <code class="code highlight python docutils literal highlight-python"><span class="mi">50000</span></code>).
+If the <code class="code highlight python docutils literal highlight-python"><span class="n">mask</span></code> includes more values, a random subset is selected.
+Accessing <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a> returns the boolean array for the currently displayed rays.</p>
+<p>Typical useful scenarios are debugging or ray analysis.
+For instance, only rays from a specific source, region or wavelength range can be selected and displayed.
+See <a class="reference internal" href="advanced.html#usage-ray-access"><span class="std std-ref">Accessing Ray Properties</span></a> to learn how to access ray properties.
+You can find examples for ray selections below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">GUI</span><span class="p">):</span>
+
+    <span class="c1"># display rays with wavelengths between 400 and 450nm</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">GUI</span><span class="o">.</span><span class="n">raytracer</span><span class="o">.</span><span class="n">rays</span><span class="o">.</span><span class="n">wl_list</span> <span class="o">&gt;=</span> <span class="mi">400</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">GUI</span><span class="o">.</span><span class="n">raytracer</span><span class="o">.</span><span class="n">rays</span><span class="o">.</span><span class="n">wl_list</span> <span class="o">&lt;=</span> <span class="mi">450</span><span class="p">)</span>
+    <span class="n">GUI</span><span class="o">.</span><span class="n">select_rays</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="c1"># no max_show provided, but might be limited by this function</span>
+
+    <span class="c1"># display 2000 rays that start at x &gt; 0</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">GUI</span><span class="o">.</span><span class="n">raytracer</span><span class="o">.</span><span class="n">rays</span><span class="o">.</span><span class="n">p_list</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">GUI</span><span class="o">.</span><span class="n">select_rays</span><span class="p">(</span><span class="n">mask</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">2000</span><span class="p">)</span>  <span class="c1"># slicing with 0 so mask is 1D</span>
+
+    <span class="c1"># get mask for actually displayed selection</span>
+    <span class="n">selection</span> <span class="o">=</span> <span class="n">GUI</span><span class="o">.</span><span class="n">ray_selection</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+</section>
+<section id="picking-manually">
+<h2><span class="section-number">4.14.7. </span>Picking Manually<a class="headerlink" href="#picking-manually" title="Link to this heading">#</a></h2>
+<p>The function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray" title="optrace.gui.trace_gui.TraceGUI.pick_ray"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.pick_ray</span></code></a> highlights a full ray.
+An integer <code class="code highlight python docutils literal highlight-python"><span class="n">index</span></code> is required as to select a given ray.
+Only currently displayed rays are pickable, which are defined by <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a>, see <a class="reference internal" href="#usage-gui-selecting-rays"><span class="std std-ref">Selecting Rays</span></a>.
+So an <code class="code highlight python docutils literal highlight-python"><span class="n">index</span><span class="o">=</span><span class="mi">50</span></code> means that the 50th <code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code> value of <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.ray_selection" title="optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TraceGUI.ray_selection</span></code></a> is picked.</p>
+<p>Function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.pick_ray_section" title="optrace.gui.trace_gui.TraceGUI.pick_ray_section"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.pick_ray_section</span></code></a> highlights a ray at a given intersection.
+The ray is highlighted, a crosshair is shown at the intersection position and a ray information text is shown inside the scene.
+Compared to the previous function, an additional integer <code class="code highlight python docutils literal highlight-python"><span class="n">section</span></code> parameter is needed.
+An optional parameter <code class="code highlight python docutils literal highlight-python"><span class="n">detailed</span></code> defines if more detailed information should be shown.
+This would be equivalent to picking a section manually in the scene with the Shift key held.</p>
+<p>To deactivate the ray highlighting, information text and cross hair, <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.reset_picking" title="optrace.gui.trace_gui.TraceGUI.reset_picking"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.reset_picking</span></code></a> needs to be called.</p>
+<p>Here is an example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+
+    <span class="c1"># pick the ray with index 100</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">pick_ray</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="c1"># pick ray section 2 of ray 50 with default view</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">pick_ray_section</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># pick ray section with detailed view</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">pick_ray_section</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">detailed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># reset (=hide) the picking view</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">reset_picking</span><span class="p">()</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+</section>
+<section id="showing-plots">
+<h2><span class="section-number">4.14.8. </span>Showing Plots<a class="headerlink" href="#showing-plots" title="Link to this heading">#</a></h2>
+<p>Available plotting functions include <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_image" title="optrace.gui.trace_gui.TraceGUI.source_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_image</span></code></a> , <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_profile" title="optrace.gui.trace_gui.TraceGUI.source_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_profile</span></code></a>,
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_image" title="optrace.gui.trace_gui.TraceGUI.detector_image"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_image</span></code></a>, <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_profile" title="optrace.gui.trace_gui.TraceGUI.detector_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_profile</span></code></a>,
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.detector_spectrum" title="optrace.gui.trace_gui.TraceGUI.detector_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.detector_spectrum</span></code></a>, <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.source_spectrum" title="optrace.gui.trace_gui.TraceGUI.source_spectrum"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.source_spectrum</span></code></a>,
+<a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI.move_to_focus" title="optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.move_to_focus</span></code></a>.</p>
+<p>There are more settings available than through the GUI.
+For example, it is possible to save a image to the disk.
+Additionally, a custom detector/source extent can be specified, a setting not available through the GUI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+
+    <span class="c1"># change plot settings</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">image_pixels</span> <span class="o">=</span> <span class="mi">315</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">image_mode</span> <span class="o">=</span> <span class="s2">&quot;Lightness (CIELUV)&quot;</span>
+
+    <span class="c1"># show a source profile with a user-defined extent</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">source_profile</span><span class="p">(</span><span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">])</span>
+
+    <span class="c1"># save a detector image with higher dpi</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">detector_image</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;detector.png&quot;</span><span class="p">,</span> <span class="n">sargs</span><span class="o">=</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">))</span>
+
+    <span class="c1"># example for an automated focus plots</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">detector_index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">source_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">cost_function_plot</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">move_to_focus</span><span class="p">()</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-custom-ui-elements">
+<span id="gui-automation-custom-ui"></span><h2><span class="section-number">4.14.9. </span>Accessing custom UI elements<a class="headerlink" href="#accessing-custom-ui-elements" title="Link to this heading">#</a></h2>
+<p>Custom elements are accessible through a name, consisting of their type and a chronological number.
+The number corresponds to the order that the element has been created.
+Assigning values works analogously to all other parameters.
+To button action is called with a special function.</p>
+<p>You can find examples below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sim</span><span class="o">.</span><span class="n">custom_value_2</span> <span class="o">=</span> <span class="mf">4.5</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">custom_checkbox_1</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">custom_selection_3</span> <span class="o">=</span> <span class="s2">&quot;Case 2&quot;</span>
+
+<span class="n">sim</span><span class="o">.</span><span class="n">custom_button_action_1</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="closing-down">
+<span id="gui-automation-close"></span><h2><span class="section-number">4.14.10. </span>Closing Down<a class="headerlink" href="#closing-down" title="Link to this heading">#</a></h2>
+<p>To close the GUI down programmatically, the function <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TraceGUI.close</span></code></a> can be called:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">automated</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+
+    <span class="c1"># do some things</span>
+    <span class="o">...</span>
+
+    <span class="c1"># close everything down</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1"># create the GUI and provide the automation function to TraceGUI.control()</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">TraceGUI</span><span class="p">(</span><span class="n">RT</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">control</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">automated</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">sim</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p>This will close all GUI and plotting windows and exit all background tasks.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="gui.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4.13. </span>GUI Interaction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="advanced.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">4.15. </span>Advanced Topics</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-control-method">4.14.1. The Control Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-properties">4.14.2. Applying Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replotting">4.14.3. Replotting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#controlling-the-camera">4.14.4. Controlling the Camera</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#taking-screenshots">4.14.5. Taking Screenshots</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#selecting-rays">4.14.6. Selecting Rays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#picking-manually">4.14.7. Picking Manually</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#showing-plots">4.14.8. Showing Plots</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-custom-ui-elements">4.14.9. Accessing custom UI elements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#closing-down">4.14.10. Closing Down</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+    <div class="footer-items__start">
+        <div class="footer-item">
+          <p class="copyright">
+              &copy; 2025, Damian Mendroch &nbsp;  &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+              &nbsp; &nbsp; 
+              <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+              <br>
+          </p>
+        </div>
+    </div>
+    <div class="footer-items__end">
+        <div class="footer-item">
+        <p class="theme-version">
+          Built with <a href="https://www.sphinx-doc.org/" style="color: var(--pst-color-text-muted)">Sphinx</a> 8.2.3
+          and the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html" style="color: var(--pst-color-text-muted)">PyData Sphinx Theme</a> 0.16.1
+        </p>
+        </div>
+    </div>
+</div>
+
+  </body>
+</html>
