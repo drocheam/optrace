@@ -1,8 +1,4 @@
 
-/** Main style changes **/
-/***********************************************************/
-
-
 /*font and header settings*/
 html {
     --pst-header-height: 3.5rem;
@@ -27,11 +23,17 @@ body {
     max-width: 88%;
     }
 }
-/*set "Section Navigation" title in side bar to normal size*/
-/*nav.bd-links p.bd-links__title {*/
-    /*font-size: unset;*/
-/*}*/
 
+/*invert contact image*/
+html[data-theme="dark"] .contact-image {
+    filter: invert() !important
+}
+
+/*unset padding and background color of contact image*/
+.contact-image {
+    background-color: unset !important;
+    padding: unset
+}
 
 /*increase size of article content from 60rem to 80rem*/
 .bd-main .bd-content .bd-article-container {
@@ -72,24 +74,11 @@ html[data-theme="dark"] .highlight span.linenos{
 /**Table Settings**/
 /*******************************************************************/
 
-/*unset "width 100%" for a table so width gets adjusted automatically*/
-/*.table {*/
-	/*width: unset;*/
-	/*margin-top: 1rem;*/
-	/*margin-bottom: 2rem;*/
-/*}*/
-
-
 /*lower row padding in tables*/
 .table td, .table th {
     padding: 0.1rem;
 	/*vertical-align: middle;*/
 }
-
-/*fixes lists colors in dark mode inside table cells*/
-/*.table dt, .table dd, .table td {*/
-    /*color: var(--pst-color-text-base);*/
-/*}*/
 
 /** new borderless class for image and object alignment **/
 .table-borderless {
@@ -107,9 +96,6 @@ html[data-theme="dark"] .highlight span.linenos{
 }
 
 
-/** Misc **/
-/****************************************************************/
-
 /**add padding-top so upper math part isn't cut off**/
 div.math mjx-container {
     padding-top: 0.2rem;
@@ -122,9 +108,4 @@ a.footnote-reference, a::before, a::after {
     font-family: unset;
     margin-right: unset;
 }
-
-/*[>fix for badly displayed reference link part 2<]*/
-/*a::after {*/
-   /*color: var(--pst-color-text-muted);*/
-/*}*/
 

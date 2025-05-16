@@ -100,7 +100,8 @@ html_sidebars = {
   "index": ["sidebar-nav-bs-index", "indices"],
   "examples": ["sidebar-nav-bs-index", "indices"],
   "quickstart": ["sidebar-nav-bs-index", "indices"],
-  "installation": ["sidebar-nav-bs-index", "indices"]
+  "installation": ["sidebar-nav-bs-index", "indices"],
+  "impressum": ["sidebar-nav-bs-index", "indices"]
 }
 
 numfig = True
