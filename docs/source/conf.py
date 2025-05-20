@@ -100,6 +100,15 @@ numfig = True
 math_numfig = True
 math_number_all = True
 
+# lazy load equations
+mathjax3_config = {
+    'loader': {'load': ['ui/lazy']},
+    'options': {
+        'lazyMargin': '400px',  # Typeset math within 200px of the viewport
+        'lazyAlwaysTypeset': None, # Or specify elements that should always be typeset
+    },
+}
+
 # links to libraries
 intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'coverage': ('https://coverage.readthedocs.io/en/latest', None),

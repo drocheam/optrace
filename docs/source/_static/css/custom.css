@@ -70,7 +70,16 @@ pre {
         border-bottom: unset !important
     }
     td {
-        border-left: unset !important
+        border-left: unset !important;
+        max-width: 0px;
+        vertical-align: top !important;
+    }
+    figure {
+        margin-top: 0rem;
+        margin-bottom: 0rem;
+    }
+    figcaption {
+        font-size: 1em
     }
 }
 
