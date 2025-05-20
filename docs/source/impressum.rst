@@ -6,11 +6,10 @@
 
 .. _impressum:
 
-----
-
 Impressum / Imprint
 ============================================
 
+Impressum nach § 5 TMG / § 55 RStV:
 
 .. Use image so address and mail can't be crawled easily
 
@@ -18,8 +17,6 @@ Impressum / Imprint
    :class: contact-image
    :align: left
 
-
-|
 |
 |
 |
@@ -28,7 +25,6 @@ Impressum / Imprint
 |
 
 
-----
 
 Disclaimer (German)
 ============================================
@@ -72,12 +68,7 @@ Eine fortlaufende inhaltliche Kontrolle der verlinkten Seiten ist ohne konkrete 
 einer Rechtsverletzung nicht zumutbar. 
 Bei Bekanntwerden von Rechtsverletzungen werden entsprechende Links umgehend entfernt.
 
-
-
 |
-|
-
-----
 
 Disclaimer (English)
 ============================================
@@ -121,5 +112,3 @@ Continuous monitoring of the content of the linked pages is not reasonable witho
 of a legal violation.
 Upon becoming aware of legal violations, such links will be removed immediately.
 
-|
-|

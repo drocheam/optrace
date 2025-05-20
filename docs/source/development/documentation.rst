@@ -37,7 +37,7 @@ The following extensions are used:
 .. list-table::
    :align: left
 
-   * - `sphinx.ext.doctest <https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html>`_ 
+   * - `doctest <https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html>`_ 
      - automatic testing of documentation code examples
    * - `autodoc <https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html>`_ 
      - automatic source code documentation generation
@@ -47,8 +47,12 @@ The following extensions are used:
      - LaTeX equations
    * - `sphinxcontrib.bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ 
      - bibliography management
-   * - `PyData Sphinx Theme <https://pydata-sphinx-theme.readthedocs.io/en/stable/>`_
+   * - `Shibuya Sphinx Theme <https://shibuya.lepture.com/>`_
      - A modern looking theme
+   * - `Sphinx Sitemap <https://sphinx-sitemap.readthedocs.io/en/latest/index.html>`_
+     - Generate sitemaps while building the documentation
+   * - `Sphinx Mathjax Offline <https://pypi.org/project/sphinx-mathjax-offline/>`_
+     - Provides the mathjax js and font files without having to rely on an external CDN
 
 Additionally, a custom css (`docs/source/_static/css/custom.css <https://github.com/drocheam/optrace/blob/main/docs/source/_static/css/custom.css>`_) adapts the formatting to our needs.
 

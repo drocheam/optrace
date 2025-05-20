@@ -1,56 +1,47 @@
 
-/*font and header settings*/
+/*overwrite style*/
 html {
-    --pst-header-height: 3.5rem;
-    /*--pst-font-family-base-system: "Times New Roman", serif;*/
-    /*--pst-font-size-base: 16px;*/
-	--pst-font-size-h1: 25px;
-	--pst-font-size-h2: 23px;
-	--pst-font-size-h3: 21px;
-	--pst-font-size-h4: 19px;
-	--pst-font-size-h5: 17px;
-	--pst-font-size-h6: 16px;
+    --syntax-meta:  var(--syntax-comment) !important;
+    --yue-c-code-text: var(--sg-text-color) !important;
+    --yue-c-ol-marker: var(--gray-11) !important;
+    --yue-c-ul-marker: var(--gray-11) !important;
 }
 
-/*lower the line height*/
-body {
-    line-height: 1.5em;
+/*show equation numbers on the right*/
+.eqno {
+    float: right
 }
 
-/*increase relative page size for larger displays*/
-@media (min-width: 960px) {
-.bd-page-width {
-    max-width: 88%;
-    }
+/*decrease size of left side bar below 1000px width*/
+@media (max-width: 1000px) {
+  .md\:shrink-0 {
+    max-width: 200px;
+  }
 }
 
-/*invert contact image*/
-html[data-theme="dark"] .contact-image {
+/*no empty space on the right below 768px width*/
+@media (min-width: 768px) {
+  .sy-main {
+      width: calc(100% - 13rem);
+  }
+}
+
+/*show toc tree markers as links*/
+.yue .toctree-wrapper a {
+    border-bottom: 1px solid var(--yue-c-link-border)
+}
+
+/*invert contact image in dark mode*/
+html.dark .contact-image {
     filter: invert() !important
 }
 
 /*unset padding and background color of contact image*/
 .contact-image {
     background-color: unset !important;
-    padding: unset
-}
-
-/*increase size of article content from 60rem to 80rem*/
-.bd-main .bd-content .bd-article-container {
-   max-width: 90%;
-}
-
-/*lower primary sidebar size*/
-.bd-sidebar-primary {
-    max-width: 20rem;
-}
-
-/*Decrease padding of search field*/
-.search-button-field {
-    padding-top: 0.35rem;
-    padding-bottom: 0.35rem;
-    padding-left: 0.8rem;
-    padding-right: 0.8rem;
+    padding: unset;
+    height: 140px;
+    margin-left: 0px !important
 }
 
 /*word wrapping for code blocks*/
@@ -66,55 +57,40 @@ pre {
     word-break: unset;
 }
 
-/*fix line number coloring in code blocks*/
-html[data-theme="dark"] .highlight span.linenos{
-    color: var(--pst-teal-400)
-}
-
-/*fix inline code wrapping, especially on mobile*/
-code span.pre {
-    white-space: pre-wrap;
-    word-break: normal;
-    overflow-wrap: anywhere;
-}
-
-/**Table Settings**/
-/*******************************************************************/
-
-/*lower row padding in tables*/
-.table td, .table th {
-    padding: 0.1rem;
-	/*vertical-align: middle;*/
-}
-
 /** new borderless class for image and object alignment **/
 .table-borderless {
+ 
     border:none !important;
+
+    tr {
+        background-color: inherit !important;
+        border-bottom-width: 0px !important
+    }
+    caption {
+        border-bottom: unset !important
+    }
+    td {
+        border-left: unset !important
+    }
 }
 
-/**no left border line for each element in row**/
-/*let cell width be 1 / N of page*/
-.table-borderless td {
-    border-left: none !important;
-    max-width: 0
+/*don't show borders around tables*/
+.table-wrapper {
+    border: unset !important
 }
-
-/**remove coloring for rows**/
-.table-borderless tr{
-    background-color: inherit !important;
-}
-
 
 /**add padding-top so upper math part isn't cut off**/
 div.math mjx-container {
     padding-top: 0.2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
-/*don't show reference links as superscript*/
-a.footnote-reference, a::before, a::after {
-    vertical-align: unset;
-    font-size: unset;
-    font-family: unset;
-    margin-right: unset;
-}
+/*[>don't show reference links as superscript<]*/
+/*a.footnote-reference, a::before, a::after {*/
+    /*vertical-align: unset;*/
+    /*font-size: unset;*/
+    /*font-family: unset;*/
+    /*margin-right: unset;*/
+/*}*/
 

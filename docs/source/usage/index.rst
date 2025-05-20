@@ -1,7 +1,7 @@
 .. _usage:
 
 ################
-Usage
+User Guide
 ################
 
 .. toctree::

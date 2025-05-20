@@ -183,7 +183,7 @@ It is deactivated by default to increase the performance of methods :python:`"RM
 Cost Plot
 _________________
 
-.. topic:: Note
+.. note::
 
    Generally it is recommended to plot the cost function of the optimization so one can see 
    if there are multiple minima and how distinct the found value is.
@@ -192,6 +192,10 @@ _________________
 See :ref:`focus_cost_plot`.
 
 .. _focus_positional_methods:
+
+
+Mathematical Formulation of the Methods
+___________________________________________
 
 RMS Spot Size
 =========================================

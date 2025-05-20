@@ -60,10 +60,7 @@ bibtex_default_style = 'unsrt'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-# needs sphinx-rtd-theme installed
-# html_theme = 'pyramid'
-html_theme = "pydata_sphinx_theme"
+html_theme = "shibuya"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -73,39 +70,35 @@ html_css_files = ['css/custom.css']
 html_baseurl = metadata["documentation"]
 
 html_theme_options = {
-    "secondary_sidebar_items": ["page-toc"],  # add navigation to secondary sidebar
-    "navbar_align": "content",
-    "icon_links": [{"name": "GitHub",
-                    "url": "https://github.com/drocheam/optrace",
-                    "icon": "fa-brands fa-square-github",
-                    "logo": "",
-                    "type": "fontawesome",},
-                   {"name": "Releases",
-                    "url": "https://github.com/drocheam/optrace/releases",
-                    "icon": "fas fa-box",
-                    "logo": "",
-                    "type": "fontawesome",},],
-    "pygments_light_style": "tango",
-    "pygments_dark_style": "lightbulb",
-    "back_to_top_button": False,
+    "nav_links": [
+        {
+            "title": "Examples",
+            "url": "./examples"
+        },
+        {
+            "title": "Installation",
+            "url": "./installation"
+        },
+        {
+            "title": "User Guide",
+            "url": "./usage/index"
+        },
+        {
+            "title": "GitHub Repo",
+            "url": "https://github.com/drocheam/optrace"
+        }
+    ],
+    "accent_color": "cyan",
+    "color_mode": "dark",
 }
 
 html_context = {
-   "default_mode": "dark"  # force light mode
-}
-
-# primary side bar
-html_sidebars = {
-  "**": ["sidebar-nav-bs"],
-  "index": ["sidebar-nav-bs-index", "indices"],
-  "examples": ["sidebar-nav-bs-index", "indices"],
-  "quickstart": ["sidebar-nav-bs-index", "indices"],
-  "installation": ["sidebar-nav-bs-index", "indices"],
-  "impressum": ["sidebar-nav-bs-index", "indices"]
+   "default_mode": "dark"
 }
 
 numfig = True
 math_numfig = True
+math_number_all = True
 
 # links to libraries
 intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
