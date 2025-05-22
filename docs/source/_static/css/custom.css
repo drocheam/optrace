@@ -26,6 +26,16 @@ html {
   }
 }
 
+/*lower size of headers below 600px so landscape on mobile is more usable*/
+@media (max-height: 600px) {
+    html {
+        --sy-s-navbar-height: 45px !important;
+    }
+    .sy-breadcrumbs-inner {
+        padding: 0.75rem 0 0.75rem
+    }
+}
+
 /*show toc tree markers as links*/
 .yue .toctree-wrapper a {
     border-bottom: 1px solid var(--yue-c-link-border)
@@ -96,10 +106,10 @@ div.math mjx-container {
 }
 
 /*[>don't show reference links as superscript<]*/
-/*a.footnote-reference, a::before, a::after {*/
-    /*vertical-align: unset;*/
-    /*font-size: unset;*/
+a.footnote-reference, a::before, a::after {
+    vertical-align: unset;
+    font-size: unset;
     /*font-family: unset;*/
     /*margin-right: unset;*/
-/*}*/
+}
 

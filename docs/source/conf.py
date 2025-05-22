@@ -101,11 +101,12 @@ math_numfig = True
 math_number_all = True
 
 # lazy load equations
+# improves loading speed of details/ pages significantly
 mathjax3_config = {
     'loader': {'load': ['ui/lazy']},
     'options': {
-        'lazyMargin': '400px',  # Typeset math within 200px of the viewport
-        'lazyAlwaysTypeset': None, # Or specify elements that should always be typeset
+        'lazyMargin': '400px',
+        'lazyAlwaysTypeset': None,
     },
 }
 
