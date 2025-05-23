@@ -107,6 +107,12 @@ Progressbar
 
 For calculation-intensive tasks a progress bar is displayed inside the terminal 
 that displays the progress and estimated remaining time.
+Here is an example:
+
+.. code-block:: text
+
+   Rendering:  40% |############4                  | 8/20 [00:17<00:22]
+
 It can be turned off globally by:
 
 .. testcode::
@@ -287,7 +293,18 @@ number of cores. Setting the CPU count only provides a maximum number.
 Running optrace on Wayland
 _____________________________________
 
-On Linux, the vtk dependency only supports X11 but not Wayland.
+There seem to be some remaining issues for Wayland on Linux in optrace's dependencies
+(`vtk/issues/18701 <https://gitlab.kitware.com/vtk/vtk/-/issues/18701>`__, `pyvistaqt/issues/445 <https://github.com/pyvista/pyvistaqt/issues/445>`__).
+This leads to the following error:
+
+.. code-block:: text
+
+   X Error of failed request: BadWindow (invalid Window parameter)
+   Major opcode of failed request: 12 (X_ConfigureWindow)
+   Resource id in failed request: 0x3
+   Serial number of failed request: 7
+   Current serial number in output stream: 8
+
 Set the following environment variable in your terminal before running Python, so X11 is used for the application:
 
 .. code-block:: bash
