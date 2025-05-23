@@ -6,6 +6,7 @@ from .surface.function_surface_2d import FunctionSurface2D
 from .surface.function_surface_1d import FunctionSurface1D
 from .surface.circular_surface import CircularSurface
 from .surface.rectangular_surface import RectangularSurface
+from .surface.slit_surface import SlitSurface
 from .surface.ring_surface import RingSurface
 from .surface.conic_surface import ConicSurface
 from .surface.spherical_surface import SphericalSurface

@@ -8,7 +8,7 @@ import scipy.optimize  # numerical optimization methods
 
 # needed for raytracing geometry and functionality
 from .geometry import Filter, Aperture, Detector, Lens, RaySource, Surface,\
-                      RectangularSurface, Line, Point, SphericalSurface, Group, RingSurface
+                      RectangularSurface, Line, Point, SphericalSurface, Group, RingSurface, SlitSurface
 
 from .spectrum import LightSpectrum
 from .refraction_index import RefractionIndex
@@ -368,7 +368,7 @@ class Raytracer(Group):
                     else:
                         weights[hwh, i+1] = 0
 
-                        if isinstance(element.surface, RingSurface):
+                        if isinstance(element.surface, RingSurface) or isinstance(element.surface, SlitSurface):
                             self.__hurb(p, s, wavelengths, i, element.surface)
 
                     # treat rays that go outside outline
@@ -401,55 +401,30 @@ class Raytracer(Group):
 
     def __hurb(self, p, s, wl, i, surf):
 
-        # polar coordinates
-        r = np.sqrt((p[:, i, 0] - surf.pos[0])**2 + (p[:, i, 1] - surf.pos[1])**2)
-        theta = np.atan2(p[:, i, 1] - surf.pos[1], p[:, i, 0] - surf.pos[0])
-
-        # fitting of largest ellipse inside circle
-        # -> minor axis defined by distance to edge
-        # -> major axis defined by ellipse with same curvature at end of minor axis
-
-        # ellipse parameters
-        R = surf.ri
-        inside = r < R
-        b_ = R - r[inside]
-        a_ = np.sqrt(b_*R)  # see https://math.stackexchange.com/questions/4511168/how-to-find-the-radius-of-the-smallest-circle-such-that-the-inner-ellipse-is-tan
+        # get bending angles, axes and mask
+        a_, b_, a, b, inside = surf.hurb_props(p[:, i, 0], p[:, i, 1])
 
         # std dev of direction gaussian
         # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
-        sig_b = np.arctan(1/(2*b_*1e-3*2*np.pi/(wl[inside]*1e-9)))
-        sig_a = np.arctan(1/(2*a_*1e-3*2*np.pi/(wl[inside]*1e-9)))
+        k = 2*np.pi / (wl[inside] * 1e-9)  # TODO what about n?
+        sig_b = np.arctan(1/(2*b_*1e-3*k))
+        sig_a = np.arctan(1/(2*a_*1e-3*k))
 
-        # ellipse minor axis as vector
-        b = np.zeros((b_.shape[0], 3))
-        b[:, 0] = np.cos(theta[inside]) 
-        b[:, 1] = np.sin(theta[inside]) 
-        
-        # ellipse major axis as vector
-        a = np.zeros_like(b)
-        a[:, 0] = -b[:, 1] 
-        a[:, 1] =  b[:, 0]
+        # generated normally distributed angles (but truncate distribution by sig_th)
+        sig_th = 5  # only inner 5 sigma
+        tha = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_a, size=a_.shape[0])
+        thb = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_b, size=b_.shape[0])
 
-    
-        def gauss_strat(N, ks=3):
-            Xl = (1 + scipy.special.erf(-ks/np.sqrt(2)))/2
-            Xr = (1 + scipy.special.erf(ks/np.sqrt(2)))/2
-            X = random.stratified_interval_sampling(Xl, Xr, N)
-            return np.sqrt(2) * scipy.special.erfinv(2*X-1)
-
-        # get normal distributed values, scale by std dev for each ray
-        tha = np.random.normal(size=a_.shape) * sig_a
-        thb = np.random.normal(size=b_.shape) * sig_b
-        # tha = gauss_strat(a_.shape[0]) * sig_a
-        # thb = gauss_strat(b_.shape[0]) * sig_b
-
+        # TODO move to misc module
+        # TODO would it be useful to use elsewhere? (ray source ray generation etc.)
         # see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
         def rodrigues(v, k, th):
-            return v*np.cos(th)[:, np.newaxis] + misc.cross(k, v)*np.sin(th)[:, np.newaxis] + k*misc.rdot(k, v)[:, np.newaxis] * (1 - np.cos(th))[:, np.newaxis]
+            return v*np.cos(th)[:, np.newaxis] + misc.cross(k, v)*np.sin(th)[:, np.newaxis]\
+                    + k*misc.rdot(k, v)[:, np.newaxis] * (1 - np.cos(th))[:, np.newaxis]
 
         # rotate around a and b for direction variation in b and a
-        sa = rodrigues(s[inside], a, tha)
-        sab = rodrigues(sa, b, thb)
+        sa = rodrigues(s[inside], a, thb)
+        sab = rodrigues(sa, b, tha)
 
         s[inside] = sab
         # TODO delete s with negative z component

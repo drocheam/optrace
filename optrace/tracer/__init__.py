@@ -20,6 +20,7 @@ from .geometry.surface.function_surface_2d import FunctionSurface2D
 from .geometry.surface.function_surface_1d import FunctionSurface1D
 from .geometry.surface.circular_surface import CircularSurface
 from .geometry.surface.rectangular_surface import RectangularSurface
+from .geometry.surface.slit_surface import SlitSurface
 from .geometry.surface.ring_surface import RingSurface
 from .geometry.surface.conic_surface import ConicSurface
 from .geometry.surface.tilted_surface import TiltedSurface

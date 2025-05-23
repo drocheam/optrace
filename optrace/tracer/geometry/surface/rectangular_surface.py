@@ -82,16 +82,14 @@ class RectangularSurface(Surface):
         """
         Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
         The only guarantee is that neighbouring array values are neighbouring values in 3D space.
+        Parameter N has no effect for a slit surface and is only for compatibility to other classes.
 
         :param N: number of grid values in each dimension (int)
         :return: X, Y, Z coordinate array (all numpy 2D array)
         """
-        if N < 10:
-            raise ValueError("Expected at least N=10.")
-
         # create a rotated grid
         xs, xe, ys, ye = self._extent[:4]
-        Y, X = np.mgrid[ys:ye:N*1j, xs:xe:N*1j]
+        Y, X = np.mgrid[ys:ye:5j, xs:xe:5j]
         x2, y2 = self._rotate_rc(X.flatten(), Y.flatten(), self._angle)
         X, Y = self.pos[0] + x2.reshape(X.shape), self.pos[1] + y2.reshape(Y.shape)
 

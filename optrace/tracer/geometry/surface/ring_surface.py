@@ -7,6 +7,7 @@ from ... import random  # calculation
 from ....property_checker import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
 
+# TODO Hurb test
 
 class RingSurface(Surface):
     
@@ -84,6 +85,42 @@ class RingSurface(Surface):
         Z[mask5] = self.pos[2]
 
         return X+self.pos[0], Y+self.pos[1], Z
+
+    def hurb_props(self, x, y) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Calculates the properties for Heisenberg Uncertainty Ray Bending.
+
+        :param x: ray position at surface, x-coordinate
+        :param y: ray position at surface, y-coordinate
+        :return: distances axis 1, distances axis 2, axis 1 vector, axis 2 vector, ray mask for rays to bend
+        """
+        # polar coordinates
+        r = np.sqrt((x - self.pos[0])**2 + (y - self.pos[1])**2)
+        theta = np.atan2(y - self.pos[1], x - self.pos[0])
+
+        # fitting of largest ellipse inside circle
+        # see STRAY LIGHT SIMULATION WITH ADVANCED MONTE CARLO TECHNIQUES*, Dr. Barry K. Likeness 
+        # -> minor axis defined by distance to edge
+        # -> major axis defined by ellipse with same curvature at end of minor axis
+
+        # ellipse parameters
+        R = self.ri
+        inside = r < R
+        b_ = R - r[inside]
+        a_ = np.sqrt(b_*R)  
+        # ^-- see https://math.stackexchange.com/questions/4511168/how-to-find-the-radius-of-the-smallest-circle-such-that-the-inner-ellipse-is-tan
+    
+        # ellipse minor axis as vector
+        b = np.zeros((b_.shape[0], 3))
+        b[:, 0] = np.cos(theta[inside]) 
+        b[:, 1] = np.sin(theta[inside]) 
+        
+        # ellipse major axis as vector
+        a = np.zeros_like(b)
+        a[:, 0] = -b[:, 1] 
+        a[:, 1] =  b[:, 0]
+
+        return a_, b_, a, b, inside
 
     def mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
