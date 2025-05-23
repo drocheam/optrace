@@ -68,7 +68,8 @@ class SlitSurface(RectangularSurface):
 
         return X, Y, Z
     
-    def hurb_props(self, x, y) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def hurb_props(self, x: np.ndarray, y: np.ndarray)\
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Calculates the properties for Heisenberg Uncertainty Ray Bending.
 

@@ -86,7 +86,8 @@ class RingSurface(Surface):
 
         return X+self.pos[0], Y+self.pos[1], Z
 
-    def hurb_props(self, x, y) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def hurb_props(self, x: np.ndarray, y: np.ndarray)\
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Calculates the properties for Heisenberg Uncertainty Ray Bending.
 

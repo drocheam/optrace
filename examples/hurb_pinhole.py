@@ -10,7 +10,7 @@ import numpy as np
 # The size of the stop and the test image are parameterizable through the "Custom" GUI tab. 
 
 # make raytracer
-RT = ot.Raytracer(outline=[-15, 15, -15, 15, 0, 40])
+RT = ot.Raytracer(outline=[-15, 15, -15, 15, 0, 40], use_hurb=True)
 
 
 # Pinhole

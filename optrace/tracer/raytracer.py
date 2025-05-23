@@ -23,6 +23,7 @@ from ..progress_bar import ProgressBar
 from . import misc  # calculations
 from ..property_checker import PropertyChecker as pc  # check types and values
 
+# TODO check use_hurb
 
 class Raytracer(Group):
 
@@ -56,6 +57,7 @@ class Raytracer(Group):
                  outline:        (list | np.ndarray),
                  n0:              RefractionIndex = None,
                  no_pol:          bool = False,
+                 use_hurb:        bool = False,
                  **kwargs)\
             -> None:
         """
@@ -68,6 +70,7 @@ class Raytracer(Group):
 
         self.outline = outline  #: geometrical raytracer outline
         self.no_pol = no_pol  #: polarization calculation flag
+        self.use_hurb = use_hurb  #: flag for using Heisenberg uncertainty ray bending on apertures
 
         self.rays = RayStorage()  #: traced rays
         self._msgs = np.array([])
@@ -99,6 +102,9 @@ class Raytracer(Group):
                 return
 
             case "no_pol":
+                pc.check_type(key, val, bool)
+            
+            case "use_hurb":
                 pc.check_type(key, val, bool)
 
         super().__setattr__(key, val)
@@ -142,7 +148,7 @@ class Raytracer(Group):
         """
         return dict(Rays=self.rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()],
-                    TraceSettings=[self.no_pol],
+                    TraceSettings=[self.no_pol, self.use_hurb],
                     Lenses=[D.crepr() for D in self.lenses],
                     Filters=[D.crepr() for D in self.filters],
                     Apertures=[D.crepr() for D in self.apertures],
@@ -296,7 +302,7 @@ class Raytracer(Group):
             n1 = self.n0  # ambient medium before all elements
             ns[:, 0] = n1(wavelengths)  # assign refractive index
 
-            for element in elements:
+            for en, element in enumerate(elements):
 
                 p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
                 hw = weights[:, i] > 0
@@ -368,7 +374,8 @@ class Raytracer(Group):
                     else:
                         weights[hwh, i+1] = 0
 
-                        if isinstance(element.surface, RingSurface) or isinstance(element.surface, SlitSurface):
+                        # use ray bending if activated, but ignore last surface that acts as absorber
+                        if self.use_hurb and en != len(elements) - 1:
                             self.__hurb(p, s, wavelengths, i, element.surface)
 
                     # treat rays that go outside outline
@@ -399,8 +406,20 @@ class Raytracer(Group):
         self._last_trace_snapshot = self.tracing_snapshot()
                         
 
-    def __hurb(self, p, s, wl, i, surf):
+    def __hurb(self, p: np.ndarray, s: np.ndarray, wl: np.ndarray, i: int, surf: Surface) -> None:
+        """
+        Approximate aperture diffraction asymptotically using HURB (Heisenberg Uncertainty Ray Bending),
+        see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
 
+        :param p: position array
+        :param s: direction array
+        :param wl: wavelength arry
+        :param i: surface number
+        :param surf: aperture surface
+        """
+        if not (isinstance(surf, RingSurface) or isinstance(surf, SlitSurface)):
+            raise RuntimeError(f"Ray bending for surface type {type(surf).__name__} not implemented.")
+        
         # get bending angles, axes and mask
         a_, b_, a, b, inside = surf.hurb_props(p[:, i, 0], p[:, i, 1])
 
@@ -427,7 +446,7 @@ class Raytracer(Group):
         sab = rodrigues(sa, b, tha)
 
         s[inside] = sab
-        # TODO delete s with negative z component
+        # TODO delete s with negative z component -> raytrace warning?
 
 
     def __tracing_elements(self) -> list[Lens | Filter | Aperture]:
