@@ -434,16 +434,10 @@ class Raytracer(Group):
         tha = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_a, size=a_.shape[0])
         thb = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_b, size=b_.shape[0])
 
-        # TODO move to misc module
-        # TODO would it be useful to use elsewhere? (ray source ray generation etc.)
-        # see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
-        def rodrigues(v, k, th):
-            return v*np.cos(th)[:, np.newaxis] + misc.cross(k, v)*np.sin(th)[:, np.newaxis]\
-                    + k*misc.rdot(k, v)[:, np.newaxis] * (1 - np.cos(th))[:, np.newaxis]
-
         # rotate around a and b for direction variation in b and a
-        sa = rodrigues(s[inside], a, thb)
-        sab = rodrigues(sa, b, tha)
+        sa = misc.rodrigues_rotation(s[inside], a, thb)
+        sab = misc.rodrigues_rotation(sa, b, tha)
+        # TODO actually correct to rotate around a and b?
 
         s[inside] = sab
         # TODO delete s with negative z component -> raytrace warning?

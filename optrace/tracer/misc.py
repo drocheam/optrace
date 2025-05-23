@@ -83,6 +83,22 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
         raise RuntimeError("Invalid number of dimensions.")
 
 
+# TODO test
+# TODO would it be useful to use elsewhere? (ray source ray generation etc.)
+def rodrigues_rotation(v: np.ndarray, k: np.ndarray, th: np.ndarray) -> np.ndarray:
+    """
+    Rotation of v around k with angle th.
+    see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+    
+    :param v: initial vectors, shape (N, 3)
+    :param k: axis vectors, shape (N, 3)
+    :param th: rotation angles, shape (N,)
+    :return: rotated vectors, shape (N, 3)
+    """
+    return v*np.cos(th)[:, np.newaxis] + cross(k, v)*np.sin(th)[:, np.newaxis]\
+            + k*rdot(k, v)[:, np.newaxis] * (1 - np.cos(th))[:, np.newaxis]
+
+
 def masked_assign(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     """
     set True values of bool mask cond1 to values of cond2, returns resulting mask
