@@ -421,7 +421,7 @@ class Raytracer(Group):
             raise RuntimeError(f"Ray bending for surface type {type(surf).__name__} not implemented.")
         
         # get bending angles, axes and mask
-        a_, b_, a, b, inside = surf.hurb_props(p[:, i, 0], p[:, i, 1])
+        a_, b_, b, inside = surf.hurb_props(p[:, i, 0], p[:, i, 1])
 
         # std dev of direction gaussian
         # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
@@ -434,12 +434,15 @@ class Raytracer(Group):
         tha = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_a, size=a_.shape[0])
         thb = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_b, size=b_.shape[0])
 
-        # rotate around a and b for direction variation in b and a
-        sa = misc.rodrigues_rotation(s[inside], a, thb)
-        sab = misc.rodrigues_rotation(sa, b, tha)
-        # TODO actually correct to rotate around a and b?
+        # TODO explain
+        sa = misc.cross(b, s[inside])
+        sa = misc.normalize(sa)
+        sb = misc.cross(s, sa)
 
-        s[inside] = sab
+        # TODO explain
+        sab = s[inside] + sa*np.tan(tha)[:, np.newaxis] + sb*np.tan(thb)[:, np.newaxis]
+        s[inside] = misc.normalize(sab)
+
         # TODO delete s with negative z component -> raytrace warning?
 
 

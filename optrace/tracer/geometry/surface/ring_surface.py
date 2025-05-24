@@ -87,13 +87,13 @@ class RingSurface(Surface):
         return X+self.pos[0], Y+self.pos[1], Z
 
     def hurb_props(self, x: np.ndarray, y: np.ndarray)\
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Calculates the properties for Heisenberg Uncertainty Ray Bending.
 
         :param x: ray position at surface, x-coordinate
         :param y: ray position at surface, y-coordinate
-        :return: distances axis 1, distances axis 2, axis 1 vector, axis 2 vector, ray mask for rays to bend
+        :return: distances axis 1, distances axis 2, minor axis vector, ray mask for rays to bend
         """
         # polar coordinates
         r = np.sqrt((x - self.pos[0])**2 + (y - self.pos[1])**2)
@@ -115,13 +115,8 @@ class RingSurface(Surface):
         b = np.zeros((b_.shape[0], 3))
         b[:, 0] = np.cos(theta[inside]) 
         b[:, 1] = np.sin(theta[inside]) 
-        
-        # ellipse major axis as vector
-        a = np.zeros_like(b)
-        a[:, 0] = -b[:, 1] 
-        a[:, 1] =  b[:, 0]
 
-        return a_, b_, a, b, inside
+        return a_, b_, b, inside
 
     def mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """

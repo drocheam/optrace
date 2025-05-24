@@ -69,34 +69,29 @@ class SlitSurface(RectangularSurface):
         return X, Y, Z
     
     def hurb_props(self, x: np.ndarray, y: np.ndarray)\
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Calculates the properties for Heisenberg Uncertainty Ray Bending.
 
         :param x: ray position at surface, x-coordinate
         :param y: ray position at surface, y-coordinate
-        :return: distances axis 1, distances axis 2, axis 1 vector, axis 2 vector, ray mask for rays to bend
+        :return: distances axis 1, distances axis 2, left-right axis vector, ray mask for rays to bend
         """
         # rotate coordinates to rectangle coordinate system
         x_, y_ = self._rotate_rc(x - self.pos[0], y - self.pos[1], -self._angle)
 
         # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
-        a_ = self.dimi[0] / 2 - np.abs(x_)
-        b_ = self.dimi[1] / 2 - np.abs(y_)
+        a_ = self.dimi[1] / 2 - np.abs(y_)
+        b_ = self.dimi[0] / 2 - np.abs(x_)
         inside = (a_ > 0) & (b_ > 0)
         a_, b_ = a_[inside], b_[inside]
 
         # side vector left-right
-        a = np.zeros((a_.shape[0], 3))
-        a[:, 0] = np.cos(self._angle) 
-        a[:, 1] = np.sin(self._angle) 
-        
-        # side vector up-down
-        b = np.zeros_like(a)
-        b[:, 0] = -a[:, 1] 
-        b[:, 1] =  a[:, 0]
+        b = np.zeros((b_.shape[0], 3))
+        b[:, 0] = np.cos(self._angle) 
+        b[:, 1] = np.sin(self._angle) 
 
-        return a_, b_, a, b, inside
+        return a_, b_, b, inside
 
     def mask(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
