@@ -24,6 +24,8 @@ from . import misc  # calculations
 from ..property_checker import PropertyChecker as pc  # check types and values
 
 # TODO check use_hurb
+# TODO test hurb
+# TODO test hurb INFO
 
 class Raytracer(Group):
 
@@ -47,6 +49,7 @@ class Raytracer(Group):
         T_BELOW_TTH = 2
         ILL_COND = 3
         OUTLINE_INTERSECTION = 4
+        HURB_NEG_DIR = 5
     """enum for info messages in raytracing"""
 
     focus_search_methods: list[str, str, str] = ['RMS Spot Size', 'Irradiance Variance',
@@ -240,6 +243,11 @@ class Raytracer(Group):
                         case self.INFOS.OUTLINE_INTERSECTION:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                     f"hitting outline after surface {surf} ({surf_name[surf]}), set to absorbed.")
+                        
+                        case self.INFOS.HURB_NEG_DIR:
+                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
+                                    f"have negative z-direction after ray bending at "
+                                    f"surface {surf} ({surf_name[surf]}), set to absorbed.")
 
     def _pretrace_check(self, N: int) -> bool:
         """checks the geometry and N parameter. Returns if tracing is possible"""
@@ -376,7 +384,7 @@ class Raytracer(Group):
 
                         # use ray bending if activated, but ignore last surface that acts as absorber
                         if self.use_hurb and en != len(elements) - 1:
-                            self.__hurb(p, s, wavelengths, i, element.surface)
+                            self.__hurb(p, s, weights, wavelengths, i, element.surface, msg)
 
                     # treat rays that go outside outline
                     hwnh = misc.masked_assign(hw, ~hit)  # rays having power and not hitting filter
@@ -406,16 +414,19 @@ class Raytracer(Group):
         self._last_trace_snapshot = self.tracing_snapshot()
                         
 
-    def __hurb(self, p: np.ndarray, s: np.ndarray, wl: np.ndarray, i: int, surf: Surface) -> None:
+    def __hurb(self, p: np.ndarray, s: np.ndarray, weights: np.ndarray, 
+               wl: np.ndarray, i: int, surf: Surface, msg: np.ndarray) -> None:
         """
         Approximate aperture diffraction asymptotically using HURB (Heisenberg Uncertainty Ray Bending),
         see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
 
         :param p: position array
         :param s: direction array
+        :param weights: weight array
         :param wl: wavelength arry
         :param i: surface number
         :param surf: aperture surface
+        :param msg: message array
         """
         if not (isinstance(surf, RingSurface) or isinstance(surf, SlitSurface)):
             raise RuntimeError(f"Ray bending for surface type {type(surf).__name__} not implemented.")
@@ -433,17 +444,21 @@ class Raytracer(Group):
         tan_tha = np.random.normal(scale=tan_sig_a, size=a_.shape[0])
         tan_thb = np.random.normal(scale=tan_sig_b, size=b_.shape[0])
 
-        # TODO explain
+        # create sa, sb components
+        # sa lies in plane containing s and a, but is orthogonal to s and sb
+        # sb lies in plane containing s and b, but is orthogonal to s and sa
         sa = misc.cross(b, s[inside])
         sa = misc.normalize(sa)
         sb = misc.cross(s, sa)
 
-        # TODO explain
+        # construct new direction from old one and sb, sa components
         sab = s[inside] + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
         s[inside] = misc.normalize(sab)
 
-        # TODO delete s with negative z component -> raytrace warning?
-
+        # absorb rays with negative direction after bending
+        neg = s[:, 2] < 0
+        weights[neg, i+1] = 0
+        msg[self.INFOS.HURB_NEG_DIR, i] += np.count_nonzero(neg)
 
     def __tracing_elements(self) -> list[Lens | Filter | Aperture]:
         """
@@ -630,6 +645,7 @@ class Raytracer(Group):
         :param w: ray weights (numpy 1D array)
         :param hw: bool array for rays still having a weight
         :param i: surface/section number
+        :param msg: message array
         """
 
         if not np.any(hw):
@@ -737,6 +753,7 @@ class Raytracer(Group):
         :param pols: polarizations of the input ray
         :param hwh: boolean array for rays having a weight and hitting the lens
         :param i: number of the surface
+        :param msg: message array
         """
 
         if not np.any(hwh):
@@ -855,6 +872,7 @@ class Raytracer(Group):
         :param wl: wavelength array (numpy 1D array)
         :param hwh: boolean array for rays having a weight and hitting the filter
         :param i: surface number
+        :param msg: message array
         """
 
         if not np.any(hwh):
