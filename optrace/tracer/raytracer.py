@@ -426,13 +426,12 @@ class Raytracer(Group):
         # std dev of direction gaussian
         # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
         k = 2*np.pi / (wl[inside] * 1e-9)  # TODO what about n?
-        sig_b = np.arctan(1/(2*b_*1e-3*k))
-        sig_a = np.arctan(1/(2*a_*1e-3*k))
+        tan_sig_b = 1 / (2*b_*1e-3*k)
+        tan_sig_a = 1 / (2*a_*1e-3*k)
 
-        # generated normally distributed angles (but truncate distribution by sig_th)
-        sig_th = 5  # only inner 5 sigma
-        tha = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_a, size=a_.shape[0])
-        thb = scipy.stats.truncnorm.rvs(-sig_th, sig_th, loc=0, scale=sig_b, size=b_.shape[0])
+        # generated normally distributed tan(angles)
+        tan_tha = np.random.normal(scale=tan_sig_a, size=a_.shape[0])
+        tan_thb = np.random.normal(scale=tan_sig_b, size=b_.shape[0])
 
         # TODO explain
         sa = misc.cross(b, s[inside])
@@ -440,7 +439,7 @@ class Raytracer(Group):
         sb = misc.cross(s, sa)
 
         # TODO explain
-        sab = s[inside] + sa*np.tan(tha)[:, np.newaxis] + sb*np.tan(thb)[:, np.newaxis]
+        sab = s[inside] + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
         s[inside] = misc.normalize(sab)
 
         # TODO delete s with negative z component -> raytrace warning?
