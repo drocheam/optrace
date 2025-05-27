@@ -15,7 +15,7 @@ RS = ot.RaySource(RSS, pos=[0, 0, -10])
 RT.add(RS)
 
 # load LeGrand Eye model
-eye = ot.presets.geometry.legrand_eye()
+eye = ot.presets.geometry.legrand_eye(pupil=2)
 RT.add(eye)
 
 # plot cardinal points as line markers

@@ -37,6 +37,10 @@ class Raytracer(Group):
     values below this are handled as absorbed
     needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power"""
 
+    HURB_FACTOR: float = 2**0.5
+    """HURB uncertainty factor. Original sources use 2, but sqrt(2) matches the envelope better
+    See the documentation."""
+
     MAX_RAY_STORAGE_RAM: int = 8000000000
     """ Maximum available RAM for the stored rays """
 
@@ -376,6 +380,7 @@ class Raytracer(Group):
                     p[hw, i+1], hit, ill = element.surface.find_hit(p[hw, i], s[hw])
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
                     hwh = misc.masked_assign(hw, hit)  # rays having power and hitting filter
+                    hwnh = misc.masked_assign(hw, ~hit)  # rays having power and not hitting filter
 
                     if isinstance(element, Filter):
                         self.__filter(element, weights, wavelengths, hwh, i, msg)
@@ -384,10 +389,9 @@ class Raytracer(Group):
 
                         # use ray bending if activated, but ignore last surface that acts as absorber
                         if self.use_hurb and en != len(elements) - 1:
-                            self.__hurb(p, s, weights, wavelengths, i, element.surface, msg)
+                            self.__hurb(p, s, weights, wavelengths, ns, hwnh, i, element.surface, msg)
 
                     # treat rays that go outside outline
-                    hwnh = misc.masked_assign(hw, ~hit)  # rays having power and not hitting filter
                     self.__outline_intersection(p, s, weights, hwnh, i, msg)
                     
                     ns[:, i+1] = ns[:, i]
@@ -415,7 +419,7 @@ class Raytracer(Group):
                         
 
     def __hurb(self, p: np.ndarray, s: np.ndarray, weights: np.ndarray, 
-               wl: np.ndarray, i: int, surf: Surface, msg: np.ndarray) -> None:
+               wl: np.ndarray, ns: np.ndarray, hwnh: np.ndarray, i: int, surf: Surface, msg: np.ndarray) -> None:
         """
         Approximate aperture diffraction asymptotically using HURB (Heisenberg Uncertainty Ray Bending),
         see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
@@ -423,7 +427,9 @@ class Raytracer(Group):
         :param p: position array
         :param s: direction array
         :param weights: weight array
-        :param wl: wavelength arry
+        :param wl: wavelength array
+        :param ns: refractive index array
+        :param hwnh: ray having an power and not hitting the surface
         :param i: surface number
         :param surf: aperture surface
         :param msg: message array
@@ -432,13 +438,15 @@ class Raytracer(Group):
             raise RuntimeError(f"Ray bending for surface type {type(surf).__name__} not implemented.")
         
         # get bending angles, axes and mask
-        a_, b_, b, inside = surf.hurb_props(p[:, i, 0], p[:, i, 1])
+        a_, b_, b, inside = surf.hurb_props(p[hwnh, i, 0], p[hwnh, i, 1])
+        hwnhi = misc.masked_assign(hwnh, inside)  
+        # ^-- rays having an power, not hitting the aperture, but inside of inner, ray bending part
 
-        # std dev of direction gaussian
+        # std dev of direction Gaussian
         # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
-        k = 2*np.pi / (wl[inside] * 1e-9)  # TODO what about n?
-        tan_sig_b = 1 / (2*b_*1e-3*k)
-        tan_sig_a = 1 / (2*a_*1e-3*k)
+        k = 2*np.pi*ns[hwnhi, i] / (wl[hwnhi] * 1e-9)
+        tan_sig_b = 1 / (self.HURB_FACTOR*b_*1e-3*k)
+        tan_sig_a = 1 / (self.HURB_FACTOR*a_*1e-3*k)
 
         # generated normally distributed tan(angles)
         tan_tha = np.random.normal(scale=tan_sig_a, size=a_.shape[0])
@@ -447,13 +455,13 @@ class Raytracer(Group):
         # create sa, sb components
         # sa lies in plane containing s and a, but is orthogonal to s and sb
         # sb lies in plane containing s and b, but is orthogonal to s and sa
-        sa = misc.cross(b, s[inside])
+        sa = misc.cross(b, s[hwnhi])
         sa = misc.normalize(sa)
-        sb = misc.cross(s, sa)
+        sb = misc.cross(s[hwnhi], sa)
 
         # construct new direction from old one and sb, sa components
-        sab = s[inside] + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
-        s[inside] = misc.normalize(sab)
+        sab = s[hwnhi] + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
+        s[hwnhi] = misc.normalize(sab)
 
         # absorb rays with negative direction after bending
         neg = s[:, 2] < 0

@@ -108,7 +108,9 @@ class RingSurface(Surface):
         R = self.ri
         inside = r < R
         b_ = R - r[inside]
-        a_ = np.sqrt(b_*R)  
+        a_ = np.sqrt(b_*R)
+        # a_ = b_
+        # a_ = np.sqrt(R**2 - r**2)
         # ^-- see https://math.stackexchange.com/questions/4511168/how-to-find-the-radius-of-the-smallest-circle-such-that-the-inner-ellipse-is-tan
     
         # ellipse minor axis as vector
