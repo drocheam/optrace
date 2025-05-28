@@ -8,6 +8,7 @@ Implementation Details
    
    sampling
    tracing
+   hurb
    image_spectrum
    matrix_analysis
    convolution

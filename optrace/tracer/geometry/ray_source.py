@@ -9,6 +9,7 @@ import numpy as np  # ndarray type and calculations
 from .element import Element  # parent class
 from . import Surface, Line, Point  # source types
 from .surface.rectangular_surface import RectangularSurface
+from .surface.slit_surface import SlitSurface
 
 # spectrum and color
 from ..spectrum.light_spectrum import LightSpectrum  # spectrum of source
@@ -504,7 +505,9 @@ class RaySource(Element):
 
             case "front":
                 if not (isinstance(val, Point | Line)\
-                        or (isinstance(val, Surface) and val.is_flat()) or isinstance(val, RGBImage)):
-                    raise ValueError("Currently only planar surfaces are supported for RaySources.")
+                        or (isinstance(val, Surface) and val.is_flat()) or isinstance(val, RGBImage))\
+                        or isinstance(val, SlitSurface):
+                    raise ValueError("Currently only RectangularSurface, CircularSurface, Point, Line and RingSurface"
+                                     " are supported for RaySources.")
 
         super().__setattr__(key, val)

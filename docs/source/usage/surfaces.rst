@@ -15,8 +15,10 @@ Base Shapes (Surface, Line, Point)
 Overview
 _________________
 
-Surfaces, points and lines are the base component for all |Element| classes. They describe a geometrical behavior relative to their center (marked as "x" in the following figures).
-They have no absolute position in three-dimensional space, their actual position is assigned and managed by their owner Element.
+Surfaces, points and lines are the base component for all |Element| classes. 
+They describe a geometrical behavior relative to their center (marked as "x" in the following figures).
+They have no absolute position in three-dimensional space, 
+their actual position is assigned and managed by their owner Element.
 All lengths are given in millimeters and angles in degrees.
 
 
@@ -24,7 +26,8 @@ Point and Line
 ___________________
 
 
-:class:`Point <optrace.tracer.geometry.point.Point>` and :class:`Line <optrace.tracer.geometry.line.Line>` are the simplest geometry types. 
+:class:`Point <optrace.tracer.geometry.point.Point>` and :class:`Line <optrace.tracer.geometry.line.Line>` 
+are the simplest geometry types. 
 Both types have no extent in z-direction, therefore lie exclusively on a  xy-plane.
 
 
@@ -65,15 +68,20 @@ ______________________
 
 
 Planar surfaces are purely two-dimensional and have no extent in z-direction, therefore being parallel to the xy-plane.
-:class:`CircularSurfaces <optrace.tracer.geometry.surface.circular_surface.CircularSurface>` is often used for plan-concave or plan-convex lenses or color filters.
-:class:`RingSurfaces <optrace.tracer.geometry.surface.ring_surface.RingSurface>` is typically found for Apertures, and :class:`RectangularSurfaces <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>` for detectors or object images.
+:class:`CircularSurfaces <optrace.tracer.geometry.surface.circular_surface.CircularSurface>` 
+is often used for plan-concave or plan-convex lenses or color filters.
+:class:`RingSurfaces <optrace.tracer.geometry.surface.ring_surface.RingSurface>` and
+`SlitSurfaces <optrace.tracer.geometry.surface.slit_surface.SlitSurface>` are typically found for Apertures, 
+and :class:`RectangularSurfaces <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>` 
+for detectors or object images.
+
 
 .. list-table::
    :class: table-borderless
 
    * - .. figure:: ../images/circle.svg
           :align: center
-          :width: 300
+          :width: 250
           :class: dark-light
 
           Circle geometry
@@ -81,17 +89,24 @@ Planar surfaces are purely two-dimensional and have no extent in z-direction, th
 
      - .. figure:: ../images/ring.svg
           :align: center
-          :width: 300
+          :width: 250
           :class: dark-light
 
           Ring geometry
 
-     - .. figure:: ../images/rectangle.svg
+   * - .. figure:: ../images/rectangle.svg
           :align: center
-          :width: 300
+          :width: 250
           :class: dark-light
 
           Rectangle geometry
+     
+     - .. figure:: ../images/slit.svg
+          :align: center
+          :width: 250
+          :class: dark-light
+
+          Slit geometry
 
 
 A circle/disc of radius 3.5 is created by:
@@ -113,13 +128,21 @@ For a side length in x-direction of 4 mm and 5 mm in y-direction we write:
    
    Rect = ot.RectangularSurface(dim=[4.0, 5.0])
 
+The slit surface requires additionally the inner dimensions specified by a parameter :python:`dimi`:
+
+.. testcode::
+   
+   Slit = ot.SlitSurface(dim=[4.0, 5.0], dimi=[0.01, 0.1])
+
 
 Height Surfaces
 _____________________
 
 **Tilted Surface**
 
-A :class:`TiltedSurface <optrace.tracer.geometry.surface.tilted_surface.TiltedSurface>` has a circular projection in the xy-plane, but has a surface normal that is not parallel to the optical axis (z-direction).
+A :class:`TiltedSurface <optrace.tracer.geometry.surface.tilted_surface.TiltedSurface>` 
+has a circular projection in the xy-plane, but has a surface normal 
+that is not parallel to the optical axis (z-direction).
 It can be used for creating prisms or tilted glass plates.
 
 .. figure:: ../images/tilted_surface.svg
@@ -129,7 +152,11 @@ It can be used for creating prisms or tilted glass plates.
 
    TiltedSurface geometry
 
-As for most other surfaces, it is defined by a radius :math:`r`. Additionally, a normal vector must be provided. This can either be done in the cartesian form, with 3 elements and parameter :python:`normal=[x, y, z]` or using spherical coordinates :python:`normal_sph=[theta, phi]` with two elements. :python:`theta` describes the angle between the normal and the optical axis (z-axis), while :python:`phi` describes the angle in the xy-plane.
+As for most other surfaces, it is defined by a radius :math:`r`. Additionally, a normal vector must be provided. 
+This can either be done in the cartesian form, with 3 elements and parameter :python:`normal=[x, y, z]`
+or using spherical coordinates :python:`normal_sph=[theta, phi]` with two elements. :python:`theta` 
+describes the angle between the normal and the optical axis (z-axis), while :python:`phi` 
+describes the angle in the xy-plane.
 The following examples both describe the same surface:
 
 .. testcode::
@@ -144,8 +171,10 @@ The following examples both describe the same surface:
 **Spherical Surface**
 
 
-A :class:`SphericalSurface <optrace.tracer.geometry.surface.spherical_surface.SphericalSurface>` is the most common surface type for lenses. 
-It is defined by a curvature radius :math:`R`, which is positive when the center of the curvature circle lies behind the surface and negative otherwise. 
+A :class:`SphericalSurface <optrace.tracer.geometry.surface.spherical_surface.SphericalSurface>` 
+is the most common surface type for lenses. 
+It is defined by a curvature radius :math:`R`, which is positive when the center of the curvature 
+circle lies behind the surface and negative otherwise. 
 This is illustrated in figure :numref:`spherical_surface_fig`.
 
 .. _sphericaL_surface_fig:
@@ -201,7 +230,8 @@ Depending on this constant the type of conic section differs:
    Conic surface geometry with a different conic constant :math:`k` signs. 
    An aspheric surface has a small additional rotationally symmetric polynomial added.
 
-Compared to the spherical surface, a :class:`ConicSurface <optrace.tracer.geometry.surface.conic_surface.ConicSurface>` takes another parameter, the conical constant :python:`k`:
+Compared to the spherical surface, a :class:`ConicSurface <optrace.tracer.geometry.surface.conic_surface.ConicSurface>` 
+takes another parameter, the conical constant :python:`k`:
 
 .. testcode::
 
@@ -218,7 +248,9 @@ An aspheric surface is a conic surface with additional :math:`m` even order poly
 
    z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}} + \sum_{i=1}^{m} a_i \cdot r^{2i}
 
-An :class:`AsphericSurface <optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface>` has additional polynomial components :math:`a_0 r^2 + a_1 r^4 + \dots`, where :math:`a_0,~a_1,\dots` are the polynomical coefficients given in powers of millimeters. 
+An :class:`AsphericSurface <optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface>` 
+has additional polynomial components :math:`a_0 r^2 + a_1 r^4 + \dots`, 
+where :math:`a_0,~a_1,\dots` are the polynomical coefficients given in powers of millimeters. 
 
 For :math:`a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}` the surface is created by:
 
@@ -232,8 +264,11 @@ ____________________
 
 **Overview**
 
-The :class:`FunctionSurface2D <optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D>` class allows us to define custom surfaces, defined by a mathematical function depending on x and y.
-For functions with rotational symmetry we can also use the :class:`FunctionSurface1D <optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D>` class, where the values are only dependent on the radial distance r.
+The :class:`FunctionSurface2D <optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D>` 
+class allows us to define custom surfaces, defined by a mathematical function depending on x and y.
+For functions with rotational symmetry we can also use the 
+:class:`FunctionSurface1D <optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D>` class, 
+where the values are only dependent on the radial distance r.
 
 
 .. figure:: ../images/function_surface.svg
@@ -252,12 +287,14 @@ As an example we want to create an axicon surface:
 
    func = ot.FunctionSurface1D(r=3, func=lambda r: r)
 
-The user defined function must take r-values (as numpy array), return a numpy array and is provided as the :python:`func` parameter.
+The user defined function must take r-values (as numpy array), 
+return a numpy array and is provided as the :python:`func` parameter.
 Note that the surface offset at :math:`r=0` is irrelevant, as it will be automatically compensated for.
 
 **Providing partial derivatives**
 
-To speed up tracing and enhance numerical precision we can provide the partial derivatives of the surface in x and y-direction.
+To speed up tracing and enhance numerical precision we can provide the partial derivatives 
+of the surface in x and y-direction.
 For our axicon the special case :math:`r=0` needs to be handled separately.
 The derivative function is passed with the :python:`deriv_func`-parameter.
 
@@ -295,9 +332,11 @@ For :python:`deriv_func` it is :python:`deriv_args`.
 **z-Range**
 
 When initializing a surface, optrace tries to determine the surface extent in z-direction. 
-The resulting :python:`z_min` and :python:`z_max` values are needed to know the surface bounds, which in turn are needed for tracing of the surface.
+The resulting :python:`z_min` and :python:`z_max` values are needed to know the surface bounds, 
+which in turn are needed for tracing of the surface.
 While this works automatically in many cases, the user has the option to provide these values manually.
-If these values should largely differ from the automatically estimated values a warning or, for a large deviation, an exception is raised.
+If these values should largely differ from the automatically estimated values a warning or,
+for a large deviation, an exception is raised.
 
 For a :python:`a=-0.3` and :python:`r=3` the z-bounds are :python:`[-0.9, 0]`. 
 This can be provided using:
@@ -413,7 +452,8 @@ Moving/setting its initial position of the surface/point/line is handled by its 
 
 **Rotation**
 
-Using the :python:`rotate` function the surface/point/line is rotated by 180 degrees around its center around the z-axis.
+Using the :python:`rotate` function the surface/point/line is rotated by 180 degrees around its 
+center around the z-axis.
 The function takes a rotation angle in degrees:
 
 .. code-block:: python
@@ -430,15 +470,19 @@ Flipping the surface rotates it around an axis parallel to the x-axis passing th
 
 **Other**
 
-Below you can find some additional geometrical quantities that are useful when moving surfaces, assigning them to lenses or determining the correct thicknesses.
+Below you can find some additional geometrical quantities that are useful when moving surfaces, 
+assigning them to lenses or determining the correct thicknesses.
 
 .. figure:: ../images/surface_geometry_quantities.svg
    :width: 600
    :align: center
    :class: dark-light
 
-:math:`z_\text{min}` and :math:`z_\text{max}` describe the minimal and maximal z-position on the surface, while :math:`z_0` is the z-position of the center.
-:math:`d_\text{s}` is the difference between :math:`z_\text{min}` and :math:`z_\text{max}`, :math:`d_\text{p}` is the difference between :math:`z_\text{max}` and :math:`z_0` and :math:`d_\text{n}` the difference between :math:`z_0` and :math:`z_\text{min}`.
+:math:`z_\text{min}` and :math:`z_\text{max}` describe the minimal and maximal z-position on the surface, 
+while :math:`z_0` is the z-position of the center.
+:math:`d_\text{s}` is the difference between :math:`z_\text{min}` and :math:`z_\text{max}`, 
+:math:`d_\text{p}` is the difference between :math:`z_\text{max}` 
+and :math:`z_0` and :math:`d_\text{n}` the difference between :math:`z_0` and :math:`z_\text{min}`.
 
 
 

@@ -3,20 +3,15 @@ from typing import Any  # Any type
 
 import numpy as np  # matrix calculations
 
-from ... import random  # stratified sampling
 from ....property_checker import PropertyChecker as pc  # check types and values
 from .rectangular_surface import RectangularSurface  # parent class
 
 
-# TODO tests in test_surface
 # TODO Hurb test: Different ratios, check orientation, etc.
-# TODO dimi shape check (nonzero, smaller dim, ...)
-# TODO check that it can't be used as ray source
+
 
 class SlitSurface(RectangularSurface):
     
-    rotational_symmetry: bool = False  #: has the surface rotational symmetry?
-
     def __init__(self,
                  dim:               (list | np.ndarray),
                  dimi:              (list | np.ndarray),
@@ -39,7 +34,7 @@ class SlitSurface(RectangularSurface):
     @property
     def info(self) -> str:
         """property string for UI information"""
-        return super().info + "dimi = [{self.dimi[0]:.5g} mm, {self.dimi[1]:.5g} mm]"
+        return super().info + ", dimi = [{self.dimi[0]:.5g} mm, {self.dimi[1]:.5g} mm]"
 
     def plotting_mesh(self, N: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -50,10 +45,10 @@ class SlitSurface(RectangularSurface):
         :param N: number of grid values in each dimension (int)
         :return: X, Y, Z coordinate array (all numpy 2D array)
         """
-        y = np.array([self._extent[2], -self.dimi[1]/2, -self.dimi[1]/2, 
-                      self.dimi[1]/2, self.dimi[1]/2, self._extent[3]])
-        x = np.array([self._extent[0], -self.dimi[0]/2, -self.dimi[0]/2, 
-                      self.dimi[0]/2, self.dimi[0]/2, self._extent[1]])
+        y = np.array([self._extent[2], -self.dimi[1]/2, -self.dimi[1]/2+self.N_EPS, 
+                      self.dimi[1]/2-self.N_EPS, self.dimi[1]/2, self._extent[3]])
+        x = np.array([self._extent[0], -self.dimi[0]/2, -self.dimi[0]/2+self.N_EPS, 
+                      self.dimi[0]/2-self.N_EPS, self.dimi[0]/2, self._extent[1]])
 
         # calculate rotated coordinates
         Y, X = np.meshgrid(y, x)
@@ -104,18 +99,9 @@ class SlitSurface(RectangularSurface):
         # instead of rotating the mask we rotate the relative point positions towards an unrotated rectangle
         xr, yr = self._rotate_rc(x-self.pos[0], y-self.pos[1], -self._angle)
         xs, xe, ys, ye = -self.dimi[0]/2, self.dimi[0]/2, -self.dimi[1]/2, self.dimi[1]/2
-        inside = (xs-self.N_EPS <= xr) & (xr <= xe+self.N_EPS) & (ys-self.N_EPS <= yr) & (yr <= ye+self.N_EPS)
+        inside = (xs+self.N_EPS <= xr) & (xr <= xe-self.N_EPS) & (ys+self.N_EPS <= yr) & (yr <= ye-self.N_EPS)
 
         return super().mask(x, y) & (~inside)
-
-    def random_positions(self, N: int) -> np.ndarray:
-        """
-        Get random 3D positions on the surface, uniformly distributed
-
-        :param N: number of positions
-        :return: position array, shape (N, 3)
-        """
-        raise RuntimeError("Not implemented")
 
     def __setattr__(self, key: str, val: Any) -> None:
         """

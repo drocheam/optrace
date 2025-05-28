@@ -24,13 +24,13 @@ RT = ot.Raytracer(outline=[-15, 15, -15, 15, -1, 40], use_hurb=True, n0=ot.Refra
 
 
 # Ideal Lens
-# RS = ot.RaySource(ot.CircularSurface(r=3), s=[0, 0, 1], pos=[0, 0, 0])
-# RT.add(RS)
-# ap_surf = ot.RingSurface(r=4.001, ri=3.001)
-# ap = ot.Aperture(ap_surf, pos=[0, 0, 5])
-# RT.add(ap)
-# L = ot.IdealLens(4, 50, pos=[0, 0, 5.01])
-# RT.add(L)
+RS = ot.RaySource(ot.CircularSurface(r=3), s=[0, 0, 1], pos=[0, 0, 0])
+RT.add(RS)
+ap_surf = ot.RingSurface(r=4.001, ri=3.001)
+ap = ot.Aperture(ap_surf, pos=[0, 0, 5])
+RT.add(ap)
+L = ot.IdealLens(4, 50, pos=[0, 0, 5.01])
+RT.add(L)
 
 # Ideal Lens 2
 # RS = ot.RaySource(ot.CircularSurface(r=3), s=[0, 0, 1], pos=[0, 0, 0])
@@ -55,16 +55,15 @@ RT = ot.Raytracer(outline=[-15, 15, -15, 15, -1, 40], use_hurb=True, n0=ot.Refra
 # ap = ot.Aperture(ap_surf, pos=[0, 0, L1.front.pos[2]-0.001])
 # RT.add(ap)
 
-
 # slit
-rect = ot.RectangularSurface(dim=[0.1/2, 0.1])
-rect.rotate(15)
-RS = ot.RaySource(rect, s=[0, 0, 1], pos=[0, 0, -1])
-RT.add(RS)
-ap_surf = ot.SlitSurface(dim=[2,2], dimi=[0.1/2, 0.1])
-ap_surf.rotate(15)
-ap = ot.Aperture(ap_surf, pos=[0, 0, 0.0001])
-RT.add(ap)
+# rect = ot.RectangularSurface(dim=[0.1/2, 0.1])
+# rect.rotate(15)
+# RS = ot.RaySource(rect, s=[0, 0, 1], pos=[0, 0, -1])
+# RT.add(RS)
+# ap_surf = ot.SlitSurface(dim=[2,2], dimi=[0.1/2, 0.1])
+# ap_surf.rotate(15)
+# ap = ot.Aperture(ap_surf, pos=[0, 0, 0.0001])
+# RT.add(ap)
 
 # add Detector
 DetS = ot.RectangularSurface(dim=[1, 1])

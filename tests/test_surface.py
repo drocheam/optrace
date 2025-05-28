@@ -22,6 +22,10 @@ class SurfaceTests(unittest.TestCase):
         self.assertRaises(TypeError, ot.SphericalSurface, r=1, R=[])  # invalid R type
         self.assertRaises(TypeError, ot.ConicSurface, r=1, R=[], k=0)  # invalid R type
         self.assertRaises(TypeError, ot.RectangularSurface, dim=True)  # invalid dim type
+        self.assertRaises(TypeError, ot.RectangularSurface, dim=[1, 2, 3])  # invalid dim shape
+        self.assertRaises(TypeError, ot.SlitSurface, dim=[1, 1], dimi=True)  # invalid dimi type
+        self.assertRaises(TypeError, ot.SlitSurface, dim=[1, 1], dimi=True)  # invalid dimi type
+        self.assertRaises(TypeError, ot.SlitSurface, dim=[1, 1], dimi=[0.1, 0.1, 0.1])  # invalid dimi shape
         self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, z_min=[], z_max=2)
         # ^-- invalid z_min type
         self.assertRaises(TypeError, ot.FunctionSurface2D, r=2, func=lambda x, y: x, z_min=0, z_max=[])
@@ -50,6 +54,12 @@ class SurfaceTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.RingSurface, r=1, ri=1.4)  # ri larger than r
         self.assertRaises(ValueError, ot.RectangularSurface, dim=[-5, 5])  # size negative
         self.assertRaises(ValueError, ot.RectangularSurface, dim=[5, np.inf])  # size non finite
+        self.assertRaises(ValueError, ot.SlitSurface, dim=[-5, 5], dimi=[0.1, 0.1])  # size negative
+        self.assertRaises(ValueError, ot.SlitSurface, dim=[5, np.inf], dimi=[0.1, 0.1])  # size non finite
+        self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[-5, 5])  # size negative
+        self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[1, np.inf])  # size non finite
+        self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[6, 1])  # slit too large x
+        self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[1, 6])  # slit too large y
         self.assertRaises(ValueError, ot.DataSurface2D, r=2, data=np.array([[1, 2], [3, 4]]))
         # ^-- data needs to be at least 50x5
         self.assertRaises(ValueError, ot.DataSurface2D, r=2, data=np.ones((100, 101)))  # matrix not square
@@ -77,6 +87,7 @@ class SurfaceTests(unittest.TestCase):
              ot.ConicSurface(r=3.2, R=-7, k=2),
              ot.AsphericSurface(r=3, R=-20, k=1, coeff=[0.02, 0.0034, 1e-5, 2e-5, 3e-5, 4e-5, 5e-5, 6e-5]),
              ot.RectangularSurface(dim=[5, 6]),
+             ot.SlitSurface(dim=[5, 6], dimi=[0.1, 0.2]),
              ot.FunctionSurface2D(func=lambda x, y: x, r=2),
              ot.FunctionSurface2D(func=lambda x, y: -x, r=2),
              ot.FunctionSurface1D(func=lambda r: r**2, r=2),
@@ -261,7 +272,8 @@ class SurfaceTests(unittest.TestCase):
         for i, Si in enumerate(self._test_surfaces()):
             with self.subTest(i=i, Surface=type(Si).__name__):
                 # random positions only for planar types
-                if isinstance(Si, ot.RectangularSurface | ot.CircularSurface | ot.RingSurface):
+                if isinstance(Si, ot.RectangularSurface | ot.CircularSurface | ot.RingSurface)\
+                        and not isinstance(Si, ot.SlitSurface):
                     # check that generated positions are all inside surface and have correct values
                     p_ = Si.random_positions(N=10000)
                     m_ = Si.mask(p_[:, 0], p_[:, 1])
@@ -275,8 +287,14 @@ class SurfaceTests(unittest.TestCase):
             with self.subTest(i=i, Surface=type(Si).__name__):
                 
                 # check mask values. Especially surface edge, which by definition is valid
-                if isinstance(Si, ot.RectangularSurface):
-                    self.assertTrue(Si.mask([Si.pos[0]], [Si.pos[1]])[0])
+                if isinstance(Si, ot.RectangularSurface):  # includes SlitSurface
+
+                    if not isinstance(Si, ot.SlitSurface):
+                        self.assertTrue(Si.mask([Si.pos[0]], [Si.pos[1]])[0])
+                    else:
+                        self.assertFalse(Si.mask(np.array([Si.pos[0]]), np.array([Si.pos[1]]))[0])
+                        self.assertTrue(Si.mask(np.array([Si.pos[0] + Si.dimi[0]/2]), np.array([Si.pos[1]]))[0])
+
                     self.assertTrue(Si.mask([Si.extent[0]], [Si.extent[2]])[0])
                     self.assertTrue(Si.mask([Si.extent[0]], [Si.extent[3]])[0])
                     self.assertTrue(Si.mask([Si.extent[1]], [Si.extent[3]])[0])
@@ -318,10 +336,11 @@ class SurfaceTests(unittest.TestCase):
                 for N in [10, 11, 25, 200]:
                     X, Y, Z = Si.plotting_mesh(N)
                     
-                    # check shapes
-                    self.assertEqual(X.shape, (N, N))
-                    self.assertEqual(Y.shape, (N, N))
-                    self.assertEqual(Z.shape, (N, N))
+                    # check shapes (Slit and Rectangle Surface don't use N parameter)
+                    if not isinstance(Si, ot.RectangularSurface):  # includes SlitSurface
+                        self.assertEqual(X.shape, (N, N))
+                        self.assertEqual(Y.shape, (N, N))
+                        self.assertEqual(Z.shape, (N, N))
                     
                     # check if values are masked correctly
                     m2 = Si.mask(X.flatten(), Y.flatten())
@@ -333,7 +352,7 @@ class SurfaceTests(unittest.TestCase):
                     self.assertTrue(np.allclose(Z.flatten()[valid]-z2[valid], 0))
                    
                     # check if values are in relevant area of circle
-                    if not isinstance(Si, ot.RectangularSurface):
+                    if not isinstance(Si, ot.RectangularSurface):  # also excludes SlitSurface
                         # no points outside circle area
                         R2 = (X-Si.pos[0])**2 + (Y-Si.pos[1])**2
                         self.assertTrue(np.all(R2 < (Si.r + 10*Si.N_EPS)**2))
@@ -372,6 +391,7 @@ class SurfaceTests(unittest.TestCase):
         self.assertAlmostEqual(ot.CircularSurface(r=2).parax_roc, np.inf)
         self.assertAlmostEqual(ot.RingSurface(r=2, ri=0.5).parax_roc, np.inf)
         self.assertAlmostEqual(ot.RectangularSurface(dim=[1, 1]).parax_roc, np.inf)
+        self.assertAlmostEqual(ot.SlitSurface(dim=[1, 1], dimi=[0.1, 0.1]).parax_roc, np.inf)
 
         # data and function surfaces
         self.assertEqual(ot.DataSurface2D(data=np.ones((50, 50)), r=3).parax_roc, None)
@@ -570,10 +590,11 @@ class SurfaceTests(unittest.TestCase):
         mask_func = lambda x, y: x**2 + y**2 > 0.5
         ot.FunctionSurface2D(func=sfunc, r=3, mask_func=mask_func)
 
-        # coverage test: case rectangle, too few points for mesh and edge
+        # coverage test: case rectangle and slit, too few points for edge
         rect = ot.RectangularSurface(dim=[2, 3])
-        self.assertRaises(ValueError, rect.plotting_mesh, N=1)
         self.assertRaises(ValueError, rect.edge, nc=1)
+        slit = ot.SlitSurface(dim=[2, 3], dimi=[0.1, 0.1])
+        self.assertRaises(ValueError, slit.edge, nc=1)
 
     def test_surface_function_values(self):
 
@@ -754,6 +775,7 @@ class SurfaceTests(unittest.TestCase):
               ot.CircularSurface(r=2),
               ot.RingSurface(r=3, ri=0.2),
               ot.RectangularSurface(dim=[2, 3]),
+              ot.SlitSurface(dim=[2, 3], dimi=[0.01, 0.1]),
               ot.DataSurface2D(r=2, data=np.zeros((100, 100))),
               ot.FunctionSurface2D(r=2, func=lambda x, y: np.zeros_like(x)),
               # in built analytical types
@@ -822,12 +844,14 @@ class SurfaceTests(unittest.TestCase):
             self.assertTrue(np.nanmin(Z) >= Sr.z_min - 10*Sr.C_EPS)
             self.assertTrue(np.nanmax(Z) <= Sr.z_max + 10*Sr.C_EPS)
 
-        # flip rectangle
+        # flip slit and rectangle
         rect = ot.RectangularSurface(dim=[5, 4])
-        rect.rotate(-78)
-        rect2 = rect.copy()
-        rect.flip()
-        self.assertEqual(-rect2._angle, rect._angle)
+        slit = ot.SlitSurface(dim=[5, 4], dimi=[0.2, 0.3])
+        for obj in [rect, slit]:
+            obj.rotate(-78)
+            obj2 = obj.copy()
+            obj.flip()
+            self.assertEqual(-obj2._angle, obj._angle)
 
     @staticmethod
     def relative_rotate(x, y, angle):
@@ -930,52 +954,57 @@ class SurfaceTests(unittest.TestCase):
 
                 S.flip()
 
-    def test_rotate_rectangular_surface(self):
+    def test_rotate_rectangular_slit_surface(self):
 
         rect = ot.RectangularSurface(dim=[2, 3])
-        pos0 = [5, -3, 12]
-        rect.move_to(pos0)
+        slit = ot.SlitSurface(dim=[2, 3], dimi=[0.05, 0.15])
+        
+        for obj0 in [rect, slit]:
 
-        x = np.random.uniform(-2, 2, 100)
-        y = np.random.uniform(-2, 2, 100)
+            obj = obj0.copy()
+            pos0 = [5, -3, 12]
+            obj.move_to(pos0)
 
-        # edge, mesh and mask or an unrotated rectangle
-        X0, Y0, Z0 = rect.plotting_mesh(100)
-        x0, y0, z0 = rect.edge(100)
-        m0 = rect.mask(x, y)
+            x = np.random.uniform(-2, 2, 100)
+            y = np.random.uniform(-2, 2, 100)
 
-        angle = -82.46
-        rect.rotate(angle)
+            # edge, mesh and mask or an unrotated rectangle/slit
+            X0, Y0, Z0 = obj.plotting_mesh(100)
+            x0, y0, z0 = obj.edge(100)
+            m0 = obj.mask(x, y)
 
-        # get mesh, rotate mesh back
-        X1, Y1, Z1 = rect.plotting_mesh(100)
-        X1r, Y1r = self.relative_rotate(X1 - pos0[0], Y1 - pos0[1], -np.deg2rad(angle))
-        X1r, Y1r = X1r + pos0[0], Y1r + pos0[1]
+            angle = -82.46
+            obj.rotate(angle)
 
-        # get edge, rotate edge back
-        x1, y1, z1 = rect.edge(100)
-        x1r, y1r = self.relative_rotate(x1 - pos0[0], y1 - pos0[1], -np.deg2rad(angle))
-        x1r, y1r = x1r + pos0[0], y1r + pos0[1]
+            # get mesh, rotate mesh back
+            X1, Y1, Z1 = obj.plotting_mesh(100)
+            X1r, Y1r = self.relative_rotate(X1 - pos0[0], Y1 - pos0[1], -np.deg2rad(angle))
+            X1r, Y1r = X1r + pos0[0], Y1r + pos0[1]
 
-        # rotate coordinates to math rotation, get mask
-        xr, yr = self.relative_rotate(x - pos0[0], y - pos0[1], -np.deg2rad(angle))
-        m1 = rect.mask(xr + pos0[0], yr + pos0[1])
+            # get edge, rotate edge back
+            x1, y1, z1 = obj.edge(100)
+            x1r, y1r = self.relative_rotate(x1 - pos0[0], y1 - pos0[1], -np.deg2rad(angle))
+            x1r, y1r = x1r + pos0[0], y1r + pos0[1]
 
-        # compare values
-        self.assertTrue(np.allclose(x1r - x0 + y1r - y0, 0)) 
-        self.assertTrue(np.allclose(X1r - X0 + Y1r - Y0, 0)) 
-        self.assertTrue(np.all(m1 == m0))
+            # rotate coordinates to math rotation, get mask
+            xr, yr = self.relative_rotate(x - pos0[0], y - pos0[1], -np.deg2rad(angle))
+            m1 = obj.mask(xr + pos0[0], yr + pos0[1])
 
-        # check extent
-        rect = ot.RectangularSurface(dim=[2, 3])
-        self.assertTrue(np.allclose(np.array(rect.extent) - [-1, 1, -1.5, 1.5, 0, 0], 0))
-        rect.rotate(90)
-        self.assertTrue(np.allclose(np.array(rect.extent) - [-1.5, 1.5, -1, 1, 0, 0], 0))
-        rect.rotate(-180)
-        self.assertTrue(np.allclose(np.array(rect.extent) - [-1.5, 1.5, -1, 1, 0, 0], 0))
-        rect.rotate(45)
-        isq = 1/np.sqrt(2)
-        self.assertTrue(np.allclose(np.array(rect.extent) - [-2.5*isq, 2.5*isq, -2.5*isq, 2.5*isq, 0, 0], 0))
+            # compare values
+            self.assertTrue(np.allclose(x1r - x0 + y1r - y0, 0)) 
+            self.assertTrue(np.allclose(X1r - X0 + Y1r - Y0, 0)) 
+            self.assertTrue(np.all(m1 == m0))
+
+            # check extent
+            obj = obj0
+            self.assertTrue(np.allclose(np.array(obj.extent) - [-1, 1, -1.5, 1.5, 0, 0], 0))
+            obj.rotate(90)
+            self.assertTrue(np.allclose(np.array(obj.extent) - [-1.5, 1.5, -1, 1, 0, 0], 0))
+            obj.rotate(-180)
+            self.assertTrue(np.allclose(np.array(obj.extent) - [-1.5, 1.5, -1, 1, 0, 0], 0))
+            obj.rotate(45)
+            isq = 1/np.sqrt(2)
+            self.assertTrue(np.allclose(np.array(obj.extent) - [-2.5*isq, 2.5*isq, -2.5*isq, 2.5*isq, 0, 0], 0))
 
 if __name__ == '__main__':
     unittest.main()

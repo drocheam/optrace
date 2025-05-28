@@ -586,6 +586,9 @@ class GeometryTests(unittest.TestCase):
                                                                [2, 2]))  # image too large
         self.assertRaises(ValueError, ot.RaySource, ot.RGBImage(np.zeros((100, 100, 3)), [2, 2]))
         # ^-- image completely black
+        
+        # slit surface not supported
+        self.assertRaises(ValueError, ot.RaySource, ot.SlitSurface([1, 1], [0.1, 0.1]), [0, 0, 0])
 
     def test_ray_source_polarization(self):
             
