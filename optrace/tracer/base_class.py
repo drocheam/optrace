@@ -101,7 +101,8 @@ class BaseClass:
         :param val: value to assign
         """
         if key not in ["_lock", "_new_lock"]:
-            if "_new_lock" in self.__dict__ and self._new_lock and key not in self.__dict__:
+            if "_new_lock" in self.__dict__ and self._new_lock\
+                    and not (key in self.__dict__ or key in type(self).__dict__):
                 raise AttributeError(f"Failed to set invalid/unknown property {key}.")
 
             if "_lock" in self.__dict__ and self._lock and key not in ["desc", "long_desc"]:

@@ -181,6 +181,11 @@ class TracerMiscTests(unittest.TestCase):
         self.assertEqual(BC.get_desc(), BC.desc)
         BC = BaseClass()
         self.assertEqual(BC.get_long_desc(fallback="abc"), "abc")
+        
+        # setting a class variable (not an instance variable) is possible
+        # (in older versions the BaseClass did not allow setting class level variables at all)
+        RT = ot.Raytracer([-1, 1, -1, 1, -1, 1])
+        RT.HURB_FACTOR = 1.40005
 
         # coverage: crepr of different member types
         L = ot.presets.geometry.arizona_eye().lenses[0]

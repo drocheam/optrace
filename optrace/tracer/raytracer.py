@@ -23,9 +23,6 @@ from ..progress_bar import ProgressBar
 from . import misc  # calculations
 from ..property_checker import PropertyChecker as pc  # check types and values
 
-# TODO check use_hurb
-# TODO test hurb
-# TODO test hurb INFO
 
 class Raytracer(Group):
 
@@ -155,7 +152,7 @@ class Raytracer(Group):
         """
         return dict(Rays=self.rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()],
-                    TraceSettings=[self.no_pol, self.use_hurb],
+                    TraceSettings=[self.no_pol, self.use_hurb, self.T_TH, self.HURB_FACTOR],
                     Lenses=[D.crepr() for D in self.lenses],
                     Filters=[D.crepr() for D in self.filters],
                     Apertures=[D.crepr() for D in self.apertures],
@@ -434,19 +431,28 @@ class Raytracer(Group):
         :param surf: aperture surface
         :param msg: message array
         """
-        if not (isinstance(surf, RingSurface) or isinstance(surf, SlitSurface)):
-            raise RuntimeError(f"Ray bending for surface type {type(surf).__name__} not implemented.")
-        
         # get bending angles, axes and mask
-        a_, b_, b, inside = surf.hurb_props(p[hwnh, i, 0], p[hwnh, i, 1])
+        a_, b_, b, inside = surf.hurb_props(p[hwnh, i+1, 0], p[hwnh, i+1, 1])
         hwnhi = misc.masked_assign(hwnh, inside)  
-        # ^-- rays having an power, not hitting the aperture, but inside of inner, ray bending part
+        # ^-- rays having an power, not hitting the aperture, but inside of inner, ray bending aperture part
+      
+        # a is just b rotated by 90° in aperture plane
+        a = b.copy()
+        a[:, 0] = -b[:, 1]
+        a[:, 1] = b[:, 0]
+
+        # a tilted ray sees a projected aperture. The distance to the a-edge is smaller by cos(psi_a),
+        # where psi_a = 90 - ang_a, with ang_a being the angle between the ray and the ellipsis axis a
+        # scalar product s * a is cos(ang_a), so sin(ang_a) = sqrt(1 - cos^2(ang_a)) is cos(psi_a)
+        cos_psi_a = np.sqrt(1 - misc.rdot(s[hwnhi], a)**2)
+        cos_psi_b = np.sqrt(1 - misc.rdot(s[hwnhi], b)**2)
 
         # std dev of direction Gaussian
         # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
+        # additionally, the refractive index, cos-dependency from a above and a custom uncertainty factor were included
         k = 2*np.pi*ns[hwnhi, i] / (wl[hwnhi] * 1e-9)
-        tan_sig_b = 1 / (self.HURB_FACTOR*b_*1e-3*k)
-        tan_sig_a = 1 / (self.HURB_FACTOR*a_*1e-3*k)
+        tan_sig_b = 1 / (self.HURB_FACTOR*b_*cos_psi_b*1e-3*k)
+        tan_sig_a = 1 / (self.HURB_FACTOR*a_*cos_psi_a*1e-3*k)
 
         # generated normally distributed tan(angles)
         tan_tha = np.random.normal(scale=tan_sig_a, size=a_.shape[0])
@@ -466,7 +472,7 @@ class Raytracer(Group):
         # absorb rays with negative direction after bending
         neg = s[:, 2] < 0
         weights[neg, i+1] = 0
-        msg[self.INFOS.HURB_NEG_DIR, i] += np.count_nonzero(neg)
+        msg[self.INFOS.HURB_NEG_DIR, i+1] += np.count_nonzero(neg)
 
     def __tracing_elements(self) -> list[Lens | Filter | Aperture]:
         """
@@ -523,6 +529,12 @@ class Raytracer(Group):
             # collision of back and next front
             if not coll and el.has_back():
                 coll, xc, yc, zc = self.check_collision(el.back, elements[i + 1].front)
+
+            if self.use_hurb and i < len(elements) - 1 and isinstance(el, Aperture):
+                if not (isinstance(el.front, RingSurface) or isinstance(el.front, SlitSurface)):
+                    warning(f"Ray bending for surface type {type(el.front).__name__} not implemented.")
+                    self.geometry_error = True
+                    return
 
             if coll:
                 break

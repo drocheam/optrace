@@ -15,7 +15,7 @@ from tracing_geometry import tracing_geometry
 
 class TracerSpecialTests(unittest.TestCase):
 
-    def test_0sphere_detector_range_hits(self):
+    def test_sphere_detector_range_hits(self):
         """
         this function checks if the detector hit finding correctly handles:
         * rays starting after the detector

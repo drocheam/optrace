@@ -19,7 +19,8 @@ commands = [
     ],
     ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_color.py", "tests{/}test_convolve.py", 
-        "tests{/}test_load.py", "tests{/}test_tracer.py", "tests{/}test_tracer_special.py"
+        "tests{/}test_load.py", "tests{/}test_tracer.py", "tests{/}test_tracer_hurb.py", 
+        "tests{/}test_tracer_special.py"
     ],
     ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_plots.py"

@@ -7,7 +7,6 @@ from ... import random  # calculation
 from ....property_checker import PropertyChecker as pc  # check types and values
 from .surface import Surface  # parent class
 
-# TODO Hurb test
 
 class RingSurface(Surface):
     

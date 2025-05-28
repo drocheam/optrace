@@ -7,7 +7,6 @@ from ....property_checker import PropertyChecker as pc  # check types and values
 from .rectangular_surface import RectangularSurface  # parent class
 
 
-# TODO Hurb test: Different ratios, check orientation, etc.
 
 
 class SlitSurface(RectangularSurface):
