@@ -6,6 +6,8 @@ import numpy as np
 
 # Simulation of vision with an Alcon IQ monfocal intraocular lens after cataract surgery
 # Renders a polychromatic pinhole image on the retina for a given pupil and object distance
+# Uses Heisenberg uncertainty ray bending (HURB, see the documentation for more details)
+# to approximate blurring due to diffraction
 
 # simulation parameters
 #######################################################################################################################
@@ -30,8 +32,8 @@ RS_r_max = oh_angle*max_g  # maximum raysource radius
 RT_xy_max = max(RS_r_max, 10)  # lateral maximum size
 RT_z0_min = -max(400, max_g)  # largest raysource position to -z direction
 
-# raytracer with worst case size
-RT = ot.Raytracer(outline=[-RT_xy_max, RT_xy_max, -RT_xy_max, RT_xy_max, RT_z0_min, 30])
+# raytracer with worst case size and activated HURB
+RT = ot.Raytracer(outline=[-RT_xy_max, RT_xy_max, -RT_xy_max, RT_xy_max, RT_z0_min, 30], use_hurb=True)
 
 # Arizona eye model preset
 eye = ot.presets.geometry.arizona_eye(pupil=P)
@@ -81,7 +83,7 @@ for gi in g:
     # constant extent (tested empirically) so the images are comparable
     # detector_index=1 is the rectangular detector
     # approximate the resolution limit d=4µm for the eye
-    det_im = RT.iterative_render(N_rays, detector_index=1, limit=4, extent=[-0.10, 0.10, -0.10, 0.10])
+    det_im = RT.iterative_render(N_rays, detector_index=1, extent=[-0.10, 0.10, -0.10, 0.10])
 
     # calculate and the sRGB image with perceptual RI
     # see publication for the justification of this choice

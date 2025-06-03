@@ -27,7 +27,7 @@ wl = 550
 zd = 20
 
 
-r, imgic, imgr = hurb_lens(n, ri, wl, zd, N=2000000, N_px=315, dim_ext_fact=6, use_hurb=True)
+r, imgic, imgr = hurb_lens(n, ri, wl, zd, N=2000000, N_px=315, dim_ext_fact=5, use_hurb=True)
 
 # print(np.mean((imgic - rayleigh_curve(r, wl, n, ri, zd))**2))
 

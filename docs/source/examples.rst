@@ -318,6 +318,55 @@ Cardinal points, exit and entrance pupils are calculated and marked inside the s
 
    Tilted view with visible pupil.
 
+.. _example_hurb_apertures:
+
+HURB Apertures
+----------------------
+
+**File**: `examples/hurb_apertures.py <https://github.com/drocheam/optrace/blob/main/examples/hurb_apertures.py>`_
+
+This example demonstrates the diffraction approximation through Heisenberg uncertainty ray bending (HURB)
+of multiple aperture shapes.
+You can read more about HURB in section :numref:`hurb_details`.
+
+Different apertures can be selected in the "custom" tab of the GUI.
+
+.. figure:: ./images/example_hurb_scene.png
+   :align: center
+   :width: 600
+   :class: dark-light
+
+
+.. list-table::
+   :class: table-borderless
+
+   * - .. figure:: ./images/example_hurb_square.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+
+          Approximated diffraction pattern of a square aperture.
+
+     - .. figure:: ./images/example_hurb_slit.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+          
+          Approximated diffraction pattern of a slit aperture.
+   
+   * - .. figure:: ./images/example_hurb_pinhole.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+
+          Approximated diffraction pattern of a pinhole aperture.
+
+     - .. figure:: ./images/example_hurb_edge.webp
+          :align: center
+          :width: 400
+          :class: dark-light
+          
+          Approximated diffraction pattern of an edge.
 
 .. _example_image_render:
 

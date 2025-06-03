@@ -248,3 +248,75 @@ def hurb_slit(n:            float,
 
     return r, r, imgic1, imgic2, slit_curve(r, wl, n, d1, zd), slit_curve(r, wl, n, d2, zd)
 
+
+def hurb_edge(n:            float, 
+              wl:           float, 
+              zd:           float, 
+              N:            int, 
+              N_px:         int, 
+              dim_ext_fact: float = 6, 
+              use_hurb:     bool = True, 
+              hurb_factor:  float = None)\
+        -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Simulate a diffracting edge using HURB.
+    Calculates the ray profile at a given distance.
+
+    :param n: ambient refractive index
+    :param wl: wavelength in nm
+    :param zd: detector distance in mm
+    :param N: number of rays to trace
+    :param N_px: number of detector pixels in each dimension
+    :param dim_ext_fact: scaling factor for detector extent
+    :param use_hurb: simulate using HURB
+    :param hurb_factor: HURB uncertainty factor
+    :return: distances along axis orthogonal to edge, simulated data along axis, data from theory along axis
+    """
+    # see eq 10.132 in https://farside.ph.utexas.edu/teaching/315/Waveshtml/node102.html
+    # and eq. 10.99 in  https://farside.ph.utexas.edu/teaching/315/Waveshtml/node99.html 
+    def edge_curve(x, wl, n, d, z):
+        u_ = np.sqrt(2 * n / (wl*1e-9) / (zd*1e-3)) * x*1e-3
+        S, C = scipy.special.fresnel(u_)
+        return 0.5*((S+0.5)**2 + (C+0.5)**2)
+    
+    # calculate detector width
+    dim_ext = 0.5*2*dim_ext_fact
+
+    # make raytracer
+    RT = ot.Raytracer(outline=[-4*dim_ext, 4*dim_ext, -4*dim_ext, 4*dim_ext, -6, zd+10], use_hurb=use_hurb, 
+                      n0=ot.RefractionIndex("Constant", n))
+
+    if hurb_factor is not None:
+        RT.HURB_FACTOR = hurb_factor
+   
+    # ray source
+    rect = ot.RectangularSurface(dim=[dim_ext/2, dim_ext/2])
+    RS = ot.RaySource(rect, s=[0, 0, 1], pos=[0, dim_ext/4, -1],
+                      spectrum=ot.LightSpectrum("Monochromatic", wl=wl))  # offset so edge lies at y=0
+    RT.add(RS)
+
+    # large rectangular surface, we only use one edge
+    # make sure the width and height are much larger than the used part of the aperture
+    ap_surf = ot.SlitSurface(dim=[4*dim_ext, 4*dim_ext], dimi=[4*dim_ext-0.4, 4*dim_ext-0.4])
+    ap = ot.Aperture(ap_surf, pos=[0, (4*dim_ext - 0.4)/2, 0])  # offset so edge lies at y=0
+    RT.add(ap)
+
+    # add Detector
+    DetS = ot.RectangularSurface(dim=[dim_ext, dim_ext])
+    Det = ot.Detector(DetS, pos=[0, 0, zd])
+    RT.add(Det)
+
+    # trace
+    RT.trace(N)
+  
+    # get irradiance profile along image axis
+    img = RT.detector_image()
+    imgi = img.get("Irradiance", N_px)
+    imgic = np.mean(imgi.data, axis=1)
+    imgic /= np.mean(imgic[4*(imgic.shape[0]//5):])
+
+    # radial vector
+    r = np.linspace(imgi.extent[2], imgi.extent[3], imgi.shape[0])
+    
+    return r, imgic, edge_curve(r, wl, n, 5, zd)
+

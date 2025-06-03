@@ -40,6 +40,10 @@ tracer.geometry.surface.ring_surface
 ____________________________________________
 .. automodule:: optrace.tracer.geometry.surface.ring_surface
 
+tracer.geometry.surface.slit_surface
+____________________________________________
+.. automodule:: optrace.tracer.geometry.surface.slit_surface
+
 tracer.geometry.surface.spherical_surface
 ____________________________________________
 .. automodule:: optrace.tracer.geometry.surface.spherical_surface

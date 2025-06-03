@@ -165,3 +165,51 @@ To generate images with even more rays, the method
 which traces the geometry iteratively without holding all rays in memory. 
 More details are available in :numref:`rimage_iterative_render`.
 
+
+.. _hurb_usage:
+
+Modelling Diffraction
+________________________
+
+**Image Blurring**
+
+Image blurring can be applied to rendered images to account for resolution limits.
+This process utilizes an Airy disk filter, as detailed in :numref:`image_airy_filter`, 
+to approximate the blurring effect. 
+It is important to note that this method provides a very generalized approximation.
+
+**Ray Bending**
+
+optrace incorporates experimental support for Heisenberg Uncertainty Ray Bending (HURB). 
+Further technical details regarding its implementation are available in :numref:`hurb_details`.
+An example for experimentation with HURB is available in :numref:`example_hurb_apertures`.
+
+The current implementation of HURB has the following limitations:
+
+* HURB simulates the blurring associated with edge diffraction. It does not account for interference effects.
+* Deviations persist between theoretical and simulated beam profiles. 
+  For a detailed comparison, refer to :numref:`hurb_comparison`.
+* Ray bending is currently limited to the inner aperture edges 
+  of :class:`RingSurface <optrace.tracer.geometry.surface.ring_surface.RingSurface>`
+  and :class:`SlitSurface <optrace.tracer.geometry.surface.slit_surface.SlitSurface>` types.
+* All apertures are modeled as diffracting elements.
+* The aperture stop must be explicitly defined as a surface within the optical setup.
+
+Given these restrictions and the experimental status of the feature, 
+HURB requires explicit activation. 
+To enable HURB, set :python:`use_hurb=True` during the raytracer initialization:
+
+.. testcode::
+
+    RT = ot.Raytracer(outline=[-2, 2, -3, 3, -5, 60], use_hurb=True)
+
+A custom uncertainty scaling factor can be configured using 
+the :attr:`HURB_FACTOR <optrace.tracer.raytracer.Raytracer.HURB_FACTOR>` attribute:
+
+.. testcode::
+
+    RT.HURB_FACTOR = 2.3
+
+Additional information concerning this factor is provided in :numref:`hurb_uncertainty_factor`. 
+
+

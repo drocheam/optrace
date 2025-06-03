@@ -35,8 +35,8 @@ class Raytracer(Group):
     needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power"""
 
     HURB_FACTOR: float = 2**0.5
-    """HURB uncertainty factor. Original sources use 2, but sqrt(2) matches the envelope better
-    See the documentation."""
+    """HURB uncertainty factor. Scales the tangent uncertainty expression. Original sources use 1, 
+    but sqrt(2) matches the envelope better. See the documentation for details."""
 
     MAX_RAY_STORAGE_RAM: int = 8000000000
     """ Maximum available RAM for the stored rays """
@@ -386,7 +386,7 @@ class Raytracer(Group):
 
                         # use ray bending if activated, but ignore last surface that acts as absorber
                         if self.use_hurb and en != len(elements) - 1:
-                            self.__hurb(p, s, weights, wavelengths, ns, hwnh, i, element.surface, msg)
+                            self.__hurb(p, s, pols, weights, wavelengths, ns, hwnh, i, element.surface, msg)
 
                     # treat rays that go outside outline
                     self.__outline_intersection(p, s, weights, hwnh, i, msg)
@@ -415,14 +415,25 @@ class Raytracer(Group):
         self._last_trace_snapshot = self.tracing_snapshot()
                         
 
-    def __hurb(self, p: np.ndarray, s: np.ndarray, weights: np.ndarray, 
-               wl: np.ndarray, ns: np.ndarray, hwnh: np.ndarray, i: int, surf: Surface, msg: np.ndarray) -> None:
+    def __hurb(self, 
+               p:       np.ndarray, 
+               s:       np.ndarray, 
+               pols:    np.ndarray,
+               weights: np.ndarray, 
+               wl:      np.ndarray, 
+               ns:      np.ndarray, 
+               hwnh:    np.ndarray, 
+               i:       int, 
+               surf:    Surface, 
+               msg:     np.ndarray)\
+            -> None:
         """
         Approximate aperture diffraction asymptotically using HURB (Heisenberg Uncertainty Ray Bending),
         see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
 
         :param p: position array
         :param s: direction array
+        :param pols: ray polarizations
         :param weights: weight array
         :param wl: wavelength array
         :param ns: refractive index array
@@ -447,14 +458,14 @@ class Raytracer(Group):
         cos_psi_a = np.sqrt(1 - misc.rdot(s[hwnhi], a)**2)
         cos_psi_b = np.sqrt(1 - misc.rdot(s[hwnhi], b)**2)
 
-        # std dev of direction Gaussian
-        # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
-        # additionally, the refractive index, cos-dependency from a above and a custom uncertainty factor were included
+        # # std dev of direction Gaussian
+        # # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
+        # # additionally, the refractive index, cos-dependency from a above and a custom uncertainty factor were included
         k = 2*np.pi*ns[hwnhi, i] / (wl[hwnhi] * 1e-9)
-        tan_sig_b = 1 / (self.HURB_FACTOR*b_*cos_psi_b*1e-3*k)
-        tan_sig_a = 1 / (self.HURB_FACTOR*a_*cos_psi_a*1e-3*k)
+        tan_sig_b = self.HURB_FACTOR / (2*b_*cos_psi_b*1e-3*k)
+        tan_sig_a = self.HURB_FACTOR / (2*a_*cos_psi_a*1e-3*k)
 
-        # generated normally distributed tan(angles)
+        # # generated normally distributed tan(angles)
         tan_tha = np.random.normal(scale=tan_sig_a, size=a_.shape[0])
         tan_thb = np.random.normal(scale=tan_sig_b, size=b_.shape[0])
 
@@ -464,15 +475,20 @@ class Raytracer(Group):
         sa = misc.cross(b, s[hwnhi])
         sa = misc.normalize(sa)
         sb = misc.cross(s[hwnhi], sa)
-
+        
         # construct new direction from old one and sb, sa components
         sab = s[hwnhi] + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
+        s0 = s.copy()
         s[hwnhi] = misc.normalize(sab)
 
         # absorb rays with negative direction after bending
         neg = s[:, 2] < 0
         weights[neg, i+1] = 0
         msg[self.INFOS.HURB_NEG_DIR, i+1] += np.count_nonzero(neg)
+        
+        # recalculate polarization
+        n = np.broadcast_to([0., 0., 1.], (s0.shape[0], 3))
+        self.__compute_polarization(s0, s[hwnhi], n, pols, i, hwnhi)
 
     def __tracing_elements(self) -> list[Lens | Filter | Aperture]:
         """

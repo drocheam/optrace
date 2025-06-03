@@ -104,6 +104,9 @@ class ExampleTests(unittest.TestCase):
     def test_brewster(self):
         self._run_file(Path.cwd() / "examples" / "brewster_polarizer.py")
     
+    def test_hurb_apertures(self):
+        self._run_file(Path.cwd() / "examples" / "hurb_apertures.py")
+    
     @pytest.mark.os
     def test_eye_model(self):
         self._run_file(Path.cwd() / "examples" / "arizona_eye_model.py")
