@@ -35,7 +35,7 @@ class ExampleTests(unittest.TestCase):
                           "sim.control(func=lambda a: (automated(a), a.close()), args=(sim,))")
 
         # start process
-        env = os.environ | {"PYTHONPATH": str(Path.cwd())}  # needed so example find optrace
+        env = os.environ | {"PYTHONPATH": str(Path.cwd())}  # PYTHONPATH needed so example find optrace
         process = subprocess.run(["python", "-c", cmd], env=env, timeout=timeout)
         self.assertEqual(process.returncode, 0)
 
@@ -64,6 +64,10 @@ class ExampleTests(unittest.TestCase):
     @pytest.mark.slow
     def test_iol_pinhole_imaging(self):
         self._run_file(Path.cwd() / "examples" / "IOL_pinhole_imaging.py", 25)
+    
+    @pytest.mark.slow
+    def test_iol_target_imaging(self):
+        self._run_file(Path.cwd() / "examples" / "IOL_target_imaging.py", 25)
     
     def test_convolve(self):
         self._run_file(Path.cwd() / "examples" / "psf_imaging.py")

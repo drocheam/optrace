@@ -507,26 +507,67 @@ A pinhole is rendered for three different viewing distances.
 .. list-table::
    :class: table-borderless
 
-   * - .. figure:: images/example_IOL_0D.webp
+   * - .. figure:: images/example_IOL_pinhole_0D.webp
           :align: center
           :width: 300
           :class: dark-light
 
-          0.01 D focus.
+          0.01 D defocus.
 
-     - .. figure:: images/example_IOL_075D.webp
+     - .. figure:: images/example_IOL_pinhole_075D.webp
           :align: center
           :width: 300
           :class: dark-light
 
-          0.75 D focus.
+          0.75 D defocus.
 
-     - .. figure:: images/example_IOL_150D.webp
+     - .. figure:: images/example_IOL_pinhole_150D.webp
           :align: center
           :width: 300
           :class: dark-light
 
-          1.50 D focus.
+          1.50 D defocus.
+
+.. _example_iol_target_imaging:
+
+IOL Target Imaging
+-------------------------
+
+**File**: 
+`examples/IOL_target_imaging.py <https://github.com/drocheam/optrace/blob/main/examples/IOL_target_imaging.py>`_
+
+Simulation of an Alcon IQ intraocular lens (IOL) in the Arizona Eye Model. 
+An ETDRS chart is rendered for three different viewing distances.
+You can change distance, angle, pupil and image parameters from within the script.
+
+.. For more details see the publication *Damian Mendroch, Stefan Altmeyer, Uwe Oberheide; 
+   „Polychromatic Virtual Retinal Imaging of Two Extended-Depth-of-Focus Intraocular Lenses“. 
+   Trans. Vis. Sci. Tech. 2025*.
+
+
+.. list-table::
+   :class: table-borderless
+
+   * - .. figure:: images/example_IOL_target_0D.webp
+          :align: center
+          :width: 300
+          :class: dark-light
+
+          0.01 D defocus.
+
+     - .. figure:: images/example_IOL_target_075D.webp
+          :align: center
+          :width: 300
+          :class: dark-light
+
+          0.75 D defocus.
+
+     - .. figure:: images/example_IOL_target_150D.webp
+          :align: center
+          :width: 300
+          :class: dark-light
+
+          1.50 D defocus.
 
 .. _example_keratoconus:
 
