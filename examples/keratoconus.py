@@ -52,7 +52,7 @@ sr_angle = np.arctan(1.4*P/2/g)/np.pi*180  # ray divergence angle
 G_size = g*np.tan(G_alpha/180*np.pi)  # object size from angle
 
 # create raytracer
-RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28], no_pol=False)
+RT = ot.Raytracer(outline=[-OL, OL, -OL, OL, -g, 28])
 
 # Point Source
 RS = ot.RaySource(ot.Point(), divergence="Lambertian", div_angle=sr_angle, pos=[0, 0, -g])

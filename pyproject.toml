@@ -10,7 +10,8 @@ readme = "ReadMe.md"
 license = {text = "MIT License"}
 requires-python = ">=3.10,<3.14"
 dependencies = ["numpy>2", "chardet", "scipy", "opencv-python-headless", "pyqtdarktheme-fork", "pyside6", 
-"matplotlib", "tqdm", "mayavi @ git+https://github.com/enthought/mayavi"]
+"matplotlib", "tqdm", "mayavi @ https://github.com/enthought/mayavi/zipball/master", "vtk < 9.5"] 
+# TODO remove vtk version requirement when mayavi fixes things
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",

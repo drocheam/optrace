@@ -78,14 +78,16 @@ Below you can find a list of external dependencies that will be automatically in
 * When `mayavi <https://pypi.org/project/mayavi/>`__ fails installing `vtk <https://pypi.org/project/vtk/>`_, 
   try to install vtk first
 
-* When the installation of vtk fails, try to install from a list of other wheels 
-  as described `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
+* In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. 
+  The syntax is: :bash:`pip install --force-reinstall -v "some-package==1.2.2"`.
+  Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
+  A list of other wheels for vtk is found `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
 
 * Consult the `mayavi issues <https://github.com/enthought/mayavi/issues>`__, 
   `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ 
   or `PySide issues <https://bugreports.qt.io/projects/PYSIDE/issues/>`__ for current problems and solutions
 
-* In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. 
-  The syntax is: :bash:`pip install --force-reinstall -v "some-package==1.2.2"`.
-  Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
+* Installing mayavi with no cache and without isolated building can help, see `here <https://github.com/enthought/mayavi/issues/1325#issuecomment-2537662062>`__:
+  :bash:`pip install mayavi --no-cache-dir --verbose  --no-build-isolation`
+
 

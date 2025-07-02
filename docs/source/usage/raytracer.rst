@@ -195,6 +195,11 @@ The current implementation of HURB has the following limitations:
 * All apertures are modeled as diffracting elements.
 * The aperture stop must be explicitly defined as a surface within the optical setup.
 
+Another issue is that bending leads to large angle rays.
+The use of image rendering with automatic extent is discouraged,
+as these rays lead to drastically increased automatically set sizes.
+Provide the image size manually, see :numref:`rimage_rendering`.
+
 Given these restrictions and the experimental status of the feature, 
 HURB requires explicit activation. 
 To enable HURB, set :python:`use_hurb=True` during the raytracer initialization:

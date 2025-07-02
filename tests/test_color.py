@@ -647,7 +647,13 @@ class ColorTests(unittest.TestCase):
         srgb = color.xyz_to_srgb(xyz, rendering_intent="Perceptual", chroma_scale=1)
         srgb2 = color.xyz_to_srgb(xyz, rendering_intent="Absolute")
         self.assertTrue(np.allclose(srgb2, srgb, atol=1e-4))
-        
+       
+        # case 12: coverage, check that chroma_scale is applied even when all colors lie inside the gamut
+        xyz = np.ones((50, 50, 3))
+        assert not np.any(color.outside_srgb_gamut(xyz))
+        srgb = color.xyz_to_srgb(xyz, rendering_intent="Perceptual", chroma_scale=0.3)
+        srgb2 = color.xyz_to_srgb(xyz, rendering_intent="Absolute")
+        self.assertNotAlmostEqual(np.mean(np.abs(srgb-srgb2)), 0, delta=1e-3)  # chroma clipped differs significantly
 
     def test_spectral_color_map(self):
 

@@ -1,4 +1,5 @@
 
+.. NOTE: this page is referenced by a paper. Don't change its path or at least redirect it correctly
 
 .. _hurb_details:
 

@@ -320,7 +320,8 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
     # colors outside the gamut
     inv = np.any(RGBL < 0, axis=2)
 
-    if not np.any(inv):
+    # no conversion required when all colors in gamut and no specified chroma clipping
+    if not np.any(inv) and chroma_scale is None:
         return RGBL
 
     if rendering_intent == "Absolute":

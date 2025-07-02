@@ -493,6 +493,8 @@ This is done for multiple image distances and without needing to start a GUI.
 IOL Pinhole Imaging
 -------------------------
 
+.. NOTE: this page and label are referenced by a paper. Don't change its path or at least redirect it correctly
+
 **File**: 
 `examples/IOL_pinhole_imaging.py <https://github.com/drocheam/optrace/blob/main/examples/IOL_pinhole_imaging.py>`_
 
@@ -532,6 +534,8 @@ A pinhole is rendered for three different viewing distances.
 
 IOL Target Imaging
 -------------------------
+
+.. NOTE: this page and label are referenced by a paper. Don't change its path or at least redirect it correctly
 
 **File**: 
 `examples/IOL_target_imaging.py <https://github.com/drocheam/optrace/blob/main/examples/IOL_target_imaging.py>`_

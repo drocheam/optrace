@@ -83,7 +83,6 @@ for gi in g:
     # iteratively render the retinal image
     # constant extent (tested empirically) so the images are comparable
     # detector_index=1 is the rectangular detector
-    # approximate the resolution limit d=4µm for the eye
     det_im = RT.iterative_render(N_rays, detector_index=1, extent=[-0.10, 0.10, -0.10, 0.10])
 
     # calculate and the sRGB image with perceptual RI

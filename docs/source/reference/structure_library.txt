@@ -75,6 +75,7 @@
 │   │   │   ├── __init__.py
 │   │   │   ├── rectangular_surface.py
 │   │   │   ├── ring_surface.py
+│   │   │   ├── slit_surface.py
 │   │   │   ├── spherical_surface.py
 │   │   │   ├── surface.py
 │   │   │   └── tilted_surface.py
@@ -115,4 +116,4 @@
 │   └── transfer_matrix_analysis.py
 └── warnings.py
 
-14 directories, 102 files
+14 directories, 103 files
