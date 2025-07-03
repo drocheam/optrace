@@ -721,9 +721,10 @@ class GUITests(unittest.TestCase):
 
         def send_key(sim, key):
             self._do_in_main(sim.scene.scene_editor._content.setFocus)
-            time.sleep(0.3)
+            self._wait_for_idle(sim, base=0.5)
+            time.sleep(0.2)
             pyautogui.press(key)
-            time.sleep(0.3)
+            time.sleep(0.5)
 
         def interact(sim):
             with self._try(sim):
@@ -1457,10 +1458,10 @@ class GUITests(unittest.TestCase):
         
                 # check that pyautogui works
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.6)
                 self.assertTrue(sim.scene.interactor.shift_key)
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.6)
 
                 # change to z+ view, so there are rays at the middle of the scene
                 self._do_in_main(sim.scene.z_plus_view)
@@ -1479,7 +1480,7 @@ class GUITests(unittest.TestCase):
                
                 # ray picked -> show verbose info
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.5)
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
                                  sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
@@ -1527,7 +1528,7 @@ class GUITests(unittest.TestCase):
 
                 # space picked -> show coordinates
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.5)
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
                                  sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
@@ -1539,7 +1540,7 @@ class GUITests(unittest.TestCase):
                 
                 # valid space picked with shift -> move detector
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.5)
                 old_pos = RT.detectors[0].pos
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
                                  sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
@@ -1574,7 +1575,7 @@ class GUITests(unittest.TestCase):
 
                 # release shift key
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.5)
                 
                 # remove crosshair and pick without shift key
                 self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
@@ -1612,10 +1613,10 @@ class GUITests(unittest.TestCase):
             def pick_shift_combs():
                 pick()
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.5)
                 pick()
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.3)
+                time.sleep(0.5)
 
             with self._try(sim):
                 # change to z+ view, so there are rays at the middle of the scene
