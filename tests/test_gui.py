@@ -719,16 +719,18 @@ class GUITests(unittest.TestCase):
         RT = tracing_geometry()
         sim = TraceGUI(RT)
 
+        # without these high sleeping times there are errors in the github action workflows
+
         def send_key(sim, key):
             self._do_in_main(sim.scene.scene_editor._content.setFocus)
-            self._wait_for_idle(sim, base=2)
+            self._wait_for_idle(sim)
             pyautogui.press(key)
-            time.sleep(0.75)
+            time.sleep(0.5)
 
         def interact(sim):
             with self._try(sim):
 
-                time.sleep(2)
+                time.sleep(3)
 
                 # check minimalistic_view shortcut
                 self.assertTrue(len(sim.minimalistic_view) == 0)

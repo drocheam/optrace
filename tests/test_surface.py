@@ -56,7 +56,7 @@ class SurfaceTests(unittest.TestCase):
         self.assertRaises(ValueError, ot.RectangularSurface, dim=[5, np.inf])  # size non finite
         self.assertRaises(ValueError, ot.SlitSurface, dim=[-5, 5], dimi=[0.1, 0.1])  # size negative
         self.assertRaises(ValueError, ot.SlitSurface, dim=[5, np.inf], dimi=[0.1, 0.1])  # size non finite
-        self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[-5, 5])  # size negative
+        self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[-3, 3])  # size negative
         self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[1, np.inf])  # size non finite
         self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[6, 1])  # slit too large x
         self.assertRaises(ValueError, ot.SlitSurface, dim=[5, 5], dimi=[1, 6])  # slit too large y
