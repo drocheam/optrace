@@ -1,8 +1,7 @@
-from __future__ import annotations
-from typing import Any  # Callable and Any type
+from typing import Any
 
 import cv2
-import numpy as np  # calculations
+import numpy as np
 
 from .base_image import BaseImage
 from ...property_checker import PropertyChecker as pc  # check types and values
@@ -13,9 +12,9 @@ from ..color.srgb import srgb_to_xyz, srgb_linear_to_srgb
 class RGBImage(BaseImage):
 
     def __init__(self,
-                 data:        numpy.ndarray | str,
-                 s:           list | numpy.ndarray = None,
-                 extent:      (list | numpy.ndarray) = None,
+                 data:        np.ndarray | str,
+                 s:           list | np.ndarray = None,
+                 extent:      (list | np.ndarray) = None,
                  **kwargs)\
             -> None:
         """

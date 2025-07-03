@@ -158,7 +158,7 @@ Github Workflows
 ________________________
 
 * see `.github/workflows/ <https://github.com/drocheam/optrace/blob/main/.github/workflows/>`_
-* Actions: Main testing, OS Compatibility, Python 3.10 Compatibility
+* Actions: Main testing, OS Compatibility, Older Python Version Compatibility
 * all get run on a push the repository or can get run manually
 
 

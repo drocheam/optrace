@@ -1,6 +1,6 @@
 
 # standard libs
-from typing import Callable, Any  # Callable and Any type
+from typing import Callable, Any, assert_never
 
 # external libs
 import numpy as np  # ndarray type and calculations
@@ -269,9 +269,12 @@ class RaySource(Element):
             case "Converging":
                 s_or = misc.normalize(self.conv_pos - p)
 
-            case "Function":  # pragma: no branch
+            case "Function":
                 pc.check_callable("RaySource.or_func", self.or_func)
                 s_or = self.or_func(p[:, 0], p[:, 1], **self.or_args)
+
+            case _:
+                assert_never(self.orientation)
 
         ## Generate ray divergences relative to orientation
         ################################################################################################################
@@ -325,10 +328,13 @@ class RaySource(Element):
                 X0 = r**2 / div_sin**2
                 theta = random.inverse_transform_sampling(x, f, X0, kind="continuous")
 
-            case "Function" if self.div_2d:  # pragma: no branch
+            case "Function" if self.div_2d:
                 x = np.linspace(0, np.radians(self.div_angle), 1000)
                 f = self.div_func(x, **self.div_args)
                 theta = random.inverse_transform_sampling(x, f, N, kind="continuous")
+
+            case _:
+                assert_never(self.divergence)
 
         if self.divergence != "None":
             # vector perpendicular to s, created using  sy = [1, 0, 0] x s_or
@@ -378,12 +384,15 @@ class RaySource(Element):
                     ang = random.inverse_transform_sampling(self.pol_angles, self.pol_probs, N, kind="discrete")
                     ang = np.radians(ang)
 
-                case "Function":  # pragma: no branch
+                case "Function":
                     pc.check_callable("RaySource.pol_func", self.pol_func)
                     x = np.linspace(0, 2*np.pi, 5000)
                     f = self.pol_func(x, **self.pol_args)
                     ang = random.inverse_transform_sampling(x, f, N, kind="continuous")
                     ang = np.radians(ang)
+
+                case _:
+                    assert_never(self.polarization)
 
             # pol is rotated by an axis perpendicular to the plane of base divergence s = [0, 0, 1]
             # and the current divergence s_

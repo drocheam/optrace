@@ -1,5 +1,5 @@
 
-from typing import Any  # Any type
+from typing import Any, assert_never
 from threading import Thread  # threading
 from enum import IntEnum  # integer enum
 
@@ -249,6 +249,9 @@ class Raytracer(Group):
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                     f"have negative z-direction after ray bending at "
                                     f"surface {surf} ({surf_name[surf]}), set to absorbed.")
+                        
+                        case _:
+                            assert_never(type_)
 
     def _pretrace_check(self, N: int) -> bool:
         """checks the geometry and N parameter. Returns if tracing is possible"""
@@ -372,7 +375,7 @@ class Raytracer(Group):
                     # index after lens is index before lens in the next iteration
                     n1 = n2
 
-                elif isinstance(element, Filter | Aperture):  # pragma: no branch
+                elif isinstance(element, Filter | Aperture):
 
                     p[hw, i+1], hit, ill = element.surface.find_hit(p[hw, i], s[hw])
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
@@ -392,6 +395,9 @@ class Raytracer(Group):
                     self.__outline_intersection(p, s, weights, hwnh, i, msg)
                     
                     ns[:, i+1] = ns[:, i]
+
+                else:
+                    assert_never(element)
 
                 i += 1
                 bar.update(N_t == 0)
@@ -1634,6 +1640,8 @@ class Raytracer(Group):
                 pos = np.argmin(vals)
                 res = scipy.optimize.minimize(cost_func2, r[pos], args=method, tol=None, callback=None,
                                               options={'maxiter': 30}, bounds=[bounds], method="COBYLA")
+            else:
+                assert_never(method)
 
             res.x = res.x[0]
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from contextlib import contextmanager  # context manager for _no_trait_action()
+from typing import assert_never
 
 import numpy as np  # calculations
 import copy
@@ -1125,11 +1126,17 @@ class ScenePlotting:
             case 'Source':
                 lutm.number_of_labels = len(self.raytracer.ray_sources)
                 lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-6.0f"
-                if lutm.number_of_labels > 1:  # pragma: no branch
+                if lutm.number_of_labels > 1:
                     lutm.lut.table = 255*color.spectral_colormap(np.linspace(440, 620, lutm.number_of_labels))
 
             case 'Plain':
                 lutm.reverse_lut = bool(self.ui.high_contrast)
+            
+            case ('Power' | 'Refractive Index'):
+                pass
+
+            case _:
+                assert_never(self.ui.coloring_mode)
 
     def color_ray_sources(self) -> None:
         """sets colors of ray sources"""
@@ -1159,8 +1166,10 @@ class ScenePlotting:
                                 pol_ang = 0
                             case "y":
                                 pol_ang = np.pi/2
-                            case "Constant":  # pragma: no branch
+                            case "Constant":
                                 pol_ang = np.deg2rad(RS.pol_angle)
+                            case _:
+                                assert_never(RS.polarization)
                     
                         proj = np.sin(pol_ang) if self.ui.coloring_mode == "Polarization yz" else np.cos(pol_ang)
                         col = np.array(lutm.lut.table[int(proj*255)])
@@ -1171,9 +1180,12 @@ class ScenePlotting:
             case 'Source':
                 RSColor = [np.array(lutm.lut.table[i][:3]) / 255. for i, _ in enumerate(self._ray_source_plots)]
 
-            case 'Power':  # pragma: no branch
+            case 'Power':
                 # set to maximum ray power, this is the same for all sources
                 RSColor = [np.array(lutm.lut.table[-1][:3]) / 255. for RSp in self._ray_source_plots]
+
+            case _:
+                assert_never(self.ui.coloring_mode)
 
         if len(self.raytracer.ray_sources) == len(self._ray_source_plots):
             for color, RSp in zip(RSColor, self._ray_source_plots):

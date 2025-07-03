@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Any  # Callable and Any type
+from typing import Any
 
 import cv2  # image loading and saving
 import numpy as np  # calculations
@@ -10,13 +9,12 @@ from ...property_checker import PropertyChecker as pc  # check types and values
 from ..geometry.surface import SphericalSurface
 
 
-
 class BaseImage(BaseClass):
 
     def __init__(self,
-                 data:              numpy.ndarray | str,
-                 s:                 (list | numpy.ndarray) = None,
-                 extent:            (list | numpy.ndarray) = None,
+                 data:              np.ndarray | str,
+                 s:                 (list | np.ndarray) = None,
+                 extent:            (list | np.ndarray) = None,
                  projection:        str = None,
                  quantity:          str = "",
                  limit:             float = None,
@@ -66,7 +64,7 @@ class BaseImage(BaseClass):
         super().__init__(**kwargs)
         self._new_lock = True
 
-    def _load_image(self, path: str) -> numpy.ndarray:
+    def _load_image(self, path: str) -> np.ndarray:
         """
         Loads an image file and converts it into a numpy array.
         
@@ -90,7 +88,7 @@ class BaseImage(BaseClass):
         return self._data.shape
 
     @property
-    def data(self) -> numpy.ndarray:
+    def data(self) -> np.ndarray:
         """image data array"""
         return self._data.copy()
 

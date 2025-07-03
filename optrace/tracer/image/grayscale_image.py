@@ -1,10 +1,8 @@
-from __future__ import annotations
-from typing import Any  # Callable and Any type
-
-import numpy as np  # calculations
+from typing import Any
+import numpy as np
 
 from .scalar_image import ScalarImage
-from ...property_checker import PropertyChecker as pc  # check types and values
+from ...property_checker import PropertyChecker as pc
 from .. import color
 
 
@@ -12,9 +10,9 @@ from .. import color
 class GrayscaleImage(ScalarImage):
 
     def __init__(self,
-                 data:              numpy.ndarray | str,
-                 s:                 list | numpy.ndarray = None,
-                 extent:            (list | numpy.ndarray) = None,
+                 data:              np.ndarray | str,
+                 s:                 list | np.ndarray = None,
+                 extent:            (list | np.ndarray) = None,
                  **kwargs)\
             -> None:
         """

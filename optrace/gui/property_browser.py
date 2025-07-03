@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import Any  # Any type
-import numpy as np  # numpy ndarray type
+from typing import Any
+import numpy as np
 
 from traitsui.api import View, Item, ValueEditor, Group
 from traits.api import HasTraits, observe, Button, Dict, Str

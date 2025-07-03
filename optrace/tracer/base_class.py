@@ -1,6 +1,5 @@
-from __future__ import annotations
 import copy  # deepcopy
-from typing import Any  # Any type
+from typing import Any, Self
 
 import numpy as np  # calculations
 
@@ -75,7 +74,7 @@ class BaseClass:
         """
         return self.desc if self.desc != "" else fallback
 
-    def copy(self) -> BaseClass:
+    def copy(self) -> Self:
         """:return: a fully independent copy"""
         return copy.deepcopy(self)
 

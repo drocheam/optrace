@@ -1,6 +1,6 @@
 
 import copy  # deepcopy for dicts
-from typing import Callable, Any  # Callable and Any type
+from typing import Callable, Any, assert_never
 
 import numpy as np  # calculations
 
@@ -111,9 +111,12 @@ class Spectrum(BaseClass):
                 val, mu, sig = self.val, self.mu, self.sig
                 return val*np.exp(-(wl-mu)**2/(2*sig**2))
 
-            case "Function":  # pragma: no branch
+            case "Function":
                 pc.check_callable("Spectrum.func", self.func)
                 return self.func(wl_, **self.func_args)
+
+            case _:
+                assert_never(self.spectrum_type)
 
     def is_continuous(self) -> bool:
         """:return: if the spectrum is continuous, thus not discrete"""

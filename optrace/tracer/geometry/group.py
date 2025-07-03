@@ -1,11 +1,11 @@
 from __future__ import annotations
-from typing import Any  # Any type
+from typing import Any
 
-import numpy as np  # calculations
+import numpy as np
 
 from . import Filter, Aperture, Detector, Lens, RaySource, Surface,\
         PointMarker, LineMarker, IdealLens, Element, SphereVolume, BoxVolume, CylinderVolume, Volume
-        # possible elements in group
+        # supported elements in group
 from ..base_class import BaseClass  # parent class
 
 from ..transfer_matrix_analysis import TMA  # paraxial analysis

@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Any  # Callable and Any type
+from typing import Any, Self
 from threading import Thread  # multithreading
 
 import numpy as np  # calculations
@@ -17,7 +16,6 @@ from .. import color  # xyz_observers curves and sRGB conversions
 
 from ...global_options import global_options
 
-# from .image.base_image import BaseImage
 
 # odd number of pixels per side, so we have a center pixel, which is useful in images with rotational symmetry
 # otherwise a pixel at the center would fall in one of the neighboring pixel due to numeric errors
@@ -53,7 +51,7 @@ class RenderImage(BaseClass):
 
 
     def __init__(self,
-                 extent:            (list | numpy.ndarray),
+                 extent:            (list | np.ndarray),
                  projection:        str = None,
                  **kwargs)\
             -> None:
@@ -104,7 +102,7 @@ class RenderImage(BaseClass):
         return self._data.shape
 
     @property
-    def data(self) -> numpy.ndarray:
+    def data(self) -> np.ndarray:
         """image data array"""
         self.__check_for_image()
         return self._data.copy()
@@ -131,9 +129,9 @@ class RenderImage(BaseClass):
         return self._limit
 
     def get(self,
-            mode:       str,
-            N:          int = 315,
-            L_th:       float = 0,
+            mode:          str,
+            N:             int = 315,
+            L_th:          float = 0,
             chroma_scale:  float = None)\
             -> RGBImage | ScalarImage:
         """
@@ -256,7 +254,7 @@ class RenderImage(BaseClass):
             self.extent += np.array([-1.0, 1.0, -1.0, 1.0]) * 2.7 * self._limit/1000.0
 
         
-    def _apply_rayleigh_filter(self):
+    def _apply_rayleigh_filter(self) -> None:
         """applies the rayleigh filter"""
 
         if self._limit is not None and self.projection is not None:
@@ -313,7 +311,7 @@ class RenderImage(BaseClass):
         np.savez_compressed(path_, **sdict)
 
     @staticmethod
-    def load(path: str) -> RenderImage:
+    def load(path: str) -> Self:
         """
         Load a saved RenderImage (.npz) from disk.
 

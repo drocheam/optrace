@@ -1,5 +1,5 @@
 
-from typing import Callable  # Callable typing hints
+from typing import Callable, assert_never  # Callable typing hints
 
 import numpy as np  # calculations
 import matplotlib.pyplot as plt  # actual plotting
@@ -204,6 +204,8 @@ def _chromaticity_plot(img:       RenderImage | RGBImage | LightSpectrum | list[
         mask = ~np.all(RGB == 0, axis=2)
         RGB[mask] /= (np.abs(RGB[mask, 0]**2 + RGB[mask, 1]**2 + RGB[mask, 2]**2)**0.5)[:, np.newaxis]  
         # normalize brightness
+    else:
+        assert_never(norm)
 
     # convert to sRGB
     sRGB = color.srgb_linear_to_srgb(RGB)

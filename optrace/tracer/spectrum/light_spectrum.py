@@ -1,9 +1,8 @@
-from __future__ import annotations
 
 import numpy as np  # calculations
 import scipy.special  # error function and inverse
 import scipy.integrate
-from typing import Any  # Any type
+from typing import Any, Self, assert_never
 
 from .spectrum import Spectrum  # parent class
 from .. import color # color conversions
@@ -42,7 +41,7 @@ class LightSpectrum(Spectrum):
     def render(wl:        np.ndarray,
                w:         np.ndarray,
                **kwargs)\
-            -> LightSpectrum:
+            -> Self:
         """
         Render a LightSpectrum from a list of wavelengths and powers.
         The resulting LightSpectrum has type "Histogram" and unit W/nm
@@ -132,9 +131,12 @@ class LightSpectrum(Spectrum):
                 wlr = color.wavelengths(cnt)
                 wl = random.inverse_transform_sampling(wlr, self(wlr), N)
 
+            case _:
+                assert_never(self.spectrum_type)
+
         return wl
 
-    def __call__(self, wl: list | numpy.ndarray | float) -> numpy.ndarray:
+    def __call__(self, wl: list | np.ndarray | float) -> np.ndarray:
         """
         Get the spectrum values
 
@@ -190,7 +192,12 @@ class LightSpectrum(Spectrum):
 
         return color.xyz_from_spectrum(wl, spec)
 
-    def color(self, rendering_intent="Ignore", clip=False, L_th=0, chroma_scale=0) -> tuple[float, float, float]:
+    def color(self, 
+              rendering_intent:     str = "Ignore", 
+              clip:                 bool = False, 
+              L_th:                 float = 0.0, 
+              chroma_scale:         float = 0.0)\
+            -> tuple[float, float, float]:
         """
         Get the sRGB color of the spectrum
 
@@ -199,7 +206,8 @@ class LightSpectrum(Spectrum):
         :return: tuple of 3 sRGB values
         """
         XYZ = np.array([[[*self.xyz()]]])
-        RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, clip=clip, L_th=L_th, chroma_scale=chroma_scale)[0, 0]
+        RGB = color.xyz_to_srgb(XYZ, rendering_intent=rendering_intent, 
+                                clip=clip, L_th=L_th, chroma_scale=chroma_scale)[0, 0]
         return float(RGB[0]), float(RGB[1]), float(RGB[2])
 
     def dominant_wavelength(self) -> float:

@@ -182,7 +182,7 @@ def surface_profile_plot(surface:          Surface | list[Surface],
 
 def block() -> None:
     """show all plots and block application"""
-    plt.show(block=True)
+    plt.show(block=True)  # pragma: no cover
 
 def _show_grid(what=plt) -> None:
     """active major and minor grid lines, while minor are dashed and less visible"""
