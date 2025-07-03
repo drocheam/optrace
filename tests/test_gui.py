@@ -721,9 +721,9 @@ class GUITests(unittest.TestCase):
 
         def send_key(sim, key):
             self._do_in_main(sim.scene.scene_editor._content.setFocus)
-            time.sleep(0.1)
+            time.sleep(0.3)
             pyautogui.press(key)
-            time.sleep(0.1)
+            time.sleep(0.3)
 
         def interact(sim):
             with self._try(sim):
@@ -1457,10 +1457,10 @@ class GUITests(unittest.TestCase):
         
                 # check that pyautogui works
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.2)
+                time.sleep(0.3)
                 self.assertTrue(sim.scene.interactor.shift_key)
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.2)
+                time.sleep(0.3)
 
                 # change to z+ view, so there are rays at the middle of the scene
                 self._do_in_main(sim.scene.z_plus_view)
@@ -1612,9 +1612,10 @@ class GUITests(unittest.TestCase):
             def pick_shift_combs():
                 pick()
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.2)
+                time.sleep(0.3)
                 pick()
                 pyautogui.keyUp("shiftleft")
+                time.sleep(0.3)
 
             with self._try(sim):
                 # change to z+ view, so there are rays at the middle of the scene
