@@ -14,20 +14,19 @@ Installation
 
 Make sure Python 3.10, 3.11, 3.12 or 3.13 are installed on your system
 
+
 **Installing the latest official release**
 
+#. Make sure python and pip are installed
 #. Download the optrace .tar.gz archive 
    from the `latest release <https://github.com/drocheam/optrace/releases/latest>`__
-#. Open a terminal
-#. Run :bash:`pip install <path to archive>`, 
-   where :bash:`<path to archive>` is the path to the archive downloaded in the first step
+#. Run :bash:`pip install <archive>` from a terminal, 
+   where :bash:`<archive>` is the path of the downloaded file 
 
-**Installing the current git version**
+**Installing the latest git version**
 
-#. Open a terminal
-#. Clone the whole project repository using git: :bash:`git clone https://github.com/drocheam/optrace/`
-#. Change the directory into the cloned folder: :bash:`cd optrace`
-#. Install using :bash:`pip install .`
+#. Make sure python and pip are installed
+#. Open a terminal and run: :bash:`pip install "optrace @ git+https://github.com/drocheam/optrace.git"`
 
 
 .. TODO note about limitation with PyPi
