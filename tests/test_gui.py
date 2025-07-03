@@ -1454,6 +1454,14 @@ class GUITests(unittest.TestCase):
         
         def interact(sim):
             with self._try(sim):
+        
+                # check that pyautogui works
+                pyautogui.keyDown("shiftleft")
+                time.sleep(0.2)
+                self.assertTrue(sim.scene.interactor.shift_key)
+                pyautogui.keyUp("shiftleft")
+                time.sleep(0.2)
+
                 # change to z+ view, so there are rays at the middle of the scene
                 self._do_in_main(sim.scene.z_plus_view)
                 self._wait_for_idle(sim)
@@ -1471,7 +1479,7 @@ class GUITests(unittest.TestCase):
                
                 # ray picked -> show verbose info
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.1)
+                time.sleep(0.3)
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
                                  sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
@@ -1519,7 +1527,7 @@ class GUITests(unittest.TestCase):
 
                 # space picked -> show coordinates
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.1)
+                time.sleep(0.3)
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
                                  sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
@@ -1531,7 +1539,7 @@ class GUITests(unittest.TestCase):
                 
                 # valid space picked with shift -> move detector
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.1)
+                time.sleep(0.3)
                 old_pos = RT.detectors[0].pos
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
                                  sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
@@ -1566,7 +1574,7 @@ class GUITests(unittest.TestCase):
 
                 # release shift key
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.1)
+                time.sleep(0.3)
                 
                 # remove crosshair and pick without shift key
                 self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
@@ -1587,6 +1595,8 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui3
+    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland", 
+                        reason="KDE Wayland wants remote authentication")
     def test_picker_coverage(self):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10])
