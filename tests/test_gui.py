@@ -1831,7 +1831,7 @@ class GUITests(unittest.TestCase):
 
                 # replot
                 self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._wait_for_idle(sim, base=1)
                 self.assertEqual(len(sim._plot._volume_plots), 4)  # elements were added
                 self.assertTrue(sim._plot._volume_plots[0][3] is None)  # no text label for volumes
 

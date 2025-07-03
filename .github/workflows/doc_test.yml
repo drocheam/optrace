@@ -39,5 +39,6 @@ jobs:
     - name: Test code snippets
       run: tox -e doctest -- -v
 
-    - name: Test links
-      run: tox -e linkcheck -- -v 
+    # skip linkchecks for now, github and some other sites block it
+    #- name: Test links
+      #run: tox -e linkcheck -- -v 
