@@ -205,6 +205,7 @@ ________________________________________________________________________________
 * tox-ignore-env-name-mismatch allows us to reuse the tox env for all actions
 * parallelized testing with pytest-xdist could be possible, but we wouldn't gain much from it as the heaviest
   tasks are already multithreaded
-* when gui tests fail on wayland, first run :bash:`xhost +`
+* pytest-xvfb uses xvfb as headless-display. Use the option :bash:`--no-xvfb` to actually see the plots/windows.
+* when GUI tests fail on wayland, first run :bash:`xhost +`
 
 

@@ -12,6 +12,7 @@ from contextlib import contextmanager  # context manager for _no_trait_action()
 
 import numpy as np
 import pytest
+import pytest_xvfb
 from threading import Thread
 import matplotlib.pyplot as plt
 import pyautogui
@@ -705,8 +706,11 @@ class GUITests(unittest.TestCase):
    
     @pytest.mark.slow
     @pytest.mark.gui3
-    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland", 
-                        reason="KDE Wayland wants remote authentication")
+    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland" \
+                        and pytest_xvfb.xvfb_instance is None,
+                        reason="KDE Wayland wants remote authentication. Use X11 or run with xvfb")
+    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
+                        reason="Issues with headless display and input in github actions")
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
@@ -1445,8 +1449,11 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui2
-    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland", 
-                        reason="KDE Wayland wants remote authentication")
+    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland" \
+                        and pytest_xvfb.xvfb_instance is None,
+                        reason="KDE Wayland wants remote authentication. Use X11 or run with xvfb")
+    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
+                        reason="Issues with headless display and input in github actions")
     def test_picker(self):
         """
         test picker interaction in the scene
@@ -1462,10 +1469,10 @@ class GUITests(unittest.TestCase):
         
                 # check that pyautogui works
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.6)
+                time.sleep(0.3)
                 self.assertTrue(sim.scene.interactor.shift_key)
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.6)
+                time.sleep(0.3)
 
                 # change to z+ view, so there are rays at the middle of the scene
                 self._do_in_main(sim.scene.z_plus_view)
@@ -1484,7 +1491,7 @@ class GUITests(unittest.TestCase):
                
                 # ray picked -> show verbose info
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.5)
+                time.sleep(0.3)
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
                                  sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
@@ -1532,7 +1539,7 @@ class GUITests(unittest.TestCase):
 
                 # space picked -> show coordinates
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.5)
+                time.sleep(0.3)
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
                                  sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
                 self._wait_for_idle(sim)
@@ -1544,7 +1551,7 @@ class GUITests(unittest.TestCase):
                 
                 # valid space picked with shift -> move detector
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.5)
+                time.sleep(0.3)
                 old_pos = RT.detectors[0].pos
                 self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
                                  sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
@@ -1579,7 +1586,7 @@ class GUITests(unittest.TestCase):
 
                 # release shift key
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.5)
+                time.sleep(0.3)
                 
                 # remove crosshair and pick without shift key
                 self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
@@ -1600,8 +1607,11 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui3
-    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland", 
-                        reason="KDE Wayland wants remote authentication")
+    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland" \
+                        and pytest_xvfb.xvfb_instance is None,
+                        reason="KDE Wayland wants remote authentication. Use X11 or run with xvfb")
+    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
+                        reason="Issues with headless display and input in github actions")
     def test_picker_coverage(self):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10])
@@ -1617,10 +1627,10 @@ class GUITests(unittest.TestCase):
             def pick_shift_combs():
                 pick()
                 pyautogui.keyDown("shiftleft")
-                time.sleep(0.5)
+                time.sleep(0.2)
                 pick()
                 pyautogui.keyUp("shiftleft")
-                time.sleep(0.5)
+                time.sleep(0.2)
 
             with self._try(sim):
                 # change to z+ view, so there are rays at the middle of the scene
