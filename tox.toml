@@ -50,6 +50,10 @@ commands = [["pytest", "-m", "os", {replace="posargs", extend=true}]]
 description = "Don't test slower tests (> 10 seconds)"
 commands = [["pytest", "-m", "not slow", {replace="posargs", extend=true}]]
 
+[env.install]
+description = "Quick testing of installation"
+commands = [["pytest", "-v", "-m", "install", {replace="posargs", extend=true}]]
+
 [env.linkcheck]
 description = "Check all links in software and documentation"
 commands = [["sphinx-build", "-M", "linkcheck", "docs{/}source", "docs{/}build", "-j", "auto"]]

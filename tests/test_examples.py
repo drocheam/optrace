@@ -45,7 +45,8 @@ class ExampleTests(unittest.TestCase):
 
     def test_presets_refraction_index(self):
         self._run_file(Path.cwd() / "examples" / "refraction_index_presets.py")
-    
+   
+    @pytest.mark.install
     def test_legrand_eye(self):
         self._run_file(Path.cwd() / "examples" / "legrand_eye_model.py")
     
@@ -68,7 +69,8 @@ class ExampleTests(unittest.TestCase):
     @pytest.mark.slow
     def test_iol_target_imaging(self):
         self._run_file(Path.cwd() / "examples" / "IOL_target_imaging.py", 25)
-    
+   
+    @pytest.mark.install
     def test_convolve(self):
         self._run_file(Path.cwd() / "examples" / "psf_imaging.py")
     
@@ -77,6 +79,7 @@ class ExampleTests(unittest.TestCase):
     def test_benchmark(self):
         self._run_file(Path.cwd() / "tests" / "benchmark.py", 45)
     
+    @pytest.mark.install
     def test_double_gauss(self):
         self._run_file(Path.cwd() / "examples" / "double_gauss.py")
    
@@ -88,6 +91,7 @@ class ExampleTests(unittest.TestCase):
     def test_microscope(self):
         self._run_file(Path.cwd() / "examples" / "microscope.py", 45)
     
+    @pytest.mark.install
     def test_presets_spectrum(self):
         self._run_file(Path.cwd() / "examples" / "spectrum_presets.py")
     
@@ -100,7 +104,8 @@ class ExampleTests(unittest.TestCase):
 
     def test_prism(self):
         self._run_file(Path.cwd() / "examples" / "prism.py")
-    
+   
+    @pytest.mark.install
     @pytest.mark.slow
     def test_gui_automation(self):
         self._run_file(Path.cwd() / "examples" / "gui_automation.py", 35)

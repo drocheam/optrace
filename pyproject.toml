@@ -62,6 +62,7 @@ addopts = "--random-order"
 markers = [
     "slow: tests slower than 10 seconds on my machine",
     "os: marks test relevant for testing of different operating systems",
+    "install: marks tests for regular package installation tests",
     "gui1: only first batch of GUI tests (separated for lower RAM usage)",
     "gui2: only second batch of GUI tests (separated for lower RAM usage)",
     "gui3: only third batch of GUI tests (separated for lower RAM usage)"

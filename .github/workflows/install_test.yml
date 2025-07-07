@@ -1,18 +1,15 @@
-name: Functionality Tests
+name: Weekly package installation test
 
-# do testing on commits, but only if python files changed
-# and files are not in examples/ or tests/
+# do tests on dispatch and every Wednesday at 13:00 UTC
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'optrace/**'
+  schedule:
+    - cron: "0 13 * * 3"
 
-      
 jobs:
-  tox_test:
+  install_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 10
     strategy:
       matrix:
         python-version: ['3.13']
@@ -20,13 +17,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # needed for the x-server to work
     - name: Setup headless display
       uses: pyvista/setup-headless-display-action@v3
       with:
         qt: true
       
-    # set up python and dependencies
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
@@ -39,4 +34,4 @@ jobs:
     # actual tests
     - name: Test with tox
       run: |        
-        tox -e py313 
+        tox -r -e install 
