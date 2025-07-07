@@ -27,6 +27,13 @@ jobs:
       with:
         qt: true
     
+    # needed for pyautogui
+    # see https://micwan88.github.io/linux/xauth/2019/10/16/create-xauthority-manually.html
+    - name: Create Xauthority manually
+      run: |
+        touch ~/.Xauthority
+        xauth add ${HOST}:0 . $(xxd -l 16 -p /dev/urandom)
+      
     # set up python and dependecies
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
