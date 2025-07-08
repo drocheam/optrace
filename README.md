@@ -1,11 +1,13 @@
 # optrace
 
-![Python 3.11, 3.12, 3.13](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-blue)
-![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
-![License MIT](https://img.shields.io/badge/license-MIT-blue)
+[![Version](https://img.shields.io/github/v/tag/drocheam/optrace?label=version)](https://github.com/drocheam/optrace/releases/latest)
+[![Python 3.11, 3.12, 3.13](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://github.com/drocheam/optrace/blob/main/pyproject.toml)
+[![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/drocheam/optrace/blob/main/pyproject.toml)
+[![License MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/drocheam/optrace/blob/main/LICENSE)
 
 [![Testing](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/tox_test.yml)
 [![Documentation](https://github.com/drocheam/optrace/actions/workflows/gen_docs.yml/badge.svg)](https://drocheam.github.io/optrace)
+[![OS Compatibility](https://github.com/drocheam/optrace/actions/workflows/os_comp.yml/badge.svg)](https://github.com/drocheam/optrace/actions/workflows/os_comp.yml)
 
 <img src="./docs/source/images/header.webp" width="95%"></img>
 
@@ -63,8 +65,6 @@ The documentation features an [Example Gallery](https://drocheam.github.io/optra
 range of applications.
 
 ## Installation
-
-Make sure Python 3.11, 3.12 or 3.13 are installed on your system
 
 **Installing the latest official release**
 

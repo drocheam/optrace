@@ -14,7 +14,6 @@ Installation
 
 Make sure Python 3.11, 3.12 or 3.13 are installed on your system
 
-
 **Installing the latest official release**
 
 #. Make sure python and pip are installed
