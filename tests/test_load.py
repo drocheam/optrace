@@ -23,6 +23,7 @@ class LoadTests(unittest.TestCase):
 
 
     @pytest.mark.os
+    @pytest.mark.install
     def test_readlines(self):
         """test text loading for different encodings"""
 
@@ -53,6 +54,7 @@ class LoadTests(unittest.TestCase):
 
 
     @pytest.mark.os
+    @pytest.mark.install
     def test_agf_valid_files(self):
         """load different agf catalogues and check if everything is handled correctly"""
 

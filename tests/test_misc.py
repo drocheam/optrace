@@ -406,6 +406,7 @@ class TracerMiscTests(unittest.TestCase):
         # stratified sampling has smaller discrepancy
         self.assertTrue(d_strat < d_lhc)
     
+    @pytest.mark.install
     def test_progress_bar_class(self):
 
         for active in [False, True]:

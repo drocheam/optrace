@@ -55,6 +55,7 @@ class ColorTests(unittest.TestCase):
         xyY = np.dstack((x, y, Y))
         return color.xyY_to_xyz(xyY)
     
+    @pytest.mark.install
     def test_srgb_linear_conversion(self):
         """test xyz -> srgb linear conversion by comparing to colour science conversion"""
 
@@ -94,6 +95,7 @@ class ColorTests(unittest.TestCase):
         # check if those are true that have negative srgb values
         self.assertTrue(np.all(og == np.any(srgbl < -1e-6, axis=2)))  # same tolerance as outside_srgb_gamut function
 
+    @pytest.mark.install
     def test_srgb_conversion(self):
         """test xyz -> srgb conversion by comparing to colour-science conversion"""
     
@@ -119,6 +121,7 @@ class ColorTests(unittest.TestCase):
         d = color.xyz_to_srgb(np.array([[[*color.WP_D65_XYZ]]]), normalize=False)
         self.assertTrue(np.allclose(d, 1))
 
+    @pytest.mark.install
     def test_xyY_conversion(self):
         """test xyz -> xyY conversion by comparing to colour-science conversion"""
 
@@ -158,6 +161,7 @@ class ColorTests(unittest.TestCase):
         self.assertTrue(np.allclose(XYZ2 - XYZ0, 0, atol=5e-3))
         self.assertTrue(np.any(XYZ1 != XYZ2))  # different results depending on method
 
+    @pytest.mark.install
     def test_luv_conversion(self):
         """test xyz -> CIELUV conversion by comparing to colour-science conversion"""
         
@@ -193,6 +197,7 @@ class ColorTests(unittest.TestCase):
         diff = luvn[m, 1:]/luvn[m, 0, np.newaxis] - luv[m, 1:]/luv[m, 0, np.newaxis]
         self.assertTrue(np.allclose(diff, 0))
 
+    @pytest.mark.install
     def test_luv_chroma_hue(self):
         """test xyz -> CIELCH conversion by comparing to colour-science conversion"""
         

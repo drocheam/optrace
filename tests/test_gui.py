@@ -705,6 +705,7 @@ class GUITests(unittest.TestCase):
         self.raise_thread_exceptions()
    
     @pytest.mark.slow
+    @pytest.mark.install
     @pytest.mark.gui3
     @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland" \
                         and pytest_xvfb.xvfb_instance is None,
@@ -816,6 +817,7 @@ class GUITests(unittest.TestCase):
    
     # os test because clipboard is system dependent
     @pytest.mark.os
+    @pytest.mark.install
     @pytest.mark.slow
     @pytest.mark.gui1
     def test_run_command(self):

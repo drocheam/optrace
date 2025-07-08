@@ -7,8 +7,9 @@ on:
   push:
     paths:
       - 'optrace/**'
+      - 'examples/**'
+      - 'tests/**'
 
-      
 jobs:
   tox_test:
     runs-on: ubuntu-latest

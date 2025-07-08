@@ -9,7 +9,7 @@ on:
 jobs:
   install_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       matrix:
         python-version: ['3.13']
@@ -40,5 +40,8 @@ jobs:
         
     # actual tests
     - name: Test with tox
-      run: |        
-        tox -r -e install 
+      run: tox -r -e install 
+   
+    # tests docs requirements
+    - name: Test doc building
+      run: tox -e docsbuildcheck -- -v

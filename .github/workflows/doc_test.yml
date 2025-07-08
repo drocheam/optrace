@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - 'docs/**'
+      - 'optrace/**'
+      - 'examples/**'
       
 jobs:
   doc_test:

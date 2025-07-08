@@ -51,7 +51,12 @@ commands = [["pytest", "-m", "os", {replace="posargs", extend=true}]]
 
 [env.fast]
 description = "Don't test slower tests (> 10 seconds)"
-commands = [["pytest", "-m", "not slow", {replace="posargs", extend=true}]]
+commands = [
+    ["pytest", "-m", "not slow", "--ignore=tests{/}test_examples.py", "--ignore=tests{/}test_gui.py", 
+        {replace="posargs", extend=true}],
+    ["pytest", "-m", "not slow", {replace="posargs", extend=true}, "tests{/}test_examples.py"],
+    ["pytest", "-m", "not slow", {replace="posargs", extend=true}, "tests{/}test_gui.py"],
+]
 
 [env.install]
 description = "Quick testing of installation"

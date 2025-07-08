@@ -24,6 +24,7 @@ class ScopeTests(unittest.TestCase):
         process = subprocess.run(["python", "-c", command], env=env, timeout=timeout)
         return process.returncode
 
+    @pytest.mark.install
     @pytest.mark.os
     def test_scope_partial_load(self):
         """test that importing optrace does not import optrace.plots and optrace.gui by default"""
@@ -116,6 +117,7 @@ class ScopeTests(unittest.TestCase):
         self._test_scope_ext_libs(locals())
 
     @pytest.mark.os
+    @pytest.mark.install
     def test_init_order(self):
 
         eval_str = "import optrace as ot; import optrace.plots as otp; import optrace.gui as otg"

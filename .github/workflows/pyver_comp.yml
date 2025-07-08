@@ -7,6 +7,8 @@ on:
   push:
     paths:
       - 'optrace/**'
+      - 'examples/**'
+      - 'tests/**'
       
 jobs:
   comp_test:
