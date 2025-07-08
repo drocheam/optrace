@@ -1,6 +1,7 @@
 
 import time  # provides sleeping
 import traceback  # traceback printing
+import warnings  # turn off code_widget user warning # TODO remove if possible
 from threading import Thread, Lock  # threading
 from typing import Callable, Any  # typing types
 from contextlib import contextmanager  # context managers
@@ -1717,7 +1718,9 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
         if self._command_window_view is None or self._command_window_view.destroyed:
-            self._command_window_view = self.command_window.edit_traits()
+            # silence qt6 code_widget operator + deprecated warning # TODO remove context manager
+            with warnings.catch_warnings(action='ignore'):
+                self._command_window_view = self.command_window.edit_traits()
         else:
             self._command_window_view.control.window().raise_()
             

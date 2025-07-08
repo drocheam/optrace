@@ -569,7 +569,7 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.move_to_focus)
                 self._do_in_main(sim.source_spectrum)
                 
-                self._wait_for_idle(sim)
+                self._wait_for_idle(sim, timeout=45)
 
                 self.assertEqual(sim.ray_count, 1000000)
                 self.assertEqual(sim.raytracer.rays.N, 1000000)
