@@ -19,7 +19,7 @@ jobs:
     
     ## needed for the x-server to work
     - name: Setup headless display
-      uses: pyvista/setup-headless-display-action@v3
+      uses: pyvista/setup-headless-display-action@v4
       with:
         qt: true
       
