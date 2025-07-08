@@ -135,6 +135,14 @@ Testing of the compatibility with multiple python versions is done with the
 `pyver_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml>`_ workflow.
 It executes a subset of tests (:bash:`tox -e fast`) for multiple python main versions in an Ubuntu runner.
 
+Installation Testing
+__________________________________
+
+Weekly tests that try to install the package and execute some quick tests.
+Ensures that requirements and available PyPI packages are up-to-date or need changes.
+The workflow is located in 
+`install_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/install_test.yml>`_.
+
 Platform Testing
 __________________________________
 

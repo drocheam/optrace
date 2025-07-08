@@ -18,9 +18,12 @@ commands = [
         "tests{/}test_spectrum.py", "tests{/}test_surface.py", "tests{/}test_tma.py"
     ],
     ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
-        "pytest", {replace="posargs", extend=true}, "tests{/}test_color.py", "tests{/}test_convolve.py", 
-        "tests{/}test_load.py", "tests{/}test_tracer.py", "tests{/}test_tracer_hurb.py", 
+        "pytest", {replace="posargs", extend=true}, "tests{/}test_tracer.py", "tests{/}test_tracer_hurb.py", 
         "tests{/}test_tracer_special.py"
+    ],
+    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+        "pytest", {replace="posargs", extend=true}, "tests{/}test_color.py", "tests{/}test_convolve.py", 
+        "tests{/}test_load.py"
     ],
     ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_plots.py"
