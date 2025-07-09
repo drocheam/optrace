@@ -101,7 +101,7 @@ numfig = True
 math_numfig = True
 math_number_all = True
 
-notfound_urls_prefix = "/"
+notfound_urls_prefix = "/optrace/"
 
 # lazy load equations
 # improves loading speed of details/ pages significantly
