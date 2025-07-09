@@ -79,6 +79,8 @@ range of applications.
 
 More information are provided in the [Documentation](https://drocheam.github.io/optrace/installation.html).
 
+<!--TODO add contributing section, reference dev section in documentation-->
+
 ## License
 
 This project is published under the [MIT License](https://github.com/drocheam/optrace/blob/main/LICENSE).

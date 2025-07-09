@@ -1,0 +1,24 @@
+name: Documentation website connectivity and resource tests
+
+# do tests on dispatch, every Wednesday at 13:00 UTC and when documentation website has been changed
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types: [completed] 
+  schedule:
+    - cron: "0 13 * * 3"
+
+jobs:
+  install_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    # run actual tests
+    - name: Run website tests
+      run: |
+        sleep 10  # so website is published by now
+        bash ./tests/test_website.sh
