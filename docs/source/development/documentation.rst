@@ -15,22 +15,32 @@ _______________________
 The documentation should contain information about the project, its usage as well as implementation and programming details.
 All should be presented as easily navigable webpage which includes figures, equations and code snippets.
 
-To allow for a simple and up-to-date code reference the process should be automatic, by generating it from `typing hints <https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html>`_ and  `docstrings <https://peps.python.org/pep-0257/>`_. 
+To allow for a simple and up-to-date code reference the process should be automatic, by generating it from 
+`typing hints <https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html>`_ 
+and  `docstrings <https://peps.python.org/pep-0257/>`_. 
 
 
 Workflow
 _______________________
 
-The `gen_docs.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/gen_docs.yml>`_ action compiles the documentation and publishes it in the `gh-pages <https://github.com/drocheam/optrace/tree/gh-pages>`__ branch. In the future, this content will be published on a webpage.
+The `gen_docs.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/gen_docs.yml>`_ 
+action compiles the documentation and publishes 
+it in the `gh-pages <https://github.com/drocheam/optrace/tree/gh-pages>`__ branch. 
+The `pages-build-deployment <https://github.com/drocheam/optrace/actions/workflows/pages/pages-build-deployment>`_ 
+action deploys the documentation on the website.
 
-Internally the workflow executes the :bash:`docs` environment for `tox <https://tox.wiki/en/latest/>`_ (see the :ref:`tox file <tox_file>`), which builds the documentation with the help of `Sphinx <https://www.sphinx-doc.org/en/master/>`_.
-The steps also include an automatic generation of a changelog and a source file toctree.
+Internally the workflow executes the :bash:`docs` environment for `tox <https://tox.wiki/en/latest/>`_ 
+(see the :ref:`tox file <tox_file>`), which builds the documentation 
+with the help of `Sphinx <https://www.sphinx-doc.org/en/master/>`_.
+The steps also include an automatic generation of a changelog, source file toctree and sitemap.
 
 Documentation Generation
 __________________________________
 
-The documentation is created with `Sphinx <https://www.sphinx-doc.org/en/master/>`_, which uses `reStructuredText <https://docutils.sourceforge.io/docs/user/rst/quickref.html>`_ as markup language. 
-The html builder of Sphinx compiles a webpage including the self-written documentation, automatically generated code information, as well as indices for searching.
+The documentation is created with `Sphinx <https://www.sphinx-doc.org/en/master/>`_, 
+which uses `reStructuredText <https://docutils.sourceforge.io/docs/user/rst/quickref.html>`_ as markup language. 
+The html builder of Sphinx compiles a webpage including the self-written documentation, 
+automatically generated code information, as well as indices for searching.
 
 The following extensions are used:
 

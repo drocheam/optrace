@@ -14,9 +14,7 @@ Notes
 * plotting and TraceGUI are independent of the tracing backend
 * automation/scripting easily possible
 * platform independent and open source
-* importing only the backend tracing functionality does not import GUI and plotting libraries. 
-  This ensures better performance and enables us to use this functionality without 
-  ever needing to install this heavy libraries when they are never needed.
+* importing only the backend tracing functionality does not import GUI and plotting libraries. This ensures better performance and enables us to use this functionality without ever needing to install this heavy libraries when they are never needed.
 
 **Dependencies**
 
@@ -75,10 +73,10 @@ Notes
 * pre-allocation instead of growing an array step by step
 * use :python:`np.float32` or :python:`int` instead of :python:`np.float64` where high precision is not needed
 * prefer analytical solutions instead of iterative numerical approximations
-* multi-dimensional array access can be accelerated by choosing a specific memory layout of the :class:`numpy.ndarray` (:python:`order="F", order="C"` etc.)
+* multi-dimensional array access can be accelerated by choosing a specific memory layout of the 
+  :class:`numpy.ndarray` (:python:`order="F", order="C"` etc.)
 * always keep the GUI responsive
-* range indexing (:python:`array[52:79829]`) is faster than boolean indexing (:python:`array[[False, False, True, ..., True, False]]`, 
-  which is faster than indexing by index list (:python:`array[[52, 456, 897987, 0, 77, ...]]`)
+* range indexing (:python:`array[52:79829]`) is faster than boolean indexing  (:python:`array[[False, False, True, ..., True, False]]`,  which is faster than indexing by index list (:python:`array[[52, 456, 897987, 0, 77, ...]]`)
 * a reasonable amount of points and curves in plots
 * limit array sizes
 
@@ -95,7 +93,7 @@ Notes
 
 * functions and classes that are exposed to the user should have type and value checking
 * some people will tell you "this is not the pythonic way", however:
-   * clear error messages are more helpful than debugging for 20 minutes
+   * clear error messages are more helpful than needing to debug for 30 minutes
    * some values produce results that are valid mathematically, but impossible according to physics (e.g. negative energies, zero sized geometries etc.). 
    * even I as developer do not remember the types and value ranges for all parameters and the correct function usage
 
@@ -108,30 +106,39 @@ Notes
    * a change is not propagated to the parent/child object
    * we can't expect the user to know where assignments are possible without side effects and where not.
 * ➜ restricting assignments
-   * lock the geometry of an :python:`Element`, surfaces can only be assigned by special functions, the position can only be changed with a dedicated method
+   * lock the geometry of an :python:`Element`, surfaces can only be assigned by special functions, 
+     the position can only be changed with a dedicated method
    * lock objects like a :python:`Surface` to avoid nasty side effects
    * allow assignments where possible
    * make numpy arrays read-only while locking
-   * locking can still be turned off manually when knowing about the internal mechanism, but at that point the user should have noticed that changing the code in such a way was not intended by the library
+   * locking can still be turned off manually when knowing about the internal mechanism, 
+     but at that point the user should have noticed that changing the code in such a way was not intended by the library
 
 **Coding Style**
 
-* ``CamelCase`` class names, ``lower_case_with_underscores`` for functions, filenames, parameters. Note that the latter this is not always possible for mathematical or physical quantities with standardized symbols
+* ``CamelCase`` class names, ``lower_case_with_underscores`` for functions, filenames, parameters. 
+  Note that the latter this is not always possible for mathematical or physical quantities with standardized symbols
 * increased line length of 120 characters
-* prefer writing out keyword arguments (:python:`function(width=1026, height=4596)`) for readability and simpler documentation
+* prefer writing out keyword arguments (:python:`function(width=1026, height=4596)`)
+  for readability and simpler documentation
 * use of docstrings for functions, classes and important variables
 
 **Standard Output**
 
 * functions and classes output information and warnings to the terminal
-* warnings have an own type :class:`OptraceWarning <optrace.warnings.OptraceWarning>` and can be silenced with a global option :attr:`show_warnings <optrace.global_options.ClassGlobalOptions.show_warnings>`
-* the progressbar should only used for more time-intensive tasks and can be turned off with the :attr:`show_progressbar <optrace.global_options.ClassGlobalOptions.show_progress_bar>` option.
+* warnings have an own type :class:`OptraceWarning <optrace.warnings.OptraceWarning>` 
+  and can be silenced with a global option 
+  :attr:`show_warnings <optrace.global_options.ClassGlobalOptions.show_warnings>`
+* the progressbar should only used for more time-intensive tasks and can be turned off with the :
+  attr:`show_progressbar <optrace.global_options.ClassGlobalOptions.show_progress_bar>` option.
 
 **Responsiveness**
 
 * some actions need time, but the program should still appear active and responsive. Hence, we need to notify the user with:
    * a message that something has been started / processed/ approved
-   * a progress bar indicating the progress and estimated remaining time. Also distracts the user, lowering the subjective waiting time
-* TraceGUI actions like tracing, focussing etc. need to run in background threads, so the scene and main UI thread are responsive
+   * a progress bar indicating the progress and estimated remaining time. 
+     Also distracts the user, lowering the subjective waiting time
+* TraceGUI actions like tracing, focussing etc. need to run in background threads, 
+  so the scene and main UI thread are responsive
 
 

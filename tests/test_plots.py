@@ -264,6 +264,8 @@ class PlotTests(unittest.TestCase):
             otp.chromaticities_cie_1976([], path=path)
             self.assertTrue(os.path.exists(path))
             os.remove(path)
+        
+        plt.close("all")
 
         # dummy RenderImage
         RIm = ot.RenderImage(extent=[-1, 1, -1, 1])
@@ -291,6 +293,8 @@ class PlotTests(unittest.TestCase):
 
         # IOError if file could not be saved
         self.assertRaises(IOError, otp.chromaticities_cie_1976, [], path="./hjkhjkhkhjk/hjkhjkhk/jk")
+        
+        plt.close("all")
        
 if __name__ == '__main__':
     unittest.main()

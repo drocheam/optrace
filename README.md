@@ -79,7 +79,11 @@ range of applications.
 
 More information are provided in the [Documentation](https://drocheam.github.io/optrace/installation.html).
 
-<!--TODO add contributing section, reference dev section in documentation-->
+## Contributing
+
+If you encounter any bugs, have feature requests, or want to suggest improvements, please open an issue or pull request.
+Documentation on testing, packaging 
+and other technical details is located [here](https://drocheam.github.io/optrace/development/index.html).
 
 ## License
 

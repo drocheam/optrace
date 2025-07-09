@@ -10,16 +10,18 @@ Testing
   :class: highlight
 
 
-.. TODO write an overview
+Overview
+_______________________
 
-.. TODO reference github action section
+Extensive tests are done on the functionality, documentation and website of optrace.
+All workflows are located in `.github/workflows/ <https://github.com/drocheam/optrace/blob/main/.github/workflows/>`_,
+while the last action runs can be seen in `GitHub Actions <https://github.com/drocheam/optrace/actions>`_. 
 
-.. TODO note about website tests
-
+The tests can also be run locally with `tox <https://tox.wiki/en/latest/>`_.
+Requirements for testing are listed in the :ref:`pyproject_toml`.
 
 Functionality Testing
 _______________________
-
 
 The goal of the functionality testing is to check both typical features as well as edge cases.
 Not only should the code "run", but also produce correct results.
@@ -110,21 +112,6 @@ The raytracing on my system (Arch Linux 6.13, i7-1360P notebook CPU, 16GB RAM, P
 
 So there is not much gain in using 16 over 8 cores.
 
-.. TODO how to handle these points:
-
-Test Cases
-__________________
-
-* :mod:`doctest` for documentation strings in some non-class functions
-* test cases are handled with :mod:`unittest`, testing is however typically done by :mod:`pytest` 
-  that loads and executed the created TestSuites
-* :python:`TraceGUI` has a :python:`debug` method, which runs a separate thread, from which actions are executed:
-   * Note that each UI actions needs to be run in the main thread, for this :python:`TraceGUI` 
-     provides :python:`_do_in_main` and :python:`_set_in_main` methods
-   * generally we want to do an action, after the old one has finished.
-     For this :python:`TraceGUI._wait_for_idle` is implemented.
-
-
 Documentation Testing
 __________________________________
 
@@ -132,7 +119,7 @@ The workflow file `doc_test.yml <https://github.com/drocheam/optrace/blob/main/.
 runs multiple test environments. This includes:
 
 * :bash:`tox -e docsbuildcheck`: Testing of correct documentation building while not permitting warning
-* :bash:`tox -e linkcheck`: Testing of all documentation links
+* :bash:`tox -e linkcheck`: Testing of all documentation links (currently deactived, due to GitHub rate limits)
 * :bash:`tox -e doctest`: Testing of most documentation code examples (using :mod:`doctest`)
 
 Python Version Testing
@@ -155,7 +142,7 @@ __________________________________
 
 Platform testing is done with the 
 `os_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml>`_ workflow.
-It executes the os tox environment, which runs a subset of all available tests.
+It executes the os tox environment (run with :bash:`tox -e os`), which runs a subset of all available tests.
 These tests include relevant possibly platform-dependent cases, including:
 
 * installation
@@ -169,13 +156,24 @@ These tests include relevant possibly platform-dependent cases, including:
 The workflow is executed with the current python version and both the latest macOC and Windows runners.
 Linux is not included, as all other workflows already run on Ubuntu.
 
-Github Workflows
+Update Action Dependencies
+_____________________________
+
+The dependencies inside the GitHub Actions are kept up-to-date with the 
+`Dependabot <https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide>`__.
+It is run weekly an opens pull request if there a newer versions of an action available.
+
+Website tests
 ________________________
 
-* see `.github/workflows/ <https://github.com/drocheam/optrace/blob/main/.github/workflows/>`_
-* Actions: Main testing, OS Compatibility, Older Python Version Compatibility
-* all get run on a push the repository or can get run manually
-
+Documentation website tests are done with the 
+`website_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/website_test.yml>` 
+workflow that runs the 
+`tests/test_website.sh <https://github.com/drocheam/optrace/blob/main/tests/test_website.sh>`__ bash script.
+The test check that the site is reachable, includes most important parts (index, impressum, robots, sitemap), 
+does not set cookies and does not load any external resources.
+The two last points are required for more privacy and GDPR compliance.
+Runs are triggered either manually, weekly or after the page deployment.
 
 Manual Tests
 _____________________________________________________

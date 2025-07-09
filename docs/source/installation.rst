@@ -28,8 +28,6 @@ Make sure Python 3.11, 3.12 or 3.13 are installed on your system
 #. Open a terminal and run: :bash:`pip install "optrace @ git+https://github.com/drocheam/optrace.git"`
 
 
-.. TODO note about limitation with PyPi
-
 **External dependencies**
 
 Below you can find a list of external dependencies that will be automatically installed. 
@@ -73,9 +71,6 @@ Below you can find a list of external dependencies that will be automatically in
 
 **Troubleshooting**
 
-* When `mayavi <https://pypi.org/project/mayavi/>`__ fails installing `vtk <https://pypi.org/project/vtk/>`_, 
-  try to install vtk first
-
 * In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. 
   The syntax is: :bash:`pip install --force-reinstall -v "some-package==1.2.2"`.
   Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
@@ -88,4 +83,12 @@ Below you can find a list of external dependencies that will be automatically in
 * Installing mayavi with no cache and without isolated building can help, see `here <https://github.com/enthought/mayavi/issues/1325#issuecomment-2537662062>`__:
   :bash:`pip install mayavi --no-cache-dir --verbose  --no-build-isolation`
 
+
+**Notes**
+
+Due to regular installation issues and infrequent updates of mayavi to PyPI the optrace package uses a git version of mayavi.
+While this solves most issues, optrace can't be published on PyPI due to this git dependency.
+See `<https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links>`_
+and `<https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation#comment115929654_65527149>`_
+or `<https://stackoverflow.com/a/54894359>`_.
 

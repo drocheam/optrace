@@ -1,4 +1,4 @@
-name: Documentation website connectivity and resource tests
+name: Website tests
 
 # do tests on dispatch, every Wednesday at 13:00 UTC and when documentation website has been changed
 on:
