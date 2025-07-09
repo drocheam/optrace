@@ -101,6 +101,8 @@ numfig = True
 math_numfig = True
 math_number_all = True
 
+notfound_urls_prefix = "/"
+
 # lazy load equations
 # improves loading speed of details/ pages significantly
 mathjax3_config = {

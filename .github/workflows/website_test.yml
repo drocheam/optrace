@@ -19,6 +19,4 @@ jobs:
     
     # run actual tests
     - name: Run website tests
-      run: |
-        sleep 10  # so website is published by now
-        bash ./tests/test_website.sh
+      run: bash ./tests/test_website.sh
