@@ -239,7 +239,7 @@ class Raytracer(Group):
                         case self.INFOS.ILL_COND:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
                                     f"numerical hit finding at surface {surf} ({surf_name[surf]}). "
-                                    f"Their hit position will certainly be wrong.")
+                                    f"Where and whether they intersect might be wrong.")
                         
                         case self.INFOS.OUTLINE_INTERSECTION:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
@@ -941,7 +941,7 @@ class Raytracer(Group):
                       source_index:      int = None,
                       extent:            list | np.ndarray = None,
                       projection_method: str = "Equidistant") \
-            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar]:
+            -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str, ProgressBar, int]:
         """
         Internal function for calculating the detector intersection positions
 
@@ -951,7 +951,8 @@ class Raytracer(Group):
         :param extent: extent to detect the intersections in as [x0, x1, y0, y1].
                 Defaults to None, meaning the whole detector are is used
         :param projection_method: sphere projection method for a SphericalSurface detector
-        :return: hit, weights, wavelengths, actual extent, actual projection_method, ProgressBar
+        :return: hit, weights, wavelengths, actual extent, actual projection_method, ProgressBar, 
+            number of ill-conditioned rays
         """
         if not self.detectors:
             raise RuntimeError("Detector Missing")
@@ -994,6 +995,9 @@ class Raytracer(Group):
             rs2 = np.argmax(bh_zmin, axis=1) - 1
             rs2[rs2 < 0] = 0
 
+            # mask for ill-conditioned rays
+            ill_mask = np.zeros(rs2.shape[0], dtype=bool)
+
             # exclude rays that start behind detector or end before it
             rs2z = misc.masked_assign(rs, ignore)
             rs[rs2z] = False
@@ -1031,8 +1035,9 @@ class Raytracer(Group):
                     w[rsi] = 0  # set invalid to weight of zero
                     p, s, rs2 = p[val], s[val], rs2[val]  # only use valid rays
 
-                ph[rs3], ish[rs3], _ = dsurf.find_hit(p, s)  # find hit
-                # TODO ^-- how to handle illcount parameter?
+                ph[rs3], ish[rs3], ill = dsurf.find_hit(p, s)  # find hit
+                if np.any(ill):
+                    ill_mask = ill_mask | ill  
 
                 p2z = self.rays.p_list[rs, rs2, 2]
                 rs4 = ph[rs3, 2] > p2z + dsurf.C_EPS  # hit point behind next surface intersection -> no valid hit
@@ -1043,7 +1048,7 @@ class Raytracer(Group):
                     rs2 = rs2[rs4]
                     p, s, _, w[rs3], _, _, _ = self.rays.rays_by_mask(rs, rs2, ret=[1, 1, 0, 1, 0, 0, 0])
 
-            list_[list_i] = [ph, w, wl, ish]
+            list_[list_i] = [ph, w, wl, ish, np.count_nonzero(ill_mask)]
 
         N_th = misc.cpu_count() if global_options.multithreading and Ne-Ns > 100000 else 1
         threads = []
@@ -1071,6 +1076,7 @@ class Raytracer(Group):
         w = np.concatenate([list__[1] for list__ in list_])
         wl = np.concatenate([list__[2] for list__ in list_])
         ish = np.concatenate([list__[3] for list__ in list_])
+        ill_count = sum([list__[4] for list__ in list_])
 
         hitw = ish & (w > 0)
         ph, w, wl = ph[hitw], w[hitw], wl[hitw]
@@ -1100,7 +1106,7 @@ class Raytracer(Group):
         else:
             raise ValueError(f"Invalid extent '{extent}'.")
 
-        return ph, w, wl, extent_out, projection, bar
+        return ph, w, wl, extent_out, projection, bar, ill_count
 
     def detector_image(self,
                        detector_index:    int = 0,
@@ -1127,8 +1133,8 @@ class Raytracer(Group):
                     " will produce an incorrect detector image, as the rays outside the extent"
                     " are not included in the convolution calculation.")
 
-        p, w, wl, extent_out, projection, bar  = self._hit_detector("Detector Image", detector_index, source_index,
-                                                                    extent, projection_method)
+        p, w, wl, extent_out, projection, bar, ill_count\
+                = self._hit_detector("Detector Image", detector_index, source_index, extent, projection_method)
 
         # create description
         detector = self.detectors[detector_index]
@@ -1141,6 +1147,11 @@ class Raytracer(Group):
         img = RenderImage(long_desc=desc, extent=extent_out, projection=projection)
         img.render(p, w, wl, limit=limit, **kwargs)
         bar.finish()
+
+        if ill_count:
+            warning(f"{ill_count} rays ({100*ill_count/self.rays.N:.3g}% of all rays) were ill-conditioned for "
+                    f"numerical hit finding at detector {detector_index}. "
+                     "Where and whether they intersect might be wrong.")
 
         return img
 
@@ -1159,7 +1170,7 @@ class Raytracer(Group):
         :param kwargs: optional keyword arguments for the created LightSpectrum
         :return: rendered LightSpectrum
         """
-        p, w, wl, extent, _, bar\
+        p, w, wl, extent, _, bar, ill_count\
             = self._hit_detector("Detector Spectrum", detector_index, source_index, extent)
         
         # create description
@@ -1171,6 +1182,11 @@ class Raytracer(Group):
         spec = LightSpectrum.render(wl, w, long_desc=desc, **kwargs)
         bar.finish()
 
+        if ill_count:
+            warning(f"{ill_count} rays ({100*ill_count/self.rays.N:.3g}% of all rays) were ill-conditioned for "
+                    f"numerical hit finding at detector {detector_index}. "
+                     "Where and whether they intersect might be wrong.")
+        
         return spec
 
     def iterative_render(self,
@@ -1203,6 +1219,7 @@ class Raytracer(Group):
         to have the same length as the number of sources.
 
         This functions raises an exception if the geometry is incorrect.
+        Note that no warnings for ill-conditioned rays are raised.
 
         :param N: number of rays
         :param detector_index: number/list of detector indices

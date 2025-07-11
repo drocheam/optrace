@@ -286,6 +286,35 @@ class TracerSpecialTests(unittest.TestCase):
         # see if it is handled
         RT.trace(10000)
 
+    def test_detector_ill_conditioned(self):
+        """test handling of ill-conditioned rays in find_hit and for detector image/spectrum rendering"""
+
+        # make raytracer
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -8, 12])
+
+        # create source
+        RS0 = ot.RaySource(ot.CircularSurface(r=0.05), divergence="None", pos=[0, 0.5, -4])
+        RT.add(RS0)
+
+        # add tilted Detector with incorrect z_max
+        # this leads to no roots for regula falsi hit finding inside search region 
+        surf = ot.TiltedSurface(r=0.2, normal=[0, -np.sin(1.0), np.cos(1.0)])
+        surf._lock = False
+        surf.z_max = 0.1
+        Det = ot.Detector(surf, pos=[0, 0, 12])
+        RT.add(Det)
+
+        # trace
+        RT.trace(1000)
+
+        # _hit_detector should set ill_count to N
+        _, _, _, _, _, _, ill_count = RT._hit_detector("Detector Image", 0, None, None, "Equidistant")
+        self.assertEqual(RT.rays.N, ill_count)
+
+        # coverage: test both detector functions, should print warnings
+        RT.detector_image()
+        RT.detector_spectrum()
+
     def test_tilted_plane_different_surface_types(self):
         """
         similar to brewster polarizer example

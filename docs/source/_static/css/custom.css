@@ -54,6 +54,19 @@ html.dark .contact-image {
     margin-left: 0px !important
 }
 
+/*fix color and spacing of bullet point lists*/
+.yue li {
+
+    dt {
+        color: unset;
+        font-weight: unset;
+    }
+    p, dl {    
+        margin-top: unset;
+        margin-bottom: unset;
+    }
+}
+
 /*word wrapping for code blocks*/
 pre {
     white-space: pre-wrap;

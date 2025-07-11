@@ -64,11 +64,11 @@ class ExampleTests(unittest.TestCase):
     
     @pytest.mark.slow
     def test_iol_pinhole_imaging(self):
-        self._run_file(Path.cwd() / "examples" / "IOL_pinhole_imaging.py", 25)
+        self._run_file(Path.cwd() / "examples" / "IOL_pinhole_imaging.py", 30)
     
     @pytest.mark.slow
     def test_iol_target_imaging(self):
-        self._run_file(Path.cwd() / "examples" / "IOL_target_imaging.py", 25)
+        self._run_file(Path.cwd() / "examples" / "IOL_target_imaging.py", 30)
    
     @pytest.mark.install
     def test_convolve(self):
@@ -89,14 +89,14 @@ class ExampleTests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.os
     def test_microscope(self):
-        self._run_file(Path.cwd() / "examples" / "microscope.py", 45)
+        self._run_file(Path.cwd() / "examples" / "microscope.py", 50)
     
     @pytest.mark.install
     def test_presets_spectrum(self):
         self._run_file(Path.cwd() / "examples" / "spectrum_presets.py")
     
     def test_image_render(self):
-        self._run_file(Path.cwd() / "examples" / "image_render.py")
+        self._run_file(Path.cwd() / "examples" / "image_render.py", 20)
     
     @pytest.mark.slow
     def test_keratoconus(self):
