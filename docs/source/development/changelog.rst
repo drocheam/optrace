@@ -8,3 +8,5 @@ Changelog
 
 .. highlight:: default
 
+
+This changelog was generated from git version tags and descriptions.

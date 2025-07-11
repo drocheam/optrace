@@ -63,6 +63,8 @@ The following extensions are used:
      - Generate sitemaps while building the documentation
    * - `Sphinx Mathjax Offline <https://pypi.org/project/sphinx-mathjax-offline/>`_
      - Provides the mathjax js and font files without having to rely on an external CDN
+   * - `sphinx-notfound-page <https://sphinx-notfound-page.readthedocs.io/en/latest/>`_
+     - Fixes some issues with 404 pages
 
 Additionally, a custom css (`docs/source/_static/css/custom.css <https://github.com/drocheam/optrace/blob/main/docs/source/_static/css/custom.css>`_) adapts the formatting to our needs.
 

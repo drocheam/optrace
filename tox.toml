@@ -1,5 +1,5 @@
 
-env_list = ["py{310,311,312,313}"]
+env_list = ["py{311,312,313}"]
 requires = ["tox-ignore-env-name-mismatch"]
 skip_missing_interpreters = true
 

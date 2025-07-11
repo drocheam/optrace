@@ -68,8 +68,8 @@ For instance, :python:`extent=[-1, 2, 3, 5]` describes that the geometry of the 
 to :python:`x=2` and :python:`y=3` to :python:`y=5`.
 
 The data argument must be a numpy array with either two dimensions (|ScalarImage| and |GrayscaleImage|) 
-or three dimensions (|RGBImage|). In both cases, the data should be non-negative and in the case of the |RGBImage| 
-lie inside the value range of :python:`[0, 1]`.
+or three dimensions (|RGBImage|). In both cases, the data should be non-negative and in the case of |RGBImage|
+and |GrayscaleImage| lie inside the value range of :python:`[0, 1]`.
 
 The following example creates a random |GrayscaleImage| using a numpy array and the :python:`s` argument:
 

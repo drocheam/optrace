@@ -12,11 +12,10 @@ Installation
   :language: bash
   :class: highlight
 
-Make sure Python 3.11, 3.12 or 3.13 are installed on your system
+Make sure Python 3.11, 3.12 or 3.13 and pip are installed on your system
 
 **Installing the latest official release**
 
-#. Make sure python and pip are installed
 #. Download the optrace .tar.gz archive 
    from the `latest release <https://github.com/drocheam/optrace/releases/latest>`__
 #. Run :bash:`pip install <archive>` from a terminal, 
@@ -24,13 +23,14 @@ Make sure Python 3.11, 3.12 or 3.13 are installed on your system
 
 **Installing the latest git version**
 
-#. Make sure python and pip are installed
-#. Open a terminal and run: :bash:`pip install "optrace @ git+https://github.com/drocheam/optrace.git"`
+Open a terminal and run: :bash:`pip install "optrace @ git+https://github.com/drocheam/optrace.git"`
 
+**Installing from a package index**
 
-**External dependencies**
+optrace currently isn't included in any official package index.
+This project is not affiliated with a package of the same name on PyPI.
 
-Below you can find a list of external dependencies that will be automatically installed. 
+**Dependencies**
 
 .. list-table:: 
    :widths: 250 600 250
@@ -74,13 +74,15 @@ Below you can find a list of external dependencies that will be automatically in
 * In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. 
   The syntax is: :bash:`pip install --force-reinstall -v "some-package==1.2.2"`.
   Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
-  A list of other wheels for vtk is found `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
+  A list of other wheels for vtk is found 
+  `here <https://docs.vtk.org/en/latest/advanced/available_python_wheels.html>`__.
 
 * Consult the `mayavi issues <https://github.com/enthought/mayavi/issues>`__, 
   `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ 
   or `PySide issues <https://bugreports.qt.io/projects/PYSIDE/issues/>`__ for current problems and solutions
 
-* Installing mayavi with no cache and without isolated building can help, see `here <https://github.com/enthought/mayavi/issues/1325#issuecomment-2537662062>`__:
+* Installing mayavi with no cache and without isolated building can help, 
+  see `here <https://github.com/enthought/mayavi/issues/1325#issuecomment-2537662062>`__:
   :bash:`pip install mayavi --no-cache-dir --verbose  --no-build-isolation`
 
 

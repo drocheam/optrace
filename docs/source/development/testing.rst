@@ -14,11 +14,16 @@ Overview
 _______________________
 
 Extensive tests are done on the functionality, documentation and website of optrace.
-All workflows are located in `.github/workflows/ <https://github.com/drocheam/optrace/blob/main/.github/workflows/>`_,
-while the last action runs can be seen in `GitHub Actions <https://github.com/drocheam/optrace/actions>`_. 
+Testing is done with `tox <https://tox.wiki/en/latest/>`_ and :mod:`pytest`.
+Packages `tox <https://tox.wiki/en/latest/>`_ as well as 
+`tox-ignore-env-name-mismatch <https://github.com/masenf/tox-ignore-env-name-mismatch>`_ need to be installed to run
+different tests environments.
+All other requirements are automatically installed while running tox.
+The configuration can be found in Section :numref:`tox_file`.
 
-The tests can also be run locally with `tox <https://tox.wiki/en/latest/>`_.
-Requirements for testing are listed in the :ref:`pyproject_toml`.
+Test can be run locally or through GitHub actions.
+The workflows are located in `.github/workflows/ <https://github.com/drocheam/optrace/blob/main/.github/workflows/>`_,
+while the last action runs can be seen in `GitHub Actions <https://github.com/drocheam/optrace/actions>`_. 
 
 Functionality Testing
 _______________________
@@ -212,13 +217,26 @@ ________________________________________________________________________________
    :language: toml
    :linenos:
 
+The pytest configuration is located in the ``pyproject.toml`` in Section :numref:`pyproject_toml`.
+
 
 **Notes**
 
-* tox-ignore-env-name-mismatch allows us to reuse the tox env for all actions
 * parallelized testing with pytest-xdist could be possible, but we wouldn't gain much from it as the heaviest
   tasks are already multithreaded
-* pytest-xvfb uses xvfb as headless-display. Use the option :bash:`--no-xvfb` to actually see the plots/windows.
+
+
+* `pytest-xvfb <https://github.com/The-Compiler/pytest-xvfb>`_ 
+  uses xvfb as headless-display. Use the option :bash:`--no-xvfb` to actually see the plots/windows.
+
+* using `pytest-timeout <https://pypi.org/project/pytest-timeout/>`_ for adding timeouts
+
+* using `pytest-random-order <https://pypi.org/project/pytest-random-order/>`_ for running tests in random order
+
+* `tox-ignore-env-name-mismatch <https://github.com/masenf/tox-ignore-env-name-mismatch>`_ is required so multiple
+  tox environments are able to use the same Python virtualenv.
+
 * when GUI tests fail on wayland, first run :bash:`xhost +`
 
+* some tests are excluded in GitHub actions, as there issues with the headless displays
 

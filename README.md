@@ -78,6 +78,7 @@ range of applications.
 2. Open a terminal and run `pip install "optrace @ git+https://github.com/drocheam/optrace.git"` 
 
 More information are provided in the [Documentation](https://drocheam.github.io/optrace/installation.html).
+This project is not affiliated with a package of the same name on PyPI.
 
 ## Contributing
 

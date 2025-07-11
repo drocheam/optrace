@@ -1,88 +1,247 @@
- Version  |      Date      |                                 Description 
--------------------------------------------------------------------------------------------------------------------------------------
-  1.7.0   |   2025-06-03   |  Experimental support for Heisenberg uncertainty ray bending.   
-  1.6.10  |   2025-05-15   |  New button for online documentation in TraceGUI. Code refactoring.   
-  1.6.9   |   2025-05-14   |  Improved readability and accessibility of the documentation.   
-  1.6.8   |   2025-04-09   |  New GrayscaleImage class. Renamed LinearImage to ScalarImage. Colored convolution now handled correctly for both colored image and PSF.   
-  1.6.7   |   2025-03-16   |  Replaced progressbar2 by tqdm progressbar.   
-  1.6.6   |   2025-03-16   |  Removed numexpr dependency. Performance improvements.   
-  1.6.5   |   2025-03-12   |  Removed Airy Disc Weighting and Irradiance Maximum focus methods. Renamed Position Variance to RMS Spot Size and made it more performant. New Image Center Sharpness focus mode.   
-  1.6.4   |   2025-02-28   |  Renamed focus functions, image profiles and convolution parameters.   
-  1.6.3   |   2025-02-28   |  New custom UI elements that can be assigned before starting the GUI.   
-  1.6.2   |   2025-02-04   |  Support for python 3.13   
-  1.6.1   |   2024-11-27   |  New IOL_pinhole_imaging example.   
-  1.6.0   |   2024-11-20   |  Licensed with MIT License   
-  1.5.12  |   2024-11-19   |  Replaced PyQt5 dependency with PySide6   
-  1.5.11  |   2024-10-16   |  New LED-BH1, LED-RGB1, LED-V1, LED-V2 standard illuminants.   
-  1.5.10  |   2024-10-10   |  numpy 2.0 support. In Perceptual RI remaining out-of-gamut colors are handled with Absolute RI   
-  1.5.9   |   2024-08-23   |  Dark mode options for GUI and pyplots. Everything is now dark by default.   
-  1.5.8   |   2024-04-17   |  Function select_rays for manually selecting custom rays for the scene.   
-  1.5.7   |   2024-03-21   |  Support for Python 3.12 and vtk 9.3.   
-  1.5.6   |   2024-02-28   |  Migrated from setup.py to pyproject.toml. There's now a ray RAM limit.   
-  1.5.5   |   2024-01-10   |  Removed tracing with absorb_missing=False. Renamed multiple TraceGUI traits.   
-  1.5.4   |   2024-01-09   |  detector_image() and detector_cut() in TraceGUI now support extent parameter. New pick_ray(), pick_ray_section() and reset_picking() functions in TraceGUI.   
-  1.5.3   |   2024-01-05   |  New LinearImage, RGBImage classes. RImage renamed to RenderImage. RaySource now supports LinearImage.   
-  1.5.2   |   2023-12-29   |  Replaced Pillow by cv. New GUI automation and keratoconus example. Convolution now supports slicing and padding. New Image class. Options are now defined in optrace.global_options.   
-  1.5.1   |   2023-12-08   |  Output texts are now warnings. Threading, warning and figure parameters are now set globally. Hide_labels property in TraceGUI. Improved microscope example.   
-  1.5.0   |   2023-11-29   |  TraceGUI has now set_camera, get_camera and screenshot functions. Picked ray is highlighted in the scene. All plots in optrace.plots now can be saved by providing a path.   
-  1.4.7   |   2023-08-17   |  New 'converging' ray source orientation mode.   
-  1.4.6   |   2023-08-16   |  New Siemens Star and TV test card image presets.   
-  1.4.5   |   2023-08-06   |  Replaced image presets with better ones.   
-  1.4.4   |   2023-06-19   |  New parameters for sRGB Perceptual RI. Resolution filter is now an Airy disc.   
-  1.4.3   |   2023-04-12   |  Support for convolution of both colored PSF and image.   
-  1.4.2   |   2023-03-21   |  Rewrite of convolution functionality. Now faster and more robust.   
-  1.4.1   |   2023-03-21   |  New PSF presets.   
-  1.4.0   |   2023-03-02   |  New image convolution feature.   
-  1.3.7   |   2023-02-07   |  New Volume classes to plot orientation volumes in the gui. Moved markers to their own submodule.   
-  1.3.6   |   2023-02-03   |  TraceGUI command window now has the option to copy the history to the clipboard. Better documentation dark mode support.   
-  1.3.5   |   2023-02-03   |  Qt UI theme can now be set using a TraceGUI parameter.   
-  1.3.4   |   2023-02-01   |  Theme and configuration changes for the documentation.   
-  1.3.3   |   2023-01-31   |  Documentation restructuring. Renamed names 'chromacity' to 'chromaticity'.   
-  1.3.2   |   2023-01-25   |  Added ideal_camera geometry preset.   
-  1.3.1   |   2023-01-23   |  Renamed Marker to PointMarker. New LineMarker element class.   
-  1.3.0   |   2023-01-20   |  New wavelength (peak_wavelength, fwhm, ...) and spectrum characteristics (peak, power, ...) for LightSpectrum. Units are now enforced. New property view for rendered spectra in TraceGUI. Renamed some functions.   
-  1.2.6   |   2023-01-17   |  Clearer TMA names. New "optical_center" property in TMA.   
-  1.2.5   |   2023-01-16   |  Removed pooch dependency. Now there are multiple scene image presets available (cell, group photo, interior, landscape).   
-  1.2.4   |   2023-01-13   |  New functions pupil_position and pupil_magnification in TMA for calculating entrance and exit pupil.   
-  1.2.3   |   2023-01-11   |  New functions "image_magnification" and "object_magnification" in ray transfer matrix analysis.   
-  1.2.2   |   2023-01-10   |  A Group now has an ambient refraction index.   
-  1.2.1   |   2023-01-09   |  New TraceGUI keyboard shortcut "F11" toggling fullscreen. vertical_labels option changing Element label orientation.   
-  1.2.0   |   2023-01-06   |  scipy.misc has been moved to scipy.datasets. optrace now requires pooch dependency for this work. Added scipy>=1.10 requirement.   
-  1.1.5   |   2023-01-06   |  Improved documentation. TransmissionSpectrum now has a "inverse" parameter, that turns the transmission into absorption.   
-  1.1.4   |   2023-01-02   |  Improved TraceGUI picking multithreading. Better CommandWindow, PropertyBrowser UI (fonts, legends).   
-  1.1.3   |   2022-12-22   |  FunctionSurface renamed to FunctionSurface2D. New FunctionSurface1D class. New ray coloring mode "Refractive Index" in TraceGUI.   
-  1.1.2   |   2022-12-19   |  New polarization modes "List" and "Function".   
-  1.1.1   |   2022-12-19   |  Removed center artefacts for direction distributions. Improved Changelog. Running commands in TraceGUI is now done in a separate window.   
-  1.1.0   |   2022-12-16   |  Simplified numeric tracing. Removed FunctionSurface hit_func. RImage export_png now can export in different resolutions and rescaling modes. New Raytracer.absorb_missing behavior: no restictions, but not-lens-hitting-rays at medium transition get absorbed.   
-  1.0.7   |   2022-12-15   |  Improved documentation. Ring and Circle sampling now without artefacts at the center.   
-  1.0.6   |   2022-12-02   |  Removed colorio dependency from tests. sRGB primaries are now strictly 0 beyond visible range. Improved testing and documentation.   
-  1.0.5   |   2022-11-25   |  Fixed polarization calculation bug. Surface collisions are now plotted inside GUI. More tests.   
-  1.0.4   |   2022-11-18   |  DataSurface has been renamed to DataSurface2D. New DataSurface1D class for radial data profiles.   
-  1.0.3   |   2022-11-16   |  New Orthographic sphere projection method.   
-  1.0.2   |   2022-11-16   |  Surface/geometry reverse() changed to a flip() function that flips around the x-axis. rotate() operation to rotate around z-axis.   
-  1.0.1   |   2022-11-09   |  Minor UI improvements. Index Boxes are now joined if the spacing between them is small.   
-  1.0.0   |   2022-11-04   |  Import of agf and zmx files. New Group class, raytracer is a subclass of this. Reverse() action on elements, surfaces and group. GUI high contrast mode. Surface types now have their own classes. New aspheric surface type. Optional gaussian filter to simulate diffraction limit in RImages.   
-  0.9.9   |   2022-10-10   |  RImage now has an odd number of pixels. New Group class. New color submodule.   
-  0.9.8   |   2022-09-23   |  New: Ray transfer matrix analysis. Different sphere projection methods. Markers for tracing geometry. Removed colorio dependency. New LED standard illuminants. More examples.   
-  0.9.7   |   2022-08-02   |  Improved GUI and new UI actions. More tests. Package installing tools.   
-  0.9.6   |   2022-07-23   |  Preset restructuring. Eye model geometry presets and examples. Improved multithreading in TraceGUI. Now possible to run commands via TCP from UI.   
-  0.9.5   |   2022-07-08   |  Improved RImage saving. Added optional RImage offset. More plot and backend tests.   
-  0.9.4   |   2022-05-29   |  Project restructuring. New RefractionIndex Presets. New AbbePlot.   
-  0.9.3   |   2022-05-28   |  Project restructuring   
-  0.9.2   |   2022-05-28   |  New RefractionIndex presets. Functions for plotting RefractionIndex, Spectrum and chromaticity diagrams. Functions for creating spectra at Detector and RaySource. Plots for Image cuts. iterativeDetectorImage is now iterativeRender, also renders RaySource Images.   
-  0.9.1   |   2022-05-10   |  Spectrum class for Filter and RaySource. Common BaseClass for almost all optrace.tracer classes. Spectral line presets. Two new RefractionIndex Formulas and mutiple new presets. DetectorImage now possible for selected source only.   
-  0.9.0   |   2022-04-26   |  Image now can be saved and loaded. Holds higher resolution version internally, that can be rescaled to. New sRGB Rendering Intents. New Image modes (Outside Gamut, Lightness, Hue, Chroma, Saturation). RaySource for autofocus can be selected.   
-  0.8.9   |   2022-04-09   |  Information messages are now displayed combined from all tracing threads. RaySource rays are now created in threads.   
-  0.8.8   |   2022-04-08   |  Project restructuring 2.   
-  0.8.7   |   2022-04-08   |  Backend now has a progress bar for operations.   
-  0.8.6   |   2022-04-07   |  Project restructuring.   
-  0.8.5   |   2022-04-06   |  New 'Cleaner View'-option in GUI. Simpler and more cleaned up GUI code. Minor bug fixes.   
-  0.8.4   |   2022-04-05   |  TCP Server for controlling the GUI. Automatic RT change detection and GUI replotting. New restrictions to when the user can define or assign some class properties.   
-  0.8.3   |   2022-04-01   |  Improvement of Autofocus and Debug Plot. Opacity simulation of filter in GUI. RaySource Color adapts to Ray Coloring Mode. GUI now has an advanced picking mode.   
-  0.8.2   |   2022-03-31   |  GUI shell interface and interface functions. Additional GUI Tests.   
-  0.8.1   |   2022-03-29   |  List of RaySources now belongs to Raytracer. Renamed RaySourceList to RayStorage. Globally defined wavelength range. Own Misc.calc() instead of numexpr.evaluate().   
-  0.8.0   |   2022-03-28   |  Restructuring: Lens, Filter, Detector, RaySource now have a common parent class 'SObject'   
-  0.7.4   |   2022-03-28   |  GUI class: Now plotting with a common function for RaySource, Filter, Detector   
-  0.7.3   |   2022-03-28   |  GUI Object Labels are now centered.   
-  0.7.1   |   2022-03-28   |  First named version   
-  0.7.2   |   2022-03-28   |  Testing: More GUI Tests added. GUI class: Minor Cleanup.   
+ Version  |      Date      |                             Description
+----------|----------------|------------------------------------------------------------------------
+  1.7.1   |   2025-07-11   | Correct handling of ill-conditioned rays in intersection search for 
+          |                | detector surfaces. 
+----------|----------------|------------------------------------------------------------------------
+  1.7.0   |   2025-06-03   | Experimental support for Heisenberg uncertainty ray bending. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.10  |   2025-05-15   | New button for online documentation in TraceGUI. Code refactoring. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.9   |   2025-05-14   | Improved readability and accessibility of the documentation. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.8   |   2025-04-09   | New GrayscaleImage class. Renamed LinearImage to ScalarImage. Colored 
+          |                | convolution now handled correctly for both colored image and PSF. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.7   |   2025-03-16   | Replaced progressbar2 by tqdm progressbar. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.6   |   2025-03-16   | Removed numexpr dependency. Performance improvements. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.5   |   2025-03-12   | Removed Airy Disc Weighting and Irradiance Maximum focus methods. 
+          |                | Renamed Position Variance to RMS Spot Size and made it more 
+          |                | performant. New Image Center Sharpness focus mode. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.4   |   2025-02-28   | Renamed focus functions, image profiles and convolution parameters. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.3   |   2025-02-28   | New custom UI elements that can be assigned before starting the GUI. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.2   |   2025-02-04   | Support for python 3.13 
+----------|----------------|------------------------------------------------------------------------
+  1.6.1   |   2024-11-27   | New IOL_pinhole_imaging example. 
+----------|----------------|------------------------------------------------------------------------
+  1.6.0   |   2024-11-20   | Licensed with MIT License 
+----------|----------------|------------------------------------------------------------------------
+  1.5.12  |   2024-11-19   | Replaced PyQt5 dependency with PySide6 
+----------|----------------|------------------------------------------------------------------------
+  1.5.11  |   2024-10-16   | New LED-BH1, LED-RGB1, LED-V1, LED-V2 standard illuminants. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.10  |   2024-10-10   | numpy 2.0 support. In Perceptual RI remaining out-of-gamut colors are 
+          |                | handled with Absolute RI 
+----------|----------------|------------------------------------------------------------------------
+  1.5.9   |   2024-08-23   | Dark mode options for GUI and pyplots. Everything is now dark by 
+          |                | default. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.8   |   2024-04-17   | Function select_rays for manually selecting custom rays for the scene. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.7   |   2024-03-21   | Support for Python 3.12 and vtk 9.3. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.6   |   2024-02-28   | Migrated from setup.py to pyproject.toml. There's now a ray RAM limit. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.5   |   2024-01-10   | Removed tracing with absorb_missing=False. Renamed multiple TraceGUI 
+          |                | traits. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.4   |   2024-01-09   | detector_image() and detector_cut() in TraceGUI now support extent 
+          |                | parameter. New pick_ray(), pick_ray_section() and reset_picking() 
+          |                | functions in TraceGUI. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.3   |   2024-01-05   | New LinearImage, RGBImage classes. RImage renamed to RenderImage. 
+          |                | RaySource now supports LinearImage. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.2   |   2023-12-29   | Replaced Pillow by cv. New GUI automation and keratoconus example. 
+          |                | Convolution now supports slicing and padding. New Image class. Options 
+          |                | are now defined in optrace.global_options. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.1   |   2023-12-08   | Output texts are now warnings. Threading, warning and figure 
+          |                | parameters are now set globally. Hide_labels property in TraceGUI. 
+          |                | Improved microscope example. 
+----------|----------------|------------------------------------------------------------------------
+  1.5.0   |   2023-11-29   | TraceGUI has now set_camera, get_camera and screenshot functions. 
+          |                | Picked ray is highlighted in the scene. All plots in optrace.plots now 
+          |                | can be saved by providing a path. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.7   |   2023-08-17   | New 'converging' ray source orientation mode. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.6   |   2023-08-16   | New Siemens Star and TV test card image presets. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.5   |   2023-08-06   | Replaced image presets with better ones. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.4   |   2023-06-19   | New parameters for sRGB Perceptual RI. Resolution filter is now an 
+          |                | Airy disc. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.3   |   2023-04-12   | Support for convolution of both colored PSF and image. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.2   |   2023-03-21   | Rewrite of convolution functionality. Now faster and more robust. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.1   |   2023-03-21   | New PSF presets. 
+----------|----------------|------------------------------------------------------------------------
+  1.4.0   |   2023-03-02   | New image convolution feature. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.7   |   2023-02-07   | New Volume classes to plot orientation volumes in the gui. Moved 
+          |                | markers to their own submodule. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.6   |   2023-02-03   | TraceGUI command window now has the option to copy the history to the 
+          |                | clipboard. Better documentation dark mode support. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.5   |   2023-02-03   | Qt UI theme can now be set using a TraceGUI parameter. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.4   |   2023-02-01   | Theme and configuration changes for the documentation. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.3   |   2023-01-31   | Documentation restructuring. Renamed names 'chromacity' to 
+          |                | 'chromaticity'. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.2   |   2023-01-25   | Added ideal_camera geometry preset. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.1   |   2023-01-23   | Renamed Marker to PointMarker. New LineMarker element class. 
+----------|----------------|------------------------------------------------------------------------
+  1.3.0   |   2023-01-20   | New wavelength (peak_wavelength, fwhm, ...) and spectrum 
+          |                | characteristics (peak, power, ...) for LightSpectrum. Units are now 
+          |                | enforced. New property view for rendered spectra in TraceGUI. Renamed 
+          |                | some functions. 
+----------|----------------|------------------------------------------------------------------------
+  1.2.6   |   2023-01-17   | Clearer TMA names. New "optical_center" property in TMA. 
+----------|----------------|------------------------------------------------------------------------
+  1.2.5   |   2023-01-16   | Removed pooch dependency. Now there are multiple scene image presets 
+          |                | available (cell, group photo, interior, landscape). 
+----------|----------------|------------------------------------------------------------------------
+  1.2.4   |   2023-01-13   | New functions pupil_position and pupil_magnification in TMA for 
+          |                | calculating entrance and exit pupil. 
+----------|----------------|------------------------------------------------------------------------
+  1.2.3   |   2023-01-11   | New functions "image_magnification" and "object_magnification" in ray 
+          |                | transfer matrix analysis. 
+----------|----------------|------------------------------------------------------------------------
+  1.2.2   |   2023-01-10   | A Group now has an ambient refraction index. 
+----------|----------------|------------------------------------------------------------------------
+  1.2.1   |   2023-01-09   | New TraceGUI keyboard shortcut "F11" toggling fullscreen. 
+          |                | vertical_labels option changing Element label orientation. 
+----------|----------------|------------------------------------------------------------------------
+  1.2.0   |   2023-01-06   | scipy.misc has been moved to scipy.datasets. optrace now requires 
+          |                | pooch dependency for this work. Added scipy>=1.10 requirement. 
+----------|----------------|------------------------------------------------------------------------
+  1.1.5   |   2023-01-06   | Improved documentation. TransmissionSpectrum now has a "inverse" 
+          |                | parameter, that turns the transmission into absorption. 
+----------|----------------|------------------------------------------------------------------------
+  1.1.4   |   2023-01-02   | Improved TraceGUI picking multithreading. Better CommandWindow, 
+          |                | PropertyBrowser UI (fonts, legends). 
+----------|----------------|------------------------------------------------------------------------
+  1.1.3   |   2022-12-22   | FunctionSurface renamed to FunctionSurface2D. New FunctionSurface1D 
+          |                | class. New ray coloring mode "Refractive Index" in TraceGUI. 
+----------|----------------|------------------------------------------------------------------------
+  1.1.2   |   2022-12-19   | New polarization modes "List" and "Function". 
+----------|----------------|------------------------------------------------------------------------
+  1.1.1   |   2022-12-19   | Removed center artefacts for direction distributions. Improved 
+          |                | Changelog. Running commands in TraceGUI is now done in a separate 
+          |                | window. 
+----------|----------------|------------------------------------------------------------------------
+  1.1.0   |   2022-12-16   | Simplified numeric tracing. Removed FunctionSurface hit_func. RImage 
+          |                | export_png now can export in different resolutions and rescaling 
+          |                | modes. New Raytracer.absorb_missing behavior: no restictions, but 
+          |                | not-lens-hitting-rays at medium transition get absorbed. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.7   |   2022-12-15   | Improved documentation. Ring and Circle sampling now without artefacts 
+          |                | at the center. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.6   |   2022-12-02   | Removed colorio dependency from tests. sRGB primaries are now strictly 
+          |                | 0 beyond visible range. Improved testing and documentation. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.5   |   2022-11-25   | Fixed polarization calculation bug. Surface collisions are now plotted 
+          |                | inside GUI. More tests. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.4   |   2022-11-18   | DataSurface has been renamed to DataSurface2D. New DataSurface1D class 
+          |                | for radial data profiles. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.3   |   2022-11-16   | New Orthographic sphere projection method. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.2   |   2022-11-16   | Surface/geometry reverse() changed to a flip() function that flips 
+          |                | around the x-axis. rotate() operation to rotate around z-axis. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.1   |   2022-11-09   | Minor UI improvements. Index Boxes are now joined if the spacing 
+          |                | between them is small. 
+----------|----------------|------------------------------------------------------------------------
+  1.0.0   |   2022-11-04   | Import of agf and zmx files. New Group class, raytracer is a subclass 
+          |                | of this. Reverse() action on elements, surfaces and group. GUI high 
+          |                | contrast mode. Surface types now have their own classes. New aspheric 
+          |                | surface type. Optional gaussian filter to simulate diffraction limit 
+          |                | in RImages. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.9   |   2022-10-10   | RImage now has an odd number of pixels. New Group class. New color 
+          |                | submodule. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.8   |   2022-09-23   | New: Ray transfer matrix analysis. Different sphere projection 
+          |                | methods. Markers for tracing geometry. Removed colorio dependency. New 
+          |                | LED standard illuminants. More examples. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.7   |   2022-08-02   | Improved GUI and new UI actions. More tests. Package installing tools. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.6   |   2022-07-23   | Preset restructuring. Eye model geometry presets and examples. 
+          |                | Improved multithreading in TraceGUI. Now possible to run commands via 
+          |                | TCP from UI. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.5   |   2022-07-08   | Improved RImage saving. Added optional RImage offset. More plot and 
+          |                | backend tests. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.4   |   2022-05-29   | Project restructuring. New RefractionIndex Presets. New AbbePlot. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.3   |   2022-05-28   | Project restructuring 
+----------|----------------|------------------------------------------------------------------------
+  0.9.2   |   2022-05-28   | New RefractionIndex presets. Functions for plotting RefractionIndex, 
+          |                | Spectrum and chromaticity diagrams. Functions for creating spectra at 
+          |                | Detector and RaySource. Plots for Image cuts. iterativeDetectorImage 
+          |                | is now iterativeRender, also renders RaySource Images. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.1   |   2022-05-10   | Spectrum class for Filter and RaySource. Common BaseClass for almost 
+          |                | all optrace.tracer classes. Spectral line presets. Two new 
+          |                | RefractionIndex Formulas and mutiple new presets. DetectorImage now 
+          |                | possible for selected source only. 
+----------|----------------|------------------------------------------------------------------------
+  0.9.0   |   2022-04-26   | Image now can be saved and loaded. Holds higher resolution version 
+          |                | internally, that can be rescaled to. New sRGB Rendering Intents. New 
+          |                | Image modes (Outside Gamut, Lightness, Hue, Chroma, Saturation). 
+          |                | RaySource for autofocus can be selected. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.9   |   2022-04-09   | Information messages are now displayed combined from all tracing 
+          |                | threads. RaySource rays are now created in threads. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.8   |   2022-04-08   | Project restructuring 2. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.7   |   2022-04-08   | Backend now has a progress bar for operations. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.6   |   2022-04-07   | Project restructuring. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.5   |   2022-04-06   | New 'Cleaner View'-option in GUI. Simpler and more cleaned up GUI 
+          |                | code. Minor bug fixes. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.4   |   2022-04-05   | TCP Server for controlling the GUI. Automatic RT change detection and 
+          |                | GUI replotting. New restrictions to when the user can define or assign 
+          |                | some class properties. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.3   |   2022-04-01   | Improvement of Autofocus and Debug Plot. Opacity simulation of filter 
+          |                | in GUI. RaySource Color adapts to Ray Coloring Mode. GUI now has an 
+          |                | advanced picking mode. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.2   |   2022-03-31   | GUI shell interface and interface functions. Additional GUI Tests. 
+----------|----------------|------------------------------------------------------------------------
+  0.8.1   |   2022-03-29   | List of RaySources now belongs to Raytracer. Renamed RaySourceList to 
+          |                | RayStorage. Globally defined wavelength range. Own Misc.calc() instead 
+          |                | of numexpr.evaluate(). 
+----------|----------------|------------------------------------------------------------------------
+  0.8.0   |   2022-03-28   | Restructuring: Lens, Filter, Detector, RaySource now have a common 
+          |                | parent class 'SObject' 
+----------|----------------|------------------------------------------------------------------------
+  0.7.4   |   2022-03-28   | GUI class: Now plotting with a common function for RaySource, Filter, 
+          |                | Detector 
+----------|----------------|------------------------------------------------------------------------
+  0.7.3   |   2022-03-28   | GUI Object Labels are now centered. 
+----------|----------------|------------------------------------------------------------------------
+  0.7.1   |   2022-03-28   | First named version 
+----------|----------------|------------------------------------------------------------------------
+  0.7.2   |   2022-03-28   | Testing: More GUI Tests added. GUI class: Minor Cleanup. 
+----------|----------------|------------------------------------------------------------------------
