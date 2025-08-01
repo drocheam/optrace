@@ -36,7 +36,7 @@ make it a viable tool for research applications.
   * Includes preset and user-definable surface shapes, ray sources, and media
   * An additional GUI with an interactive 3D scene viewer
   * Automation capabilities
-  * High performance of 0.11 s / surface / million rays 
+  * High performance of 85 ms / surface / million rays 
     ([details](https://drocheam.github.io/optrace/development/testing.html#benchmark-testing))
   * Comprehensive documentation
 

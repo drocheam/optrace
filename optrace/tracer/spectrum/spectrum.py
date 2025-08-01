@@ -150,13 +150,13 @@ class Spectrum(BaseClass):
                 if val2.shape[0] == 0:
                     raise ValueError(f"'{key}' can't be empty.")
 
-                if key == "lines" and ((wlo := np.min(val2)) < go.wavelength_range[0]
-                                       or (wlo := np.max(val2)) > go.wavelength_range[1]):
+                if key == "lines" and ((wlo := val2.min()) < go.wavelength_range[0]
+                                       or (wlo := val2.max()) > go.wavelength_range[1]):
                     raise ValueError(f"'lines' need to be inside visible range [{go.wavelength_range[0]}nm, "
                                      f"{go.wavelength_range[1]}nm]"
                                      f", but got a value of {wlo}nm.")
 
-                if key == "line_vals" and (lmin := np.min(val2)) < 0:
+                if key == "line_vals" and (lmin := val2.min()) < 0:
                     raise ValueError(f"line_vals must be all positive, but one value is {lmin}.")
 
                 if key == "lines" and len(np.unique(val)) != len(val):
@@ -193,7 +193,7 @@ class Spectrum(BaseClass):
                     if np.std(np.diff(val2)) > 1e-4 or np.any(np.diff(val2) <= 0) or (val[1]-val[0] < 1e-6):
                         raise ValueError("wls needs to be monotonically increasing with the same step size.")
                 else: 
-                    if (lmin := np.min(val2)) < 0:
+                    if (lmin := val2.min()) < 0:
                         raise ValueError(f"vals must be all positive, but one value is {lmin}")
 
                 super().__setattr__(key, val2)

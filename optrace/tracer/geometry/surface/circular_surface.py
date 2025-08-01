@@ -36,11 +36,9 @@ class CircularSurface(Surface):
         :param N: number of positions
         :return: position array, shape (N, 3)
         """
-        x, y = random.stratified_ring_sampling(0, self.r, N)
-
-        p = np.tile(self.pos, (N, 1))
-        p[:, 0] += x
-        p[:, 1] += y
+        p = np.zeros((N, 3), dtype=np.float64, order='F')
+        p[:, 0], p[:, 1] = random.stratified_ring_sampling(0, self.r, N)
+        p += self.pos
 
         return p
 

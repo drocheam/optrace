@@ -109,8 +109,7 @@ class RectangularSurface(Surface):
         xr, yr = self._rotate_rc(x-self.pos[0], y-self.pos[1], -self._angle)
         xs, xe, ys, ye = self._extent[:4]
 
-        inside = (xs-self.N_EPS <= xr) & (xr <= xe+self.N_EPS) & (ys-self.N_EPS <= yr) & (yr <= ye+self.N_EPS)
-        return inside
+        return (xs-self.N_EPS <= xr) & (xr <= xe+self.N_EPS) & (ys-self.N_EPS <= yr) & (yr <= ye+self.N_EPS)
 
     def edge(self, nc: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -149,15 +148,13 @@ class RectangularSurface(Surface):
         :param N: number of positions
         :return: position array, shape (N, 3)
         """
-        p = np.zeros((N, 3), dtype=np.float64, order='F')
         # grid for unrotated rectangle at (0, 0, 0)
         x, y = random.stratified_rectangle_sampling(*self._extent[:4], N)
 
         # rotate and add offset (=position)
+        p = np.zeros((N, 3), dtype=np.float64, order='F')
         p[:, 0], p[:, 1] = self._rotate_rc(x, y, self._angle)
-        p[:, 0] += self.pos[0]
-        p[:, 1] += self.pos[1]
-        p[:, 2] = self.pos[2]
+        p += self.pos
 
         return p
 

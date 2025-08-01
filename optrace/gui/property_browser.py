@@ -7,8 +7,7 @@ from traits.api import HasTraits, observe, Button, Dict, Str
 from traits.observation.api import TraitChangeEvent
 
 from ..tracer.presets import spectral_lines as spec_lines
-from ..tracer.base_class import BaseClass  # BaseClass type
-
+from ..tracer.base_class import BaseClass
 from ..tracer import presets as otp
 
 
@@ -45,14 +44,16 @@ class PropertyBrowser(HasTraits):
                     Group(
                         Item('_ray_dict', editor=ValueEditor(), show_label=False),
                         Item("_legend_title", show_label=False, style="readonly", emphasized=True),
-                        Item("_ray_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
+                        Item("_ray_legend", show_label=False, style="readonly", 
+                             style_sheet="*{font-family: monospace}"),
                         label="Shown Rays",
                     ),
                     Group(
                         Item("_unit_label", show_label=False, style="readonly"),
                         Item('_card_dict', editor=ValueEditor(), show_label=False),
                         Item("_legend_title", show_label=False, style="readonly", emphasized=True),
-                        Item("_tma_legend", show_label=False, style="readonly", style_sheet="*{font-family: monospace}"),
+                        Item("_tma_legend", show_label=False, style="readonly", 
+                             style_sheet="*{font-family: monospace}"),
                         label="Cardinal Points",
                     ),
                     Group(
@@ -97,12 +98,12 @@ class PropertyBrowser(HasTraits):
 
         :param event: optional trait change event
         """
-        self._raytracer_dict = self._gen_dict_repr(self.raytracer.__dict__)
-        self._ray_dict = self._gen_dict_repr(self.gui._plot._ray_property_dict)
-        self._scene_dict = self._gen_dict_repr(self.scene.trait_get())
-        self._trace_gui_dict = self._gen_dict_repr(self.gui.trait_get())
-        self._card_dict = self._gen_dict_repr(self._gen_cardinals())
-        self._preset_dict = self._gen_dict_repr(self._gen_pdict())
+        self._raytracer_dict    = self._gen_dict_repr(self.raytracer.__dict__)
+        self._ray_dict          = self._gen_dict_repr(self.gui._plot._ray_property_dict)
+        self._scene_dict        = self._gen_dict_repr(self.scene.trait_get())
+        self._trace_gui_dict    = self._gen_dict_repr(self.gui.trait_get())
+        self._card_dict         = self._gen_dict_repr(self._gen_cardinals())
+        self._preset_dict       = self._gen_dict_repr(self._gen_pdict())
 
     def _gen_dict_repr(self, val: Any) -> dict:
         """generate a dictionary containing representable elements for ValueEditor()"""
@@ -152,12 +153,12 @@ class PropertyBrowser(HasTraits):
         """generate a dictionary of cardinal points / ray transfer matrix analysis"""
 
         # get properties for lens
-        def set_cdict(w, cdict, name):
+        def set_cdict(group, cdict, name):
             cdict[name] = dict()
 
             # get properties for wavelengths
             for wl in spec_lines.FdC:
-                tma = w.tma(wl=wl)
+                tma = group.tma(wl=wl)
                 cdict[name][f"{wl:.4g}nm"] = \
                     dict(nodal_points=tma.nodal_points, d=tma.d, n1=tma.n1, n2=tma.n2,
                          focal_points=tma.focal_points, focal_lengths=tma.focal_lengths,

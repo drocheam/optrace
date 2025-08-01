@@ -126,10 +126,10 @@ def inverse_transform_sampling(x: np.ndarray, f: np.ndarray, S: int | np.ndarray
     """
 
     # check if cdf is non-zero and monotonically increasing
-    if not np.sum(f):
+    if not f.sum():
         raise RuntimeError("Cumulated probability is zero.")
 
-    elif np.min(f) < 0:
+    elif f.min() < 0:
         raise RuntimeError("Got negative value in pdf.")
 
     # exclude zeros values for discrete distribution, set interpolation to nearest

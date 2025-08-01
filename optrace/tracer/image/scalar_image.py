@@ -53,7 +53,7 @@ class ScalarImage(BaseImage):
                 elif val2.ndim != 2:
                     raise ValueError(f"Image needs to have two dimensions but has shape {val2.shape}.")
 
-                if (min_ := np.min(val2)) < 0.0:
+                if (min_ := val2.min()) < 0.0:
                     raise ValueError(f"There is a negative value of {min_} inside the image. "
                                      "Make sure all image data is non-negative.")
 

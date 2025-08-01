@@ -131,7 +131,7 @@ class BaseImage(BaseClass):
       
         # if single channel image / linear image: make three channels and normalize
         if self._data.ndim == 2:
-            if (maxi := np.max(img)):
+            if (maxi := img.max()):
                 img /= maxi
             img = np.broadcast_to(img[:, :, np.newaxis], [img.shape[0], img.shape[1], 3])
 

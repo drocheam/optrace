@@ -149,8 +149,8 @@ class RefractionIndex(Spectrum):
 
             case "Data" if self._wls is not None:
                 # no extrapolation in "Data" Mode
-                wlmin = np.min(wl_)
-                wlmax = np.max(wl_)
+                wlmin = wl_.min()
+                wlmax = wl_.max()
 
                 if wlmin < self._wls[0] or wlmax > self._wls[-1]:
                     raise RuntimeError(f"Wavelength range [{wlmin:.5g}, {wlmax:.5g}] larger than data range"
@@ -238,7 +238,7 @@ class RefractionIndex(Spectrum):
             case "func" if callable(val):
                 wls = color.wavelengths(1000)
                 n = val(wls, **self.func_args)
-                if np.min(n) < 1:
+                if n.min() < 1:
                     raise ValueError("Function func needs to output values >= 1 over the whole visible range.")
 
             case "V" if val is not None:
@@ -262,4 +262,4 @@ class RefractionIndex(Spectrum):
 
     def is_dispersive(self) -> bool:
         """:return: if the refractive index is dispersive, determined by the Abbe Number"""
-        return self.abbe_number() != np.inf
+        return np.isfinite(self.abbe_number())

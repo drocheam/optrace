@@ -116,10 +116,8 @@ def _to_srgb(xyz_: np.ndarray, normalize: bool) -> np.ndarray:
     RGBL_ = RGBL_.reshape(xyz_.shape)
 
     # normalize to the highest value
-    if normalize:
-        nmax = np.nanmax(RGBL_)
-        if nmax:
-            RGBL_ /= nmax
+    if normalize and (nmax := np.nanmax(RGBL_)):
+        RGBL_ /= nmax
 
     return RGBL_
 
@@ -144,7 +142,7 @@ def _triangle_intersect(r, g, b, w, x, y):
     # angles from primaries to whitepoint
     phir = np.arctan2(ry-wy, rx-wx)
     phig = np.arctan2(gy-wy, gx-wx)
-    phib = np.arctan2(by-wy, bx-wx) + 2*np.pi  # so range is [0, 2*pi]
+    phib = np.arctan2(by-wy, bx-wx) + 2*np.pi  # so range is [0, 2*pi]  # TODO is it?
 
     # conditions for this to algorithm to work:
     # whitepoint inside gamut (not on triangle edge)
@@ -159,7 +157,7 @@ def _triangle_intersect(r, g, b, w, x, y):
     assert rx != gx
    
     phi = np.arctan2(y-wy, x-wx)
-    phi[phi < 0] += 2*np.pi  # so range is [0, 2*pi]
+    phi[phi < 0] += 2*np.pi  # so range is [0, 2*pi] # TODO is it?
 
     # slope towards whitepoint and between primaries
     aw = np.tan(phi)
@@ -254,7 +252,7 @@ def get_chroma_scale(Luv: np.ndarray, L_th = 0.0):
     """
 
     mask_valid, cr_fact2 = _get_chroma_scale(Luv)
-    mask_th = Luv[:, :, 0] > L_th*np.max(Luv[:, :, 0])
+    mask_th = Luv[:, :, 0] > L_th*Luv[:, :, 0].max()
     return _min_factor_from_chroma_factors(cr_fact2[mask_valid & mask_th])
 
 
@@ -269,7 +267,7 @@ def _min_factor_from_chroma_factors(cr_fact2):
     if not cr_fact2.size:
         return 1.0
 
-    cr_sq = np.min(cr_fact2)
+    cr_sq = cr_fact2.min()
     cr = np.sqrt(cr_sq)
     
     # due to numerical issues cr could be above 1 or below some worst case
@@ -348,7 +346,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         Luv = xyz_to_luv(XYZ, normalize=False)  
         # ^-- don't normalize, since we transform back and forth and expect the same L
 
-        mask_th = Luv[:, :, 0] > L_th*np.max(Luv[:, :, 0])
+        mask_th = Luv[:, :, 0] > L_th*Luv[:, :, 0].max()
         mask_valid, cr_fact2 =  _get_chroma_scale(Luv)
 
         if chroma_scale is None:
@@ -437,8 +435,8 @@ def log_srgb(img: np.ndarray) -> np.ndarray:
     # get lightness bounds (except zero)
     L = luv[:, :, 0]
     L0 = L[L > 0]
-    lmax = np.max(L0)
-    lmin = np.min(L0)
+    lmax = L0.max()
+    lmin = L0.min()
 
     if lmin == lmax:
         return img.copy()

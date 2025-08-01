@@ -66,13 +66,13 @@ class LightSpectrum(Spectrum):
         
         else:
             # wavelength range
-            wl0, wl1 = np.min(wl), np.max(wl)
+            wl0, wl1 = wl.min(), wl.max()
 
             # add +-1nm to range, but make sure it is inside visible range
             if np.abs(wl0 - wl1) < 1:
                 wl0, wl1 = max(wl0-1, go.wavelength_range[0]), min(wl0+1, go.wavelength_range[1])
 
-            spec._vals, spec._wls = np.histogram(wl, bins=N, weights=w, range=[wl0, wl1])
+            spec._vals, spec._wls = np.histogram(wl, bins=N, weights=w, range=[wl0, wl1]) # TODO use built-in method from np.histogram_bin_edges
             spec._vals /= (spec._wls[1] - spec._wls[0])  # scale by delta lambda for W/nm
 
         return spec
@@ -272,14 +272,14 @@ class LightSpectrum(Spectrum):
                 res = self.val
 
             case "Lines":
-                res = np.max(self.line_vals)
+                res = self.line_vals.max()
 
             case ("Histogram" | "Data"):
-                res = np.max(self._vals)
+                res = self._vals.max()
 
             case _:
                 wl = color.wavelengths(100000)
-                res = np.max(self(wl))
+                res = self(wl).max()
 
         return float(res)
 

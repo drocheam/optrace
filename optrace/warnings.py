@@ -1,5 +1,4 @@
 import warnings
-
 from . import global_options
 
 

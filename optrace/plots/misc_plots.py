@@ -1,14 +1,13 @@
 
 import copy
 
-import numpy as np  # calculations
-import scipy.optimize  # optimize result type
-import matplotlib.pyplot as plt  # actual plotting
+import numpy as np
+import scipy.optimize
+import matplotlib.pyplot as plt
 
-# only needed for typing and plotting
 from ..tracer.refraction_index import RefractionIndex
 from ..tracer.geometry import Surface
-from ..tracer.presets import spectral_lines as Lines  # spectral lines for AbbePlot
+from ..tracer.presets import spectral_lines as Lines
 from ..property_checker import PropertyChecker as pc
 from ..warnings import warning
 from ..global_options import global_options
@@ -60,6 +59,7 @@ def focus_search_cost_plot(res:     scipy.optimize.OptimizeResult,
     plt.title(title)
     plt.tight_layout()
     _save_or_show(path, sargs)
+
 
 def abbe_plot(ri:     list[RefractionIndex],
               title:  str = "Abbe Diagram",
@@ -194,8 +194,7 @@ def _show_grid(what=plt) -> None:
         what.grid(visible=True, which='minor', color="gainsboro", linestyle='--')
     what.minorticks_on()
 
-
-def _save_or_show(path: str = None, sargs: dict = {}):
+def _save_or_show(path: str = None, sargs: dict = {}) -> None:
     """show a plot (path is None) or store the image of a plot at file given as 'path'"""
     pc.check_type("path", path, str | None)
                

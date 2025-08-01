@@ -277,7 +277,14 @@ The setting can be either applied as Python argument:
 
    python -Xcpu_count=4 ./script.py
 
-It is also possible to set the environment variable from within your script, so it is applied locally:
+
+Using an environment variable from the terminal calling python:
+
+.. code-block:: bash
+
+    export PYTHON_CPU_COUNT=4
+
+Or from within your python script, so it is applied only locally:
 
 .. code-block:: python
 
@@ -287,8 +294,8 @@ It is also possible to set the environment variable from within your script, so 
    # do the computations with 4 threads
    ...
 
-It is important to note that only some actions use multithreading, and only fewer work with all possible 
-number of cores. Setting the CPU count only provides a maximum number.
+It is important to note that only some actions use multithreading, and only fewer work with all available/specified 
+cores. Setting the CPU count only provides an upper limit.
 
 Running optrace on Wayland
 _____________________________________

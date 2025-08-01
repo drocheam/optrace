@@ -117,23 +117,23 @@ class ConicSurface(Surface):
             n = np.zeros((x.shape[0], 3), order="F", dtype=np.float64)
             n[:, 0] = n_r*np.cos(phi)
             n[:, 1] = n_r*np.sin(phi)
-
             n[:, 2] = np.sqrt(1 - n_r**2)
         
         n[~m] = [0, 0, 1]
 
         return n
 
-    def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def find_hit(self, p: np.ndarray, s: np.ndarray, where: slice | np.ndarray = None)\
+            -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Find hit/intersections of rays with this surface.
 
         :param p: ray position array, shape (N, 3)
         :param s: unity ray direction vectors, shape (N, 3)
+        :param where: (optional) mask for input arrays, can be a slice or array
         :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit,
                  indices of ill-conditioned rays
         """
-
         o = p - self.pos  # coordinates relative to surface center
         ox, oy, oz = o[:, 0], o[:, 1], o[:, 2]
         sx, sy, sz = s[:, 0], s[:, 1], s[:, 2]
@@ -199,7 +199,8 @@ class ConicSurface(Surface):
         p_hit[m] = p[m]
         is_hit[m] = False
 
-        return p_hit, is_hit, np.array([])
+        where_ = where if where is not None else slice(None)
+        return p_hit[where_], is_hit[where_], np.array([])
 
     def flip(self) -> None:
         """flip the surface around the x-axis"""

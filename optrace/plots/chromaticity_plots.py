@@ -32,8 +32,8 @@ _CONV_XYZ_NORM = color.xyz_to_srgb_linear(_red_xyz, normalize=False)[0, 0, 0]  #
 
 
 
-def chromaticities_cie_1931(img:                  RenderImage | RGBImage | LightSpectrum | list[LightSpectrum] = None,
-                            title:                str = "CIE 1931 Chromaticity Diagram",
+def chromaticities_cie_1931(img:      RenderImage | RGBImage | LightSpectrum | list[LightSpectrum] = None,
+                            title:    str = "CIE 1931 Chromaticity Diagram",
                             **kwargs)\
         -> None:
     """
@@ -162,7 +162,7 @@ def _chromaticity_plot(img:       RenderImage | RGBImage | LightSpectrum | list[
         raise TypeError(f"Invalid parameter of type {type(img)}.")
 
     # convert wavelength to coordinates in diagram
-    def wl_to_xy(wl):
+    def wl_to_xy(wl: np.ndarray) -> np.ndarray:
         XYZ = np.column_stack((color.x_observer(wl),
                                color.y_observer(wl),
                                color.z_observer(wl)))
@@ -203,7 +203,7 @@ def _chromaticity_plot(img:       RenderImage | RGBImage | LightSpectrum | list[
     elif norm == "Euclidean":
         mask = ~np.all(RGB == 0, axis=2)
         RGB[mask] /= (np.abs(RGB[mask, 0]**2 + RGB[mask, 1]**2 + RGB[mask, 2]**2)**0.5)[:, np.newaxis]  
-        # normalize brightness
+        # ^-- normalize brightness
     else:
         assert_never(norm)
 

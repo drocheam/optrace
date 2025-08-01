@@ -321,7 +321,7 @@ class Raytracer(Group):
 
                 if isinstance(element, Lens):
 
-                    p[hw, i+1], hit_front, ill = element.front.find_hit(p[hw, i], s[hw])
+                    p[hw, i+1], hit_front, ill = element.front.find_hit(p[:, i], s, where=hw)
                     hwh = misc.masked_assign(hw, hit_front)  # rays having power and hitting lens front
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
 
@@ -351,7 +351,7 @@ class Raytracer(Group):
                         ns[:, i], ns[:, i+1] = n_l, n2_l
 
                         hw = weights[:, i] > 0
-                        p[hw, i+1], hit_back, ill = element.back.find_hit(p[hw, i], s[hw])
+                        p[hw, i+1], hit_back, ill = element.back.find_hit(p[:, i], s, where=hw)
                         msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
                     
                         # absorb rays not hitting surface
@@ -377,7 +377,7 @@ class Raytracer(Group):
 
                 elif isinstance(element, Filter | Aperture):
 
-                    p[hw, i+1], hit, ill = element.surface.find_hit(p[hw, i], s[hw])
+                    p[hw, i+1], hit, ill = element.surface.find_hit(p[:, i], s, where=hw)
                     msg[self.INFOS.ILL_COND, i+1] += np.count_nonzero(ill)
                     hwh = misc.masked_assign(hw, hit)  # rays having power and hitting filter
                     hwnh = misc.masked_assign(hw, ~hit)  # rays having power and not hitting filter
@@ -449,8 +449,8 @@ class Raytracer(Group):
         :param msg: message array
         """
         # get bending angles, axes and mask
-        a_, b_, b, inside = surf.hurb_props(p[hwnh, i+1, 0], p[hwnh, i+1, 1])
-        hwnhi = misc.masked_assign(hwnh, inside)  
+        a_, b_, b, inside = surf.hurb_props(p[:, i+1, 0], p[:, i+1, 1])
+        hwnhi = hwnh & inside 
         # ^-- rays having an power, not hitting the aperture, but inside of inner, ray bending aperture part
       
         # a is just b rotated by 90° in aperture plane
@@ -461,13 +461,13 @@ class Raytracer(Group):
         # a tilted ray sees a projected aperture. The distance to the a-edge is smaller by cos(psi_a),
         # where psi_a = 90 - ang_a, with ang_a being the angle between the ray and the ellipsis axis a
         # scalar product s * a is cos(ang_a), so sin(ang_a) = sqrt(1 - cos^2(ang_a)) is cos(psi_a)
-        cos_psi_a = np.sqrt(1 - misc.rdot(s[hwnhi], a)**2)
-        cos_psi_b = np.sqrt(1 - misc.rdot(s[hwnhi], b)**2)
+        cos_psi_a = np.sqrt(1 - misc.rdot(s, a)**2)
+        cos_psi_b = np.sqrt(1 - misc.rdot(s, b)**2)
 
         # # std dev of direction Gaussian
         # # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
         # # additionally, the refractive index, cos-dependency from a above and a custom uncertainty factor were included
-        k = 2*np.pi*ns[hwnhi, i] / (wl[hwnhi] * 1e-9)
+        k = 2*np.pi*ns[:, i] / (wl * 1e-9)
         tan_sig_b = self.HURB_FACTOR / (2*b_*cos_psi_b*1e-3*k)
         tan_sig_a = self.HURB_FACTOR / (2*a_*cos_psi_a*1e-3*k)
 
@@ -478,14 +478,14 @@ class Raytracer(Group):
         # create sa, sb components
         # sa lies in plane containing s and a, but is orthogonal to s and sb
         # sb lies in plane containing s and b, but is orthogonal to s and sa
-        sa = misc.cross(b, s[hwnhi])
+        sa = misc.cross(b, s)
         sa = misc.normalize(sa)
-        sb = misc.cross(s[hwnhi], sa)
+        sb = misc.cross(s, sa)
         
         # construct new direction from old one and sb, sa components
-        sab = s[hwnhi] + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
+        sab = s + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
         s0 = s.copy()
-        s[hwnhi] = misc.normalize(sab)
+        s[hwnhi] = misc.normalize(sab)[hwnhi]
 
         # absorb rays with negative direction after bending
         neg = s[:, 2] < 0
@@ -494,7 +494,7 @@ class Raytracer(Group):
         
         # recalculate polarization
         n = np.broadcast_to([0., 0., 1.], (s0.shape[0], 3))
-        self.__compute_polarization(s0, s[hwnhi], n, pols, i, hwnhi)
+        self.__compute_polarization(s0, s, n, pols, i, hwnhi)
 
     def __tracing_elements(self) -> list[Lens | Filter | Aperture]:
         """
@@ -589,7 +589,7 @@ class Raytracer(Group):
             -> tuple[bool, np.ndarray, np.ndarray, np.ndarray]:
         """
         Check for surface/point/line collisions.
-        A collision is defined as the front surface havin a higher z-value than the back surface,
+        A collision is defined as the front surface having a higher z-value than the back surface,
         at a point where both surfaces are defined
 
         :param front: first object (in regards to z-position)
@@ -746,29 +746,24 @@ class Raytracer(Group):
         :param i: surface number
         :param msg: message array
         """
-       
         # check the documentation for the math on this
 
         # copy, needed later
         s0 = s.copy()
         
-        # position relative to lens center
-        x = p[hwh, i+1, 0] - surface.pos[0]
-        y = p[hwh, i+1, 1] - surface.pos[1]
-
         # helper variables
         f = 1000 / D
-        fsz = f / s0[hwh, 2]
+        fsz = f / s0[:, 2]
 
         # calculate and normalize new vector
-        s[hwh, 0] = s0[hwh, 0] * fsz - x
-        s[hwh, 1] = s0[hwh, 1] * fsz - y
+        s[hwh, 0] = (s0[:, 0] * fsz - (p[:, i+1, 0] - surface.pos[0]))[hwh]
+        s[hwh, 1] = (s0[:, 1] * fsz - (p[:, i+1, 1] - surface.pos[1]))[hwh]
         s[hwh, 2] = f
-        s[hwh] = misc.normalize(s[hwh]) * np.sign(f)  # sign so it points always in +z
+        s[hwh] = misc.normalize(s[hwh]) * np.sign(f)  # sign to always point in +z
 
         # calculate polarization
-        n = np.broadcast_to([0., 0., 1.], (x.shape[0], 3))
-        self.__compute_polarization(s0, s[hwh], n, pols, i, hwh)
+        n = np.broadcast_to([0., 0., 1.], (fsz.shape[0], 3))
+        self.__compute_polarization(s0, s, n, pols, i, hwh)
 
     def __refraction(self,
                      surface:      Surface,
@@ -801,23 +796,19 @@ class Raytracer(Group):
         if not np.any(hwh):
             return
 
-        n = surface.normals(p[hwh, i + 1, 0], p[hwh, i + 1, 1])
-
-        n1_h = n1[hwh]
-        n2_h = n2[hwh]
-        s_h = s[hwh]
+        n = surface.normals(p[:, i + 1, 0], p[:, i + 1, 1])
 
         # vectorial Snell's Law as in "Optik - Physikalisch-technische Grundlagen und Anwendungen,
         # Heinz Haferkorn, Auflage 4, Wiley-VCH, 2008", p.43
         # but with s_ = s', n1 = n, n2 = n', alpha = ε, beta = ε'
 
-        ns = misc.rdot(n, s_h)  # equals cos(alpha)
-        N = n1_h/n2_h  # ray wise refraction index quotient
+        ns = misc.rdot(n, s)  # equals cos(alpha)
+        N = n1/n2  # ray wise refraction index quotient
 
         # rays with TIR mean an imaginary W, we'll handle this later
         with np.errstate(invalid="ignore"):
             W = np.sqrt(1 - N**2 * (1-ns**2))
-            s_ = s_h*N[:, np.newaxis] - n*(N*ns - W)[:, np.newaxis]
+            s_ = s*N[:, np.newaxis] - n*(N*ns - W)[:, np.newaxis]
 
         # rotate polarization vectors and calculate amplitude components in s and p plane
         A_ts, A_tp = self.__compute_polarization(s, s_, n, pols, i, hwh)
@@ -827,29 +818,30 @@ class Raytracer(Group):
         # see https://de.wikipedia.org/wiki/Fresnelsche_Formeln#Spezialfall:_gleiche_magnetische_Permeabilit.C3.A4t
         #####
         cos_alpha, cos_beta = ns, W
-        n1_h_cos_alpha = n1_h*cos_alpha
-        n2_h_cos_beta = n2_h*cos_beta
-        ts = 2 * n1_h_cos_alpha / (n1_h_cos_alpha + n2_h_cos_beta)
-        tp = 2 * n1_h_cos_alpha / (n2_h*cos_alpha + n1_h*cos_beta)
-        T = n2_h_cos_beta / (n1_h_cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)
+        n1_cos_alpha = n1*cos_alpha
+        n2_cos_beta = n2*cos_beta
+        ts = 2 * n1_cos_alpha / (n1_cos_alpha + n2_cos_beta)
+        tp = 2 * n1_cos_alpha / (n2*cos_alpha + n1*cos_beta)
+        T = n2_cos_beta / (n1_cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)
+        T = T[hwh]
 
         # handle rays with total internal reflection
-        TIR = ~np.isfinite(W)
+        TIR = ~np.isfinite(W[hwh])
         if np.any(TIR):
             T[TIR] = 0
             TIR_count = np.count_nonzero(TIR)
             msg[self.INFOS.TIR, i] += TIR_count
 
         weights[hwh, i+1] = weights[hwh, i]*T
-        s[hwh] = s_
+        s[hwh] = s_[hwh]
 
     def __compute_polarization(self,
-                              s:        np.ndarray,
-                              s_:       np.ndarray,
-                              n:        np.ndarray,
-                              pols:     np.ndarray,
-                              i:        int,
-                              hwh:      np.ndarray)\
+                               s:        np.ndarray,
+                               s_:       np.ndarray,
+                               n:        np.ndarray,
+                               pols:     np.ndarray,
+                               i:        int,
+                               hwh:      np.ndarray)\
             -> tuple[np.ndarray | float, np.ndarray | float]:
         """
         compute new polarization vectors and calculate amplitude components in s and p plane
@@ -868,32 +860,27 @@ class Raytracer(Group):
 
         # exclude rays where direction did not change
         # these are the rays where p and s plane are not defined and the polarization stays the same
-        mask = np.any(s[hwh] != s_, axis=1)
-        mask2 = misc.masked_assign(hwh, mask)
-        sm = s[mask2]
-
-        # reduce slicing by storing separately
-        polsm = pols[mask2, i]
-        s_m = s_[mask]
+        mask = np.any(s != s_, axis=1)
+        mask2 = hwh & mask
+        mask3 = hwh & (~mask)
 
         # ps is perpendicular to the plane of s and s_
         # pp is perpendicular to ps and s
-        ps = misc.cross(s_m, sm)
+        ps = misc.cross(s_, s)
         ps = misc.normalize(ps)
-        pp = misc.cross(ps, sm)
-
-        # init arrays
-        # default for A_ts, A_tp are 1/sqrt(2)
-        A_ts = np.full(s_.shape[0], 1/np.sqrt(2), dtype=np.float32)
-        A_tp = np.full(s_.shape[0], 1/np.sqrt(2), dtype=np.float32)
+        pp = misc.cross(ps, s)
 
         # A_ts is component of pol in ps
-        A_ts[mask] = misc.rdot(ps, polsm)
-        A_tp[mask] = misc.rdot(pp, polsm)
+        A_ts = misc.rdot(ps, pols[:, i])
+        A_tp = misc.rdot(pp, pols[:, i])
+
+        # set rays without direction change to equal components
+        A_ts[mask3] = 1/np.sqrt(2)
+        A_tp[mask3] = 1/np.sqrt(2)
 
         # new polarization vector after refraction
-        pp_ = misc.cross(ps, s_m)  # ps and s_m are unity vectors and perpendicular, so we need no normalization
-        pols[mask2, i+1] = ps*A_ts[mask, np.newaxis] + pp_*A_tp[mask, np.newaxis]
+        pp_ = misc.cross(ps, s_)  # ps and s_m are unity vectors and perpendicular, so we need no normalization
+        pols[mask2, i+1] = (ps*A_ts[:, np.newaxis] + pp_*A_tp[:, np.newaxis])[mask2]
 
         # return amplitude components
         return A_ts, A_tp
@@ -1455,7 +1442,7 @@ class Raytracer(Group):
             w2 = 1 - R2
             Im0 = Im*w2**2 if mode == "Image Center Sharpness" else Im
             
-            if (Im0s := np.sum(Im0)):
+            if (Im0s := Im0.sum()):
                 Im0 /= Im0s
 
             Im = np.abs(np.fft.fft2(Im0))
@@ -1621,7 +1608,7 @@ class Raytracer(Group):
         sb = s/s[:, 2, np.newaxis]
             
         # sample cost function
-        if return_cost or method in  ["Image Sharpness", "Image Center Sharpness"]:
+        if return_cost or method in ["Image Sharpness", "Image Center Sharpness"]:
 
             r = random.stratified_interval_sampling(bounds[0], bounds[1], Nt, shuffle=False)
             vals = np.zeros_like(r)

@@ -1,8 +1,8 @@
 
-import numpy as np  # calculations
-import matplotlib.pyplot as plt  # actual plotting
+import numpy as np
+import matplotlib.pyplot as plt
 
-from ..tracer import color as mcolor  # color conversions for chromaticity plots
+from ..tracer import color as mcolor
 from ..tracer.spectrum import Spectrum, LightSpectrum
 from ..tracer.refraction_index import RefractionIndex
 from .misc_plots import _show_grid, _save_or_show
@@ -46,13 +46,16 @@ def spectrum_plot(spectrum:  Spectrum | list[Spectrum],
      path: if provided, the plot is saved at this location instead of displaying a plot. Specify with file ending.
      sargs: option dictionary for pyplot.savefig
     """
+    # type checks
     pc.check_type("title", title, str)
     pc.check_type("spectrum", spectrum, Spectrum | list)
+
     # set ylabel
     Spec0 = spectrum[0] if isinstance(spectrum, list) and len(spectrum) else spectrum
     ylabel = Spec0.quantity if Spec0 and Spec0.quantity != "" else "value"
     ylabel += f" in {Spec0.unit}" if Spec0 and Spec0.unit != "" else ""
 
+    # plot
     _spectrum_plot(spectrum, r"$\lambda$ in nm", ylabel, title=title, **kwargs)
 
 
@@ -81,20 +84,24 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # wavelength range
     wl0, wl1 = go.wavelength_range
 
+    # create subplots with grid
     fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [15, 1]})
     _show_grid(ax1)
 
     # get spectrum values
     def get_val(obj):
+
         # discrete wavelengths -> not plottable
         if not obj.is_continuous():
             plt.close(fig)  # otherwise a window would stay open
             raise RuntimeError(f"Can't plot discontinuous spectrum_type '{obj.spectrum_type}'.")
+
         # spectrum_type="Data" -> show actual data values and positions
         # otherwise we would have interpolation issues or fake accuracy
         # this could also lead to an incorrect power for a LightSpectrum in the next part
         elif obj.spectrum_type in ["Data", "Histogram"]:
             return obj._wls, obj._vals
+
         # default mode, crate wavelength range and just call the object
         else:
             wl = np.linspace(wl0, wl1, steps)
@@ -102,6 +109,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
 
     # single Spectrum
     if not isinstance(obj, list):
+
         wlp, val = get_val(obj)
         if obj.spectrum_type == "Histogram":
             ax1.stairs(val, wlp, color=color, zorder=10)
@@ -117,6 +125,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # multiple spectra
     else:
         for i, obji in enumerate(obj):
+
             wlp, val = get_val(obji)
 
             cl = color[i] if color is not None else None
@@ -143,8 +152,10 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
     # otherwise the color bar size changes for different wavelength ranges
     spectral_colormap = go.spectral_colormap if go.spectral_colormap is not None else mcolor.spectral_colormap
     colors = np.array([spectral_colormap(np.linspace(plt.xlim()[0], plt.xlim()[1], 500))[:, :3]])
-    ax2.imshow(colors, extent=[*plt.xlim(), 0.1*plt.xlim()[0], 0.1*plt.xlim()[1]], aspect="auto", interpolation="gaussian")
+    ax2.imshow(colors, extent=[*plt.xlim(), 0.1*plt.xlim()[0], 0.1*plt.xlim()[1]], 
+               aspect="auto", interpolation="gaussian")
 
+    # apply labels and show
     ax1.set(ylabel=ylabel)
     ax2.set(xlabel=xlabel)
     ax2.get_yaxis().set_visible(False)

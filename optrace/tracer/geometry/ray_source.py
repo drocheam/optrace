@@ -124,7 +124,7 @@ class RaySource(Element):
             # calculate pixel probability from relative power for each pixel
             sRGBL = color.srgb_to_srgb_linear(self._image._data)
             If = color.power_from_srgb_linear(sRGBL).flatten()
-            Ifs = np.sum(If)
+            Ifs = If.sum()
             self._pIf = 1/Ifs*If
 
             # calculate mean image color, needed for self.color
@@ -140,7 +140,7 @@ class RaySource(Element):
             self._mean_img_color = None
             
             If = color.srgb_to_srgb_linear(surface.data).ravel()
-            Ifs = np.sum(If)
+            Ifs = If.sum()
             self._pIf = 1/Ifs*If
         
         else:
@@ -509,7 +509,7 @@ class RaySource(Element):
                 if val.shape[0]*val.shape[1] > self._max_image_px:
                     raise RuntimeError("For performance reasons only images with less than 2 megapixels are allowed.")
                 
-                if np.sum(val._data) <= 0:
+                if val._data.sum() <= 0:
                     raise ValueError("Image can not be completely black")
 
             case "front":

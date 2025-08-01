@@ -53,7 +53,7 @@ class GrayscaleImage(ScalarImage):
             case "_data":
                 pc.check_type(key, val, np.ndarray)
                 
-                if (max_ := np.max(val)) > 1.0:
+                if (max_ := val.max()) > 1.0:
                     raise ValueError(f"There is a value of {max_} inside the image. "
                                      "Make sure all image data is in the range [0, 1].")
 

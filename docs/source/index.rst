@@ -35,7 +35,7 @@ make it a viable tool for research applications.
  * Includes preset and user-definable surface shapes, ray sources, and media
  * An additional GUI with an interactive 3D scene viewer
  * Automation capabilities
- * High performance of 0.11 s / surface / million rays (:ref:`details <benchmarking>`)
+ * High performance of 85 ms / surface / million rays (:ref:`details <benchmarking>`)
  * Comprehensive documentation
 
 **Limitations**

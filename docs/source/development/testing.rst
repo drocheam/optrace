@@ -94,8 +94,10 @@ one outline surface of the bounding box). Detectors are excluded as they don't i
 image rendering is executed.
 Turning off the polarization calculation (with :attr:`Raytracer.no_pol <optrace.tracer.raytracer.Raytracer.no_pol>`)
 leads to a significant speedup.
+The number of used threads is controlled by setting an environment variable
+as described in section :numref:`number_of_thread_specification`.
 
-The raytracing on my system (Arch Linux 6.13, i7-1360P notebook CPU, 16GB RAM, Python 3.13) results in:
+The raytracing on my system (Arch Linux 6.15.8, i7-1360P notebook CPU, 16GB RAM, Python 3.13) results in:
 
 .. table:: Performance Comparison. Result values are in seconds / surface / million rays.
    :widths: 60 110 110
@@ -104,18 +106,22 @@ The raytracing on my system (Arch Linux 6.13, i7-1360P notebook CPU, 16GB RAM, P
    +-------+----------------------+---------------------+
    | Cores | Without Polarization | With Polarization   |
    +=======+======================+=====================+
-   |   1   |        0.262         |        0.417        |
+   |   1   |        0.148         |        0.218        |
    +-------+----------------------+---------------------+
-   |   2   |        0.122         |        0.171        |
+   |   2   |        0.082         |        0.115        |
    +-------+----------------------+---------------------+
-   |   4   |        0.069         |        0.125        |
+   |   4   |        0.053         |        0.085        |
    +-------+----------------------+---------------------+
-   |   8   |        0.059         |        0.108        |
+   |   8   |        0.045         |        0.082        |
    +-------+----------------------+---------------------+
-   |  16   |        0.057         |        0.101        |
+   |  12   |        0.043         |        0.078        |
+   +-------+----------------------+---------------------+
+   |  16   |        0.046         |        0.073        |
    +-------+----------------------+---------------------+
 
-So there is not much gain in using 16 over 8 cores.
+Performance plateaus at 8-16 cores for the "without polarization" case, but still seems to improve for the second case.
+Reasons could be thermal throttling or other bottlenecks.
+On my machine, 8 cores could be a compromise between CPU usage and performance.
 
 Documentation Testing
 __________________________________

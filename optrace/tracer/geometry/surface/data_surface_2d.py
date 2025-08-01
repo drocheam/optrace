@@ -82,7 +82,7 @@ class DataSurface2D(Surface):
             self.z_min, self.z_max = np.min(zn), np.max(zn)
 
             # range of input data, not to be confused with height of interpolated data
-            z_range0 = np.max(Z) - np.min(Z)
+            z_range0 = np.ptp(Z)
 
         else:
             if Z.ndim != 2:

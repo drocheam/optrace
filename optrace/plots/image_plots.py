@@ -1,18 +1,17 @@
 
-import matplotlib  # plotting library
-import matplotlib.pyplot as plt  # actual plotting
-
-import numpy as np  # calculations
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 
 from .misc_plots import _show_grid, _save_or_show
 
 from ..tracer.image import RGBImage, ScalarImage, GrayscaleImage
-from ..property_checker import PropertyChecker as pc  # check types and values
+from ..property_checker import PropertyChecker as pc
 from ..tracer import color
 from .. import global_options
 
 
-def image_plot(im: ScalarImage | GrayscaleImage | RGBImage,
+def image_plot(im:       ScalarImage | GrayscaleImage | RGBImage,
                log:      bool = False,
                flip:     bool = False,
                title:    str = None,
@@ -20,8 +19,9 @@ def image_plot(im: ScalarImage | GrayscaleImage | RGBImage,
                sargs:    dict = {})\
         -> None:
     """
+    Display a ScalarImage, GrayscaleImage or RGBImage.
 
-    :param im: Image to plot
+    :param im: image to plot
     :param flip: if the image should be flipped
     :param log: if logarithmic values are shown
     :param title: title of the plot
@@ -39,8 +39,7 @@ def image_plot(im: ScalarImage | GrayscaleImage | RGBImage,
     _, _, xlabel, _, _, ylabel, _, _, zlabel, text = _get_labels(im, im.quantity, log)
 
     if im.projection not in ["Equal-Area", None] and im.quantity in ["Irradiance", "Illuminance"]:
-        imax = np.max(Imd)
-        if imax:
+        if imax := np.max(Imd):
             Imd /= imax
 
     if title is not None:
@@ -106,15 +105,17 @@ def image_plot(im: ScalarImage | GrayscaleImage | RGBImage,
     _save_or_show(path, sargs)
 
 
-def image_profile_plot(im: RGBImage | ScalarImage | GrayscaleImage,
-                       log:      bool = False,
-                       flip:     bool = False,
-                       title:    str = None,
-                       path:     str = None,
-                       sargs:    dict = {},
+def image_profile_plot(im:          RGBImage | ScalarImage | GrayscaleImage,
+                       log:         bool = False,
+                       flip:        bool = False,
+                       title:       str = None,
+                       path:        str = None,
+                       sargs:       dict = {},
                        **kwargs)\
         -> None:
     """
+    Display a profile of a a ScalarImage, GrayscaleImage or RGBImage.
+    Slicing through x and y are supported, see the profile method of the image classes.
 
     :param im: Image to plot
     :param log: if logarithmic values are shown
@@ -123,7 +124,7 @@ def image_profile_plot(im: RGBImage | ScalarImage | GrayscaleImage,
     :param path: if provided, the plot is saved at this location instead of displaying a plot. 
                  Specify a path with file ending.
     :param sargs: option dictionary for pyplot.savefig
-    :param kwargs: additional keyword arguments for Image.profile
+    :param kwargs: keyword arguments for Image.profile, including the slicing parameters
     """
     _check_types(im, log, flip, title)
     
@@ -141,11 +142,10 @@ def image_profile_plot(im: RGBImage | ScalarImage | GrayscaleImage,
     # normalize values for sphere projections that are not Equal-Area
     # (since the values are incorrect anyway)
     if im.projection not in ["Equal-Area", None] and im.quantity in ["Irradiance", "Illuminance"]:
-        imax = np.max(Imd)
-        if imax:
+        if imax := np.max(Imd):
             Imd /= imax
 
-    # overwrite title if provided
+    # overwrite title if user provided
     if title is not None:
         text = title
 
@@ -194,7 +194,7 @@ def image_profile_plot(im: RGBImage | ScalarImage | GrayscaleImage,
     _save_or_show(path, sargs)
 
 
-def _check_types(im, log, flip, title) -> None:
+def _check_types(im: np.ndarray, log: bool, flip: bool, title: str) -> None:
     """check types for r_image plots"""
     pc.check_type("im", im, ScalarImage | RGBImage | GrayscaleImage)
     pc.check_type("flip", flip, bool)
@@ -202,7 +202,7 @@ def _check_types(im, log, flip, title) -> None:
     pc.check_type("title", title, str | None)
 
 
-def _get_labels(im: RGBImage | ScalarImage | GrayscaleImage,
+def _get_labels(im:             RGBImage | ScalarImage | GrayscaleImage,
                 mode:           str,
                 log:            bool,
                 cut_pos_dim:    str = None,

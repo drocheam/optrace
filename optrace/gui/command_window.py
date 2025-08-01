@@ -3,17 +3,16 @@ from typing import Any
 
 from traitsui.api import View, Item, ValueEditor, Group, CodeEditor, ListStrEditor, CheckListEditor, HSplit
 from traits.api import HasTraits, observe, Button, Dict, Str, List, Enum
-from pyface.qt import QtGui  # copying to clipboard 
+from pyface.qt import QtGui
 from traits.observation.api import TraitChangeEvent
 
 from ..warnings import warning
 
 
-
 class CommandWindow(HasTraits):
 
-    cmd:                 Str = Str()  #: command to run
-    history:             List = List()  #: command history
+    cmd:                  Str = Str()  #: command to run
+    history:              List = List()  #: command history
 
     _execute_label:       Str = Str('Command:')
     _history_label:       Str = Str('History:')

@@ -118,16 +118,12 @@ def luv_to_u_v_l(luv: np.ndarray) -> np.ndarray:
     :return: u'v'L image, same shape as input
     """
     _, un, vn = WP_D65_LUV
+
     mi = luv[:, :, 0] > 0
 
-    u_v_L = np.zeros_like(luv)
-    u_v_L[:, :, 0] = un
-    u_v_L[:, :, 1] = vn
+    u_v_L = np.tile([un, vn, 0], (*luv.shape[:2], 1))
+    u_v_L[mi, :2] += 1/13 * luv[mi, 1:3] / luv[mi, 0, np.newaxis] 
     u_v_L[:, :, 2] = luv[:, :, 0]
-
-    Lm, um, vm = luv[mi, 0], luv[mi, 1], luv[mi, 2]
-    u_v_L[mi, 0] += 1/13 * um / Lm
-    u_v_L[mi, 1] += 1/13 * vm / Lm
 
     return u_v_L
 

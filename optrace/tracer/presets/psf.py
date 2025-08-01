@@ -110,7 +110,7 @@ def glare(sig1: float = 0.5, sig2: float = 3.0, a: float = 0.15) -> GrayscaleIma
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R2 = X**2 + Y**2
     Z = a*np.exp(-R2 / 2 / sig2**2) + (1-a)*np.exp(-R2 / 2 / sig1**2)
-    Z /= np.max(Z)
+    Z /= Z.max()
     Z = srgb_linear_to_srgb(Z)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d
@@ -140,7 +140,7 @@ def halo(sig1: float = 0.5, sig2: float = 0.25, r: float = 4.0, a: float = 0.3) 
     Y, X = np.mgrid[-ds:ds:sz*1j, -ds:ds:sz*1j]
     R = np.sqrt(X**2 + Y**2)
     Z = np.exp(-R**2 / 2 / sig1**2) + a*np.exp(-(R - r)**2 / 2 / sig2**2)
-    Z /= np.max(Z)
+    Z /= Z.max()
     Z = srgb_linear_to_srgb(Z)
 
     s = [2*ds/1000, 2*ds/1000]  # scale size with d

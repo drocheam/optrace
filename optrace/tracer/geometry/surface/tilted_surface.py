@@ -88,12 +88,14 @@ class TiltedSurface(Surface):
 
         return n
 
-    def find_hit(self, p: np.ndarray, s: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def find_hit(self, p: np.ndarray, s: np.ndarray, where: slice | np.ndarray = None)\
+            -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Find hit/intersections of rays with this surface.
 
         :param p: ray position array, shape (N, 3)
         :param s: unity ray direction vectors, shape (N, 3)
+        :param where: (optional) mask for input arrays, can be a slice or array
         :return: intersection position (shape (N, 3)), boolean array (shape N) declaring a hit,
                  indices of ill-conditioned rays
         """
@@ -112,12 +114,13 @@ class TiltedSurface(Surface):
 
         # edge is continued in radial direction -> find iteratively for non-hitting rays
         if np.any(~is_hit):
-            p_hit[~is_hit], is_hit[~is_hit], ill[~is_hit] = super().find_hit(p[~is_hit], s[~is_hit])
+            p_hit[~is_hit], is_hit[~is_hit], ill[~is_hit] = super().find_hit(p, s, where=~is_hit)
 
         # handle rays that start behind surface or inside its extent 
         self._find_hit_handle_abnormal(p, s, p_hit, is_hit)
 
-        return p_hit, is_hit, ill
+        where_ = where if where is not None else slice(None)
+        return p_hit[where_], is_hit[where_], ill[where_]
 
     def flip(self) -> None:
         """flip the surface around the x-axis"""

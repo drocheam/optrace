@@ -87,7 +87,7 @@ class FunctionSurface2D(Surface):
             rn = np.linspace(0, self.r, 10000)
             zn = self._values(rn, np.zeros_like(rn))
             mn = self.mask(rn, np.zeros_like(rn))
-            self.z_min, self.z_max = np.min(zn[mn]), np.max(zn[mn])
+            self.z_min, self.z_max = zn[mn].min(), zn[mn].max()
 
         else:
             self.z_min, self.z_max = self._find_bounds()
