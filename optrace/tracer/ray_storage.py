@@ -74,18 +74,20 @@ class RayStorage(BaseClass):
         self.B_list = np.concatenate(([0], np.cumsum(self.N_list))).astype(int)
         self.ray_source_list = ray_source_list
 
-        # save some storage space if we need the space only for nans when self.no_pol = True
-        pol_dtype = np.float32 if not self.no_pol else np.float16
-
         # weights, polarization and wavelengths don't need double precision, this way we save some RAM
         # fortran order='F' speeds things up around 20% in our application
         # positions and direction must have higher precision, the same as n, as optical lengths are calculated from it
         self.p_list = np.zeros((N, nt, 3), dtype=np.float64, order='F')
         self.s0_list = np.zeros((N, 3), dtype=np.float64, order='F')
-        self.pol_list = np.zeros((N, nt, 3), dtype=pol_dtype, order='F')
         self.w_list = np.zeros((N, nt), dtype=np.float32, order='F')
         self.n_list = np.zeros((N, nt), dtype=np.float64, order='F')
         self.wl_list = np.zeros(N, dtype=np.float32)
+       
+        # don't allocate an array when no_pol is on
+        if self.no_pol:
+            self.pol_list = np.broadcast_to(np.nan, self.p_list.shape)
+        else:
+            self.pol_list = np.zeros((N, nt, 3), dtype=np.float32, order='F')
 
     @staticmethod
     def storage_size(N: int, nt: int, no_pol: bool) -> int:
@@ -98,8 +100,8 @@ class RayStorage(BaseClass):
         :return: approximate size in bytes
         """
         f16, f32, f64 = 2, 4, 8
-        fpol = f32 if not no_pol else f16
-        return N*nt*3*f64 + N*3*f64 + N*nt*3*fpol + N*nt*f32 + N*nt*f64 + N*f32
+        fpol = f32*N*nt*3 if not no_pol else f64
+        return N*nt*3*f64 + N*3*f64 + fpol + N*nt*f32 + N*nt*f64 + N*f32
 
     @property
     def N(self) -> int:
@@ -139,8 +141,11 @@ class RayStorage(BaseClass):
 
             power = (Nei - Nsi) / self.N_list[i] * self.ray_source_list[i].power
 
-            self.p_list[sl1, 0], self.s0_list[sl1], self.pol_list[sl1, 0], self.w_list[sl1, 0], self.wl_list[sl1]\
+            self.p_list[sl1, 0], self.s0_list[sl1], pols, self.w_list[sl1, 0], self.wl_list[sl1]\
                 = self.ray_source_list[i].create_rays(Nei - Nsi, no_pol=self.no_pol, power=power)
+
+            if not self.no_pol:
+                self.pol_list[sl1, 0] = pols
 
             i += 1
 

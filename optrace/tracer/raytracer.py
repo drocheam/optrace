@@ -27,7 +27,7 @@ from ..property_checker import PropertyChecker as pc  # check types and values
 class Raytracer(Group):
 
     N_EPS: float = 1e-11
-    """ numerical epsilon. Used for floating number comparisions in some places or adding small differences """
+    """ numerical epsilon. Used for floating number comparisons in some places or adding small differences """
 
     HURB_FACTOR: float = 2**0.5
     """HURB uncertainty factor. Scales the tangent uncertainty expression. Original sources use 1, 
@@ -305,8 +305,10 @@ class Raytracer(Group):
 
             for en, element in enumerate(elements):
 
-                p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
+                p[:, i+1], weights[:, i+1] = p[:, i], weights[:, i]
                 hw = weights[:, i] > 0
+                if not self.no_pol:
+                    pols[:, i+1] = pols[:, i]
 
                 if isinstance(element, Lens):
 
@@ -336,8 +338,10 @@ class Raytracer(Group):
 
                         i += 1
                         bar.update(N_t == 0)
-                        p[:, i+1], pols[:, i+1], weights[:, i+1] = p[:, i], pols[:, i], weights[:, i]
+                        p[:, i+1], weights[:, i+1] = p[:, i], weights[:, i]
                         ns[:, i], ns[:, i+1] = n_l, n2_l
+                        if not self.no_pol:
+                            pols[:, i+1] = pols[:, i]
 
                         hw = weights[:, i] > 0
                         p[hw, i+1], hit_back, ill = element.back.find_hit(p[:, i], s, where=hw)
@@ -810,9 +814,9 @@ class Raytracer(Group):
         n2_cos_beta = n2*cos_beta
         ts = 2 * n1_cos_alpha / (n1_cos_alpha + n2_cos_beta)
         tp = 2 * n1_cos_alpha / (n2*cos_alpha + n1*cos_beta)
-        T = n2_cos_beta / (n1_cos_alpha) * ((A_ts*ts)**2 + (A_tp*tp)**2)
+        T = n2_cos_beta / n1_cos_alpha * ((A_ts*ts)**2 + (A_tp*tp)**2)
         T = T[hwh]
-
+        
         # handle rays with total internal reflection
         TIR = ~np.isfinite(W[hwh])
         if np.any(TIR):
@@ -1381,8 +1385,13 @@ class Raytracer(Group):
         N_px = 100*int(1 + np.sqrt(w.shape[0])/1000)
         N_px = N_px if N_px % 2 else N_px + 1  # enforce odd number
     
-        # render power image
-        Im, x_bin, y_bin = np.histogram2d(x, y, weights=w, bins=[N_px, N_px])
+        # calculate image bin positions
+        ext = ph[:, 0].min(), ph[:, 0].max(), ph[:, 1].min(), ph[:, 1].max()
+        xi, yi, wm = misc.binning_indices_2d(ph[:, 0], ph[:, 1], w, N_px, N_px, ext)
+          
+        # render image
+        Im = np.zeros((N_px, N_px))
+        np.add.at(Im, (yi, xi), wm)
 
         if mode in ["Image Sharpness", "Image Center Sharpness"]:
 
@@ -1396,7 +1405,7 @@ class Raytracer(Group):
             if (Im0s := Im0.sum()):
                 Im0 /= Im0s
 
-            Im = np.abs(np.fft.fft2(Im0))
+            Im = np.abs(np.fft.fft2(np.fft.ifftshift(Im0)))
             Im = np.fft.fftshift(Im)
 
             rsm = np.mean(R2*Im)
@@ -1404,7 +1413,7 @@ class Raytracer(Group):
 
         else:  # Irradiance Variance
             Im = Im[Im > 0]  # exclude empty pixels
-            Ap = (x_bin[1] - x_bin[0]) * (y_bin[1] - y_bin[0])  # pixel area
+            Ap = (ext[1] - ext[0]) * (ext[3] - ext[2]) / N_px**2  # pixel area
             Imstd = np.std(Im)
             return np.sqrt(Ap/Imstd) if Imstd else 1  # sqrt for better value range
               

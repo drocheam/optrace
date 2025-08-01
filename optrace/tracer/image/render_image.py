@@ -388,33 +388,35 @@ class RenderImage(BaseClass):
         Ny = Nrs if self.s[0] > self.s[1] else Nrs*nf(self.s[1]/self.s[0]) 
 
         # init image
-        # x in first, y in second since np.histogram2d needs it that way
-        self._data = np.zeros((Nx, Ny, 4), dtype=np.float64)
+        self._data = np.zeros((Ny, Nx, 4), dtype=np.float64)
 
         if p is not None and p.shape[0]:
 
-            # threading function
-            def func(img, ind):
-               
-                tri = [color.x_observer, color.y_observer, color.z_observer]
-                w_ = tri[ind](wl) * w if ind < 3 else w
-
-                img[:, :, ind], _, _ = np.histogram2d(p[:, 0], p[:, 1], weights=w_, bins=[Nx, Ny], 
-                                                      range=self.extent.reshape((2, 2)))
-
+            # calculate x and y pixel indices
+            xi, yi, wm = misc.binning_indices_2d(p[:, 0], p[:, 1], w, Nx, Ny, self.extent)
+            
             # multithreading
-            if global_options.multithreading and misc.cpu_count() > 3: 
+            if global_options.multithreading and misc.cpu_count() > 3 and p.shape[0] > 10000: 
+            
+                def threaded(img, ind):
+                    tri = [color.x_observer, color.y_observer, color.z_observer]
+                    w_ = tri[ind](wl) * wm if ind < 3 else wm
+                    np.add.at(img[:, :, ind], (yi, xi), w_)
 
-                threads = [Thread(target=func, args=(self._data, i)) for i in np.arange(4)]
+                threads = [Thread(target=threaded, args=(self._data, i)) for i in np.arange(4)]
                 [thread.start() for thread in threads]
                 [thread.join() for thread in threads]
 
             # no multithreading
             else:
-                [func(self._data, i) for i in np.arange(4)]
+                xyzw = np.ones((p.shape[0], 4), order="F", dtype=np.float64)
+                xyzw[:, 0] = color.x_observer(wl)
+                xyzw[:, 1] = color.y_observer(wl)
+                xyzw[:, 2] = color.z_observer(wl)
+                xyzw *= wm[:, np.newaxis]
 
-        # transpose since histogram2d returns x in first dimension, y in second
-        self._data = np.transpose(self._data, (1, 0, 2))
+                # render image fro positions and XYZW array
+                np.add.at(self._data, (yi, xi), xyzw)
 
         if not _dont_filter and self._limit is not None:
             self._apply_rayleigh_filter()  # apply resolution filter

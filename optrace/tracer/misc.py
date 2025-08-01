@@ -11,7 +11,7 @@ def cpu_count() -> int:
     """
     Number of logical cpu cores assigned to this process (Python >= 3.13)
     Number of logical cpu cores (Python < 3.13)
-    Can be overriden by setting the PYTHON_CPU_COUNT environment variable or running python -X cpucores
+    Can be overridden by setting the PYTHON_CPU_COUNT environment variable or running python -X cpucores
     Setting by PYTHON_CPU_COUNT must be between 1-64.
 
     :return: cpu count
@@ -57,6 +57,41 @@ def timer(func: Callable) -> Any:
     return _time_it
 
 
+def binning_indices_2d(x: np.ndarray, y: np.ndarray, w: np.ndarray, Nx: int, Ny: int, extent: list)\
+        -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Calculate x and y bin indices for a 2D histogram from provided positions x, y.
+    Positions outside the extent are set to indices (0, 0) and their weight is set to zero in result wm.
+    Binning includes all edges.
+
+    :param x: x position array
+    :param y: y position array
+    :param w: weight array
+    :param Nx: number of x pixels
+    :param Ny: number of y pixels
+    :param extent: image position extent as list [x0, x1, y0, y1]
+    :return: y bin indices, x bin indices, weight array with values at invalid position indices set to zero
+    """
+    # extent side lengths
+    s = extent[1] - extent[0], extent[3] - extent[2]
+
+    # calculate relative pixel positions
+    xi = np.floor(Nx / s[0] * (x - extent[0])).astype(np.int32)
+    yi = np.floor(Ny / s[1] * (y - extent[2])).astype(np.int32)
+
+    # include positive edge values
+    yi[y == extent[3]] = Ny - 1
+    xi[x == extent[1]] = Nx - 1
+
+    # set weights of outside rays to zero and their position to (0, 0)
+    outside = (xi < 0) | (yi < 0) | (yi >= Ny) | (xi >= Nx)
+    wm = np.where(outside, 0, w)
+    yi[outside] = 0
+    xi[outside] = 0
+
+    return xi, yi, wm
+
+
 def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     row wise scalar product for two or three dimension.
@@ -82,6 +117,7 @@ def rdot(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     else:
         raise RuntimeError("Invalid number of dimensions.")
 
+
 def masked_assign(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     """
     set True values of bool mask cond1 to values of cond2, returns resulting mask
@@ -96,6 +132,7 @@ def masked_assign(cond1: np.ndarray, cond2: np.ndarray) -> np.ndarray:
     wc = np.zeros_like(cond1)
     wc[cond1] = cond2
     return wc
+
 
 def normalize(a: np.ndarray) -> np.ndarray:
     """
@@ -112,6 +149,7 @@ def normalize(a: np.ndarray) -> np.ndarray:
     """
     with np.errstate(invalid="ignore"):  # we use nan as zero division indicator, suppress warnings
         return a / np.sqrt(a[:, 0]**2 + a[:, 1]**2 + a[:, 2]**2)[:, np.newaxis]
+
 
 def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """

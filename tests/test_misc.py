@@ -134,6 +134,38 @@ class TracerMiscTests(unittest.TestCase):
         # call explicitly as coverage does not seem to catch the execution of this function
         ot.warnings.simplified_warning("abcdefj nm ", None, None, None)
 
+    def test_hist2_bin_coords(self):
+        """check mapping of binning_indices_2d image edge values and masking of powers"""
+
+        # test that edge values lie inside the image
+
+        ext = np.array([-1.5, 1.2, 3, 5])
+        x0 = np.linspace(ext[0], ext[1], 100)
+        y0 = np.linspace(ext[2], ext[3], 100)
+        X, Y = np.meshgrid(x0, y0)
+        x, y = X.ravel(), Y.ravel()
+
+        w = np.ones_like(x)
+        nx, ny = 50, 501
+
+        xc, yc, wm = misc.binning_indices_2d(x, y, w, nx, ny, ext)
+
+        assert x[0] == ext[0] and x[-1] == ext[1] and y[0] == ext[2] and y[-1] == ext[3]
+        self.assertEqual(np.sum(w), np.sum(wm))
+        
+        # test that outside values are correctly mapped
+
+        ext2 = 0.93*np.array(ext)
+        xc, yc, wm = misc.binning_indices_2d(x, y, w, nx, ny, ext2)
+
+        self.assertTrue(np.all(xc >= 0))
+        self.assertTrue(np.all(yc >= 0))
+        self.assertTrue(np.all(xc < nx))
+        self.assertTrue(np.all(yc < ny))
+
+        mask = (x >= ext2[0]) & (x <= ext2[1]) & (y >= ext2[2]) & (y <= ext2[3])
+        self.assertEqual(np.sum(w[mask]), np.sum(wm))
+
     @pytest.mark.os
     def test_ray_storage(self):
 
@@ -152,9 +184,10 @@ class TracerMiscTests(unittest.TestCase):
                     RS.init([RS_], N, nt, pol)
 
                     calculated = RayStorage.storage_size(RS.N, RS.Nt, RS.no_pol)
-                    measured = RS.p_list.nbytes + RS.s0_list.nbytes + RS.pol_list.nbytes +\
+                    measured = RS.p_list.nbytes + RS.s0_list.nbytes + \
                         RS.w_list.nbytes + RS.n_list.nbytes + RS.wl_list.nbytes
-                    
+                    measured += RS.pol_list.base.nbytes if RS.pol_list.base is not None else RS.pol_list.nbytes
+
                     self.assertEqual(measured, calculated)
         
         # actual tests are done with tracing in tracer test file

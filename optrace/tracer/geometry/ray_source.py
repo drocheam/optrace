@@ -357,7 +357,7 @@ class RaySource(Element):
         ################################################################################################################
 
         if no_pol:
-            pols = np.full_like(p, np.nan, np.float16, order='F')
+            pols = np.broadcast_to(np.nan, p.shape)
 
         else:
             match self.polarization:
@@ -410,26 +410,28 @@ class RaySource(Element):
             # A_tp = pp * pol
             # pol_ = A_ts*ps + A_tp*pp_
 
+            # rays not parallel to z-axis
             mask = s[:, 2] != 1
-            sm = s[mask]
+                
             pols = np.zeros_like(s, dtype=np.float64, order='F')
-
-            # sqrt(s0**2 + s1**2) equals sqrt(1-s2**2) for a unity vector
-            fa = 1 / np.sqrt(1 - sm[:, 2]**2)
-            ps = np.zeros_like(sm, dtype=np.float64, order='F')
-            ps[:, 0] = sm[:, 1] * fa
-            ps[:, 1] = -sm[:, 0] * fa
-
             pols[:, 0] = np.cos(ang)
             pols[:, 1] = np.sin(ang)
 
-            ps0, ps1 = ps[:, 0], ps[:, 1]
-            pol0m, pol1m = pols[mask, 0], pols[mask, 1]
-            A_ts = ps0*pol0m + ps1*pol1m
-            A_tp = ps1*pol0m - ps0*pol1m
+            if np.any(mask):
 
-            pp_ = misc.cross(ps, sm)
-            pols[mask] = ps*A_ts[:, np.newaxis] + pp_*A_tp[:, np.newaxis]
+                # sqrt(s0**2 + s1**2) equals sqrt(1-s2**2) for a unity vector
+                # don't mask out sz = 1, as masking is more expensive than correcting afterwards
+                with np.errstate(divide="ignore"):
+                    fa = 1 / np.sqrt(1 - s[:, 2]**2)
+                ps = np.zeros_like(s, dtype=np.float64, order='F')
+                ps[:, 0] = s[:, 1] * fa
+                ps[:, 1] = -s[:, 0] * fa
+
+                A_ts = ps[:, 0]*pols[:, 0] + ps[:, 1]*pols[:, 1]
+                A_tp = ps[:, 1]*pols[:, 0] - ps[:, 0]*pols[:, 1]
+
+                pp_ = misc.cross(ps, s)
+                pols[mask] = (ps*A_ts[:, np.newaxis] + pp_*A_tp[:, np.newaxis])[mask]
 
         ## return ray properties
         ################################################################################################################
