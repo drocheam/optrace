@@ -960,31 +960,6 @@ class TracerTests(unittest.TestCase):
         RT.trace(N)
         self.assertEqual(RT._msgs[RT.INFOS.TIR, 0], N)
    
-    def test_t_th(self):
-        """
-        to avoid ghost rays, small transmission factors are set to 0
-        """
-
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50])
-
-        RSS = ot.CircularSurface(r=2)
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Constant"), divergence="None",
-                          pos=[0, 0, -3])
-        RT.add(RS)
-
-        surf1 = ot.CircularSurface(r=10)
-        surf2 = ot.CircularSurface(r=10)
-        F = ot.Filter(surf1, pos=[0, 0, 0], spectrum=ot.TransmissionSpectrum("Gaussian", mu=750, sig=0.1))
-        RT.add(F)
-
-        RT.trace(10000)
-        self.assertTrue(RT._msgs[RT.INFOS.T_BELOW_TTH, 0] > 0)
-
-        # don't do t_th on a constant spectrum
-        F.spectrum = ot.TransmissionSpectrum("Constant", val=RT.T_TH/2)
-        RT.trace(10000)
-        self.assertFalse(RT._msgs[RT.INFOS.T_BELOW_TTH, 0] > 0)
-    
     def test_outline_intersection(self):
         """
         strongly diverging rays, but tracing geometry is a long corridor

@@ -596,19 +596,6 @@ Calling the filter with a wavelength array returns the transmittance at these wa
    array([0. , 0.5, 0. ])
 
 
-When tracing, the raytracer sets all transmission values below a specific threshold :python:`T_TH` to zero. 
-This is done to avoid ghost rays, that are rays that merely contribute to the light distribution 
-or image but are nonetheless calculated and reduce performance. 
-An example are rays far outside of a normal distribution.
-
-By default the relative threshold value is
-
-.. doctest::
-
-   >>> ot.Raytracer.T_TH
-   1e-05
-
-
 Aperture
 ________________
 

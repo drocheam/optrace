@@ -29,11 +29,6 @@ class Raytracer(Group):
     N_EPS: float = 1e-11
     """ numerical epsilon. Used for floating number comparisions in some places or adding small differences """
 
-    T_TH: float = 1e-5
-    """ threshold for the transmission Filter
-    values below this are handled as absorbed
-    needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power"""
-
     HURB_FACTOR: float = 2**0.5
     """HURB uncertainty factor. Scales the tangent uncertainty expression. Original sources use 1, 
     but sqrt(2) matches the envelope better. See the documentation for details."""
@@ -47,10 +42,9 @@ class Raytracer(Group):
     class INFOS(IntEnum):
         ABSORB_MISSING = 0
         TIR = 1
-        T_BELOW_TTH = 2
-        ILL_COND = 3
-        OUTLINE_INTERSECTION = 4
-        HURB_NEG_DIR = 5
+        ILL_COND = 2
+        OUTLINE_INTERSECTION = 3
+        HURB_NEG_DIR = 4
     """enum for info messages in raytracing"""
 
     focus_search_methods: list[str, str, str] = ['RMS Spot Size', 'Irradiance Variance',
@@ -152,7 +146,7 @@ class Raytracer(Group):
         """
         return dict(Rays=self.rays.crepr(),
                     Ambient=[tuple(self.outline), self.n0.crepr()],
-                    TraceSettings=[self.no_pol, self.use_hurb, self.T_TH, self.HURB_FACTOR],
+                    TraceSettings=[self.no_pol, self.use_hurb, self.HURB_FACTOR],
                     Lenses=[D.crepr() for D in self.lenses],
                     Filters=[D.crepr() for D in self.filters],
                     Apertures=[D.crepr() for D in self.apertures],
@@ -231,11 +225,6 @@ class Raytracer(Group):
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
                                     f"missing lens surface {surf} ({surf_name[surf]}), set to absorbed")
 
-                        case self.INFOS.T_BELOW_TTH:
-                            warning(f"{count} rays ({100*count/N:.3g}% of all rays) "
-                                    f"with transmittivity at filter surface {surf}  ({surf_name[surf]}) below threshold"
-                                    f" of {self.T_TH*100:.3g}%, setting to absorbed.")
-                        
                         case self.INFOS.ILL_COND:
                             warning(f"{count} rays ({100*count/N:.3g}% of all rays) are ill-conditioned for "
                                     f"numerical hit finding at surface {surf} ({surf_name[surf]}). "
@@ -383,7 +372,7 @@ class Raytracer(Group):
                     hwnh = misc.masked_assign(hw, ~hit)  # rays having power and not hitting filter
 
                     if isinstance(element, Filter):
-                        self.__filter(element, weights, wavelengths, hwh, i, msg)
+                        weights[hwh, i+1] = weights[hwh, i]*element(wavelengths[hwh])
                     else:
                         weights[hwh, i+1] = 0
 
@@ -420,7 +409,6 @@ class Raytracer(Group):
         # store settings for this trace
         self._last_trace_snapshot = self.tracing_snapshot()
                         
-
     def __hurb(self, 
                p:       np.ndarray, 
                s:       np.ndarray, 
@@ -884,43 +872,6 @@ class Raytracer(Group):
 
         # return amplitude components
         return A_ts, A_tp
-
-    def __filter(self,
-                 filter_:     Filter,
-                 weights:     np.ndarray,
-                 wl:          np.ndarray,
-                 hwh:         np.ndarray,
-                 i:           int,
-                 msg:         np.ndarray)\
-            -> None:
-        """
-        Get ray weights from positions on Filter and wavelengths.
-
-        :param filter_: Filter object
-        :param weights: ray weights
-        :param wl: wavelength array (numpy 1D array)
-        :param hwh: boolean array for rays having a weight and hitting the filter
-        :param i: surface number
-        :param msg: message array
-        """
-
-        if not np.any(hwh):
-            return
-
-        T = filter_(wl[hwh])
-
-        # set transmittivity below a threshold to zero
-        # useful when filter function is e.g. a gauss function
-        # needed to avoid ghost rays, meaning rays that have a non-zero, but negligible power
-        mask = (0 < T) & (T < self.T_TH)
-
-        # only do absorbing due to T_TH if spectrum is not constant or rectangular
-        if np.any(mask) and filter_.spectrum.spectrum_type != "Constant":
-            T[mask] = 0
-            m_count = np.count_nonzero(mask)
-            msg[self.INFOS.T_BELOW_TTH, i] += m_count
-
-        weights[hwh, i+1] = weights[hwh, i]*T
 
     def _hit_detector(self,
                       info:              str,

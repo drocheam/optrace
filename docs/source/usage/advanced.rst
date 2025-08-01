@@ -31,9 +31,6 @@ Internally these are characterized by flags, which can be found below:
    * - :obj:`Raytracer.INFOS.TIR <optrace.tracer.raytracer.Raytracer.INFOS.TIR>`
      - Total inner reflection. Reflections are not simulated, so the ray is treated as being absorbed at the surface intersection
 
-   * - :obj:`Raytracer.INFOS.T_BELOW_TTH  <optrace.tracer.raytracer.Raytracer.INFOS.T_BELOW_TTH>`
-     - A filter transmittivity is below the :attr:`T_TH <optrace.tracer.raytracer.Raytracer.T_TH>` threshold of the raytracer and the ray is therefore absorbed. Avoids 'ghost rays' that need to be traced, but don't contribute to an image.
-
    * - :obj:`Raytracer.INFOS.ILL_COND <optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND>`
      -  Ill-conditioned rays for hit finding of a numerical, custom surface. In almost all cases the intersection will be wrong. This can happen if the surface is badly defined numerically or geometrically, there are surface collisions or a ray hits the surface multiple times. Please check the geometry of the raytracer and the surface definition.
 

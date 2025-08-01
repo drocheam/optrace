@@ -54,6 +54,7 @@ class LightSpectrum(Spectrum):
         # init light spectrum
         spec = LightSpectrum("Histogram", **kwargs)
 
+        # can't use an automatic bin count estimation method for np.histogram as data is weighted
         # set bins to at least 51, scale using sqrt(N) above that (since mean SNR grows with sqrt(N))
         # make sure it is an odd int, so we have a bin for the range center
         N = max(51, np.sqrt(np.count_nonzero(w))/2)
@@ -72,7 +73,7 @@ class LightSpectrum(Spectrum):
             if np.abs(wl0 - wl1) < 1:
                 wl0, wl1 = max(wl0-1, go.wavelength_range[0]), min(wl0+1, go.wavelength_range[1])
 
-            spec._vals, spec._wls = np.histogram(wl, bins=N, weights=w, range=[wl0, wl1]) # TODO use built-in method from np.histogram_bin_edges
+            spec._vals, spec._wls = np.histogram(wl, bins=N, weights=w, range=[wl0, wl1])
             spec._vals /= (spec._wls[1] - spec._wls[0])  # scale by delta lambda for W/nm
 
         return spec
