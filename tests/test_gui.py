@@ -400,7 +400,7 @@ class GUITests(unittest.TestCase):
                 # try setting many rays
                 rc0 = sim.ray_count
                 self._set_in_main(sim, "ray_count", 50000000-1)
-                self._wait_for_idle(sim)
+                self._wait_for_idle(sim, base=0.5)
                 self.assertEqual(rc0, sim.ray_count)
 
         RT = tracing_geometry()

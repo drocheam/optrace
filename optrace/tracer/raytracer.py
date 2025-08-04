@@ -2,6 +2,7 @@
 from typing import Any, assert_never
 from threading import Thread  # threading
 from enum import IntEnum  # integer enum
+import concurrent
 
 import numpy as np  # calculations
 import scipy.optimize  # numerical optimization methods
@@ -441,8 +442,9 @@ class Raytracer(Group):
         :param msg: message array
         """
         # get bending angles, axes and mask
-        a_, b_, b, inside = surf.hurb_props(p[:, i+1, 0], p[:, i+1, 1])
-        hwnhi = hwnh & inside 
+        a_, b_, b, inside = surf.hurb_props(p[hwnh, i+1, 0], p[hwnh, i+1, 1])
+        hwnhi = misc.masked_assign(hwnh, inside) 
+        s_ = s[hwnhi]
         # ^-- rays having an power, not hitting the aperture, but inside of inner, ray bending aperture part
       
         # a is just b rotated by 90° in aperture plane
@@ -453,13 +455,13 @@ class Raytracer(Group):
         # a tilted ray sees a projected aperture. The distance to the a-edge is smaller by cos(psi_a),
         # where psi_a = 90 - ang_a, with ang_a being the angle between the ray and the ellipsis axis a
         # scalar product s * a is cos(ang_a), so sin(ang_a) = sqrt(1 - cos^2(ang_a)) is cos(psi_a)
-        cos_psi_a = np.sqrt(1 - misc.rdot(s, a)**2)
-        cos_psi_b = np.sqrt(1 - misc.rdot(s, b)**2)
+        cos_psi_a = np.sqrt(1 - misc.rdot(s_, a)**2)
+        cos_psi_b = np.sqrt(1 - misc.rdot(s_, b)**2)
 
         # # std dev of direction Gaussian
         # # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
         # # additionally, the refractive index, cos-dependency from a above and a custom uncertainty factor were included
-        k = 2*np.pi*ns[:, i] / (wl * 1e-9)
+        k = 2*np.pi*ns[hwnhi, i] / (wl[hwnhi] * 1e-9)
         tan_sig_b = self.HURB_FACTOR / (2*b_*cos_psi_b*1e-3*k)
         tan_sig_a = self.HURB_FACTOR / (2*a_*cos_psi_a*1e-3*k)
 
@@ -470,14 +472,14 @@ class Raytracer(Group):
         # create sa, sb components
         # sa lies in plane containing s and a, but is orthogonal to s and sb
         # sb lies in plane containing s and b, but is orthogonal to s and sa
-        sa = misc.cross(b, s)
+        sa = misc.cross(b, s_)
         sa = misc.normalize(sa)
-        sb = misc.cross(s, sa)
+        sb = misc.cross(s_, sa)
         
         # construct new direction from old one and sb, sa components
-        sab = s + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
+        sab = s_ + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
         s0 = s.copy()
-        s[hwnhi] = misc.normalize(sab)[hwnhi]
+        s[hwnhi] = misc.normalize(sab)
 
         # absorb rays with negative direction after bending
         neg = s[:, 2] < 0
@@ -1380,14 +1382,13 @@ class Raytracer(Group):
 
         # adapt pixel number, so we have less noise for few rays,
         # but can see more image details and information for a larger number of rays
-        # N rays are distributed on a square area,
-        # scale default number by (1 + sqrt(N))
-        N_px = 100*int(1 + np.sqrt(w.shape[0])/1000)
+        # N rays are distributed on a square area, scale default number by (1 + sqrt(N))
+        N_px = 100*int(1 + np.sqrt(w.shape[0])/1500)
         N_px = N_px if N_px % 2 else N_px + 1  # enforce odd number
     
         # calculate image bin positions
-        ext = ph[:, 0].min(), ph[:, 0].max(), ph[:, 1].min(), ph[:, 1].max()
-        xi, yi, wm = misc.binning_indices_2d(ph[:, 0], ph[:, 1], w, N_px, N_px, ext)
+        ext = [x.min(), x.max(), y.min(), y.max()]
+        xi, yi, wm = misc.binning_indices_2d(x, y, w, N_px, N_px, ext)
           
         # render image
         Im = np.zeros((N_px, N_px))
@@ -1395,27 +1396,28 @@ class Raytracer(Group):
 
         if mode in ["Image Sharpness", "Image Center Sharpness"]:
 
-            Y, X = np.mgrid[-1:1:N_px*1j, -1:1:N_px*1j]
-            R2 = X**2 + Y**2
-            R2[R2 > 1] = 1
-            
-            w2 = 1 - R2
-            Im0 = Im*w2**2 if mode == "Image Center Sharpness" else Im
-            
-            if (Im0s := Im0.sum()):
-                Im0 /= Im0s
+            if mode == "Image Center Sharpness":
+                # apply rotational symmetric hanning window to emphasize image center
+                Y, X = np.mgrid[-1:1:N_px*1j, -1:1:N_px*1j]
+                R = np.sqrt(X**2 + Y**2)
+                win = np.where(R > 1, 0, 1 + np.cos(R*np.pi))
+                Im0 = Im*win
+               
+                # more intensity around the center lowers the cost (as the derivative is proportional to the intensity)
+                # normalize the image to lower the impact of these intensity shifts towards the center
+                if (Im0s := Im0.sum()):
+                    Im0 /= Im0s
+            else:
+                Im0 = Im
 
-            Im = np.abs(np.fft.fft2(np.fft.ifftshift(Im0)))
-            Im = np.fft.fftshift(Im)
-
-            rsm = np.mean(R2*Im)
-            return 1/rsm**0.5 if rsm else 1
+            # sum of squared gradients
+            rsm = ((Im0[1:] - Im0[:-1])**2).sum() + ((Im0[:, 1:] - Im0[:, :-1])**2).sum()
+            return -rsm
 
         else:  # Irradiance Variance
             Im = Im[Im > 0]  # exclude empty pixels
             Ap = (ext[1] - ext[0]) * (ext[3] - ext[2]) / N_px**2  # pixel area
-            Imstd = np.std(Im)
-            return np.sqrt(Ap/Imstd) if Imstd else 1  # sqrt for better value range
+            return -np.log(Im.var() / Ap**2)
               
     def __focus_rms_spot_direct_solution(self, pa: np.ndarray, sb: np.ndarray, w: np.ndarray, bounds: tuple)\
             -> scipy.optimize.OptimizeResult:
@@ -1458,6 +1460,7 @@ class Raytracer(Group):
         res.x = d
         res.fun = self.__focus_search_cost_function(d, "RMS Spot Size", pa, sb, w)
         return res
+
 
     def focus_search(self,
                      method:           str,
@@ -1520,10 +1523,10 @@ class Raytracer(Group):
         ################################################################################################################
 
         Nt = 320  # cost function sampling points, good if divisible by 2, 4, 8, 16, 32 threads
+        div = 32  # grouping by
         N_th = misc.cpu_count() if global_options.multithreading else 1
-        steps = int(Nt/32) if return_cost or method in ["Image Sharpness", "Image Center Sharpness"] else 0
-        steps += 3  # progressbars steps
-        bar = ProgressBar("Finding Focus: ", steps)
+        steps = int(Nt/div) if return_cost or method in ["Image Sharpness", "Image Center Sharpness"] else 0
+        bar = ProgressBar("Finding Focus: ", steps+3)
 
         # get rays and properties
         ################################################################################################################
@@ -1573,22 +1576,23 @@ class Raytracer(Group):
             r = random.stratified_interval_sampling(bounds[0], bounds[1], Nt, shuffle=False)
             vals = np.zeros_like(r)
 
-            def threaded(N_th, N_is, Nt, *afargs):
-                Ns = N_is*int(Nt/N_th)
-                Ne = (N_is+1)*int(Nt/N_th) if N_is != N_th-1 else Nt
-                div = int(Nt / (steps - 3) / N_th)
-
-                for i, Ni in enumerate(np.arange(Ns, Ne)):
-                    vals[Ni] = self.__focus_search_cost_function(r[Ni], *afargs)
-                    bar.update(i % div == div-1 and not N_is)
-
             if N_th > 1:
-                threads = [Thread(target=threaded, args=(N_th, N_is, Nt, method, pa, sb, weights))
-                           for N_is in range(N_th)]
-                [th.start() for th in threads]
-                [th.join() for th in threads]
+
+                # distribute workload dynamically to N_th threads
+                with concurrent.futures.ThreadPoolExecutor(max_workers=N_th) as executor:
+                    future_to_res = {executor.submit(self.__focus_search_cost_function, r[Ni], 
+                                                     method, pa, sb, weights): Ni\
+                                     for Ni in np.arange(Nt)}
+                    
+                    for future in concurrent.futures.as_completed(future_to_res):
+                        Ni = future_to_res[future]
+                        vals[Ni] = future.result()
+                        bar.update(Ni % div == 0)
+
             else:
-                threaded(1, 0, Nt, method, pa, sb, weights)
+                for Ni in np.arange(Nt):
+                    vals[Ni] = self.__focus_search_cost_function(r[Ni], method, pa, sb, weights)
+                    bar.update(Ni % div == 0)
        
         # method depending handling
         if method == "RMS Spot Size":

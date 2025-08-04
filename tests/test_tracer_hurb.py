@@ -11,6 +11,7 @@ import optrace.tracer.misc as misc
 from hurb_geometry import *
 from tracing_geometry import tracing_geometry
 
+# TODO coverage tests: not all rays are inside of aperture
 
 # Tests for hurb functionality in Raytracing
 

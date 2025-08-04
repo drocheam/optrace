@@ -476,9 +476,7 @@ class GeometryTests(unittest.TestCase):
 
         def or_func(x, y):
             s = np.column_stack((-x, -y, np.ones_like(x)*5))
-            ab = (s[:, 0]**2 + s[:, 1]**2 + s[:, 2]**2) ** 0.5
-            s /= ab[:, np.newaxis]
-            return s
+            return misc.normalize(s)
 
         # use powers other than default of 1
         # use position other than default of [0, 0, 0]
@@ -493,13 +491,16 @@ class GeometryTests(unittest.TestCase):
 
         # check most RaySource combinations
         # also checks validity of createRays()
-        # the loop also has the nice side effect of checking of all image presets
 
         for Surf in Surfaces:
             for dir_type in ot.RaySource.divergences:
                 for div_2d in [False, True]:
                     for or_type in ot.RaySource.orientations:
                         for pol_type in ot.RaySource.polarizations:
+
+                            # no divergence needs no div option
+                            if dir_type == "None" and div_2d:
+                                continue
 
                             RS = ot.RaySource(Surf, divergence=dir_type, orientation=or_type, div_2d=div_2d,
                                               polarization=pol_type, **rargs)

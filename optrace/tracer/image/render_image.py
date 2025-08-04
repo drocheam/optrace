@@ -358,7 +358,6 @@ class RenderImage(BaseClass):
 
         super().__setattr__(key, val)
 
-
     def render(self,
                p:               np.ndarray = None,
                w:               np.ndarray = None,

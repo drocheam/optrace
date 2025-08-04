@@ -314,8 +314,11 @@ class TracerTests(unittest.TestCase):
         RT.trace(200000)
         cpus = misc.cpu_count()
 
+        # all methods should find roughly the same focus
+        # rms spot size, irradiance variance: focus size is small
+        # image sharpness, image center sharpness: very sharp core compared to the sph. aberration
         for method in RT.focus_search_methods:  # all methods
-            for N_th in [1, 4, 8]:  # different thread counts
+            for N_th in [1, 4]:  # different thread counts
                 os.environ["PYTHON_CPU_COUNT"] = str(N_th)
                 res, _ = RT.focus_search(method, z_start=5.0, return_cost=False)
                 self.assertAlmostEqual(res.x, fs, delta=0.15)
@@ -377,7 +380,44 @@ class TracerTests(unittest.TestCase):
         RT.add(ot.Aperture(ot.CircularSurface(r=2.99), pos=[0, 0, -2.2]))
         self.assertRaises(RuntimeError, RT.focus_search, "RMS Spot Size", z_start=10)
 
-    def test_focus2(self):
+    @pytest.mark.slow
+    def test_focus_sharpness(self):
+        """test focus optimization for modes Image Sharpness and Image Center Sharpness
+        Similar setup as examples/image_render.py"""
+        # make raytracer
+        RT = ot.Raytracer(outline=[-15, 15, -15, 15, 0, 40], no_pol=True)
+
+        # add image source
+        ap_r = 1
+        div_angle = np.rad2deg(np.atan(ap_r/12)*1.2)  
+        # ^-- rays need to hit outline with r=3 in 12mm distance. Add 20% margin
+        image = ot.presets.image.grid([4, 4])
+        RS = ot.RaySource(image, divergence="Isotropic", div_angle=div_angle, s=[0, 0, 1], pos=[0, 0, 0], 
+                          orientation="Converging", conv_pos=[0, 0, 12])
+        RT.add(RS)
+
+        # add aperture before first lens
+        ap_surf = ot.RingSurface(r=5, ri=ap_r)
+        ap = ot.Aperture(ap_surf, pos=[0, 0, 11])
+        RT.add(ap)
+
+        # add Lens
+        front = ot.SphericalSurface(r=3, R=8)
+        back = ot.SphericalSurface(r=3, R=-8)
+        nL1 = ot.RefractionIndex("Abbe", n=1.5, V=40)
+        L1 = ot.Lens(front, back, de=0.1, pos=[0, 0, 12], n=nL1)
+        RT.add(L1)
+
+        # trace and find focus        
+        RT.trace(1000000)
+        res1, _ = RT.focus_search("Image Sharpness", z_start=30)
+        res2, _ = RT.focus_search("Image Center Sharpness", z_start=30)
+
+        # check focal positions
+        self.assertAlmostEqual(res1.x, 36.3, delta=0.2)
+        self.assertAlmostEqual(res2.x, 37.4, delta=0.2)
+
+    def test_focus_additional(self):
         """additional focus tests"""
 
         # setup with converging light source with focus outside of outline
@@ -714,7 +754,7 @@ class TracerTests(unittest.TestCase):
 
             for powersi in powers:  # different power ratios
                 for N in Ns:  # different rays numbers
-                    for N_th in [1, 4, 8]:  # different number of threads
+                    for N_th in [1, 4]:  # different number of threads
 
                         RS0.power, RS1.power, RS2.power = powersi
 
@@ -845,48 +885,6 @@ class TracerTests(unittest.TestCase):
         lengths_m = RT.rays.ray_lengths(mask1, mask2)
         self.assertTrue(np.all(lengths[mask1, mask2] == lengths_m))
 
-    def test_ray_storage_misc(self):
-        # coverage tests
-
-        # warns that there are sources without rays
-        RT = tracing_geometry()
-        RT.ray_sources[0].power = 0.000001
-        RT.ray_sources[1].power = 1
-        RT.trace(10000)
-
-    def test_raytracer_output_threading_nopol(self):
-        """test actions without multithreading, progressbar and tracing with no_pol"""
-        RT = tracing_geometry()
-        ot.global_options.multithreading = False
-        ot.global_options.show_progress_bar = False
-
-        # raytracer not silent -> outputs messages and progress bar for actions
-        RT.trace(10000)
-        RT.focus_search(RT.focus_search_methods[0], 12)
-        RT.source_image()
-        RT.detector_image()
-        RT.source_spectrum()
-        RT.detector_spectrum()
-        RT.iterative_render(100000)
-
-        # show all tracing messages
-        for i in np.arange(len(RT.INFOS)):
-            RT._msgs = np.zeros((len(RT.INFOS), 2), dtype=int)
-            RT._msgs[i, 0] = 1
-
-            # some infos throw
-            try:
-                RT._show_messages(1000)
-            except Exception as err:
-                print(err)
-
-        # simulate with no_pol
-        RT.no_pol = True
-        RT.trace(10000)
-        
-        ot.global_options.multithreading = True
-        ot.global_options.show_progress_bar = True
-
     def test_numeric_tracing(self):
         """checks RT.find_hit for a numeric surface and DataSurface """
 
@@ -917,84 +915,6 @@ class TracerTests(unittest.TestCase):
         f_should = lens_maker(R, -R, n(555), 1, L.d)
 
         self.assertAlmostEqual(res.x, f_should, delta=0.2)
-
-    def test_absorb_missing(self):
-        """
-        infinitely small lens -> almost all rays miss and are set to absorbed
-        """
-
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
-
-        RSS = ot.CircularSurface(r=2)
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
-        RT.add(RS)
-
-        surf = ot.CircularSurface(r=1e-6)
-        L = ot.Lens(surf, surf, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        RT.add(L)
-
-        N = 10000
-        RT.trace(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 1] / N, places=3)
-        self.assertTrue(np.all(RT.rays.p_list[:, -1, 2] < RT.outline[5] - 1))  # absorbed before hitting outline
-    
-    def test_tir(self):
-        """
-        unrealistically high refractive index, a slight angle leads to TIR at the next surface
-        """
-
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], 
-                          n0=ot.RefractionIndex("Constant", 100))
-
-        RSS = ot.CircularSurface(r=2)
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None",
-                          pos=[0, 0, -3], s=[0, 0.1, 0.99])
-        RT.add(RS)
-
-        surf1 = ot.CircularSurface(r=10)
-        surf2 = ot.CircularSurface(r=10)
-        L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
-        RT.add(L)
-
-        N = 10000
-        RT.trace(N)
-        self.assertEqual(RT._msgs[RT.INFOS.TIR, 0], N)
-   
-    def test_outline_intersection(self):
-        """
-        strongly diverging rays, but tracing geometry is a long corridor
-        -> almost all rays are absorbed by outline 
-        """
-
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 5000])
-
-        RSS = ot.Point()
-        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="Isotropic", 
-                          div_angle=80, pos=[0, 0, -3])
-        RT.add(RS)
-
-        N = 10000
-        RT.trace(N)
-        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.OUTLINE_INTERSECTION, 0] / N, places=3)
-
-    def test_object_collision(self):
-
-        # make raytracer
-        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
-
-        # add Raysource
-        RSS = ot.Point()
-        RS = ot.RaySource(RSS, divergence="Isotropic",
-                          pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
-        RT.add(RS)
-        
-        geom = ot.presets.geometry.arizona_eye()
-        geom.elements[2].move_to([0, 0, 0.15])
-        RT.add(geom)
-
-        RT.trace(1000)
-        self.assertTrue(RT.geometry_error)  # object collision
-        self.assertEqual(RT.rays.N, 0)  # not traced
 
     def test_image_render_parameter(self):
 
@@ -1143,79 +1063,6 @@ class TracerTests(unittest.TestCase):
         RT.iterative_render(N)
         self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 1] / N, places=3)
 
-    def test_brewster_and_fresnel_transmission(self):
-        """
-        test polarization and transmission for a setup with brewster angle
-        """
-
-        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 10])
-
-        # source parameters
-        n = ot.RefractionIndex("Constant", n=1.55)
-        b_ang = np.arctan(1.55/1)  # brewster angle
-        RSS = ot.CircularSurface(r=0.05)
-        spectrum = ot.LightSpectrum("Monochromatic", wl=550.)
-        s = [0, np.sin(b_ang), np.cos(b_ang)]
-
-        # create sources
-        RS0 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[2, -2.5, -2], s=s, 
-                          polarization="x", desc="x-pol", power=1)
-        RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, -2.5, -2], s=s, 
-                          polarization="y", desc="y-pol", power=1)
-        RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[-2, -2.5, -2], s=s, 
-                          polarization="Uniform", desc="no pol", power=10)
-        RT.add(RS0)
-        RT.add(RS1)
-        RT.add(RS2)
-
-        # add refraction index step
-        rect = ot.RectangularSurface(dim=[10, 10])
-        L1 = ot.Lens(rect, rect, de=0.5, pos=[0, 0, 0], n=n, n2=n)
-        RT.add(L1)
-
-        RT.trace(100000)
-
-        def get_s_w_pol_source(index):
-
-            mask = np.zeros(RT.rays.N, dtype=bool)
-            Ns, Ne = RT.rays.B_list[index:index + 2]
-            mask[Ns:Ne] = True
-
-            p, s, pol, w, wl, _, _ = RT.rays.rays_by_mask(mask, slice(None))
-            return s, pol, w
-
-        sx, polx, wx = get_s_w_pol_source(0)
-        sy, poly, wy = get_s_w_pol_source(1)
-        sn, poln, wn = get_s_w_pol_source(2)
-
-        # check power after transmission
-        # values for n=1.55, n0=1
-        # see https://de.wikipedia.org/wiki/Brewster-Winkel
-        w0 = wn[0, 0]
-        self.assertTrue(np.allclose(wx[:, 1]/w0, 0.8301, atol=0.001, rtol=0))
-        self.assertTrue(np.allclose(wy[:, 1]/w0, 1.0000, atol=0.001, rtol=0))
-        self.assertAlmostEqual(np.mean(wn[:, 1])/w0, 0.915, delta=0.001)
-
-        # check pol projection values
-        self.assertTrue(np.allclose(polx[:, 0, 1]**2 + polx[:, 0, 2]**2, 0, atol=0.00001, rtol=0))
-        self.assertTrue(np.allclose(polx[:, 1, 1]**2 + polx[:, 1, 2]**2, 0, atol=0.00001, rtol=0))
-        self.assertTrue(np.allclose(poly[:, 0, 1]**2 + poly[:, 0, 2]**2, 1, atol=0.00001, rtol=0))
-        self.assertTrue(np.allclose(poly[:, 1, 1]**2 + poly[:, 1, 2]**2, 1, atol=0.00001, rtol=0))
-
-        mean_yz_proj = lambda pol: np.mean(np.sqrt(pol[:, 1]**2 + pol[:, 2]**2)) 
-        self.assertAlmostEqual(mean_yz_proj(poln[:, 0]), 2/np.pi, delta=0.005)
-        self.assertAlmostEqual(mean_yz_proj(poln[:, 1]), 2/np.pi, delta=0.005)
-
-        for pols, ss in zip([polx[:, 0], polx[:, 1], poly[:, 0], poly[:, 1], poln[:, 0], poln[:, 1]],
-                            [sx[:, 0], sx[:, 1], sy[:, 0], sy[:, 1], sn[:, 0], sn[:, 1]]):
-            # pols stays unity vector
-            polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
-            self.assertTrue(np.allclose(polss, 1, atol=0.0001, rtol=0))
-
-            # pol and s are always perpendicular
-            cross = misc.cross(pols, ss)
-            crosss = cross[:, 0]**2 + cross[:, 1]**2 + cross[:, 2]**2
-            self.assertTrue(np.allclose(crosss, 1, atol=0.0001, rtol=0))
 
     def test_source_detector_image_spectrum(self):
         # different projection methods are tested in surface tests

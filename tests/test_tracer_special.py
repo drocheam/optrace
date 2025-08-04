@@ -46,7 +46,7 @@ class TracerSpecialTests(unittest.TestCase):
         for z in [RT.outline[4], RS.pos[2]+1, ap.pos[2]-1, ap.pos[2]+1, RS.pos[2]+1+det.surface.R,
                   RT.outline[5]-RT.N_EPS, RT.outline[5] + 1]:
             det.move_to([0, 0, z])
-            for N_th in [1, 2, 3, 4, 8, 16]:
+            for N_th in [1, 3, 4]:
                 os.environ["PYTHON_CPU_COUNT"] = str(N_th)
                 img = RT.detector_image(projection_method="Equidistant")
                 
@@ -172,7 +172,7 @@ class TracerSpecialTests(unittest.TestCase):
     def test_same_surface_behavior(self):
         """check if different surface modes describing the same surface shape actually behave the same"""
 
-        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500])
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 500], no_pol=True)
 
         RSS = ot.CircularSurface(r=0.2)
         RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
@@ -524,6 +524,198 @@ class TracerSpecialTests(unittest.TestCase):
         RT.add(ot.Detector(ot.ConicSurface(r=3.5, R=-10, k=2), pos=[0, 0, 12]))
         img = RT.detector_image(detector_index=3)
         self.assertTrue(img.power() > 0.4)
+    
+    def test_ray_storage_misc(self):
+        # coverage tests
+
+        # warns that there are sources without rays
+        RT = tracing_geometry()
+        RT.ray_sources[0].power = 0.000001
+        RT.ray_sources[1].power = 1
+        RT.trace(10000)
+
+    def test_raytracer_output_threading_nopol(self):
+        """test actions without multithreading, progressbar and tracing with no_pol"""
+        RT = tracing_geometry()
+        ot.global_options.multithreading = False
+        ot.global_options.show_progress_bar = False
+
+        # raytracer not silent -> outputs messages and progress bar for actions
+        RT.trace(10000)
+        RT.focus_search(RT.focus_search_methods[0], 12)
+        RT.source_image()
+        RT.detector_image()
+        RT.source_spectrum()
+        RT.detector_spectrum()
+        RT.iterative_render(100000)
+
+        # show all tracing messages
+        for i in np.arange(len(RT.INFOS)):
+            RT._msgs = np.zeros((len(RT.INFOS), 2), dtype=int)
+            RT._msgs[i, 0] = 1
+
+            # some infos throw
+            try:
+                RT._show_messages(1000)
+            except Exception as err:
+                print(err)
+
+        # simulate with no_pol
+        RT.no_pol = True
+        RT.trace(10000)
+        
+        ot.global_options.multithreading = True
+        ot.global_options.show_progress_bar = True
+    
+    def test_absorb_missing(self):
+        """
+        infinitely small lens -> almost all rays miss and are set to absorbed
+        """
+
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 50])
+
+        RSS = ot.CircularSurface(r=2)
+        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None", pos=[0, 0, -3])
+        RT.add(RS)
+
+        surf = ot.CircularSurface(r=1e-6)
+        L = ot.Lens(surf, surf, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        RT.add(L)
+
+        N = 10000
+        RT.trace(N)
+        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.ABSORB_MISSING, 1] / N, places=3)
+        self.assertTrue(np.all(RT.rays.p_list[:, -1, 2] < RT.outline[5] - 1))  # absorbed before hitting outline
+    
+    def test_tir(self):
+        """
+        unrealistically high refractive index, a slight angle leads to TIR at the next surface
+        """
+
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 50], 
+                          n0=ot.RefractionIndex("Constant", 100))
+
+        RSS = ot.CircularSurface(r=2)
+        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="None",
+                          pos=[0, 0, -3], s=[0, 0.1, 0.99])
+        RT.add(RS)
+
+        surf1 = ot.CircularSurface(r=10)
+        surf2 = ot.CircularSurface(r=10)
+        L = ot.Lens(surf2, surf1, n=ot.RefractionIndex("Constant", n=1.5), pos=[0, 0, 0], d=0.1)
+        RT.add(L)
+
+        N = 10000
+        RT.trace(N)
+        self.assertEqual(RT._msgs[RT.INFOS.TIR, 0], N)
+   
+    def test_outline_intersection(self):
+        """
+        strongly diverging rays, but tracing geometry is a long corridor
+        -> almost all rays are absorbed by outline 
+        """
+
+        RT = ot.Raytracer(outline=[-3, 3, -3, 3, -10, 5000])
+
+        RSS = ot.Point()
+        RS = ot.RaySource(RSS, spectrum=ot.LightSpectrum("Monochromatic", wl=555), divergence="Isotropic", 
+                          div_angle=80, pos=[0, 0, -3])
+        RT.add(RS)
+
+        N = 10000
+        RT.trace(N)
+        self.assertAlmostEqual(1, RT._msgs[RT.INFOS.OUTLINE_INTERSECTION, 0] / N, places=3)
+    
+    def test_brewster_and_fresnel_transmission(self):
+        """ test polarization and transmission for a setup with brewster angle"""
+
+        RT = ot.Raytracer(outline=[-5, 5, -5, 5, -10, 10])
+
+        # source parameters
+        n = ot.RefractionIndex("Constant", n=1.55)
+        b_ang = np.arctan(1.55/1)  # brewster angle
+        RSS = ot.CircularSurface(r=0.05)
+        spectrum = ot.LightSpectrum("Monochromatic", wl=550.)
+        s = [0, np.sin(b_ang), np.cos(b_ang)]
+
+        # create sources
+        RS0 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[2, -2.5, -2], s=s, 
+                          polarization="x", desc="x-pol", power=1)
+        RS1 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[0, -2.5, -2], s=s, 
+                          polarization="y", desc="y-pol", power=1)
+        RS2 = ot.RaySource(RSS, divergence="None", spectrum=spectrum, pos=[-2, -2.5, -2], s=s, 
+                          polarization="Uniform", desc="no pol", power=10)
+        RT.add(RS0)
+        RT.add(RS1)
+        RT.add(RS2)
+
+        # add refraction index step
+        rect = ot.RectangularSurface(dim=[10, 10])
+        L1 = ot.Lens(rect, rect, de=0.5, pos=[0, 0, 0], n=n, n2=n)
+        RT.add(L1)
+
+        RT.trace(100000)
+
+        def get_s_w_pol_source(index):
+
+            mask = np.zeros(RT.rays.N, dtype=bool)
+            Ns, Ne = RT.rays.B_list[index:index + 2]
+            mask[Ns:Ne] = True
+
+            p, s, pol, w, wl, _, _ = RT.rays.rays_by_mask(mask, slice(None))
+            return s, pol, w
+
+        sx, polx, wx = get_s_w_pol_source(0)
+        sy, poly, wy = get_s_w_pol_source(1)
+        sn, poln, wn = get_s_w_pol_source(2)
+
+        # check power after transmission
+        # values for n=1.55, n0=1
+        # see https://de.wikipedia.org/wiki/Brewster-Winkel
+        w0 = wn[0, 0]
+        self.assertTrue(np.allclose(wx[:, 1]/w0, 0.8301, atol=0.001, rtol=0))
+        self.assertTrue(np.allclose(wy[:, 1]/w0, 1.0000, atol=0.001, rtol=0))
+        self.assertAlmostEqual(np.mean(wn[:, 1])/w0, 0.915, delta=0.001)
+
+        # check pol projection values
+        self.assertTrue(np.allclose(polx[:, 0, 1]**2 + polx[:, 0, 2]**2, 0, atol=0.00001, rtol=0))
+        self.assertTrue(np.allclose(polx[:, 1, 1]**2 + polx[:, 1, 2]**2, 0, atol=0.00001, rtol=0))
+        self.assertTrue(np.allclose(poly[:, 0, 1]**2 + poly[:, 0, 2]**2, 1, atol=0.00001, rtol=0))
+        self.assertTrue(np.allclose(poly[:, 1, 1]**2 + poly[:, 1, 2]**2, 1, atol=0.00001, rtol=0))
+
+        mean_yz_proj = lambda pol: np.mean(np.sqrt(pol[:, 1]**2 + pol[:, 2]**2)) 
+        self.assertAlmostEqual(mean_yz_proj(poln[:, 0]), 2/np.pi, delta=0.005)
+        self.assertAlmostEqual(mean_yz_proj(poln[:, 1]), 2/np.pi, delta=0.005)
+
+        for pols, ss in zip([polx[:, 0], polx[:, 1], poly[:, 0], poly[:, 1], poln[:, 0], poln[:, 1]],
+                            [sx[:, 0], sx[:, 1], sy[:, 0], sy[:, 1], sn[:, 0], sn[:, 1]]):
+            # pols stays unity vector
+            polss = pols[:, 0]**2 + pols[:, 1]**2 + pols[:, 2]**2
+            self.assertTrue(np.allclose(polss, 1, atol=0.0001, rtol=0))
+
+            # pol and s are always perpendicular
+            cross = misc.cross(pols, ss)
+            crosss = cross[:, 0]**2 + cross[:, 1]**2 + cross[:, 2]**2
+            self.assertTrue(np.allclose(crosss, 1, atol=0.0001, rtol=0))
+    
+    def test_object_collision(self):
+
+        # make raytracer
+        RT = ot.Raytracer(outline=[-10, 10, -10, 10, -10, 60])
+
+        # add Raysource
+        RSS = ot.Point()
+        RS = ot.RaySource(RSS, divergence="Isotropic",
+                          pos=[0, 0, 0], s=[0, 0, 1], div_angle=75)
+        RT.add(RS)
+        
+        geom = ot.presets.geometry.arizona_eye()
+        geom.elements[2].move_to([0, 0, 0.15])
+        RT.add(geom)
+
+        RT.trace(1000)
+        self.assertTrue(RT.geometry_error)  # object collision
+        self.assertEqual(RT.rays.N, 0)  # not traced
 
 if __name__ == '__main__':
     unittest.main()

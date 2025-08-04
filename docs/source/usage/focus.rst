@@ -191,11 +191,9 @@ _________________
 
 See :ref:`focus_cost_plot`.
 
-.. _focus_positional_methods:
 
-
-Mathematical Formulation of the Methods
-___________________________________________
+Mathematical Formulations
+_______________________________________
 
 RMS Spot Size
 =========================================
@@ -206,7 +204,7 @@ when calculating the weighted variance :math:`\sigma^2_P`.
 The Pythagorean sum is applied using both variances to get a simple quantity :math:`R_\text{v}` for optimization.
 
 .. math::
-   \text{minimize}~~ R_\text{v}(z) := \sqrt{\sigma^2_{x,P}(z) + \sigma^2_{y,P}(z)}
+   \underset{z \in [z_0, z_1]}{\text{minimize}}~~ R_\text{v}(z) := \sqrt{\sigma^2_{x,P}(z) + \sigma^2_{y,P}(z)}
    :label: autofocus_position
 
 This procedure is simple and performant. 
@@ -218,9 +216,15 @@ which can lead to a compromise between the halo and the size of the actual focus
 Irradiance Variance
 =====================
 
-Renders a power histogram for rays at position :math:`z`. 
-This histogram is divided by pixel area to get an irradiance image :math:`E(z)`
+Renders a two dimensional power histogram :math:`P(x, y, z)` for rays at position :math:`z`. 
+This image is divided by pixel area to get an irradiance image :math:`E(x, y, z)`.
 The approach then calculates the variance of the pixel values and finds the :math:`z` with the largest variance.
+
+.. math::
+   \underset{z \in [z_0, z_1]}{\text{maximize}}~~ \log{\sigma_E^2(z)}
+   :label: autofocus_image
+
+The logarithm is applied for a more compact value range.
 
 The most outside rays define the image dimensions, the absolute image size therefore varies along the beam path. 
 This can be an issue when few rays are far away from the optical axis, 
@@ -228,52 +232,42 @@ since the resolution suffers because of these marginal rays.
 
 The variance is large when there are bright areas in the image (with much power per area)
 or if there is a large variance between pixels, which should be the case if unblurred structures are present.
-For a minimization, the variance is inverted.
-For a more smooth cost function and a better data range the square root of the variance is used.
 
-.. math::
-   \text{minimize}~~ I_\text{v}(z) := \frac{1}{\sqrt[4]{\sigma_E^2(z)}}
-   :label: autofocus_image
 
 Image Sharpness
 ==================
 
-The power image :math:`P(x, y, z)` is transformed into the Fourier domain, creating a Fourier power image :math:`p_f` 
-with image frequencies :math:`f_x` and :math:`f_y`.
-Using the Pythagorean theorem we can join the frequency components into a radial frequency.
-The radial frequency of each pixel is scaled with the corresponding pixel power.
-We want to maximize this product, which is large when there are many high frequency components 
-in the original image :math:`P_z` or when high frequency components have a high power.
+As for the method Irradiance Variance, a power histogram is calculated.
+The method then maximizes all image gradients, which indicate sharp structures and a high local variance.
+The magnitude of the gradient is calculated from the Pythagorean sum of its components.
+Maximizing the sum of all squared magnitudes leads to the following expression:
 
 .. math::
-   P_f(f_x, f_y, z) = \mathcal{F}\left\{ P(x, y, z)\right\}
-   :label: autofocus_image_sharpness_fourier
-
-.. math::
-   \text{minimize}~~ F_\text{p}(z) := \frac{1}{ \sqrt{\sum_{x,y} P_f(f_x, f_y, z) \left( f^2_x + f_y^2 \right)}}
+   \underset{z \in [z_0, z_1]}{\text{maximize}} ~~ \sum_{x, y} \left(\left( \frac{\partial P(x, y, z)}{\partial x}\right)^2 + \left( \frac{\partial P(x, y, z)}{\partial y}\right)^2\right)
    :label: autofocus_image_sharpness
 
-For a minimization, the term is normalized by the pixel count :math:`N` and inverted.
-This method is independent of the image size, as only the power image and not the irradiance map is employed.
+This is equivalent to:
 
-A disadvantage of this method is that it tries to maximize the sharpness of the *whole* image.
-Only a compromise solution is found for images with spatial varying blur.
+.. math::
+   \underset{z \in [z_0, z_1]}{\text{maximize}}~~ \sum_{x,y} \left( \frac{\partial P(x, y, z)}{\partial x}\right)^2 + \sum_{x, y} \left( \frac{\partial P(x, y, z)}{\partial y}\right)^2
+   :label: autofocus_image_sharpness2
+
 
 Image Center Sharpness
 ========================
 
-To put more emphasis on the image center, the following weighing function is applied:
+The same procedure is performed as for the Image Sharpness method, 
+but the image is weighted with a rotationally symmetric Hanning window:
 
 .. math::
-   w_r = \begin{cases} (1 - r^2)^2 &~~\text{for}~ r \leq 1\\ 1 & ~~\text{for}~ r > 1\\ \end{cases}
-   :label: autofocus_image_center_sharpness_weighting
+   P_w(x, y, z) = P(x, y, z) \cdot \begin{cases} 1 + \cos(\pi r) &~~\text{for}~ r \leq 1\\ 0 & ~~\text{for}~ r > 1\\ \end{cases}
+   :label: autofocus_image_center_sharpness
 
-Here, :math:`r` is the normalized image radius with values between 0 and 1, 
-describing the radial position on the pixel grid.
-The Fourier transform is then:
+Here, :math:`r` is calculated from the normalized image coordinates :math:`x, y \in [-1, 1]`.
 
-.. math::
-   P_{f,w}(f_x, f_y, z) = \mathcal{F}\left\{ P(x, y, z)~ w_r \right\}
-   :label: autofocus_image_center_sharpness_fourier
-
-From here on, the steps are the same as for the method Image Sharpness.
+After weighing the image, its power is normalized.
+This is done to avoid rewarding images with more light intensity at their center,
+as the linearity of scaling also leads to higher partial derivatives.
+This is equivalent to optimizing the ratio of sum of derivatives and image intensities.
+In the Image Sharpness method this is not required, as the power remains constant in each image,
+as all rays are included equally.
