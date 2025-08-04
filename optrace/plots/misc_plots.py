@@ -175,7 +175,8 @@ def surface_profile_plot(surface:          Surface | list[Surface],
     plt.xlabel("x in mm")
     plt.ylabel("z in mm")
     plt.title(title)
-    plt.legend()
+    if not (isinstance(Surf_list, list) and not len(Surf_list)):
+        plt.legend()
     plt.tight_layout()
     _save_or_show(path, sargs)
 

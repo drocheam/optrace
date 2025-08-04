@@ -9,6 +9,7 @@ import optrace as ot
 from optrace.tracer.geometry.surface import Surface
 
 
+
 class SurfaceTests(unittest.TestCase):
 
     def test_surface_init_type_errors(self):

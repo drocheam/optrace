@@ -11,12 +11,43 @@ import optrace.tracer.misc as misc
 from hurb_geometry import *
 from tracing_geometry import tracing_geometry
 
-# TODO coverage tests: not all rays are inside of aperture
 
 # Tests for hurb functionality in Raytracing
 
 class TracerHurbTests(unittest.TestCase):
 
+    def test_hurb_masking(self):
+        """
+        Make sure the function Raytracer.__hurb correctly handles the masks 
+        for rays without power and rays the don't hit the inner aperture area.
+        """
+        # make raytracer
+        RT = ot.Raytracer(outline=[-15, 15, -15, 15, -6, 10], use_hurb=True)
+
+        # add ray source
+        RS = ot.RaySource(ot.CircularSurface(r=3), s=[0, 0, 1], pos=[0, 0, -5], 
+                          spectrum=ot.presets.light_spectrum.d65)
+        RT.add(RS)
+        
+        # Filter
+        filt_surf = ot.CircularSurface(r=5, ri=4)
+        filt_func = ot.TransmissionSpectrum("Rectangle", wl0=500, wl1=650, val=1)
+        filt = ot.Filter(filt_surf, pos=[0, 0, -1], spectrum=filt_func)
+        RT.add(filt)
+
+        # Pinhole
+        ap_surf = ot.RingSurface(r=5, ri=2.9)
+        ap = ot.Aperture(ap_surf, pos=[0, 0, 0])
+        RT.add(ap)
+
+        # trace
+        RT.trace(200000)
+
+        # make sure the test approach is correct by checking
+        # that both the filter and aperture filter more rays,
+        # we therefore have different masking in the raytracer hurb function
+        assert np.count_nonzero(RT.rays.w_list[:, 0]) > np.count_nonzero(RT.rays.w_list[:, 1])\
+                > np.count_nonzero(RT.rays.w_list[:, 2])
 
     @pytest.mark.slow
     def test_hurb_error_pinhole(self):

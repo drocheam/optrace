@@ -27,7 +27,6 @@ from tracing_geometry import tracing_geometry
 class GUITests(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
-        self.exc_info = False
 
         # set seed to PYTHONHASHSEED, so the results are reproducible
         if "PYTHONHASHSEED" in os.environ:
@@ -40,18 +39,9 @@ class GUITests(unittest.TestCase):
 
     def tearDown(self) -> None:
         warnings.simplefilter("default")
-    
-    def raise_thread_exceptions(self):
-        """raise saved exception from thread"""
-        if self.exc_info:  # raise unhandled thread exception
-            raise self.exc_info[0](self.exc_info[1]).with_traceback(self.exc_info[2])
-        self.exc_info = False
 
     def _wait_for_idle(self, sim, base=0.2, timeout=30) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
-
-        def raise_timeout(keys):
-            raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
 
         tsum = base
         time.sleep(base)  # wait for flags to be set, this could also be trait handlers, which could take longer
@@ -60,7 +50,7 @@ class GUITests(unittest.TestCase):
             tsum += 0.05
 
             if tsum > timeout:
-                raise TimeoutError("")
+                raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
     
     def _do_in_main(self, f: Callable, *args, **kw) -> None:
         """execute a function in the GUI main thread"""
@@ -74,18 +64,14 @@ class GUITests(unittest.TestCase):
 
     @contextmanager
     def _try(self, sim, *args, **kwargs):
-        """try TraceGUI actions. Exceptions are catched and saved in the class to be later
-        raised by raise_thread_exceptions(). In all cases the gui is closed normally"""
+        """try TraceGUI actions. Add timeouts and close down the GUI"""
         time.sleep(1)
         self._wait_for_idle(sim)
         try:
             yield
-        except Exception as e:
-            self.exc_info = sys.exc_info()  # assign thread exception
         finally:
             self._wait_for_idle(sim)
             self._do_in_main(sim.close)
-            # time.sleep(2)
 
     @pytest.mark.gui1
     @pytest.mark.slow
@@ -314,7 +300,6 @@ class GUITests(unittest.TestCase):
         RT = tracing_geometry()
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui2
     @pytest.mark.slow
@@ -407,7 +392,6 @@ class GUITests(unittest.TestCase):
         sim = TraceGUI(RT)
         sim.debug(func=interact2, args=(sim,))
         plt.close('all')
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui2
     @pytest.mark.slow
@@ -449,7 +433,6 @@ class GUITests(unittest.TestCase):
         sim = TraceGUI(RT)
         sim.debug(interact3, args=(sim,))
         plt.close('all')
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui1
     @pytest.mark.slow
@@ -501,7 +484,6 @@ class GUITests(unittest.TestCase):
                     self._do_in_main(sim.replot)
 
             sim.debug(interact, args=(sim,))
-            self.raise_thread_exceptions()
             time.sleep(1)
 
         RT = tracing_geometry()
@@ -576,7 +558,6 @@ class GUITests(unittest.TestCase):
                 os.remove("tmp.png")
 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.gui3
@@ -617,7 +598,6 @@ class GUITests(unittest.TestCase):
                     self._wait_for_idle(sim)
 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.skip(reason="there seems to be some issue with qt4, leads to segmentation faults.")
@@ -702,7 +682,6 @@ class GUITests(unittest.TestCase):
                         self._do_in_main(plt.close, "all")
         
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
    
     @pytest.mark.slow
     @pytest.mark.install
@@ -813,7 +792,6 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(sim.last_det_image is not None)
 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
    
     # os test because clipboard is system dependent
     @pytest.mark.os
@@ -949,7 +927,6 @@ class GUITests(unittest.TestCase):
                     self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
 
     # @pytest.mark.os
@@ -1045,7 +1022,6 @@ class GUITests(unittest.TestCase):
                 time.sleep(dt)
                 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
         
     @pytest.mark.gui2
     def test_non_2d(self):
@@ -1081,7 +1057,6 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.replot)
 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.gui3
@@ -1133,7 +1108,6 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(sim._plot._ray_property_dict)
 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
     
     @pytest.mark.slow
     @pytest.mark.gui3
@@ -1224,7 +1198,6 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
 
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui2
     def test_run(self):
@@ -1268,7 +1241,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT, ray_count=30000, high_contrast=False, hide_labels=True, minimalistic_view=True)
         sim.control(func=automated, args=(sim,))
-        self.raise_thread_exceptions()
 
         # exceptions
         self.assertRaises(TypeError, sim.control, func=3)
@@ -1348,7 +1320,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui1
     def test_point_marker(self):
@@ -1402,7 +1373,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
     
     @pytest.mark.slow
     @pytest.mark.gui1
@@ -1447,7 +1417,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.gui2
@@ -1605,7 +1574,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.gui3
@@ -1666,7 +1634,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui2
     def test_picker_command(self):
@@ -1730,7 +1697,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui3
     def test_select_rays(self):
@@ -1831,7 +1797,6 @@ class GUITests(unittest.TestCase):
         
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.gui3
     def test_volumes(self):
@@ -1889,7 +1854,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.gui2
@@ -1978,7 +1942,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.os
@@ -2013,7 +1976,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.os
     @pytest.mark.gui1
@@ -2134,7 +2096,6 @@ class GUITests(unittest.TestCase):
         sim.add_custom_selection("Selection 3", ["g", "h", "i"], "i", set_val3)
         
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
     @pytest.mark.slow
     @pytest.mark.os
@@ -2171,7 +2132,6 @@ class GUITests(unittest.TestCase):
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
-        self.raise_thread_exceptions()
 
 
 if __name__ == '__main__':

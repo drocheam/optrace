@@ -78,7 +78,6 @@ class SlitSurface(RectangularSurface):
         a_ = self.dimi[1] / 2 - np.abs(y_)
         b_ = self.dimi[0] / 2 - np.abs(x_)
         inside = (a_ > 0) & (b_ > 0)
-        a_, b_ = a_[inside], b_[inside]
 
         # side vector left-right
         b = np.zeros((b_.shape[0], 3))

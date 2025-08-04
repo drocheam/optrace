@@ -7,6 +7,7 @@ import unittest
 import subprocess
 import pytest
 
+
 # Test that the library does not load internal classes or external libraries into its or the global namespace
 
 # loading optrace should not load optrace.gui or optrace.plots, 

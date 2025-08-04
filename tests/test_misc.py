@@ -22,6 +22,7 @@ from optrace.tracer.ray_storage import RayStorage as RayStorage
 from optrace.property_checker import PropertyChecker as pc
 from optrace.progress_bar import ProgressBar
 
+
 # Test tracer.random, tracer.misc, tracer.base_class
 # tracer.ray_storage global_options, warnings, property_checker, progress_bar
 

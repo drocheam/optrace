@@ -237,6 +237,8 @@ The pytest configuration is located in the ``pyproject.toml`` in Section :numref
 
 * using `pytest-timeout <https://pypi.org/project/pytest-timeout/>`_ for adding timeouts
 
+* using `pytest-qt <https://github.com/pytest-dev/pytest-qt>`__ to handle exceptions in slots and virtual methods
+
 * using `pytest-random-order <https://pypi.org/project/pytest-random-order/>`_ for running tests in random order
 
 * `tox-ignore-env-name-mismatch <https://github.com/masenf/tox-ignore-env-name-mismatch>`_ is required so multiple

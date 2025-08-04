@@ -6,7 +6,6 @@ import time  # timing
 
 import numpy as np  # calculations
 
-
 def cpu_count() -> int:
     """
     Number of logical cpu cores assigned to this process (Python >= 3.13)
@@ -150,7 +149,6 @@ def normalize(a: np.ndarray) -> np.ndarray:
     with np.errstate(invalid="ignore"):  # we use nan as zero division indicator, suppress warnings
         return a / np.sqrt(a[:, 0]**2 + a[:, 1]**2 + a[:, 2]**2)[:, np.newaxis]
 
-
 def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     faster alternative to :func:`numpy.cross` for 3 element vectors and axis=1
@@ -169,4 +167,3 @@ def cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     n[:, 2] = a[:, 0]*b[:, 1] - a[:, 1]*b[:, 0]
 
     return n
-

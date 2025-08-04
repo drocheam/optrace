@@ -10,6 +10,7 @@ import optrace as ot
 import optrace.tracer.load as load
 
 
+
 class LoadTests(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):

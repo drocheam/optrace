@@ -143,7 +143,7 @@ def _spectrum_plot(obj:          Spectrum | list[Spectrum],
                 ax1.text(wlp[tp], val[tp], obji.get_desc(), color=tcolor)
 
         # add legend and title
-        if not legend_off:
+        if not legend_off and len(obj):
             ax1.legend()
         ax1.set_title(title)
 

@@ -40,7 +40,8 @@ Documentation = "https://drocheam.github.io/optrace"
 Changelog = "https://drocheam.github.io/optrace/development/changelog.html"
 
 [project.optional-dependencies]
-tests = ["pyautogui", "pytest", "coverage", "colour-science", "pytest-timeout", "pytest-random-order", "pytest-xvfb"]
+tests = ["pyautogui", "pytest", "coverage", "colour-science", "pytest-timeout", 
+         "pytest-random-order", "pytest-xvfb", "pytest-qt"]
 docs = ["sphinx", "sphinxcontrib-bibtex", "shibuya", "sphinx-sitemap", "sphinx-mathjax-offline", "sphinx-notfound-page"]
 
 [build-system]
@@ -57,7 +58,8 @@ package-data = {optrace = ["resources/*", "resources/images/*"]}
 testpaths = ["tests"]
 timeout = 360
 timeout_method = "thread"
-filterwarnings = ["ignore::UserWarning"]
+filterwarnings = ["ignore::optrace.OptraceWarning", "error::pytest.PytestUnhandledThreadExceptionWarning", 
+                  "error::pytest.PytestUnraisableExceptionWarning"]
 addopts = "--random-order"
 markers = [
     "slow: tests slower than 10 seconds on my machine",

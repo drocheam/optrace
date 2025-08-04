@@ -106,16 +106,17 @@ class RingSurface(Surface):
         # ellipse parameters
         R = self.ri
         inside = r < R
-        b_ = R - r[inside]
-        a_ = np.sqrt(b_*R)
+        b_ = R - r
+        with np.errstate(invalid="ignore"):
+            a_ = np.sqrt(b_*R)
         # a_ = b_
         # a_ = np.sqrt(R**2 - r**2)
         # ^-- see https://math.stackexchange.com/questions/4511168/how-to-find-the-radius-of-the-smallest-circle-such-that-the-inner-ellipse-is-tan
     
         # ellipse minor axis as vector
         b = np.zeros((b_.shape[0], 3))
-        b[:, 0] = np.cos(theta[inside]) 
-        b[:, 1] = np.sin(theta[inside]) 
+        b[:, 0] = np.cos(theta) 
+        b[:, 1] = np.sin(theta) 
 
         return a_, b_, b, inside
 

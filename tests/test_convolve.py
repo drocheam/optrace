@@ -228,7 +228,6 @@ class ConvolutionTests(unittest.TestCase):
             # similar to an integration error that becomes smaller and smaller for a larger resolution
 
 
-    @pytest.mark.conv
     @pytest.mark.slow
     @pytest.mark.timeout(600)
     def test_tracing_consistency(self):
@@ -695,7 +694,6 @@ class ConvolutionTests(unittest.TestCase):
         self.assertTrue(cm[0] > 0.7)
         self.assertTrue(cm[1] > 0.7)
 
-    @pytest.mark.norm
     def test_unnormalized_color_and_grayscale(self):
         """
         test convolving without normalization of a single colored image leads to the same colored images

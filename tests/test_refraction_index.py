@@ -7,6 +7,7 @@ import optrace.tracer.color as color
 import optrace as ot
 
 
+
 class RefractionIndexTests(unittest.TestCase):
 
     def test_refraction_index_base(self):

@@ -105,12 +105,16 @@ class PropertyBrowser(HasTraits):
         self._card_dict         = self._gen_dict_repr(self._gen_cardinals())
         self._preset_dict       = self._gen_dict_repr(self._gen_pdict())
 
-    def _gen_dict_repr(self, val: Any) -> dict:
+    def _gen_dict_repr(self, val: Any, rec: int = 0, max_rec: int = 20) -> dict:
         """generate a dictionary containing representable elements for ValueEditor()"""
 
         # some elements are not copyable or should not be copied or the application will hang
         # int64 and float32 are shown as hexadecimal values in the ValueEditor,
         # convert to float64 to show them correctly
+
+        # limit recursions
+        if rec > max_rec:
+            return "Recursion larger than {max_rec}, ignoring remaining recursions."
 
         if isinstance(val, None | bool | int | float | str | BaseClass):
             return val
@@ -118,19 +122,19 @@ class PropertyBrowser(HasTraits):
         elif isinstance(val, np.ndarray):
             # unpack arrays with only one element
             if val.size == 1:
-                return self._gen_dict_repr(val[()])
+                return self._gen_dict_repr(val[()], rec+1)
 
             # force convert to float, but only if size is not gigantic
             return np.array(val, dtype=np.float64) if val.size < 1e5 else val
 
         elif isinstance(val, list):
-            return [self._gen_dict_repr(el) for el in val]
+            return [self._gen_dict_repr(el, rec+1) for el in val]
 
         elif isinstance(val, tuple):
-            return tuple([self._gen_dict_repr(el) for el in val])
+            return tuple([self._gen_dict_repr(el, rec+1) for el in val])
 
         elif isinstance(val, dict):
-            return {key: self._gen_dict_repr(val_) for key, val_ in val.items()}
+            return {key: self._gen_dict_repr(val_, rec+1) for key, val_ in val.items()}
 
         else:
             return str(val)

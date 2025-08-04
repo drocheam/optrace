@@ -14,6 +14,7 @@ import optrace.plots as otp
 import optrace.tracer.color as color
 from optrace.tracer import misc as misc
 
+
 # Things that need to be checked by hand/eye:
 # applying of title and labels
 

@@ -1,6 +1,6 @@
 
+from threading import Thread
 from typing import Any, assert_never
-from threading import Thread  # threading
 from enum import IntEnum  # integer enum
 import concurrent
 
@@ -442,9 +442,8 @@ class Raytracer(Group):
         :param msg: message array
         """
         # get bending angles, axes and mask
-        a_, b_, b, inside = surf.hurb_props(p[hwnh, i+1, 0], p[hwnh, i+1, 1])
-        hwnhi = misc.masked_assign(hwnh, inside) 
-        s_ = s[hwnhi]
+        a_, b_, b, inside = surf.hurb_props(p[:, i+1, 0], p[:, i+1, 1])
+        hwnhi = hwnh & inside
         # ^-- rays having an power, not hitting the aperture, but inside of inner, ray bending aperture part
       
         # a is just b rotated by 90° in aperture plane
@@ -455,31 +454,31 @@ class Raytracer(Group):
         # a tilted ray sees a projected aperture. The distance to the a-edge is smaller by cos(psi_a),
         # where psi_a = 90 - ang_a, with ang_a being the angle between the ray and the ellipsis axis a
         # scalar product s * a is cos(ang_a), so sin(ang_a) = sqrt(1 - cos^2(ang_a)) is cos(psi_a)
-        cos_psi_a = np.sqrt(1 - misc.rdot(s_, a)**2)
-        cos_psi_b = np.sqrt(1 - misc.rdot(s_, b)**2)
+        cos_psi_a = np.sqrt(1 - misc.rdot(s, a)**2)
+        cos_psi_b = np.sqrt(1 - misc.rdot(s, b)**2)
 
         # # std dev of direction Gaussian
         # # see Edge diffraction in Monte Carlo ray tracing Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler
         # # additionally, the refractive index, cos-dependency from a above and a custom uncertainty factor were included
-        k = 2*np.pi*ns[hwnhi, i] / (wl[hwnhi] * 1e-9)
+        k = 2*np.pi*ns[:, i] / (wl * 1e-9)
         tan_sig_b = self.HURB_FACTOR / (2*b_*cos_psi_b*1e-3*k)
         tan_sig_a = self.HURB_FACTOR / (2*a_*cos_psi_a*1e-3*k)
 
         # # generated normally distributed tan(angles)
-        tan_tha = np.random.normal(scale=tan_sig_a, size=a_.shape[0])
-        tan_thb = np.random.normal(scale=tan_sig_b, size=b_.shape[0])
+        tan_tha = np.random.normal(scale=np.abs(tan_sig_a), size=a_.shape[0])
+        tan_thb = np.random.normal(scale=np.abs(tan_sig_b), size=b_.shape[0])
 
         # create sa, sb components
         # sa lies in plane containing s and a, but is orthogonal to s and sb
         # sb lies in plane containing s and b, but is orthogonal to s and sa
-        sa = misc.cross(b, s_)
+        sa = misc.cross(b, s)
         sa = misc.normalize(sa)
-        sb = misc.cross(s_, sa)
+        sb = misc.cross(s, sa)
         
         # construct new direction from old one and sb, sa components
-        sab = s_ + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
+        sab = s + sa*tan_tha[:, np.newaxis] + sb*tan_thb[:, np.newaxis]
         s0 = s.copy()
-        s[hwnhi] = misc.normalize(sab)
+        s[hwnhi] = misc.normalize(sab[hwnhi])
 
         # absorb rays with negative direction after bending
         neg = s[:, 2] < 0
