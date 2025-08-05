@@ -25,22 +25,13 @@ jobs:
       with:
         qt: true
       
-    # set up python and dependencies
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+    # run tests 
+    - name: Run tox
+      uses: lsst-sqre/run-tox@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox tox-gh-actions
-        
-    - name: Test doc building
-      run: tox -e docsbuildcheck -- -v
+        tox-envs: "docsbuildcheck,doctest"
+        tox-plugins: "tox-gh-actions"
+        tox-posargs: "-v"
+        cache-key-prefix: ".tox"
 
-    - name: Test code snippets
-      run: tox -e doctest -- -v
-
-    # skip linkchecks for now, github and some other sites block it
-    #- name: Test links
-      #run: tox -e linkcheck -- -v 

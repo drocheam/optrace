@@ -36,17 +36,11 @@ jobs:
         touch ~/.Xauthority
         xauth add ${HOST}:0 . $(xxd -l 16 -p /dev/urandom)
       
-    # set up python and dependecies
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+    # run tests 
+    - name: Run tox
+      uses: lsst-sqre/run-tox@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox tox-gh-actions
-        
-    # actual tests
-    - name: Python 3.11 - 3.12 tests with tox
-      run: |        
-        tox -e fast 
+        tox-envs: "fast"
+        tox-plugins: "tox-gh-actions"
+        cache-key-prefix: ".tox"

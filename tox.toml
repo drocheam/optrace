@@ -60,7 +60,7 @@ commands = [
 
 [env.install]
 description = "Quick testing of installation"
-commands = [["pytest", "-v", "-m", "install", {replace="posargs", extend=true}]]
+commands = [["pytest", "-m", "install", {replace="posargs", extend=true}]]
 
 [env.linkcheck]
 description = "Check all links in software and documentation"
