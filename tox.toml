@@ -12,35 +12,35 @@ runner = "ignore_env_name_mismatch"
 deps = ["pylint"]
 extras = ["tests", "docs"]
 commands = [
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+    ["coverage", "run", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_geometry.py", "tests{/}test_misc.py", 
         "tests{/}test_image.py", "tests{/}test_refraction_index.py", "tests{/}test_scope.py", 
         "tests{/}test_spectrum.py", "tests{/}test_surface.py", "tests{/}test_tma.py"
     ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+    ["coverage", "run", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_tracer.py", "tests{/}test_tracer_hurb.py", 
         "tests{/}test_tracer_special.py"
     ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+    ["coverage", "run", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_color.py", "tests{/}test_convolve.py", 
         "tests{/}test_load.py"
     ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+    ["coverage", "run", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_plots.py"
     ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+    ["coverage", "run", "-m", 
         "pytest", {replace="posargs", extend=true}, "tests{/}test_examples.py"
     ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m",
+    ["coverage", "run", "-m",
         "pytest", {replace="posargs", extend=true}, "-m", "gui1", "tests{/}test_gui.py"
     ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+    ["coverage", "run", "-m", 
         "pytest", {replace="posargs", extend=true}, "-m", "gui2", "tests{/}test_gui.py"
     ],
-    ["coverage", "run", "-p", "--source=optrace", "--branch", "-m", 
+    ["coverage", "run", "-m", 
         "pytest", {replace="posargs", extend=true}, "-m", "gui3", "tests{/}test_gui.py"
     ],
-    ["coverage", "combine"],
+    ["coverage", "combine", "--quiet"],
     ["coverage", "report", "--show-missing"],
     ["coverage", "erase"]
 ]

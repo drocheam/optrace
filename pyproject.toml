@@ -72,3 +72,10 @@ markers = [
 
 [tool.gh_actions]
 python = { "3.11" = "py311", "3.12" = "py312", "3.13" = "py313" }
+
+[tool.coverage.run]
+branch = true
+patch = ["subprocess"]
+source = ["optrace"]
+parallel = true
+
