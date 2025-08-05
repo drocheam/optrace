@@ -19,7 +19,7 @@ jobs:
 
     # needed for the x-server to work
     - name: Setup headless display
-      uses: drocheam/setup-headless-display-action
+      uses: drocheam/setup-headless-display-action@main
       with:
         qt: true
 
