@@ -3,6 +3,7 @@
 from pathlib import Path  # path of this file
 import os  # environment variables
 import re
+import sys
 
 import unittest  # testing framework
 import subprocess  # running processes
@@ -36,7 +37,7 @@ class ExampleTests(unittest.TestCase):
 
         # start process
         env = os.environ | {"PYTHONPATH": str(Path.cwd())}  # PYTHONPATH needed so example find optrace
-        process = subprocess.run(["python", "-c", cmd], env=env, timeout=timeout)
+        process = subprocess.run([sys.executable, "-c", cmd], env=env, timeout=timeout)
         self.assertEqual(process.returncode, 0)
 
     @pytest.mark.slow

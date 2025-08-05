@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import os
+import sys
 import subprocess
 import contextlib
 import time
@@ -43,7 +44,7 @@ class TracerMiscTests(unittest.TestCase):
         for cores in [32, 12, 9, 8, 5, 4, 2, 1]:  # include some atypical numbers
             
             env["PYTHON_CPU_COUNT"] = str(cores)
-            result = subprocess.run(["python", "-c", cmd], env=env, capture_output=True, text=True, check=True)
+            result = subprocess.run([sys.executable, "-c", cmd], env=env, capture_output=True, text=True, check=True)
             correct_cores = str(cores) if 1 <= cores <= 64 else "1"
             self.assertEqual(result.stdout[:-1], correct_cores, msg=result.stdout)
         

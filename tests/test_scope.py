@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import os
+import sys
 from pathlib import Path  # path of this file
 
 import unittest
@@ -22,7 +23,7 @@ class ScopeTests(unittest.TestCase):
         
         # we need to run a seperate process so that the script is in a default state without libraries loaded
         env = os.environ | {"PYTHONPATH": str(Path.cwd())}  # needed to find optrace
-        process = subprocess.run(["python", "-c", command], env=env, timeout=timeout)
+        process = subprocess.run([sys.executable, "-c", command], env=env, timeout=timeout)
         return process.returncode
 
     @pytest.mark.install
