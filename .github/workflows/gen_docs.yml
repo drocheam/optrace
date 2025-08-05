@@ -17,12 +17,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
    
-
     - name: Upgrade
-      run: |
-        sudo apt-get clean
-        sudo apt-get update
-        sudo apt-get upgrade -f
+      run: sudo apt-get update
 
     # these dependencies will be installed by the setup-headless-display action
     # prior install to enable caching
