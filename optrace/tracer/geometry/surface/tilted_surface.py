@@ -82,9 +82,9 @@ class TiltedSurface(Surface):
         :return: normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)
         """
         # coordinates actually on surface
+        n = np.tile(self.normal, (x.shape[0], 1))
         m = self.mask(x, y)
-        n = np.tile([0., 0., 1.], (x.shape[0], 1))
-        n[m] = self.normal
+        n[~m] = [0, 0, 1]
 
         return n
 

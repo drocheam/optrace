@@ -76,9 +76,19 @@ Notes
 * multi-dimensional array access can be accelerated by choosing a specific memory layout of the 
   :class:`numpy.ndarray` (:python:`order="F", order="C"` etc.)
 * always keep the GUI responsive
-* range indexing (:python:`array[52:79829]`) is faster than boolean indexing  (:python:`array[[False, False, True, ..., True, False]]`,  which is faster than indexing by index list (:python:`array[[52, 456, 897987, 0, 77, ...]]`)
+* range indexing (:python:`array[52:79829]`) is faster than boolean indexing  
+  (:python:`array[[False, False, True, ..., True, False]]`,  which is faster than indexing by index list 
+  (:python:`array[[52, 456, 897987, 0, 77, ...]]`)
 * a reasonable amount of points and curves in plots
 * limit array sizes
+* As there is no compilation, there is almost no optimization:
+  For an array :python:`a` and constants: :python:`1/const*a` is faster than :python:`a/const`, 
+  even :python:`a *= 1/const` is actually faster than :python:`a /= const`. 
+  :python:`a + (const2 + const1)` is faster than :python:`const1 + a + const2`.
+  :python:`a.sum()` is faster than :python:`np.sum(a)`.
+* Indexing can be costly due to copying and RAM usage. Sometimes running the default case for all rays and
+  only indexing and treating the special rays afterwards is much faster. (Instead of indexing the arrays 
+  for both cases and creating copies).
 
 **File Input/Output**
 

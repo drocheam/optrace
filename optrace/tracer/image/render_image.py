@@ -278,7 +278,7 @@ class RenderImage(BaseClass):
         psf = np.ones((2*ps+1, 2*ps+1), dtype=np.float64)
         psf[R != 0] = (2*scipy.special.j1(Rnz) / Rnz) ** 2
         psf[R > 10.1735] = 0  # only use up to third zero at 10.1735
-        psf /= psf.sum()
+        psf *= 1/psf.sum()
 
         if global_options.multithreading and misc.cpu_count() > 3:
             # for each of the XYZW channels:

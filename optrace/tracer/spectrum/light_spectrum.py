@@ -74,7 +74,7 @@ class LightSpectrum(Spectrum):
                 wl0, wl1 = max(wl0-1, go.wavelength_range[0]), min(wl0+1, go.wavelength_range[1])
 
             spec._vals, spec._wls = np.histogram(wl, bins=N, weights=w, range=[wl0, wl1])
-            spec._vals /= (spec._wls[1] - spec._wls[0])  # scale by delta lambda for W/nm
+            spec._vals *= 1/(spec._wls[1] - spec._wls[0])  # scale by delta lambda for W/nm
 
         return spec
 

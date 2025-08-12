@@ -1405,7 +1405,7 @@ class Raytracer(Group):
                 # more intensity around the center lowers the cost (as the derivative is proportional to the intensity)
                 # normalize the image to lower the impact of these intensity shifts towards the center
                 if (Im0s := Im0.sum()):
-                    Im0 /= Im0s
+                    Im0 *= 1/Im0s
             else:
                 Im0 = Im
 

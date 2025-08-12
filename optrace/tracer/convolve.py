@@ -235,7 +235,7 @@ def _check_and_load_psf(psf: GrayscaleImage | RenderImage | list[RenderImage], f
         
         # normalize PSF
         if (psum := np.sum(psf_lin)):
-            psf_lin /= psum
+            psf_lin *= 1/psum
 
         if flags.make_linear:
             psf_lins = [psf_lin]
@@ -442,7 +442,7 @@ def _slice_and_convert_output_image(img2: np.ndarray, cargs: dict, s: _ConvShape
     if flags.make_linear:
         # normalize if not set otherwise by user and if maximum exists
         if ("normalize" not in cargs or cargs["normalize"]) and (imax := np.max(img2)):
-            img2 /= imax
+            img2 *= 1/imax
         img2 = np.clip(img2, 0, 1)
         return color.srgb_linear_to_srgb(img2)
     

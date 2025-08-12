@@ -98,14 +98,14 @@ def luv_to_xyz(luv: np.ndarray) -> np.ndarray:
     mask3 = misc.masked_assign(mask, mask2)
     mask4 = misc.masked_assign(mask, ~mask2)
 
-    XYZ[mask3, 1] = ((L_[mask2]+16) / 116)**3
+    XYZ[mask3, 1] = (1/116 * (L_[mask2]+16))**3
     XYZ[mask4, 1] = 1/k * L_[~mask2]
 
     Y = XYZ[mask, 1]
     L13 = 13 * luv[mask, 0]
 
     XYZ[mask, 0] = X = 9/4*Y * (u_ + L13*un) / (v_ + L13*vn)
-    XYZ[mask, 2] = 3*Y * (L13/(v_ + L13*vn) - 5/3) - X/3
+    XYZ[mask, 2] = 3 * Y * (L13/(v_ + L13*vn) - 5/3) - 1/3*X
 
     return XYZ
 
@@ -161,6 +161,6 @@ def luv_hue(luv: np.ndarray) -> np.ndarray:
     :param luv: Luv Image, np.ndarray with shape (Ny, Nx, 3)
     :return: Hue Image, np.ndarray with shape (Ny, Nx)
     """
-    hue = np.arctan2(luv[:, :, 2], luv[:, :, 1]) / np.pi * 180
+    hue = 180/np.pi * np.arctan2(luv[:, :, 2], luv[:, :, 1])
     hue[hue < 0] += 360
     return hue

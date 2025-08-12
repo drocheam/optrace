@@ -26,6 +26,7 @@ _SRGB_G_PRIMARY_POWER_FACTOR = 1.000000000000
 _SRGB_B_PRIMARY_POWER_FACTOR = 0.775993481741
 SRGB_PRIMARY_POWER_FACTORS = [_SRGB_R_PRIMARY_POWER_FACTOR, _SRGB_G_PRIMARY_POWER_FACTOR, _SRGB_B_PRIMARY_POWER_FACTOR]
 
+
 def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     """
     Conversion from sRGB to linear RGB values. sRGB values should be inside range [0, 1],
@@ -40,8 +41,8 @@ def srgb_to_srgb_linear(rgb: np.ndarray) -> np.ndarray:
     # optimize for default case: rgb > 0.04045
     a = 0.055
     below = np.abs(rgb) <= 0.04045
-    rgb_lin = np.sign(rgb)*((abs(rgb) + a) / (1 + a)) ** 2.4
-    rgb_lin[below] = rgb[below] / 12.92
+    rgb_lin = np.sign(rgb)*(1/(1+a) * (np.abs(rgb) + a)) ** 2.4
+    rgb_lin[below] = 1/12.92*rgb[below]
 
     return rgb_lin
 
@@ -117,7 +118,7 @@ def _to_srgb(xyz_: np.ndarray, normalize: bool) -> np.ndarray:
 
     # normalize to the highest value
     if normalize and (nmax := np.nanmax(RGBL_)):
-        RGBL_ /= nmax
+        RGBL_ *= 1/nmax
 
     return RGBL_
 
@@ -142,22 +143,22 @@ def _triangle_intersect(r, g, b, w, x, y):
     # angles from primaries to whitepoint
     phir = np.arctan2(ry-wy, rx-wx)
     phig = np.arctan2(gy-wy, gx-wx)
-    phib = np.arctan2(by-wy, bx-wx) + 2*np.pi  # so range is [0, 2*pi]  # TODO is it?
+    phib = np.arctan2(by-wy, bx-wx) + 2*np.pi
 
     # conditions for this to algorithm to work:
     # whitepoint inside gamut (not on triangle edge)
     # phir > 0, phig < pi, phib > pi and phir < phig < phib
     # rx != bx, gx != bx, rx != gx
-    assert np.all(phir > 0)
-    assert np.all(phig < np.pi)
-    assert np.all(phib > np.pi)
-    assert np.all((phir < phig) & (phir  < phib))
-    assert rx != bx
-    assert gx != bx
-    assert rx != gx
+    # assert np.all(phir > 0)
+    # assert np.all(phig < np.pi)
+    # assert np.all(phib > np.pi)
+    # assert np.all((phir < phig) & (phir  < phib))
+    # assert rx != bx
+    # assert gx != bx
+    # assert rx != gx
    
     phi = np.arctan2(y-wy, x-wx)
-    phi[phi < 0] += 2*np.pi  # so range is [0, 2*pi] # TODO is it?
+    phi[phi < 0] += 2*np.pi
 
     # slope towards whitepoint and between primaries
     aw = np.tan(phi)
@@ -174,21 +175,21 @@ def _triangle_intersect(r, g, b, w, x, y):
 
     # blue-green line intersections
     is_bg = (phi <= phib) & (phi > phig)
-    xbg, ybg, awbg = x[is_bg], y[is_bg], aw[is_bg]
-    x[is_bg] = t = (ybg - by - xbg*awbg + bx*abg) / (abg-awbg)
-    y[is_bg] = by + (t - bx)*abg
+    awbg = aw[is_bg]
+    x[is_bg] = (y[is_bg] - x[is_bg]*awbg + (bx*abg - by)) / (abg - awbg)
+    y[is_bg] = x[is_bg]*abg + (by - bx*abg)
 
     # green-red line intersections
     is_gr = (phi <= phig) & (phi > phir)
-    xgr, ygr, awgr = x[is_gr], y[is_gr], aw[is_gr]
-    x[is_gr] = t = (ygr - gy - xgr*awgr + gx*agr) / (agr-awgr)
-    y[is_gr] = gy + (t - gx)*agr
+    awgr = aw[is_gr]
+    x[is_gr] = (y[is_gr] - x[is_gr]*awgr + (gx*agr-gy)) / (agr - awgr)
+    y[is_gr] = x[is_gr]*agr + (gy - gx*agr)
 
     # blue-red line intersections
     is_br = ~(is_bg | is_gr)
-    xbr, ybr, awbr = x[is_br], y[is_br], aw[is_br]
-    x[is_br] = t = (ybr - by - xbr*awbr + bx*abr) / (abr-awbr)
-    y[is_br] = by + (t - bx)*abr
+    awbr = aw[is_br]
+    x[is_br] = (y[is_br] - x[is_br]*awbr + (bx*abr - by)) / (abr - awbr)
+    y[is_br] = x[is_br]*abr + (by - bx*abr)
 
 
 def _get_chroma_scale(Luv: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -238,7 +239,7 @@ def _get_chroma_scale(Luv: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         return in_gamut, cr_fact2
 
 
-def get_chroma_scale(Luv: np.ndarray, L_th = 0.0):
+def get_chroma_scale(Luv: np.ndarray, L_th = 0.0, return_full: bool = False) -> float:
     """
     Calculate the chroma scaling factor for xyz_to_srgb_linear with mode "Perceptual"
     Ignore values below L_th*np.max(L) with L being the lightness.
@@ -248,30 +249,19 @@ def get_chroma_scale(Luv: np.ndarray, L_th = 0.0):
 
     :param Luv: CIELUV image values (shape (Ny, Nx, 3))
     :param L_th: optional lightness threshold as fraction of the peak lightness (range 0 - 1)
+    :param return_full: also return scaling factors for each value
     :return: saturation scaling factor (0-1)
     """
-
     mask_valid, cr_fact2 = _get_chroma_scale(Luv)
     mask_th = Luv[:, :, 0] > L_th*Luv[:, :, 0].max()
-    return _min_factor_from_chroma_factors(cr_fact2[mask_valid & mask_th])
 
+    cr_fact2_m = cr_fact2[mask_valid & mask_th] 
+    cr = np.sqrt(cr_fact2_m.min()) if cr_fact2_m.size else 1
+    fact = float(np.clip(cr, 0.32, 1.0))
 
-def _min_factor_from_chroma_factors(cr_fact2):
-    """
-    Calculate the smallest scaling factor from chroma factors.
-    Enfoce range 0.32-1
-
-    :param cr_fact2: list of quadratic chroma factors
-    :return: chroma factor
-    """
-    if not cr_fact2.size:
-        return 1.0
-
-    cr_sq = cr_fact2.min()
-    cr = np.sqrt(cr_sq)
-    
-    # due to numerical issues cr could be above 1 or below some worst case
-    return float(np.clip(cr, 0.32, 1.0))
+    if return_full:
+        return fact, np.sqrt(cr_fact2)
+    return fact
 
 
 def xyz_to_srgb_linear(xyz:                 np.ndarray,
@@ -346,13 +336,13 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         Luv = xyz_to_luv(XYZ, normalize=False)  
         # ^-- don't normalize, since we transform back and forth and expect the same L
 
-        mask_th = Luv[:, :, 0] > L_th*Luv[:, :, 0].max()
-        mask_valid, cr_fact2 =  _get_chroma_scale(Luv)
-
+        # get rescaling factors
+        fact, cr_fact = get_chroma_scale(Luv, L_th, return_full = True)
         if chroma_scale is None:
-            chroma_scale = _min_factor_from_chroma_factors(cr_fact2[mask_th & mask_valid])
+            chroma_scale = fact
 
-        cr_fact = np.sqrt(cr_fact2)
+        # rescale all valid colors and those above L_th with chroma_scale (chroma scaling)
+        # all others get their cr_fact applied, resulting in chroma clipping to the gamut edge
         cr_fact[cr_fact > chroma_scale] = chroma_scale
         Luv[:, :, 1:] *= cr_fact[:, :, np.newaxis]
 
@@ -381,7 +371,7 @@ def srgb_linear_to_srgb(rgbl: np.ndarray) -> np.ndarray:
     below = np.abs(RGB) <= 0.0031308
     RGB[below] *= 12.92
     RGBnb = RGB[~below]
-    RGB[~below] = np.sign(RGBnb)*((1 + a) * abs(RGBnb) ** (1 / 2.4) - a)
+    RGB[~below] = np.sign(RGBnb)*((1 + a) * np.abs(RGBnb) ** (1 / 2.4) - a)
 
     return RGB
 
@@ -464,7 +454,7 @@ def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
     :param sig: standard deviation
     :return: function values with same shape as x
     """
-    return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 * (x - mu) ** 2 / sig ** 2)
+    return 1/(sig*np.sqrt(2*np.pi)) * np.exp(-0.5 / sig**2 * (x - mu) ** 2)
 
 
 # spectra that lie at the sRGB primaries position in the xy-CIE Diagram
@@ -483,12 +473,10 @@ def srgb_r_primary(wl: np.ndarray) -> np.ndarray:
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
     """
-    r = np.zeros_like(wl)
-    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
-    wlm = wl[m]
-
     rs = 0.951190393
-    r[m] = 75.1660756583 * rs * (gauss(wlm, 639.854491, 30.0) + 0.0500907584 * gauss(wlm, 418.905848, 80.6220465))
+    r = 75.1660756583 * rs * (gauss(wl, 639.854491, 30.0) + 0.0500907584 * gauss(wl, 418.905848, 80.6220465))
+    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
+    r[~m] = 0
     return r 
 
 
@@ -499,12 +487,10 @@ def srgb_g_primary(wl: np.ndarray) -> np.ndarray:
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
     """
-    g = np.zeros_like(wl)
-    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
-    wlm = wl[m]
-    
     gs = 1
-    g[m] = 83.4999222966 * gs * gauss(wlm, 539.13108974, 33.31164968)
+    g = 83.4999222966 * gs * gauss(wl, 539.13108974, 33.31164968)
+    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
+    g[~m] = 0
     return g
 
 
@@ -515,12 +501,10 @@ def srgb_b_primary(wl: np.ndarray) -> np.ndarray:
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
     """
-    b = np.zeros_like(wl)
-    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
-    wlm = wl[m]
-    
     bs = 1.16364585503
-    b[m] = 47.99521746361 * bs * (gauss(wlm, 454.833119, 20.1460206) + 0.184484176 * gauss(wlm, 459.658190, 71.0927568))
+    b = 47.99521746361 * bs * (gauss(wl, 454.833119, 20.1460206) + 0.184484176 * gauss(wl, 459.658190, 71.0927568))
+    m = (wl >= tools._WL_MIN0) & (wl <= tools._WL_MAX0)
+    b[~m] = 0
     return b
 
 ########################################################################################################################
@@ -541,10 +525,8 @@ def random_wavelengths_from_srgb(rgb: np.ndarray) -> np.ndarray:
         raise RuntimeError(f"Wavelength range {go.wavelength_range} does not include range "
                            f"[{tools._WL_MIN0}, {tools._WL_MAX0}] needed for this feature.")
 
-    wl = np.linspace(tools._WL_MIN0, tools._WL_MAX0, 10000)
-
     # wavelengths to work with
-    wl = tools.wavelengths(10000)
+    wl = tools.wavelengths(5000)
 
     # rescale channel values by probability (=spectrum power factor)
     RGBL[:, 0] *= _SRGB_R_PRIMARY_POWER_FACTOR
