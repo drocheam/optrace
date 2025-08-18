@@ -15,7 +15,7 @@ jobs:
         python-version: ['3.13']
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup headless display
       uses: drocheam/setup-headless-display-action@main
