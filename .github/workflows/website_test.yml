@@ -10,7 +10,7 @@ on:
     - cron: "0 13 * * 3"
 
 jobs:
-  install_test:
+  website_test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
