@@ -29,8 +29,7 @@ def xyz_to_luv(xyz: np.ndarray, normalize: bool = True) -> np.ndarray:
     _, un, vn = WP_D65_LUV
 
     # exclude Y = 0 otherwise divisions by zero occur
-    xyz2 = xyz.copy()
-    xyz2[xyz < 0] = 0  # negative values due to numerical errors
+    xyz2 = xyz.clip(0) # negative values due to numerical errors
     mask = xyz2[:, :, 1] > 0  # Y > 0 for 3D array
     X, Y, Z = xyz2[mask, 0], xyz2[mask, 1], xyz2[mask, 2]
 

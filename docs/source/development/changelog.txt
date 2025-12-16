@@ -1,5 +1,8 @@
  Version  |      Date      |                             Description
 ----------|----------------|------------------------------------------------------------------------
+  1.7.5   |   2025-08-04   | Improved performance for focus search methods. Image sharpness methods 
+          |                | now use gradient. 
+----------|----------------|------------------------------------------------------------------------
   1.7.4   |   2025-08-01   | Lower RAM usage with no_pol=True. Increased performance for image 
           |                | rendering. 
 ----------|----------------|------------------------------------------------------------------------

@@ -12,7 +12,7 @@ Tracing Process
 
 The tracing process primarily involves three key steps: 
 detecting surface hits, calculating refraction indices and directions, 
-and managing rays that do not make contact with a surface. 
+and managing rays that do not contact a surface. 
 For ideal lenses, filters, and apertures, only one instance of surface hit detection is required, 
 whereas a standard lens requires two.
 
@@ -259,7 +259,7 @@ is attenuated according to the filter's transmission function :math:`T_\text{F}(
 Additionally, ray powers are set to zero if the transmission falls below a specific threshold :math:`T_\text{th}`. 
 This approach avoids *ghost rays* that continue to be propagated during raytracing but carry very little power. 
 As their contribution to image formation is negligible, absorbing them as soon as possible
-helps speed up the tracing process.
+helps accelerate the tracing process.
 
 As a side note, apertures are also implemented as filters, but with :math:`T_\text{F}(\lambda) = 0` for all wavelengths.
 
@@ -292,7 +292,7 @@ the surface is extended so that all rays intersect a surface.
 Gaps on the surface are filled, and the surface edge is extended radially towards infinity. 
 
 An intersection is calculated for the extended surface. 
-The ray is marked as hitting or non-hitting based on a surface mask afterwards.
+The ray is marked as hitting or non-hitting based on a surface mask afterward.
 
 .. figure:: ../images/surface_extension.svg
    :width: 900
@@ -430,7 +430,7 @@ a line from :math:`z = z_0` to :math:`z \rightarrow \infty` for :math:`k = -1`,
 or a point at :math:`(x_0, y_0, z_0)` for :math:`k > -1`. 
 In the first two cases, the conic sections consist of long linear segments. 
 Depending on the cases of equation :math:numref:`IntersectionAsphere5`, a ray can intersect once, twice, 
-not hit the surface, or lie within it. 
+not hit the surface or lie within it. 
 For a point (:math:`k > -1`), there can be no intersection or a single one. 
 In the latter case, :math:`B^2 - CA = 0` holds, 
 producing a single intersection in the first case of equation :math:numref:`IntersectionAsphere5`.
@@ -622,7 +622,7 @@ With a 64-bit floating-point number, where :math:`\varepsilon_\text{f} \approx 2
 the result is :math:`\varepsilon_\text{o} \approx 3.22 \times 10^{-5}`.
 Since optrace units are measured in millimeters, this corresponds to :math:`32.2\,` nm.
 
-In order to ensure that numerical differences in :math:`f` are not only representable, 
+To ensure that numerical differences in :math:`f` are not only representable, 
 but also that :math:`x + \varepsilon` is distinct from :math:`x`, 
 it is essential to satisfy the condition :math:`x + \varepsilon > x (1 + \varepsilon_\text{f})` 
 for every coordinate :math:`x` on the surface.
@@ -633,7 +633,7 @@ Given :math:`r_\text{max}` as the maximum absolute distance on the surface, the 
    \varepsilon_\text{p} = r_\text{max} ~\varepsilon_\text{f}
    :label: machine_eps_scaling
 
-It is advisable to center the surface at :math:`r = 0` prior to differentiation to minimize :math:`r_\text{max}`.
+It is advisable to center the surface at :math:`r = 0` before differentiation to minimize :math:`r_\text{max}`.
 
 
 DataSurface
@@ -650,11 +650,12 @@ These derivatives can then be used to compute surface normals, as described in t
 
 It is important to note that due to the nature of interpolation, 
 the minimum and maximum surface values may exceed the specified data range. 
-A warning informs the user about the occurence of large deviations.
+A warning informs the user about the occurrence of large deviations.
 
 ------------
 
 **References**
 
 .. footbibliography::
+
 

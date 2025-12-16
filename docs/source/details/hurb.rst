@@ -1,5 +1,5 @@
 
-.. NOTE: this page is referenced by a paper. Don't change its path or at least redirect it correctly
+.. NOTE: A paper references this page. Don't change this file's path or at least redirect it correctly.
 
 .. _hurb_details:
 
@@ -221,7 +221,7 @@ We define new orthogonal basis vectors, :math:`a'` and :math:`b'`, relative to t
 In this new basis, the vectors :math:`s`, :math:`b`, and :math:`b'` are coplanar, 
 and :math:`b'` aligns with the direction of the shortest distance to the aperture edge. 
 While :math:`s` and :math:`a'` also lie within a plane, this plane is orthogonal to the one containing :math:`s, b, b'`. 
-It is important to note that the original vector :math:`a` generally does not lie within this second plane. 
+It is important to note that the original vector :math:`a` typically does not lie within this second plane. 
 This non-alignment is a consequence of the fact that the true shortest distances to the aperture edges are typically
 not orthogonal to each other in 3D space when the ray is tilted.
 
@@ -230,7 +230,7 @@ not orthogonal to each other in 3D space when the ray is tilted.
    :width: 350
    :class: dark-light
 
-   Example for a ray tilted around a passing through a slit. The ray is tilted around :math:`a`, so :math:`a' = a`.
+   Example of a tilted ray passing through a slit. The ray is tilted around :math:`a`, so :math:`a' = a`.
 
 The lengths of the actual shortest distances are adjusted by the cosine of the angles 
 between the ray direction and the original axis vectors:
@@ -310,7 +310,7 @@ as :math:`\tan \sigma = \frac{1}{\sqrt{2} \ldots}`,
 this is mathematically equivalent to our formulation of :math:`\tan \sigma = \frac{\gamma}{2\ldots}` 
 with :math:`\gamma = \sqrt{2}` in equation :math:numref:`eq_hurb_tan_custom_uncertainty`.
 
-In optrace :math:`\gamma` can be customized via a parameter, as detailed in Section :numref:`hurb_usage`, 
+In optrace, :math:`\gamma` can be customized via a parameter, as detailed in Section :numref:`hurb_usage`, 
 allowing for fine-tuning to specific simulation scenarios. 
 By default, optrace uses :math:`\gamma = \sqrt{2}`. 
 The results of this parametrization can be found in the subsequent section.
@@ -341,7 +341,7 @@ All simulations were conducted with an uncertainty factor of :math:`\gamma = \sq
    :width: 700
    :class: dark-light
 
-   Comparison of HURB and the theoretical curve for the far field diffraction of a pinhole.
+   Comparison of HURB and the theoretical curve for the far-field diffraction of a pinhole.
 
 .. figure:: ../images/hurb_simulation_lens.webp
    :align: center
@@ -362,4 +362,5 @@ All simulations were conducted with an uncertainty factor of :math:`\gamma = \sq
 **References**
 
 .. footbibliography::
+
 

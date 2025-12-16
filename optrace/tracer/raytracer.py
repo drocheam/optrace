@@ -935,8 +935,7 @@ class Raytracer(Group):
             ignore = no_start | no_reach
 
             # index for ray position before intersection
-            rs2 = np.argmax(bh_zmin, axis=1) - 1
-            rs2[rs2 < 0] = 0
+            rs2 = (np.argmax(bh_zmin, axis=1) - 1).clip(0)
 
             # mask for ill-conditioned rays
             ill_mask = np.zeros(rs2.shape[0], dtype=bool)

@@ -71,7 +71,7 @@ ___________________
 Namespaces
 ______________________
 
-:python:`optrace` s the primary namespace.
+:python:`optrace` is the primary namespace.
 While there is a separate sub-namespace for the tracer, called :mod:`optrace.tracer`, 
 it is automatically included in the main namespace.
 

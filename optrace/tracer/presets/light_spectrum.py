@@ -90,6 +90,7 @@ standard_f: list = [f2, f7, f11]
 standard_led: list = [led_b1, led_b2, led_b3, led_b4, led_b5, led_bh1, led_rgb1, led_v1, led_v2]
 """standard illuminants for LED light"""
 
+#: :meta hide-value:
 standard: list = [*standard_natural, *standard_f, *standard_led]
 """standard illuminant presets in one list"""
 
@@ -118,6 +119,7 @@ srgb_w: LightSpectrum = LightSpectrum("Function", func=lambda wl: color.srgb_r_p
 srgb_r_power_factor, srgb_g_power_factor, srgb_b_power_factor = color.SRGB_PRIMARY_POWER_FACTORS
 """Power ratios for white mixing from sRGB primaries"""
 
+#: :meta hide-value:
 srgb: list = [srgb_r, srgb_g, srgb_b, srgb_w]
 """sRGB channel and white presets in one list"""
 
@@ -145,6 +147,7 @@ rgb_lines: LightSpectrum = LightSpectrum("Lines", lines=Lines.rgb, line_vals=[0.
                                          desc="RGB Lines'", long_desc="sRGB Primary Dominant Wavelengths")
 """Spectral Lines 450, 550, 650nm with a power ratio producing neutral D65 white"""
 
+#: :meta hide-value:
 lines: list = [FDC, FdC, FeC, F_eC_, rgb_lines]
 """all lines spectrum presets in one list"""
 
@@ -154,3 +157,4 @@ lines: list = [FDC, FdC, FeC, F_eC_, rgb_lines]
 
 all_presets: list = [*standard, *lines, *srgb]
 """all light spectrum presets in one list"""
+

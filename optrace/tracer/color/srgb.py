@@ -332,7 +332,7 @@ def xyz_to_srgb_linear(xyz:                 np.ndarray,
         XYZ[inv, 2] = k*(1-x-y)
 
     if rendering_intent == "Perceptual":
-        XYZ[XYZ < 0] = 0
+        XYZ = XYZ.clip(0)
         Luv = xyz_to_luv(XYZ, normalize=False)  
         # ^-- don't normalize, since we transform back and forth and expect the same L
 

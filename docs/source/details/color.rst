@@ -155,7 +155,7 @@ according to perceived brightness and minimizing banding.
 
 **Conversion XYZ to sRGB**
 
-The linear sRGB values, prior to gamma correction, are obtained through a linear transformation of 
+The linear sRGB values, before gamma correction, are obtained through a linear transformation of 
 the CIE XYZ tristimulus values. The conversion from CIE XYZ to linear sRGB is defined by the following 
 matrix multiplication :footcite:`BloomMatrices,sRGBWiki`:
 
@@ -255,7 +255,7 @@ In its default configuration, the Perceptual Colorimetric rendering intent scale
 ensure they fall within the target gamut. Alternatively, a fixed rescaling factor (within the range 0 to 1) can be 
 supplied via the :python:`chroma_scale` parameter. This allows for consistent scaling, which can be beneficial when 
 comparing different images. In the adaptive scaling scenario, an additional :python:`L_th` parameter can be specified. 
-This parameter represents a relative luminance threshold: Colors with luminance below this threshold are excluded from 
+This parameter represents a relative luminance threshold: colors with luminance below this threshold are excluded from 
 the calculation of the scaling factor. This can be useful for disregarding dark but saturated image regions that might 
 otherwise influence the overall chroma scaling. For more detailed information, refer to :ref:`usage_color`.
 
@@ -263,7 +263,7 @@ The effect of different rendering intents is illustrated in the next figures.
 The rendered images were created using the :ref:`example_prism`. 
 Since all spectral wavelengths create colors beyond the sRGB gamut, this leads to an extreme case.
 In the first image the lightness component is pictured, the following images should be the colored version of 
-this lightness image. With the Absolute Colorimetric rendering intent one can see not only the colors having different 
+this lightness image. With the Absolute Colorimetric rendering intent, one can see not only the colors having different 
 saturation, but the lightness gradient is different compared to the first image. This can especially be seen around 
 :math:`x = 1.3` mm to :math:`x= 1.4` mm. While the lightness values were in fact unchanged, this subjective difference 
 comes from the Helmholtz-Kohlrausch effect :footcite:`HelmKohlWiki`, which describes that color saturation can lead to
@@ -271,11 +271,11 @@ higher perceived lightness. Since the saturation was clipped, and the maximum va
 saturation ratios are falsified, leading to this effect behaving differently for every color.
 The third image shows the Perceptual Colorimetric rendering intent. 
 One can clearly see a decreased saturation for all colors. 
-However, the saturation ratios are kept and the lightness gradient matches the lightness image.
+However, the saturation ratios are kept, and the lightness gradient matches the lightness image.
 
 
 The effect of different rendering intents is illustrated in the following figures, 
-generated using the :ref:`example_prism`.This scenario represents an extreme case, due to the fact that all spectral 
+generated using the :ref:`example_prism`.This scenario represents an extreme case, since all spectral 
 wavelengths produce colors exceeding the sRGB gamut.
 
 The first image depicts the lightness component. Subsequent images display the colored versions corresponding 
@@ -312,7 +312,7 @@ However, the chroma ratios are preserved, and the lightness gradient aligns with
           :class: dark-light
 
 
-A lot of negative examples for color representation can be found in literature  
+Plenty of negative examples for color representation can be found in literature  
 (`Link1 <https://clarkvision.com/articles/color-cie-chromaticity-and-perception/color-rgb-xy-cie1931-diagram1g1000spjfjl1-1000-ciesrgb-axes-waveticks-c1-srgb-800.jpg>`__,
 `Link2 <https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a>`__,
 `Link3 <https://www.faes.de/NN_in_der_Farbmetrik/NN_Erklaerung_Farbraum/cie-normfarbtafel.jpg>`__,
@@ -469,7 +469,7 @@ However, this limitation does not apply when selecting illuminant curves.
 
 While the conversion of a spectral distribution to a color is well-defined, going backwards the conversion is not unique 
 and simply reversible. Multiple spectral distributions can create the same color stimulus, 
-an effect known as *metamerism*. In fact, there infinitely many distributions being perceived as the same color.
+an effect known as *metamerism*. In fact, there are infinitely many distributions being perceived as the same color.
 With so many possibilities to choose from, we can demand some requirements for our sRGB primaries:
 
 While the conversion from a spectral distribution to a color is a well-defined process, 
@@ -484,7 +484,7 @@ for our sRGB primaries:
      2. Same luminance ratios as sRGB primaries
      3. Simple, smooth spectral functions
      4. Wide spectrum
-     5. Relatively few light in non-visible regions (infrared and ultraviolet)
+     5. Relatively little light in non-visible regions (infrared and ultraviolet)
 
 Points 1 and 2 simplify the spectral upsampling process because the mixing ratios of the linear sRGB values can be
 directly utilized. Although we could theoretically define a new color space and gamut that encompasses the sRGB gamut 
@@ -497,7 +497,7 @@ Points 3 and 4 are necessary to approximate natural illuminants with a high degr
 primaries to generate a white spectrum should ideally cover the entire visible spectral range without any significant
 gaps. Such gaps would reduce the color rendering index (CRI) of the illuminant. The CRI is a metric used to quantify 
 how faithfully an object's colors are rendered when illuminated by a particular light source. For example, a light 
-spectrum with a deficiency in the yellow region would fail to accurately render pure yellow colors.
+spectrum with a deficiency in the yellow region would fail to render pure yellow colors accurately.
 
 Point 5 ensures that the majority of the traced light contributes meaningfully to the final rendered image.
 Given that sRGB is a color space designed for human vision, an input color image in sRGB should ideally produce a 
@@ -548,7 +548,7 @@ descriptions for the resulting spectral curves.
 
 **Dimensioning**
 
-The mathematical functions of choice is a Gaussian function, which is defined as:
+The mathematical function of choice is a Gaussian function, which is defined as:
 
 .. math::
    S(\lambda, \mu, \sigma)=\frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \left(-\frac{(\lambda-\mu)^{2}}{2 \sigma^{2}}\right)
@@ -624,7 +624,7 @@ The resulting spectrum for sRGB white (with coordinates :math:`[1.0, 1.0, 1.0]`)
 In a subsequent step, the spectral distributions of the color channel primaries are treated as 
 probability density functions (pdfs). A key property of a pdf is that its integral over the entire domain 
 (the area under the curve) must be normalized to unity, representing a total probability of 1. 
-This normalization process effectively cancels out any multiplicative factors in the channel curves, 
+This normalization process effectively cancels any multiplicative factors in the channel curves, 
 as well as the relative scaling between the channels. 
 To compensate for this effect on luminance, the mixing ratio of each channel is rescaled by the area under 
 its corresponding spectral curve. Since this area is proportional to the probability ratio, 
@@ -659,7 +659,7 @@ A specific wavelength is subsequently sampled from this probability distribution
     3. Normalize, so integral equals 1: :math:`[0.788, 0.190, 0.022]`
     4. Choose one of the three channels with the values from 3. as the probability: 
        The R channel gets randomly chosen.
-    5. Use the R primary curve as probability distribution, choose a random wavelength accordingly: 
+    5. Use the R primary curve as a probability distribution, choose a random wavelength accordingly: 
        :math:`\lambda = 623.91\,` nm gets chosen.
     6. Repeating 4. and 5. by choosing randomly, a spectrum is created, 
        that for many rays converges to the correct sRGB color.
@@ -720,7 +720,7 @@ these intensity weights are then rescaled so that the sum over all pixels in the
       0.277 & 0.470
       \end{bmatrix}
 
-   4. Chose randomly according to the probabilities.
+   4. Choose randomly according to the probabilities.
 
 
 ------------
@@ -728,4 +728,5 @@ these intensity weights are then rescaled so that the sum over all pixels in the
 **References**
 
 .. footbibliography::
+
 
