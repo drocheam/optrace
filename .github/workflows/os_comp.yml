@@ -23,11 +23,19 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     
-    # needed for the x-server to work
+    # headless display (Linux and Windows)
     - name: Setup headless display
       uses: drocheam/setup-headless-display-action@main
       with:
         qt: true
+
+    # offscreen rendering (MacOS)
+    - name: Force offscreen render for macOS
+      run: |
+        if [ "$RUNNER_OS" == "macOS" ]; then
+          echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
+          echo "VTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=1" >> $GITHUB_ENV
+        fi
     
     # run tests 
     - name: Run tox

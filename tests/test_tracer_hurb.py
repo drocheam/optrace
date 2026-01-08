@@ -102,7 +102,7 @@ class TracerHurbTests(unittest.TestCase):
                               [1.5, 0.005, 0.005, 780, 23., -30], [1.1, 0.01, 0.1, 480, 20, 45]]:
 
             r, _, imgi1, imgi2, imgr1, imgr2 = hurb_slit(n=n, d1=d1, d2=d2, wl=wl, zd=zd, 
-                                      N=3000000, N_px=945, angle=ang, dim_ext_fact=5, use_hurb=True, hurb_factor=1)
+                                      N=5000000, N_px=945, angle=ang, dim_ext_fact=5, use_hurb=True, hurb_factor=1)
 
             std_i1 = np.average(r**2, weights=imgi1)**0.5
             std_r1 = np.average(r**2, weights=imgr1)**0.5
