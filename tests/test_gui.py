@@ -798,6 +798,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.install
     @pytest.mark.slow
     @pytest.mark.gui1
+    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_run_command(self):
         """test command setting and sending as well as automatic replotting (also tests TraceGUI.smart_replot()"""
 
@@ -1946,6 +1947,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.os
     @pytest.mark.gui2
+    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_screenshot(self) -> None:
         
         RT = tracing_geometry()
