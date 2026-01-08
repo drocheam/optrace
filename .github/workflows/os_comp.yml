@@ -31,12 +31,13 @@ jobs:
 
     # offscreen rendering (MacOS)
     - name: Force offscreen render for macOS
-      run: |
-        if [ "$RUNNER_OS" == "macOS" ]; then
+        if: runner.os == 'macOS'
+        run: |
           echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
           echo "VTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=1" >> $GITHUB_ENV
-        fi
-    
+          echo "LIBGL_ALWAYS_SOFTWARE=1" >> $GITHUB_ENV
+          echo "GALLIUM_DRIVER=llvmpipe" >> $GITHUB_ENV
+
     # run tests 
     - name: Run tox
       uses: lsst-sqre/run-tox@v1
