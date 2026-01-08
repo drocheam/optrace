@@ -14,7 +14,7 @@ jobs:
   os_test:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-14, windows-latest] # NOTE macos-latest (15) leads to issues when running headless (as of 08.01.2026)
         python-version: ['3.13']
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -28,15 +28,6 @@ jobs:
       uses: drocheam/setup-headless-display-action@main
       with:
         qt: true
-
-    # offscreen rendering (MacOS)
-    - name: Force offscreen render for macOS
-      if: runner.os == 'macOS'
-      run: |
-          echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
-          echo "VTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=1" >> $GITHUB_ENV
-          echo "LIBGL_ALWAYS_SOFTWARE=1" >> $GITHUB_ENV
-          echo "GALLIUM_DRIVER=llvmpipe" >> $GITHUB_ENV
 
     # run tests 
     - name: Run tox
