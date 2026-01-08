@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>5.3. Heisenberg Uncertainty Ray Bending - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="5.4. Image and Spectrum Rendering" href="image_spectrum.html" /><link rel="prev" title="5.2. Tracing Procedure" href="tracing.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/details/hurb.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/details/hurb.html"/>
+  <meta property="og:title" content="5.3. Heisenberg Uncertainty Ray Bending"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">5. Implementation Details</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#overview">5.3.1. Overview</a></li>
+<li><a class="reference internal" href="#directional-distribution">5.3.2. Directional Distribution</a></li>
+<li><a class="reference internal" href="#aperture-edge-distances">5.3.3. Aperture Edge Distances</a></li>
+<li><a class="reference internal" href="#new-direction-vectors">5.3.4. New Direction Vectors</a></li>
+<li><a class="reference internal" href="#selecting-the-uncertainty-factor">5.3.5. Selecting the Uncertainty Factor</a></li>
+<li><a class="reference internal" href="#comparison-to-theoretical-curves">5.3.6. Comparison to Theoretical Curves</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">5. </span>Implementation Details</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">5.3. </span>Heisenberg Uncertainty Ray Bending</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/details/hurb.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/details/hurb.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/details/hurb.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/hurb.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/hurb.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="heisenberg-uncertainty-ray-bending">
+<span id="hurb-details"></span><h1><span class="section-number">5.3. </span>Heisenberg Uncertainty Ray Bending<a class="headerlink" href="#heisenberg-uncertainty-ray-bending" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2><span class="section-number">5.3.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Heisenberg Uncertainty Ray Bending (HURB), also known as Heisenberg Uncertainty Monte Carlo (HUMC),
+is a statistical method designed to approximate edge diffraction within Monte Carlo raytracing.
+This approach perturbs the direction of rays near aperture edges.
+The magnitude of this directional deviation is determined by the ray’s proximity to the edge
+and is governed by the position-momentum uncertainty principle.</p>
+<p>The concept of applying this principle to raytracing was initially proposed by
+Heinisch and Chou <a class="footnote-reference brackets" href="#footcite-heinisch-1971" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, with subsequent modifications introduced
+by Likeness <a class="footnote-reference brackets" href="#footcite-likeness-1977" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> and Coffey et al. <a class="footnote-reference brackets" href="#footcite-coffey-1998" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.
+Numerous studies have demonstrated HURB’s effectiveness in approximating both near-field and far-field
+diffraction phenomena <a class="footnote-reference brackets" href="#footcite-heinisch-1971" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-freniere-2006" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-serikov-2001" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
+<p>HURB has been implemented in commercial raytracers such as TracePro <a class="footnote-reference brackets" href="#footcite-freniere-1999" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>,
+as well as open-source projects like ISET3D <a class="footnote-reference brackets" href="#footcite-lian-2019" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>.
+While extensions exist that incorporate the light’s phase to model interference effects
+<a class="footnote-reference brackets" href="#footcite-freniere-2006" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-serikov-2001" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-yuan-2016" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>, these are outside the scope of this work.</p>
+</section>
+<section id="directional-distribution">
+<h2><span class="section-number">5.3.2. </span>Directional Distribution<a class="headerlink" href="#directional-distribution" title="Link to this heading">¶</a></h2>
+<p>The principles of position and momentum can be analyzed by separating them into their respective
+<span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> components.
+For the <span class="math notranslate nohighlight">\(x\)</span>-direction, the uncertainty principle is expressed as <a class="footnote-reference brackets" href="#footcite-freniere-1999" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-eq-hurb-heisenberg-x">
+<div class="math notranslate nohighlight" id="equation-eq-hurb-heisenberg-x">
+<span class="eqno">(5.68)<a class="headerlink" href="#equation-eq-hurb-heisenberg-x" title="Link to this equation">¶</a></span>\[\Delta x \Delta p_x \geq \frac{\hbar}{2}\]</div>
+</div>
+<p>In this equation, <span class="math notranslate nohighlight">\(\Delta x\)</span> represents the distance from the ray to the nearest aperture edge,
+<span class="math notranslate nohighlight">\(\Delta p_x\)</span> is the momentum uncertainty in the <span class="math notranslate nohighlight">\(x\)</span>-direction,
+and <span class="math notranslate nohighlight">\(\hbar\)</span> denotes the reduced Planck constant.</p>
+<p>The relative directional uncertainty can be characterized by a tangent relationship <a class="footnote-reference brackets" href="#footcite-freniere-1999" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-eq-hurb-tan-momentum">
+<div class="math notranslate nohighlight" id="equation-eq-hurb-tan-momentum">
+<span class="eqno">(5.69)<a class="headerlink" href="#equation-eq-hurb-tan-momentum" title="Link to this equation">¶</a></span>\[\tan \sigma_x = \frac{\Delta p_x}{p}\]</div>
+</div>
+<p>Here, <span class="math notranslate nohighlight">\(p\)</span> is the total momentum, defined as:</p>
+<div class="math-wrapper docutils container" id="equation-eq-hurb-momentum">
+<div class="math notranslate nohighlight" id="equation-eq-hurb-momentum">
+<span class="eqno">(5.70)<a class="headerlink" href="#equation-eq-hurb-momentum" title="Link to this equation">¶</a></span>\[p = \hbar k = \hbar \frac{2 \pi}{\lambda} = \frac{n(\lambda_0) h}{\lambda_0}\]</div>
+</div>
+<p>Substituting Equation <a class="reference internal" href="#equation-eq-hurb-heisenberg-x">(5.68)</a> and Equation <a class="reference internal" href="#equation-eq-hurb-momentum">(5.70)</a>
+into Equation <a class="reference internal" href="#equation-eq-hurb-tan-momentum">(5.69)</a> yields the following expression
+for the tangent of the uncertainty in the <span class="math notranslate nohighlight">\(x\)</span>-direction:</p>
+<div class="math-wrapper docutils container" id="equation-eq-hurb-tan-x">
+<div class="math notranslate nohighlight" id="equation-eq-hurb-tan-x">
+<span class="eqno">(5.71)<a class="headerlink" href="#equation-eq-hurb-tan-x" title="Link to this equation">¶</a></span>\[\tan \sigma_x = \frac{1}{2\Delta x k}\]</div>
+</div>
+<p>Similarly, for the <span class="math notranslate nohighlight">\(y\)</span>-direction, the tangent of the uncertainty is given by:</p>
+<div class="math-wrapper docutils container" id="equation-eq-hurb-tan-y">
+<div class="math notranslate nohighlight" id="equation-eq-hurb-tan-y">
+<span class="eqno">(5.72)<a class="headerlink" href="#equation-eq-hurb-tan-y" title="Link to this equation">¶</a></span>\[\tan \sigma_y = \frac{1}{2\Delta y k}\]</div>
+</div>
+<p>A key assumption in this model is that the tangent of the perturbed angles,
+<span class="math notranslate nohighlight">\(\tan \theta_x\)</span> and <span class="math notranslate nohighlight">\(\tan \theta_y\)</span>, follow a bivariate normal distribution
+with standard deviations <span class="math notranslate nohighlight">\(\tan \sigma_x\)</span> and <span class="math notranslate nohighlight">\(\tan \sigma_y\)</span>
+respectively <a class="footnote-reference brackets" href="#footcite-coffey-1998" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-serikov-2001" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>. The probability density function is therefore:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-0">
+<div class="math notranslate nohighlight" id="equation-details-hurb-0">
+<span class="eqno">(5.73)<a class="headerlink" href="#equation-details-hurb-0" title="Link to this equation">¶</a></span>\[p\left(\tan \theta_x, \tan \theta_y\right)=\frac{1}{2 \pi \tan \sigma_x \tan \sigma_y}
+\exp\left(-\frac{\tan^2 \theta_x}{2 \tan^2 \sigma_x} -\frac{\tan^2 \theta_y}{2 \tan^2 \sigma_y}\right)\]</div>
+</div>
+<p>It is worth noting that some authors <a class="footnote-reference brackets" href="#footcite-heinisch-1971" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-freniere-1999" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>
+propose that the angles themselves, rather than their tangents, are normally distributed.
+For small angles, the small angle approximation renders both approaches equivalent.
+However, for larger angles, the tangent-based approach is considered more accurate for two primary reasons:</p>
+<ol class="arabic simple">
+<li><p>Using the tangent intrinsically limits the new ray direction to the forward half-space.</p></li>
+<li><p>From a physical perspective, the uncertainty lies in <span class="math notranslate nohighlight">\(\Delta p_x\)</span> and <span class="math notranslate nohighlight">\(\Delta p_y\)</span>.
+Since momentum <span class="math notranslate nohighlight">\(p\)</span> is constant, the uncertainty in direction is proportional to the tangent of the angle
+(as shown in Equation <a class="reference internal" href="#equation-eq-hurb-tan-momentum">(5.69)</a>), rather than the angle directly.</p></li>
+</ol>
+</section>
+<section id="aperture-edge-distances">
+<h2><span class="section-number">5.3.3. </span>Aperture Edge Distances<a class="headerlink" href="#aperture-edge-distances" title="Link to this heading">¶</a></h2>
+<p><strong>Overview</strong></p>
+<p>The fundamental procedure, as outlined by Heinisch and Chou <a class="footnote-reference brackets" href="#footcite-heinisch-1971" id="id18" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>,
+involves identifying the direction associated with the minimum distance to an aperture edge.
+This shortest distance defines the minor axis of a conceptual distance ellipse.
+Conversely, the major axis of this ellipse is determined
+by fitting the largest possible area ellipse within the aperture boundaries.</p>
+<p>These ellipse axes will be denoted as <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>,
+and their corresponding uncertainties as <span class="math notranslate nohighlight">\(\Delta a\)</span> and <span class="math notranslate nohighlight">\(\Delta b\)</span>.</p>
+<p><strong>Rectangle</strong></p>
+<p>Consider a rectangular aperture with a width of <span class="math notranslate nohighlight">\(2B\)</span> and a height of <span class="math notranslate nohighlight">\(2A\)</span>,
+centered at coordinates <span class="math notranslate nohighlight">\((x_0, y_0, z_0)\)</span> and orthogonal to the z-axis.
+For a ray traversing the aperture at position <span class="math notranslate nohighlight">\((x, y, z_0)\)</span>,
+the distances to the respective edges are given by <a class="footnote-reference brackets" href="#footcite-freniere-1999" id="id19" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-1">
+<div class="math notranslate nohighlight" id="equation-details-hurb-1">
+<span class="eqno">(5.74)<a class="headerlink" href="#equation-details-hurb-1" title="Link to this equation">¶</a></span>\[\begin{split}\Delta a &amp;= \lvert y - y_0 \rvert - A\\
+\Delta b &amp;= \lvert x - x_0 \rvert - B\end{split}\]</div>
+</div>
+<figure class="align-center" id="id22">
+<a class="dark-light reference internal image-reference" href="../_images/hurb_rectangle.svg"><img alt="../_images/hurb_rectangle.svg" class="dark-light" src="../_images/hurb_rectangle.svg" width="350" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.11 </span><span class="caption-text">Example for the HURB ellipse inside a rectangle aperture.
+The ray position is marked in cyan color, the ellipse in orange.</span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The direction vectors aligned with the edges are equivalent to the unit vectors in the x and y directions:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-2">
+<div class="math notranslate nohighlight" id="equation-details-hurb-2">
+<span class="eqno">(5.75)<a class="headerlink" href="#equation-details-hurb-2" title="Link to this equation">¶</a></span>\[\begin{split}b = \left(\begin{array}{c}
+1 \\
+0 \\
+0
+\end{array}\right)\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-details-hurb-3">
+<div class="math notranslate nohighlight" id="equation-details-hurb-3">
+<span class="eqno">(5.76)<a class="headerlink" href="#equation-details-hurb-3" title="Link to this equation">¶</a></span>\[\begin{split}a = \left(\begin{array}{c}
+0 \\
+1 \\
+0
+\end{array}\right)\end{split}\]</div>
+</div>
+<p>For a rotated rectangular aperture, the ray’s position must first be transformed into the rotated rectangle’s
+local coordinate system via a rotation operation.
+Conversely, the direction vectors <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>
+must be converted from the rotated system back into the absolute coordinate system.</p>
+<p><strong>Circle</strong></p>
+<p>For a circular aperture with radius <span class="math notranslate nohighlight">\(R\)</span> centered at <span class="math notranslate nohighlight">\((x_0, y_0, z_0)\)</span>,
+the relative polar coordinates of a ray position <span class="math notranslate nohighlight">\((x, y, z_0)\)</span>
+within the aperture’s coordinate system are defined as:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-4">
+<div class="math notranslate nohighlight" id="equation-details-hurb-4">
+<span class="eqno">(5.77)<a class="headerlink" href="#equation-details-hurb-4" title="Link to this equation">¶</a></span>\[\begin{split}r &amp;= \sqrt{(x-x_0)^2 + (y-y_0)^2}\\
+\phi &amp;= \text{atan2}(y-y_0, x-x_0)\\\end{split}\]</div>
+</div>
+<figure class="align-center" id="id23">
+<a class="dark-light reference internal image-reference" href="../_images/hurb_circle.svg"><img alt="../_images/hurb_circle.svg" class="dark-light" src="../_images/hurb_circle.svg" width="350" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.12 </span><span class="caption-text">Example for the HURB ellipse inside a circular aperture.
+The ray position is marked in cyan color, the ellipse in orange.</span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The minor axis length of the ellipse, <span class="math notranslate nohighlight">\(\Delta b\)</span>, is determined by the distance from the ray to the circular edge:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-5">
+<div class="math notranslate nohighlight" id="equation-details-hurb-5">
+<span class="eqno">(5.78)<a class="headerlink" href="#equation-details-hurb-5" title="Link to this equation">¶</a></span>\[\Delta b = R - r\]</div>
+</div>
+<p>The major axis length, <span class="math notranslate nohighlight">\(\Delta a\)</span>, is calculated by matching the curvature of the ellipse to that of the aperture.
+This relationship leads to the formula <span class="math notranslate nohighlight">\(R = \Delta a^2 / \Delta b\)</span>
+(as derived <a class="reference external" href="https://math.stackexchange.com/a/4511196">here</a>), from which <span class="math notranslate nohighlight">\(\Delta a\)</span> is obtained:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-6">
+<div class="math notranslate nohighlight" id="equation-details-hurb-6">
+<span class="eqno">(5.79)<a class="headerlink" href="#equation-details-hurb-6" title="Link to this equation">¶</a></span>\[\Delta a = \sqrt{\Delta b R}\]</div>
+</div>
+<p>The unit vectors defining the directions of these axes are:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-7">
+<div class="math notranslate nohighlight" id="equation-details-hurb-7">
+<span class="eqno">(5.80)<a class="headerlink" href="#equation-details-hurb-7" title="Link to this equation">¶</a></span>\[\begin{split}b = \left(\begin{array}{c}
+\cos \phi \\
+\sin \phi \\
+0
+\end{array}\right)\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-details-hurb-8">
+<div class="math notranslate nohighlight" id="equation-details-hurb-8">
+<span class="eqno">(5.81)<a class="headerlink" href="#equation-details-hurb-8" title="Link to this equation">¶</a></span>\[\begin{split}a = \left(\begin{array}{c}
+\sin \phi \\
+-\cos \phi \\
+0
+\end{array}\right)\end{split}\]</div>
+</div>
+<p>It is noteworthy that the implementation within ISET3D,
+as observed <a class="reference external" href="https://github.com/scienstanford/pbrt-v4/blob/master/src/pbrt/cameras.cpp#L2105">here</a>,
+does not utilize the largest-ellipse approach for defining the major axis.
+Instead, it directly employs the distance to the circular edge as the size of the major ellipse axis.
+Compared to the presented method, this alternative approach results in smaller uncertainties of <span class="math notranslate nohighlight">\(\tan \sigma_a\)</span>.</p>
+</section>
+<section id="new-direction-vectors">
+<h2><span class="section-number">5.3.4. </span>New Direction Vectors<a class="headerlink" href="#new-direction-vectors" title="Link to this heading">¶</a></h2>
+<p>Composing a new direction vector for light propagating perpendicular to the aperture plane is a straightforward process.
+However, this becomes significantly more challenging when considering arbitrary ray angles.</p>
+<p>A tilted incident ray effectively “sees” a projected aperture, which introduces several complexities:</p>
+<ul class="simple">
+<li><p>The direction vectors <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> are no longer orthogonal to the ray’s propagation vector <span class="math notranslate nohighlight">\(s\)</span>.</p></li>
+<li><p>The calculated <span class="math notranslate nohighlight">\(\Delta a\)</span> and <span class="math notranslate nohighlight">\(\Delta b\)</span>
+no longer represent the true shortest distances to the aperture edges.</p></li>
+<li><p>The actual shortest distance to the aperture edge does not necessarily lie within the aperture plane.</p></li>
+<li><p>The vectors representing the actual shortest distances are generally not orthogonal to each other.</p></li>
+<li><p>These actual shortest distances can occur at different starting points along the ray’s path.</p></li>
+</ul>
+<p>Our current implementation aims to address the first three of these issues.
+We define new orthogonal basis vectors, <span class="math notranslate nohighlight">\(a'\)</span> and <span class="math notranslate nohighlight">\(b'\)</span>, relative to the ray’s direction vector <span class="math notranslate nohighlight">\(s\)</span>:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-9">
+<div class="math notranslate nohighlight" id="equation-details-hurb-9">
+<span class="eqno">(5.82)<a class="headerlink" href="#equation-details-hurb-9" title="Link to this equation">¶</a></span>\[\begin{split}a' &amp;= \frac{b \times s}{\lvert b \times s\rvert}\\
+b' &amp;= \frac{s \times a'}{\lvert s \times a'\rvert}\end{split}\]</div>
+</div>
+<p>In this new basis, the vectors <span class="math notranslate nohighlight">\(s\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, and <span class="math notranslate nohighlight">\(b'\)</span> are coplanar,
+and <span class="math notranslate nohighlight">\(b'\)</span> aligns with the direction of the shortest distance to the aperture edge.
+While <span class="math notranslate nohighlight">\(s\)</span> and <span class="math notranslate nohighlight">\(a'\)</span> also lie within a plane, this plane is orthogonal to the one containing <span class="math notranslate nohighlight">\(s, b, b'\)</span>.
+It is important to note that the original vector <span class="math notranslate nohighlight">\(a\)</span> typically does not lie within this second plane.
+This non-alignment is a consequence of the fact that the true shortest distances to the aperture edges are typically
+not orthogonal to each other in 3D space when the ray is tilted.</p>
+<figure class="align-center" id="id24">
+<a class="dark-light reference internal image-reference" href="../_images/hurb_direction.svg"><img alt="../_images/hurb_direction.svg" class="dark-light" src="../_images/hurb_direction.svg" width="350" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.13 </span><span class="caption-text">Example of a tilted ray passing through a slit. The ray is tilted around <span class="math notranslate nohighlight">\(a\)</span>, so <span class="math notranslate nohighlight">\(a' = a\)</span>.</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The lengths of the actual shortest distances are adjusted by the cosine of the angles
+between the ray direction and the original axis vectors:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-10">
+<div class="math notranslate nohighlight" id="equation-details-hurb-10">
+<span class="eqno">(5.83)<a class="headerlink" href="#equation-details-hurb-10" title="Link to this equation">¶</a></span>\[\begin{split}\Delta a' &amp;= \Delta a \cos \psi_a\\
+\Delta b' &amp;= \Delta b \cos \psi_b\\\end{split}\]</div>
+</div>
+<p>Here, <span class="math notranslate nohighlight">\(\psi_a\)</span> and <span class="math notranslate nohighlight">\(\psi_b\)</span> represent the angles lying in the planes defined by <span class="math notranslate nohighlight">\(s, a\)</span>
+and <span class="math notranslate nohighlight">\(s, b\)</span> respectively.
+Assuming <span class="math notranslate nohighlight">\(s\)</span>, <span class="math notranslate nohighlight">\(a\)</span>, and <span class="math notranslate nohighlight">\(b\)</span> are unit vectors,
+the cosine terms can be expressed through a dot product,
+utilizing the identity <span class="math notranslate nohighlight">\(\cos \psi = \sqrt{1 - \sin^2 \psi}\)</span>:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-11">
+<div class="math notranslate nohighlight" id="equation-details-hurb-11">
+<span class="eqno">(5.84)<a class="headerlink" href="#equation-details-hurb-11" title="Link to this equation">¶</a></span>\[\begin{split}\cos \psi_a &amp;= \sqrt{1 - (s \cdot a)^2}\\
+\cos \psi_b &amp;= \sqrt{1 - (s \cdot b)^2}\\\end{split}\]</div>
+</div>
+<p>This leads to modified tangent expressions for the directional uncertainties:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-12">
+<div class="math notranslate nohighlight" id="equation-details-hurb-12">
+<span class="eqno">(5.85)<a class="headerlink" href="#equation-details-hurb-12" title="Link to this equation">¶</a></span>\[\begin{split}\tan \sigma_{a'} &amp;= \frac{1}{2 k \Delta a \cos \psi_a}\\
+\tan \sigma_{b'} &amp;= \frac{1}{2 k \Delta b \cos \psi_b}\\\end{split}\]</div>
+</div>
+<p>These modified tangents, <span class="math notranslate nohighlight">\(\tan \sigma_{a'}\)</span> and <span class="math notranslate nohighlight">\(\tan \sigma_{b'}\)</span>,
+are then used to determine the values <span class="math notranslate nohighlight">\(\tan \theta_{b'}\)</span> and <span class="math notranslate nohighlight">\(\tan \theta_{a'}\)</span>.
+With this approach, the distances <span class="math notranslate nohighlight">\(\Delta a'\)</span> and <span class="math notranslate nohighlight">\(\Delta b'\)</span>, as well as the vector <span class="math notranslate nohighlight">\(b'\)</span>,
+are calculated correctly.
+However, the vector <span class="math notranslate nohighlight">\(a'\)</span> is generally not entirely accurate due to the non-orthogonality
+of the true shortest distance vectors for tilted rays.
+An exception occurs when the ray is tilted exclusively along the <span class="math notranslate nohighlight">\(a\)</span> or <span class="math notranslate nohighlight">\(b\)</span> direction,
+in which case both vectors <span class="math notranslate nohighlight">\(a'\)</span> and <span class="math notranslate nohighlight">\(b'\)</span> are correctly determined.</p>
+<p>The new perturbed direction vector is constructed by summing the initial ray direction with components scaled
+by <span class="math notranslate nohighlight">\(\tan \theta_{b'}\)</span> and <span class="math notranslate nohighlight">\(\tan \theta_{a'}\)</span> along the <span class="math notranslate nohighlight">\(b'\)</span> and <span class="math notranslate nohighlight">\(a'\)</span> unit vectors, respectively:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-13">
+<div class="math notranslate nohighlight" id="equation-details-hurb-13">
+<span class="eqno">(5.86)<a class="headerlink" href="#equation-details-hurb-13" title="Link to this equation">¶</a></span>\[s'_\text{un} = s + b' \tan \theta_{b'} + a' \tan \theta_{a'}\]</div>
+</div>
+<p>This resultant vector, <span class="math notranslate nohighlight">\(s'_\text{un}\)</span>,
+must then be normalized to obtain the final perturbed unity direction vector <span class="math notranslate nohighlight">\(s'\)</span>:</p>
+<div class="math-wrapper docutils container" id="equation-details-hurb-14">
+<div class="math notranslate nohighlight" id="equation-details-hurb-14">
+<span class="eqno">(5.87)<a class="headerlink" href="#equation-details-hurb-14" title="Link to this equation">¶</a></span>\[s' = \frac{s'_\text{un}}{\lvert s'_\text{un} \rvert}\]</div>
+</div>
+<p>The implementation in ISET3D
+(as seen <a class="reference external" href="https://github.com/scienstanford/pbrt-v4/blob/master/src/pbrt/cameras.cpp#L2131-L2166">here</a>)
+constructs the new vector directly from <span class="math notranslate nohighlight">\(s\)</span>, <span class="math notranslate nohighlight">\(a\)</span>, and <span class="math notranslate nohighlight">\(b\)</span>.
+This method can introduce errors for significant ray tilts,
+as the components <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> are no longer orthogonal to each other in the projected plane.
+While our implementation addresses some of the aforementioned issues,
+it does not fully resolve all complexities arising from tilted rays.
+Nevertheless, the residual issues typically manifest noticeably only for rays with large tilt angles,
+as the projection effects exhibit a cosine dependency that can be neglected for small angles.</p>
+</section>
+<section id="selecting-the-uncertainty-factor">
+<span id="hurb-uncertainty-factor"></span><h2><span class="section-number">5.3.5. </span>Selecting the Uncertainty Factor<a class="headerlink" href="#selecting-the-uncertainty-factor" title="Link to this heading">¶</a></h2>
+<p>To provide further parametrization, a scaling factor <span class="math notranslate nohighlight">\(\gamma\)</span> has been introduced into the uncertainty equations
+<a class="reference internal" href="#equation-eq-hurb-tan-x">(5.71)</a> and <a class="reference internal" href="#equation-eq-hurb-tan-y">(5.72)</a>.
+The modified equations become:</p>
+<div class="math-wrapper docutils container" id="equation-eq-hurb-tan-custom-uncertainty">
+<div class="math notranslate nohighlight" id="equation-eq-hurb-tan-custom-uncertainty">
+<span class="eqno">(5.88)<a class="headerlink" href="#equation-eq-hurb-tan-custom-uncertainty" title="Link to this equation">¶</a></span>\[\begin{split}\tan \sigma_{a'} &amp;= \frac{\gamma}{2 k \Delta a \cos \psi_a}\\
+\tan \sigma_{b'} &amp;= \frac{\gamma}{2 k \Delta b \cos \psi_b}\\\end{split}\]</div>
+</div>
+<p>Most authors typically employ a value of <span class="math notranslate nohighlight">\(\gamma = 1\)</span>.
+However, Lin (2015) proposed a scaling factor of <span class="math notranslate nohighlight">\(\gamma = \sqrt{2}\)</span> (<a class="footnote-reference brackets" href="#footcite-lin2015computational" id="id20" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>, page 17)
+to achieve a better fit for diffraction patterns observed at a circular aperture.
+This value is also implemented in the PBRT fork used by ISET3D,
+as can be seen <a class="reference external" href="https://github.com/scienstanford/pbrt-v4/blob/master/src/pbrt/cameras.cpp#L2114">here</a>.
+It’s worth noting that while these sources might present the fraction
+as <span class="math notranslate nohighlight">\(\tan \sigma = \frac{1}{\sqrt{2} \ldots}\)</span>,
+this is mathematically equivalent to our formulation of <span class="math notranslate nohighlight">\(\tan \sigma = \frac{\gamma}{2\ldots}\)</span>
+with <span class="math notranslate nohighlight">\(\gamma = \sqrt{2}\)</span> in equation <a class="reference internal" href="#equation-eq-hurb-tan-custom-uncertainty">(5.88)</a>.</p>
+<p>In optrace, <span class="math notranslate nohighlight">\(\gamma\)</span> can be customized via a parameter, as detailed in Section <a class="reference internal" href="../usage/raytracer.html#hurb-usage"><span class="std std-numref">Section 4.5.3</span></a>,
+allowing for fine-tuning to specific simulation scenarios.
+By default, optrace uses <span class="math notranslate nohighlight">\(\gamma = \sqrt{2}\)</span>.
+The results of this parametrization can be found in the subsequent section.</p>
+<p>A value of <span class="math notranslate nohighlight">\(\gamma = 2\)</span> has been observed to provide a superior fit for the main lobe in comparison
+to graphs generated with <span class="math notranslate nohighlight">\(\gamma = 1\)</span>, which are commonly found in existing literature.
+With <span class="math notranslate nohighlight">\(\gamma = 2\)</span>, the simulation asymptotically matches the side lobes for slit, pinhole, and pupil geometries.
+Conversely, for edge diffraction, the fit is less optimal, producing more pronounced glare to the left of the edge.
+In such cases, <span class="math notranslate nohighlight">\(\gamma = 1\)</span> is likely to yield better results.</p>
+</section>
+<section id="comparison-to-theoretical-curves">
+<span id="hurb-comparison"></span><h2><span class="section-number">5.3.6. </span>Comparison to Theoretical Curves<a class="headerlink" href="#comparison-to-theoretical-curves" title="Link to this heading">¶</a></h2>
+<p>The following curves were generated using the test scripts located under <code class="docutils literal notranslate"><span class="pre">tests/hurb/</span></code>.
+All simulations were conducted with an uncertainty factor of <span class="math notranslate nohighlight">\(\gamma = \sqrt{2}\)</span>.</p>
+<figure class="align-center" id="id25">
+<a class="dark-light reference internal image-reference" href="../_images/hurb_simulation_slit.webp"><img alt="../_images/hurb_simulation_slit.webp" class="dark-light" src="../_images/hurb_simulation_slit.webp" width="700" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.14 </span><span class="caption-text">Comparison of HURB and the theoretical curve for the far field diffraction of a slit.</span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id26">
+<a class="dark-light reference internal image-reference" href="../_images/hurb_simulation_pinhole.webp"><img alt="../_images/hurb_simulation_pinhole.webp" class="dark-light" src="../_images/hurb_simulation_pinhole.webp" width="700" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.15 </span><span class="caption-text">Comparison of HURB and the theoretical curve for the far-field diffraction of a pinhole.</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id27">
+<a class="dark-light reference internal image-reference" href="../_images/hurb_simulation_lens.webp"><img alt="../_images/hurb_simulation_lens.webp" class="dark-light" src="../_images/hurb_simulation_lens.webp" width="700" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.16 </span><span class="caption-text">Comparison of HURB and the theoretical curve for the focus profile of an ideal lens behind a pupil.</span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id28">
+<a class="dark-light reference internal image-reference" href="../_images/hurb_simulation_edge.webp"><img alt="../_images/hurb_simulation_edge.webp" class="dark-light" src="../_images/hurb_simulation_edge.webp" width="700" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.17 </span><span class="caption-text">Comparison of HURB and the theoretical curve for the profile of edge diffraction.</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id21">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-heinisch-1971" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>,<a role="doc-backlink" href="#id16">3</a>,<a role="doc-backlink" href="#id18">4</a>)</span>
+<p>R. P. Heinisch and T. S. Chou. Numerical experiments in modeling diffraction phenomena. <em>Applied Optics</em>, 10(10):2248, October 1971. URL: <a class="reference external" href="http://dx.doi.org/10.1364/AO.10.002248">http://dx.doi.org/10.1364/AO.10.002248</a>, <a class="reference external" href="https://doi.org/10.1364/ao.10.002248">doi:10.1364/ao.10.002248</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-likeness-1977" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Barry K. Likeness. Stray light simulation with advanced monte carlo techniques. In John D. Lytle and Howard E. Morrow, editors, <em>Stray Light Problems in Optical Systems</em>, volume 0107, 80–88. SPIE, September 1977. URL: <a class="reference external" href="http://dx.doi.org/10.1117/12.964599">http://dx.doi.org/10.1117/12.964599</a>, <a class="reference external" href="https://doi.org/10.1117/12.964599">doi:10.1117/12.964599</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-coffey-1998" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id14">2</a>)</span>
+<p>Katherine L. Coffey, Kory J. Priestley, J. Robert Mahan, and Maria C. Sanchez. Diffraction models of radiation entering an aperture for use in a monte carlo ray-trace environment. In Robert E. Fischer, Lawrence M. Germann, Alson E. Hatheway, Malachy McConnell, and Warren J. Smith, editors, <em>Current Developments in Optical Design and Engineering VII</em>, volume 3429, 213. SPIE, October 1998. URL: <a class="reference external" href="http://dx.doi.org/10.1117/12.328547">http://dx.doi.org/10.1117/12.328547</a>, <a class="reference external" href="https://doi.org/10.1117/12.328547">doi:10.1117/12.328547</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-freniere-2006" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id5">1</a>,<a role="doc-backlink" href="#id9">2</a>)</span>
+<p>Edward R. Freniere. Numerical experiments in modeling diffraction phenomena with monte carlo ray tracing. In José M. Sasian and Mary G. Turner, editors, <em>Novel Optical Systems Design and Optimization IX</em>, volume 6289, 62890N. SPIE, August 2006. URL: <a class="reference external" href="http://dx.doi.org/10.1117/12.681797">http://dx.doi.org/10.1117/12.681797</a>, <a class="reference external" href="https://doi.org/10.1117/12.681797">doi:10.1117/12.681797</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-serikov-2001" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id6">1</a>,<a role="doc-backlink" href="#id10">2</a>,<a role="doc-backlink" href="#id15">3</a>)</span>
+<p>Vladimir V. Serikov and Shinji Kawamoto. Numerical experiments in monte carlo modeling of polarization, diffraction, and interference phenomena. In Frank Wyrowski, editor, <em>Wave-Optical Systems Engineering</em>, volume 4436, 80–88. SPIE, December 2001. URL: <a class="reference external" href="http://dx.doi.org/10.1117/12.451286">http://dx.doi.org/10.1117/12.451286</a>, <a class="reference external" href="https://doi.org/10.1117/12.451286">doi:10.1117/12.451286</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-freniere-1999" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id7">1</a>,<a role="doc-backlink" href="#id12">2</a>,<a role="doc-backlink" href="#id13">3</a>,<a role="doc-backlink" href="#id17">4</a>,<a role="doc-backlink" href="#id19">5</a>)</span>
+<p>Edward R. Freniere, G. Groot Gregory, and Richard A. Hassler. Edge diffraction in monte carlo ray tracing. In Richard C. Juergens, editor, <em>Optical Design and Analysis Software</em>, volume 3780, 151–157. SPIE, September 1999. URL: <a class="reference external" href="http://dx.doi.org/10.1117/12.363773">http://dx.doi.org/10.1117/12.363773</a>, <a class="reference external" href="https://doi.org/10.1117/12.363773">doi:10.1117/12.363773</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-lian-2019" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">7</a><span class="fn-bracket">]</span></span>
+<p>Trisha Lian, Kevin J. MacKenzie, David H. Brainard, Nicolas P. Cottaris, and Brian A. Wandell. Ray tracing 3d spectral scenes through human optics models. <em>Journal of Vision</em>, 19(12):23, October 2019. URL: <a class="reference external" href="http://dx.doi.org/10.1167/19.12.23">http://dx.doi.org/10.1167/19.12.23</a>, <a class="reference external" href="https://doi.org/10.1167/19.12.23">doi:10.1167/19.12.23</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-yuan-2016" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">8</a><span class="fn-bracket">]</span></span>
+<p>Yijia Yuan, Kuanfang Ren, and Claude Rozé. Fraunhofer diffraction of irregular apertures by heisenberg uncertainty monte carlo model. <em>Particuology</em>, 24:151–158, February 2016. URL: <a class="reference external" href="http://dx.doi.org/10.1016/j.partic.2015.03.006">http://dx.doi.org/10.1016/j.partic.2015.03.006</a>, <a class="reference external" href="https://doi.org/10.1016/j.partic.2015.03.006">doi:10.1016/j.partic.2015.03.006</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-lin2015computational" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">9</a><span class="fn-bracket">]</span></span>
+<p>Andy Lai Lin. <em>The Computational Image Systems Evaluation Toolbox: a software environment for rapid prototyping and evaluating computational imaging hardware and algorithms</em>. PhD thesis, Stanford University, Stanford, CA, 2015. Available online via Stanford Digital Repository. URL: <a class="reference external" href="https://purl.stanford.edu/xz083nw1432">https://purl.stanford.edu/xz083nw1432</a>.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="tracing.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">5.2. </span>Tracing Procedure</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="image_spectrum.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">5.4. </span>Image and Spectrum Rendering</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

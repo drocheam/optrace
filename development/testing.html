@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>7.1. Testing - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="7.2. Documentation" href="documentation.html" /><link rel="prev" title="7. Development" href="index.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/development/testing.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/development/testing.html"/>
+  <meta property="og:title" content="7.1. Testing"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">7. Development</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#overview">7.1.1. Overview</a></li>
+<li><a class="reference internal" href="#functionality-testing">7.1.2. Functionality Testing</a></li>
+<li><a class="reference internal" href="#coverage-testing">7.1.3. Coverage Testing</a></li>
+<li><a class="reference internal" href="#benchmark-testing">7.1.4. Benchmark Testing</a></li>
+<li><a class="reference internal" href="#documentation-testing">7.1.5. Documentation Testing</a></li>
+<li><a class="reference internal" href="#python-version-testing">7.1.6. Python Version Testing</a></li>
+<li><a class="reference internal" href="#installation-testing">7.1.7. Installation Testing</a></li>
+<li><a class="reference internal" href="#platform-testing">7.1.8. Platform Testing</a></li>
+<li><a class="reference internal" href="#update-action-dependencies">7.1.9. Update Action Dependencies</a></li>
+<li><a class="reference internal" href="#website-tests">7.1.10. Website tests</a></li>
+<li><a class="reference internal" href="#manual-tests">7.1.11. Manual Tests</a></li>
+<li><a class="reference internal" href="#tox-configuration-in-tox-toml">7.1.12. Tox configuration in tox.toml</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">7. </span>Development</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">7.1. </span>Testing</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/development/testing.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/development/testing.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/development/testing.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/development/testing.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/development/testing.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="testing">
+<h1><span class="section-number">7.1. </span>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2><span class="section-number">7.1.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Extensive tests are done on the functionality, documentation and website of optrace.
+Testing is done with <a class="reference external" href="https://tox.wiki/en/latest/">tox</a> and <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v9.0.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a>.
+Packages <a class="reference external" href="https://tox.wiki/en/latest/">tox</a> as well as
+<a class="reference external" href="https://github.com/masenf/tox-ignore-env-name-mismatch">tox-ignore-env-name-mismatch</a> need to be installed to run
+different tests environments.
+All other requirements are automatically installed while running tox.
+The configuration can be found in Section <a class="reference internal" href="#tox-file"><span class="std std-numref">Section 7.1.12</span></a>.</p>
+<p>Test can be run locally or through GitHub actions.
+The workflows are located in <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/">.github/workflows/</a>,
+while the last action runs can be seen in <a class="reference external" href="https://github.com/drocheam/optrace/actions">GitHub Actions</a>.</p>
+</section>
+<section id="functionality-testing">
+<h2><span class="section-number">7.1.2. </span>Functionality Testing<a class="headerlink" href="#functionality-testing" title="Link to this heading">¶</a></h2>
+<p>The goal of the functionality testing is to check both typical features as well as edge cases.
+Not only should the code “run”, but also produce correct results.
+This is guaranteed by many automated test cases.</p>
+<p>Some examples include:</p>
+<ul class="simple">
+<li><p>a nearly ideal lens produces a distinct focal point at the correct focal distance</p></li>
+<li><p>a growing number of rays decreases sampling noise</p></li>
+<li><p>user-built surfaces modeling a spherical surface behaving the same as the in-built type</p></li>
+<li><p>sampling of directions, color, positions produces the correct distribution on both the source and destination</p></li>
+<li><p>GUI interactions execute the expected actions</p></li>
+<li><p>images are correctly loaded and saved</p></li>
+<li><p>typical phenomena and aberrations of geometrical optics can be reproduced (spherical and chromatic aberration,
+vignetting, dispersion, astigmatism, coma, …)</p></li>
+<li><p>image formation by convolving produces correct results even the images must be scaled or interpolated</p></li>
+<li><p>PSF convolution and raytracing produce comparable results</p></li>
+<li><p>simple <code class="code highlight bash docutils literal highlight-bash">.zmx</code> and <code class="code highlight bash docutils literal highlight-bash">.agf</code> files are handled and imported correctly</p></li>
+<li><p>… many more</p></li>
+</ul>
+<p>Some edge cases include:</p>
+<ul class="simple">
+<li><p>normalizing a black image does not lead to divisions by zero</p></li>
+<li><p>requesting billions of rays prints an error message instead of crashing the PC due to too much requested RAM</p></li>
+<li><p>collisions of lenses are detected</p></li>
+<li><p>moving geometry elements outside of the setup bounding box is not possible</p></li>
+<li><p>check of value validity (no negative powers, wavelengths outside the visible range, …)</p></li>
+<li><p>plotting/loading/tracing of a single pixel image</p></li>
+<li><p>an optical setup without lenses, filters or apertures is traced correctly</p></li>
+<li><p>… many more</p></li>
+</ul>
+<p>Test files can be found under <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tests/">tests/</a>,
+starting with filename <code class="code highlight bash docutils literal highlight-bash">test_</code>
+Testing is performed with <a class="reference external" href="https://docs.pytest.org/en/stable/index.html#module-pytest" title="(in pytest v9.0.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pytest</span></code></a>.
+To ensure that it is performed on a “clean” and defined environment, it is run by <a class="reference external" href="https://tox.wiki/en/latest/">tox</a>,
+this creates a virtual python environment where the library is installed and tested.
+With its default call, <code class="code highlight bash docutils literal highlight-bash">tox</code> calls the testing environment that includes all test cases.
+To lower RAM usage, tox calls test groups instead of all tests at once.</p>
+<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/tox_test.yml">tox_test.yml</a>
+runs the functionality tests on a defined system and python version as github actions.
+By default this is done on pushed code changes, but the action can also be run manually.</p>
+</section>
+<section id="coverage-testing">
+<h2><span class="section-number">7.1.3. </span>Coverage Testing<a class="headerlink" href="#coverage-testing" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://coverage.readthedocs.io/en/latest/api_module.html#module-coverage" title="(in Coverage.py v7.11.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">coverage</span></code></a> is used to check if all code lines and branches were tested.
+It wraps around pytest inside the tox test environment and reports on executed and missing lines.
+The output gets represented as both html or as text output (inside the terminal or github action output).</p>
+</section>
+<section id="benchmark-testing">
+<span id="benchmarking"></span><h2><span class="section-number">7.1.4. </span>Benchmark Testing<a class="headerlink" href="#benchmark-testing" title="Link to this heading">¶</a></h2>
+<p>Tracing performance depends on the number of surfaces and rays as well as the complexity of the surfaces.
+Spherical surfaces are easier to trace then complex user defined ones.
+For systems with a low number of surfaces the ray generation at the source becomes dominant.</p>
+<p>The benchmarking file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tests/benchmark.py">tests/benchmark.py</a>
+is an adapted version of the <a class="reference internal" href="../examples.html#example-microscope"><span class="std std-ref">Microscope</span></a> example.
+It includes 57 light-interacting surfaces (one ray source, one aperture, 27 lenses with front and back surface each,
+one outline surface of the bounding box). Detectors are excluded as they don’t interact with the rays unless
+image rendering is executed.
+Turning off the polarization calculation (with <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.no_pol" title="optrace.tracer.raytracer.Raytracer.no_pol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.no_pol</span></code></a>)
+leads to a significant speedup.
+The number of used threads is controlled by setting an environment variable
+as described in section <a class="reference internal" href="../usage/overview.html#number-of-thread-specification"><span class="std std-numref">Section 4.1.4</span></a>.</p>
+<p>The raytracing on my system (Arch Linux 6.15.8, i7-1360P notebook CPU, 16GB RAM, Python 3.13) results in:</p>
+<div class="table-wrapper colwidths-given docutils container" id="id4">
+<table class="docutils align-default" id="id4" style="width: 600px">
+<caption><span class="caption-number">Table 7.1 </span><span class="caption-text">Performance Comparison. Result values are in seconds / surface / million rays.</span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 21.4%" />
+<col style="width: 39.3%" />
+<col style="width: 39.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Cores</p></th>
+<th class="head"><p>Without Polarization</p></th>
+<th class="head"><p>With Polarization</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>0.148</p></td>
+<td><p>0.218</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>0.082</p></td>
+<td><p>0.115</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>0.053</p></td>
+<td><p>0.085</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>0.045</p></td>
+<td><p>0.082</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>0.043</p></td>
+<td><p>0.078</p></td>
+</tr>
+<tr class="row-odd"><td><p>16</p></td>
+<td><p>0.046</p></td>
+<td><p>0.073</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Performance plateaus at 8-16 cores for the “without polarization” case, but still seems to improve for the second case.
+Reasons could be thermal throttling or other bottlenecks.
+On my machine, 8 cores could be a compromise between CPU usage and performance.</p>
+</section>
+<section id="documentation-testing">
+<h2><span class="section-number">7.1.5. </span>Documentation Testing<a class="headerlink" href="#documentation-testing" title="Link to this heading">¶</a></h2>
+<p>The workflow file <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/doc_test.yml">doc_test.yml</a>
+runs multiple test environments. This includes:</p>
+<ul class="simple">
+<li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>docsbuildcheck</code>: Testing of correct documentation building while not permitting warning</p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>linkcheck</code>: Testing of all documentation links (currently deactived, due to GitHub rate limits)</p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>doctest</code>: Testing of most documentation code examples (using <a class="reference external" href="https://docs.python.org/3/library/doctest.html#module-doctest" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">doctest</span></code></a>)</p></li>
+</ul>
+</section>
+<section id="python-version-testing">
+<h2><span class="section-number">7.1.6. </span>Python Version Testing<a class="headerlink" href="#python-version-testing" title="Link to this heading">¶</a></h2>
+<p>Testing of the compatibility with multiple python versions is done with the
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml">pyver_comp.yml</a> workflow.
+It executes a subset of tests (<code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>fast</code>) for multiple python main versions in an Ubuntu runner.</p>
+</section>
+<section id="installation-testing">
+<h2><span class="section-number">7.1.7. </span>Installation Testing<a class="headerlink" href="#installation-testing" title="Link to this heading">¶</a></h2>
+<p>Weekly tests that try to install the package and execute some quick tests.
+Ensures that requirements and available PyPI packages are up-to-date or need changes.
+The workflow is located in
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/install_test.yml">install_test.yml</a>.</p>
+</section>
+<section id="platform-testing">
+<h2><span class="section-number">7.1.8. </span>Platform Testing<a class="headerlink" href="#platform-testing" title="Link to this heading">¶</a></h2>
+<p>Platform testing is done with the
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml">os_comp.yml</a> workflow.
+It executes the os tox environment (run with <code class="code highlight bash docutils literal highlight-bash">tox<span class="w"> </span>-e<span class="w"> </span>os</code>), which runs a subset of all available tests.
+These tests include relevant possibly platform-dependent cases, including:</p>
+<ul class="simple">
+<li><p>installation</p></li>
+<li><p>loading and saving of files</p></li>
+<li><p>handling of filenames and paths</p></li>
+<li><p>loading sensitivity and image presets (which also are files inside the library)</p></li>
+<li><p>opening the gui and plots</p></li>
+<li><p>enforcing a specific float bit width</p></li>
+<li><p>detecting the number of cores and multithreading</p></li>
+</ul>
+<p>The workflow is executed with the current python version and both the latest macOC and Windows runners.
+Linux is not included, as all other workflows already run on Ubuntu.</p>
+</section>
+<section id="update-action-dependencies">
+<h2><span class="section-number">7.1.9. </span>Update Action Dependencies<a class="headerlink" href="#update-action-dependencies" title="Link to this heading">¶</a></h2>
+<p>The dependencies inside the GitHub Actions are kept up-to-date with the
+<a class="reference external" href="https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide">Dependabot</a>.
+It is run weekly an opens pull request if there a newer versions of an action available.</p>
+</section>
+<section id="website-tests">
+<h2><span class="section-number">7.1.10. </span>Website tests<a class="headerlink" href="#website-tests" title="Link to this heading">¶</a></h2>
+<p>Documentation website tests are done with the
+<cite>website_test.yml &lt;https://github.com/drocheam/optrace/blob/main/.github/workflows/website_test.yml&gt;</cite>
+workflow that runs the
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tests/test_website.sh">tests/test_website.sh</a> bash script.
+The test check that the site is reachable, includes most important parts (index, impressum, robots, sitemap),
+does not set cookies and does not load any external resources.
+The two last points are required for more privacy and GDPR compliance.
+Runs are triggered either manually, weekly or after the page deployment.</p>
+</section>
+<section id="manual-tests">
+<h2><span class="section-number">7.1.11. </span>Manual Tests<a class="headerlink" href="#manual-tests" title="Link to this heading">¶</a></h2>
+<p>Unfortunately, not all tests can be automated.
+The following test cases need to be handled manually:</p>
+<p><strong>Checking that</strong> <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.plots.block</span></code></a> <strong>actually pauses the program execution</strong></p>
+<p>This can’t be tested automatically, as it would halt testing.
+Maybe there is a way by using multithreading or multiprocessing and a timer?
+What about coverage information in such cases?</p>
+<p><strong>Correct and nice formatting inside plots and the GUI</strong></p>
+<p>Can only be tested by a human viewer.</p>
+<p><strong>Usage in Python Notebooks or inline IDEs such as Spyder</strong></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Installation:</dt><dd><ul>
+<li><p>see <a class="reference external" href="https://docs.spyder-ide.org/current/installation.html">https://docs.spyder-ide.org/current/installation.html</a></p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash">python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>spyder-env</code></p></li>
+<li><p><code class="code highlight bash docutils literal highlight-bash"><span class="nb">source</span><span class="w"> </span>spyder-env/bin/activate</code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Testing:</dt><dd><ul>
+<li><p>make sure pyplot windows are displayed correctly (plot viewer) with enough dpi</p></li>
+<li><p>make sure this is also the case for plots generated by the GUI</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="tox-configuration-in-tox-toml">
+<span id="tox-file"></span><h2><span class="section-number">7.1.12. </span>Tox configuration in <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/tox.toml">tox.toml</a><a class="headerlink" href="#tox-configuration-in-tox-toml" title="Link to this heading">¶</a></h2>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="n">env_list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;py{311,312,313}&quot;</span><span class="p">]</span>
+</span><span data-line="2"><span class="linenos"> 2</span><span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;tox-ignore-env-name-mismatch&quot;</span><span class="p">]</span>
+</span><span data-line="3"><span class="linenos"> 3</span><span class="n">skip_missing_interpreters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</span><span data-line="4"><span class="linenos"> 4</span>
+</span><span data-line="5"><span class="linenos"> 5</span><span class="k">[env_run_base]</span>
+</span><span data-line="6"><span class="linenos"> 6</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Main testing environment&quot;</span>
+</span><span data-line="7"><span class="linenos"> 7</span><span class="n">pass_env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;HOME&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;DISPLAY&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;WAYLAND_DISPLAY&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;QT_QPA_PLATFORM&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;XAUTHORITY&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;GITHUB_ACTIONS&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PYTHON_CPU_COUNT&quot;</span><span class="p">,</span>
+</span><span data-line="8"><span class="linenos"> 8</span><span class="w">            </span><span class="s2">&quot;XDG_SESSION_TYPE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;XDG_SESSION_DESKTOP&quot;</span><span class="p">]</span>
+</span><span data-line="9"><span class="linenos"> 9</span><span class="n">env_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{toxworkdir}{/}env_static&quot;</span>
+</span><span data-line="10"><span class="linenos">10</span><span class="n">runner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ignore_env_name_mismatch&quot;</span>
+</span><span data-line="11"><span class="linenos">11</span><span class="n">deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;pylint&quot;</span><span class="p">]</span>
+</span><span data-line="12"><span class="linenos">12</span><span class="n">extras</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;tests&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs&quot;</span><span class="p">]</span>
+</span><span data-line="13"><span class="linenos">13</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+</span><span data-line="14"><span class="linenos">14</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="15"><span class="linenos">15</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tests{/}test_geometry.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_misc.py&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="16"><span class="linenos">16</span><span class="w">        </span><span class="s2">&quot;tests{/}test_image.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_refraction_index.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_scope.py&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="17"><span class="linenos">17</span><span class="w">        </span><span class="s2">&quot;tests{/}test_spectrum.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_surface.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_tma.py&quot;</span>
+</span><span data-line="18"><span class="linenos">18</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="19"><span class="linenos">19</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="20"><span class="linenos">20</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tests{/}test_tracer.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_tracer_hurb.py&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="21"><span class="linenos">21</span><span class="w">        </span><span class="s2">&quot;tests{/}test_tracer_special.py&quot;</span>
+</span><span data-line="22"><span class="linenos">22</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="23"><span class="linenos">23</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="24"><span class="linenos">24</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tests{/}test_color.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_convolve.py&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="25"><span class="linenos">25</span><span class="w">        </span><span class="s2">&quot;tests{/}test_load.py&quot;</span>
+</span><span data-line="26"><span class="linenos">26</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="27"><span class="linenos">27</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="28"><span class="linenos">28</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tests{/}test_plots.py&quot;</span>
+</span><span data-line="29"><span class="linenos">29</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="30"><span class="linenos">30</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="31"><span class="linenos">31</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tests{/}test_examples.py&quot;</span>
+</span><span data-line="32"><span class="linenos">32</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="33"><span class="linenos">33</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+</span><span data-line="34"><span class="linenos">34</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;gui1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_gui.py&quot;</span>
+</span><span data-line="35"><span class="linenos">35</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="36"><span class="linenos">36</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="37"><span class="linenos">37</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;gui2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_gui.py&quot;</span>
+</span><span data-line="38"><span class="linenos">38</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="39"><span class="linenos">39</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="40"><span class="linenos">40</span><span class="w">        </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;gui3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tests{/}test_gui.py&quot;</span>
+</span><span data-line="41"><span class="linenos">41</span><span class="w">    </span><span class="p">],</span>
+</span><span data-line="42"><span class="linenos">42</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;combine&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--quiet&quot;</span><span class="p">],</span>
+</span><span data-line="43"><span class="linenos">43</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;report&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--show-missing&quot;</span><span class="p">],</span>
+</span><span data-line="44"><span class="linenos">44</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;coverage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;erase&quot;</span><span class="p">]</span>
+</span><span data-line="45"><span class="linenos">45</span><span class="p">]</span>
+</span><span data-line="46"><span class="linenos">46</span>
+</span><span data-line="47"><span class="linenos">47</span><span class="k">[env.os]</span>
+</span><span data-line="48"><span class="linenos">48</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Testing of system dependent functionality&quot;</span>
+</span><span data-line="49"><span class="linenos">49</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;os&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">}]]</span>
+</span><span data-line="50"><span class="linenos">50</span>
+</span><span data-line="51"><span class="linenos">51</span><span class="k">[env.fast]</span>
+</span><span data-line="52"><span class="linenos">52</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Don&#39;t test slower tests (&gt; 10 seconds)&quot;</span>
+</span><span data-line="53"><span class="linenos">53</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+</span><span data-line="54"><span class="linenos">54</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--ignore=tests{/}test_examples.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--ignore=tests{/}test_gui.py&quot;</span><span class="p">,</span><span class="w"> </span>
+</span><span data-line="55"><span class="linenos">55</span><span class="w">        </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">}],</span>
+</span><span data-line="56"><span class="linenos">56</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tests{/}test_examples.py&quot;</span><span class="p">],</span>
+</span><span data-line="57"><span class="linenos">57</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tests{/}test_gui.py&quot;</span><span class="p">],</span>
+</span><span data-line="58"><span class="linenos">58</span><span class="p">]</span>
+</span><span data-line="59"><span class="linenos">59</span>
+</span><span data-line="60"><span class="linenos">60</span><span class="k">[env.install]</span>
+</span><span data-line="61"><span class="linenos">61</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Quick testing of installation&quot;</span>
+</span><span data-line="62"><span class="linenos">62</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;install&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">replace</span><span class="p">=</span><span class="s2">&quot;posargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extend</span><span class="p">=</span><span class="kc">true</span><span class="p">}]]</span>
+</span><span data-line="63"><span class="linenos">63</span>
+</span><span data-line="64"><span class="linenos">64</span><span class="k">[env.linkcheck]</span>
+</span><span data-line="65"><span class="linenos">65</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Check all links in software and documentation&quot;</span>
+</span><span data-line="66"><span class="linenos">66</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;sphinx-build&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-M&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;linkcheck&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}build&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-j&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;auto&quot;</span><span class="p">]]</span>
+</span><span data-line="67"><span class="linenos">67</span>
+</span><span data-line="68"><span class="linenos">68</span><span class="k">[env.docsbuildcheck]</span>
+</span><span data-line="69"><span class="linenos">69</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Nitpicky documentation building, turn warnings into errors&quot;</span>
+</span><span data-line="70"><span class="linenos">70</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;sphinx-build&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-M&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;html&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}build{/}htmlcheck&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-n&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-W&quot;</span><span class="p">]]</span>
+</span><span data-line="71"><span class="linenos">71</span>
+</span><span data-line="72"><span class="linenos">72</span><span class="k">[env.doctest]</span>
+</span><span data-line="73"><span class="linenos">73</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Test documentation doctest snippets&quot;</span>
+</span><span data-line="74"><span class="linenos">74</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;sphinx-build&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-M&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;doctest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}build&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-j&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;auto&quot;</span><span class="p">]]</span>
+</span><span data-line="75"><span class="linenos">75</span>
+</span><span data-line="76"><span class="linenos">76</span><span class="k">[env.docs]</span>
+</span><span data-line="77"><span class="linenos">77</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Create documentation and update structure and changelog&quot;</span>
+</span><span data-line="78"><span class="linenos">78</span><span class="n">allowlist_externals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;{/}usr{/}bin{/}bash&quot;</span><span class="p">]</span>
+</span><span data-line="79"><span class="linenos">79</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+</span><span data-line="80"><span class="linenos">80</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;bash&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}generate_changelog.sh&quot;</span><span class="p">],</span>
+</span><span data-line="81"><span class="linenos">81</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;bash&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}generate_bib_structure.sh&quot;</span><span class="p">],</span>
+</span><span data-line="82"><span class="linenos">82</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;sphinx-build&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-M&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;html&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;docs{/}build&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-n&quot;</span><span class="p">]</span>
+</span><span data-line="83"><span class="linenos">83</span><span class="p">]</span>
+</span><span data-line="84"><span class="linenos">84</span>
+</span><span data-line="85"><span class="linenos">85</span><span class="k">[env.pylint]</span>
+</span><span data-line="86"><span class="linenos">86</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Run pylint with excluded unnecessary rules&quot;</span>
+</span><span data-line="87"><span class="linenos">87</span><span class="n">skip_install</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</span><span data-line="88"><span class="linenos">88</span><span class="n">commands</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+</span><span data-line="89"><span class="linenos">89</span><span class="w">    </span><span class="p">[</span><span class="s2">&quot;pylint&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;optrace&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-j&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--max-line-length&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;120&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--variable-naming-style&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;any&quot;</span><span class="p">,</span>
+</span><span data-line="90"><span class="linenos">90</span><span class="w">    </span><span class="s2">&quot;--disable&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;W0612,W0613,W0106,W0212,E1101,R0902,R0904,R0911,R0912,R0913,R0914,R0915,R0916,C0301,C0302&quot;</span><span class="p">,</span>
+</span><span data-line="91"><span class="linenos">91</span><span class="w">    </span><span class="s2">&quot;--good-names-rgxs&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;^[_a-z][_a-z0-9]?$&quot;</span><span class="p">]</span>
+</span><span data-line="92"><span class="linenos">92</span><span class="p">]</span>
+</span></pre></div>
+</div>
+<p>The pytest configuration is located in the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> in Section <a class="reference internal" href="packaging.html#id1"><span class="std std-numref">Section 7.3.2</span></a>.</p>
+<p><strong>Notes</strong></p>
+<ul class="simple">
+<li><p>parallelized testing with pytest-xdist could be possible, but we wouldn’t gain much from it as the heaviest
+tasks are already multithreaded</p></li>
+<li><p><a class="reference external" href="https://github.com/The-Compiler/pytest-xvfb">pytest-xvfb</a>
+uses xvfb as headless-display. Use the option <code class="code highlight bash docutils literal highlight-bash">--no-xvfb</code> to actually see the plots/windows.</p></li>
+<li><p>using <a class="reference external" href="https://pypi.org/project/pytest-timeout/">pytest-timeout</a> for adding timeouts</p></li>
+<li><p>using <a class="reference external" href="https://github.com/pytest-dev/pytest-qt">pytest-qt</a> to handle exceptions in slots and virtual methods</p></li>
+<li><p>using <a class="reference external" href="https://pypi.org/project/pytest-random-order/">pytest-random-order</a> for running tests in random order</p></li>
+<li><p><a class="reference external" href="https://github.com/masenf/tox-ignore-env-name-mismatch">tox-ignore-env-name-mismatch</a> is required so multiple
+tox environments are able to use the same Python virtualenv.</p></li>
+<li><p>when GUI tests fail on wayland, first run <code class="code highlight bash docutils literal highlight-bash">xhost<span class="w"> </span>+</code></p></li>
+<li><p>some tests are excluded in GitHub actions, as there issues with the headless displays</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">7. </span>Development</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="documentation.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">7.2. </span>Documentation</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

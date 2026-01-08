@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>4.6. Refractive Indices - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.7. Spectrum Classes" href="spectrum.html" /><link rel="prev" title="4.5. Raytracer" href="raytracer.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/usage/refraction_index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/usage/refraction_index.html"/>
+  <meta property="og:title" content="4.6. Refractive Indices"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#defining-the-index">4.6.1. Defining the Index</a></li>
+<li><a class="reference internal" href="#getting-the-index-values">4.6.2. Getting the Index Values</a></li>
+<li><a class="reference internal" href="#abbe-number">4.6.3. Abbe Number</a></li>
+<li><a class="reference internal" href="#loading-material-catalogues-agf">4.6.4. Loading material catalogues (.agf)</a></li>
+<li><a class="reference internal" href="#plotting">4.6.5. Plotting</a></li>
+<li><a class="reference internal" href="#presets">4.6.6. Presets</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">4. </span>User Guide</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">4.6. </span>Refractive Indices</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/usage/refraction_index.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/usage/refraction_index.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/usage/refraction_index.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/refraction_index.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/refraction_index.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="refractive-indices">
+<h1><span class="section-number">4.6. </span>Refractive Indices<a class="headerlink" href="#refractive-indices" title="Link to this heading">¶</a></h1>
+<section id="defining-the-index">
+<h2><span class="section-number">4.6.1. </span>Defining the Index<a class="headerlink" href="#defining-the-index" title="Link to this heading">¶</a></h2>
+<p><strong>Constant</strong></p>
+<p>In the simplest case a constant (wavelength-independent)
+<a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex" title="optrace.tracer.refraction_index.RefractionIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">refractive</span> <span class="pre">index</span></code></a> is defined as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.54</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>By Abbe Number</strong></p>
+<p>In many cases materials are characterized by the index at a center wavelength and the Abbe number only.
+However, materials with these same quantities can still differ slightly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Abbe&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">V</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Details on how the model is estimated are found in <a class="reference internal" href="../details/misc.html#index-from-abbe"><span class="std std-numref">Section 5.9.1</span></a>.</p>
+<p>You can also specify the wavelength combination, for which <code class="code highlight python docutils literal highlight-python"><span class="n">n</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">V</span></code> are specified:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Abbe&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">V</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectral_lines</span><span class="o">.</span><span class="n">FeC</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Common Index Models</strong></p>
+<p>The subsequent equations describe common refractive index models used in simulation software.
+They are taken from <a class="footnote-reference brackets" href="#footcite-comsoldispersion" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#footcite-zemaxhagen" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
+A comprehensive list of different index models is found in <a class="footnote-reference brackets" href="#footcite-palmer2005" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<p>Generally, all coefficients must be given in powers of µm, while the same is true for the wavelength input.</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Equation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Cauchy</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-cauchy">
+<div class="math notranslate nohighlight" id="equation-n-cauchy">
+<span class="eqno">(4.5)<a class="headerlink" href="#equation-n-cauchy" title="Link to this equation">¶</a></span>\[n = c_0 + \frac{c_1}{\lambda^2} + \frac{c_2}{\lambda^4} + \frac{c_3}{\lambda^6}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Conrady</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-conrady">
+<div class="math notranslate nohighlight" id="equation-n-conrady">
+<span class="eqno">(4.6)<a class="headerlink" href="#equation-n-conrady" title="Link to this equation">¶</a></span>\[n = c_0+ \frac{c_1} {\lambda} + \frac{c_2} {\lambda^{3.5}}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Extended</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-extended">
+<div class="math notranslate nohighlight" id="equation-n-extended">
+<span class="eqno">(4.7)<a class="headerlink" href="#equation-n-extended" title="Link to this equation">¶</a></span>\[n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+
+\frac{c_4} {\lambda^{6}}+ \frac{c_5} {\lambda^{8}}+ \frac{c_6} {\lambda^{10}}+\frac{c_7} {\lambda^{12}}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Extended2</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-extended2">
+<div class="math notranslate nohighlight" id="equation-n-extended2">
+<span class="eqno">(4.8)<a class="headerlink" href="#equation-n-extended2" title="Link to this equation">¶</a></span>\[n^2 = c_0+c_1 \lambda^2+ \frac{c_2} {\lambda^{2}}+ \frac{c_3} {\lambda^{4}}+\frac{c_4}
+{\lambda^{6}}+\frac{c_5} {\lambda^{8}}+c_6 \lambda^4+c_7 \lambda^6\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Handbook of Optics 1</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-optics1">
+<div class="math notranslate nohighlight" id="equation-n-optics1">
+<span class="eqno">(4.9)<a class="headerlink" href="#equation-n-optics1" title="Link to this equation">¶</a></span>\[n^2 = c_0+\frac{c_1}{\lambda^2-c_2}-c_3 \lambda^2\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Handbook of Optics 2</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-optics2">
+<div class="math notranslate nohighlight" id="equation-n-optics2">
+<span class="eqno">(4.10)<a class="headerlink" href="#equation-n-optics2" title="Link to this equation">¶</a></span>\[n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}-c_3 \lambda^2\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Herzberger</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-herzberger">
+<div class="math notranslate nohighlight" id="equation-n-herzberger">
+<span class="eqno">(4.11)<a class="headerlink" href="#equation-n-herzberger" title="Link to this equation">¶</a></span>\[\begin{split}\begin{align}
+n =&amp;~ c_0+c_1 L+c_2 L^2+c_3 \lambda^2+c_4 \lambda^4+c_5 \lambda^6 \\
+&amp;\text{ with   } L= \frac{1} {\lambda^2-0.028 \mathrm{\,µm}^2}
+\end{align}\end{split}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Sellmeier1</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-sellmeier1">
+<div class="math notranslate nohighlight" id="equation-n-sellmeier1">
+<span class="eqno">(4.12)<a class="headerlink" href="#equation-n-sellmeier1" title="Link to this equation">¶</a></span>\[n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}
+{\lambda^2-c_3}+\frac{c_4 \lambda^2}{\lambda^2-c_5}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Sellmeier2</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-sellmeier2">
+<div class="math notranslate nohighlight" id="equation-n-sellmeier2">
+<span class="eqno">(4.13)<a class="headerlink" href="#equation-n-sellmeier2" title="Link to this equation">¶</a></span>\[n^2 = 1+c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2^2}+\frac{c_3}{\lambda^2-c_4^2}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Sellmeier3</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-sellmeier3">
+<div class="math notranslate nohighlight" id="equation-n-sellmeier3">
+<span class="eqno">(4.14)<a class="headerlink" href="#equation-n-sellmeier3" title="Link to this equation">¶</a></span>\[n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+
+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Sellmeier4</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-sellmeier4">
+<div class="math notranslate nohighlight" id="equation-n-sellmeier4">
+<span class="eqno">(4.15)<a class="headerlink" href="#equation-n-sellmeier4" title="Link to this equation">¶</a></span>\[n^2 = c_0+\frac{c_1 \lambda^2}{\lambda^2-c_2}+\frac{c_3 \lambda^2}{\lambda^2-c_4}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Sellmeier5</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-sellmeier5">
+<div class="math notranslate nohighlight" id="equation-n-sellmeier5">
+<span class="eqno">(4.16)<a class="headerlink" href="#equation-n-sellmeier5" title="Link to this equation">¶</a></span>\[n^2 = 1+\frac{c_0 \lambda^2}{\lambda^2-c_1}+\frac{c_2 \lambda^2}{\lambda^2-c_3}+
+\frac{c_4 \lambda^2}{\lambda^2-c_5}+\frac{c_6 \lambda^2}{\lambda^2-c_7}+\frac{c_8 \lambda^2}{\lambda^2-c_9}\]</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Schott</p></td>
+<td><div class="math-wrapper docutils container" id="equation-n-schott">
+<div class="math notranslate nohighlight" id="equation-n-schott">
+<span class="eqno">(4.17)<a class="headerlink" href="#equation-n-schott" title="Link to this equation">¶</a></span>\[n^2 = c_0+c_1 \lambda^2+\frac{c_2}{ \lambda^{2}}+\frac{c_3} {\lambda^{4}}+\frac{c_4}
+{\lambda^{6}}+\frac{c_5} {\lambda^{8}}\]</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In the case of the Schott model, the initialization looks as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Schott&quot;</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="p">[</span><span class="mf">2.13e-06</span><span class="p">,</span> <span class="mf">1.65e-08</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.98e-11</span><span class="p">,</span> <span class="mf">1.02e-06</span><span class="p">,</span> <span class="mf">6.56e-10</span><span class="p">,</span> <span class="mf">0.208</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p><strong>User Data</strong></p>
+<p>With type <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Data&quot;</span></code> a wavelength and index vector should be provided.
+Values in-between are interpolated linearly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">wls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">380</span><span class="p">,</span> <span class="mi">780</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.58</span><span class="p">,</span> <span class="mf">1.55</span><span class="p">,</span> <span class="mf">1.54</span><span class="p">,</span> <span class="mf">1.535</span><span class="p">,</span> <span class="mf">1.532</span><span class="p">,</span> <span class="mf">1.531</span><span class="p">,</span> <span class="mf">1.53</span><span class="p">,</span> <span class="mf">1.529</span><span class="p">,</span> <span class="mf">1.528</span><span class="p">])</span>
+</span><span data-line="3"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Data&quot;</span><span class="p">,</span> <span class="n">wls</span><span class="o">=</span><span class="n">wls</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">vals</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>User Function</strong></p>
+<p>optrace supports custom user functions for the refractive index.
+The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wl</span><span class="p">:</span> <span class="mf">1.6</span> <span class="o">-</span> <span class="mf">1e-4</span><span class="o">*</span><span class="n">wl</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>When providing a function with multiple parameters, you can use the <code class="code highlight python docutils literal highlight-python"><span class="n">func_args</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wl</span><span class="p">,</span> <span class="n">n0</span><span class="p">:</span> <span class="n">n0</span> <span class="o">-</span> <span class="mf">1e-4</span><span class="o">*</span><span class="n">wl</span><span class="p">,</span> <span class="n">func_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">n0</span><span class="o">=</span><span class="mf">1.6</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+<section id="getting-the-index-values">
+<h2><span class="section-number">4.6.2. </span>Getting the Index Values<a class="headerlink" href="#getting-the-index-values" title="Link to this heading">¶</a></h2>
+<p>The refractive index values are calculated when calling the refractive index object with a wavelength vector.
+The call returns a vector of the same shape as the input.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Abbe&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.543</span><span class="p">,</span> <span class="n">V</span><span class="o">=</span><span class="mf">62.1</span><span class="p">)</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">380</span><span class="p">,</span> <span class="mi">780</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+</span><span data-line="4"><span class="go">array([1.56237795, 1.54967655, 1.54334454, 1.5397121 , 1.53742915])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="abbe-number">
+<h2><span class="section-number">4.6.3. </span>Abbe Number<a class="headerlink" href="#abbe-number" title="Link to this heading">¶</a></h2>
+<p>With a refractive index object at hand the Abbe number can be calculated with</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refraction_index</span><span class="o">.</span><span class="n">LAF2</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">abbe_number</span><span class="p">()</span>
+</span><span data-line="3"><span class="go">44.850483919254984</span>
+</span></pre></div>
+</div>
+<p>Alternatively the function can be called with a different spectral line combination
+from <a class="reference internal" href="../reference/optrace_tracer_presets.html#module-optrace.tracer.presets.spectral_lines" title="optrace.tracer.presets.spectral_lines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ot.presets.spectral_lines</span></code></a>:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">abbe_number</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectral_lines</span><span class="o">.</span><span class="n">F_eC_</span><span class="p">)</span>
+</span><span data-line="2"><span class="go">44.57150709341499</span>
+</span></pre></div>
+</div>
+<p>Or specify a user defined list of three wavelengths:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">abbe_number</span><span class="p">([</span><span class="mi">450</span><span class="p">,</span> <span class="mi">580</span><span class="p">,</span> <span class="mi">680</span><span class="p">])</span>
+</span><span data-line="2"><span class="go">30.59379412865849</span>
+</span></pre></div>
+</div>
+<p>You can also check if a medium is dispersive by calling</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">is_dispersive</span><span class="p">())</span>
+</span><span data-line="2"><span class="go">True</span>
+</span></pre></div>
+</div>
+<p>A list of predefined lines can be found in <a class="reference internal" href="spectrum.html#spectral-lines"><span class="std std-numref">Section 4.7.5</span></a>.</p>
+</section>
+<section id="loading-material-catalogues-agf">
+<span id="agf-load"></span><h2><span class="section-number">4.6.4. </span>Loading material catalogues (.agf)<a class="headerlink" href="#loading-material-catalogues-agf" title="Link to this heading">¶</a></h2>
+<p>optrace can also load .agf catalogue files containing different materials.
+The function <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.load.load_agf" title="optrace.tracer.load.load_agf"><code class="xref py py-func docutils literal notranslate"><span class="pre">ot.load_agf</span></code></a> requires a file path and
+returns a dictionary of media, with the key being the name and the value being the refractive index object.</p>
+<p>For instance, loading the Schott catalogue and accessing the material <code class="docutils literal notranslate"><span class="pre">N-LAF21</span></code> can be done as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n_schott</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">load_agf</span><span class="p">(</span><span class="s2">&quot;schott.agf&quot;</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">n_laf21</span> <span class="o">=</span> <span class="n">n_schott</span><span class="p">[</span><span class="s2">&quot;N-LAF21&quot;</span><span class="p">]</span>
+</span></pre></div>
+</div>
+<p>Different <code class="docutils literal notranslate"><span class="pre">.agf</span></code> files are found in <a class="reference external" href="https://github.com/nzhagen/zemaxglass/tree/master/AGF_files">this repository</a>
+or <a class="reference external" href="https://github.com/edeforas/Astree/tree/master/glass">this one</a>.</p>
+<p>Information on the file format can be found <a class="reference external" href="https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf">here</a> and
+and <a class="reference external" href="https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf">here</a>.</p>
+</section>
+<section id="plotting">
+<h2><span class="section-number">4.6.5. </span>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="plots.html#index-plots"><span class="std std-ref">Plotting Refractive Indices</span></a>.</p>
+</section>
+<section id="presets">
+<span id="refraction-index-presets"></span><h2><span class="section-number">4.6.6. </span>Presets<a class="headerlink" href="#presets" title="Link to this heading">¶</a></h2>
+<p>optrace comes with multiple material presets, which can be accessed using <code class="docutils literal notranslate"><span class="pre">ot.presets.refractive_index.&lt;name&gt;</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> is the material name.
+The materials are also grouped into multiple lists
+<code class="code highlight python docutils literal highlight-python"><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refractive_index</span><span class="o">.</span><span class="n">glasses</span><span class="p">,</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refractive_index</span><span class="o">.</span><span class="n">plastics</span><span class="p">,</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refractive_index</span><span class="o">.</span><span class="n">misc</span></code>.</p>
+<p>These groups are plotted below in an index and an Abbe plot.</p>
+<div class="table-wrapper colwidths-given table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id5">
+<a class="dark-light reference internal image-reference" href="../_images/glass_presets_n.svg"><img alt="../_images/glass_presets_n.svg" class="dark-light" src="../_images/glass_presets_n.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.21 </span><span class="caption-text">Refraction index curves for different glass presets.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id6">
+<a class="dark-light reference internal image-reference" href="../_images/glass_presets_V.svg"><img alt="../_images/glass_presets_V.svg" class="dark-light" src="../_images/glass_presets_V.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.22 </span><span class="caption-text">Abbe diagram for different glass presets.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id7">
+<a class="dark-light reference internal image-reference" href="../_images/plastics_presets_n.svg"><img alt="../_images/plastics_presets_n.svg" class="dark-light" src="../_images/plastics_presets_n.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.23 </span><span class="caption-text">Refraction index curves for different plastic presets.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id8">
+<a class="dark-light reference internal image-reference" href="../_images/plastics_presets_V.svg"><img alt="../_images/plastics_presets_V.svg" class="dark-light" src="../_images/plastics_presets_V.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.24 </span><span class="caption-text">Abbe diagram for different plastic presets.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-odd"><td><figure class="align-center" id="id9">
+<a class="dark-light reference internal image-reference" href="../_images/misc_presets_n.svg"><img alt="../_images/misc_presets_n.svg" class="dark-light" src="../_images/misc_presets_n.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.25 </span><span class="caption-text">Refraction index curves for miscellaneous presets.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id10">
+<a class="dark-light reference internal image-reference" href="../_images/misc_presets_V.svg"><img alt="../_images/misc_presets_V.svg" class="dark-light" src="../_images/misc_presets_V.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.26 </span><span class="caption-text">Abbe diagram for miscellaneous presets. <em>Air</em> and <em>Vacuum</em> are missing here,
+because they are modelled without dispersion.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id4">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-comsoldispersion" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>COMSOL. Optical dispersion models. 2022. URL: <a class="reference external" href="https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.html">https://doc.comsol.com/6.1/docserver/#!/com.comsol.help.roptics/roptics_ug_optics.6.54.html</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-zemaxhagen" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Nathan Hagen. Zemaxglass user manual. 2013. URL: <a class="reference external" href="https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf">https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-palmer2005" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>James M. Palmer. Models for fitting refractive index. 2005. URL: <a class="reference external" href="https://wp.optics.arizona.edu/jpalmer/wp-content/uploads/sites/65/2017/03/dispeqns.pdf">https://wp.optics.arizona.edu/jpalmer/wp-content/uploads/sites/65/2017/03/dispeqns.pdf</a>.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="raytracer.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">4.5. </span>Raytracer</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="spectrum.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">4.7. </span>Spectrum Classes</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

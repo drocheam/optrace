@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>6.6. tracer.geometry.surface Submodule - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="6.7. tracer.image Submodule" href="optrace_tracer_image.html" /><link rel="prev" title="6.5. tracer.geometry Submodule" href="optrace_tracer_geometry.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/reference/optrace_tracer_geometry_surface.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/reference/optrace_tracer_geometry_surface.html"/>
+  <meta property="og:title" content="6.6. tracer.geometry.surface Submodule"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">6. API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.aspheric_surface">6.6.1. tracer.geometry.surface.aspheric_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface"><code class="docutils literal notranslate"><span class="pre">AsphericSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.flip"><code class="docutils literal notranslate">flip()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.circular_surface">6.6.2. tracer.geometry.surface.circular_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.circular_surface.CircularSurface"><code class="docutils literal notranslate"><span class="pre">CircularSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.circular_surface.CircularSurface.random_positions"><code class="docutils literal notranslate">random_positions()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.circular_surface.CircularSurface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.conic_surface">6.6.3. tracer.geometry.surface.conic_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface"><code class="docutils literal notranslate"><span class="pre">ConicSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.find_hit"><code class="docutils literal notranslate">find_hit()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.flip"><code class="docutils literal notranslate">flip()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.normals"><code class="docutils literal notranslate">normals()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.data_surface_1d">6.6.4. tracer.geometry.surface.data_surface_1d</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D"><code class="docutils literal notranslate"><span class="pre">DataSurface1D</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.data_surface_2d">6.6.5. tracer.geometry.surface.data_surface_2d</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D"><code class="docutils literal notranslate"><span class="pre">DataSurface2D</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.flip"><code class="docutils literal notranslate">flip()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.normals"><code class="docutils literal notranslate">normals()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotate"><code class="docutils literal notranslate">rotate()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.function_surface_1d">6.6.6. tracer.geometry.surface.function_surface_1d</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D"><code class="docutils literal notranslate"><span class="pre">FunctionSurface1D</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.function_surface_2d">6.6.7. tracer.geometry.surface.function_surface_2d</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D"><code class="docutils literal notranslate"><span class="pre">FunctionSurface2D</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.flip"><code class="docutils literal notranslate">flip()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.mask"><code class="docutils literal notranslate">mask()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.normals"><code class="docutils literal notranslate">normals()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotate"><code class="docutils literal notranslate">rotate()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.rectangular_surface">6.6.8. tracer.geometry.surface.rectangular_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.edge"><code class="docutils literal notranslate">edge()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.flip"><code class="docutils literal notranslate">flip()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.mask"><code class="docutils literal notranslate">mask()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.plotting_mesh"><code class="docutils literal notranslate">plotting_mesh()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.random_positions"><code class="docutils literal notranslate">random_positions()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotate"><code class="docutils literal notranslate">rotate()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.extent"><code class="docutils literal notranslate">extent</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.ring_surface">6.6.9. tracer.geometry.surface.ring_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="docutils literal notranslate"><span class="pre">RingSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.hurb_props"><code class="docutils literal notranslate">hurb_props()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.mask"><code class="docutils literal notranslate">mask()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.plotting_mesh"><code class="docutils literal notranslate">plotting_mesh()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.random_positions"><code class="docutils literal notranslate">random_positions()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.slit_surface">6.6.10. tracer.geometry.surface.slit_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface"><code class="docutils literal notranslate"><span class="pre">SlitSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.hurb_props"><code class="docutils literal notranslate">hurb_props()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.mask"><code class="docutils literal notranslate">mask()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.plotting_mesh"><code class="docutils literal notranslate">plotting_mesh()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.spherical_surface">6.6.11. tracer.geometry.surface.spherical_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface"><code class="docutils literal notranslate"><span class="pre">SphericalSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection"><code class="docutils literal notranslate">sphere_projection()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods"><code class="docutils literal notranslate">sphere_projection_methods</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.surface">6.6.12. tracer.geometry.surface.surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface"><code class="docutils literal notranslate"><span class="pre">Surface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.edge"><code class="docutils literal notranslate">edge()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.find_hit"><code class="docutils literal notranslate">find_hit()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.flip"><code class="docutils literal notranslate">flip()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.is_flat"><code class="docutils literal notranslate">is_flat()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.mask"><code class="docutils literal notranslate">mask()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.move_to"><code class="docutils literal notranslate">move_to()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.normals"><code class="docutils literal notranslate">normals()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.plotting_mesh"><code class="docutils literal notranslate">plotting_mesh()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.rotate"><code class="docutils literal notranslate">rotate()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.values"><code class="docutils literal notranslate">values()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.C_EPS"><code class="docutils literal notranslate">C_EPS</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.N_EPS"><code class="docutils literal notranslate">N_EPS</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.dn"><code class="docutils literal notranslate">dn</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.dp"><code class="docutils literal notranslate">dp</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.ds"><code class="docutils literal notranslate">ds</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.extent"><code class="docutils literal notranslate">extent</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.surface.Surface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.geometry.surface.tilted_surface">6.6.13. tracer.geometry.surface.tilted_surface</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface"><code class="docutils literal notranslate"><span class="pre">TiltedSurface</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.find_hit"><code class="docutils literal notranslate">find_hit()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.flip"><code class="docutils literal notranslate">flip()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.normals"><code class="docutils literal notranslate">normals()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotate"><code class="docutils literal notranslate">rotate()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.info"><code class="docutils literal notranslate">info</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotational_symmetry"><code class="docutils literal notranslate">rotational_symmetry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">6. </span>API Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">6.6. </span>tracer.geometry.surface Submodule</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_geometry_surface.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_geometry_surface.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_geometry_surface.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer_geometry_surface.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer_geometry_surface.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="module-optrace.tracer.geometry.surface">
+<span id="tracer-geometry-surface-submodule"></span><h1><span class="section-number">6.6. </span>tracer.geometry.surface Submodule<a class="headerlink" href="#module-optrace.tracer.geometry.surface" title="Link to this heading">¶</a></h1>
+<section id="module-optrace.tracer.geometry.surface.aspheric_surface">
+<span id="tracer-geometry-surface-aspheric-surface"></span><h2><span class="section-number">6.6.1. </span>tracer.geometry.surface.aspheric_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.aspheric_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.aspheric_surface.</span></span><span class="sig-name descname"><span class="pre">AsphericSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Define an aspheric surface, which is a ConicSurface with a
+n additional polynomial component a_0*r^2 + a_1*r^4 + …
+There is no upper bound on number of coefficients</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – surface radius</p></li>
+<li><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – curvature circle</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – conic constant</p></li>
+<li><p><strong>coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – coefficients for orders r^2, r^4, r^6, … as list, where units are mm^-1, mm^-3, …</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.flip">
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.flip" title="Link to this definition">¶</a></dt>
+<dd><p>flip the surface around the x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.info" title="Link to this definition">¶</a></dt>
+<dd><p>info string, characterizing the surface</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotation symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.circular_surface">
+<span id="tracer-geometry-surface-circular-surface"></span><h2><span class="section-number">6.6.2. </span>tracer.geometry.surface.circular_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.circular_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.circular_surface.CircularSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.circular_surface.</span></span><span class="sig-name descname"><span class="pre">CircularSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.circular_surface.CircularSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Create a surface object.
+The z-coordinate in the pos array is irrelevant if the surface is used for a lens, since it wil be
+adapted inside the lens class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radial size for surface_type=”Conic”, “Sphere”, “Circle” or “Ring” (float)</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.circular_surface.CircularSurface.random_positions">
+<span class="sig-name descname"><span class="pre">random_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.circular_surface.CircularSurface.random_positions" title="Link to this definition">¶</a></dt>
+<dd><p>Get 3D random positions on the surface, uniformly distributed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of positions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>position array, shape (N, 3)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.circular_surface.CircularSurface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.circular_surface.CircularSurface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry? Needs to be overwritten by child classes</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.conic_surface">
+<span id="tracer-geometry-surface-conic-surface"></span><h2><span class="section-number">6.6.3. </span>tracer.geometry.surface.conic_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.conic_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.conic_surface.ConicSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.conic_surface.</span></span><span class="sig-name descname"><span class="pre">ConicSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Define a conic section surface, following the equation:
+z(r) = 1/R * r**2 / (1 + sqrt(1 - (k+1) * r**2 / R**2))</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – curvature circle for surface_type=”Conic” or “Sphere” (float)</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radial size for surface_type=”Conic”, “Sphere”, “Circle” or “Ring” (float)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – conic constant for surface_type=”Conic” (float)</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.conic_surface.ConicSurface.find_hit">
+<span class="sig-name descname"><span class="pre">find_hit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.find_hit" title="Link to this definition">¶</a></dt>
+<dd><p>Find hit/intersections of rays with this surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray position array, shape (N, 3)</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – unity ray direction vectors, shape (N, 3)</p></li>
+<li><p><strong>where</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><em>slice</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – (optional) mask for input arrays, can be a slice or array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>intersection position (shape (N, 3)), boolean array (shape N) declaring a hit,
+indices of ill-conditioned rays</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.conic_surface.ConicSurface.flip">
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.flip" title="Link to this definition">¶</a></dt>
+<dd><p>flip the surface around the x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.conic_surface.ConicSurface.normals">
+<span class="sig-name descname"><span class="pre">normals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.normals" title="Link to this definition">¶</a></dt>
+<dd><p>Get normal vectors of the surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinates (numpy 1D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinates (numpy 1D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.conic_surface.ConicSurface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.info" title="Link to this definition">¶</a></dt>
+<dd><p>property string for UI information</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.conic_surface.ConicSurface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.conic_surface.ConicSurface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.data_surface_1d">
+<span id="tracer-geometry-surface-data-surface-1d"></span><h2><span class="section-number">6.6.4. </span>tracer.geometry.surface.data_surface_1d<a class="headerlink" href="#module-optrace.tracer.geometry.surface.data_surface_1d" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.data_surface_1d.</span></span><span class="sig-name descname"><span class="pre">DataSurface1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parax_roc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D" title="Link to this definition">¶</a></dt>
+<dd><p>Define a data surface with rotational symmetry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – surface radius</p></li>
+<li><p><strong>parax_roc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – paraxial radius of curvature, optional</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – equi-spaced data array, going from 0 to r</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.data_surface_2d">
+<span id="tracer-geometry-surface-data-surface-2d"></span><h2><span class="section-number">6.6.5. </span>tracer.geometry.surface.data_surface_2d<a class="headerlink" href="#module-optrace.tracer.geometry.surface.data_surface_2d" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.data_surface_2d.</span></span><span class="sig-name descname"><span class="pre">DataSurface2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parax_roc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D" title="Link to this definition">¶</a></dt>
+<dd><p>Create a surface object, defined by a two dimensional data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radial size of surface</p></li>
+<li><p><strong>parax_roc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – paraxial radius of curvature, optional</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – uses copy of this array, grid z-coordinate array for surface_type=”Data” (numpy 2D array)</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.flip">
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.flip" title="Link to this definition">¶</a></dt>
+<dd><p>flip the surface around the x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.normals">
+<span class="sig-name descname"><span class="pre">normals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.normals" title="Link to this definition">¶</a></dt>
+<dd><p>Get normal vectors of the surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinates (numpy 1D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinates (numpy 1D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotate" title="Link to this definition">¶</a></dt>
+<dd><p>rotate the surface around the z-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – rotation angle in degrees</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.function_surface_1d">
+<span id="tracer-geometry-surface-function-surface-1d"></span><h2><span class="section-number">6.6.6. </span>tracer.geometry.surface.function_surface_1d<a class="headerlink" href="#module-optrace.tracer.geometry.surface.function_surface_1d" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.function_surface_1d.</span></span><span class="sig-name descname"><span class="pre">FunctionSurface1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parax_roc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D" title="Link to this definition">¶</a></dt>
+<dd><p>Create a surface object defined by a mathematical function.</p>
+<p>Most of the time the automatic detection of the surface extent values z_min, z_max works correctly,
+assign the values manually otherwise.</p>
+<p>Providing parax_roc only makes sense, if the surface center can be locally described by a spherical surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – surface radius</p></li>
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em>) – surface function, must take one 1D array (r positions) and return one 1D float array</p></li>
+<li><p><strong>mask_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em>) – mask function (optional), must take one 1D array (r positions)
+and return one boolean 1D array, where the surface is defined</p></li>
+<li><p><strong>deriv_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em>) – derivative function (optional), must take one 1D array (r positions)
+and return one float 1D array with the derivative in r-direction</p></li>
+<li><p><strong>func_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – optional dict for keyword arguments for parameter func</p></li>
+<li><p><strong>mask_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – optional dict for keyword arguments for parameter mask_func</p></li>
+<li><p><strong>deriv_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – optional dict for keyword arguments for parameter deriv_func</p></li>
+<li><p><strong>parax_roc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – optional paraxial radius of curvature</p></li>
+<li><p><strong>z_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – exact value for the maximum surface z-extent, optional</p></li>
+<li><p><strong>z_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – exact value for the minimum surface z-extent, optional</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.function_surface_2d">
+<span id="tracer-geometry-surface-function-surface-2d"></span><h2><span class="section-number">6.6.7. </span>tracer.geometry.surface.function_surface_2d<a class="headerlink" href="#module-optrace.tracer.geometry.surface.function_surface_2d" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.function_surface_2d.</span></span><span class="sig-name descname"><span class="pre">FunctionSurface2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parax_roc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D" title="Link to this definition">¶</a></dt>
+<dd><p>Create a surface object defined by a mathematical function.</p>
+<p>Most of the time the automatic detection of the surface extent values z_min, z_max works correctly,
+assign the values manually otherwise.</p>
+<p>Providing parax_roc only makes sense, if the surface center can be locally described by a spherical surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – surface radius</p></li>
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em>) – surface function, must take two 1D arrays (x and y positions) and return one 1D float array</p></li>
+<li><p><strong>mask_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em>) – mask function (optional), must take two 1D arrays (x and y positions)
+and return one boolean 1D array, where the surface is defined</p></li>
+<li><p><strong>deriv_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>]</em>) – derivative function (optional), must take two 1D arrays (x and y positions)
+and return two float 1D arrays with partial derivatives in x and y direction</p></li>
+<li><p><strong>func_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – optional dict for keyword arguments for parameter func</p></li>
+<li><p><strong>mask_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – optional dict for keyword arguments for parameter mask_func</p></li>
+<li><p><strong>deriv_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – optional dict for keyword arguments for parameter deriv_func</p></li>
+<li><p><strong>parax_roc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – optional paraxial radius of curvature</p></li>
+<li><p><strong>z_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – exact value for the maximum surface z-extent, optional</p></li>
+<li><p><strong>z_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – exact value for the minimum surface z-extent, optional</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.flip">
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.flip" title="Link to this definition">¶</a></dt>
+<dd><p>flip the surface around the x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.mask" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface mask values. A value of 1 means the surface is defined here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinate array (numpy 1D or 2D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinate array (numpy 1D or 2D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.normals">
+<span class="sig-name descname"><span class="pre">normals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.normals" title="Link to this definition">¶</a></dt>
+<dd><p>Get normal vectors of the surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinates (numpy 1D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinates (numpy 1D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotate" title="Link to this definition">¶</a></dt>
+<dd><p>rotate the surface around the z-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – rotation angle in degrees</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.rectangular_surface">
+<span id="tracer-geometry-surface-rectangular-surface"></span><h2><span class="section-number">6.6.8. </span>tracer.geometry.surface.rectangular_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.rectangular_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.rectangular_surface.</span></span><span class="sig-name descname"><span class="pre">RectangularSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Create a rectangular surface, perpendicular to the z-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x and y side length as two element array/list</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.edge">
+<span class="sig-name descname"><span class="pre">edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.edge" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface values of the surface edge, assumes a circular edge.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of points on edge (int)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X, Y, Z coordinate arrays (all numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.flip">
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.flip" title="Link to this definition">¶</a></dt>
+<dd><p>flip the surface around the x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.mask" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface mask values. A value of 1 means the surface is defined here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinate array (numpy 1D or 2D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinate array (numpy 1D or 2D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.plotting_mesh">
+<span class="sig-name descname"><span class="pre">plotting_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.plotting_mesh" title="Link to this definition">¶</a></dt>
+<dd><p>Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
+The only guarantee is that neighbouring array values are neighbouring values in 3D space.
+Parameter N has no effect for a slit surface and is only for compatibility to other classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of grid values in each dimension (int)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X, Y, Z coordinate array (all numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.random_positions">
+<span class="sig-name descname"><span class="pre">random_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.random_positions" title="Link to this definition">¶</a></dt>
+<dd><p>Get random 3D positions on the surface, uniformly distributed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of positions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>position array, shape (N, 3)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotate" title="Link to this definition">¶</a></dt>
+<dd><p>rotate the surface around the z-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – rotation angle in degrees</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.extent">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">extent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.extent" title="Link to this definition">¶</a></dt>
+<dd><p>Surface extent, values for a smallest box encompassing all of the surface</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of x0, x1, y0, y1, z0, z1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.info" title="Link to this definition">¶</a></dt>
+<dd><p>property string for UI information</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.ring_surface">
+<span id="tracer-geometry-surface-ring-surface"></span><h2><span class="section-number">6.6.9. </span>tracer.geometry.surface.ring_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.ring_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.ring_surface.RingSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.ring_surface.</span></span><span class="sig-name descname"><span class="pre">RingSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ri</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Create a ring surface, an area between two concentric circles (also known as annulus)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radial size for surface_type=”Conic”, “Sphere”, “Circle” or “Ring” (float)</p></li>
+<li><p><strong>ri</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radius of inner circle for surface_type=”Ring” (float)</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.ring_surface.RingSurface.hurb_props">
+<span class="sig-name descname"><span class="pre">hurb_props</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.hurb_props" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the properties for Heisenberg Uncertainty Ray Bending.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray position at surface, x-coordinate</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray position at surface, y-coordinate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>distances axis 1, distances axis 2, minor axis vector, ray mask for rays to bend</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.ring_surface.RingSurface.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.mask" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface mask values. A value of 1 means the surface is defined here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinate array (numpy 1D or 2D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinate array (numpy 1D or 2D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.ring_surface.RingSurface.plotting_mesh">
+<span class="sig-name descname"><span class="pre">plotting_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.plotting_mesh" title="Link to this definition">¶</a></dt>
+<dd><p>Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
+The only guarantee is that neighbouring array values are neighbouring values in 3D space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of grid values in each dimension (int)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X, Y, Z coordinate array (all numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.ring_surface.RingSurface.random_positions">
+<span class="sig-name descname"><span class="pre">random_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.random_positions" title="Link to this definition">¶</a></dt>
+<dd><p>Get random 3D positions on the surface, uniformly distributed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of positions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>position array, shape (N, 3)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.ring_surface.RingSurface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.info" title="Link to this definition">¶</a></dt>
+<dd><p>info message describing the surface</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.ring_surface.RingSurface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.ring_surface.RingSurface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.slit_surface">
+<span id="tracer-geometry-surface-slit-surface"></span><h2><span class="section-number">6.6.10. </span>tracer.geometry.surface.slit_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.slit_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.slit_surface.SlitSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.slit_surface.</span></span><span class="sig-name descname"><span class="pre">SlitSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimi</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Create a rectangular surface, perpendicular to the z-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x and y side outer length as two element array/list</p></li>
+<li><p><strong>dimi</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x and y side slit lengths as two element array/list</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.slit_surface.SlitSurface.hurb_props">
+<span class="sig-name descname"><span class="pre">hurb_props</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.hurb_props" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the properties for Heisenberg Uncertainty Ray Bending.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray position at surface, x-coordinate</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray position at surface, y-coordinate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>distances axis 1, distances axis 2, left-right axis vector, ray mask for rays to bend</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.slit_surface.SlitSurface.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.mask" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface mask values. A value of 1 means the surface is defined here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinate array (numpy 1D or 2D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinate array (numpy 1D or 2D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.slit_surface.SlitSurface.plotting_mesh">
+<span class="sig-name descname"><span class="pre">plotting_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.plotting_mesh" title="Link to this definition">¶</a></dt>
+<dd><p>Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
+The only guarantee is that neighbouring array values are neighbouring values in 3D space.
+Parameter N has no effect for a slit surface and is only for compatibility to other classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of grid values in each dimension (int)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X, Y, Z coordinate array (all numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.slit_surface.SlitSurface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.slit_surface.SlitSurface.info" title="Link to this definition">¶</a></dt>
+<dd><p>property string for UI information</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.spherical_surface">
+<span id="tracer-geometry-surface-spherical-surface"></span><h2><span class="section-number">6.6.11. </span>tracer.geometry.surface.spherical_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.spherical_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.spherical_surface.</span></span><span class="sig-name descname"><span class="pre">SphericalSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Create a spherical surface object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – curvature circle for surface_type=”Conic” or “Sphere” (float)</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radial size for surface_type=”Conic”, “Sphere”, “Circle” or “Ring” (float)</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection">
+<span class="sig-name descname"><span class="pre">sphere_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Equidistant'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection" title="Link to this definition">¶</a></dt>
+<dd><p>Sign convention: projection coordinates are positive, 
+when they point in the same direction as cartesian coordinates for the corresponding axis.
+E.g: cartesian coordinates x = +5, y = -2 relative to sphere center 
+would have some projection coordinate px &gt; 0, py &lt; 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – cartesian positions in 3D space</p></li>
+<li><p><strong>projection_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – one of sphere_projection_methods defined in this class</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>projected coordinates, same shape as input</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.info" title="Link to this definition">¶</a></dt>
+<dd><p>property string for UI information</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods">
+<span class="sig-name descname"><span class="pre">sphere_projection_methods</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Equidistant',</span> <span class="pre">'Orthographic',</span> <span class="pre">'Equal-Area',</span> <span class="pre">'Stereographic']</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface.sphere_projection_methods" title="Link to this definition">¶</a></dt>
+<dd><p>projection methods for mapping a sphere surface onto a plane</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.surface">
+<span id="tracer-geometry-surface-surface"></span><h2><span class="section-number">6.6.12. </span>tracer.geometry.surface.surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.surface.</span></span><span class="sig-name descname"><span class="pre">Surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface" title="Link to this definition">¶</a></dt>
+<dd><p>Create a surface object, parent class of all other surface types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – surface radius</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.edge">
+<span class="sig-name descname"><span class="pre">edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.edge" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface values of the surface edge.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of points on edge (int)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X, Y, Z coordinate arrays (all numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.find_hit">
+<span class="sig-name descname"><span class="pre">find_hit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.find_hit" title="Link to this definition">¶</a></dt>
+<dd><p>Find the position of hits on surface using the iterative regula falsi algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – position array (numpy 2D array, shape (N, 3))</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – direction array (numpy 2D array, shape (N, 3))</p></li>
+<li><p><strong>where</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><em>slice</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – (optional) mask for input arrays, can be a slice or array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>positions of hit (shape as p), bool numpy 1D array if ray hits lens, indices of ill-conditioned rays</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.flip">
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.flip" title="Link to this definition">¶</a></dt>
+<dd><p>flip the surface around the x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.is_flat">
+<span class="sig-name descname"><span class="pre">is_flat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.is_flat" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>if the surface has no extent in z-direction</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.mask" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface mask values. A value of 1 means the surface is defined here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinate array (numpy 1D or 2D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinate array (numpy 1D or 2D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.move_to">
+<span class="sig-name descname"><span class="pre">move_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.move_to" title="Link to this definition">¶</a></dt>
+<dd><p>Moves the surface in 3D space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pos</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – 3D position to move to (list or numpy 1D array)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.normals">
+<span class="sig-name descname"><span class="pre">normals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.normals" title="Link to this definition">¶</a></dt>
+<dd><p>Get normal vectors of the surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinates (numpy 1D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinates (numpy 1D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.plotting_mesh">
+<span class="sig-name descname"><span class="pre">plotting_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.plotting_mesh" title="Link to this definition">¶</a></dt>
+<dd><p>Get 2D plotting mesh. Note that the values are not gridded, the distance can be arbitrary.
+The only guarantee is that neighbouring array values are neighbouring values in 3D space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of grid values in each dimension (int)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X, Y, Z coordinate array (all numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.rotate" title="Link to this definition">¶</a></dt>
+<dd><p>rotate the surface around the z-axis
+:param angle: rotation angle in degrees</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.values">
+<span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.values" title="Link to this definition">¶</a></dt>
+<dd><p>Get surface values. Absolute coordinates. 
+Points outside the surface are intersected with the radially continued edge.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinate array (numpy 1D or 2D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinate array (numpy 1D or 2D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>z-coordinate array (numpy 1D or 2D array, depending on shape of x and y)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.C_EPS">
+<span class="sig-name descname"><span class="pre">C_EPS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-06</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.C_EPS" title="Link to this definition">¶</a></dt>
+<dd><p>calculation epsilon. In some numerical methods this is the desired solution precision</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.N_EPS">
+<span class="sig-name descname"><span class="pre">N_EPS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-10</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.N_EPS" title="Link to this definition">¶</a></dt>
+<dd><p>numerical epsilon. Used for floating number comparisons. As well as adding small differences for plotting</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.dn">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dn</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.dn" title="Link to this definition">¶</a></dt>
+<dd><p>thickness between center z-position and lowest point on surface</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.dp">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dp</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.dp" title="Link to this definition">¶</a></dt>
+<dd><p>thickness between highest point on surface and center z-position</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.ds">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ds</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.ds" title="Link to this definition">¶</a></dt>
+<dd><p>surface thickness. Difference between highest and lowest point on surface</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.extent">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">extent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.extent" title="Link to this definition">¶</a></dt>
+<dd><p>Surface extent, values for a smallest box encompassing all of the surface</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of x0, x1, y0, y1, z0, z1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.info" title="Link to this definition">¶</a></dt>
+<dd><p>property string for UI information</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.surface.Surface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.surface.Surface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry? Needs to be overwritten by child classes</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.geometry.surface.tilted_surface">
+<span id="tracer-geometry-surface-tilted-surface"></span><h2><span class="section-number">6.6.13. </span>tracer.geometry.surface.tilted_surface<a class="headerlink" href="#module-optrace.tracer.geometry.surface.tilted_surface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.geometry.surface.tilted_surface.</span></span><span class="sig-name descname"><span class="pre">TiltedSurface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal_sph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface" title="Link to this definition">¶</a></dt>
+<dd><p>Create a tilted surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radial size of the surface</p></li>
+<li><p><strong>normal</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – normal vector, list or array of 3 elements</p></li>
+<li><p><strong>normal_sph</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – spherical normal vector, list or array of 2 elements (theta, phi, both in degrees)</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for parent classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.find_hit">
+<span class="sig-name descname"><span class="pre">find_hit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.find_hit" title="Link to this definition">¶</a></dt>
+<dd><p>Find hit/intersections of rays with this surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray position array, shape (N, 3)</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – unity ray direction vectors, shape (N, 3)</p></li>
+<li><p><strong>where</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><em>slice</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – (optional) mask for input arrays, can be a slice or array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>intersection position (shape (N, 3)), boolean array (shape N) declaring a hit,
+indices of ill-conditioned rays</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.flip">
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.flip" title="Link to this definition">¶</a></dt>
+<dd><p>flip the surface around the x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.normals">
+<span class="sig-name descname"><span class="pre">normals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.normals" title="Link to this definition">¶</a></dt>
+<dd><p>Get normal vectors of the surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x-coordinates (numpy 1D array)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y-coordinates (numpy 1D array)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normal vector array of shape (x.shape[0], 3), components in second dimension (numpy 2D array)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotate" title="Link to this definition">¶</a></dt>
+<dd><p>rotate the surface around the z-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – rotation angle in degrees</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.info">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.info" title="Link to this definition">¶</a></dt>
+<dd><p>property string for UI information</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotational_symmetry">
+<span class="sig-name descname"><span class="pre">rotational_symmetry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface.rotational_symmetry" title="Link to this definition">¶</a></dt>
+<dd><p>has the surface rotational symmetry?</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="optrace_tracer_geometry.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">6.5. </span>tracer.geometry Submodule</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="optrace_tracer_image.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">6.7. </span>tracer.image Submodule</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

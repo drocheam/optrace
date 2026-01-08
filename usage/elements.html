@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>4.3. Elements (Lens, Ray Source, …) - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.4. Geometry Groups" href="group.html" /><link rel="prev" title="4.2. Base Shapes (Surface, Line, Point)" href="surfaces.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/usage/elements.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/usage/elements.html"/>
+  <meta property="og:title" content="4.3. Elements (Lens, Ray Source, …)"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#overview">4.3.1. Overview</a><ul>
+<li><a class="reference internal" href="#types">4.3.1.1. Types</a></li>
+<li><a class="reference internal" href="#shared-functions-properties">4.3.1.2. Shared Functions/Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#raysource">4.3.2. RaySource</a><ul>
+<li><a class="reference internal" href="#id1">4.3.2.1. Overview</a></li>
+<li><a class="reference internal" href="#surface-point-line-parameter">4.3.2.2. Surface/Point/Line Parameter</a></li>
+<li><a class="reference internal" href="#position-parameter">4.3.2.3. Position Parameter</a></li>
+<li><a class="reference internal" href="#power-parameter">4.3.2.4. Power Parameter</a></li>
+<li><a class="reference internal" href="#orientation-parameter">4.3.2.5. Orientation Parameter</a></li>
+<li><a class="reference internal" href="#spectrum-parameter">4.3.2.6. Spectrum Parameter</a></li>
+<li><a class="reference internal" href="#divergence-parameter">4.3.2.7. Divergence Parameter</a></li>
+<li><a class="reference internal" href="#image-parameter">4.3.2.8. Image Parameter</a></li>
+<li><a class="reference internal" href="#polarization-parameter">4.3.2.9. Polarization Parameter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lens">4.3.3. Lens</a><ul>
+<li><a class="reference internal" href="#id2">4.3.3.1. Overview</a></li>
+<li><a class="reference internal" href="#example">4.3.3.2. Example</a></li>
+<li><a class="reference internal" href="#lens-thickness">4.3.3.3. Lens Thickness</a></li>
+<li><a class="reference internal" href="#paraxial-properties">4.3.3.4. Paraxial Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ideal-lens">4.3.4. Ideal Lens</a></li>
+<li><a class="reference internal" href="#filter">4.3.5. Filter</a></li>
+<li><a class="reference internal" href="#aperture">4.3.6. Aperture</a></li>
+<li><a class="reference internal" href="#detector">4.3.7. Detector</a></li>
+<li><a class="reference internal" href="#markers">4.3.8. Markers</a><ul>
+<li><a class="reference internal" href="#pointmarker">4.3.8.1. PointMarker</a></li>
+<li><a class="reference internal" href="#linemarker">4.3.8.2. LineMarker</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#volumes">4.3.9. Volumes</a><ul>
+<li><a class="reference internal" href="#boxvolume">4.3.9.1. BoxVolume</a></li>
+<li><a class="reference internal" href="#spherevolume">4.3.9.2. SphereVolume</a></li>
+<li><a class="reference internal" href="#cylindervolume">4.3.9.3. CylinderVolume</a></li>
+<li><a class="reference internal" href="#custom-volumes">4.3.9.4. Custom Volumes</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">4. </span>User Guide</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">4.3. </span>Elements (Lens, Ray Source,  …)</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/usage/elements.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/usage/elements.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/usage/elements.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/elements.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/elements.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="elements-lens-ray-source">
+<span id="usage-elements"></span><h1><span class="section-number">4.3. </span>Elements (Lens, Ray Source,  …)<a class="headerlink" href="#elements-lens-ray-source" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2><span class="section-number">4.3.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<section id="types">
+<h3><span class="section-number">4.3.1.1. </span>Types<a class="headerlink" href="#types" title="Link to this heading">¶</a></h3>
+<p>In optrace the class <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> denotes an object which has 0-2 surfaces and belongs to the tracing geometry.</p>
+<p><strong>Tracing Elements</strong></p>
+<p>Tracing elements are Elements with direct ray interaction:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-left">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a></p></td>
+<td><p>An element with a light emitting surface</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a></p></td>
+<td><p>An element with two surfaces on which light is refracted.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a></p></td>
+<td><p>A Lens, except that it has a planar surface and refracts light without aberrations</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p></td>
+<td><p>Element with a surface on which wavelength-dependent filtering takes place.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture" title="optrace.tracer.geometry.aperture.Aperture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aperture</span></code></a></p></td>
+<td><p>Similar to a Filter, except that incident light is completely absorbed.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Rendering Elements</strong></p>
+<p>Elements with no ray interaction for tracing, but the ability to render images of intersecting rays.</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-left">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector" title="optrace.tracer.geometry.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Detector</span></code></a></p></td>
+<td><p>Element with a single surface on which images or spectra can be rendered</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Markers</strong></p>
+<p>Markers are Elements for annotations in 3D space.</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-left">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.point_marker.PointMarker" title="optrace.tracer.geometry.marker.point_marker.PointMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointMarker</span></code></a></p></td>
+<td><p>Element consisting of a point and a label</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker" title="optrace.tracer.geometry.marker.line_marker.LineMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LineMarker</span></code></a></p></td>
+<td><p>Element consisting of a line and a label</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Volumes</strong></p>
+<p>Objects for plotting volumes in the TraceGUI, for instance an enclosing cylinder or a medium outline.</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-left">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume" title="optrace.tracer.geometry.volume.box_volume.BoxVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoxVolume</span></code></a></p></td>
+<td><p>Volume of a box or cube</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume" title="optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">CylinderVolume</span></code></a></p></td>
+<td><p>Cylinder volume with the symmetry axis in direction of the optical axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.sphere_volume.SphereVolume" title="optrace.tracer.geometry.volume.sphere_volume.SphereVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphereVolume</span></code></a></p></td>
+<td><p>A spherical volume</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="shared-functions-properties">
+<span id="element-geometry-props"></span><h3><span class="section-number">4.3.1.2. </span>Shared Functions/Properties<a class="headerlink" href="#shared-functions-properties" title="Link to this heading">¶</a></h3>
+<p>All subclasses of <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> share the following methods and properties.</p>
+<p><strong>Position</strong></p>
+<p>The position of the element is accessed using:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">pos</span> <span class="o">=</span> <span class="n">El</span><span class="o">.</span><span class="n">pos</span>
+</span></pre></div>
+</div>
+<p>This returns a three element list with x, y, z coordinates.
+For an element consisting of a singular surface, line or point,
+the returned value is identical to the position of this surface/line/point.
+For an element consisting of two surfaces, the position depends on how the object was specified,
+for instance see <a class="reference internal" href="#usage-lens"><span class="std std-ref">Lens</span></a>.</p>
+<p><strong>Extent</strong></p>
+<p>The extent box is the smallest encompassing bounding box that include the element.
+The extent property returns a list of coordinate bounds <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">z1</span><span class="p">]</span></code>.
+It is accessed using:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">extent</span> <span class="o">=</span> <span class="n">El</span><span class="o">.</span><span class="n">extent</span>
+</span></pre></div>
+</div>
+<p><strong>Moving</strong></p>
+<p>An object is moved using the <code class="code highlight python docutils literal highlight-python"><span class="n">move_to</span></code> function.
+A single parameter describes the new absolute position as list <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">]</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">El</span><span class="o">.</span><span class="n">move_to</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.25</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>The element is moved in such a way that the provided position is its new <code class="code highlight python docutils literal highlight-python"><span class="n">El</span><span class="o">.</span><span class="n">pos</span></code>.</p>
+<p><strong>Rotation</strong></p>
+<p>Using the <code class="code highlight python docutils literal highlight-python"><span class="n">rotate</span></code> function the objects can be rotated around the z-axis and around their center.
+The function takes a rotation angle in degrees as parameter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">El</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Flipping</strong></p>
+<p>Flipping the element rotates it around an axis parallel to the x-axis passing through the position <code class="code highlight python docutils literal highlight-python"><span class="n">El</span><span class="o">.</span><span class="n">pos</span></code>.
+Doing so, the order of front and back surface is reversed and each surface also gets flipped.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">El</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="raysource">
+<h2><span class="section-number">4.3.2. </span>RaySource<a class="headerlink" href="#raysource" title="Link to this heading">¶</a></h2>
+<section id="id1">
+<h3><span class="section-number">4.3.2.1. </span>Overview<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaySource</span></code></a>
+defines the properties for rays it creates, including</p>
+<ul class="simple">
+<li><p>Emitting surface/point/line</p></li>
+<li><p>Light distribution on this area</p></li>
+<li><p>Emitted spectrum and power</p></li>
+<li><p>Ray polarization</p></li>
+<li><p>Ray orientation</p></li>
+<li><p>Ray divergence</p></li>
+<li><p>Source position</p></li>
+</ul>
+</section>
+<section id="surface-point-line-parameter">
+<h3><span class="section-number">4.3.2.2. </span>Surface/Point/Line Parameter<a class="headerlink" href="#surface-point-line-parameter" title="Link to this heading">¶</a></h3>
+<p>A RaySource supports the following base shapes <code class="code highlight python docutils literal highlight-python"><span class="n">Point</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">CircularSurface</span><span class="p">,</span> <span class="n">RectangularSurface</span><span class="p">,</span> <span class="n">RingSurface</span></code>,
+which are provided as first parameter to the <code class="code highlight python docutils literal highlight-python"><span class="n">RaySource</span><span class="p">()</span></code> constructor.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">circ</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="position-parameter">
+<h3><span class="section-number">4.3.2.3. </span>Position Parameter<a class="headerlink" href="#position-parameter" title="Link to this heading">¶</a></h3>
+<p>The position in three-dimensional space is provided by the <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code>-parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="power-parameter">
+<h3><span class="section-number">4.3.2.4. </span>Power Parameter<a class="headerlink" href="#power-parameter" title="Link to this heading">¶</a></h3>
+<p>Providing the <code class="code highlight python docutils literal highlight-python"><span class="n">power</span></code> the cumulative power of all rays is defined. This proves especially
+useful when working with multiple sources with different power ratios.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="orientation-parameter">
+<h3><span class="section-number">4.3.2.5. </span>Orientation Parameter<a class="headerlink" href="#orientation-parameter" title="Link to this heading">¶</a></h3>
+<p>The base orientation type of the rays is defined by the <code class="code highlight python docutils literal highlight-python"><span class="n">orientation</span></code>-parameter.</p>
+<p>For <code class="code highlight python docutils literal highlight-python"><span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Constant&quot;</span></code> the orientation is independent of the position on the emitting area.
+The orientation vector is then defined by the <code class="code highlight python docutils literal highlight-python"><span class="n">s</span></code>-parameter in cartesian coordinates.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>Or with <code class="code highlight python docutils literal highlight-python"><span class="n">s_sph</span></code> for spherical coordinates, where the first one is the angle between
+the orientation and the optical axis and the second the angle inside the lateral plane.
+Values are provided in degrees.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">s_sph</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">30</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>If all rays from the source should be converging to a position <code class="code highlight python docutils literal highlight-python"><span class="n">conv_pos</span></code>,
+mode <code class="code highlight python docutils literal highlight-python"><span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Converging&quot;</span></code> should be employed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Converging&quot;</span><span class="p">,</span> <span class="n">conv_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>It is also possible to define orientations as a function of the position of the rays.
+For this we need to set <code class="code highlight python docutils literal highlight-python"><span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span></code> and provide the <code class="code highlight python docutils literal highlight-python"><span class="n">or_func</span></code> parameter.
+This parameter takes two numpy arrays containing the x and y-position
+and returns a two dimensional array with cartesian vector components in rows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">def</span><span class="w"> </span><span class="nf">or_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+</span><span data-line="2">    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">g</span><span class="p">))</span>
+</span><span data-line="3">    <span class="n">ab</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">s</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">s</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+</span><span data-line="4">    <span class="k">return</span> <span class="n">s</span> <span class="o">/</span> <span class="n">ab</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">or_func</span><span class="o">=</span><span class="n">or_func</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>As with other functions, we can also provide a keyword argument dictionary for the function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="o">...</span>
+</span><span data-line="2"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">or_func</span><span class="o">=</span><span class="n">or_func</span><span class="p">,</span> <span class="n">or_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">g</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+<section id="spectrum-parameter">
+<h3><span class="section-number">4.3.2.6. </span>Spectrum Parameter<a class="headerlink" href="#spectrum-parameter" title="Link to this heading">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object
+is provided with the <code class="code highlight python docutils literal highlight-python"><span class="n">spectrum</span></code> parameter.
+For instance, this can be a predefined spectrum:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d75</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Or a user defined one:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="s2">&quot;Monochromatic&quot;</span><span class="p">,</span> <span class="n">wl</span><span class="o">=</span><span class="mi">529</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">spec</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="divergence-parameter">
+<h3><span class="section-number">4.3.2.7. </span>Divergence Parameter<a class="headerlink" href="#divergence-parameter" title="Link to this heading">¶</a></h3>
+<p>Divergence defines how rays are distributed relative to their base orientation (<code class="code highlight python docutils literal highlight-python"><span class="n">orientation</span></code> parameter).</p>
+<p>With <code class="code highlight python docutils literal highlight-python"><span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;None&quot;</span></code> all rays follow their orientation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>Paired with <code class="code highlight python docutils literal highlight-python"><span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;Constant&quot;</span></code> all rays are emitted in parallel.</p>
+<p>We can also define Lambertian divergence, which follows the cosine law.
+<code class="code highlight python docutils literal highlight-python"><span class="n">div_angle</span></code> defines the half opening angle of the cone volume in which the divergence is generated.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;Lambertian&quot;</span><span class="p">,</span> <span class="n">div_angle</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;Isotropic&quot;</span></code> defines divergence with equal probability in all directions,
+but again only inside the cone defined by <code class="code highlight python docutils literal highlight-python"><span class="n">div_angle</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;Isotropic&quot;</span><span class="p">,</span> <span class="n">div_angle</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>User functions can be defined by <code class="code highlight python docutils literal highlight-python"><span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span></code> and providing the <code class="code highlight python docutils literal highlight-python"><span class="n">div_func</span></code> parameter.
+This function must take angular values in radians up to <code class="code highlight python docutils literal highlight-python"><span class="n">div_angle</span></code>
+and return a normalized or unnormalized probability.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">div_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">div_angle</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>For all the combinations above we can also generate a direction distribution inside an circular arc instead of a cone.
+The correct way to do this is by setting <code class="code highlight python docutils literal highlight-python"><span class="n">div_2d</span><span class="o">=</span><span class="kc">True</span></code>. With <code class="code highlight python docutils literal highlight-python"><span class="n">div_axis_angle</span></code>
+we can additionally define the orientation of this arc distribution.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">div_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">div_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">div_axis_angle</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">div_angle</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="image-parameter">
+<h3><span class="section-number">4.3.2.8. </span>Image Parameter<a class="headerlink" href="#image-parameter" title="Link to this heading">¶</a></h3>
+<p>Alternatively to a uniformly emitting area, there is a way to provide light distributions (modelled by images).</p>
+<p>This emitting surface needs to be a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.scalar_image.ScalarImage" title="optrace.tracer.image.scalar_image.ScalarImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalarImage</span></code></a>
+or <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> object.
+A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a>
+emitting this image will be created automatically.
+Its size will be equal to the side lengths of the image.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">image</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">landscape</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">image</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RGBImage</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">((</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">image</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RGBImage</span><span class="p">(</span><span class="s2">&quot;some_image_path&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Every image color generates a specific physical spectrum matching its color.
+This spectrum is a linear combination of the sRGB primaries in <a class="reference internal" href="../details/color.html#random-srgb"><span class="std std-numref">Section 5.8.5</span></a>.</p>
+<p>With <code class="code highlight python docutils literal highlight-python"><span class="n">image</span></code> specified the <code class="code highlight python docutils literal highlight-python"><span class="n">spectrum</span></code> parameter won’t be used.</p>
+</section>
+<section id="polarization-parameter">
+<h3><span class="section-number">4.3.2.9. </span>Polarization Parameter<a class="headerlink" href="#polarization-parameter" title="Link to this heading">¶</a></h3>
+<p>The polarization parameter describes the distribution of linear light polarizations.</p>
+<p>In the default case the directions are random, parametrized by <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Uniform&quot;</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Uniform&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;x&quot;</span></code> defines polarizations parallel to the x-axis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;y&quot;</span></code> defines polarizations parallel to the y-axis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span></code> defines random polarizations of x or y-direction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The user can also set a user-defined value with <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Constant&quot;</span></code> and the <code class="code highlight python docutils literal highlight-python"><span class="n">pol_angle</span></code> parameter.
+The polarization direction is defined by an angle inside the plane perpendicular to the ray direction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">pol_angle</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Or alternatively a list with <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;List&quot;</span></code>,
+the angular values in <code class="code highlight python docutils literal highlight-python"><span class="n">pol_angles</span></code> and their probabilities in <code class="code highlight python docutils literal highlight-python"><span class="n">pol_probs</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;List&quot;</span><span class="p">,</span> <span class="n">pol_angles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">pol_probs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>Lastly, a user defined function is set with  <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span></code> and the <code class="code highlight python docutils literal highlight-python"><span class="n">pol_func</span></code> parameter.
+This parameter takes angles in range <span class="math notranslate nohighlight">\([0, ~2 \pi]\)</span> and returns a normalized or unnormalized probability.</p>
+<p>Above we talked how for instance for <code class="code highlight python docutils literal highlight-python"><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;x&quot;</span></code> the rays are parallel to the x-axis.
+However, depending on their actual ray orientation this isn’t always the case.
+Read about what the angles mean for rays not parallel to the optical axis in <a class="reference internal" href="../details/sampling.html#polarization-sampling"><span class="std std-numref">Section 5.1.8</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">pol_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ang</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">ang</span> <span class="o">-</span> <span class="mi">30</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mi">10</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="lens">
+<span id="usage-lens"></span><h2><span class="section-number">4.3.3. </span>Lens<a class="headerlink" href="#lens" title="Link to this heading">¶</a></h2>
+<section id="id2">
+<h3><span class="section-number">4.3.3.1. </span>Overview<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> consists of two surfaces
+and a medium with a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex" title="optrace.tracer.refraction_index.RefractionIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">RefractionIndex</span></code></a> inbetween.
+Additionally, the position and a thickness parameter is required.</p>
+</section>
+<section id="example">
+<h3><span class="section-number">4.3.3.2. </span>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">sph1</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">10.2</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">sph2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">R</span><span class="o">=-</span><span class="mi">20</span><span class="p">)</span>
+</span><span data-line="3"><span class="n">n</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Sellmeier2&quot;</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="p">[</span><span class="mf">1.045</span><span class="p">,</span> <span class="mf">0.266</span><span class="p">,</span> <span class="mf">0.206</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="n">L</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Lens</span><span class="p">(</span><span class="n">sph1</span><span class="p">,</span> <span class="n">sph2</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">de</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>To define a different ambient medium behind the lens (other than the ambient
+medium defined by the raytracer geometry), we can provide the <code class="code highlight python docutils literal highlight-python"><span class="n">n2</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">L</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Lens</span><span class="p">(</span><span class="n">sph1</span><span class="p">,</span> <span class="n">sph2</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">de</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">n2</span><span class="o">=</span><span class="n">n2</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="lens-thickness">
+<span id="usage-lens-thickness"></span><h3><span class="section-number">4.3.3.3. </span>Lens Thickness<a class="headerlink" href="#lens-thickness" title="Link to this heading">¶</a></h3>
+<p>To allow for simple definitions of lens thickness and positions, there are multiple ways to define the thickness:</p>
+<ul class="simple">
+<li><p><code class="code highlight python docutils literal highlight-python"><span class="n">d</span></code>: thickness at the optical axis</p></li>
+<li><p><code class="code highlight python docutils literal highlight-python"><span class="n">de</span></code>: thickness extension. Distance between largest z-position on front and lowest z-position on back</p></li>
+<li><p><code class="code highlight python docutils literal highlight-python"><span class="n">d1</span></code>: distance between front surface center z-position and z-position of <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> of Lens</p></li>
+<li><p><code class="code highlight python docutils literal highlight-python"><span class="n">d2</span></code>: distance between z-position of <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> of Lens and z-position of the back surface center</p></li>
+</ul>
+<figure class="align-center" id="id3">
+<a class="dark-light reference internal image-reference" href="../_images/lens_thickness.svg"><img alt="../_images/lens_thickness.svg" class="dark-light" src="../_images/lens_thickness.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.15 </span><span class="caption-text"><span class="math notranslate nohighlight">\(d\)</span> and <span class="math notranslate nohighlight">\(d_\text{e}\)</span> for a convex lens, a concave lens and a meniscus lens</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>While for a convex lens using the <code class="code highlight python docutils literal highlight-python"><span class="n">de</span></code> is most comfortable,
+for concave or meniscus lenses the thickness at the optical axis <code class="code highlight python docutils literal highlight-python"><span class="n">d</span></code> proves to be more useful.
+For instance, a concave lens can be defined with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">L</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Lens</span><span class="p">(</span><span class="n">sph2</span><span class="p">,</span> <span class="n">sph1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">d</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>When the lens is defined by <code class="code highlight python docutils literal highlight-python"><span class="n">d</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="n">de</span></code> the position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></code>
+is at the center of the <code class="code highlight python docutils literal highlight-python"><span class="n">d</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="n">de</span></code> distance.</p>
+<p>With the <code class="code highlight python docutils literal highlight-python"><span class="n">d1</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">d2</span></code> parameters we can control the position of both surfaces relative
+to the lens position manually.
+For instance, with <code class="code highlight python docutils literal highlight-python"><span class="n">d1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">d2</span><span class="o">=...</span></code> the lens front starts exactly at the <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> of the Lens.
+On the other hand setting <code class="code highlight python docutils literal highlight-python"><span class="n">d1</span><span class="o">=...</span><span class="p">,</span> <span class="n">d2</span><span class="o">=</span><span class="mi">0</span></code> leads to the back surface center ending at <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code>.</p>
+<figure class="align-center" id="id4">
+<a class="dark-light reference internal image-reference" href="../_images/lens_thickness_position.svg"><img alt="../_images/lens_thickness_position.svg" class="dark-light" src="../_images/lens_thickness_position.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.16 </span><span class="caption-text">Defining a convex lens by <code class="docutils literal notranslate"><span class="pre">de=...</span></code>, by <code class="docutils literal notranslate"><span class="pre">d1=0,</span> <span class="pre">d2=...</span></code> and by <code class="docutils literal notranslate"><span class="pre">d1=...,</span> <span class="pre">d2=0</span></code>.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>All cases in-between are also viable, for instance:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">L</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Lens</span><span class="p">(</span><span class="n">sph1</span><span class="p">,</span> <span class="n">sph2</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">d1</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">d2</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>But only as long as the surfaces don’t collide.
+With a Lens object you can also access the thickness parameters:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="o">.</span><span class="n">d</span>
+</span><span data-line="2"><span class="go">0.7</span>
+</span></pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="o">.</span><span class="n">de</span>
+</span><span data-line="2"><span class="go">0.022566018...</span>
+</span></pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="o">.</span><span class="n">d1</span>
+</span><span data-line="2"><span class="go">0.1</span>
+</span></pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="o">.</span><span class="n">d2</span>
+</span><span data-line="2"><span class="go">0.6</span>
+</span></pre></div>
+</div>
+<p>Or the parameters of its surfaces:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="o">.</span><span class="n">front</span><span class="o">.</span><span class="n">ds</span>
+</span><span data-line="2"><span class="go">0.45115391...</span>
+</span></pre></div>
+</div>
+</section>
+<section id="paraxial-properties">
+<h3><span class="section-number">4.3.3.4. </span>Paraxial Properties<a class="headerlink" href="#paraxial-properties" title="Link to this heading">¶</a></h3>
+<p>Paraxial analysis by using transfer matrix is described in <a class="reference internal" href="tma.html#usage-tma"><span class="std std-numref">Section 4.10</span></a>.
+As for a setup of many lenses, we can also do paraxial analysis on a simple lens.
+To create a ray transfer matrix analysis object (<a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.transfer_matrix_analysis.TMA" title="optrace.tracer.transfer_matrix_analysis.TMA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TMA</span></code></a> object)
+we call the member function <code class="code highlight python docutils literal highlight-python"><span class="n">tma</span><span class="p">()</span></code>.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">tma</span><span class="p">()</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">efl</span>
+</span><span data-line="3"><span class="go">12.749973...</span>
+</span></pre></div>
+</div>
+<p>As the behavior can differ with the light wavelength, we can also provide a non-default wavelength in nanometers.
+As the lens object itself has no knowledge of the geometry surrounding it, the prior medium it is undefined.
+By default, a constant refractive index of 1 is assumed, but can be overwritten with the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">n0</span></code>.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">tma</span><span class="p">(</span><span class="mf">589.2</span><span class="p">,</span> <span class="n">n0</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.1</span><span class="p">))</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">tma</span><span class="o">.</span><span class="n">efl</span>
+</span><span data-line="3"><span class="go">17.300045...</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="ideal-lens">
+<h2><span class="section-number">4.3.4. </span>Ideal Lens<a class="headerlink" href="#ideal-lens" title="Link to this heading">¶</a></h2>
+<p>An <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a> focusses and images light perfectly
+and without aberrations according to the imaging equation.
+The geometry is an infinitesimal thin circular area with radius <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code>.
+Additionally, the optical power <code class="code highlight python docutils literal highlight-python"><span class="n">D</span></code> and a position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> need to be provided.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">IL</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">IdealLens</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">9.5</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>As for a normal Lens, it is possible to define a <code class="code highlight python docutils literal highlight-python"><span class="n">n2</span></code>.
+Note that this does not change the optical power or focal length, as they are controlled by the <code class="code highlight python docutils literal highlight-python"><span class="n">D</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">n2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RefractionIndex</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.25</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">IL</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">IdealLens</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">D</span><span class="o">=-</span><span class="mf">8.2</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">9.5</span><span class="p">],</span> <span class="n">n2</span><span class="o">=</span><span class="n">n2</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="filter">
+<h2><span class="section-number">4.3.5. </span>Filter<a class="headerlink" href="#filter" title="Link to this heading">¶</a></h2>
+<p>When light hits a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a>,
+the ray power is transmitted according to the filter’s transmittance function.</p>
+<p>A Filter is defined by a Surface, a position and the
+<a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TransmissionSpectrum</span><span class="p">(</span><span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="n">wl0</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">wl1</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">circ</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="3"><span class="n">F</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">23.93</span><span class="p">],</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">spec</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>With a filter the approximate sRGB color is calculated with <code class="code highlight python docutils literal highlight-python"><span class="n">F</span><span class="o">.</span><span class="n">color</span><span class="p">()</span></code>.
+The fourth return value is the opacity for visualization.
+Note that the opacity is more of a visual extra than a physically correct simulation.</p>
+<p>Calling the filter with a wavelength array returns the transmittance at these wavelengths.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">380</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">550</span><span class="p">])</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+</span><span data-line="3"><span class="go">array([0. , 0.5, 0. ])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="aperture">
+<h2><span class="section-number">4.3.6. </span>Aperture<a class="headerlink" href="#aperture" title="Link to this heading">¶</a></h2>
+<p>An <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture" title="optrace.tracer.geometry.aperture.Aperture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aperture</span></code></a> is just a
+<a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.filter.Filter" title="optrace.tracer.geometry.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a> that absorbs light completely for rays that hit it.
+In the most common use cases a <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RingSurface</span></code></a>
+is employed as Aperture surface.  As for all other elements, we also need to specify the position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ring</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RingSurface</span><span class="p">(</span><span class="n">ri</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">AP</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Aperture</span><span class="p">(</span><span class="n">ring</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">10.1</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="detector">
+<h2><span class="section-number">4.3.7. </span>Detector<a class="headerlink" href="#detector" title="Link to this heading">¶</a></h2>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.detector.Detector" title="optrace.tracer.geometry.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Detector</span></code></a> enables the rendering of images
+and spectra on its geometry. But by itself, it has no effect on raytracing.</p>
+<p>It takes a surface parameter and the position parameter as arguments.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">rect</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RectangularSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">Det</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Detector</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">15.2</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="markers">
+<h2><span class="section-number">4.3.8. </span>Markers<a class="headerlink" href="#markers" title="Link to this heading">¶</a></h2>
+<section id="pointmarker">
+<h3><span class="section-number">4.3.8.1. </span>PointMarker<a class="headerlink" href="#pointmarker" title="Link to this heading">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.point_marker.PointMarker" title="optrace.tracer.geometry.marker.point_marker.PointMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointMarker</span></code></a>
+annotates positions or elements inside the tracing geometry.
+As all markers, is has no influence on the tracing process.</p>
+<p>In the simplest case a <code class="code highlight python docutils literal highlight-python"><span class="n">PointMarker</span></code> is defined with a text string and a position
+for the <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">PointMarker</span><span class="p">(</span><span class="s2">&quot;Text132&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>One can scale the text and marker with <code class="code highlight python docutils literal highlight-python"><span class="n">text_factor</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="n">marker_factor</span></code>.
+The actual size change is handled by the plotting GUI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">PointMarker</span><span class="p">(</span><span class="s2">&quot;Text132&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">text_factor</span><span class="o">=</span><span class="mf">2.3</span><span class="p">,</span> <span class="n">marker_factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>We can also hide the marker point and only display the text with the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">label_only</span><span class="o">=</span><span class="kc">True</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">PointMarker</span><span class="p">(</span><span class="s2">&quot;Text132&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">label_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Conversly, text can be hidden by leaving the text empty:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">PointMarker</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="linemarker">
+<h3><span class="section-number">4.3.8.2. </span>LineMarker<a class="headerlink" href="#linemarker" title="Link to this heading">¶</a></h3>
+<p>Similarly, a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.marker.line_marker.LineMarker" title="optrace.tracer.geometry.marker.line_marker.LineMarker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LineMarker</span></code></a>
+is a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a> in the xy-plane with a text annotation.</p>
+<p>In the simplest case a <code class="code highlight python docutils literal highlight-python"><span class="n">LineMarker</span></code> is defined by a text string, radius, angle and a position.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LineMarker</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Text132&quot;</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>One can scale the text and marker with <code class="code highlight python docutils literal highlight-python"><span class="n">text_factor</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="n">line_factor</span></code>.
+The actual size change is handled by the plotting GUI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LineMarker</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Text132&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">text_factor</span><span class="o">=</span><span class="mf">2.3</span><span class="p">,</span> <span class="n">line_factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>We can hide the text and only plot the marker line by leaving the text empty:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">M</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LineMarker</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="volumes">
+<h2><span class="section-number">4.3.9. </span>Volumes<a class="headerlink" href="#volumes" title="Link to this heading">¶</a></h2>
+<section id="boxvolume">
+<h3><span class="section-number">4.3.9.1. </span>BoxVolume<a class="headerlink" href="#boxvolume" title="Link to this heading">¶</a></h3>
+<p>As for a <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurface</span></code></a>,
+the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">dim</span></code> defines the x- and y-side lengths in the lateral plane.
+Parameter <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> describes the center of this rectangle.
+For a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.box_volume.BoxVolume" title="optrace.tracer.geometry.volume.box_volume.BoxVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoxVolume</span></code></a> this surface gets extended
+by length <code class="code highlight python docutils literal highlight-python"><span class="n">length</span></code> in positive z-direction, forming a three-dimensional volume.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ot</span><span class="o">.</span><span class="n">BoxVolume</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">length</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>Additionally, a plotting opacity and color can be specified:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ot</span><span class="o">.</span><span class="n">BoxVolume</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">length</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+<section id="spherevolume">
+<h3><span class="section-number">4.3.9.2. </span>SphereVolume<a class="headerlink" href="#spherevolume" title="Link to this heading">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.sphere_volume.SphereVolume" title="optrace.tracer.geometry.volume.sphere_volume.SphereVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphereVolume</span></code></a>
+is defined by its center position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> and the sphere radius <code class="code highlight python docutils literal highlight-python"><span class="n">R</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ot</span><span class="o">.</span><span class="n">SphereVolume</span><span class="p">(</span><span class="n">R</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>As for the other volumes, the plotting opacity and color can be specified:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ot</span><span class="o">.</span><span class="n">SphereVolume</span><span class="p">(</span><span class="n">R</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+<section id="cylindervolume">
+<h3><span class="section-number">4.3.9.3. </span>CylinderVolume<a class="headerlink" href="#cylindervolume" title="Link to this heading">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume" title="optrace.tracer.geometry.volume.cylinder_volume.CylinderVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">CylinderVolume</span></code></a>
+is defined by its front surface center position <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> and the cylinder radius <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ot</span><span class="o">.</span><span class="n">CylinderVolume</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>As for the other volumes, the plotting opacity and color can be specified:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ot</span><span class="o">.</span><span class="n">CylinderVolume</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+<section id="custom-volumes">
+<h3><span class="section-number">4.3.9.4. </span>Custom Volumes<a class="headerlink" href="#custom-volumes" title="Link to this heading">¶</a></h3>
+<p>A custom <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.volume.volume.Volume" title="optrace.tracer.geometry.volume.volume.Volume"><code class="xref py py-class docutils literal notranslate"><span class="pre">Volume</span></code></a>
+makes it possible to define user-defined volumes.
+It requires a front and back surface as parameter, as well as a position and the thickness distances <code class="code highlight python docutils literal highlight-python"><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span></code>.
+These have the same meaning as for a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a>
+in <a class="reference internal" href="#usage-lens-thickness"><span class="std std-numref">Section 4.3.3.3</span></a>.</p>
+<p>You can find an example below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">front</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">ConicSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">back</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RectangularSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</span><span data-line="3"><span class="n">vol</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Volume</span><span class="p">(</span><span class="n">front</span><span class="p">,</span> <span class="n">back</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">d1</span><span class="o">=</span><span class="n">front</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="n">d2</span><span class="o">=</span><span class="n">back</span><span class="o">.</span><span class="n">ds</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Here a conic front surface and a rectangular surface are defined. <code class="code highlight python docutils literal highlight-python"><span class="n">front</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="n">back</span><span class="o">.</span><span class="n">ds</span></code>
+denote the total thickness of both surfaces at their center.
+The overall length for this volumes is then <code class="code highlight python docutils literal highlight-python"><span class="n">front</span><span class="o">.</span><span class="n">ds</span> <span class="o">+</span> <span class="n">back</span><span class="o">.</span><span class="n">ds</span> <span class="o">+</span> <span class="mi">1</span></code>.</p>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="surfaces.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">4.2. </span>Base Shapes (Surface, Line, Point)</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="group.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">4.4. </span>Geometry Groups</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>4.5. Raytracer - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.6. Refractive Indices" href="refraction_index.html" /><link rel="prev" title="4.4. Geometry Groups" href="group.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/usage/raytracer.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/usage/raytracer.html"/>
+  <meta property="og:title" content="4.5. Raytracer"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#usage-raytracer">4.5.1. Raytracer</a></li>
+<li><a class="reference internal" href="#tracing">4.5.2. Tracing</a></li>
+<li><a class="reference internal" href="#modelling-diffraction">4.5.3. Modelling Diffraction</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">4. </span>User Guide</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">4.5. </span>Raytracer</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/usage/raytracer.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/usage/raytracer.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/usage/raytracer.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/raytracer.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/raytracer.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="raytracer">
+<h1><span class="section-number">4.5. </span>Raytracer<a class="headerlink" href="#raytracer" title="Link to this heading">¶</a></h1>
+<section id="usage-raytracer">
+<span id="id1"></span><h2><span class="section-number">4.5.1. </span>Raytracer<a class="headerlink" href="#usage-raytracer" title="Link to this heading">¶</a></h2>
+<p><strong>Overview</strong></p>
+<p>The <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class provides the functionality for tracing, geometry checking, rendering spectra and images,
+and focusing.</p>
+<p>Since the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> is a subclass of a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a>, elements can be changed or added in the same way.</p>
+<figure class="align-center" id="id2">
+<a class="dark-light reference internal image-reference" href="../_images/example_legrand1.png"><img alt="../_images/example_legrand1.png" class="dark-light" src="../_images/example_legrand1.png" width="700" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.19 </span><span class="caption-text">Example of a raytracer geometry in the TraceGUI in side view</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>Outline</strong></p>
+<p>All objects and rays can only exist in a three-dimensional box, the <em>outline</em>.
+When initializing the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> it is passed as <code class="code highlight python docutils literal highlight-python"><span class="n">outline</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p><strong>Geometry</strong></p>
+<p>Since optrace implements sequential raytracing, the surfaces and objects must be in a well-defined and unique sequence.
+This applies to all elements with interactions of light: <code class="code highlight python docutils literal highlight-python"><span class="n">Lens</span><span class="p">,</span> <span class="n">IdealLens</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">Aperture</span><span class="p">,</span> <span class="n">RaySource</span></code>.
+The elements <code class="code highlight python docutils literal highlight-python"><span class="n">Detector</span><span class="p">,</span> <span class="n">LineMarker</span><span class="p">,</span> <span class="n">PointMarker</span><span class="p">,</span> <span class="n">BoxVolume</span><span class="p">,</span> <span class="n">SphereVolume</span><span class="p">,</span> <span class="n">CylinderVolume</span></code>
+are excluded from this. All ray source elements must lie before all lenses, filters and apertures.
+And all subsequent lenses, filters, apertures must not collide with each other and be inside the outline.</p>
+<p>Rays that hit the outline box will be absorbed.</p>
+<p><strong>Surrounding Media</strong></p>
+<p>In <a class="reference internal" href="elements.html#usage-lens"><span class="std std-ref">Lens</span></a> we learned that when creating a lens, the <code class="code highlight python docutils literal highlight-python"><span class="n">n2</span></code> parameter defines the subsequent medium.
+In the case of multiple lenses, the <code class="code highlight python docutils literal highlight-python"><span class="n">n2</span></code> of the previous lens is the medium prior to the next lens.
+In the case of the raytracer, we can define an <code class="code highlight python docutils literal highlight-python"><span class="n">n0</span></code> which defines the refractive index for all
+undefined <code class="code highlight python docutils literal highlight-python"><span class="n">n2</span><span class="o">=</span><span class="kc">None</span></code>, as well as for the region to the first lens.</p>
+<p>The following figure shows a setup with lenses <code class="code highlight python docutils literal highlight-python"><span class="n">L0</span><span class="p">,</span> <span class="n">L2</span></code> having a <code class="code highlight python docutils literal highlight-python"><span class="n">n2</span></code> defined and a custom
+<code class="code highlight python docutils literal highlight-python"><span class="n">n0</span></code> parameter in the raytracer class. The medium before the first lens as well as the medium
+behind <code class="code highlight python docutils literal highlight-python"><span class="n">L1</span></code> are therefore also <code class="code highlight python docutils literal highlight-python"><span class="n">n0</span></code>.</p>
+<figure class="align-center" id="id3">
+<a class="dark-light reference internal image-reference" href="../_images/rt_setup_different_ambient_media.svg"><img alt="../_images/rt_setup_different_ambient_media.svg" class="dark-light" src="../_images/rt_setup_different_ambient_media.svg" width="760" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.20 </span><span class="caption-text">Schematic figure of a setup with a ray source, three different lenses and three different ambient media</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>Absorbing Rays</strong></p>
+<p>optrace ensures that rays not intersecting both lens surfaces get absorbed.</p>
+<p>Generally, these rays are error cases.
+A ray only hitting one surfaces must enter/leave through the lens side cylinder,
+that is not handled in our sequential simulation.
+Rays not hitting the lens at all are typically undesired.
+In real optical systems they would be (hopefully) absorbed by the housing of the system.</p>
+<p><strong>Parameter</strong> <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.no_pol" title="optrace.tracer.raytracer.Raytracer.no_pol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">no_pol</span></code></a></p>
+<p>The raytracer provides the functionality to trace polarization directions. Thus, not only the polarization vector
+for the ray and ray segment can be calculated, but also the exact transmission at each surface transition.
+Unfortunately, the calculation is comparatively computationally intensive.</p>
+<p>With the parameter <code class="code highlight python docutils literal highlight-python"><span class="n">no_pol</span><span class="o">=</span><span class="kc">True</span></code> no polarizations are calculated and a unpolarized/uniformly polarized light
+is assumed everywhere. Typically this speeds up the tracing by 10-30%.
+Whether you can neglect the influence of polarization depends on the exact setup of the geometry.</p>
+</section>
+<section id="tracing">
+<h2><span class="section-number">4.5.2. </span>Tracing<a class="headerlink" href="#tracing" title="Link to this heading">¶</a></h2>
+<p><strong>Tracing the system</strong></p>
+<p>Tracing is with the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.trace" title="optrace.tracer.raytracer.Raytracer.trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.trace()</span></code></a>
+method of the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> class.
+It takes the number of rays <code class="code highlight python docutils literal highlight-python"><span class="n">N</span></code> as parameter.
+The method uses the current tracing geometry and stores the ray properties
+internally in a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.ray_storage.RayStorage" title="optrace.tracer.ray_storage.RayStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RayStorage</span></code></a> object.</p>
+<p><strong>Example</strong></p>
+<p>Below you can find an example. A eye preset is loaded and flipped around the x-axis.
+A point source is added at the retina and the geometry is traced.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">optrace</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ot</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="c1"># init raytracer</span>
+</span><span data-line="4"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="c1"># load eye preset</span>
+</span><span data-line="7"><span class="n">eye</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">arizona_eye</span><span class="p">(</span><span class="n">pupil</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span data-line="8">
+</span><span data-line="9"><span class="c1"># flip, move and add it to the tracer</span>
+</span><span data-line="10"><span class="n">eye</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+</span><span data-line="11"><span class="n">eye</span><span class="o">.</span><span class="n">move_to</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</span><span data-line="12"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eye</span><span class="p">)</span>
+</span><span data-line="13">
+</span><span data-line="14"><span class="c1"># create and add divergent point source</span>
+</span><span data-line="15"><span class="n">point</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Point</span><span class="p">()</span>
+</span><span data-line="16"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d50</span><span class="p">,</span>
+</span><span data-line="17">                  <span class="n">divergence</span><span class="o">=</span><span class="s2">&quot;Isotropic&quot;</span><span class="p">,</span> <span class="n">div_angle</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span><span data-line="18">                  <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</span><span data-line="19"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS</span><span class="p">)</span>
+</span><span data-line="20">
+</span><span data-line="21"><span class="c1"># trace</span>
+</span><span data-line="22"><span class="n">RT</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+</span><span data-line="23">
+</span><span data-line="24"><span class="c1"># access ray parameters, render images etc.</span>
+</span><span data-line="25"><span class="o">...</span>
+</span></pre></div>
+</div>
+<p><strong>Accessing the Ray Properties</strong></p>
+<p>Described in <a class="reference internal" href="advanced.html#usage-ray-access"><span class="std std-numref">Section 4.15.2</span></a>.</p>
+<p><strong>Rendering Images</strong></p>
+<p>Described in <a class="reference internal" href="image.html#rimage-rendering"><span class="std std-numref">Section 4.8.3</span></a>.</p>
+<p><strong>Tracing with many rays</strong></p>
+<p>The number of rays is limited by the RAM usage.
+The RAM usage is by default limited by the
+<a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM" title="optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Raytracer.MAX_RAY_STORAGE_RAM</span></code></a> parameter,
+the actual number of rays results from the complexity of the geometry.
+Its default value is 8GB, but it can be set for each <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a> object separately.</p>
+<p>To generate images with even more rays, the method
+<a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.iterative_render" title="optrace.tracer.raytracer.Raytracer.iterative_render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Raytracer.iterative_render</span></code></a> can be applied,
+which traces the geometry iteratively without holding all rays in memory.
+More details are available in <a class="reference internal" href="image.html#rimage-iterative-render"><span class="std std-numref">Section 4.8.4</span></a>.</p>
+</section>
+<section id="modelling-diffraction">
+<span id="hurb-usage"></span><h2><span class="section-number">4.5.3. </span>Modelling Diffraction<a class="headerlink" href="#modelling-diffraction" title="Link to this heading">¶</a></h2>
+<p><strong>Image Blurring</strong></p>
+<p>Image blurring can be applied to rendered images to account for resolution limits.
+This process utilizes an Airy disk filter, as detailed in <a class="reference internal" href="image.html#image-airy-filter"><span class="std std-numref">Section 4.8.7</span></a>,
+to approximate the blurring effect.
+It is important to note that this method provides a very generalized approximation.</p>
+<p><strong>Ray Bending</strong></p>
+<p>optrace incorporates experimental support for Heisenberg Uncertainty Ray Bending (HURB).
+Further technical details regarding its implementation are available in <a class="reference internal" href="../details/hurb.html#hurb-details"><span class="std std-numref">Section 5.3</span></a>.
+An example for experimentation with HURB is available in <a class="reference internal" href="../examples.html#example-hurb-apertures"><span class="std std-numref">Section 1.9</span></a>.</p>
+<p>The current implementation of HURB has the following limitations:</p>
+<ul class="simple">
+<li><p>HURB simulates the blurring associated with edge diffraction. It does not account for interference effects.</p></li>
+<li><p>Deviations persist between theoretical and simulated beam profiles.
+For a detailed comparison, refer to <a class="reference internal" href="../details/hurb.html#hurb-comparison"><span class="std std-numref">Section 5.3.6</span></a>.</p></li>
+<li><p>Ray bending is currently limited to the inner aperture edges
+of <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RingSurface</span></code></a>
+and <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.slit_surface.SlitSurface" title="optrace.tracer.geometry.surface.slit_surface.SlitSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SlitSurface</span></code></a> types.</p></li>
+<li><p>All apertures are modeled as diffracting elements.</p></li>
+<li><p>The aperture stop must be explicitly defined as a surface within the optical setup.</p></li>
+</ul>
+<p>Another issue is that bending leads to large angle rays.
+The use of image rendering with automatic extent is discouraged,
+as these rays lead to drastically increased automatically set sizes.
+Provide the image size manually, see <a class="reference internal" href="image.html#rimage-rendering"><span class="std std-numref">Section 4.8.3</span></a>.</p>
+<p>Given these restrictions and the experimental status of the feature,
+HURB requires explicit activation.
+To enable HURB, set <code class="code highlight python docutils literal highlight-python"><span class="n">use_hurb</span><span class="o">=</span><span class="kc">True</span></code> during the raytracer initialization:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span> <span class="n">use_hurb</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>A custom uncertainty scaling factor can be configured using
+the <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.HURB_FACTOR" title="optrace.tracer.raytracer.Raytracer.HURB_FACTOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HURB_FACTOR</span></code></a> attribute:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RT</span><span class="o">.</span><span class="n">HURB_FACTOR</span> <span class="o">=</span> <span class="mf">2.3</span>
+</span></pre></div>
+</div>
+<p>Additional information concerning this factor is provided in <a class="reference internal" href="../details/hurb.html#hurb-uncertainty-factor"><span class="std std-numref">Section 5.3.5</span></a>.</p>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="group.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">4.4. </span>Geometry Groups</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="refraction_index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">4.6. </span>Refractive Indices</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

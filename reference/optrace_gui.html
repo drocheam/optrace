@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>6.11. gui Submodule - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="7. Development" href="../development/index.html" /><link rel="prev" title="6.10. plots Submodule" href="optrace_plots.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/reference/optrace_gui.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/reference/optrace_gui.html"/>
+  <meta property="og:title" content="6.11. gui Submodule"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">6. API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#module-optrace.gui.command_window">6.11.1. gui.command_window</a><ul>
+<li><a class="reference internal" href="#optrace.gui.command_window.CommandWindow"><code class="docutils literal notranslate"><span class="pre">CommandWindow</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.gui.command_window.CommandWindow.clear_history"><code class="docutils literal notranslate">clear_history()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.command_window.CommandWindow.copy_history"><code class="docutils literal notranslate">copy_history()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.command_window.CommandWindow.send_command"><code class="docutils literal notranslate">send_command()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.command_window.CommandWindow.automatic_replot"><code class="docutils literal notranslate">automatic_replot</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.command_window.CommandWindow.cmd"><code class="docutils literal notranslate">cmd</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.command_window.CommandWindow.history"><code class="docutils literal notranslate">history</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.gui.property_browser">6.11.2. gui.property_browser</a><ul>
+<li><a class="reference internal" href="#optrace.gui.property_browser.PropertyBrowser"><code class="docutils literal notranslate"><span class="pre">PropertyBrowser</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.gui.property_browser.PropertyBrowser.update_dict"><code class="docutils literal notranslate">update_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.gui.trace_gui">6.11.3. gui.trace_gui</a><ul>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI"><code class="docutils literal notranslate"><span class="pre">TraceGUI</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.add_custom_button"><code class="docutils literal notranslate">add_custom_button()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.add_custom_checkbox"><code class="docutils literal notranslate">add_custom_checkbox()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.add_custom_selection"><code class="docutils literal notranslate">add_custom_selection()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.add_custom_value"><code class="docutils literal notranslate">add_custom_value()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.close"><code class="docutils literal notranslate">close()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.control"><code class="docutils literal notranslate">control()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_button_action_1"><code class="docutils literal notranslate">custom_button_action_1()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_button_action_2"><code class="docutils literal notranslate">custom_button_action_2()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_button_action_3"><code class="docutils literal notranslate">custom_button_action_3()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.debug"><code class="docutils literal notranslate">debug()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.detector_image"><code class="docutils literal notranslate">detector_image()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.detector_profile"><code class="docutils literal notranslate">detector_profile()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.detector_spectrum"><code class="docutils literal notranslate">detector_spectrum()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.get_camera"><code class="docutils literal notranslate">get_camera()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.move_to_focus"><code class="docutils literal notranslate">move_to_focus()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.open_command_window"><code class="docutils literal notranslate">open_command_window()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.open_documentation"><code class="docutils literal notranslate">open_documentation()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.open_property_browser"><code class="docutils literal notranslate">open_property_browser()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.pick_ray"><code class="docutils literal notranslate">pick_ray()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.pick_ray_section"><code class="docutils literal notranslate">pick_ray_section()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.process"><code class="docutils literal notranslate">process()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.replot"><code class="docutils literal notranslate">replot()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.replot_rays"><code class="docutils literal notranslate">replot_rays()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.reset_picking"><code class="docutils literal notranslate">reset_picking()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.retrace"><code class="docutils literal notranslate">retrace()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.run"><code class="docutils literal notranslate">run()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.run_command"><code class="docutils literal notranslate">run_command()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.screenshot"><code class="docutils literal notranslate">screenshot()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.select_rays"><code class="docutils literal notranslate">select_rays()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.set_camera"><code class="docutils literal notranslate">set_camera()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.smart_replot"><code class="docutils literal notranslate">smart_replot()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.source_image"><code class="docutils literal notranslate">source_image()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.source_profile"><code class="docutils literal notranslate">source_profile()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.source_spectrum"><code class="docutils literal notranslate">source_spectrum()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.activate_filter"><code class="docutils literal notranslate">activate_filter</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.busy"><code class="docutils literal notranslate">busy</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.coloring_mode"><code class="docutils literal notranslate">coloring_mode</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.coloring_modes"><code class="docutils literal notranslate">coloring_modes</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_checkbox_1"><code class="docutils literal notranslate">custom_checkbox_1</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_checkbox_2"><code class="docutils literal notranslate">custom_checkbox_2</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_checkbox_3"><code class="docutils literal notranslate">custom_checkbox_3</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_selection_1"><code class="docutils literal notranslate">custom_selection_1</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_selection_2"><code class="docutils literal notranslate">custom_selection_2</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_selection_3"><code class="docutils literal notranslate">custom_selection_3</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_value_1"><code class="docutils literal notranslate">custom_value_1</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_value_2"><code class="docutils literal notranslate">custom_value_2</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.custom_value_3"><code class="docutils literal notranslate">custom_value_3</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.detector_image_single_source"><code class="docutils literal notranslate">detector_image_single_source</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.detector_names"><code class="docutils literal notranslate">detector_names</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.detector_selection"><code class="docutils literal notranslate">detector_selection</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source"><code class="docutils literal notranslate">detector_spectrum_single_source</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.filter_constant"><code class="docutils literal notranslate">filter_constant</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.flip_detector_image"><code class="docutils literal notranslate">flip_detector_image</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.focus_search_method"><code class="docutils literal notranslate">focus_search_method</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.focus_search_single_source"><code class="docutils literal notranslate">focus_search_single_source</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.hide_labels"><code class="docutils literal notranslate">hide_labels</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.high_contrast"><code class="docutils literal notranslate">high_contrast</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.image_mode"><code class="docutils literal notranslate">image_mode</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.image_pixels"><code class="docutils literal notranslate">image_pixels</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.log_image"><code class="docutils literal notranslate">log_image</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.maximize_scene"><code class="docutils literal notranslate">maximize_scene</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.minimalistic_view"><code class="docutils literal notranslate">minimalistic_view</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.plot_cost_function"><code class="docutils literal notranslate">plot_cost_function</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.plotting_mode"><code class="docutils literal notranslate">plotting_mode</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.plotting_modes"><code class="docutils literal notranslate">plotting_modes</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.profile_position"><code class="docutils literal notranslate">profile_position</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.profile_position_dimension"><code class="docutils literal notranslate">profile_position_dimension</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.projection_method"><code class="docutils literal notranslate">projection_method</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.projection_method_enabled"><code class="docutils literal notranslate">projection_method_enabled</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.ray_count"><code class="docutils literal notranslate">ray_count</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.ray_opacity"><code class="docutils literal notranslate">ray_opacity</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.ray_selection"><code class="docutils literal notranslate">ray_selection</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.ray_width"><code class="docutils literal notranslate">ray_width</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.rays_visible"><code class="docutils literal notranslate">rays_visible</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.raytracer"><code class="docutils literal notranslate">raytracer</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.scene"><code class="docutils literal notranslate">scene</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.source_names"><code class="docutils literal notranslate">source_names</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.source_selection"><code class="docutils literal notranslate">source_selection</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.vertical_labels"><code class="docutils literal notranslate">vertical_labels</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.view"><code class="docutils literal notranslate">view</span></code></a></li>
+<li><a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI.z_det"><code class="docutils literal notranslate">z_det</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">6. </span>API Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">6.11. </span>gui Submodule</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_gui.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_gui.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/reference/optrace_gui.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_gui.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_gui.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="module-optrace.gui">
+<span id="gui-submodule"></span><h1><span class="section-number">6.11. </span>gui Submodule<a class="headerlink" href="#module-optrace.gui" title="Link to this heading">¶</a></h1>
+<section id="module-optrace.gui.command_window">
+<span id="gui-command-window"></span><h2><span class="section-number">6.11.1. </span>gui.command_window<a class="headerlink" href="#module-optrace.gui.command_window" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.gui.command_window.CommandWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.gui.command_window.</span></span><span class="sig-name descname"><span class="pre">CommandWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.command_window.CommandWindow" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the command window</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gui</strong> (<a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><em>TraceGUI</em></a>) – parent TraceGUI</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.command_window.CommandWindow.clear_history">
+<span class="sig-name descname"><span class="pre">clear_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.command_window.CommandWindow.clear_history" title="Link to this definition">¶</a></dt>
+<dd><p>clear command history
+:param event: optional trait change event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.command_window.CommandWindow.copy_history">
+<span class="sig-name descname"><span class="pre">copy_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.command_window.CommandWindow.copy_history" title="Link to this definition">¶</a></dt>
+<dd><p>copy the full history to the clipboard
+:param event: optional trait change event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.command_window.CommandWindow.send_command">
+<span class="sig-name descname"><span class="pre">send_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.command_window.CommandWindow.send_command" title="Link to this definition">¶</a></dt>
+<dd><p>Execute the entered command in the TraceGUI</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.command_window.CommandWindow.automatic_replot">
+<span class="sig-name descname"><span class="pre">automatic_replot</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.command_window.CommandWindow.automatic_replot" title="Link to this definition">¶</a></dt>
+<dd><p>Option for automatic replotting/recalculating the geometry after running the command</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.command_window.CommandWindow.cmd">
+<span class="sig-name descname"><span class="pre">cmd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Str" title="(in traits v7.1)"><span class="pre">Str</span></a></span><a class="headerlink" href="#optrace.gui.command_window.CommandWindow.cmd" title="Link to this definition">¶</a></dt>
+<dd><p>command to run</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.command_window.CommandWindow.history">
+<span class="sig-name descname"><span class="pre">history</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.command_window.CommandWindow.history" title="Link to this definition">¶</a></dt>
+<dd><p>command history</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.gui.property_browser">
+<span id="gui-property-browser"></span><h2><span class="section-number">6.11.2. </span>gui.property_browser<a class="headerlink" href="#module-optrace.gui.property_browser" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.gui.property_browser.PropertyBrowser">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.gui.property_browser.</span></span><span class="sig-name descname"><span class="pre">PropertyBrowser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.property_browser.PropertyBrowser" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize a PropertyBrowser</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gui</strong> (<a class="reference internal" href="#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><em>TraceGUI</em></a>) – reference to the TraceGUI</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.property_browser.PropertyBrowser.update_dict">
+<span class="sig-name descname"><span class="pre">update_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.property_browser.PropertyBrowser.update_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Update the dictionaries in all ValueEditor()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.gui.trace_gui">
+<span id="gui-trace-gui"></span><h2><span class="section-number">6.11.3. </span>gui.trace_gui<a class="headerlink" href="#module-optrace.gui.trace_gui" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.gui.trace_gui.</span></span><span class="sig-name descname"><span class="pre">TraceGUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raytracer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_camera</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new TraceGUI with the assigned Raytracer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>RT</strong> – raytracer</p></li>
+<li><p><strong>initial_camera</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – parameter dictionary for set_camera</p></li>
+<li><p><strong>kwargs</strong> – additional arguments, options, traits and parameters</p></li>
+<li><p><strong>raytracer</strong> (<a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><em>Raytracer</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.add_custom_button">
+<span class="sig-name descname"><span class="pre">add_custom_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.add_custom_button" title="Link to this definition">¶</a></dt>
+<dd><p>Add a custom button with an action to the “custom” GUI tab.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of the button / shown label text</p></li>
+<li><p><strong>function</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – function to call when the button is pressed. Function without parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.add_custom_checkbox">
+<span class="sig-name descname"><span class="pre">add_custom_checkbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.add_custom_checkbox" title="Link to this definition">¶</a></dt>
+<dd><p>Add a custom checkbox with an action to the “custom” GUI tab.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of the checkbox / shown label</p></li>
+<li><p><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if the box is checked in its default state</p></li>
+<li><p><strong>function</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – function to call when box state is changed (optional). Exactly one boolean parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.add_custom_selection">
+<span class="sig-name descname"><span class="pre">add_custom_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.add_custom_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Add a custom selection field with an action to the “custom” GUI tab.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of the checkbox / shown label text</p></li>
+<li><p><strong>list</strong> – list of selectable string</p></li>
+<li><p><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – default selection</p></li>
+<li><p><strong>function</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – function to call when selection is changed (optional). Exactly one string parameter.</p></li>
+<li><p><strong>list_</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.add_custom_value">
+<span class="sig-name descname"><span class="pre">add_custom_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.add_custom_value" title="Link to this definition">¶</a></dt>
+<dd><p>Add a custom float value field with an action to the “custom” GUI tab.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of the field / shown label text</p></li>
+<li><p><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – default value</p></li>
+<li><p><strong>function</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – function to call when the value is changed (optional). Exactly one float parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.close" title="Link to this definition">¶</a></dt>
+<dd><p>Close the whole application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.control">
+<span class="sig-name descname"><span class="pre">control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.control" title="Link to this definition">¶</a></dt>
+<dd><p>Interact with the TraceGUI.
+Function ‘func’ is executed in the main thread after the TraceGUI is loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – function to execute</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – positional arguments for func</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – keyword arguments for func</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_button_action_1">
+<span class="sig-name descname"><span class="pre">custom_button_action_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_button_action_1" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function assigned with custom button 1</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_button_action_2">
+<span class="sig-name descname"><span class="pre">custom_button_action_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_button_action_2" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function assigned with custom button 2</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_button_action_3">
+<span class="sig-name descname"><span class="pre">custom_button_action_3</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_button_action_3" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function assigned with custom button 3</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.debug" title="Link to this definition">¶</a></dt>
+<dd><p>Control the GUI from a separate thread.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – thread function to execute while the GUI is active</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – positional arguments for func</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – keyword arguments for func</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.detector_image">
+<span class="sig-name descname"><span class="pre">detector_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.detector_image" title="Link to this definition">¶</a></dt>
+<dd><p>Render a detector image at the chosen Detector, uses a separate thread.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> – optional trait change event</p></li>
+<li><p><strong>profile</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if a Image profile image is plotted</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent, see Raytracer.detector_image()</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for r_image_plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.detector_profile">
+<span class="sig-name descname"><span class="pre">detector_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.detector_profile" title="Link to this definition">¶</a></dt>
+<dd><p>Plot a detector image profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> – optional trait change event</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent, see Raytracer.detector_image()</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for image_profile_plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.detector_spectrum">
+<span class="sig-name descname"><span class="pre">detector_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.detector_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Render a Detector Spectrum for the chosen Source, uses a separate thread.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent, see Raytracer.detector_image()</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for spectrum_plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.get_camera">
+<span class="sig-name descname"><span class="pre">get_camera</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.get_camera" title="Link to this definition">¶</a></dt>
+<dd><p>Get the camera parameters that can be passed down to set_camera()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Return the current camera parameters (center, height, direction, roll)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.move_to_focus">
+<span class="sig-name descname"><span class="pre">move_to_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.move_to_focus" title="Link to this definition">¶</a></dt>
+<dd><p>Find a Focus.
+The chosen Detector defines the search range for focus finding.
+Searches are always between lenses or the next outline.
+Search takes place in a separate thread, after that the Detector is moved to the focus</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for focus_search_cost_plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.open_command_window">
+<span class="sig-name descname"><span class="pre">open_command_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.open_command_window" title="Link to this definition">¶</a></dt>
+<dd><p>Open the command window for executing code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.open_documentation">
+<span class="sig-name descname"><span class="pre">open_documentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.open_documentation" title="Link to this definition">¶</a></dt>
+<dd><p>Open the online documentation <a class="reference external" href="https://drocheam.github.io/optrace">https://drocheam.github.io/optrace</a> in a browser</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.open_property_browser">
+<span class="sig-name descname"><span class="pre">open_property_browser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.open_property_browser" title="Link to this definition">¶</a></dt>
+<dd><p>Open a property browser for the gui, the scene, the raytracer, shown rays and cardinal points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.pick_ray">
+<span class="sig-name descname"><span class="pre">pick_ray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.pick_ray" title="Link to this definition">¶</a></dt>
+<dd><p>Pick a ray with index ‘index’.
+The selected ray is highlighted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – is the index of the displayed rays.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.pick_ray_section">
+<span class="sig-name descname"><span class="pre">pick_ray_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detailed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.pick_ray_section" title="Link to this definition">¶</a></dt>
+<dd><p>Pick a ray with index ‘index’ at intersection number ‘section’.
+A ray highlight plot, crosshair and ray info text are shown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – is the index of the displayed rays.</p></li>
+<li><p><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – intersection index (starting position is zero)</p></li>
+<li><p><strong>detailed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If ‘detailed’ is set, a more detailed ray info text is shown</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.process" title="Link to this definition">¶</a></dt>
+<dd><p>Force an update to traits and unprocessed events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.replot">
+<span class="sig-name descname"><span class="pre">replot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.replot" title="Link to this definition">¶</a></dt>
+<dd><p>replot all or part of the geometry and scene.
+If the change dictionary is not provided, everything is replotted according to the raytracer geometry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>change</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – optional change dict from raytracer.compare_property_snapshot</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.replot_rays">
+<span class="sig-name descname"><span class="pre">replot_rays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.replot_rays" title="Link to this definition">¶</a></dt>
+<dd><p>choose a subset of all raytracer rays and plot them with :<cite>TraceGUI._plot_rays</cite>.</p>
+<p>By default, a random subset is selected.
+When mask and max_show (both optional) are provided, a specific subset is displayed.
+See TraceGUI.select_rays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – boolean array for which rays to display. Shape must equal the number of currently traced rays.</p></li>
+<li><p><strong>max_show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – maximum number of rays to display</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.reset_picking">
+<span class="sig-name descname"><span class="pre">reset_picking</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.reset_picking" title="Link to this definition">¶</a></dt>
+<dd><p>Hide/reset the displayed picker objects.
+Hides the ray info text, ray highlight and crosshair that have been created
+with TraceGUI.pick_ray or TraceGUI.pick_ray_section</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.retrace">
+<span class="sig-name descname"><span class="pre">retrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.retrace" title="Link to this definition">¶</a></dt>
+<dd><p>raytrace in separate thread, after that call <cite>TraceGUI.replot_rays</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the TraceGUI</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.run_command">
+<span class="sig-name descname"><span class="pre">run_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.run_command" title="Link to this definition">¶</a></dt>
+<dd><p>send/execute a command</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.screenshot">
+<span class="sig-name descname"><span class="pre">screenshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.screenshot" title="Link to this definition">¶</a></dt>
+<dd><p>Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
+See <cite>https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig</cite> for parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.select_rays">
+<span class="sig-name descname"><span class="pre">select_rays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.select_rays" title="Link to this definition">¶</a></dt>
+<dd><p>Apply a specific selection of rays for display.
+If the number is too large it is either limited by the ‘max_show’ parameter or a predefined limit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – boolean array for which rays to display. Shape must equal the number of currently traced rays.</p></li>
+<li><p><strong>max_show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – maximum number of rays to display</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.set_camera">
+<span class="sig-name descname"><span class="pre">set_camera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.set_camera" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the camera view.
+Not all parameters must be defined, setting single properties is also allowed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>focal_point</strong> – 3D position of camera focal point, also defines the center of the view</p></li>
+<li><p><strong>parallel_scale</strong> – view scaling. Defines half the size of the view in vertical direction.</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – 3D coordinates of center of view</p></li>
+<li><p><strong>height</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – half of vertical height in mm</p></li>
+<li><p><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – camera view direction vector
+(direction of vector perpendicular to your monitor and in your viewing direction)</p></li>
+<li><p><strong>roll</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – absolute camera roll angle</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.smart_replot">
+<span class="sig-name descname"><span class="pre">smart_replot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">automatic_replot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.smart_replot" title="Link to this definition">¶</a></dt>
+<dd><p>This contextmanager makes a property snapshot of the raytracer before and after a specific action.
+If changes are detected. the corresponding elements are updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>automatic_replot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if automatic replotting should be executed</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.source_image">
+<span class="sig-name descname"><span class="pre">source_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.source_image" title="Link to this definition">¶</a></dt>
+<dd><p>Render a source image for the chosen Source, uses a separate thread</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> – optional trait change event</p></li>
+<li><p><strong>profile</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if an Image profile plot is plotted</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for image_plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.source_profile">
+<span class="sig-name descname"><span class="pre">source_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.source_profile" title="Link to this definition">¶</a></dt>
+<dd><p>Plot a source image profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> – optional trait change event</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for image_profile_plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.source_spectrum">
+<span class="sig-name descname"><span class="pre">source_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.source_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>render a Source Spectrum for the chosen Source, uses a separate thread.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/traits.observation.html#traits.observation.events.TraitChangeEvent" title="(in traits v7.1)"><em>TraitChangeEvent</em></a>) – optional trait change event</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for spectrum_plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.activate_filter">
+<span class="sig-name descname"><span class="pre">activate_filter</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.activate_filter" title="Link to this definition">¶</a></dt>
+<dd><p>gaussian blur filter estimating resolution limit</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.busy">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">busy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.busy" title="Link to this definition">¶</a></dt>
+<dd><p>busy state flag of TraceGUI</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.coloring_mode">
+<span class="sig-name descname"><span class="pre">coloring_mode</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.coloring_mode" title="Link to this definition">¶</a></dt>
+<dd><p>Ray Coloring Mode</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.coloring_modes">
+<span class="sig-name descname"><span class="pre">coloring_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Plain',</span> <span class="pre">'Power',</span> <span class="pre">'Wavelength',</span> <span class="pre">'Source',</span> <span class="pre">'Polarization</span> <span class="pre">xz',</span> <span class="pre">'Polarization</span> <span class="pre">yz',</span> <span class="pre">'Refractive</span> <span class="pre">Index']</span></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.coloring_modes" title="Link to this definition">¶</a></dt>
+<dd><p>available ray coloring modes</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_checkbox_1">
+<span class="sig-name descname"><span class="pre">custom_checkbox_1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_checkbox_1" title="Link to this definition">¶</a></dt>
+<dd><p>First assigned checkbox for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_checkbox_2">
+<span class="sig-name descname"><span class="pre">custom_checkbox_2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_checkbox_2" title="Link to this definition">¶</a></dt>
+<dd><p>Second assigned checkbox for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_checkbox_3">
+<span class="sig-name descname"><span class="pre">custom_checkbox_3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_checkbox_3" title="Link to this definition">¶</a></dt>
+<dd><p>Third assigned checkbox for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_selection_1">
+<span class="sig-name descname"><span class="pre">custom_selection_1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_selection_1" title="Link to this definition">¶</a></dt>
+<dd><p>First assigned selection option for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_selection_2">
+<span class="sig-name descname"><span class="pre">custom_selection_2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_selection_2" title="Link to this definition">¶</a></dt>
+<dd><p>Second assigned selection option for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_selection_3">
+<span class="sig-name descname"><span class="pre">custom_selection_3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_selection_3" title="Link to this definition">¶</a></dt>
+<dd><p>Third assigned selection option for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_value_1">
+<span class="sig-name descname"><span class="pre">custom_value_1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Float" title="(in traits v7.1)"><span class="pre">Float</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_value_1" title="Link to this definition">¶</a></dt>
+<dd><p>First assigned value field for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_value_2">
+<span class="sig-name descname"><span class="pre">custom_value_2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Float" title="(in traits v7.1)"><span class="pre">Float</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_value_2" title="Link to this definition">¶</a></dt>
+<dd><p>Second assigned value field for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.custom_value_3">
+<span class="sig-name descname"><span class="pre">custom_value_3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Float" title="(in traits v7.1)"><span class="pre">Float</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.custom_value_3" title="Link to this definition">¶</a></dt>
+<dd><p>Third assigned value field for custom UI elements</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.detector_image_single_source">
+<span class="sig-name descname"><span class="pre">detector_image_single_source</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.detector_image_single_source" title="Link to this definition">¶</a></dt>
+<dd><p>Use only rays from selected source for the detector image</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.detector_names">
+<span class="sig-name descname"><span class="pre">detector_names</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.detector_names" title="Link to this definition">¶</a></dt>
+<dd><p>short names for raytracer detectors</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.detector_selection">
+<span class="sig-name descname"><span class="pre">detector_selection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.detector_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Detector Selection. Holds the name of one of the Detectors.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source">
+<span class="sig-name descname"><span class="pre">detector_spectrum_single_source</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.detector_spectrum_single_source" title="Link to this definition">¶</a></dt>
+<dd><p>Use only rays from selected source for the detector spectrum</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.filter_constant">
+<span class="sig-name descname"><span class="pre">filter_constant</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Range" title="(in traits v7.1)"><span class="pre">Range</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.filter_constant" title="Link to this definition">¶</a></dt>
+<dd><p>gaussian filter constant standard deviation</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.flip_detector_image">
+<span class="sig-name descname"><span class="pre">flip_detector_image</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.flip_detector_image" title="Link to this definition">¶</a></dt>
+<dd><p>Boolean value for flipping the image (rotating it by 180°). Packed as Checkbox into a <code class="xref py py-obj docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.focus_search_method">
+<span class="sig-name descname"><span class="pre">focus_search_method</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.focus_search_method" title="Link to this definition">¶</a></dt>
+<dd><p>Focus Finding Mode from raytracer.focus_search_methods</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.focus_search_single_source">
+<span class="sig-name descname"><span class="pre">focus_search_single_source</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.focus_search_single_source" title="Link to this definition">¶</a></dt>
+<dd><p>Use only rays from selected source for focus finding</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.hide_labels">
+<span class="sig-name descname"><span class="pre">hide_labels</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.hide_labels" title="Link to this definition">¶</a></dt>
+<dd><p>Shows or hides object labels</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.high_contrast">
+<span class="sig-name descname"><span class="pre">high_contrast</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.high_contrast" title="Link to this definition">¶</a></dt>
+<dd><p>high contrast mode without object colors and with white background</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.image_mode">
+<span class="sig-name descname"><span class="pre">image_mode</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.image_mode" title="Link to this definition">¶</a></dt>
+<dd><p>Image Type</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.image_pixels">
+<span class="sig-name descname"><span class="pre">image_pixels</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.image_pixels" title="Link to this definition">¶</a></dt>
+<dd><p>Image Pixel value for Source/Detector Image. This the number of pixels for the smaller image side.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.log_image">
+<span class="sig-name descname"><span class="pre">log_image</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.log_image" title="Link to this definition">¶</a></dt>
+<dd><p>Boolean value for a logarithmic image visualization. Packed as Checkbox into a <code class="xref py py-obj docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.maximize_scene">
+<span class="sig-name descname"><span class="pre">maximize_scene</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.maximize_scene" title="Link to this definition">¶</a></dt>
+<dd><p>maximize mode. Menu and toolbar hidden</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.minimalistic_view">
+<span class="sig-name descname"><span class="pre">minimalistic_view</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.minimalistic_view" title="Link to this definition">¶</a></dt>
+<dd><p>More minimalistic scene view. Axes are hidden and labels shortened.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.plot_cost_function">
+<span class="sig-name descname"><span class="pre">plot_cost_function</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.plot_cost_function" title="Link to this definition">¶</a></dt>
+<dd><p>Show a plot of the optimization cost function for the focus finding</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.plotting_mode">
+<span class="sig-name descname"><span class="pre">plotting_mode</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.plotting_mode" title="Link to this definition">¶</a></dt>
+<dd><p>Ray Plotting Type</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.plotting_modes">
+<span class="sig-name descname"><span class="pre">plotting_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Rays',</span> <span class="pre">'Points']</span></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.plotting_modes" title="Link to this definition">¶</a></dt>
+<dd><p>available ray representations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.profile_position">
+<span class="sig-name descname"><span class="pre">profile_position</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Float" title="(in traits v7.1)"><span class="pre">Float</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.profile_position" title="Link to this definition">¶</a></dt>
+<dd><p>numeric profile position value for chosen image profile dimension</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.profile_position_dimension">
+<span class="sig-name descname"><span class="pre">profile_position_dimension</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.profile_position_dimension" title="Link to this definition">¶</a></dt>
+<dd><p>dimension for the image profile position</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.projection_method">
+<span class="sig-name descname"><span class="pre">projection_method</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.projection_method" title="Link to this definition">¶</a></dt>
+<dd><p>sphere surface projection method</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.projection_method_enabled">
+<span class="sig-name descname"><span class="pre">projection_method_enabled</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Bool" title="(in traits v7.1)"><span class="pre">Bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.projection_method_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>if method is selectable, only the case for spherical detectors</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.ray_count">
+<span class="sig-name descname"><span class="pre">ray_count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Range" title="(in traits v7.1)"><span class="pre">Range</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.ray_count" title="Link to this definition">¶</a></dt>
+<dd><p>Number of rays for raytracing</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.ray_opacity">
+<span class="sig-name descname"><span class="pre">ray_opacity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Range" title="(in traits v7.1)"><span class="pre">Range</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.ray_opacity" title="Link to this definition">¶</a></dt>
+<dd><p>opacity of shown ray</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.ray_selection">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ray_selection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.ray_selection" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean array for which of the traced rays in TraceGUI.raytracer.rays are displayed currently</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.ray_width">
+<span class="sig-name descname"><span class="pre">ray_width</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Range" title="(in traits v7.1)"><span class="pre">Range</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.ray_width" title="Link to this definition">¶</a></dt>
+<dd><p>Width of rays shown.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.rays_visible">
+<span class="sig-name descname"><span class="pre">rays_visible</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Range" title="(in traits v7.1)"><span class="pre">Range</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.rays_visible" title="Link to this definition">¶</a></dt>
+<dd><p>Number of rays shown in mayavi scene</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.raytracer">
+<span class="sig-name descname"><span class="pre">raytracer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><span class="pre">Raytracer</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.raytracer" title="Link to this definition">¶</a></dt>
+<dd><p>reference to the raytracer</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.scene">
+<span class="sig-name descname"><span class="pre">scene</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Instance" title="(in traits v7.1)"><span class="pre">Instance</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.scene" title="Link to this definition">¶</a></dt>
+<dd><p>the mayavi scene</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.source_names">
+<span class="sig-name descname"><span class="pre">source_names</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.source_names" title="Link to this definition">¶</a></dt>
+<dd><p>short names for raytracer ray sources</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.source_selection">
+<span class="sig-name descname"><span class="pre">source_selection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Enum" title="(in traits v7.1)"><span class="pre">Enum</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.source_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Source Selection. Holds the name of one of the Sources.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.vertical_labels">
+<span class="sig-name descname"><span class="pre">vertical_labels</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.List" title="(in traits v7.1)"><span class="pre">List</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.vertical_labels" title="Link to this definition">¶</a></dt>
+<dd><p>in geometries with tight geometry and long descriptions one could want to display the labels vertically</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.view">
+<span class="sig-name descname"><span class="pre">view</span></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.view" title="Link to this definition">¶</a></dt>
+<dd><p>the UI view</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.gui.trace_gui.TraceGUI.z_det">
+<span class="sig-name descname"><span class="pre">z_det</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.enthought.com/traits/traits_api_reference/trait_types.html#traits.trait_types.Range" title="(in traits v7.1)"><span class="pre">Range</span></a></span><a class="headerlink" href="#optrace.gui.trace_gui.TraceGUI.z_det" title="Link to this definition">¶</a></dt>
+<dd><p>z-Position of Detector. Lies inside z-range of <cite>Raytracer.outline</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="optrace_plots.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">6.10. </span>plots Submodule</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../development/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">7. </span>Development</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

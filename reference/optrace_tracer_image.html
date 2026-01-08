@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>6.7. tracer.image Submodule - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="6.8. tracer.spectrum Submodule" href="optrace_tracer_spectrum.html" /><link rel="prev" title="6.6. tracer.geometry.surface Submodule" href="optrace_tracer_geometry_surface.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/reference/optrace_tracer_image.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/reference/optrace_tracer_image.html"/>
+  <meta property="og:title" content="6.7. tracer.image Submodule"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">6. API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#module-optrace.tracer.image.base_image">6.7.1. tracer.base_image</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.base_image.BaseImage"><code class="docutils literal notranslate"><span class="pre">BaseImage</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.base_image.BaseImage.profile"><code class="docutils literal notranslate">profile()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.base_image.BaseImage.save"><code class="docutils literal notranslate">save()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.base_image.BaseImage.Apx"><code class="docutils literal notranslate">Apx</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.base_image.BaseImage.data"><code class="docutils literal notranslate">data</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.base_image.BaseImage.s"><code class="docutils literal notranslate">s</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.base_image.BaseImage.shape"><code class="docutils literal notranslate">shape</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.image.scalar_image">6.7.2. tracer.scalar_image</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.scalar_image.ScalarImage"><code class="docutils literal notranslate"><span class="pre">ScalarImage</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.image.grayscale_image">6.7.3. tracer.grayscale_image</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.grayscale_image.GrayscaleImage.to_rgb_image"><code class="docutils literal notranslate">to_rgb_image()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.image.render_image">6.7.4. tracer.render_image</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage"><code class="docutils literal notranslate"><span class="pre">RenderImage</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.load"><code class="docutils literal notranslate">load()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.get"><code class="docutils literal notranslate">get()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.has_image"><code class="docutils literal notranslate">has_image()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.luminous_power"><code class="docutils literal notranslate">luminous_power()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.power"><code class="docutils literal notranslate">power()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.render"><code class="docutils literal notranslate">render()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.save"><code class="docutils literal notranslate">save()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.Apx"><code class="docutils literal notranslate">Apx</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.EPS"><code class="docutils literal notranslate">EPS</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.K"><code class="docutils literal notranslate">K</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_RATIO"><code class="docutils literal notranslate">MAX_IMAGE_RATIO</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_SIDE"><code class="docutils literal notranslate">MAX_IMAGE_SIDE</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.SIZES"><code class="docutils literal notranslate">SIZES</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.data"><code class="docutils literal notranslate">data</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.extent"><code class="docutils literal notranslate">extent</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.image_modes"><code class="docutils literal notranslate">image_modes</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.limit"><code class="docutils literal notranslate">limit</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.s"><code class="docutils literal notranslate">s</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.image.render_image.RenderImage.shape"><code class="docutils literal notranslate">shape</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.image.rgb_image">6.7.5. tracer.rgb_image</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.rgb_image.RGBImage"><code class="docutils literal notranslate"><span class="pre">RGBImage</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.image.rgb_image.RGBImage.to_grayscale_image"><code class="docutils literal notranslate">to_grayscale_image()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">6. </span>API Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">6.7. </span>tracer.image Submodule</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_image.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_image.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_image.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer_image.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer_image.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="module-optrace.tracer.image">
+<span id="tracer-image-submodule"></span><h1><span class="section-number">6.7. </span>tracer.image Submodule<a class="headerlink" href="#module-optrace.tracer.image" title="Link to this heading">¶</a></h1>
+<section id="module-optrace.tracer.image.base_image">
+<span id="tracer-base-image"></span><h2><span class="section-number">6.7.1. </span>tracer.base_image<a class="headerlink" href="#module-optrace.tracer.image.base_image" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.image.base_image.BaseImage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.image.base_image.</span></span><span class="sig-name descname"><span class="pre">BaseImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.base_image.BaseImage" title="Link to this definition">¶</a></dt>
+<dd><p>Init an Image object. Parent class of ScalarImage, GrayscaleImage and RGBImage</p>
+<p>Image dimensions should be either provided by the s or extent parameter.</p>
+<p>When parameter ‘data’ is provided as array, 
+element [0, 0] defines the lower left corner (negative x, negative y)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – Three-dimensional numpy array with data range [0, 1] or a file path to an image</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image side lengths, x-dimension first</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent in the form [xs, xe, ys, ye]</p></li>
+<li><p><strong>quantity</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – name of the stored image quantity/property</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – resolution limit information. Single value in micrometers.</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for the BaseClass</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>projection</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.base_image.BaseImage.profile">
+<span class="sig-name descname"><span class="pre">profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.base_image.BaseImage.profile" title="Link to this definition">¶</a></dt>
+<dd><p>Create an image profile.
+Only specify one of parameters x or y.</p>
+<p>There is no interpolation, the nearest pixel value is chosen (nearest neighbor ‘interpolation’)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – x-value for the profile</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – y-value for the profile</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>bin edge array, list of image cuts (one for linear images, three for rgb images)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.base_image.BaseImage.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.base_image.BaseImage.save" title="Link to this definition">¶</a></dt>
+<dd><p>Save the image data as image file.
+The image is rescaled (and therefore interpolated) so we have square pixels before the export.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – path with file ending to save the image to</p></li>
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – additional parameters for cv2.imwrite, see cv ImwriteFlags</p></li>
+<li><p><strong>flip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if image should be flipped (rotated 180 degrees)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.base_image.BaseImage.Apx">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Apx</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.image.base_image.BaseImage.Apx" title="Link to this definition">¶</a></dt>
+<dd><p>area per pixel in mm^2</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.base_image.BaseImage.data">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">data</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span><a class="headerlink" href="#optrace.tracer.image.base_image.BaseImage.data" title="Link to this definition">¶</a></dt>
+<dd><p>image data array</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.base_image.BaseImage.s">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">s</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.image.base_image.BaseImage.s" title="Link to this definition">¶</a></dt>
+<dd><p>image side lengths, x-dimension first</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.base_image.BaseImage.shape">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.image.base_image.BaseImage.shape" title="Link to this definition">¶</a></dt>
+<dd><p>data shape of the image. y-dimension first</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.image.scalar_image">
+<span id="tracer-scalar-image"></span><h2><span class="section-number">6.7.2. </span>tracer.scalar_image<a class="headerlink" href="#module-optrace.tracer.image.scalar_image" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.image.scalar_image.ScalarImage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.image.scalar_image.</span></span><span class="sig-name descname"><span class="pre">ScalarImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.scalar_image.ScalarImage" title="Link to this definition">¶</a></dt>
+<dd><p>Init a ScalarImage object.</p>
+<p>When provided as numpy array, the image data must be non-negative and have only one channel (simple 2D array).
+When provided as image path, the image must have no color information.</p>
+<p>When parameter ‘data’ is provided as array, 
+element [0, 0] defines the lower left corner (negative x, negative y)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Image filepath or two dimensional numpy array.</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image side lengths, x-dimension first</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent in the form [xs, xe, ys, ye]</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for the BaseImage and BaseClass class. 
+These include the limit and quantity option.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.image.grayscale_image">
+<span id="tracer-grayscale-image"></span><h2><span class="section-number">6.7.3. </span>tracer.grayscale_image<a class="headerlink" href="#module-optrace.tracer.image.grayscale_image" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.image.grayscale_image.GrayscaleImage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.image.grayscale_image.</span></span><span class="sig-name descname"><span class="pre">GrayscaleImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.grayscale_image.GrayscaleImage" title="Link to this definition">¶</a></dt>
+<dd><p>Init a GrayscaleImage object.
+Subclass of ScalarImage, but communicates an image in sRGB grayscale with gamma compression.</p>
+<p>When parameter ‘data’ is provided as array, 
+element [0, 0] defines the lower left corner (negative x, negative y)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Image filepath or two dimensional numpy array.</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image side lengths, x-dimension first</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent in the form [xs, xe, ys, ye]</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for the BaseImage and BaseClass class. 
+These include the limit and quantity option.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.grayscale_image.GrayscaleImage.to_rgb_image">
+<span class="sig-name descname"><span class="pre">to_rgb_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.grayscale_image.GrayscaleImage.to_rgb_image" title="Link to this definition">¶</a></dt>
+<dd><p>Create an RGBImage from this object.
+:return: RGBImage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage">RGBImage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.image.render_image">
+<span id="tracer-render-image"></span><h2><span class="section-number">6.7.4. </span>tracer.render_image<a class="headerlink" href="#module-optrace.tracer.image.render_image" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.image.render_image.</span></span><span class="sig-name descname"><span class="pre">RenderImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage" title="Link to this definition">¶</a></dt>
+<dd><p>Init an RenderImage object.
+This class is used to calculate
+and hold an Image consisting of the channels X, Y, Z, Illuminance and Irradiance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent in the form [xs, xe, ys, ye]</p></li>
+<li><p><strong>projection</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – string containing information about the sphere projection method, if any</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for the BaseClass, like for instance desc and long_desc</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.load">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.load" title="Link to this definition">¶</a></dt>
+<dd><p>Load a saved RenderImage (.npz) from disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – path of the RenderImage archive</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a saved image object from numpy archive to a image object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">315</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chroma_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.get" title="Link to this definition">¶</a></dt>
+<dd><p>Get a converted image with mode ‘mode’. Must be one of RenderImage.image_modes.</p>
+<p>N describes the pixel count (of the smaller side) to which the image is rescaled to.
+N should be one of RenderImage.SIZES, but the nearest value is automatically selected.
+Rescaling is done by joining bins, so there is no interpolation.</p>
+<p>Depending on the image mode, the returned image is an RGBImage with three channels
+or a ScalarImage with one channel.</p>
+<p>Parameters L_th and chroma_scale are only needed for mode=’sRGB (Perceptual RI)’,
+see function color.xyz_to_srgb_linear for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – one of RenderImage.image_modes</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – pixel count of smaller side, nearest of RenderImage.SIZES is automatically selected</p></li>
+<li><p><strong>L_th</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – lightness threshold for mode “sRGB (Perceptual RI)”</p></li>
+<li><p><strong>chroma_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – chroma_scale option for mode “sRGB (Perceptual RI)”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RGBImage or ScalarImage, depending on ‘mode’</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><em>RGBImage</em></a> | <a class="reference internal" href="#optrace.tracer.image.scalar_image.ScalarImage" title="optrace.tracer.image.scalar_image.ScalarImage"><em>ScalarImage</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.has_image">
+<span class="sig-name descname"><span class="pre">has_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.has_image" title="Link to this definition">¶</a></dt>
+<dd><p>Check Image object contains an calculated image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.luminous_power">
+<span class="sig-name descname"><span class="pre">luminous_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.luminous_power" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>calculated total image luminous power</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.power">
+<span class="sig-name descname"><span class="pre">power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.power" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>calculated total image power</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_dont_filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.render" title="Link to this definition">¶</a></dt>
+<dd><p>Creates an pixel image from ray positions on the detector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray position matrix, xyz components in columns, (numpy 2D array)</p></li>
+<li><p><strong>w</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray weight array (numpy 1D array)</p></li>
+<li><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – ray wavelength array (numpy 1D array)</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – rayleigh limit, used to approximate wave optics using a airy disc kernel</p></li>
+<li><p><strong>_dont_filter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.save" title="Link to this definition">¶</a></dt>
+<dd><p>Save the RenderImage as .npz archive.
+Files are overridden. Throws IOError if the file could not been saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – path to save to</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.Apx">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Apx</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.Apx" title="Link to this definition">¶</a></dt>
+<dd><p>area per pixel</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.EPS">
+<span class="sig-name descname"><span class="pre">EPS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-09</span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.EPS" title="Link to this definition">¶</a></dt>
+<dd><p>Used for minimal extent</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.K">
+<span class="sig-name descname"><span class="pre">K</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">683.0</span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.K" title="Link to this definition">¶</a></dt>
+<dd><p>Luminous Efficacy</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_RATIO">
+<span class="sig-name descname"><span class="pre">MAX_IMAGE_RATIO</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_RATIO" title="Link to this definition">¶</a></dt>
+<dd><p>maximum ratio of image side lengths. Images with ratios beyond will be corrected</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_SIDE">
+<span class="sig-name descname"><span class="pre">MAX_IMAGE_SIDE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">945</span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.MAX_IMAGE_SIDE" title="Link to this definition">¶</a></dt>
+<dd><p>maximum size of smaller image side in pixels</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.SIZES">
+<span class="sig-name descname"><span class="pre">SIZES</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[1,</span> <span class="pre">3,</span> <span class="pre">5,</span> <span class="pre">7,</span> <span class="pre">9,</span> <span class="pre">15,</span> <span class="pre">21,</span> <span class="pre">27,</span> <span class="pre">35,</span> <span class="pre">45,</span> <span class="pre">63,</span> <span class="pre">105,</span> <span class="pre">135,</span> <span class="pre">189,</span> <span class="pre">315,</span> <span class="pre">945]</span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.SIZES" title="Link to this definition">¶</a></dt>
+<dd><p>valid image side lengths (smallest side)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.data">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">data</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.data" title="Link to this definition">¶</a></dt>
+<dd><p>image data array</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.extent">
+<span class="sig-name descname"><span class="pre">extent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.extent" title="Link to this definition">¶</a></dt>
+<dd><p>the image extent as [x0, x1, y0, y1] array</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.image_modes">
+<span class="sig-name descname"><span class="pre">image_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['sRGB</span> <span class="pre">(Absolute</span> <span class="pre">RI)',</span> <span class="pre">'sRGB</span> <span class="pre">(Perceptual</span> <span class="pre">RI)',</span> <span class="pre">'Outside</span> <span class="pre">sRGB</span> <span class="pre">Gamut',</span> <span class="pre">'Irradiance',</span> <span class="pre">'Illuminance',</span> <span class="pre">'Lightness</span> <span class="pre">(CIELUV)',</span> <span class="pre">'Hue</span> <span class="pre">(CIELUV)',</span> <span class="pre">'Chroma</span> <span class="pre">(CIELUV)',</span> <span class="pre">'Saturation</span> <span class="pre">(CIELUV)']</span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.image_modes" title="Link to this definition">¶</a></dt>
+<dd><p>possible display modes for the RenderImage</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.limit">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">limit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.limit" title="Link to this definition">¶</a></dt>
+<dd><p>the resolution limit the RenderImage was rendered with</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.s">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">s</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.s" title="Link to this definition">¶</a></dt>
+<dd><p>geometric side lengths of image in direction (x, y)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.image.render_image.RenderImage.shape">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.image.render_image.RenderImage.shape" title="Link to this definition">¶</a></dt>
+<dd><p>data image shape (y, x)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.image.rgb_image">
+<span id="tracer-rgb-image"></span><h2><span class="section-number">6.7.5. </span>tracer.rgb_image<a class="headerlink" href="#module-optrace.tracer.image.rgb_image" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.image.rgb_image.RGBImage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.image.rgb_image.</span></span><span class="sig-name descname"><span class="pre">RGBImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.rgb_image.RGBImage" title="Link to this definition">¶</a></dt>
+<dd><p>Init a RGBImage object.</p>
+<p>When provided as numpy array, the image data must have values in range [0, 1] and three channels
+in the third dimension.
+When provided as image path, the image is loaded with three channels regardless of colorspace.</p>
+<p>When parameter ‘data’ is provided as array, 
+element [0, 0] defines the lower left corner (negative x, negative y)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Image filepath or three dimensional numpy array.</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image side lengths, x-dimension first</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – image extent in the form [xs, xe, ys, ye]</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for the BaseImage and BaseClass class. 
+These include the limit and quantity option.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.image.rgb_image.RGBImage.to_grayscale_image">
+<span class="sig-name descname"><span class="pre">to_grayscale_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.image.rgb_image.RGBImage.to_grayscale_image" title="Link to this definition">¶</a></dt>
+<dd><p>Create an GrayscaleImage from this object. Channel values are averaged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GrayscaleImage</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage">GrayscaleImage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="optrace_tracer_geometry_surface.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">6.6. </span>tracer.geometry.surface Submodule</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="optrace_tracer_spectrum.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">6.8. </span>tracer.spectrum Submodule</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

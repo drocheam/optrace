@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>6.3. tracer Submodule - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="6.4. tracer.color Submodule" href="optrace_tracer_color.html" /><link rel="prev" title="6.2. Global Module" href="optrace.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/reference/optrace_tracer.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/reference/optrace_tracer.html"/>
+  <meta property="og:title" content="6.3. tracer Submodule"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">6. API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#module-optrace.tracer.base_class">6.3.1. tracer.base_class</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.base_class.BaseClass"><code class="docutils literal notranslate"><span class="pre">BaseClass</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.base_class.BaseClass.copy"><code class="docutils literal notranslate">copy()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.base_class.BaseClass.crepr"><code class="docutils literal notranslate">crepr()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.base_class.BaseClass.get_desc"><code class="docutils literal notranslate">get_desc()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.base_class.BaseClass.get_long_desc"><code class="docutils literal notranslate">get_long_desc()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.base_class.BaseClass.lock"><code class="docutils literal notranslate">lock()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.convolve">6.3.2. tracer.convolve</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.convolve.convolve"><code class="docutils literal notranslate"><span class="pre">convolve()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.load">6.3.3. tracer.load</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.load.load_agf"><code class="docutils literal notranslate"><span class="pre">load_agf()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.load.load_zmx"><code class="docutils literal notranslate"><span class="pre">load_zmx()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.misc">6.3.4. tracer.misc</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.misc.binning_indices_2d"><code class="docutils literal notranslate"><span class="pre">binning_indices_2d()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.misc.cpu_count"><code class="docutils literal notranslate"><span class="pre">cpu_count()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.misc.cross"><code class="docutils literal notranslate"><span class="pre">cross()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.misc.masked_assign"><code class="docutils literal notranslate"><span class="pre">masked_assign()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.misc.normalize"><code class="docutils literal notranslate"><span class="pre">normalize()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.misc.rdot"><code class="docutils literal notranslate"><span class="pre">rdot()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.misc.timer"><code class="docutils literal notranslate"><span class="pre">timer()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.ray_storage">6.3.5. tracer.ray_storage</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage"><code class="docutils literal notranslate"><span class="pre">RayStorage</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.storage_size"><code class="docutils literal notranslate">storage_size()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.direction_vectors"><code class="docutils literal notranslate">direction_vectors()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.init"><code class="docutils literal notranslate">init()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.optical_lengths"><code class="docutils literal notranslate">optical_lengths()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.ray_lengths"><code class="docutils literal notranslate">ray_lengths()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.rays_by_mask"><code class="docutils literal notranslate">rays_by_mask()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.source_numbers"><code class="docutils literal notranslate">source_numbers()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.source_sections"><code class="docutils literal notranslate">source_sections()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.thread_rays"><code class="docutils literal notranslate">thread_rays()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.B_list"><code class="docutils literal notranslate">B_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.N"><code class="docutils literal notranslate">N</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.N_list"><code class="docutils literal notranslate">N_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.Nt"><code class="docutils literal notranslate">Nt</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.n_list"><code class="docutils literal notranslate">n_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.p_list"><code class="docutils literal notranslate">p_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.pol_list"><code class="docutils literal notranslate">pol_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.ray_source_list"><code class="docutils literal notranslate">ray_source_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.s0_list"><code class="docutils literal notranslate">s0_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.w_list"><code class="docutils literal notranslate">w_list</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.ray_storage.RayStorage.wl_list"><code class="docutils literal notranslate">wl_list</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.raytracer">6.3.6. tracer.raytracer</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer"><code class="docutils literal notranslate"><span class="pre">Raytracer</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.INFOS"><code class="docutils literal notranslate">INFOS</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING"><code class="docutils literal notranslate">INFOS.ABSORB_MISSING</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.INFOS.HURB_NEG_DIR"><code class="docutils literal notranslate">INFOS.HURB_NEG_DIR</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND"><code class="docutils literal notranslate">INFOS.ILL_COND</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION"><code class="docutils literal notranslate">INFOS.OUTLINE_INTERSECTION</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.INFOS.TIR"><code class="docutils literal notranslate">INFOS.TIR</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.check_collision"><code class="docutils literal notranslate">check_collision()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.check_if_rays_are_current"><code class="docutils literal notranslate">check_if_rays_are_current()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.clear"><code class="docutils literal notranslate">clear()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.compare_property_snapshot"><code class="docutils literal notranslate">compare_property_snapshot()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.detector_image"><code class="docutils literal notranslate">detector_image()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.detector_spectrum"><code class="docutils literal notranslate">detector_spectrum()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.focus_search"><code class="docutils literal notranslate">focus_search()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.iterative_render"><code class="docutils literal notranslate">iterative_render()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.property_snapshot"><code class="docutils literal notranslate">property_snapshot()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.source_image"><code class="docutils literal notranslate">source_image()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.source_spectrum"><code class="docutils literal notranslate">source_spectrum()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.trace"><code class="docutils literal notranslate">trace()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.tracing_snapshot"><code class="docutils literal notranslate">tracing_snapshot()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.HURB_FACTOR"><code class="docutils literal notranslate">HURB_FACTOR</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.ITER_RAYS_STEP"><code class="docutils literal notranslate">ITER_RAYS_STEP</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM"><code class="docutils literal notranslate">MAX_RAY_STORAGE_RAM</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.N_EPS"><code class="docutils literal notranslate">N_EPS</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.extent"><code class="docutils literal notranslate">extent</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.focus_search_methods"><code class="docutils literal notranslate">focus_search_methods</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.geometry_error"><code class="docutils literal notranslate">geometry_error</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.no_pol"><code class="docutils literal notranslate">no_pol</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.outline"><code class="docutils literal notranslate">outline</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.pos"><code class="docutils literal notranslate">pos</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.rays"><code class="docutils literal notranslate">rays</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.raytracer.Raytracer.use_hurb"><code class="docutils literal notranslate">use_hurb</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.refraction_index">6.3.7. tracer.refraction_index</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex"><code class="docutils literal notranslate"><span class="pre">RefractionIndex</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.__call__"><code class="docutils literal notranslate">__call__()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.__eq__"><code class="docutils literal notranslate">__eq__()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.__ne__"><code class="docutils literal notranslate">__ne__()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.abbe_number"><code class="docutils literal notranslate">abbe_number()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.is_dispersive"><code class="docutils literal notranslate">is_dispersive()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.coeff_count"><code class="docutils literal notranslate">coeff_count</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.n_types"><code class="docutils literal notranslate">n_types</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.quantity"><code class="docutils literal notranslate">quantity</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.spectrum_types"><code class="docutils literal notranslate">spectrum_types</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex.unit"><code class="docutils literal notranslate">unit</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.transfer_matrix_analysis">6.3.8. tracer.transfer_matrix_analysis</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA"><code class="docutils literal notranslate"><span class="pre">TMA</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.image_magnification"><code class="docutils literal notranslate">image_magnification()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.image_position"><code class="docutils literal notranslate">image_position()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.matrix_at"><code class="docutils literal notranslate">matrix_at()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.object_magnification"><code class="docutils literal notranslate">object_magnification()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.object_position"><code class="docutils literal notranslate">object_position()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification"><code class="docutils literal notranslate">pupil_magnification()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.pupil_position"><code class="docutils literal notranslate">pupil_position()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.abcd"><code class="docutils literal notranslate">abcd</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.bfl"><code class="docutils literal notranslate">bfl</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.d"><code class="docutils literal notranslate">d</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.efl"><code class="docutils literal notranslate">efl</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.efl_n"><code class="docutils literal notranslate">efl_n</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.ffl"><code class="docutils literal notranslate">ffl</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths"><code class="docutils literal notranslate">focal_lengths</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n"><code class="docutils literal notranslate">focal_lengths_n</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.focal_points"><code class="docutils literal notranslate">focal_points</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.n1"><code class="docutils literal notranslate">n1</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.n2"><code class="docutils literal notranslate">n2</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.nodal_points"><code class="docutils literal notranslate">nodal_points</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.optical_center"><code class="docutils literal notranslate">optical_center</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.powers"><code class="docutils literal notranslate">powers</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.powers_n"><code class="docutils literal notranslate">powers_n</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.principal_points"><code class="docutils literal notranslate">principal_points</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.vertex_points"><code class="docutils literal notranslate">vertex_points</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.transfer_matrix_analysis.TMA.wl"><code class="docutils literal notranslate">wl</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">6. </span>API Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">6.3. </span>tracer Submodule</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="module-optrace.tracer">
+<span id="tracer-submodule"></span><h1><span class="section-number">6.3. </span>tracer Submodule<a class="headerlink" href="#module-optrace.tracer" title="Link to this heading">¶</a></h1>
+<section id="module-optrace.tracer.base_class">
+<span id="tracer-base-class"></span><h2><span class="section-number">6.3.1. </span>tracer.base_class<a class="headerlink" href="#module-optrace.tracer.base_class" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.base_class.BaseClass">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.base_class.</span></span><span class="sig-name descname"><span class="pre">BaseClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.base_class.BaseClass" title="Link to this definition">¶</a></dt>
+<dd><p>common parent class for almost all <cite>optrace.tracer</cite> classes.
+Features description properties as well
+as methods for making the object read-only (kind of)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>desc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – compact description</p></li>
+<li><p><strong>long_desc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – verbose description</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.base_class.BaseClass.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.base_class.BaseClass.copy" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a fully independent copy</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.base_class.BaseClass.crepr">
+<span class="sig-name descname"><span class="pre">crepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.base_class.BaseClass.crepr" title="Link to this definition">¶</a></dt>
+<dd><p>Compact state representation using only lists and immutable types.
+Used to compare states of BaseClass objects.
+np.ndarray is only compared for a size &lt; 20, so either ignore these changes or make the arrays read only.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>compact representation list</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.base_class.BaseClass.get_desc">
+<span class="sig-name descname"><span class="pre">get_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.base_class.BaseClass.get_desc" title="Link to this definition">¶</a></dt>
+<dd><p>get a short description
+:param fallback: description string if the object has no desc
+:return: compact description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fallback</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.base_class.BaseClass.get_long_desc">
+<span class="sig-name descname"><span class="pre">get_long_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.base_class.BaseClass.get_long_desc" title="Link to this definition">¶</a></dt>
+<dd><p>get a longer, more verbose description
+:param fallback: description string if the object has no desc and long_desc
+:return: verbose description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fallback</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.base_class.BaseClass.lock">
+<span class="sig-name descname"><span class="pre">lock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.base_class.BaseClass.lock" title="Link to this definition">¶</a></dt>
+<dd><p>make storage and object read only</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.convolve">
+<span id="tracer-convolve"></span><h2><span class="section-number">6.3.2. </span>tracer.convolve<a class="headerlink" href="#module-optrace.tracer.convolve" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.convolve.convolve">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.convolve.</span></span><span class="sig-name descname"><span class="pre">convolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.convolve.convolve" title="Link to this definition">¶</a></dt>
+<dd><p>Convolve an image with a point spread function.</p>
+<p>Different convolution cases:
+1. Grayscale image and PSF: Img and PSF are GrayscaleImage -&gt; result is also GrayscaleImage
+2. Image grayscale or spectrally homogeneous, PSF has color information: Img GrayscaleImage, PSF RenderImage
+-&gt; result is RGBImage
+3. Image has color information, PSF is color independent: Image RGBImage, PSF GrayscaleImage
+-&gt; result is RGBImage
+4. Image has color information, PSF has color information: Image RGBImage, PSF list of R, G, B RenderImage rendered
+for the sRGB primary R, G, B preset spectra with the correct power ratios
+-&gt; result is RGBImage</p>
+<p>The system magnification factor m scales the image before convolution.
+abs(m) &gt; 1 means enlargement, abs(m) &lt; 1 size reduction,
+m &lt; 0 image flipping, m &gt; 0 an upright image.</p>
+<p>See the documentation for more details.</p>
+<p>As the convolution requires values outside the initial image, a suitable padding method must be set.
+By default, padding_mode=’constant’ and padding_value are zeros.
+Padding modes from numpy.pad are supported. padding_value is only needed for the ‘constant’ mode.
+It must have three elements if img is an RGBImage, and one otherwise.</p>
+<p>If a result with the same side lengths and pixel count as the input is desired,
+parameter <cite>keep_size</cite> must be set to True so the image is cropped back to its original shape.</p>
+<p>Provide cargs=dict(normalize=False) so the output image intensities are not normalized automatically.
+Useful for images without bright regions.</p>
+<p>In the internals of this function the convolution is done in linear sRGB values, 
+while also using values outside the sRGB gamut.
+To remove this out-of-gamut colors in the resulting image, color transformations are performed.
+Parameter cargs overwrites parameters for color.xyz_to_srgb. By default these parameters are:
+dict(rendering_intent=”Absolute”, normalize=True, clip=True, L_th=0, chroma_scale=None).
+For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><em>RGBImage</em></a><em> | </em><a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><em>GrayscaleImage</em></a>) – initial image as either RGBImage or GrayscaleImage</p></li>
+<li><p><strong>psf</strong> (<a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><em>GrayscaleImage</em></a><em> | </em><a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><em>RenderImage</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><em>RenderImage</em></a><em>]</em>) – point spread function, GrayscaleImage, RenderImage or three element list of R, G, B RenderImage</p></li>
+<li><p><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – magnification factor</p></li>
+<li><p><strong>keep_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if output image should be cropped back to size of the input image</p></li>
+<li><p><strong>padding_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – padding mode (from numpy.pad) for image padding before convolution.</p></li>
+<li><p><strong>padding_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – padding value for padding_mode=’constant’. 
+Three elements if img is a RGBImage, single element otherwise. Defaults to zeros.</p></li>
+<li><p><strong>cargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – overwrite for parameters for color.xyz_to_srgb. By default these parameters are:
+dict(rendering_intent=”Absolute”, normalize=True, clip=True, L_th=0, chroma_scale=None).
+For instance, specify cargs=dict(normalize=False) to turn off normalization, but all other parameters unchanged</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GrayscaleImage or RGBImage, see above</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><em>RGBImage</em></a> | <a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><em>GrayscaleImage</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.load">
+<span id="tracer-load"></span><h2><span class="section-number">6.3.3. </span>tracer.load<a class="headerlink" href="#module-optrace.tracer.load" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.load.load_agf">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.load.</span></span><span class="sig-name descname"><span class="pre">load_agf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.load.load_agf" title="Link to this definition">¶</a></dt>
+<dd><p>Load an .agf material catalogue</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – filepath</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dictionary of refractive media, keys are names, values are RefractionIndex objects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.load.load_zmx">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.load.</span></span><span class="sig-name descname"><span class="pre">load_zmx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.load.load_zmx" title="Link to this definition">¶</a></dt>
+<dd><p>Load a ZEMAX geometry from a .zmx into a Group.
+See the documentation on the limitations of the import.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – filepath</p></li>
+<li><p><strong>n_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – dictionary of RefractiveIndex in the geometry</p></li>
+<li><p><strong>no_marker</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if there should be no marker created for the .zmx description</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Group including the geometry from the .zmx</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><em>Group</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.misc">
+<span id="tracer-misc"></span><h2><span class="section-number">6.3.4. </span>tracer.misc<a class="headerlink" href="#module-optrace.tracer.misc" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.misc.binning_indices_2d">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.misc.</span></span><span class="sig-name descname"><span class="pre">binning_indices_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.misc.binning_indices_2d" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate x and y bin indices for a 2D histogram from provided positions x, y.
+Positions outside the extent are set to indices (0, 0) and their weight is set to zero in result wm.
+Binning includes all edges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – x position array</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – y position array</p></li>
+<li><p><strong>w</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – weight array</p></li>
+<li><p><strong>Nx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of x pixels</p></li>
+<li><p><strong>Ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of y pixels</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – image position extent as list [x0, x1, y0, y1]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>y bin indices, x bin indices, weight array with values at invalid position indices set to zero</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.misc.cpu_count">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.misc.</span></span><span class="sig-name descname"><span class="pre">cpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.misc.cpu_count" title="Link to this definition">¶</a></dt>
+<dd><p>Number of logical cpu cores assigned to this process (Python &gt;= 3.13)
+Number of logical cpu cores (Python &lt; 3.13)
+Can be overridden by setting the PYTHON_CPU_COUNT environment variable or running python -X cpucores
+Setting by PYTHON_CPU_COUNT must be between 1-64.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cpu count</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.misc.cross">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.misc.</span></span><span class="sig-name descname"><span class="pre">cross</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.misc.cross" title="Link to this definition">¶</a></dt>
+<dd><p>faster alternative to <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.cross.html#numpy.cross" title="(in NumPy v2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.cross()</span></code></a> for 3 element vectors and axis=1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – first array, shape (N, 3)</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – second array, shape (N, 3)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>cross product, shape (N, 3)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">cross</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.</span><span class="p">],</span> <span class="p">[</span><span class="mf">7.</span><span class="p">,</span> <span class="mf">8.</span><span class="p">,</span> <span class="mf">9.</span><span class="p">]]))</span>
+</span><span data-line="2"><span class="go">array([[-12.,   0.,   4.],</span>
+</span><span data-line="3"><span class="go">       [ -3.,   6.,  -3.]])</span>
+</span></pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.misc.masked_assign">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.misc.</span></span><span class="sig-name descname"><span class="pre">masked_assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cond1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cond2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.misc.masked_assign" title="Link to this definition">¶</a></dt>
+<dd><p>set True values of bool mask cond1 to values of cond2, returns resulting mask</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cond1</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – 1D array</p></li>
+<li><p><strong>con2</strong> – 1D array</p></li>
+<li><p><strong>cond2</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1D array with shape of cond1</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">masked_assign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]))</span>
+</span><span data-line="2"><span class="go">array([ True, False, False, False], dtype=bool)</span>
+</span></pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.misc.normalize">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.misc.</span></span><span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.misc.normalize" title="Link to this definition">¶</a></dt>
+<dd><p>faster vector normalization for vectors in axis=1.
+Zero length vectors can normalized to np.nan.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>a</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – array to normalize, shape (N, 3)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normalized values, shape (N, 3)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">]])</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">normalize</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span><span data-line="3"><span class="go">array([[...0.26726124, 0.53452248, 0.80178373],</span>
+</span><span data-line="4"><span class="go">       [...0.45584231, 0.56980288, 0.68376346]])</span>
+</span></pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.misc.rdot">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.misc.</span></span><span class="sig-name descname"><span class="pre">rdot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.misc.rdot" title="Link to this definition">¶</a></dt>
+<dd><p>row wise scalar product for two or three dimension.
+Coordinate values in matrix columns.
+For (N, 2) and (N, 3) faster than np.einsum(‘ij,ij-&gt;i’, a, b) and (a*b).sum(axis=1)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – 2D matrix, with shape (N, 2) or (N,  3)</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – 2D matrix, with shape (N, 2) or (N,  3)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>result vector, shape (N, )</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">rdot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.</span><span class="p">],</span> <span class="p">[</span><span class="mf">7.</span><span class="p">,</span> <span class="mf">8.</span><span class="p">,</span> <span class="mf">9.</span><span class="p">]]))</span>
+</span><span data-line="2"><span class="go">array([ -6., 122.])</span>
+</span></pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">rdot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span> <span class="p">[</span><span class="mf">8.</span><span class="p">,</span> <span class="mf">9.</span><span class="p">]]))</span>
+</span><span data-line="2"><span class="go">array([ 4., 77.])</span>
+</span></pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optrace.tracer.misc.timer">
+<span class="sig-prename descclassname"><span class="pre">optrace.tracer.misc.</span></span><span class="sig-name descname"><span class="pre">timer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.misc.timer" title="Link to this definition">¶</a></dt>
+<dd><p>timing wrapper for function timings
+write a &#64;timer decorator around a function to time it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – function to wrap</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>function return value</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.ray_storage">
+<span id="tracer-ray-storage"></span><h2><span class="section-number">6.3.5. </span>tracer.ray_storage<a class="headerlink" href="#module-optrace.tracer.ray_storage" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.ray_storage.</span></span><span class="sig-name descname"><span class="pre">RayStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage" title="Link to this definition">¶</a></dt>
+<dd><p>RayStorage is a class storing all rays and their properties</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – additional keyword arguments for the parent class</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.storage_size">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">storage_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.storage_size" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate required RAM used for the ray properties (without actually creating anything).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of rays</p></li>
+<li><p><strong>nt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of sections per ray</p></li>
+<li><p><strong>no_pol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – polarization calculation turned off</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>approximate size in bytes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.direction_vectors">
+<span class="sig-name descname"><span class="pre">direction_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.direction_vectors" title="Link to this definition">¶</a></dt>
+<dd><p>Normalized or unnormalized direction ray vectors for each ray and ray section</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if direction vectors should be normalized</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>direction vectors, shape (N, 3)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_source_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.init" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the Storage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ray_source_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.ray_source.RaySource" title="optrace.tracer.geometry.ray_source.RaySource"><em>RaySource</em></a><em>]</em>) – list of ray sources</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of rays</p></li>
+<li><p><strong>nt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of ray sections per ray</p></li>
+<li><p><strong>no_pol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if polarizations are generated</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.optical_lengths">
+<span class="sig-name descname"><span class="pre">optical_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.optical_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Optical lengths of the ray sections</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ch</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – bool array selecting the desired rays, shape N. Default to None, meaning all rays are selected</p></li>
+<li><p><strong>ch2</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – int array selecting the desired ray sections. 
+Needs to be the same shape as the number of true values in ch.
+Defaults to None, meaning all sections per ray are selected</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optical path length for each ray section, shape (N, nt)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.ray_lengths">
+<span class="sig-name descname"><span class="pre">ray_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.ray_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>Euclidean lengths of the ray sections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ch</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – bool array selecting the desired rays, shape N. Default to None, meaning all rays are selected</p></li>
+<li><p><strong>ch2</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – int array selecting the desired ray sections. 
+Needs to be the same shape as the number of true values in ch.
+Defaults to None, meaning all sections per ray are selected</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>length array with shape (N, nt)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.rays_by_mask">
+<span class="sig-name descname"><span class="pre">rays_by_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.rays_by_mask" title="Link to this definition">¶</a></dt>
+<dd><p>Get ray properties for the selected rays and ray sections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ch</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – bool array selecting the desired rays, shape N. Default to None, meaning all rays are selected</p></li>
+<li><p><strong>ch2</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – int array selecting the desired ray sections. 
+Needs to be the same shape as the number of true values in ch.
+Defaults to None, meaning all sections per ray are selected</p></li>
+<li><p><strong>ret</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – a list of seven boolean elements, specifying if the corresponding 
+return value needs to be masked/calculated.
+Generally it is recommended to only set values to True, if they are needed</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if ray directions should be normalized</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of properties (p, s, pol, w, wl, snum, n) with shape resulting from choices of ch and ch2</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.source_numbers">
+<span class="sig-name descname"><span class="pre">source_numbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.source_numbers" title="Link to this definition">¶</a></dt>
+<dd><p>Ray source numbers for each ray</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ray source numbers</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.source_sections">
+<span class="sig-name descname"><span class="pre">source_sections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.source_sections" title="Link to this definition">¶</a></dt>
+<dd><p>Return the source sections of each ray.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – source index, None if all rays should be returned</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of ray properties (p, s, pol, w, wl)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.thread_rays">
+<span class="sig-name descname"><span class="pre">thread_rays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N_threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.thread_rays" title="Link to this definition">¶</a></dt>
+<dd><p>Create the rays for the current thread</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N_threads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of threads</p></li>
+<li><p><strong>Nt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – current thread</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>references to the ray properties (p, s, pol, w, wl, n)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.B_list">
+<span class="sig-name descname"><span class="pre">B_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.B_list" title="Link to this definition">¶</a></dt>
+<dd><p>list of boundary positions between sources</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.N">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">N</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.N" title="Link to this definition">¶</a></dt>
+<dd><p>number of rays</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.N_list">
+<span class="sig-name descname"><span class="pre">N_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.N_list" title="Link to this definition">¶</a></dt>
+<dd><p>list of rays assigned to each source</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.Nt">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Nt</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.Nt" title="Link to this definition">¶</a></dt>
+<dd><p>number of ray sections per ray</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.n_list">
+<span class="sig-name descname"><span class="pre">n_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.n_list" title="Link to this definition">¶</a></dt>
+<dd><p>refractive index values, shape (N, nt)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.p_list">
+<span class="sig-name descname"><span class="pre">p_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.p_list" title="Link to this definition">¶</a></dt>
+<dd><p>ray positions, shape (N, nt, 3)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.pol_list">
+<span class="sig-name descname"><span class="pre">pol_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.pol_list" title="Link to this definition">¶</a></dt>
+<dd><p>ray polarizations, shape (N, nt, 3)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.ray_source_list">
+<span class="sig-name descname"><span class="pre">ray_source_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.ray_source_list" title="Link to this definition">¶</a></dt>
+<dd><p>list of ray sources</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.s0_list">
+<span class="sig-name descname"><span class="pre">s0_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.s0_list" title="Link to this definition">¶</a></dt>
+<dd><p>initial ray directions, shape (N, 3)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.w_list">
+<span class="sig-name descname"><span class="pre">w_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.w_list" title="Link to this definition">¶</a></dt>
+<dd><p>ray weights, shape (N, nt)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.ray_storage.RayStorage.wl_list">
+<span class="sig-name descname"><span class="pre">wl_list</span></span><a class="headerlink" href="#optrace.tracer.ray_storage.RayStorage.wl_list" title="Link to this definition">¶</a></dt>
+<dd><p>ray wavelengths, shape (N, )</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.raytracer">
+<span id="tracer-raytracer"></span><h2><span class="section-number">6.3.6. </span>tracer.raytracer<a class="headerlink" href="#module-optrace.tracer.raytracer" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.raytracer.</span></span><span class="sig-name descname"><span class="pre">Raytracer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_hurb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the raytracer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – outline of raytracer space [x1, x2, y1, y2, z1, z2] (numpy 1D array or list)</p></li>
+<li><p><strong>n0</strong> (<a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex" title="optrace.tracer.refraction_index.RefractionIndex"><em>RefractionIndex</em></a>) – refraction index of the raytracer environment (RefractionIndex object)</p></li>
+<li><p><strong>no_pol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if polarization should be neglected to speed things up</p></li>
+<li><p><strong>use_hurb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.INFOS">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">INFOS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.INFOS" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING">
+<span class="sig-name descname"><span class="pre">ABSORB_MISSING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.INFOS.ABSORB_MISSING" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.INFOS.HURB_NEG_DIR">
+<span class="sig-name descname"><span class="pre">HURB_NEG_DIR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.INFOS.HURB_NEG_DIR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND">
+<span class="sig-name descname"><span class="pre">ILL_COND</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.INFOS.ILL_COND" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION">
+<span class="sig-name descname"><span class="pre">OUTLINE_INTERSECTION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.INFOS.OUTLINE_INTERSECTION" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.INFOS.TIR">
+<span class="sig-name descname"><span class="pre">TIR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.INFOS.TIR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.check_collision">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">check_collision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">front</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.check_collision" title="Link to this definition">¶</a></dt>
+<dd><p>Check for surface/point/line collisions.
+A collision is defined as the front surface having a higher z-value than the back surface,
+at a point where both surfaces are defined</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>front</strong> (<a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface" title="optrace.tracer.geometry.surface.surface.Surface"><em>Surface</em></a><em> | </em><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><em>Line</em></a><em> | </em><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><em>Point</em></a>) – first object (in regards to z-position)</p></li>
+<li><p><strong>back</strong> (<a class="reference internal" href="optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.surface.Surface" title="optrace.tracer.geometry.surface.surface.Surface"><em>Surface</em></a><em> | </em><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><em>Line</em></a><em> | </em><a class="reference internal" href="optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><em>Point</em></a>) – second object</p></li>
+<li><p><strong>res</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – resolution measure, increase for better detection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool value if there is a collision, collision x-value array,
+collision y-value array, collision z-value array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.check_if_rays_are_current">
+<span class="sig-name descname"><span class="pre">check_if_rays_are_current</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.check_if_rays_are_current" title="Link to this definition">¶</a></dt>
+<dd><p>Check if anything tracing relevant changed since the last trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.clear" title="Link to this definition">¶</a></dt>
+<dd><p>clear geometry and rays</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.compare_property_snapshot">
+<span class="sig-name descname"><span class="pre">compare_property_snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.compare_property_snapshot" title="Link to this definition">¶</a></dt>
+<dd><p>Compare two snapshots of property_snapshot and detect changes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h1</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – snapshot 1</p></li>
+<li><p><strong>h2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – snapshot 2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dictionary of changes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.detector_image">
+<span class="sig-name descname"><span class="pre">detector_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Equidistant'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.detector_image" title="Link to this definition">¶</a></dt>
+<dd><p>Render a detector image for a traced geometry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>detector_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – index/number of the detector</p></li>
+<li><p><strong>source_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – index/number of the source. By default all sources are used.</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – rectangular extent [x0, x1, y0, y1] to detect to intersections in.
+By default the whole detector are is used.</p></li>
+<li><p><strong>projection_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – sphere projection method for a SphericalSurface detector</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – resolution limit filter constant, see the documentation. Defaults to no filter.</p></li>
+<li><p><strong>kwargs</strong> – keyword arguments for creating the RenderImage</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rendered RenderImage</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><em>RenderImage</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.detector_spectrum">
+<span class="sig-name descname"><span class="pre">detector_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.detector_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Render a detector spectrum for a traced geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>detector_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – index/number of the detector</p></li>
+<li><p><strong>source_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – index/number of the source. By default all sources are used.</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – rectangular extent [x0, x1, y0, y1] to detect to intersections in.
+By default the whole detector are is used.</p></li>
+<li><p><strong>kwargs</strong> – optional keyword arguments for the created LightSpectrum</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rendered LightSpectrum</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><em>LightSpectrum</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.focus_search">
+<span class="sig-name descname"><span class="pre">focus_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.focus_search" title="Link to this definition">¶</a></dt>
+<dd><p>Find the focal point using different methods. z_start defines the starting point,
+the search range is the region between a lens, filter, aperture or the outline.
+Outline intersections of rays are ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – focussing method from “focus_search_methods”</p></li>
+<li><p><strong>z_start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – starting position z (float)</p></li>
+<li><p><strong>source_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – source number, defaults to None, so rays from all sources are used</p></li>
+<li><p><strong>return_cost</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If a cost function value array should be included in the output dictionary.
+Needed for plotting of the cost function. Deactivate to increase performance for some methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>scipy optimize result and property dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult" title="(in SciPy v1.16.2)"><em>OptimizeResult</em></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.iterative_render">
+<span class="sig-name descname"><span class="pre">iterative_render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Equidistant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.iterative_render" title="Link to this definition">¶</a></dt>
+<dd><p>Image render with N_rays rays.
+First returned value is a list of rendered sources, the second a list of rendered detector images.</p>
+<p>If pos is not provided,
+a single detector image is rendered at the position of the detector specified by detector_index.
+&gt;&gt; RT.iterative_render(N=10000, detector_index=1)</p>
+<p>If pos is provided as coordinate, the detector is moved beforehand.
+&gt;&gt; RT.iterative_render(N=10000, pos=[0, 1, 0], detector_index=1)</p>
+<p>If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically
+repeated len(pos) times or can be specified as list with the same length as pos.
+Exemplary calls:
+&gt;&gt; RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1)
+&gt;&gt; RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1],         extent=[None, [-2, 2, -2, 2]])</p>
+<p>N_px_S can also be provided as list, note however, that when provided as list it needs
+to have the same length as the number of sources.</p>
+<p>This functions raises an exception if the geometry is incorrect.
+Note that no warnings for ill-conditioned rays are raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – number of rays</p></li>
+<li><p><strong>detector_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – number/list of detector indices</p></li>
+<li><p><strong>pos</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – 3D position(s) of the detector(s)</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – list/resolution limits for detector images</p></li>
+<li><p><strong>projection_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – type/list of projection methods for SphericalSurface</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – list/value for the extent of the detector images</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of rendered detector images</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><em>RenderImage</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.property_snapshot">
+<span class="sig-name descname"><span class="pre">property_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.property_snapshot" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a snapshot of properties of Elements and rays.
+Needed to detect changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary of properties</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.source_image">
+<span class="sig-name descname"><span class="pre">source_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.source_image" title="Link to this definition">¶</a></dt>
+<dd><p>Render a source image for a source in a traced geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – source number, defaults to 0</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – resolution filter limit constant, see the documentation. Defaults to not filter</p></li>
+<li><p><strong>kwargs</strong> – optional keyword arguments for creating the RenderImage</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rendered RenderImage</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><em>RenderImage</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.source_spectrum">
+<span class="sig-name descname"><span class="pre">source_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.source_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Render a LightSpectrum for a source in a traced geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – source number, default to 0</p></li>
+<li><p><strong>kwargs</strong> – optional keyword arguments for the creation of the LightSpectrum</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rendered LightSpectrum</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><em>LightSpectrum</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.trace">
+<span class="sig-name descname"><span class="pre">trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.trace" title="Link to this definition">¶</a></dt>
+<dd><p>Execute raytracing for the current geometry</p>
+<p>Shows a warning on geometry errors, but does not throw an exception.
+This is useful in the TraceGUI, as the broken geometry can be displayed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of rays (int)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.tracing_snapshot">
+<span class="sig-name descname"><span class="pre">tracing_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.tracing_snapshot" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a snapshot of properties of rays and Elements relevant for tracing.
+Needed to detect changes since the last trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary of properties</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.HURB_FACTOR">
+<span class="sig-name descname"><span class="pre">HURB_FACTOR</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.4142135623730951</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.HURB_FACTOR" title="Link to this definition">¶</a></dt>
+<dd><p>HURB uncertainty factor. Scales the tangent uncertainty expression. Original sources use 1, 
+but sqrt(2) matches the envelope better. See the documentation for details.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.ITER_RAYS_STEP">
+<span class="sig-name descname"><span class="pre">ITER_RAYS_STEP</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000000</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.ITER_RAYS_STEP" title="Link to this definition">¶</a></dt>
+<dd><p>number of rays per iteration in Raytracer.iterative_render()</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM">
+<span class="sig-name descname"><span class="pre">MAX_RAY_STORAGE_RAM</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8000000000</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum available RAM for the stored rays</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.N_EPS">
+<span class="sig-name descname"><span class="pre">N_EPS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-11</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.N_EPS" title="Link to this definition">¶</a></dt>
+<dd><p>numerical epsilon. Used for floating number comparisons in some places or adding small differences</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.extent">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">extent</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.extent" title="Link to this definition">¶</a></dt>
+<dd><p>equals the outline of the raytracer</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.focus_search_methods">
+<span class="sig-name descname"><span class="pre">focus_search_methods</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['RMS</span> <span class="pre">Spot</span> <span class="pre">Size',</span> <span class="pre">'Irradiance</span> <span class="pre">Variance',</span> <span class="pre">'Image</span> <span class="pre">Sharpness',</span> <span class="pre">'Image</span> <span class="pre">Center</span> <span class="pre">Sharpness']</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.focus_search_methods" title="Link to this definition">¶</a></dt>
+<dd><p>available focus_search methods</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.geometry_error">
+<span class="sig-name descname"><span class="pre">geometry_error</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.geometry_error" title="Link to this definition">¶</a></dt>
+<dd><p>if geometry checks returned an error</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.no_pol">
+<span class="sig-name descname"><span class="pre">no_pol</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.no_pol" title="Link to this definition">¶</a></dt>
+<dd><p>polarization calculation flag</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.outline">
+<span class="sig-name descname"><span class="pre">outline</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.outline" title="Link to this definition">¶</a></dt>
+<dd><p>geometrical raytracer outline</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.pos">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pos</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.pos" title="Link to this definition">¶</a></dt>
+<dd><p>center position of front xy-outline plane</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.rays">
+<span class="sig-name descname"><span class="pre">rays</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.rays" title="Link to this definition">¶</a></dt>
+<dd><p>traced rays</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.raytracer.Raytracer.use_hurb">
+<span class="sig-name descname"><span class="pre">use_hurb</span></span><a class="headerlink" href="#optrace.tracer.raytracer.Raytracer.use_hurb" title="Link to this definition">¶</a></dt>
+<dd><p>flag for using Heisenberg uncertainty ray bending on apertures</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.refraction_index">
+<span id="tracer-refraction-index"></span><h2><span class="section-number">6.3.7. </span>tracer.refraction_index<a class="headerlink" href="#module-optrace.tracer.refraction_index" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.refraction_index.</span></span><span class="sig-name descname"><span class="pre">RefractionIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex" title="Link to this definition">¶</a></dt>
+<dd><p>Create a RefractionIndex object of type “n_type”.
+See the documentation on information on how to provide all parameters correctly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – one of “n_types”</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – refraction index for n_type=”Constant”</p></li>
+<li><p><strong>V</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Abbe number for n_type=”Abbe”</p></li>
+<li><p><strong>coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – list of coefficients for the model, see the documentation</p></li>
+<li><p><strong>lines</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – spectral lines to use for n_type=”Abbe”,
+list of 3 wavelengths [short wavelength, center wavelength, long wavelength]</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the refractive index at specified wavelengths.
+Call on obj using obj(wavelengths).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – wavelengths in nm (numpy 1D array)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>array of refraction indices</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.__eq__" title="Link to this definition">¶</a></dt>
+<dd><p>Equal operator. Compares self to ‘other’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>) – object to compare to</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>if both are equal</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.__ne__">
+<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.__ne__" title="Link to this definition">¶</a></dt>
+<dd><p>Not-equal operator. Compares self to ‘other’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>) – object to compare to</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>if both are not equal</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.abbe_number">
+<span class="sig-name descname"><span class="pre">abbe_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.abbe_number" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the Abbe Number. The spectral lines can be overwritten with the parameter.
+Otherwise the RefractionIndex.lines parameter is used from its initialization, which defaults to FDC lines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lines</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – list of 3 wavelengths [short, center, long]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.is_dispersive">
+<span class="sig-name descname"><span class="pre">is_dispersive</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.is_dispersive" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>if the refractive index is dispersive, determined by the Abbe Number</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.coeff_count">
+<span class="sig-name descname"><span class="pre">coeff_count</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Cauchy':</span> <span class="pre">4,</span> <span class="pre">'Conrady':</span> <span class="pre">3,</span> <span class="pre">'Extended':</span> <span class="pre">8,</span> <span class="pre">'Extended2':</span> <span class="pre">8,</span> <span class="pre">'Extended3':</span> <span class="pre">9,</span> <span class="pre">'Handbook</span> <span class="pre">of</span> <span class="pre">Optics</span> <span class="pre">1':</span> <span class="pre">4,</span> <span class="pre">'Handbook</span> <span class="pre">of</span> <span class="pre">Optics</span> <span class="pre">2':</span> <span class="pre">4,</span> <span class="pre">'Herzberger':</span> <span class="pre">6,</span> <span class="pre">'Schott':</span> <span class="pre">6,</span> <span class="pre">'Sellmeier1':</span> <span class="pre">6,</span> <span class="pre">'Sellmeier2':</span> <span class="pre">5,</span> <span class="pre">'Sellmeier3':</span> <span class="pre">8,</span> <span class="pre">'Sellmeier4':</span> <span class="pre">5,</span> <span class="pre">'Sellmeier5':</span> <span class="pre">10}</span></span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.coeff_count" title="Link to this definition">¶</a></dt>
+<dd><p>number of coefficients for the different refractive index models</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.n_types">
+<span class="sig-name descname"><span class="pre">n_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Abbe',</span> <span class="pre">'Cauchy',</span> <span class="pre">'Conrady',</span> <span class="pre">'Constant',</span> <span class="pre">'Data',</span> <span class="pre">'Extended',</span> <span class="pre">'Extended2',</span> <span class="pre">'Extended3',</span> <span class="pre">'Function',</span> <span class="pre">'Handbook</span> <span class="pre">of</span> <span class="pre">Optics</span> <span class="pre">1',</span> <span class="pre">'Handbook</span> <span class="pre">of</span> <span class="pre">Optics</span> <span class="pre">2',</span> <span class="pre">'Sellmeier1',</span> <span class="pre">'Sellmeier2',</span> <span class="pre">'Sellmeier3',</span> <span class="pre">'Sellmeier4',</span> <span class="pre">'Sellmeier5',</span> <span class="pre">'Herzberger',</span> <span class="pre">'Schott']</span></span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.n_types" title="Link to this definition">¶</a></dt>
+<dd><p>possible refractive index types</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.quantity">
+<span class="sig-name descname"><span class="pre">quantity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Refraction</span> <span class="pre">Index</span> <span class="pre">n'</span></span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.quantity" title="Link to this definition">¶</a></dt>
+<dd><p>physical quantity</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.spectrum_types">
+<span class="sig-name descname"><span class="pre">spectrum_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Abbe',</span> <span class="pre">'Cauchy',</span> <span class="pre">'Conrady',</span> <span class="pre">'Constant',</span> <span class="pre">'Data',</span> <span class="pre">'Extended',</span> <span class="pre">'Extended2',</span> <span class="pre">'Extended3',</span> <span class="pre">'Function',</span> <span class="pre">'Handbook</span> <span class="pre">of</span> <span class="pre">Optics</span> <span class="pre">1',</span> <span class="pre">'Handbook</span> <span class="pre">of</span> <span class="pre">Optics</span> <span class="pre">2',</span> <span class="pre">'Sellmeier1',</span> <span class="pre">'Sellmeier2',</span> <span class="pre">'Sellmeier3',</span> <span class="pre">'Sellmeier4',</span> <span class="pre">'Sellmeier5',</span> <span class="pre">'Herzberger',</span> <span class="pre">'Schott']</span></span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.spectrum_types" title="Link to this definition">¶</a></dt>
+<dd><p>possible spectrum types. Can be changed by subclasses</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.refraction_index.RefractionIndex.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#optrace.tracer.refraction_index.RefractionIndex.unit" title="Link to this definition">¶</a></dt>
+<dd><p>physical unit</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.transfer_matrix_analysis">
+<span id="tracer-transfer-matrix-analysis"></span><h2><span class="section-number">6.3.8. </span>tracer.transfer_matrix_analysis<a class="headerlink" href="#module-optrace.tracer.transfer_matrix_analysis" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.transfer_matrix_analysis.</span></span><span class="sig-name descname"><span class="pre">TMA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lenses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">555.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA" title="Link to this definition">¶</a></dt>
+<dd><p>Create an ray transfer matrix analysis object.
+This is a snapshot of properties for when the object gets created, nothing is updated after that.</p>
+<p>With no lenses the abcd matrix is a unity matrix and all other properties are set to nan</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lenses</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – list of Lens</p></li>
+<li><p><strong>wl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – wavelength to create the analysis for</p></li>
+<li><p><strong>n0</strong> (<a class="reference internal" href="#optrace.tracer.refraction_index.RefractionIndex" title="optrace.tracer.refraction_index.RefractionIndex"><em>RefractionIndex</em></a>) – ambient medium before the lens setup</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for the parent class</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.image_magnification">
+<span class="sig-name descname"><span class="pre">image_magnification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_g</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.image_magnification" title="Link to this definition">¶</a></dt>
+<dd><p>get the image magnification at the image plane for a given object distance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>z_g</strong> – z-position of object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>magnification factor (image size divided by object size)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.image_position">
+<span class="sig-name descname"><span class="pre">image_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_g</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.image_position" title="Link to this definition">¶</a></dt>
+<dd><p>get the image position for a object distance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>z_g</strong> – z-position of object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>absolute image z-position</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.matrix_at">
+<span class="sig-name descname"><span class="pre">matrix_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.matrix_at" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the ABCD matrix for an object position z_g and image position z_b</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_g</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – object z-position</p></li>
+<li><p><strong>z_b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – image z-position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ABCD matrix, 2x2 numpy array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.object_magnification">
+<span class="sig-name descname"><span class="pre">object_magnification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.object_magnification" title="Link to this definition">¶</a></dt>
+<dd><p>get the object magnification at the object plane for a given image distance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>z_g</strong> – z-position of object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>magnification factor (image size divided by object size)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.object_position">
+<span class="sig-name descname"><span class="pre">object_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.object_position" title="Link to this definition">¶</a></dt>
+<dd><p>get the object position for a given image position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>z_b</strong> – z-position of image</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>z-position of object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification">
+<span class="sig-name descname"><span class="pre">pupil_magnification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.pupil_magnification" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the entrance and exit pupil magnifications for a given aperture stop position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_p</strong> – absolute stop position</p></li>
+<li><p><strong>z_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>entrance and exit pupil magnifications</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.pupil_position">
+<span class="sig-name descname"><span class="pre">pupil_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.pupil_position" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the entrance and exit pupil positions for a given aperture stop position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_p</strong> – absolute stop position</p></li>
+<li><p><strong>z_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>entrance and exit pupil positions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.abcd">
+<span class="sig-name descname"><span class="pre">abcd</span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.abcd" title="Link to this definition">¶</a></dt>
+<dd><p>abcd matrix for matrix ray optics calculations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.bfl">
+<span class="sig-name descname"><span class="pre">bfl</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.bfl" title="Link to this definition">¶</a></dt>
+<dd><p>front focal length, Distance between front focal point and front surface vertex</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.d">
+<span class="sig-name descname"><span class="pre">d</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.d" title="Link to this definition">¶</a></dt>
+<dd><p>center thickness of the lens</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.efl">
+<span class="sig-name descname"><span class="pre">efl</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.efl" title="Link to this definition">¶</a></dt>
+<dd><p>effective focal length</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.efl_n">
+<span class="sig-name descname"><span class="pre">efl_n</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.efl_n" title="Link to this definition">¶</a></dt>
+<dd><p>effective focal length</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.ffl">
+<span class="sig-name descname"><span class="pre">ffl</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.ffl" title="Link to this definition">¶</a></dt>
+<dd><p>back focal length, Distance between back focal point and back surface vertex point</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths">
+<span class="sig-name descname"><span class="pre">focal_lengths</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths" title="Link to this definition">¶</a></dt>
+<dd><p>focal lengths of the lens</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n">
+<span class="sig-name descname"><span class="pre">focal_lengths_n</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.focal_lengths_n" title="Link to this definition">¶</a></dt>
+<dd><p>focal lengths with different definition, see the documentation</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.focal_points">
+<span class="sig-name descname"><span class="pre">focal_points</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.focal_points" title="Link to this definition">¶</a></dt>
+<dd><p>z-position of focal points</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.n1">
+<span class="sig-name descname"><span class="pre">n1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.n1" title="Link to this definition">¶</a></dt>
+<dd><p>refraction index value before the lens setup</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.n2">
+<span class="sig-name descname"><span class="pre">n2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.n2" title="Link to this definition">¶</a></dt>
+<dd><p>refraction index value after the lens setup</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.nodal_points">
+<span class="sig-name descname"><span class="pre">nodal_points</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.nodal_points" title="Link to this definition">¶</a></dt>
+<dd><p>z-position of nodal points</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.optical_center">
+<span class="sig-name descname"><span class="pre">optical_center</span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.optical_center" title="Link to this definition">¶</a></dt>
+<dd><p>optical center of the setup</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.powers">
+<span class="sig-name descname"><span class="pre">powers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.powers" title="Link to this definition">¶</a></dt>
+<dd><p>optical powers of the lens, inverse of focal length</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.powers_n">
+<span class="sig-name descname"><span class="pre">powers_n</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.powers_n" title="Link to this definition">¶</a></dt>
+<dd><p>different definition for the optical powers. The optical powers is scaled with the ambient index for each side.
+Mainly used in ophthalmic optics.
+This definition has the advantage, that both powers always have the same magnitude, but only different signs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.principal_points">
+<span class="sig-name descname"><span class="pre">principal_points</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.principal_points" title="Link to this definition">¶</a></dt>
+<dd><p>z-position of principal points</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.vertex_points">
+<span class="sig-name descname"><span class="pre">vertex_points</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.vertex_points" title="Link to this definition">¶</a></dt>
+<dd><p>z-position of vertex points</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.transfer_matrix_analysis.TMA.wl">
+<span class="sig-name descname"><span class="pre">wl</span></span><a class="headerlink" href="#optrace.tracer.transfer_matrix_analysis.TMA.wl" title="Link to this definition">¶</a></dt>
+<dd><p>wavelength for the analysis</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="optrace.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">6.2. </span>Global Module</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="optrace_tracer_color.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">6.4. </span>tracer.color Submodule</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

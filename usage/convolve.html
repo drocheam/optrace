@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>4.11. PSF Convolution - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.12. Plotting Functions" href="plots.html" /><link rel="prev" title="4.10. Paraxial Analysis" href="tma.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/usage/convolve.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/usage/convolve.html"/>
+  <meta property="og:title" content="4.11. PSF Convolution"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#overview">4.11.1. Overview</a></li>
+<li><a class="reference internal" href="#grayscale-and-color-image-convolution">4.11.2. Grayscale and color image convolution</a></li>
+<li><a class="reference internal" href="#restrictions">4.11.3. Restrictions</a></li>
+<li><a class="reference internal" href="#additional-function-parameters">4.11.4. Additional Function Parameters</a></li>
+<li><a class="reference internal" href="#image-examples">4.11.5. Image Examples</a></li>
+<li><a class="reference internal" href="#presets">4.11.6. Presets</a></li>
+<li><a class="reference internal" href="#preset-gallery">4.11.7. Preset Gallery</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">4. </span>User Guide</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">4.11. </span>PSF Convolution</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/usage/convolve.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/usage/convolve.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/usage/convolve.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/convolve.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/convolve.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="psf-convolution">
+<span id="usage-convolution"></span><h1><span class="section-number">4.11. </span>PSF Convolution<a class="headerlink" href="#psf-convolution" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2><span class="section-number">4.11.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Convolution can speed up image formation significantly by parallelizing the effect of
+a PSF (point spread function) for every object point. This results in a nearly noise-free image in a small
+fraction of the time normally required. A PSF is nothing different than the impulse response of the optical system
+for the given object and image distance combination. It changes spatially, but for a small angular range it can
+be assumed constant. However, this also implies that many aberration can’t be simulated this way
+(astigmatism, coma, vignette, distortion, …).
+In cases where convolution would be viable a possible approach would be to render a PSF and then apply the PSF
+to an object using the convolution functionality in optrace.</p>
+<p>The convolution approach requires:</p>
+<ul class="simple">
+<li><p>the image and its size parameters</p></li>
+<li><p>the PSF and its size parameters</p></li>
+<li><p>a magnification factor</p></li>
+<li><p>optional parameters for padding and slicing</p></li>
+<li><p>optional parameters for the output color conversion</p></li>
+</ul>
+<p>Both colored objects and PSFs are supported. However, there are some limitations and restrictions, that will be
+explained in the following.</p>
+</section>
+<section id="grayscale-and-color-image-convolution">
+<h2><span class="section-number">4.11.2. </span>Grayscale and color image convolution<a class="headerlink" href="#grayscale-and-color-image-convolution" title="Link to this heading">¶</a></h2>
+<p>See the details in section <a class="reference internal" href="../details/convolution.html#psf-color-handling"><span class="std std-numref">Section 5.6.1</span></a>.
+A call to <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> requires the image and PSF as arguments.
+Generally, the convolution must be done on a per-wavelength basis to be physically correct, as each wavelength
+has their own PSF. See the details in section <a class="reference internal" href="../details/convolution.html#psf-color-handling"><span class="std std-numref">Section 5.6.1</span></a>.</p>
+<p>However, there are special cases, where this is not required.
+One import term will be <em>spectral homogenity</em> which describes an object that emits the same spectrum everywhere,
+only differing by an intensity factor.
+Such objects appear to have the same color everywhere, only differing in their brightness.
+Note that that the inverse is not true, objects with the same color don’t necessarily mean a spectral homogeneous
+object, as multiple spectra can produce the same color impression.</p>
+<p>As mentioned in section <a class="reference internal" href="image.html#id1"><span class="std std-numref">Section 4.8.1</span></a>, values of the pixels of the <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> and <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a>
+are not linear to the physical intensities of the color, but scaled non-linearly to account for the human perception.
+The <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> converts the images to linear values and does the convolution
+on these linear color space coordinates. At the end, the linear image is converted back
+to a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a>.</p>
+<p><strong>Grayscale Image and grayscale PSF</strong></p>
+<p>The typical case would be a black-and-white image and colorless, wavelength-independent PSF:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">grid</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">#  type GrayscaleImage</span>
+</span><span data-line="2"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">airy</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>  <span class="c1"># type GrayscaleImage</span>
+</span><span data-line="3"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">)</span>  <span class="c1"># type GrayscaleImage</span>
+</span></pre></div>
+</div>
+<p>However, this also works for a more general case: Spectral homogeneous image and spectral homogeneous PSF.
+For instance, this is also true for a intensity distribution emitting a blue spectrum every on the source area,
+and a PSF that has the same spectrum everywhere.
+It does not need to be the same spectrum as the source image, for instance the PSF can only include violet wavelengths,
+because the optical system absorbed the more blueish wavelengths of the spectrum.</p>
+<p>To model this, simulate and render a PSF by creating a point source with the image spectrum.
+Then convert both the image and the PSF to a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a> and convolve them.
+The result is also a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a>, showing the intensity distribution.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># raytracer</span>
+</span><span data-line="2"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># create R, G, B sRGB primary spectra with the correct power ratios</span>
+</span><span data-line="5"><span class="c1"># create image spectrum and point source</span>
+</span><span data-line="6"><span class="n">my_spectrum</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span data-line="7"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">Point</span><span class="p">(),</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">my_spectrum</span><span class="p">,</span> <span class="n">pos</span><span class="o">=...</span><span class="p">)</span>
+</span><span data-line="8"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS</span><span class="p">)</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># add more geometries and detector</span>
+</span><span data-line="11"><span class="o">...</span>
+</span><span data-line="12">
+</span><span data-line="13"><span class="c1"># trace</span>
+</span><span data-line="14"><span class="n">RT</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</span><span data-line="15">
+</span><span data-line="16"><span class="c1"># render detector image</span>
+</span><span data-line="17"><span class="n">psf</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">()</span>
+</span><span data-line="18"><span class="n">psf_srgb</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sRGB (Absolute RI)&quot;</span><span class="p">)</span>  <span class="c1"># convert RenderImage to sRGB</span>
+</span><span data-line="19"><span class="n">psf_gray</span> <span class="o">=</span> <span class="n">psf_srgb</span><span class="o">.</span><span class="n">to_grayscale_image</span><span class="p">()</span>  <span class="c1"># convert sRGB to grayscale</span>
+</span><span data-line="20">
+</span><span data-line="21"><span class="c1"># convolve</span>
+</span><span data-line="22"><span class="n">img_gray</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Grayscale</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>  <span class="c1"># image emitting my_spectrum</span>
+</span><span data-line="23"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img_gray</span><span class="p">,</span> <span class="n">psf_gray</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The physical interpretation is that the image emits the source spectrum <code class="code highlight python docutils literal highlight-python"><span class="n">my_spectrum</span></code> according to
+the spatial distribution given by <code class="code highlight python docutils literal highlight-python"><span class="n">img_gray</span></code> and the resulting image emits the spectrum at the detector with
+spatial intensity given by <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code>.
+You could calculate the detector spectrum from the PSF:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># detector image spectrum</span>
+</span><span data-line="2"><span class="n">img_spec</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_spectrum</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p><strong>Colored Image and grayscale PSF</strong></p>
+<p>Here, the image is an <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> and the PSF is wavelength-independent, given as <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a>.
+Each R, G, B channel is convolved separately with the PSF and the result is an <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">fruits</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span> <span class="c1">#  type RGBImage</span>
+</span><span data-line="2"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">airy</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>  <span class="c1"># type GrayscaleImage</span>
+</span><span data-line="3"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">)</span>  <span class="c1"># type RGBImage</span>
+</span></pre></div>
+</div>
+<p>This is only viable when the optical system treats all wavelengths the same, meaning no chromatic effect,
+including dispersion or wavelength-dependent absorption.</p>
+<p><strong>Grayscale Image and colored PSF</strong></p>
+<p>This is the case for a spectral homogeneous image and colored PSF.
+The image is a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a> indicating the human visible intensities.
+The PSF must be a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>, so it includes all human visible colors.
+The PSF must be rendered for the desired source spectrum.
+If the image should emit a D65 spectrum, it should be traced and rendered with the D65 spectrum.
+If it should emit a blue spectrum, it should be traced and rendered with the same blue spectrum.
+Doing so, the color information is included in the PSF and will be applied in convolution.
+The result is an <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># raytracer</span>
+</span><span data-line="2"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># create R, G, B sRGB primary spectra with the correct power ratios</span>
+</span><span data-line="5"><span class="c1"># create image spectrum and point source</span>
+</span><span data-line="6"><span class="n">my_spectrum</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">LightSpectrum</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span data-line="7"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">Point</span><span class="p">(),</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">my_spectrum</span><span class="p">,</span> <span class="n">pos</span><span class="o">=...</span><span class="p">)</span>
+</span><span data-line="8"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS</span><span class="p">)</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># add more geometries and detector</span>
+</span><span data-line="11"><span class="o">...</span>
+</span><span data-line="12">
+</span><span data-line="13"><span class="c1"># trace</span>
+</span><span data-line="14"><span class="n">RT</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</span><span data-line="15">
+</span><span data-line="16"><span class="c1"># render detector image</span>
+</span><span data-line="17"><span class="n">psf</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">()</span>
+</span><span data-line="18">
+</span><span data-line="19"><span class="c1"># convolve</span>
+</span><span data-line="20"><span class="n">img_gray</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Grayscale</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span data-line="21"><span class="c1"># ^-- spatial distribution emitting &quot;my_spectrum&quot; defined above</span>
+</span><span data-line="22"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img_gray</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Colored Image and colored PSF</strong></p>
+<p>Colored image and PSF only work correctly in one special case:
+The image is simulated as emitting a combination of R, G, B sRGB primary spectra for each pixel.
+And three PSF were rendered for each R, G, B primary with the correct power ratios.
+Only then will the convolution approach be correct.</p>
+<p>In general, there are infinite possible resolutions, as many spectra can produce the same sRGB color and spectra produce
+different PSF due to absorption or dispersion.
+This solution, assuming a composition of sRGB primary spectra, will be just one of many.</p>
+<p>The image should be an <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>, while the PSF is provided as list of R, G, B <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>.
+As described above, they need to be rendered with a specific spectrum and power and the images need to have the same
+size. Without the power factors the white balance will be incorrect.
+Below you can find an example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># raytracer</span>
+</span><span data-line="2"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># create R, G, B sRGB primary spectra with the correct power ratios</span>
+</span><span data-line="5"><span class="n">RS_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">surface</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">Point</span><span class="p">(),</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
+</span><span data-line="6"><span class="n">RS_R</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="o">**</span><span class="n">RS_args</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">srgb_r</span><span class="p">,</span>
+</span><span data-line="7">                    <span class="n">power</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">srgb_r_power_factor</span><span class="p">)</span>
+</span><span data-line="8"><span class="n">RS_G</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="o">**</span><span class="n">RS_args</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">srgb_g</span><span class="p">,</span>
+</span><span data-line="9">                    <span class="n">power</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">srgb_g_power_factor</span><span class="p">)</span>
+</span><span data-line="10"><span class="n">RS_B</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="o">**</span><span class="n">RS_args</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">srgb_b</span><span class="p">,</span>
+</span><span data-line="11">                    <span class="n">power</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">srgb_b_power_factor</span><span class="p">)</span>
+</span><span data-line="12"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">([</span><span class="n">RS_R</span><span class="p">,</span> <span class="n">RS_G</span><span class="p">,</span> <span class="n">RS_B</span><span class="p">)</span>
+</span><span data-line="13">
+</span><span data-line="14"><span class="c1"># add more geometries and detector</span>
+</span><span data-line="15"><span class="o">...</span>
+</span><span data-line="16">
+</span><span data-line="17"><span class="c1"># trace</span>
+</span><span data-line="18"><span class="n">RT</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</span><span data-line="19">
+</span><span data-line="20"><span class="c1"># render detector images, index 0 is R, index 1 is G, index 2 is B</span>
+</span><span data-line="21"><span class="n">psf0</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">()</span>  <span class="c1"># needed so we know the spatial extent</span>
+</span><span data-line="22"><span class="n">psf_r</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">(</span><span class="n">source_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">psf0</span><span class="o">.</span><span class="n">extent</span><span class="p">)</span>
+</span><span data-line="23"><span class="n">psf_g</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">(</span><span class="n">source_index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">psf0</span><span class="o">.</span><span class="n">extent</span><span class="p">)</span>
+</span><span data-line="24"><span class="n">psf_b</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">(</span><span class="n">source_index</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">psf0</span><span class="o">.</span><span class="n">extent</span><span class="p">)</span>
+</span><span data-line="25"><span class="n">psf</span> <span class="o">=</span> <span class="p">[</span><span class="n">psf_r</span><span class="p">,</span> <span class="n">psf_g</span><span class="p">,</span> <span class="n">psf_b</span><span class="p">]</span>
+</span><span data-line="26">
+</span><span data-line="27"><span class="c1"># convolve</span>
+</span><span data-line="28"><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">color_checker</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</span><span data-line="29"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="restrictions">
+<span id="convolve-limitations"></span><h2><span class="section-number">4.11.3. </span>Restrictions<a class="headerlink" href="#restrictions" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>convolution is done on image objects that contain data about the geometry, and not on data arrays</p></li>
+<li><p>it is not possible to convolve two <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or two <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a></p></li>
+<li><p>image and PSF resolutions must be between 50x50 pixels and 4 megapixels</p></li>
+<li><p>the PSF needs to be twice as large as the image scaled with the magnification factor</p></li>
+<li><p>when convolving two colored images, the resulting image is only one possible solution of many</p></li>
+<li><p>when R, G, B <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a> are provided for polychromatic convolution, they all need to have the same spatial extent</p></li>
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.fftconvolve.html#scipy.signal.fftconvolve" title="(in SciPy v1.16.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.signal.fftconvolve()</span></code></a> is involved, so small numerical errors in dark image regions can appear</p></li>
+</ul>
+<p>The convolution function does not check if the convolution of the underlying image is <em>reasonable</em>.
+This includes cases, where either the image or PSF showcase a different physical quantity,
+were rendered with different resolution limit settings or if they are sphere projections,
+where distances, areas or angles are non-linear.</p>
+</section>
+<section id="additional-function-parameters">
+<h2><span class="section-number">4.11.4. </span>Additional Function Parameters<a class="headerlink" href="#additional-function-parameters" title="Link to this heading">¶</a></h2>
+<p><strong>Magnification Factor</strong></p>
+<p>This magnification factor is equivalent the magnification factor known from geometrical optics.
+Therefore <span class="math notranslate nohighlight">\(\lvert m \rvert &gt; 1\)</span> means a magnification and <span class="math notranslate nohighlight">\(\lvert m\rvert &lt; 1\)</span> an image shrinking.
+<span class="math notranslate nohighlight">\(m &gt; 0\)</span> is an upright image, while <span class="math notranslate nohighlight">\(m &lt; 0\)</span> correspond to a flipped image.</p>
+<p>Let’s define a predefined a image and PSF:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">ETDRS_chart_inverted</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">halo</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p>You can then call <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.convolve.convolve" title="optrace.tracer.convolve.convolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">convolve</span></code></a> in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The function returns the convolved image object <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code>.
+When <code class="code highlight python docutils literal highlight-python"><span class="n">img</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">psf</span></code> are of type <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a>, <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is also a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a>.
+For all other cases color information is generated and <code class="code highlight python docutils literal highlight-python"><span class="n">img2</span></code> is a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>.</p>
+<p><strong>Slicing and Padding</strong></p>
+<p>While doing a convolution, the output image grows in size by half the PSF size in each direction.
+By providing <code class="code highlight python docutils literal highlight-python"><span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span></code> the padded data can be neglected for the resulting image.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The convolution operation requires the data outside of the image.
+By default, the image is padded with zeros before convolution.</p>
+<p>Other modes are also available.
+For instance, padding with white is done in the following fashion:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">padding_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">padding_value</span></code> specifies the values used for constant padding for each channel.
+Depending on type of <code class="code highlight python docutils literal highlight-python"><span class="n">img</span></code>, it needs to be a single number of a list of three values.</p>
+<p>To reduce boundary effects, edge padding is a viable choice:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Color conversion</strong></p>
+<p>The convolution of colored images can produce colors outside of the sRGB gamut.
+To allow for a correct mapping into the gamut, conversion arguments can be provided by the <code class="code highlight python docutils literal highlight-python"><span class="n">cargs</span></code> argument.
+By default it is set to <code class="code highlight python docutils literal highlight-python"><span class="nb">dict</span><span class="p">(</span><span class="n">rendering_intent</span><span class="o">=</span><span class="s2">&quot;Absolute&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">L_th</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">chroma_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>.</p>
+<p>Provide a <code class="code highlight python docutils literal highlight-python"><span class="n">cargs</span></code> dictionary to override this setting.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img2</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">psf</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">keep_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span><span class="p">,</span> <span class="n">cargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rendering_intent</span><span class="o">=</span><span class="s2">&quot;Perceptual&quot;</span><span class="p">))</span>
+</span></pre></div>
+</div>
+<p>The above command overrides the <code class="code highlight python docutils literal highlight-python"><span class="n">rendering_intent</span></code> while leaving the other default options unchanged.</p>
+<p><strong>Normalization</strong></p>
+<p>For a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a> PSF, the PSF is automatically normalized inside the convolution function
+so the overall power is one. By also setting <code class="code highlight python docutils literal highlight-python"><span class="n">cargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code> the output image won’t be
+normalized, meaning brightness/color values are not rescaled automatically.
+This is useful when the input image does not include bright areas.</p>
+<p>However, this is only supported for <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a> PSF.</p>
+</section>
+<section id="image-examples">
+<h2><span class="section-number">4.11.5. </span>Image Examples<a class="headerlink" href="#image-examples" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper table-borderless docutils container" id="id1">
+<table class="table-borderless docutils align-default" id="id1">
+<caption><span class="caption-number">Table 4.16 </span><span class="caption-text">Image convolution from the <a class="reference internal" href="../examples.html#example-psf-imaging"><span class="std std-ref">PSF Imaging</span></a> example</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_psf1.webp"><img alt="../_images/example_psf1.webp" class="dark-light" src="../_images/example_psf1.webp" width="400" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_psf2.webp"><img alt="../_images/example_psf2.webp" class="dark-light" src="../_images/example_psf2.webp" width="400" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_psf3.webp"><img alt="../_images/example_psf3.webp" class="dark-light" src="../_images/example_psf3.webp" width="600" />
+</a>
+</figure>
+<div class="table-wrapper table-borderless docutils container" id="id2">
+<table class="table-borderless docutils align-default" id="id2">
+<caption><span class="caption-number">Table 4.17 </span><span class="caption-text">Image convolution from the <a class="reference internal" href="../examples.html#example-keratoconus"><span class="std std-ref">Keratoconus</span></a> example</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_keratoconus_0.webp"><img alt="../_images/example_keratoconus_0.webp" class="dark-light" src="../_images/example_keratoconus_0.webp" width="400" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_keratoconus_8.webp"><img alt="../_images/example_keratoconus_8.webp" class="dark-light" src="../_images/example_keratoconus_8.webp" width="400" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/example_keratoconus_4.webp"><img alt="../_images/example_keratoconus_4.webp" class="dark-light" src="../_images/example_keratoconus_4.webp" width="600" />
+</a>
+</figure>
+</section>
+<section id="presets">
+<h2><span class="section-number">4.11.6. </span>Presets<a class="headerlink" href="#presets" title="Link to this heading">¶</a></h2>
+<p>The are multiple PSF presets available.
+All functions return a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.grayscale_image.GrayscaleImage" title="optrace.tracer.image.grayscale_image.GrayscaleImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">GrayscaleImage</span></code></a>, meaning the data values don’t correspond to a physical intensity,
+but they are preprocessed for a human vision representation.
+For convolution, they are automatically converted to intensities inside the convolution function.</p>
+<p><strong>Circle</strong></p>
+<p>A circular PSF is defined with the <code class="code highlight python docutils literal highlight-python"><span class="n">d</span></code> circle parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Gaussian</strong></p>
+<p>A simple Gaussian intensity distribution is described as:</p>
+<div class="math-wrapper docutils container" id="equation-usage-convolve-0">
+<div class="math notranslate nohighlight" id="equation-usage-convolve-0">
+<span class="eqno">(4.27)<a class="headerlink" href="#equation-usage-convolve-0" title="Link to this equation">¶</a></span>\[I_{\sigma}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma^2}\right)\]</div>
+</div>
+<p>The shape parameter <code class="code highlight python docutils literal highlight-python"><span class="n">sig</span></code> defines the Gaussian’s standard deviation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">gaussian</span><span class="p">(</span><span class="n">sig</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Airy</strong></p>
+<p>The Airy function is:</p>
+<div class="math-wrapper docutils container" id="equation-usage-convolve-1">
+<div class="math notranslate nohighlight" id="equation-usage-convolve-1">
+<span class="eqno">(4.28)<a class="headerlink" href="#equation-usage-convolve-1" title="Link to this equation">¶</a></span>\[I_{d}(x, y) = \left( \frac{2 J_1(r_d)}{r_d} \right)^2\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-usage-convolve-2">
+<div class="math notranslate nohighlight" id="equation-usage-convolve-2">
+<span class="eqno">(4.29)<a class="headerlink" href="#equation-usage-convolve-2" title="Link to this equation">¶</a></span>\[r_d = 3.8317 \frac{\sqrt{x^2 + y^2}}{r}\]</div>
+</div>
+<p>Where <span class="math notranslate nohighlight">\(J_1\)</span> is the Bessel function of the first kind of order 1.
+The resolution limit <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code> is described as distance from the center to the first root.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">airy</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Glare</strong></p>
+<p>A glare is modelled as two different Gaussians, a broad and a narrow one
+Parameter <span class="math notranslate nohighlight">\(a\)</span> describes the relative intensity of the larger one.</p>
+<div class="math-wrapper docutils container" id="equation-usage-convolve-3">
+<div class="math notranslate nohighlight" id="equation-usage-convolve-3">
+<span class="eqno">(4.30)<a class="headerlink" href="#equation-usage-convolve-3" title="Link to this equation">¶</a></span>\[I_{\sigma_1,\sigma_2}(x, y) = \left(1-a\right)\exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right)
++ a\exp \left(  \frac{-x^2 - y^2}{2 \sigma_2^2}\right)\]</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">glare</span><span class="p">(</span><span class="n">sig1</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">sig2</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Halo</strong></p>
+<p>A halo is modelled as a central Gaussian and annular Gaussian function around <span class="math notranslate nohighlight">\(r\)</span>.
+<span class="math notranslate nohighlight">\(\sigma_1, \sigma_2\)</span> describe the standard deviations of both.
+<span class="math notranslate nohighlight">\(a\)</span> describes the intensity of the ring.</p>
+<div class="math-wrapper docutils container" id="equation-usage-convolve-4">
+<div class="math notranslate nohighlight" id="equation-usage-convolve-4">
+<span class="eqno">(4.31)<a class="headerlink" href="#equation-usage-convolve-4" title="Link to this equation">¶</a></span>\[I_{\sigma_1, \sigma_2, d}(x, y) = \exp \left(  \frac{-x^2 - y^2}{2 \sigma_1^2}\right)
++  a \exp \left(  \frac{-\left(\sqrt{x^2 + y^2} - r\right)^2}{2 \sigma_2^2}\right)\]</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">psf</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">psf</span><span class="o">.</span><span class="n">halo</span><span class="p">(</span><span class="n">sig1</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sig2</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="preset-gallery">
+<span id="psf-preset-gallery"></span><h2><span class="section-number">4.11.7. </span>Preset Gallery<a class="headerlink" href="#preset-gallery" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper table-borderless docutils container" id="id3">
+<table class="table-borderless docutils align-default" id="id3">
+<caption><span class="caption-number">Table 4.18 </span><span class="caption-text">PSF presets with default parameters. Plotted with human brightness perception.</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id4">
+<a class="dark-light reference internal image-reference" href="../_images/psf_circle.svg"><img alt="../_images/psf_circle.svg" class="dark-light" src="../_images/psf_circle.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.56 </span><span class="caption-text">Exemplary Circle PSF.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id5">
+<a class="dark-light reference internal image-reference" href="../_images/psf_gaussian.svg"><img alt="../_images/psf_gaussian.svg" class="dark-light" src="../_images/psf_gaussian.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.57 </span><span class="caption-text">Exemplary Gaussian PSF.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id6">
+<a class="dark-light reference internal image-reference" href="../_images/psf_airy.svg"><img alt="../_images/psf_airy.svg" class="dark-light" src="../_images/psf_airy.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.58 </span><span class="caption-text">Exemplary Airy PSF.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id7">
+<a class="dark-light reference internal image-reference" href="../_images/psf_halo.svg"><img alt="../_images/psf_halo.svg" class="dark-light" src="../_images/psf_halo.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.59 </span><span class="caption-text">Exemplary Halo PSF.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-odd"><td><figure class="align-center" id="id8">
+<a class="dark-light reference internal image-reference" href="../_images/psf_glare.svg"><img alt="../_images/psf_glare.svg" class="dark-light" src="../_images/psf_glare.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.60 </span><span class="caption-text">Exemplary Glare PSF.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="tma.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">4.10. </span>Paraxial Analysis</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="plots.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">4.12. </span>Plotting Functions</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

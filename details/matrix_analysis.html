@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>5.5. Ray Transfer Matrix Analysis - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="5.6. PSF Convolution" href="convolution.html" /><link rel="prev" title="5.4. Image and Spectrum Rendering" href="image_spectrum.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/details/matrix_analysis.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/details/matrix_analysis.html"/>
+  <meta property="og:title" content="5.5. Ray Transfer Matrix Analysis"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">5. Implementation Details</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#abcd-matrix">5.5.1. ABCD Matrix</a></li>
+<li><a class="reference internal" href="#propagation-through-free-space">5.5.2. Propagation through Free Space</a></li>
+<li><a class="reference internal" href="#refraction-on-a-curved-interface">5.5.3. Refraction on a Curved Interface</a></li>
+<li><a class="reference internal" href="#refraction-on-a-flat-interface">5.5.4. Refraction on a Flat Interface</a></li>
+<li><a class="reference internal" href="#thick-lens">5.5.5. Thick Lens</a></li>
+<li><a class="reference internal" href="#thin-lens">5.5.6. Thin Lens</a></li>
+<li><a class="reference internal" href="#lensmaker-equation">5.5.7. Lensmaker Equation</a></li>
+<li><a class="reference internal" href="#gullstrand-equation">5.5.8. Gullstrand Equation</a></li>
+<li><a class="reference internal" href="#cardinal-points">5.5.9. Cardinal Points</a></li>
+<li><a class="reference internal" href="#optical-power">5.5.10. Optical Power</a></li>
+<li><a class="reference internal" href="#lens-setups">5.5.11. Lens Setups</a></li>
+<li><a class="reference internal" href="#optical-center">5.5.12. Optical Center</a></li>
+<li><a class="reference internal" href="#image-and-object-distances">5.5.13. Image and Object Distances</a></li>
+<li><a class="reference internal" href="#entrance-and-exit-pupils">5.5.14. Entrance and Exit Pupils</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">5. </span>Implementation Details</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">5.5. </span>Ray Transfer Matrix Analysis</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/details/matrix_analysis.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/details/matrix_analysis.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/details/matrix_analysis.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/matrix_analysis.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/matrix_analysis.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="ray-transfer-matrix-analysis">
+<span id="ray-matrix-analysis"></span><h1><span class="section-number">5.5. </span>Ray Transfer Matrix Analysis<a class="headerlink" href="#ray-transfer-matrix-analysis" title="Link to this heading">¶</a></h1>
+<section id="abcd-matrix">
+<h2><span class="section-number">5.5.1. </span>ABCD Matrix<a class="headerlink" href="#abcd-matrix" title="Link to this heading">¶</a></h2>
+<p>In paraxial optics, the relationships between angles <span class="math notranslate nohighlight">\(\theta\)</span> and distances <span class="math notranslate nohighlight">\(x\)</span>
+relative to the optical axis can be represented linearly.
+The so-called ABCD matrix describes a paraxial system and translates
+the input values to output parameters of this system.
+This relationship can be represented as: <a class="footnote-reference brackets" href="#footcite-ivanoptics" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+<div class="math-wrapper docutils container" id="equation-tma-abcd">
+<div class="math notranslate nohighlight" id="equation-tma-abcd">
+<span class="eqno">(5.98)<a class="headerlink" href="#equation-tma-abcd" title="Link to this equation">¶</a></span>\[\begin{split}\left[\begin{array}{l}
+x_2 \\
+\theta_2
+\end{array}\right]=\left[\begin{array}{ll}
+A &amp; B \\
+C &amp; D
+\end{array}\right]\left[\begin{array}{l}
+x_1 \\
+\theta_1
+\end{array}\right]\end{split}\]</div>
+</div>
+<div class="table-wrapper colwidths-given docutils container" id="id22">
+<span id="tma-elements"></span><span id="tma-elements"></span><table class="docutils align-center" id="id22">
+<caption><span class="caption-number">Table 5.3 </span><span class="caption-text">Description of matrix elements <a class="footnote-reference brackets" href="#footcite-ivanoptics" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#id22" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 21.1%" />
+<col style="width: 78.9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Element</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(A\)</span></p></td>
+<td><p>positional scaling</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(B\)</span></p></td>
+<td><p>position change depending on input angle</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(C\)</span></p></td>
+<td><div class="line-block">
+<div class="line">angle change depending on input position.</div>
+<div class="line">Equivalent to <span class="math notranslate nohighlight">\(-\frac{1}{f}\)</span>, with <span class="math notranslate nohighlight">\(f\)</span> being the focal distance</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(D\)</span></p></td>
+<td><p>angular scaling</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Zero matrix elements indicate special cases of imaging and focusing, as described in <a class="reference internal" href="#tma-zero-elements"><span class="std std-numref">Table 5.4</span></a>.</p>
+<div class="table-wrapper colwidths-given docutils container" id="id23">
+<span id="tma-zero-elements"></span><span id="tma-zero-elements"></span><table class="docutils align-center" id="id23">
+<caption><span class="caption-number">Table 5.4 </span><span class="caption-text">Significance of zero matrix elements <a class="footnote-reference brackets" href="#footcite-gilllaser" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#id23" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Case</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(A=0\)</span></p></td>
+<td><div class="line-block">
+<div class="line">parallel to point focussing,</div>
+<div class="line">output lies at second focal plane</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(B=0\)</span></p></td>
+<td><div class="line-block">
+<div class="line">point to point focusing (image of an object),</div>
+<div class="line">input and output lie at conjugate planes,</div>
+<div class="line"><span class="math notranslate nohighlight">\(A\)</span> gives the image magnification</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(C=0\)</span></p></td>
+<td><div class="line-block">
+<div class="line">parallel to parallel imaging (afocal or telescopic system),</div>
+<div class="line"><span class="math notranslate nohighlight">\(D\)</span> gives us the angular magnification</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(D=0\)</span></p></td>
+<td><div class="line-block">
+<div class="line">point to parallel imaging (e.g. headlamp),</div>
+<div class="line">input lies at the first focal plane</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>An important relationship is that the determinant of an ABCD matrix <span class="math notranslate nohighlight">\(M\)</span>
+always equals the ratio between the refractive indices of the preceding medium <span class="math notranslate nohighlight">\(n_i\)</span>
+and the subsequent medium <span class="math notranslate nohighlight">\(n_o\)</span> <a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<div class="math-wrapper docutils container" id="equation-eq-tma-det">
+<div class="math notranslate nohighlight" id="equation-eq-tma-det">
+<span class="eqno">(5.99)<a class="headerlink" href="#equation-eq-tma-det" title="Link to this equation">¶</a></span>\[\det (M) = AD - BC = \frac{n_i}{n_o}\]</div>
+</div>
+</section>
+<section id="propagation-through-free-space">
+<h2><span class="section-number">5.5.2. </span>Propagation through Free Space<a class="headerlink" href="#propagation-through-free-space" title="Link to this heading">¶</a></h2>
+<p>An ABCD matrix for free space with distance <span class="math notranslate nohighlight">\(d\)</span> has the following form:
+<a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p>
+<div class="math-wrapper docutils container" id="equation-tma-free-space">
+<div class="math notranslate nohighlight" id="equation-tma-free-space">
+<span class="eqno">(5.100)<a class="headerlink" href="#equation-tma-free-space" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_\text{s} =
+\left[\begin{array}{ll}
+1 &amp; d \\
+0 &amp; 1
+\end{array}\right]\end{split}\]</div>
+</div>
+</section>
+<section id="refraction-on-a-curved-interface">
+<h2><span class="section-number">5.5.3. </span>Refraction on a Curved Interface<a class="headerlink" href="#refraction-on-a-curved-interface" title="Link to this heading">¶</a></h2>
+<p>An ABCD matrix for free space over a distance <span class="math notranslate nohighlight">\(d\)</span> is represented as <a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-tma-curved-nterface">
+<div class="math notranslate nohighlight" id="equation-tma-curved-nterface">
+<span class="eqno">(5.101)<a class="headerlink" href="#equation-tma-curved-nterface" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_\text{c} =
+\left[\begin{array}{cc}
+1 &amp; 0 \\
+-\frac{n_o-n_i}{R \cdot n_o} &amp; \frac{n_i}{n_o}
+\end{array}\right]\end{split}\]</div>
+</div>
+</section>
+<section id="refraction-on-a-flat-interface">
+<h2><span class="section-number">5.5.4. </span>Refraction on a Flat Interface<a class="headerlink" href="#refraction-on-a-flat-interface" title="Link to this heading">¶</a></h2>
+<p>When <span class="math notranslate nohighlight">\(R \to \infty\)</span>, equivalent to a flat interface,
+the matrix simplifies to <a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-tma-flat-interface">
+<div class="math notranslate nohighlight" id="equation-tma-flat-interface">
+<span class="eqno">(5.102)<a class="headerlink" href="#equation-tma-flat-interface" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_\text{i} =
+\left[\begin{array}{cc}
+1 &amp; 0 \\
+0 &amp; \frac{n_i}{n_o}
+\end{array}\right]\end{split}\]</div>
+</div>
+</section>
+<section id="thick-lens">
+<h2><span class="section-number">5.5.5. </span>Thick Lens<a class="headerlink" href="#thick-lens" title="Link to this heading">¶</a></h2>
+<p>A thick lens is described by a refractive index <span class="math notranslate nohighlight">\(n\)</span>, front surface curvature <span class="math notranslate nohighlight">\(R_1\)</span>,
+and back surface curvature <span class="math notranslate nohighlight">\(R_2\)</span>.
+Its thickness is <span class="math notranslate nohighlight">\(d\)</span> and it has a prior medium of index <span class="math notranslate nohighlight">\(n_1\)</span> and a subsequent medium with <span class="math notranslate nohighlight">\(n_2\)</span>.
+Using ray transfer matrix analysis, this system is represented by the product of the front surface matrix
+<span class="math notranslate nohighlight">\(\text{M}_\text{c1}\)</span>, the free space propagation matrix <span class="math notranslate nohighlight">\(\text{M}_\text{s}\)</span>,
+and the back surface matrix <span class="math notranslate nohighlight">\(\text{M}_\text{c2}\)</span>.
+It is important to note that matrices are multiplied from right to left.
+The resulting matrix is then: <a class="footnote-reference brackets" href="#footcite-kaschke2014" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p>
+<div class="math-wrapper docutils container" id="equation-tma-thick-lens-complete">
+<div class="math notranslate nohighlight" id="equation-tma-thick-lens-complete">
+<span class="eqno">(5.103)<a class="headerlink" href="#equation-tma-thick-lens-complete" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_\text{thick} =&amp;~~ \text{M}_\text{c2} \cdot \text{M}_\text{s} \cdot \text{M}_\text{c1}\\
+ =&amp;~
+\left[\begin{array}{cc}
+1 &amp; 0 \\
+-\frac{n_2-n}{R_2 \cdot n_2} &amp; \frac{n}{n_2}
+\end{array}\right]
+\left[\begin{array}{ll}
+1 &amp; d \\
+0 &amp; 1
+\end{array}\right]
+\left[\begin{array}{cc}
+1 &amp; 0 \\
+-\frac{n-n_1}{R_1 \cdot n} &amp; \frac{n_1}{n}
+\end{array}\right]\\
+ =&amp;~
+\left[\begin{array}{cc}
+1 + \frac{n_1-n}{n R_1}d &amp; \frac{n_1}{n}d \\
+ \frac{n_1 - n}{n_2 R_1}  + \frac{n-n_2}{n_2 R_2} + \frac{n_1 - n}{n R_1}\frac{n-n_2}{n_2 R_2}d
+ &amp; \frac{n_1}{n_2} + \frac{n_1}{n}\frac{n - n_2}{n_2 R_2}d
+\end{array}\right]\end{split}\]</div>
+</div>
+<p>When the surrounding media are identical with <span class="math notranslate nohighlight">\(n_0 := n_1 = n_2\)</span>, this simplifies to:</p>
+<div class="math-wrapper docutils container" id="equation-tma-thick-lens-same-media">
+<div class="math notranslate nohighlight" id="equation-tma-thick-lens-same-media">
+<span class="eqno">(5.104)<a class="headerlink" href="#equation-tma-thick-lens-same-media" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_{\text{thick},n_0}   =&amp;~
+\left[\begin{array}{cc}
+1 + \frac{n_0-n}{n R_1}d &amp; \frac{n_0}{n}d \\
+\frac{n_0 - n}{n_0} \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{n-n_0}{n R_1 R_2}d \right) &amp; 1
+     + \frac{n - n_0}{n R_2}d
+\end{array}\right]\end{split}\]</div>
+</div>
+</section>
+<section id="thin-lens">
+<h2><span class="section-number">5.5.6. </span>Thin Lens<a class="headerlink" href="#thin-lens" title="Link to this heading">¶</a></h2>
+<p>In general, the matrix element <span class="math notranslate nohighlight">\(C\)</span> can be interpreted as the negative inverse focal length,
+<span class="math notranslate nohighlight">\(-\frac{1}{f}\)</span>.
+For a thin lens, where <span class="math notranslate nohighlight">\(d=0\)</span>, equation <span class="math notranslate nohighlight">\(TMA_thick_lens_complete\)</span> simplifies to:</p>
+<div class="math-wrapper docutils container" id="equation-tma-thin-lens">
+<div class="math notranslate nohighlight" id="equation-tma-thin-lens">
+<span class="eqno">(5.105)<a class="headerlink" href="#equation-tma-thin-lens" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_\text{thin} =
+\left[\begin{array}{cc}
+1 &amp; 0 \\
+-\frac{1}{f} &amp; \frac{n_i}{n_o}
+\end{array}\right]\end{split}\]</div>
+</div>
+<p>When <span class="math notranslate nohighlight">\(n_i = n_o\)</span>, resulting in <span class="math notranslate nohighlight">\(D=1\)</span>, the matrix aligns with equations commonly found in the literature,
+as referenced in <a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="lensmaker-equation">
+<h2><span class="section-number">5.5.7. </span>Lensmaker Equation<a class="headerlink" href="#lensmaker-equation" title="Link to this heading">¶</a></h2>
+<p>As for the thin lens, element <span class="math notranslate nohighlight">\(C\)</span> is equal to <span class="math notranslate nohighlight">\(-\frac{1}{f}\)</span>.
+Negating this element from equation <a class="reference internal" href="#equation-tma-thick-lens-complete">(5.103)</a> and applying <span class="math notranslate nohighlight">\(-(n_1 - n) = (n - n_1)\)</span>
+gives us the focal length in the forward direction:</p>
+<div class="math-wrapper docutils container" id="equation-tma-lensmaker0">
+<div class="math notranslate nohighlight" id="equation-tma-lensmaker0">
+<span class="eqno">(5.106)<a class="headerlink" href="#equation-tma-lensmaker0" title="Link to this equation">¶</a></span>\[\frac{1}{f_2} = \frac{n-n_1}{n_2}\frac{1}{R_1} - \frac{n-n_2}{n_2}\frac{1}{R_2} + \frac{n-n_1}{n R_1}\frac{n-n_2}{n_2 R_2}d\]</div>
+</div>
+<p>Performing the same calculations with the media and curvatures swapped, yields the backward focal length:</p>
+<div class="math-wrapper docutils container" id="equation-tma-lensmaker-f-conv">
+<div class="math notranslate nohighlight" id="equation-tma-lensmaker-f-conv">
+<span class="eqno">(5.107)<a class="headerlink" href="#equation-tma-lensmaker-f-conv" title="Link to this equation">¶</a></span>\[f_1 = -\frac{n_1}{n_2} f_2\]</div>
+</div>
+<p>In its expanded form, this is:</p>
+<div class="math-wrapper docutils container" id="equation-tma-lensmaker1">
+<div class="math notranslate nohighlight" id="equation-tma-lensmaker1">
+<span class="eqno">(5.108)<a class="headerlink" href="#equation-tma-lensmaker1" title="Link to this equation">¶</a></span>\[\frac{1}{f_1} = -\frac{n-n_1}{n_1}\frac{1}{R_1} + \frac{n-n_2}{n_1}\frac{1}{R_2} - \frac{n-n_1}{n R_1}\frac{n-n_2}{n_1 R_2}d\]</div>
+</div>
+<p>Both equations above are consistent with <a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>
+For <span class="math notranslate nohighlight">\(n_0 := n_1 = n_2\)</span>, we derive:</p>
+<div class="math-wrapper docutils container" id="equation-tma-lensmaker-common">
+<div class="math notranslate nohighlight" id="equation-tma-lensmaker-common">
+<span class="eqno">(5.109)<a class="headerlink" href="#equation-tma-lensmaker-common" title="Link to this equation">¶</a></span>\[\frac{1}{f_2} = \frac{n-n_0}{n_0}\left(\frac{1}{R_1} - \frac{1}{R_2} + \frac{n-n_0}{n R_1 R_2}d \right)\]</div>
+</div>
+<p>This is the typical form of the lens maker equation <a class="footnote-reference brackets" href="#footcite-linsenschleiferwiki" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="gullstrand-equation">
+<h2><span class="section-number">5.5.8. </span>Gullstrand Equation<a class="headerlink" href="#gullstrand-equation" title="Link to this heading">¶</a></h2>
+<p>Utilizing definition <a class="reference internal" href="#equation-tma-power-alt">(5.119)</a> and equation <a class="reference internal" href="#equation-tma-lensmaker0">(5.106)</a>,
+and defining <span class="math notranslate nohighlight">\(D\)</span> as <span class="math notranslate nohighlight">\(D_2\)</span> from now on, we can express:</p>
+<div class="math-wrapper docutils container" id="equation-tma-gullstrand-base">
+<div class="math notranslate nohighlight" id="equation-tma-gullstrand-base">
+<span class="eqno">(5.110)<a class="headerlink" href="#equation-tma-gullstrand-base" title="Link to this equation">¶</a></span>\[D = \frac{n_2}{f_2} = \frac{n-n_1}{R_1} - \frac{n-n_2}{R_2} + \frac{n-n_1}{n R_1}\frac{n-n_2}{R_2}d\]</div>
+</div>
+<p>This is equivalent to</p>
+<div class="math-wrapper docutils container" id="equation-tma-gullstrand-step">
+<div class="math notranslate nohighlight" id="equation-tma-gullstrand-step">
+<span class="eqno">(5.111)<a class="headerlink" href="#equation-tma-gullstrand-step" title="Link to this equation">¶</a></span>\[D = \frac{n_2}{f_2} = \frac{n-n_1}{R_1}  + \left( - \frac{n-n_2}{R_2} \right) - \frac{n-n_1}{R_1} \cdot \left( - \frac{n-n_2}{R_2} \right) \frac{d}{n}\]</div>
+</div>
+<p>With the surface optical powers <span class="math notranslate nohighlight">\(D_\text{s1} = \frac{n-n_1}{R_1}\)</span>
+and <span class="math notranslate nohighlight">\(D_\text{s2} = -\frac{n-n_2}{R_2}\)</span> this simplifies to:</p>
+<div class="math-wrapper docutils container" id="equation-tma-gullstrand">
+<div class="math notranslate nohighlight" id="equation-tma-gullstrand">
+<span class="eqno">(5.112)<a class="headerlink" href="#equation-tma-gullstrand" title="Link to this equation">¶</a></span>\[D = D_\text{s1} + D_\text{s2} - D_\text{s1} D_\text{s2} \frac{d}{n}\]</div>
+</div>
+<p>This is known as Gullstrand’s equation <a class="footnote-reference brackets" href="#footcite-gullstrandhyper" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-edmundfocal" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="cardinal-points">
+<span id="ray-cardinal-points"></span><h2><span class="section-number">5.5.9. </span>Cardinal Points<a class="headerlink" href="#cardinal-points" title="Link to this heading">¶</a></h2>
+<p>The following calculations are derived from <a class="footnote-reference brackets" href="#footcite-dickenabcd" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#footcite-pedrotti-pedrotti-pedrotti-2006" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<p><strong>Vertex Points</strong></p>
+<p>The vertex points <span class="math notranslate nohighlight">\(V_1\)</span> and <span class="math notranslate nohighlight">\(V_2\)</span> are positioned at the optical axis
+and represent the front and back of the lens.</p>
+<p><strong>Principal Points</strong></p>
+<div class="math-wrapper docutils container" id="equation-tma-principal">
+<div class="math notranslate nohighlight" id="equation-tma-principal">
+<span class="eqno">(5.113)<a class="headerlink" href="#equation-tma-principal" title="Link to this equation">¶</a></span>\[\begin{split}P_1 =&amp;~ V_1 - \frac{n_1 - n_2 D}{n_2 C}\\
+P_2 =&amp;~ V_2 + \frac{1-A}{C}\end{split}\]</div>
+</div>
+<p><strong>Nodal Points</strong></p>
+<div class="math-wrapper docutils container" id="equation-tma-nodal">
+<div class="math notranslate nohighlight" id="equation-tma-nodal">
+<span class="eqno">(5.114)<a class="headerlink" href="#equation-tma-nodal" title="Link to this equation">¶</a></span>\[\begin{split}N_1 =&amp;~ V_1 - \frac{1-D}{C}\\
+N_2 =&amp;~ V_2 + \frac{n_1 - n_2 A}{n_2 C}\end{split}\]</div>
+</div>
+<p><strong>Focal Lengths</strong></p>
+<p>Focal lengths are given by the negative inverse of <span class="math notranslate nohighlight">\(C\)</span> as well as equation <a class="reference internal" href="#equation-tma-lensmaker-f-conv">(5.107)</a>.</p>
+<div class="math-wrapper docutils container" id="equation-tma-focal-length">
+<div class="math notranslate nohighlight" id="equation-tma-focal-length">
+<span class="eqno">(5.115)<a class="headerlink" href="#equation-tma-focal-length" title="Link to this equation">¶</a></span>\[\begin{split}f_1 =&amp;~ \frac{n_1}{n_2 C}\\
+f_2 =&amp;~ -\frac{1}{C}\end{split}\]</div>
+</div>
+<p><strong>Focal Points</strong></p>
+<div class="math-wrapper docutils container" id="equation-tma-focal-points">
+<div class="math notranslate nohighlight" id="equation-tma-focal-points">
+<span class="eqno">(5.116)<a class="headerlink" href="#equation-tma-focal-points" title="Link to this equation">¶</a></span>\[\begin{split}F_1 = &amp;~ P_1 + f_1\\
+F_2 = &amp;~ P_2 + f_2\end{split}\]</div>
+</div>
+<p><strong>EFL, BFL, FFL</strong></p>
+<p>Effective focal length (EFL), back focal length (BFL) and front focal length (FFL) are defined as follows:</p>
+<div class="math-wrapper docutils container" id="equation-tma-ffk-bfl-efl">
+<div class="math notranslate nohighlight" id="equation-tma-ffk-bfl-efl">
+<span class="eqno">(5.117)<a class="headerlink" href="#equation-tma-ffk-bfl-efl" title="Link to this equation">¶</a></span>\[\begin{split}\text{FFL} =&amp;~ F_1 - V_1 &amp;=~&amp; &amp;\frac{D}{C}\\
+\text{BFL} =&amp;~ F_2 - V_2 &amp;=~&amp; -&amp;\frac{A}{C}\\
+\text{EFL} =&amp;~ f_2 &amp;=~&amp; -&amp;\frac{1}{C}\end{split}\]</div>
+</div>
+</section>
+<section id="optical-power">
+<span id="ray-power-def"></span><h2><span class="section-number">5.5.10. </span>Optical Power<a class="headerlink" href="#optical-power" title="Link to this heading">¶</a></h2>
+<p>The default definition in <cite>optrace</cite> considers the optical power as the inverse of the geometric focal length.</p>
+<div class="math-wrapper docutils container" id="equation-tma-power-base">
+<div class="math notranslate nohighlight" id="equation-tma-power-base">
+<span class="eqno">(5.118)<a class="headerlink" href="#equation-tma-power-base" title="Link to this equation">¶</a></span>\[\begin{split}D_1 = \frac{1}{f_1}\\
+D_2 = \frac{1}{f_2}\end{split}\]</div>
+</div>
+<p>The alternative definition below has the advantage that <span class="math notranslate nohighlight">\(D_\text{1n} = -D_\text{2n}\)</span> holds true
+independently of the refractive media.</p>
+<div class="math-wrapper docutils container" id="equation-tma-power-alt">
+<div class="math notranslate nohighlight" id="equation-tma-power-alt">
+<span class="eqno">(5.119)<a class="headerlink" href="#equation-tma-power-alt" title="Link to this equation">¶</a></span>\[\begin{split}D_\text{1n} =&amp;~ \frac{n_1}{f_1}\\
+D_\text{2n} =&amp;~ \frac{n_2}{f_2}\\
+f_\text{1n} =&amp;~ \frac{f_1}{n_1}\\
+f_\text{2n} =&amp;~ \frac{f_2}{n_2}\\
+\text{EFL}_n =&amp;~ \frac{f_2}{n_2}\\\end{split}\]</div>
+</div>
+<p>However, in this case, the focal lengths do not represent the actual geometrical distance between
+the principal plane and the focal points.
+For <span class="math notranslate nohighlight">\(n_1 = n_2 = 1\)</span>, both definitions are equivalent.</p>
+</section>
+<section id="lens-setups">
+<h2><span class="section-number">5.5.11. </span>Lens Setups<a class="headerlink" href="#lens-setups" title="Link to this heading">¶</a></h2>
+<p>To evaluate setups of <span class="math notranslate nohighlight">\(N\)</span> lenses, the lens matrices <span class="math notranslate nohighlight">\(\text{M}_\text{L,i}\)</span>
+and the free space matrices <span class="math notranslate nohighlight">\(\text{M}_\text{s,j}\)</span> with <span class="math notranslate nohighlight">\(i \in       \{0, 1, \dots, N\},~~ j \in \{0, 1, \dots, N-1\}\)</span> need to be multiplied.</p>
+<div class="math-wrapper docutils container" id="equation-tma-setup">
+<div class="math notranslate nohighlight" id="equation-tma-setup">
+<span class="eqno">(5.120)<a class="headerlink" href="#equation-tma-setup" title="Link to this equation">¶</a></span>\[\text{M} = \text{M}_\text{L,N} \cdot \text{M}_\text{s,N-1} \dots \text{M}_\text{s,0} \cdot \text{M}_\text{L,0}\]</div>
+</div>
+</section>
+<section id="optical-center">
+<span id="ray-image-object-distances"></span><h2><span class="section-number">5.5.12. </span>Optical Center<a class="headerlink" href="#optical-center" title="Link to this heading">¶</a></h2>
+<p><strong>General Case</strong></p>
+<p>The optical center is the axial position where nodal rays intersect with the optical axis,
+as illustrated by <a class="reference internal" href="#fig-optical-center"><span class="std std-numref">Fig. 5.19</span></a>.</p>
+<figure class="align-center" id="id24">
+<span id="fig-optical-center"></span><a class="dark-light reference internal image-reference" href="../_images/optical_center.svg"><img alt="../_images/optical_center.svg" class="dark-light" src="../_images/optical_center.svg" width="550" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.19 </span><span class="caption-text">Optical center of a lens.</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>For the yellow triangle, the following relation holds:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-tan-phi1">
+<div class="math notranslate nohighlight" id="equation-eq-oc-tan-phi1">
+<span class="eqno">(5.121)<a class="headerlink" href="#equation-eq-oc-tan-phi1" title="Link to this equation">¶</a></span>\[\tan \phi = \frac{x_2 - x_1}{V_2 - V_1}\]</div>
+</div>
+<p>From the green triangle, we derive:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-tan-phi2">
+<div class="math notranslate nohighlight" id="equation-eq-oc-tan-phi2">
+<span class="eqno">(5.122)<a class="headerlink" href="#equation-eq-oc-tan-phi2" title="Link to this equation">¶</a></span>\[\tan \phi = -\frac{x_1}{o}\]</div>
+</div>
+<p>Note that the minus sign was added so both equations maintain the same sign.
+Inserting <a class="reference internal" href="#equation-eq-oc-tan-phi1">(5.121)</a> into <a class="reference internal" href="#equation-eq-oc-tan-phi2">(5.122)</a> gives:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-o1">
+<div class="math notranslate nohighlight" id="equation-eq-oc-o1">
+<span class="eqno">(5.123)<a class="headerlink" href="#equation-eq-oc-o1" title="Link to this equation">¶</a></span>\[o = - \frac{x_1}{x_2 - x_1} \left(V_2 - V_1\right)\]</div>
+</div>
+<p>The blue triangle leads to:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-theta1">
+<div class="math notranslate nohighlight" id="equation-eq-oc-theta1">
+<span class="eqno">(5.124)<a class="headerlink" href="#equation-eq-oc-theta1" title="Link to this equation">¶</a></span>\[\tan \theta_1 = -\frac{x_1}{N_1 - V_1}\]</div>
+</div>
+<p>With paraxial rays, the approximation <span class="math notranslate nohighlight">\(\theta_1 \approx \tan \theta_1\)</span> holds.
+Therefore, <span class="math notranslate nohighlight">\(x_2\)</span> can be calculated using the ABCD matrix of the setup:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-x2">
+<div class="math notranslate nohighlight" id="equation-eq-oc-x2">
+<span class="eqno">(5.125)<a class="headerlink" href="#equation-eq-oc-x2" title="Link to this equation">¶</a></span>\[x_2 = A x_1 - \frac{B}{N_1 - V_1} x_1\]</div>
+</div>
+<p>Inserting into <a class="reference internal" href="#equation-eq-oc-o1">(5.123)</a> gives us:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-o2">
+<div class="math notranslate nohighlight" id="equation-eq-oc-o2">
+<span class="eqno">(5.126)<a class="headerlink" href="#equation-eq-oc-o2" title="Link to this equation">¶</a></span>\[o = -\frac{x_1}{A x_1 - \frac{B}{N_1 - V_1} x_1 -x_1} \left(V_2 - V_1\right)\]</div>
+</div>
+<p>From <a class="reference internal" href="#equation-tma-nodal">(5.114)</a>, it follows that:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-dnv">
+<div class="math notranslate nohighlight" id="equation-eq-oc-dnv">
+<span class="eqno">(5.127)<a class="headerlink" href="#equation-eq-oc-dnv" title="Link to this equation">¶</a></span>\[N_1 - V_1 = - \frac{1 - D}{C}\]</div>
+</div>
+<p>Which can also be inserted into the equation <a class="reference internal" href="#equation-eq-oc-o2">(5.126)</a>.
+After some rearranging, we obtain:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-o3">
+<div class="math notranslate nohighlight" id="equation-eq-oc-o3">
+<span class="eqno">(5.128)<a class="headerlink" href="#equation-eq-oc-o3" title="Link to this equation">¶</a></span>\[o = \frac{V_2 - V_1}{1 - A + \frac{BC}{D-1}}\]</div>
+</div>
+<p>This value needs to be added to the front vertex to get the absolute position of the optical center:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-final">
+<div class="math notranslate nohighlight" id="equation-eq-oc-final">
+<span class="eqno">(5.129)<a class="headerlink" href="#equation-eq-oc-final" title="Link to this equation">¶</a></span>\[\text{OC} = V_1 + \frac{V_2 - V_1}{1 - A + \frac{BC}{D-1}}\]</div>
+</div>
+<p>The requirements implicitly assumed include the existence of a nodal point (<span class="math notranslate nohighlight">\(C \neq 0\)</span>)
+and that the input and output positions differ (<span class="math notranslate nohighlight">\(x_2 \neq x_1\)</span>).
+The only scenario where it makes sense to define an optical center, despite these conditions, is for an ideal lens.
+In this case, we set <span class="math notranslate nohighlight">\(\text{OC} = V_1\)</span>, although a nodal ray does not cross the optical axis at that point.
+In all other cases, particularly when <span class="math notranslate nohighlight">\(1 - A + \frac{BC}{D - 1} = 0\)</span> or <span class="math notranslate nohighlight">\(D = 1\)</span>,
+the optical center is undefined.
+As mentioned previously, an ideal lens (<span class="math notranslate nohighlight">\(A = 1, ~B=0, ~C\neq 0, ~D=1\)</span>) is an exception.</p>
+<p><strong>Thick Lens/Lens Combination with Same Front and Back Medium</strong></p>
+<p>With <span class="math notranslate nohighlight">\(m := \frac{n - n_0}{n}d\)</span> matrix <a class="reference internal" href="#equation-tma-thick-lens-same-media">(5.104)</a> becomes:</p>
+<div class="math-wrapper docutils container" id="equation-tma-thick-lens-same-media-m">
+<div class="math notranslate nohighlight" id="equation-tma-thick-lens-same-media-m">
+<span class="eqno">(5.130)<a class="headerlink" href="#equation-tma-thick-lens-same-media-m" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_{\text{thick},n_0}   =&amp;~
+\left[\begin{array}{cc}
+1 - \frac{m}{R_1} &amp; \frac{n_0}{n}d \\
+\frac{n_0 - n}{n_0} \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{m}{R_1 R_2} \right) &amp; 1 + \frac{m}{R_2}
+\end{array}\right]\end{split}\]</div>
+</div>
+<p>The denominator of equation <a class="reference internal" href="#equation-eq-oc-final">(5.129)</a> is then:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-thick-lens-denom">
+<div class="math notranslate nohighlight" id="equation-eq-oc-thick-lens-denom">
+<span class="eqno">(5.131)<a class="headerlink" href="#equation-eq-oc-thick-lens-denom" title="Link to this equation">¶</a></span>\[\begin{split}1 - A + \frac{BC}{D - 1} &amp;= 1 - \left(1 - \frac{m}{R_1}\right) + \frac{\frac{n_0-n}{n_0}\frac{n_0}{n}d \left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{m}{R_1 R_2} \right)}{1 + \frac{m}{R_2} - 1}\\
+&amp;= \frac{m}{R_1} - m \frac{\left( \frac{1}{R_1}  - \frac{1}{R_2} + \frac{m}{R_1 R_2} \right)}{\frac{m}{R_2}}\\
+&amp;= \frac{m}{R_1} - \left( \frac{R_2}{R_1}  - 1 + \frac{m}{R_1} \right)\\
+&amp;= 1 - \frac{R_2}{R_1}\end{split}\]</div>
+</div>
+<p>Leading to the final form of <a class="reference internal" href="#equation-eq-oc-final">(5.129)</a>:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-radii">
+<div class="math notranslate nohighlight" id="equation-eq-oc-radii">
+<span class="eqno">(5.132)<a class="headerlink" href="#equation-eq-oc-radii" title="Link to this equation">¶</a></span>\[\text{OC} = V_1 + \frac{V_2 - V_1}{1 - \frac{R_2}{R_1}}\]</div>
+</div>
+<p>Equation <a class="reference internal" href="#equation-eq-oc-radii">(5.132)</a> is consistent with the results in <a class="footnote-reference brackets" href="#footcite-10-1117-12-805489" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>.
+As mentioned in <a class="footnote-reference brackets" href="#footcite-jenkins2001fundamentals" id="id18" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a>, in this case, the optical center is completely independent
+of the wavelength and the material dispersion.</p>
+<p>Applying the same approach to two ideal lenses with focal lengths <span class="math notranslate nohighlight">\(f_1\)</span> and <span class="math notranslate nohighlight">\(f_2\)</span>,
+separated by a distance <span class="math notranslate nohighlight">\(d\)</span> and surrounded by the same ambient media, results in a similar form:</p>
+<div class="math-wrapper docutils container" id="equation-eq-oc-two-lens-matrix">
+<div class="math notranslate nohighlight" id="equation-eq-oc-two-lens-matrix">
+<span class="eqno">(5.133)<a class="headerlink" href="#equation-eq-oc-two-lens-matrix" title="Link to this equation">¶</a></span>\[\begin{split}M_\text{2L} &amp;= \left[\begin{array}{cc}
+1 &amp; 0 \\
+\frac{1}{f_2} &amp; 1
+\end{array}\right] \cdot\left[\begin{array}{ll}
+1 &amp; d \\
+0 &amp; 1
+\end{array}\right] \cdot\left[\begin{array}{cc}
+1 &amp; 0 \\
+\frac{1}{f_1} &amp; 1
+\end{array}\right]\\
+&amp;= \left[\begin{array}{cc}
+1+\frac{d}{f_1} &amp; d \\
+\frac{1}{f_1}+\frac{1}{f_2}+\frac{d}{f_1 f_2} &amp; 1+\frac{d}{f_2}
+\end{array}\right]\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-eq-oc-two-lenses-denom">
+<div class="math notranslate nohighlight" id="equation-eq-oc-two-lenses-denom">
+<span class="eqno">(5.134)<a class="headerlink" href="#equation-eq-oc-two-lenses-denom" title="Link to this equation">¶</a></span>\[\begin{split}1 - A + \frac{BC}{D - 1} &amp;= 1 - \left(1 + \frac{d}{f_1}\right) + \frac{ \frac{1}{f_1}
++ \frac{1}{f_2} + \frac{d}{f_1 f_2} }{1 + \frac{d}{f_2} - 1} d\\
+&amp;= -\frac{d}{f_1} + \frac{f_2}{f_1} + 1 + \frac{d}{f_1}\\
+&amp;= 1 + \frac{f_2}{f_1}\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-eq-oc-two-lenses">
+<div class="math notranslate nohighlight" id="equation-eq-oc-two-lenses">
+<span class="eqno">(5.135)<a class="headerlink" href="#equation-eq-oc-two-lenses" title="Link to this equation">¶</a></span>\[\text{OC} = V_1 + \frac{V_2 - V_1}{1 + \frac{f_2}{f_1}}\]</div>
+</div>
+<p>For <span class="math notranslate nohighlight">\(R_2 = -R_1\)</span> in <a class="reference internal" href="#equation-eq-oc-radii">(5.132)</a> or <span class="math notranslate nohighlight">\(f_2 = f_1\)</span> in <a class="reference internal" href="#equation-eq-oc-two-lenses">(5.135)</a>
+the optical center lies at exactly the center of the lens/lens combination.</p>
+</section>
+<section id="image-and-object-distances">
+<span id="image-object-distance"></span><h2><span class="section-number">5.5.13. </span>Image and Object Distances<a class="headerlink" href="#image-and-object-distances" title="Link to this heading">¶</a></h2>
+<p><strong>Positions</strong></p>
+<p>The matrix representation for additional object distance <span class="math notranslate nohighlight">\(g\)</span> and image distance <span class="math notranslate nohighlight">\(b\)</span> is given by:</p>
+<div class="math-wrapper docutils container" id="equation-tma-image-distance-mat">
+<div class="math notranslate nohighlight" id="equation-tma-image-distance-mat">
+<span class="eqno">(5.136)<a class="headerlink" href="#equation-tma-image-distance-mat" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}_\text{b,g} =
+\left[\begin{array}{ll}
+1 &amp; b \\
+0 &amp; 1
+\end{array}\right]
+\cdot \text{M} \cdot
+\left[\begin{array}{ll}
+1 &amp; g \\
+0 &amp; 1
+\end{array}\right]\end{split}\]</div>
+</div>
+<p>The distance <span class="math notranslate nohighlight">\(b\)</span> is measured relative to the lens vertex point <span class="math notranslate nohighlight">\(V_2\)</span>
+and the distance <span class="math notranslate nohighlight">\(g\)</span> is measured relative to <span class="math notranslate nohighlight">\(V_1\)</span>,
+with both distances considered positive when oriented towards the positive z-direction.</p>
+<p>For imaging, element <span class="math notranslate nohighlight">\(B_\text{b,g} = \text{M}_\text{b,g}[0, 1]\)</span> needs to be zero.
+This means that the output ray position <span class="math notranslate nohighlight">\(x_2\)</span> is independent of the input angle <span class="math notranslate nohighlight">\(\theta_1\)</span>
+and depending solely on the input position <span class="math notranslate nohighlight">\(x_1\)</span>.</p>
+<p>Consequently, the condition can be expressed as:</p>
+<div class="math-wrapper docutils container" id="equation-tma-image-distance-eq">
+<div class="math notranslate nohighlight" id="equation-tma-image-distance-eq">
+<span class="eqno">(5.137)<a class="headerlink" href="#equation-tma-image-distance-eq" title="Link to this equation">¶</a></span>\[B_\text{b,g} = g (A + C b) + B + D b = 0\]</div>
+</div>
+<p>For <span class="math notranslate nohighlight">\(b, g \in \mathbb{R}\)</span>, the solution is represented as:</p>
+<div class="math-wrapper docutils container" id="equation-tma-image-distance-solution">
+<div class="math notranslate nohighlight" id="equation-tma-image-distance-solution">
+<span class="eqno">(5.138)<a class="headerlink" href="#equation-tma-image-distance-solution" title="Link to this equation">¶</a></span>\[\begin{split}b(g) =
+  \begin{cases}
+ -\frac{B + g A} {D + g C}, &amp;~ \text{for}~~ {D + g C} \neq 0\\
+ \mathbb{R} &amp;~ \text{for}~~ {D + g C} = 0 ~~\text{and}~~ B + g A = 0\\
+ \emptyset &amp;~ \text{for}~~ {D + g C} = 0 ~~\text{and}~~ B + g A \neq 0
+\end{cases}\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-tma-object-distance-solution">
+<div class="math notranslate nohighlight" id="equation-tma-object-distance-solution">
+<span class="eqno">(5.139)<a class="headerlink" href="#equation-tma-object-distance-solution" title="Link to this equation">¶</a></span>\[\begin{split}g(b) =
+  \begin{cases}
+ -\frac{B + b D} {A + b C}, &amp;~ \text{for}~~ {A + b C} \neq 0\\
+ \mathbb{R} &amp;~ \text{for}~~ {A + b C} = 0 ~~\text{and}~~ B + b D = 0\\
+ \emptyset &amp;~ \text{for}~~ {A + b C} = 0 ~~\text{and}~~ B + b D \neq 0
+\end{cases}\end{split}\]</div>
+</div>
+<p>For special cases towards <span class="math notranslate nohighlight">\(\pm\infty\)</span>, we get:</p>
+<div class="math-wrapper docutils container" id="equation-tma-image-distance-solution-special">
+<div class="math notranslate nohighlight" id="equation-tma-image-distance-solution-special">
+<span class="eqno">(5.140)<a class="headerlink" href="#equation-tma-image-distance-solution-special" title="Link to this equation">¶</a></span>\[\begin{split}\lim_{g \to \pm \infty} b(g) =
+   \begin{cases}
+ -\frac{A}{C} &amp;~ \text{for}~~ {C} \neq 0\\
+ \mathbb{R} &amp;~ \text{for}~~ C = 0 ~~\text{and}~~ A = 0\\
+ \emptyset &amp;~ \text{for}~~ C = 0 ~~\text{and}~~ A \neq 0
+\end{cases}\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-tma-object-distance-solution-special">
+<div class="math notranslate nohighlight" id="equation-tma-object-distance-solution-special">
+<span class="eqno">(5.141)<a class="headerlink" href="#equation-tma-object-distance-solution-special" title="Link to this equation">¶</a></span>\[\begin{split}\lim_{b \to \pm \infty} g(b) =
+   \begin{cases}
+ -\frac{D}{C} &amp;~ \text{for}~~ {C} \neq 0\\
+ \mathbb{R} &amp;~ \text{for}~~ C = 0 ~~\text{and}~~ D = 0\\
+ \emptyset &amp;~ \text{for}~~ C = 0 ~~\text{and}~~ D \neq 0
+\end{cases}\end{split}\]</div>
+</div>
+<p>Optrace sets all cases with <span class="math notranslate nohighlight">\(\emptyset, \mathbb{R}\)</span> to NaN (not a number), since both are impractical.</p>
+<p>For <span class="math notranslate nohighlight">\(\text{M} = \text{M}_\text{thin}\)</span> (thin lens approximation) from equation <a class="reference internal" href="#equation-tma-thin-lens">(5.105)</a>
+the equations simplify to:</p>
+<div class="math-wrapper docutils container" id="equation-tma-image-imaging-eq">
+<div class="math notranslate nohighlight" id="equation-tma-image-imaging-eq">
+<span class="eqno">(5.142)<a class="headerlink" href="#equation-tma-image-imaging-eq" title="Link to this equation">¶</a></span>\[b(g) = \frac{fg}{g-\frac{n_i}{n_o}f}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-tma-object-imaging-eq">
+<div class="math notranslate nohighlight" id="equation-tma-object-imaging-eq">
+<span class="eqno">(5.143)<a class="headerlink" href="#equation-tma-object-imaging-eq" title="Link to this equation">¶</a></span>\[g(b) = \frac{\frac{n_i}{n_o}fb}{b-f}\]</div>
+</div>
+<p>These expressions are consistent with the well-known imaging equation:</p>
+<div class="math-wrapper docutils container" id="equation-tma-imaging-eq-n">
+<div class="math notranslate nohighlight" id="equation-tma-imaging-eq-n">
+<span class="eqno">(5.144)<a class="headerlink" href="#equation-tma-imaging-eq-n" title="Link to this equation">¶</a></span>\[\frac{n_o}{f} = \frac{n_i}{g} + \frac{n_o}{b}\]</div>
+</div>
+<p>In the most common scenario, where <span class="math notranslate nohighlight">\(n_i = 1\)</span> and <span class="math notranslate nohighlight">\(n_o = 1\)</span>,
+this simplifies to: <a class="footnote-reference brackets" href="#footcite-linsengleichungwiki" id="id19" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a></p>
+<div class="math-wrapper docutils container" id="equation-tma-imaging-eq-base">
+<div class="math notranslate nohighlight" id="equation-tma-imaging-eq-base">
+<span class="eqno">(5.145)<a class="headerlink" href="#equation-tma-imaging-eq-base" title="Link to this equation">¶</a></span>\[\frac{1}{f} = \frac{1}{g} + \frac{1}{b}\]</div>
+</div>
+<p>Here, <span class="math notranslate nohighlight">\(f\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, and <span class="math notranslate nohighlight">\(g\)</span> are considered positive if measured in the positive z-direction.</p>
+<p><strong>Magnifications</strong></p>
+<p>With a given object and image position, the combined ABCD matrix, as defined in <a class="reference internal" href="#equation-tma-image-distance-mat">(5.136)</a>,
+can be computed.
+Element <span class="math notranslate nohighlight">\(A\)</span> of the matrix corresponds to the magnification factor <span class="math notranslate nohighlight">\(m\)</span>,
+as <span class="math notranslate nohighlight">\(B=0\)</span> applies for this matrix.</p>
+<p>For a thin, ideal lens, the magnification factor <span class="math notranslate nohighlight">\(m\)</span> is equivalent to <span class="math notranslate nohighlight">\(b/g\)</span>.</p>
+<p>The value of this factor conveys significant optical properties.
+Specifically, if <span class="math notranslate nohighlight">\(A &lt; 0\)</span>, the image is inverted, if <span class="math notranslate nohighlight">\(A &gt; 0\)</span>, the image is upright.
+Furthermore, if <span class="math notranslate nohighlight">\(\lvert A \rvert &gt; 1\)</span>, the image experiences a size increase,
+whereas if <span class="math notranslate nohighlight">\(\lvert A \rvert &lt; 1\)</span>, the image undergoes a size decrease.</p>
+<p>Analyzing the value in more detail,
+<span class="math notranslate nohighlight">\(A &lt; 0\)</span> signifies an inverted image, <span class="math notranslate nohighlight">\(A &gt; 0\)</span> an upright image, <span class="math notranslate nohighlight">\(\lvert A \rvert &gt; 1\)</span> a size increase, <span class="math notranslate nohighlight">\(\lvert A \rvert &lt; 1\)</span> a size decrease.</p>
+</section>
+<section id="entrance-and-exit-pupils">
+<span id="pupil-calculation"></span><h2><span class="section-number">5.5.14. </span>Entrance and Exit Pupils<a class="headerlink" href="#entrance-and-exit-pupils" title="Link to this heading">¶</a></h2>
+<p>To calculate the entrance and exit pupils for a given optical system and aperture stop,
+the lens setup is conceptually divided into a front and a rear group.
+The pupils are defined as the image of the aperture stop within the respective group. <a class="footnote-reference brackets" href="#footcite-greivenstop" id="id20" role="doc-noteref"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></a></p>
+<figure class="align-center" id="id25">
+<a class="dark-light reference internal image-reference" href="../_images/pupil_calculation.svg"><img alt="../_images/pupil_calculation.svg" class="dark-light" src="../_images/pupil_calculation.svg" width="850" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.20 </span><span class="caption-text">Visualization of the matrix separation and different distances.</span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>Aperture inside setup</strong></p>
+<p>When the aperture stop is positioned within the lens setup, the system and its matrix <span class="math notranslate nohighlight">\(\text{M}\)</span>
+can be decomposed into three parts:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-separation">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-separation">
+<span class="eqno">(5.146)<a class="headerlink" href="#equation-eq-pupils-separation" title="Link to this equation">¶</a></span>\[\text{M} = \text{M}_\text{rear} \cdot \text{M}_\text{gap} \cdot \text{M}_\text{front}\]</div>
+</div>
+<p>Here, <span class="math notranslate nohighlight">\(\text{M}_\text{front}\)</span> represents the matrix for all surfaces located before the aperture stop,
+while <span class="math notranslate nohighlight">\(\text{M}_\text{rear}\)</span> pertains to those surfaces positioned after the stop.
+The matrix <span class="math notranslate nohighlight">\(\text{M}_\text{gap}\)</span> accounts for the distance in the gap region where the stop is located
+and is not associated with either of the other group.</p>
+<p>The entrance pupil is formed by imaging the stop into the front group,
+whereas the exit pupil is the image of the aperture stop in the rear group.</p>
+<p>The object distance for calculating the exit pupil is:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-gex">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-gex">
+<span class="eqno">(5.147)<a class="headerlink" href="#equation-eq-pupils-gex" title="Link to this equation">¶</a></span>\[g_\text{ex} = V_{1,\text{rear}} - z_\text{s}\]</div>
+</div>
+<p>The exit pupil image distance <span class="math notranslate nohighlight">\(b_\text{ex}\)</span> is determined using <span class="math notranslate nohighlight">\(\text{M}_{b,g} = \text{M}_\text{rear}\)</span>
+and following equation <a class="reference internal" href="#image-object-distance"><span class="std std-numref">Section 5.5.13</span></a>.
+Subsequently, the resulting position <span class="math notranslate nohighlight">\(z_\text{ex}\)</span> is obtained as follows:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-zex">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-zex">
+<span class="eqno">(5.148)<a class="headerlink" href="#equation-eq-pupils-zex" title="Link to this equation">¶</a></span>\[z_\text{ex} = V_{2,\text{rear}} + b_\text{ex}\]</div>
+</div>
+<p>For the entrance pupil, the aperture stop is imaged in the backward direction through <span class="math notranslate nohighlight">\(\text{M}_\text{front}\)</span>
+by inverting the matrix:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-front-inverse">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-front-inverse">
+<span class="eqno">(5.149)<a class="headerlink" href="#equation-eq-pupils-front-inverse" title="Link to this equation">¶</a></span>\[\begin{split}\text{M}^{-1}_\text{front} &amp;= \left[\begin{array}{cc}
+    A &amp; B \\
+    C &amp; D
+    \end{array}\right]^{-1}\\
+ &amp;= \frac{1}{AD - BC}  \left[\begin{array}{cc}
+    D &amp; -B \\
+    -C &amp; A
+    \end{array}\right]\\\end{split}\]</div>
+</div>
+<p>The object distance is negative and calculated with the back vertex of the front group:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-gen">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-gen">
+<span class="eqno">(5.150)<a class="headerlink" href="#equation-eq-pupils-gen" title="Link to this equation">¶</a></span>\[g_\text{en} = V_{2,\text{front}} - z_\text{s}\]</div>
+</div>
+<p>The procedure outlined in <a class="reference internal" href="#image-object-distance"><span class="std std-numref">Section 5.5.13</span></a> is used to compute <span class="math notranslate nohighlight">\(b_\text{en}(g_\text{en})\)</span>,
+setting <span class="math notranslate nohighlight">\(\text{M}_{b,g} = \text{M}^{-1}_\text{front}\)</span>.
+The image distance <span class="math notranslate nohighlight">\(b_\text{en}\)</span> is then added to the front vertex of the front
+group to determine the entrance pupil position:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-zen">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-zen">
+<span class="eqno">(5.151)<a class="headerlink" href="#equation-eq-pupils-zen" title="Link to this equation">¶</a></span>\[z_\text{en} = V_{1,\text{front}} + b_\text{en}\]</div>
+</div>
+<p><strong>Aperture in front of setup</strong></p>
+<p>When the aperture stop is located in front of all lenses, it directly serves as the entrance pupil,
+thus <span class="math notranslate nohighlight">\(z_\text{en} = z_\text{s}\)</span>.
+The exit pupil is then calculated by imaging through all elements using the matrix:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-rear-only">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-rear-only">
+<span class="eqno">(5.152)<a class="headerlink" href="#equation-eq-pupils-rear-only" title="Link to this equation">¶</a></span>\[\text{M}_\text{rear} = \text{M}\]</div>
+</div>
+<p><strong>Aperture behind the setup</strong></p>
+<p>The stop equates to the exit pupil when positioned behind all lenses (<span class="math notranslate nohighlight">\(z_\text{ex} = z_\text{s}\)</span>).
+Then, the entrance pupil is the result of imaging backwards through all elements
+with the procedure above and the matrix:</p>
+<div class="math-wrapper docutils container" id="equation-eq-pupils-front-only">
+<div class="math notranslate nohighlight" id="equation-eq-pupils-front-only">
+<span class="eqno">(5.153)<a class="headerlink" href="#equation-eq-pupils-front-only" title="Link to this equation">¶</a></span>\[\text{M}_\text{front} = \text{M}\]</div>
+</div>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id21">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-ivanoptics" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>Ivan Bazarov. Geometric optics. 2016. URL: <a class="reference external" href="https://www.classe.cornell.edu/~ib38/teaching/p330/Lecture5.pdf">https://www.classe.cornell.edu/~ib38/teaching/p330/Lecture5.pdf</a> (visited on 2022-12-08).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-gilllaser" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>Allan Gillespie. Comparison between charged-particle (CP) and light/laser (L) optics. 2013. URL: <a class="reference external" href="https://indico.cern.ch/event/266133/attachments/474621/656940/Gillespie_Aachen_CP_vs_P_optics.pdf">https://indico.cern.ch/event/266133/attachments/474621/656940/Gillespie_Aachen_CP_vs_P_optics.pdf</a> (visited on 2022-12-06).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-pedrotti-pedrotti-pedrotti-2006" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id6">3</a>,<a role="doc-backlink" href="#id7">4</a>,<a role="doc-backlink" href="#id8">5</a>,<a role="doc-backlink" href="#id10">6</a>,<a role="doc-backlink" href="#id11">7</a>,<a role="doc-backlink" href="#id16">8</a>)</span>
+<p>Frank L. Pedrotti, Leno M. Pedrotti, and Leno S. Pedrotti. Matrix methods in paraxial optics. In <em>Introduction to Optics</em>, chapter 18. PEARSON EDUCATION, 3 edition, 2006.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-kaschke2014" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">4</a><span class="fn-bracket">]</span></span>
+<p>Michael Kaschke, Karl-Heinz Donnerhacke, and Michael Stefan Rill. A: Basics of Optics. In <em>Optical Devices in Ophthalmology and Optometry</em>, pages 481–548. Wiley-VCH Verlag GmbH &amp; Co. KGaA, mar 2014. <a class="reference external" href="https://doi.org/10.1002/9783527648962.app1">doi:10.1002/9783527648962.app1</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-linsenschleiferwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">5</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Linsenschleiferformel. 2022. URL: <a class="reference external" href="https://de.wikipedia.org/wiki/Linsenschleiferformel">https://de.wikipedia.org/wiki/Linsenschleiferformel</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-gullstrandhyper" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">6</a><span class="fn-bracket">]</span></span>
+<p>HyperPhysics. Gullstrand’s Equation Calculations. 2000. URL: <a class="reference external" href="http://hyperphysics.phy-astr.gsu.edu/hbase/geoopt/Gullcal.html">http://hyperphysics.phy-astr.gsu.edu/hbase/geoopt/Gullcal.html</a> (visited on 2022-12-08).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-edmundfocal" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">7</a><span class="fn-bracket">]</span></span>
+<p>Edmund Optics. Focal Length Calculator. 2022. URL: <a class="reference external" href="https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/">https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-dickenabcd" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id15">8</a><span class="fn-bracket">]</span></span>
+<p>David L. Dickensheets. Location of Cardinal Points from the ABCD Matrix for the General Optical System. 2000. URL: <a class="reference external" href="https://www.montana.edu/ddickensheets/documents/abcdCardinal%202.pdf">https://www.montana.edu/ddickensheets/documents/abcdCardinal%202.pdf</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-10-1117-12-805489" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id17">9</a><span class="fn-bracket">]</span></span>
+<p>R. Barry Johnson. Correctly making panoramic imagery and the meaning of optical center. In Pantazis Z Mouroulis, Warren J. Smith, and R. Barry Johnson, editors, <em>Current Developments in Lens Design and Optical Engineering IX</em>, volume 7060, 70600F. International Society for Optics and Photonics, SPIE, 2008. URL: <a class="reference external" href="https://doi.org/10.1117/12.805489">https://doi.org/10.1117/12.805489</a>, <a class="reference external" href="https://doi.org/10.1117/12.805489">doi:10.1117/12.805489</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-jenkins2001fundamentals" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id18">10</a><span class="fn-bracket">]</span></span>
+<p>Francis A Jenkins and Harvey E White. Thick lenses. In <em>Fundamentals of Optics</em>, chapter 5, pages 78–97. McGraw-Hill Professional, 2001.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-linsengleichungwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id19">11</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Linsengleichung. 2022. URL: <a class="reference external" href="https://de.wikipedia.org/wiki/Linsengleichung">https://de.wikipedia.org/wiki/Linsengleichung</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-greivenstop" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">12</a><span class="fn-bracket">]</span></span>
+<p>John E. Greivenkamp. Optical Design and Instrumentation I - Stops and Pupils. 2019. URL: <a class="reference external" href="https://wp.optics.arizona.edu/jgreivenkamp/wp-content/uploads/sites/11/2019/08/502-09-Stops-and-Pupils.pdf">https://wp.optics.arizona.edu/jgreivenkamp/wp-content/uploads/sites/11/2019/08/502-09-Stops-and-Pupils.pdf</a> (visited on 2023-01-13).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="image_spectrum.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">5.4. </span>Image and Spectrum Rendering</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="convolution.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">5.6. </span>PSF Convolution</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

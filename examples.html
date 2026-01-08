@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>1. Example Gallery - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="2. Installation" href="installation.html" /><link rel="prev" title="Optrace 1.7.5 Documentation" href="index.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/examples.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/examples.html"/>
+  <meta property="og:title" content="1. Example Gallery"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href="./examples.html">Examples</a></li><li class="link"><a href="./installation.html">Installation</a></li><li class="link"><a href="./usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#achromat">1.1. Achromat</a></li>
+<li><a class="reference internal" href="#arizona-eye-model">1.2. Arizona Eye Model</a></li>
+<li><a class="reference internal" href="#astigmatism">1.3. Astigmatism</a></li>
+<li><a class="reference internal" href="#brewster-polarizer">1.4. Brewster Polarizer</a></li>
+<li><a class="reference internal" href="#cosine-surfaces">1.5. Cosine Surfaces</a></li>
+<li><a class="reference internal" href="#double-gauss">1.6. Double Gauss</a></li>
+<li><a class="reference internal" href="#gui-automation">1.7. GUI Automation</a></li>
+<li><a class="reference internal" href="#legrand-eye-model">1.8. LeGrand Eye Model</a></li>
+<li><a class="reference internal" href="#hurb-apertures">1.9. HURB Apertures</a></li>
+<li><a class="reference internal" href="#image-render">1.10. Image Render</a></li>
+<li><a class="reference internal" href="#image-render-many-rays">1.11. Image Render Many Rays</a></li>
+<li><a class="reference internal" href="#iol-pinhole-imaging">1.12. IOL Pinhole Imaging</a></li>
+<li><a class="reference internal" href="#iol-target-imaging">1.13. IOL Target Imaging</a></li>
+<li><a class="reference internal" href="#keratoconus">1.14. Keratoconus</a></li>
+<li><a class="reference internal" href="#microscope">1.15. Microscope</a></li>
+<li><a class="reference internal" href="#prism">1.16. Prism</a></li>
+<li><a class="reference internal" href="#psf-imaging">1.17. PSF Imaging</a></li>
+<li><a class="reference internal" href="#refraction-index-presets">1.18. Refraction Index Presets</a></li>
+<li><a class="reference internal" href="#spectrum-presets">1.19. Spectrum Presets</a></li>
+<li><a class="reference internal" href="#sphere-projections">1.20. Sphere Projections</a></li>
+<li><a class="reference internal" href="#spherical-aberration">1.21. Spherical Aberration</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">1. </span>Example Gallery</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/examples.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/examples.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/examples.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/examples.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/examples.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="example-gallery">
+<span id="examples"></span><h1><span class="section-number">1. </span>Example Gallery<a class="headerlink" href="#example-gallery" title="Link to this heading">¶</a></h1>
+<div class="line-block">
+<div class="line">This gallery showcases all optrace examples.</div>
+<div class="line">You can download the full examples.zip archive
+<a class="reference external" href="https://github.com/drocheam/optrace/releases/latest/download/examples.zip">here</a>.</div>
+</div>
+<section id="achromat">
+<span id="example-achromat"></span><h2><span class="section-number">1.1. </span>Achromat<a class="headerlink" href="#achromat" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/achromat.py">examples/achromat.py</a></p>
+<p>This example demonstrates the effect of
+an <a class="reference external" href="https://en.wikipedia.org/wiki/Achromatic_lens">achromatic doublet</a> on the dispersion.
+Ray sources consist of different monochromatic spectral lines to show the different focal lengths.
+The “Use achromatic doublet” option in the “Custom” GUI tab toggles the use of this doublet.
+In the unchecked case a standard doublet with same optical power of 30 D is simulated,
+showing significant longitudinal chromatic aberration (LCA).</p>
+<figure class="align-center" id="id1">
+<a class="dark-light reference internal image-reference" href="_images/example_achromat1.png"><img alt="_images/example_achromat1.png" class="dark-light" src="_images/example_achromat1.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.1 </span><span class="caption-text">Overview of the scene</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id2">
+<a class="dark-light reference internal image-reference" href="_images/example_achromat2.png"><img alt="_images/example_achromat2.png" class="dark-light" src="_images/example_achromat2.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.2 </span><span class="caption-text">Uncorrected case with 1.06 D difference in optical power between blue and red.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id3">
+<a class="dark-light reference internal image-reference" href="_images/example_achromat3.png"><img alt="_images/example_achromat3.png" class="dark-light" src="_images/example_achromat3.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.3 </span><span class="caption-text">The achromatic doublet reduces the LCA to just 0.03 D.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="arizona-eye-model">
+<span id="example-arizona-eye-model"></span><h2><span class="section-number">1.2. </span>Arizona Eye Model<a class="headerlink" href="#arizona-eye-model" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/arizona_eye_model.py">examples/arizona_eye_model.py</a></p>
+<p>This example is a demonstration of human eye vision with adaptation at a distance of 66 cm.
+The <a class="reference external" href="https://support.photonengr.com/article/154-arizona-eye-model">Arizona eye model</a>
+is employed to simulate a resolution chart. This eye model accurately matches on- and off-axis aberration levels
+from clinical data and accounts for wavelength and adaptation dependencies.</p>
+<p>In the “Custom” tab of the GUI there are options available to change the pupil diameter and adaptation of the eye.</p>
+<figure class="align-center" id="id4">
+<a class="dark-light reference internal image-reference" href="_images/example_arizona_eye_scene.png"><img alt="_images/example_arizona_eye_scene.png" class="dark-light" src="_images/example_arizona_eye_scene.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.4 </span><span class="caption-text">The Arizona eye model inside the raytracer.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="table-wrapper table-borderless docutils container" id="id5">
+<table class="table-borderless docutils align-default" id="id5">
+<caption><span class="caption-number">Table 1.1 </span><span class="caption-text">Original resolution chart (left) at 66cm distance imaged with the correctly adapted eye
+with 1.67 D and a pupil of 4mm diameter (right).</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="_images/example_arizona_render1.webp"><img alt="_images/example_arizona_render1.webp" class="dark-light" src="_images/example_arizona_render1.webp" width="450" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="_images/example_arizona_render2.webp"><img alt="_images/example_arizona_render2.webp" class="dark-light" src="_images/example_arizona_render2.webp" width="450" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrapper table-borderless docutils container" id="id6">
+<table class="table-borderless docutils align-default" id="id6">
+<caption><span class="caption-number">Table 1.2 </span><span class="caption-text">Eye adapted with 0.0 D and a 2 mm pupil (left) and a 6 mm pupil (right)</span><a class="headerlink" href="#id6" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="_images/example_arizona_render3.webp"><img alt="_images/example_arizona_render3.webp" class="dark-light" src="_images/example_arizona_render3.webp" width="450" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="_images/example_arizona_render4.webp"><img alt="_images/example_arizona_render4.webp" class="dark-light" src="_images/example_arizona_render4.webp" width="450" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="astigmatism">
+<span id="example-astigmatism"></span><h2><span class="section-number">1.3. </span>Astigmatism<a class="headerlink" href="#astigmatism" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/astigmatism.py">examples/astigmatism.py</a></p>
+<p>This script showcases astigmatism by simulating sagittal and meridional off-axis rays.
+You can control their angle by changing their setting in the “Custom” Tab in the GUI.
+Sagittal (blue) and meridional (red) rays are highlighted in different colors,
+making their focal positions easier to visualize.</p>
+<figure class="align-center" id="id7">
+<a class="dark-light reference internal image-reference" href="_images/example_astigmatism0.png"><img alt="_images/example_astigmatism0.png" class="dark-light" src="_images/example_astigmatism0.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.5 </span><span class="caption-text">On-axis case</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id8">
+<a class="dark-light reference internal image-reference" href="_images/example_astigmatism1.png"><img alt="_images/example_astigmatism1.png" class="dark-light" src="_images/example_astigmatism1.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.6 </span><span class="caption-text">Off-axis case</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id9">
+<a class="dark-light reference internal image-reference" href="_images/example_astigmatism2.png"><img alt="_images/example_astigmatism2.png" class="dark-light" src="_images/example_astigmatism2.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.7 </span><span class="caption-text">Off-axis case, zoomed in</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="brewster-polarizer">
+<span id="example-brewster-polarizer"></span><h2><span class="section-number">1.4. </span>Brewster Polarizer<a class="headerlink" href="#brewster-polarizer" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>:
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/brewster_polarizer.py">examples/brewster_polarizer.py</a></p>
+<p>A setup with three different light rays impinging on multiple planar surfaces
+with an incident angle equal to the <a class="reference external" href="https://en.wikipedia.org/wiki/Brewster%27s_angle">Brewster angle</a>.
+Depending on the polarization direction we can see a huge difference in the light’s transmission.</p>
+<figure class="align-center" id="id10">
+<a class="dark-light reference internal image-reference" href="_images/example_brewster.png"><img alt="_images/example_brewster.png" class="dark-light" src="_images/example_brewster.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.8 </span><span class="caption-text">Brewster angle demonstration.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="cosine-surfaces">
+<span id="example-cosine-surfaces"></span><h2><span class="section-number">1.5. </span>Cosine Surfaces<a class="headerlink" href="#cosine-surfaces" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/cosine_surfaces.py">examples/cosine_surfaces.py</a></p>
+<p>An example with two lenses with orthogonal cosine modulations on each side.
+Creates rectangular, kaleidoscope-like images inside the beam path.</p>
+<figure class="align-center" id="id11">
+<a class="dark-light reference internal image-reference" href="_images/example_cosine_surfaces1.png"><img alt="_images/example_cosine_surfaces1.png" class="dark-light" src="_images/example_cosine_surfaces1.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.9 </span><span class="caption-text">Scene overview.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id12">
+<a class="dark-light reference internal image-reference" href="_images/example_cosine_surfaces2.webp"><img alt="_images/example_cosine_surfaces2.webp" class="dark-light" src="_images/example_cosine_surfaces2.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.10 </span><span class="caption-text">First detector image</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id13">
+<a class="dark-light reference internal image-reference" href="_images/example_cosine_surfaces3.webp"><img alt="_images/example_cosine_surfaces3.webp" class="dark-light" src="_images/example_cosine_surfaces3.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.11 </span><span class="caption-text">Second detector image</span><a class="headerlink" href="#id13" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="double-gauss">
+<span id="example-double-gauss"></span><h2><span class="section-number">1.6. </span>Double Gauss<a class="headerlink" href="#double-gauss" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/double_gauss.py">examples/double_gauss.py</a></p>
+<p>Example simulation of the double gauss Nikkor Wakamiya, 100mm, f1.4 objective.
+The simulation traces point sources from a distance of -50m and renders their PSF.
+Each point source is shown in a different color.</p>
+<div class="table-wrapper colwidths-given docutils container" id="id14">
+<table class="docutils align-default" id="id14" style="width: 800px">
+<caption><span class="caption-number">Table 1.3 </span><span class="caption-text">Elements of the objective, see
+<a class="reference external" href="https://nbviewer.org/github/quartiq/rayopt-notebooks/blob/master/Nikkor-Wakamiya-50mmf1.4_Ex1.ipynb">here</a></span><a class="headerlink" href="#id14" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>T</p></th>
+<th class="head"><p>Distance</p></th>
+<th class="head"><p>Rad Curv</p></th>
+<th class="head"><p>Diameter</p></th>
+<th class="head"><p>Material</p></th>
+<th class="head"><p>n</p></th>
+<th class="head"><p>nd</p></th>
+<th class="head"><p>Vd</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>S</p></td>
+<td><p>20</p></td>
+<td><p>inf</p></td>
+<td><p>100</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>S</p></td>
+<td><p>5</p></td>
+<td><p>78.36</p></td>
+<td><p>76</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>1.797</p></td>
+<td><p>1.797</p></td>
+<td><p>45.50</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>S</p></td>
+<td><p>9.8837</p></td>
+<td><p>469.5</p></td>
+<td><p>76</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>S</p></td>
+<td><p>0.1938</p></td>
+<td><p>50.3</p></td>
+<td><p>64</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>1.773</p></td>
+<td><p>1.773</p></td>
+<td><p>49.40</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>S</p></td>
+<td><p>9.1085</p></td>
+<td><p>74.38</p></td>
+<td><p>62</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>S</p></td>
+<td><p>2.9457</p></td>
+<td><p>138.1</p></td>
+<td><p>60</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>1.673</p></td>
+<td><p>1.673</p></td>
+<td><p>32.20</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>S</p></td>
+<td><p>2.3256</p></td>
+<td><p>34.33</p></td>
+<td><p>51</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>S</p></td>
+<td><p>16.07</p></td>
+<td><p>inf</p></td>
+<td><p>49.6</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>S</p></td>
+<td><p>13</p></td>
+<td><p>-34.41</p></td>
+<td><p>48.8</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>1.740</p></td>
+<td><p>1.740</p></td>
+<td><p>28.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>S</p></td>
+<td><p>1.938</p></td>
+<td><p>-2907</p></td>
+<td><p>57</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>1.773</p></td>
+<td><p>1.773</p></td>
+<td><p>49.40</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>S</p></td>
+<td><p>12.403</p></td>
+<td><p>-59.05</p></td>
+<td><p>60</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>S</p></td>
+<td><p>0.3876</p></td>
+<td><p>-150.9</p></td>
+<td><p>66.8</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>1.788</p></td>
+<td><p>1.788</p></td>
+<td><p>47.50</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>S</p></td>
+<td><p>8.333</p></td>
+<td><p>-57.89</p></td>
+<td><p>67.8</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>S</p></td>
+<td><p>0.1938</p></td>
+<td><p>284.6</p></td>
+<td><p>66</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>1.788</p></td>
+<td><p>1.788</p></td>
+<td><p>47.50</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>S</p></td>
+<td><p>5.0388</p></td>
+<td><p>-253.2</p></td>
+<td><p>66</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>S</p></td>
+<td><p>73.839</p></td>
+<td><p>inf</p></td>
+<td><p>86.53</p></td>
+<td><p>basic/air</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+<td><p>89.30</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center" id="id15">
+<a class="reference internal image-reference" href="_images/example_double_gauss.png"><img alt="_images/example_double_gauss.png" src="_images/example_double_gauss.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.12 </span><span class="caption-text">Side view of the objective.</span><a class="headerlink" href="#id15" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id16">
+<a class="dark-light reference internal image-reference" href="_images/example_double_gauss2.webp"><img alt="_images/example_double_gauss2.webp" class="dark-light" src="_images/example_double_gauss2.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.13 </span><span class="caption-text">PSF of point source with 10° to the optical axis.</span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id17">
+<a class="dark-light reference internal image-reference" href="_images/example_double_gauss3.webp"><img alt="_images/example_double_gauss3.webp" class="dark-light" src="_images/example_double_gauss3.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.14 </span><span class="caption-text">PSF of point source with 20° to the optical axis.</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="gui-automation">
+<span id="example-gui-automation"></span><h2><span class="section-number">1.7. </span>GUI Automation<a class="headerlink" href="#gui-automation" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/gui_automation.py">examples/gui_automation.py</a></p>
+<p>An example of GUI automation.
+Position and size of a line source that illuminates a sphere lens are varied at runtime.
+There is a clearly visible spherical aberration of the lens.
+The automation function can be rerun by pressing the button in the “Custom” GUI tab.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id18">
+<a class="dark-light reference internal image-reference" href="_images/example_gui_automation_1.png"><img alt="_images/example_gui_automation_1.png" class="dark-light" src="_images/example_gui_automation_1.png" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.15 </span><span class="caption-text">Spherical aberration of a shift ray beam.</span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id19">
+<a class="dark-light reference internal image-reference" href="_images/example_gui_automation_2.png"><img alt="_images/example_gui_automation_2.png" class="dark-light" src="_images/example_gui_automation_2.png" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.16 </span><span class="caption-text">Combined spherical aberration.</span><a class="headerlink" href="#id19" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="legrand-eye-model">
+<span id="example-legrand-eye-model"></span><h2><span class="section-number">1.8. </span>LeGrand Eye Model<a class="headerlink" href="#legrand-eye-model" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/legrand_eye_model.py">examples/legrand_eye_model.py</a></p>
+<p>A geometry with the paraxial LeGrand eye model.
+Cardinal points, exit and entrance pupils are calculated and marked inside the scene.</p>
+<figure class="align-center" id="id20">
+<a class="dark-light reference internal image-reference" href="_images/example_legrand1.png"><img alt="_images/example_legrand1.png" class="dark-light" src="_images/example_legrand1.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.17 </span><span class="caption-text">Eye model side view.</span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id21">
+<a class="dark-light reference internal image-reference" href="_images/example_legrand2.png"><img alt="_images/example_legrand2.png" class="dark-light" src="_images/example_legrand2.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.18 </span><span class="caption-text">Tilted view with visible pupil.</span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="hurb-apertures">
+<span id="example-hurb-apertures"></span><h2><span class="section-number">1.9. </span>HURB Apertures<a class="headerlink" href="#hurb-apertures" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/hurb_apertures.py">examples/hurb_apertures.py</a></p>
+<p>This example demonstrates the diffraction approximation through Heisenberg uncertainty ray bending (HURB)
+of multiple aperture shapes.
+You can read more about HURB in section <a class="reference internal" href="details/hurb.html#hurb-details"><span class="std std-numref">Section 5.3</span></a>.</p>
+<p>Different apertures can be selected in the “custom” tab of the GUI.</p>
+<figure class="align-center">
+<a class="dark-light reference internal image-reference" href="_images/example_hurb_scene.png"><img alt="_images/example_hurb_scene.png" class="dark-light" src="_images/example_hurb_scene.png" width="600" />
+</a>
+</figure>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id22">
+<a class="dark-light reference internal image-reference" href="_images/example_hurb_square.webp"><img alt="_images/example_hurb_square.webp" class="dark-light" src="_images/example_hurb_square.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.19 </span><span class="caption-text">Approximated diffraction pattern of a square aperture.</span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id23">
+<a class="dark-light reference internal image-reference" href="_images/example_hurb_slit.webp"><img alt="_images/example_hurb_slit.webp" class="dark-light" src="_images/example_hurb_slit.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.20 </span><span class="caption-text">Approximated diffraction pattern of a slit aperture.</span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id24">
+<a class="dark-light reference internal image-reference" href="_images/example_hurb_pinhole.webp"><img alt="_images/example_hurb_pinhole.webp" class="dark-light" src="_images/example_hurb_pinhole.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.21 </span><span class="caption-text">Approximated diffraction pattern of a pinhole aperture.</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id25">
+<a class="dark-light reference internal image-reference" href="_images/example_hurb_edge.webp"><img alt="_images/example_hurb_edge.webp" class="dark-light" src="_images/example_hurb_edge.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.22 </span><span class="caption-text">Approximated diffraction pattern of an edge.</span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="image-render">
+<span id="example-image-render"></span><h2><span class="section-number">1.10. </span>Image Render<a class="headerlink" href="#image-render" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/image_render.py">examples/image_render.py</a></p>
+<p>A simple imaging system consisting of a single lens.
+Spherical aberration and distortion are apparent.
+By using the aperture stop the aberrations can be limited, approximating the paraxial case for a very small diameter.
+The size of the stop and the test image are parameterizable through the “Custom” GUI tab.</p>
+<figure class="align-center" id="id26">
+<a class="dark-light reference internal image-reference" href="_images/example_image_render_1.png"><img alt="_images/example_image_render_1.png" class="dark-light" src="_images/example_image_render_1.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.23 </span><span class="caption-text">Scene overview for a aperture radius o 3.0 mm.</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id27">
+<a class="dark-light reference internal image-reference" href="_images/example_image_render_2.webp"><img alt="_images/example_image_render_2.webp" class="dark-light" src="_images/example_image_render_2.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.24 </span><span class="caption-text">Source Image</span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id28">
+<a class="dark-light reference internal image-reference" href="_images/example_image_render_3.webp"><img alt="_images/example_image_render_3.webp" class="dark-light" src="_images/example_image_render_3.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.25 </span><span class="caption-text">Detector image with a 1.5 mm stop radius.</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id29">
+<a class="dark-light reference internal image-reference" href="_images/example_image_render_4.webp"><img alt="_images/example_image_render_4.webp" class="dark-light" src="_images/example_image_render_4.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.26 </span><span class="caption-text">Detector image with a 3.0 mm stop radius.</span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id30">
+<a class="dark-light reference internal image-reference" href="_images/example_image_render_5.webp"><img alt="_images/example_image_render_5.webp" class="dark-light" src="_images/example_image_render_5.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.27 </span><span class="caption-text">Grid source image.</span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id31">
+<a class="dark-light reference internal image-reference" href="_images/example_image_render_6.webp"><img alt="_images/example_image_render_6.webp" class="dark-light" src="_images/example_image_render_6.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.28 </span><span class="caption-text">Detector image with a 1.5 mm stop radius.</span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Note that the paraxial image distance and the best fitting image distance for a high aberration setup differ.
+This is why you should move the detector to larger z-positions when decreasing the stop size.</p>
+</section>
+<section id="image-render-many-rays">
+<span id="example-image-render-many-rays"></span><h2><span class="section-number">1.11. </span>Image Render Many Rays<a class="headerlink" href="#image-render-many-rays" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>:
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/image_render_many_rays.py">examples/image_render_many_rays.py</a></p>
+<p>Comparable to the <a class="reference internal" href="#example-image-render"><span class="std std-ref">Image Render</span></a> example.
+Same lens setup, but it is traced with many more rays by using the iterative render functionality.
+This is done for multiple image distances and without needing to start a GUI.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id32">
+<a class="dark-light reference internal image-reference" href="_images/example_rgb_render1.webp"><img alt="_images/example_rgb_render1.webp" class="dark-light" src="_images/example_rgb_render1.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.29 </span><span class="caption-text">Detector image at z = 15 mm.</span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id33">
+<a class="dark-light reference internal image-reference" href="_images/example_rgb_render2.webp"><img alt="_images/example_rgb_render2.webp" class="dark-light" src="_images/example_rgb_render2.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.30 </span><span class="caption-text">Detector image at z = 20 mm.</span><a class="headerlink" href="#id33" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id34">
+<a class="dark-light reference internal image-reference" href="_images/example_rgb_render3.webp"><img alt="_images/example_rgb_render3.webp" class="dark-light" src="_images/example_rgb_render3.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.31 </span><span class="caption-text">Detector image at z = 25 mm.</span><a class="headerlink" href="#id34" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id35">
+<a class="dark-light reference internal image-reference" href="_images/example_rgb_render4.webp"><img alt="_images/example_rgb_render4.webp" class="dark-light" src="_images/example_rgb_render4.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.32 </span><span class="caption-text">Detector image at z = 29 mm.</span><a class="headerlink" href="#id35" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-odd"><td><figure class="align-center" id="id36">
+<a class="dark-light reference internal image-reference" href="_images/example_rgb_render5.webp"><img alt="_images/example_rgb_render5.webp" class="dark-light" src="_images/example_rgb_render5.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.33 </span><span class="caption-text">Detector image at z = 31 mm.</span><a class="headerlink" href="#id36" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id37">
+<a class="dark-light reference internal image-reference" href="_images/example_rgb_render6.webp"><img alt="_images/example_rgb_render6.webp" class="dark-light" src="_images/example_rgb_render6.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.34 </span><span class="caption-text">Detector image at z = 36 mm.</span><a class="headerlink" href="#id37" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="iol-pinhole-imaging">
+<span id="example-iol-pinhole-imaging"></span><h2><span class="section-number">1.12. </span>IOL Pinhole Imaging<a class="headerlink" href="#iol-pinhole-imaging" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>:
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/IOL_pinhole_imaging.py">examples/IOL_pinhole_imaging.py</a></p>
+<p>Simulation of an Alcon IQ intraocular lens (IOL) in the Arizona Eye Model.
+A pinhole is rendered for three different viewing distances.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id38">
+<a class="dark-light reference internal image-reference" href="_images/example_IOL_pinhole_0D.webp"><img alt="_images/example_IOL_pinhole_0D.webp" class="dark-light" src="_images/example_IOL_pinhole_0D.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.35 </span><span class="caption-text">0.01 D defocus.</span><a class="headerlink" href="#id38" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id39">
+<a class="dark-light reference internal image-reference" href="_images/example_IOL_pinhole_075D.webp"><img alt="_images/example_IOL_pinhole_075D.webp" class="dark-light" src="_images/example_IOL_pinhole_075D.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.36 </span><span class="caption-text">0.75 D defocus.</span><a class="headerlink" href="#id39" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id40">
+<a class="dark-light reference internal image-reference" href="_images/example_IOL_pinhole_150D.webp"><img alt="_images/example_IOL_pinhole_150D.webp" class="dark-light" src="_images/example_IOL_pinhole_150D.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.37 </span><span class="caption-text">1.50 D defocus.</span><a class="headerlink" href="#id40" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="iol-target-imaging">
+<span id="example-iol-target-imaging"></span><h2><span class="section-number">1.13. </span>IOL Target Imaging<a class="headerlink" href="#iol-target-imaging" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>:
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/IOL_target_imaging.py">examples/IOL_target_imaging.py</a></p>
+<p>Simulation of an Alcon IQ intraocular lens (IOL) in the Arizona Eye Model.
+An ETDRS chart is rendered for three different viewing distances.
+You can change distance, angle, pupil and image parameters from within the script.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id41">
+<a class="dark-light reference internal image-reference" href="_images/example_IOL_target_0D.webp"><img alt="_images/example_IOL_target_0D.webp" class="dark-light" src="_images/example_IOL_target_0D.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.38 </span><span class="caption-text">0.01 D defocus.</span><a class="headerlink" href="#id41" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id42">
+<a class="dark-light reference internal image-reference" href="_images/example_IOL_target_075D.webp"><img alt="_images/example_IOL_target_075D.webp" class="dark-light" src="_images/example_IOL_target_075D.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.39 </span><span class="caption-text">0.75 D defocus.</span><a class="headerlink" href="#id42" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id43">
+<a class="dark-light reference internal image-reference" href="_images/example_IOL_target_150D.webp"><img alt="_images/example_IOL_target_150D.webp" class="dark-light" src="_images/example_IOL_target_150D.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.40 </span><span class="caption-text">1.50 D defocus.</span><a class="headerlink" href="#id43" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="keratoconus">
+<span id="example-keratoconus"></span><h2><span class="section-number">1.14. </span>Keratoconus<a class="headerlink" href="#keratoconus" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/keratoconus.py">examples/keratoconus.py</a></p>
+<p>A simulation of vision through a patient’s eye with
+progressing levels of <a class="reference external" href="https://en.wikipedia.org/wiki/Keratoconus">keratoconus</a>.
+Parameters are taken from the work of <a class="reference external" href="https://doi.org/10.1167/8.2.13">Tan et al. (2008)</a>.</p>
+<div class="table-wrapper table-borderless docutils container" id="id44">
+<table class="table-borderless docutils align-default" id="id44">
+<caption><span class="caption-number">Table 1.4 </span><span class="caption-text">Simulated images for different keratoconus stages.</span><a class="headerlink" href="#id44" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id45">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_1.webp"><img alt="_images/example_keratoconus_1.webp" class="dark-light" src="_images/example_keratoconus_1.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.41 </span><span class="caption-text">Healthy eye.</span><a class="headerlink" href="#id45" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id46">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_2.webp"><img alt="_images/example_keratoconus_2.webp" class="dark-light" src="_images/example_keratoconus_2.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.42 </span><span class="caption-text">Mild keratoconus.</span><a class="headerlink" href="#id46" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id47">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_3.webp"><img alt="_images/example_keratoconus_3.webp" class="dark-light" src="_images/example_keratoconus_3.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.43 </span><span class="caption-text">Advanced keratoconus.</span><a class="headerlink" href="#id47" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id48">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_4.webp"><img alt="_images/example_keratoconus_4.webp" class="dark-light" src="_images/example_keratoconus_4.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.44 </span><span class="caption-text">Severe keratoconus.</span><a class="headerlink" href="#id48" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Inside the python script you can set the option <code class="code highlight python docutils literal highlight-python"><span class="n">show_psf</span><span class="o">=</span><span class="kc">True</span></code> to also plot die PSF for each case.</p>
+<div class="table-wrapper table-borderless docutils container" id="id49">
+<table class="table-borderless docutils align-default" id="id49">
+<caption><span class="caption-number">Table 1.5 </span><span class="caption-text">PSFs for each case. Note the different scale.</span><a class="headerlink" href="#id49" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id50">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_5.webp"><img alt="_images/example_keratoconus_5.webp" class="dark-light" src="_images/example_keratoconus_5.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.45 </span><span class="caption-text">PSF for the healthy eye.</span><a class="headerlink" href="#id50" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id51">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_6.webp"><img alt="_images/example_keratoconus_6.webp" class="dark-light" src="_images/example_keratoconus_6.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.46 </span><span class="caption-text">PSF for mild keratoconus.</span><a class="headerlink" href="#id51" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id52">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_7.webp"><img alt="_images/example_keratoconus_7.webp" class="dark-light" src="_images/example_keratoconus_7.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.47 </span><span class="caption-text">PSF for advanced keratoconus.</span><a class="headerlink" href="#id52" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id53">
+<a class="dark-light reference internal image-reference" href="_images/example_keratoconus_8.webp"><img alt="_images/example_keratoconus_8.webp" class="dark-light" src="_images/example_keratoconus_8.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.48 </span><span class="caption-text">PSF for severe keratoconus.</span><a class="headerlink" href="#id53" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="microscope">
+<span id="example-microscope"></span><h2><span class="section-number">1.15. </span>Microscope<a class="headerlink" href="#microscope" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/microscope.py">examples/microscope.py</a></p>
+<p>A more complex microscope setup with a objective, tube and eyepiece group as well as the human eye as imaging system.
+The infinity corrected microscope is loaded in multiple parts from ZEMAX (.zmx) files
+that are were built from patent data.</p>
+<figure class="align-center" id="id54">
+<a class="dark-light reference internal image-reference" href="_images/example_microscope0.png"><img alt="_images/example_microscope0.png" class="dark-light" src="_images/example_microscope0.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.49 </span><span class="caption-text">Overview of the imaging system.</span><a class="headerlink" href="#id54" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id55">
+<a class="dark-light reference internal image-reference" href="_images/example_microscope1.webp"><img alt="_images/example_microscope1.webp" class="dark-light" src="_images/example_microscope1.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.50 </span><span class="caption-text">Intermediate image.</span><a class="headerlink" href="#id55" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id56">
+<a class="dark-light reference internal image-reference" href="_images/example_microscope2.webp"><img alt="_images/example_microscope2.webp" class="dark-light" src="_images/example_microscope2.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.51 </span><span class="caption-text">Human visible image.</span><a class="headerlink" href="#id56" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="prism">
+<span id="example-prism"></span><h2><span class="section-number">1.16. </span>Prism<a class="headerlink" href="#prism" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/prism.py">examples/prism.py</a></p>
+<p>A prism example where light is split into its spectral components.
+Light spectrum and materials are parameterizable through the “Custom” GUI tab.</p>
+<figure class="align-center" id="id57">
+<a class="dark-light reference internal image-reference" href="_images/example_prism.png"><img alt="_images/example_prism.png" class="dark-light" src="_images/example_prism.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.52 </span><span class="caption-text">Light propagation side view.</span><a class="headerlink" href="#id57" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id58">
+<a class="dark-light reference internal image-reference" href="_images/example_prism_5.webp"><img alt="_images/example_prism_5.webp" class="dark-light" src="_images/example_prism_5.webp" width="450" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.53 </span><span class="caption-text">D65 daylight spectrum.</span><a class="headerlink" href="#id58" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id59">
+<a class="dark-light reference internal image-reference" href="_images/example_prism_6.webp"><img alt="_images/example_prism_6.webp" class="dark-light" src="_images/example_prism_6.webp" width="450" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.54 </span><span class="caption-text">F11 flourescent light spectrum.</span><a class="headerlink" href="#id59" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id60">
+<a class="dark-light reference internal image-reference" href="_images/example_prism_2.webp"><img alt="_images/example_prism_2.webp" class="dark-light" src="_images/example_prism_2.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.55 </span><span class="caption-text">Detector image for a D65 light spectrum and LAK8 (Abbe number 53.83).</span><a class="headerlink" href="#id60" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id61">
+<a class="dark-light reference internal image-reference" href="_images/example_prism_3.webp"><img alt="_images/example_prism_3.webp" class="dark-light" src="_images/example_prism_3.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.56 </span><span class="caption-text">Detector image for a F11 light spectrum and LAK8 (Abbe number 53.83).</span><a class="headerlink" href="#id61" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id62">
+<a class="dark-light reference internal image-reference" href="_images/example_prism_4.webp"><img alt="_images/example_prism_4.webp" class="dark-light" src="_images/example_prism_4.webp" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.57 </span><span class="caption-text">Detector image for a F11 light spectrum and LAK8 (Abbe number 28.53).</span><a class="headerlink" href="#id62" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="psf-imaging">
+<span id="example-psf-imaging"></span><h2><span class="section-number">1.17. </span>PSF Imaging<a class="headerlink" href="#psf-imaging" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/psf_imaging.py">examples/psf_imaging.py</a></p>
+<p>Demonstrates image formation by convolution of a resolution chart and a halo PSF.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id63">
+<a class="dark-light reference internal image-reference" href="_images/example_psf1.webp"><img alt="_images/example_psf1.webp" class="dark-light" src="_images/example_psf1.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.58 </span><span class="caption-text">Resolution chart.</span><a class="headerlink" href="#id63" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id64">
+<a class="dark-light reference internal image-reference" href="_images/example_psf2.webp"><img alt="_images/example_psf2.webp" class="dark-light" src="_images/example_psf2.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.59 </span><span class="caption-text">PSF, plotted in linear intensity.</span><a class="headerlink" href="#id64" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center" id="id65">
+<a class="dark-light reference internal image-reference" href="_images/example_psf3.webp"><img alt="_images/example_psf3.webp" class="dark-light" src="_images/example_psf3.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.60 </span><span class="caption-text">Resulting image. Displayed linear to human perception.</span><a class="headerlink" href="#id65" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="refraction-index-presets">
+<span id="example-refraction-index-presets"></span><h2><span class="section-number">1.18. </span>Refraction Index Presets<a class="headerlink" href="#refraction-index-presets" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>:
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/refraction_index_presets.py">examples/refraction_index_presets.py</a></p>
+<p>This example displays different plots for the refraction index presets.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id66">
+<a class="dark-light reference internal image-reference" href="_images/glass_presets_n.svg"><img alt="_images/glass_presets_n.svg" class="dark-light" src="_images/glass_presets_n.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.61 </span><span class="caption-text">Refractive index curve for glasses.</span><a class="headerlink" href="#id66" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id67">
+<a class="dark-light reference internal image-reference" href="_images/glass_presets_V.svg"><img alt="_images/glass_presets_V.svg" class="dark-light" src="_images/glass_presets_V.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.62 </span><span class="caption-text">Abbe number diagram for glasses.</span><a class="headerlink" href="#id67" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id68">
+<a class="dark-light reference internal image-reference" href="_images/plastics_presets_n.svg"><img alt="_images/plastics_presets_n.svg" class="dark-light" src="_images/plastics_presets_n.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.63 </span><span class="caption-text">Refractive index curve for plastics.</span><a class="headerlink" href="#id68" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id69">
+<a class="dark-light reference internal image-reference" href="_images/plastics_presets_V.svg"><img alt="_images/plastics_presets_V.svg" class="dark-light" src="_images/plastics_presets_V.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.64 </span><span class="caption-text">Abbe number diagram for plastics.</span><a class="headerlink" href="#id69" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-odd"><td><figure class="align-center" id="id70">
+<a class="dark-light reference internal image-reference" href="_images/misc_presets_n.svg"><img alt="_images/misc_presets_n.svg" class="dark-light" src="_images/misc_presets_n.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.65 </span><span class="caption-text">Refractive index curve for miscellaneous materials.</span><a class="headerlink" href="#id70" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id71">
+<a class="dark-light reference internal image-reference" href="_images/misc_presets_V.svg"><img alt="_images/misc_presets_V.svg" class="dark-light" src="_images/misc_presets_V.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.66 </span><span class="caption-text">Abbe number diagram for miscellaneous materials.</span><a class="headerlink" href="#id71" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="spectrum-presets">
+<span id="example-spectrum-presets"></span><h2><span class="section-number">1.19. </span>Spectrum Presets<a class="headerlink" href="#spectrum-presets" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>: <a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/spectrum_presets.py">examples/spectrum_presets.py</a></p>
+<p>An example loading multiple light spectrum plots, including the sRGB primaries and standard illuminants.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id72">
+<a class="dark-light reference internal image-reference" href="_images/Standard_illuminants.svg"><img alt="_images/Standard_illuminants.svg" class="dark-light" src="_images/Standard_illuminants.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.67 </span><span class="caption-text">CIE standard illuminants.</span><a class="headerlink" href="#id72" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id73">
+<a class="dark-light reference internal image-reference" href="_images/LED_illuminants.svg"><img alt="_images/LED_illuminants.svg" class="dark-light" src="_images/LED_illuminants.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.68 </span><span class="caption-text">CIE LED standard illuminants.</span><a class="headerlink" href="#id73" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id74">
+<a class="dark-light reference internal image-reference" href="_images/Fluor_illuminants.svg"><img alt="_images/Fluor_illuminants.svg" class="dark-light" src="_images/Fluor_illuminants.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.69 </span><span class="caption-text">Selected CIE flourescent lamp illuminants.</span><a class="headerlink" href="#id74" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id75">
+<a class="dark-light reference internal image-reference" href="_images/srgb_spectrum.svg"><img alt="_images/srgb_spectrum.svg" class="dark-light" src="_images/srgb_spectrum.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.70 </span><span class="caption-text">Exemplary spectral curves for the sRGB color space primaries.</span><a class="headerlink" href="#id75" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center" id="id76">
+<a class="dark-light reference internal image-reference" href="_images/cie_cmf.svg"><img alt="_images/cie_cmf.svg" class="dark-light" src="_images/cie_cmf.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.71 </span><span class="caption-text">Color matching functions for the CIE 1931 XYZ 2° standard observer.</span><a class="headerlink" href="#id76" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="sphere-projections">
+<span id="example-sphere-projections"></span><h2><span class="section-number">1.20. </span>Sphere Projections<a class="headerlink" href="#sphere-projections" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>:
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/sphere_projections.py">examples/sphere_projections.py</a></p>
+<p>This script demonstrates the effect of different projections methods for a spherical surface detector.
+Multiple point sources emit an angular cone spectrum from the spherical center of a spherical detector.
+The detector view then displays an equivalent
+of a <a class="reference external" href="https://en.wikipedia.org/wiki/Tissot%27s_indicatrix">Tissot’s indicatrix</a>.</p>
+<figure class="align-center" id="id77">
+<a class="dark-light reference internal image-reference" href="_images/example_sphere_projections.png"><img alt="_images/example_sphere_projections.png" class="dark-light" src="_images/example_sphere_projections.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.72 </span><span class="caption-text">Scene overview.</span><a class="headerlink" href="#id77" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id78">
+<a class="dark-light reference internal image-reference" href="_images/indicatrix_equidistant.webp"><img alt="_images/indicatrix_equidistant.webp" class="dark-light" src="_images/indicatrix_equidistant.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.73 </span><span class="caption-text">Equidistant map projection.</span><a class="headerlink" href="#id78" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id79">
+<a class="dark-light reference internal image-reference" href="_images/indicatrix_equal_area.webp"><img alt="_images/indicatrix_equal_area.webp" class="dark-light" src="_images/indicatrix_equal_area.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.74 </span><span class="caption-text">Equal-Area map projection.</span><a class="headerlink" href="#id79" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id80">
+<a class="dark-light reference internal image-reference" href="_images/indicatrix_stereographic.webp"><img alt="_images/indicatrix_stereographic.webp" class="dark-light" src="_images/indicatrix_stereographic.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.75 </span><span class="caption-text">Stereographic map projection.</span><a class="headerlink" href="#id80" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id81">
+<a class="dark-light reference internal image-reference" href="_images/indicatrix_orthographic.webp"><img alt="_images/indicatrix_orthographic.webp" class="dark-light" src="_images/indicatrix_orthographic.webp" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.76 </span><span class="caption-text">Orthographic map projection.</span><a class="headerlink" href="#id81" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="spherical-aberration">
+<span id="example-spherical-aberration"></span><h2><span class="section-number">1.21. </span>Spherical Aberration<a class="headerlink" href="#spherical-aberration" title="Link to this heading">¶</a></h2>
+<p><strong>File</strong>:
+<a class="reference external" href="https://github.com/drocheam/optrace/blob/main/examples/spherical_aberration.py">examples/spherical_aberration.py</a></p>
+<p>The example demonstrates the refractive error of a spherical sources by tracing a paraxial
+and a non-paraxial light beam for comparison.
+This is the <a class="reference internal" href="quickstart.html#quickstart"><span class="std std-ref">Quickstart</span></a> example with many explanations in the code’s comments.</p>
+<figure class="align-center" id="id82">
+<a class="dark-light reference internal image-reference" href="_images/example_spherical_aberration1.png"><img alt="_images/example_spherical_aberration1.png" class="dark-light" src="_images/example_spherical_aberration1.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.77 </span><span class="caption-text">Side view of the setup.</span><a class="headerlink" href="#id82" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id83">
+<a class="dark-light reference internal image-reference" href="_images/example_spherical_aberration2.png"><img alt="_images/example_spherical_aberration2.png" class="dark-light" src="_images/example_spherical_aberration2.png" width="720" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.78 </span><span class="caption-text">Zoomed-in focal region.</span><a class="headerlink" href="#id83" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Home</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="installation.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">2. </span>Installation</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=5b045848"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/shibuya.js?v=cac61aee"></script></body>
+</html>

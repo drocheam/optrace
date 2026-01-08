@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>4.12. Plotting Functions - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.13. GUI Interaction" href="gui.html" /><link rel="prev" title="4.11. PSF Convolution" href="convolve.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/usage/plots.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/usage/plots.html"/>
+  <meta property="og:title" content="4.12. Plotting Functions"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#namespace">4.12.1. Namespace</a></li>
+<li><a class="reference internal" href="#parameters">4.12.2. Parameters</a></li>
+<li><a class="reference internal" href="#block-pause-plots">4.12.3. Block/Pause Plots</a></li>
+<li><a class="reference internal" href="#saving-figures">4.12.4. Saving Figures</a></li>
+<li><a class="reference internal" href="#plotting-surfaces">4.12.5. Plotting Surfaces</a></li>
+<li><a class="reference internal" href="#spectrum-plotting">4.12.6. Spectrum Plotting</a></li>
+<li><a class="reference internal" href="#plotting-images">4.12.7. Plotting Images</a></li>
+<li><a class="reference internal" href="#chromaticity-plots">4.12.8. Chromaticity Plots</a></li>
+<li><a class="reference internal" href="#plotting-refractive-indices">4.12.9. Plotting Refractive Indices</a></li>
+<li><a class="reference internal" href="#focus-search-cost-function-plots">4.12.10. Focus Search Cost Function Plots</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">4. </span>User Guide</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">4.12. </span>Plotting Functions</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/usage/plots.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/usage/plots.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/usage/plots.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/plots.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/plots.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="plotting-functions">
+<span id="usage-plots"></span><h1><span class="section-number">4.12. </span>Plotting Functions<a class="headerlink" href="#plotting-functions" title="Link to this heading">¶</a></h1>
+<section id="namespace">
+<h2><span class="section-number">4.12.1. </span>Namespace<a class="headerlink" href="#namespace" title="Link to this heading">¶</a></h2>
+<p>The module <a class="reference internal" href="../reference/optrace_plots.html#module-optrace.plots" title="optrace.plots"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optrace.plots</span></code></a> includes multiple plot and visualization functionality.
+You can import it in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">optrace.plots</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">otp</span>
+</span></pre></div>
+</div>
+</section>
+<section id="parameters">
+<h2><span class="section-number">4.12.2. </span>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<p>Most methods include a <code class="code highlight python docutils literal highlight-python"><span class="n">title</span></code> argument for a user defined plot title.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">any_plotting_function</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Name of plot&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Legends and labels inside the figures are generated from descriptions of the objects.
+Make sure to create your objects with an expressive <code class="code highlight python docutils literal highlight-python"><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;..&quot;</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="n">long_desc</span><span class="o">=</span><span class="s2">&quot;...&quot;</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">obj</span> <span class="o">=</span> <span class="n">Object</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Abc378&quot;</span><span class="p">)</span>
+</span><span data-line="2"><span class="n">obj2</span> <span class="o">=</span> <span class="n">Object</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">long_desc</span><span class="o">=</span><span class="s2">&quot;Some long description&quot;</span><span class="p">)</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">otp</span><span class="o">.</span><span class="n">any_plotting_function</span><span class="p">([</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj2</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Plotting is implemented with <a class="reference external" href="https://matplotlib.org/stable/index.html#module-matplotlib" title="(in Matplotlib v3.10.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib</span></code></a>, so settings like size and dpi can be set globally
+with the <a class="reference external" href="https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams" title="(in Matplotlib v3.10.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.rcParams</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+</span><span data-line="2"><span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</span><span data-line="3"><span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.dpi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+</span></pre></div>
+</div>
+</section>
+<section id="block-pause-plots">
+<h2><span class="section-number">4.12.3. </span>Block/Pause Plots<a class="headerlink" href="#block-pause-plots" title="Link to this heading">¶</a></h2>
+<p>By default the plots are displayed and program continues executing.
+Call <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.block" title="optrace.plots.misc_plots.block"><code class="xref py py-func docutils literal notranslate"><span class="pre">optrace.plots.block</span></code></a> to pause and interact with the plot windows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">optrace.plots</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">otp</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="c1"># do some plotting</span>
+</span><span data-line="4"><span class="o">...</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="c1"># make blocking</span>
+</span><span data-line="7"><span class="n">otp</span><span class="o">.</span><span class="n">block</span><span class="p">()</span>
+</span></pre></div>
+</div>
+</section>
+<section id="saving-figures">
+<h2><span class="section-number">4.12.4. </span>Saving Figures<a class="headerlink" href="#saving-figures" title="Link to this heading">¶</a></h2>
+<p>Plots will be saved by specifying the <code class="code highlight python docutils literal highlight-python"><span class="n">path</span></code> parameter.
+This inhibits the display of the plot window and stores it instead in the provided location.
+The file path is determined automatically from the filename.
+Note that files are <strong>overwritten</strong> and <strong>not saved if the path is invalid</strong>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">any_plotting_function</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./results/image.jpeg&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Additional saving parameters are specified using a dictionary called <code class="code highlight python docutils literal highlight-python"><span class="n">sargs</span></code>
+that can include parameters from <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html#matplotlib.pyplot.savefig" title="(in Matplotlib v3.10.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">any_plotting_function</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./results/image.jpeg&quot;</span><span class="p">,</span> <span class="n">sargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+<section id="plotting-surfaces">
+<span id="surface-plotting"></span><h2><span class="section-number">4.12.5. </span>Plotting Surfaces<a class="headerlink" href="#plotting-surfaces" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.surface_profile_plot" title="optrace.plots.misc_plots.surface_profile_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">surface_profile_plot</span></code></a>
+allows for the plotting of one or multiple surfaces. It takes a Surface or a list of Surfaces as argument
+as well as some other display options. The profiles are created in x-direction through the center y-coordinate.
+Rotate the objects beforehand to slice through a different axis.
+The surface profiles are plotted with absolute coordinates, if you want to display them relative
+to each other provide <code class="code highlight python docutils literal highlight-python"><span class="n">remove_offset</span><span class="o">=</span><span class="kc">True</span></code>.</p>
+<p>In the following example both cornea surfaces of the Arizona eye model are plotted:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">optrace</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ot</span>
+</span><span data-line="2"><span class="kn">import</span><span class="w"> </span><span class="nn">optrace.plots</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">otp</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">G</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">arizona_eye</span><span class="p">()</span>
+</span><span data-line="5"><span class="n">L0</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">lenses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="n">otp</span><span class="o">.</span><span class="n">surface_profile_plot</span><span class="p">([</span><span class="n">L0</span><span class="o">.</span><span class="n">front</span><span class="p">,</span> <span class="n">L0</span><span class="o">.</span><span class="n">back</span><span class="p">],</span> <span class="n">remove_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Provide values for <code class="code highlight python docutils literal highlight-python"><span class="n">x0</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">xe</span></code> to plot only a part of the profile.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">surface_profile_plot</span><span class="p">([</span><span class="n">L0</span><span class="o">.</span><span class="n">front</span><span class="p">,</span> <span class="n">L0</span><span class="o">.</span><span class="n">back</span><span class="p">],</span> <span class="n">remove_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">x0</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">xe</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Cornea Surfaces&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>This produces the following plot:</p>
+<figure class="align-center" id="id2">
+<a class="dark-light reference internal image-reference" href="../_images/surface_profile_plot.svg"><img alt="../_images/surface_profile_plot.svg" class="dark-light" src="../_images/surface_profile_plot.svg" width="550" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.61 </span><span class="caption-text">Surface profile plot for the two cornea surfaces of the arizona eye model.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="spectrum-plotting">
+<span id="spectrum-plots"></span><h2><span class="section-number">4.12.6. </span>Spectrum Plotting<a class="headerlink" href="#spectrum-plotting" title="Link to this heading">¶</a></h2>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.spectrum.Spectrum" title="optrace.tracer.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>,
+<a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>
+or <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a>
+is plotted with the function <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.spectrum_plots.spectrum_plot" title="optrace.plots.spectrum_plots.spectrum_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">spectrum_plot</span></code></a>.
+It takes a single object or a list as arguments.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">optrace.plots</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">otp</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">otp</span><span class="o">.</span><span class="n">spectrum_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">standard_natural</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The user can provide a user-defined <code class="code highlight python docutils literal highlight-python"><span class="n">title</span></code>, turn off/on labels
+and the legend with <code class="code highlight python docutils literal highlight-python"><span class="n">legend_off</span><span class="p">,</span> <span class="n">labels_off</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">ot</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">spectrum_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">standard_natural</span><span class="p">,</span> <span class="n">labels_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span data-line="2">                       <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CIE Standard Illuminants&quot;</span><span class="p">,</span> <span class="n">legend_off</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The following figures demonstrate examples for spectral plots.</p>
+<div class="table-wrapper colwidths-given table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id3">
+<a class="dark-light reference internal image-reference" href="../_images/LED_illuminants.svg"><img alt="../_images/LED_illuminants.svg" class="dark-light" src="../_images/LED_illuminants.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.62 </span><span class="caption-text">CIE standard illuminants LED series.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id4">
+<a class="dark-light reference internal image-reference" href="../_images/example_spectrum_histogram.svg"><img alt="../_images/example_spectrum_histogram.svg" class="dark-light" src="../_images/example_spectrum_histogram.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.63 </span><span class="caption-text">A rendered histogram spectrum.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="plotting-images">
+<span id="image-plots"></span><h2><span class="section-number">4.12.7. </span>Plotting Images<a class="headerlink" href="#plotting-images" title="Link to this heading">¶</a></h2>
+<p><strong>Image</strong></p>
+<p>The <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.image_plots.image_plot" title="optrace.plots.image_plots.image_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">image_plot</span></code></a> plotting function takes an
+<a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a> or
+<a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.scalar_image.ScalarImage" title="optrace.tracer.image.scalar_image.ScalarImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalarImage</span></code></a> as parameter.
+A <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>
+needs to be converted to a specific image type first.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">hong_kong</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">otp</span><span class="o">.</span><span class="n">image_plot</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>We can use
+The additional parameter <code class="code highlight python docutils literal highlight-python"><span class="n">log</span></code> is used to scale the image values logarithmically.
+Provide <code class="code highlight python docutils literal highlight-python"><span class="n">flip</span><span class="o">=</span><span class="kc">True</span></code> to rotate the image by 180 degrees around the optical axis.
+This is useful when the desired image is flipped due to the system’s imaging.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">image_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Title 123&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Image Cut</strong></p>
+<p>For plotting an image profile the analogous function
+<a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.image_plots.image_profile_plot" title="optrace.plots.image_plots.image_profile_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">image_profile_plot</span></code></a> is applied.
+It additionally requires a profile parameter <code class="code highlight python docutils literal highlight-python"><span class="n">x</span></code> or <code class="code highlight python docutils literal highlight-python"><span class="n">y</span></code> that specifies the profile coordinate.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">image_profile_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Supporting all the same parameters as for <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.image_plots.image_plot" title="optrace.plots.image_plots.image_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">image_plot</span></code></a>,
+the following call is possible:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">image_profile_plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Title 123&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<div class="table-wrapper table-borderless docutils container" id="id5">
+<table class="table-borderless docutils align-default" id="id5">
+<caption><span class="caption-number">Table 4.19 </span><span class="caption-text">Exemplary image plot and image profile plot from the <a class="reference internal" href="../examples.html#example-prism"><span class="std std-ref">Prism</span></a> example.</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/color_dispersive2.svg"><img alt="../_images/color_dispersive2.svg" class="dark-light" src="../_images/color_dispersive2.svg" width="215" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/color_dispersive1_cut.svg"><img alt="../_images/color_dispersive1_cut.svg" class="dark-light" src="../_images/color_dispersive1_cut.svg" width="400" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="chromaticity-plots">
+<span id="id1"></span><h2><span class="section-number">4.12.8. </span>Chromaticity Plots<a class="headerlink" href="#chromaticity-plots" title="Link to this heading">¶</a></h2>
+<p><strong>Usage</strong></p>
+<p>Chromaticity plots allow for a representation of image or spectrum colors inside a chromaticity diagram.
+Both the <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.chromaticity_plots.chromaticities_cie_1931" title="optrace.plots.chromaticity_plots.chromaticities_cie_1931"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromaticities_cie_1931</span></code></a>
+or <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.chromaticity_plots.chromaticities_cie_1976" title="optrace.plots.chromaticity_plots.chromaticities_cie_1976"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromaticities_cie_1976</span></code></a> function are available,
+depending on your choice of diagram.</p>
+<p>It supports the plotting of <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>,
+<a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>
+and <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a>.
+Example code for a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">dimg</span> <span class="o">=</span> <span class="n">RT</span><span class="o">.</span><span class="n">detector_image</span><span class="p">()</span>
+</span><span data-line="2"><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1931</span><span class="p">(</span><span class="n">dimg</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Passing an <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.rgb_image.RGBImage" title="optrace.tracer.image.rgb_image.RGBImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RGBImage</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">img</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">color_checker</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1931</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> can also be provided:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">spec</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">led_b1</span>
+</span><span data-line="2"><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1976</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Or a list of multiple spectra:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">specs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">led_b3</span><span class="p">,</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d65</span><span class="p">]</span>
+</span><span data-line="2"><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1976</span><span class="p">(</span><span class="n">specs</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><code class="code highlight python docutils literal highlight-python"><span class="n">norm</span></code> specifies the brightness normalization, explained a few paragraphs below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">chromaticities_cie_1976</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">standard</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Standard Illuminants&quot;</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;Largest&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<div class="table-wrapper colwidths-given table-borderless docutils container" id="id6">
+<table class="table-borderless docutils align-default" id="id6">
+<caption><span class="caption-number">Table 4.20 </span><span class="caption-text">Examples of CIE 1931 and 1976 chromaticity diagrams.</span><a class="headerlink" href="#id6" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/chroma_1931.svg"><img alt="../_images/chroma_1931.svg" class="dark-light" src="../_images/chroma_1931.svg" width="500" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/chroma_1976.svg"><img alt="../_images/chroma_1976.svg" class="dark-light" src="../_images/chroma_1976.svg" width="500" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Norms</strong></p>
+<p>Chromaticity norms describe the brightness normalization for the colored diagram background.</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-left">
+<colgroup>
+<col style="width: 14.3%" />
+<col style="width: 85.7%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Sum</strong></p></td>
+<td><p>Normalize the sRGB values so the channel sum equals one.
+Leads to a diagram with smooth color changes and approximately equal brightness.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Euclidean</strong></p></td>
+<td><p>Root-mean-square value of linear sRGB channels. A good compromise between “Largest” and “Sum”,
+having more saturated colors than “Sum”, but also smooth color changes compared to “Largest”. The default option.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Largest</strong></p></td>
+<td><p>Maximum brightness for each sRGB color. Leads to colors with maximum brightness and saturation.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrapper table-borderless docutils container" id="id7">
+<table class="table-borderless docutils align-default" id="id7">
+<caption><span class="caption-number">Table 4.21 </span><span class="caption-text">Example of “Sum”, “Euclidean” and “Largest” norm (from left to right)</span><a class="headerlink" href="#id7" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/chroma_sum_norm.svg"><img alt="../_images/chroma_sum_norm.svg" class="dark-light" src="../_images/chroma_sum_norm.svg" width="300" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/chroma_rms_norm.svg"><img alt="../_images/chroma_rms_norm.svg" class="dark-light" src="../_images/chroma_rms_norm.svg" width="300" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/chroma_largest_norm.svg"><img alt="../_images/chroma_largest_norm.svg" class="dark-light" src="../_images/chroma_largest_norm.svg" width="300" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="plotting-refractive-indices">
+<span id="index-plots"></span><h2><span class="section-number">4.12.9. </span>Plotting Refractive Indices<a class="headerlink" href="#plotting-refractive-indices" title="Link to this heading">¶</a></h2>
+<p><strong>Index Plot</strong></p>
+<p>A <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.refraction_index.RefractionIndex" title="optrace.tracer.refraction_index.RefractionIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">RefractionIndex</span></code></a> or a list of those objects
+can be plotted with the function <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.spectrum_plots.refraction_index_plot" title="optrace.plots.spectrum_plots.refraction_index_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">refraction_index_plot</span></code></a>
+from <a class="reference internal" href="../reference/optrace_plots.html#module-optrace.plots" title="optrace.plots"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optrace.plots</span></code></a>. The example below displays all glass presets in one figure.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">optrace.plots</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">otp</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">otp</span><span class="o">.</span><span class="n">refraction_index_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refraction_index</span><span class="o">.</span><span class="n">glasses</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Enable or disable the legend and labels with <code class="code highlight python docutils literal highlight-python"><span class="n">legend_off</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">labels_off</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">refraction_index_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refraction_index</span><span class="o">.</span><span class="n">glasses</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Test abc&quot;</span><span class="p">,</span>
+</span><span data-line="2">                          <span class="n">legend_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labels_off</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<figure class="align-center" id="id8">
+<a class="dark-light reference internal image-reference" href="../_images/glass_presets_n.svg"><img alt="../_images/glass_presets_n.svg" class="dark-light" src="../_images/glass_presets_n.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.64 </span><span class="caption-text">Example of a Refractive Index Plot.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>Abbe Plot</strong></p>
+<p>An Abbe plot is generated with <a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.abbe_plot" title="optrace.plots.misc_plots.abbe_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">abbe_plot</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">abbe_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refraction_index</span><span class="o">.</span><span class="n">glasses</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>You can provide user defined spectral <code class="code highlight python docutils literal highlight-python"><span class="n">lines</span></code> to calculate the index and V-number at:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">otp</span><span class="o">.</span><span class="n">abbe_plot</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">refraction_index</span><span class="o">.</span><span class="n">glasses</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">spectral_lines</span><span class="o">.</span><span class="n">FeC</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<figure class="align-center" id="id9">
+<a class="dark-light reference internal image-reference" href="../_images/glass_presets_V.svg"><img alt="../_images/glass_presets_V.svg" class="dark-light" src="../_images/glass_presets_V.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.65 </span><span class="caption-text">Example of an Abbe Plot.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="focus-search-cost-function-plots">
+<span id="focus-cost-plot"></span><h2><span class="section-number">4.12.10. </span>Focus Search Cost Function Plots<a class="headerlink" href="#focus-search-cost-function-plots" title="Link to this heading">¶</a></h2>
+<p>Cost plots are used to debug the focus search and assess how pronounced a focus or focus region is.
+Plotting the cost function and result is done by calling the
+<a class="reference internal" href="../reference/optrace_plots.html#optrace.plots.misc_plots.focus_search_cost_plot" title="optrace.plots.misc_plots.focus_search_cost_plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">focus_search_cost_plot</span></code></a> method from <a class="reference internal" href="../reference/optrace_plots.html#module-optrace.plots" title="optrace.plots"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optrace.plots</span></code></a>.
+It requires the <code class="code highlight python docutils literal highlight-python"><span class="n">res</span><span class="p">,</span> <span class="n">fsdict</span></code> results from the
+<a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer.focus_search" title="optrace.tracer.raytracer.Raytracer.focus_search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">focus_search</span></code></a> function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">optrace.plots</span><span class="w"> </span><span class="kn">import</span> <span class="n">focus_search_cost_plot</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">focus_search_cost_plot</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">fsdict</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Below you can find examples for two cost function plots.</p>
+<div class="table-wrapper colwidths-given table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id10">
+<a class="dark-light reference internal image-reference" href="../_images/focus_rms_spot_size.svg"><img alt="../_images/focus_rms_spot_size.svg" class="dark-light" src="../_images/focus_rms_spot_size.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.66 </span><span class="caption-text">Focus search for mode “RMS Spot Size” in the <a class="reference internal" href="../examples.html#example-spherical-aberration"><span class="std std-ref">Spherical Aberration</span></a> example.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id11">
+<a class="dark-light reference internal image-reference" href="../_images/focus_image_sharpness.svg"><img alt="../_images/focus_image_sharpness.svg" class="dark-light" src="../_images/focus_image_sharpness.svg" width="500" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.67 </span><span class="caption-text">Focus search for mode “Image Sharpness” in the <a class="reference internal" href="../examples.html#example-spherical-aberration"><span class="std std-ref">Spherical Aberration</span></a> example.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>When calling from the <a class="reference internal" href="../reference/optrace_gui.html#optrace.gui.trace_gui.TraceGUI" title="optrace.gui.trace_gui.TraceGUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">TraceGUI</span></code></a>,
+it also outputs focus information inside the GUI:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span data-line="1">Found 3D position: [5.684185e-06mm, 2.022295e-06mm, 15.39223mm]
+</span><span data-line="2">Search Region: z = [0.9578644mm, 40mm]
+</span><span data-line="3">Method: Irradiance Maximum
+</span><span data-line="4">Used 200000 Rays for Autofocus
+</span><span data-line="5">Ignoring Filters and Apertures
+</span><span data-line="6">
+</span><span data-line="7">OptimizeResult:
+</span><span data-line="8">  message: CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH
+</span><span data-line="9">  success: True
+</span><span data-line="10">   status: 0
+</span><span data-line="11">      fun: 0.019262979304881897
+</span><span data-line="12">        x: 15.3922327445026
+</span><span data-line="13">      nit: 4
+</span><span data-line="14">      jac: [ 9.024e-03]
+</span><span data-line="15">     nfev: 102
+</span><span data-line="16">     njev: 51
+</span><span data-line="17"> hess_inv: &lt;1x1 LbfgsInvHessProduct with dtype=float64&gt;
+</span></pre></div>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="convolve.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">4.11. </span>PSF Convolution</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="gui.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">4.13. </span>GUI Interaction</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

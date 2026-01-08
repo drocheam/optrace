@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>4.2. Base Shapes (Surface, Line, Point) - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.3. Elements (Lens, Ray Source, …)" href="elements.html" /><link rel="prev" title="4.1. Overview" href="overview.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/usage/surfaces.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/usage/surfaces.html"/>
+  <meta property="og:title" content="4.2. Base Shapes (Surface, Line, Point)"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#overview">4.2.1. Overview</a></li>
+<li><a class="reference internal" href="#point-and-line">4.2.2. Point and Line</a></li>
+<li><a class="reference internal" href="#planar-surfaces">4.2.3. Planar Surfaces</a></li>
+<li><a class="reference internal" href="#height-surfaces">4.2.4. Height Surfaces</a></li>
+<li><a class="reference internal" href="#user-functions">4.2.5. User Functions</a></li>
+<li><a class="reference internal" href="#data-surfaces">4.2.6. Data Surfaces</a></li>
+<li><a class="reference internal" href="#geometry-properties">4.2.7. Geometry Properties</a></li>
+<li><a class="reference internal" href="#plotting">4.2.8. Plotting</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">4. </span>User Guide</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">4.2. </span>Base Shapes (Surface, Line, Point)</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/usage/surfaces.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/usage/surfaces.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/usage/surfaces.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/surfaces.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/surfaces.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="base-shapes-surface-line-point">
+<h1><span class="section-number">4.2. </span>Base Shapes (Surface, Line, Point)<a class="headerlink" href="#base-shapes-surface-line-point" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2><span class="section-number">4.2.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Surfaces, points and lines are the base component for all <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a> classes.
+They describe a geometrical behavior relative to their center (marked as “x” in the following figures).
+They have no absolute position in three-dimensional space,
+their actual position is assigned and managed by their owner Element.
+All lengths are given in millimeters and angles in degrees.</p>
+</section>
+<section id="point-and-line">
+<h2><span class="section-number">4.2.2. </span>Point and Line<a class="headerlink" href="#point-and-line" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.point.Point" title="optrace.tracer.geometry.point.Point"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a> and <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.line.Line" title="optrace.tracer.geometry.line.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a>
+are the simplest geometry types.
+Both types have no extent in z-direction, therefore lie exclusively on a  xy-plane.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id3">
+<a class="dark-light reference internal image-reference" href="../_images/point.svg"><img alt="../_images/point.svg" class="dark-light" src="../_images/point.svg" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.5 </span><span class="caption-text">Point geometry</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id4">
+<a class="dark-light reference internal image-reference" href="../_images/line.svg"><img alt="../_images/line.svg" class="dark-light" src="../_images/line.svg" width="300" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.6 </span><span class="caption-text">Line geometry</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To create a point write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">P</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Point</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p>A line with radius 2 and an angle of 40 degrees to the x-axis is defined using:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">L</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Line</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="planar-surfaces">
+<h2><span class="section-number">4.2.3. </span>Planar Surfaces<a class="headerlink" href="#planar-surfaces" title="Link to this heading">¶</a></h2>
+<p>Planar surfaces are purely two-dimensional and have no extent in z-direction, therefore being parallel to the xy-plane.
+<a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.circular_surface.CircularSurface" title="optrace.tracer.geometry.surface.circular_surface.CircularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircularSurfaces</span></code></a>
+is often used for plan-concave or plan-convex lenses or color filters.
+<a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.ring_surface.RingSurface" title="optrace.tracer.geometry.surface.ring_surface.RingSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RingSurfaces</span></code></a> and
+<cite>SlitSurfaces &lt;optrace.tracer.geometry.surface.slit_surface.SlitSurface&gt;</cite> are typically found for Apertures,
+and <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface" title="optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectangularSurfaces</span></code></a>
+for detectors or object images.</p>
+<div class="table-wrapper table-borderless docutils container">
+<table class="table-borderless docutils align-default">
+<tbody>
+<tr class="row-odd"><td><figure class="align-center" id="id5">
+<a class="dark-light reference internal image-reference" href="../_images/circle.svg"><img alt="../_images/circle.svg" class="dark-light" src="../_images/circle.svg" width="250" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.7 </span><span class="caption-text">Circle geometry</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id6">
+<a class="dark-light reference internal image-reference" href="../_images/ring.svg"><img alt="../_images/ring.svg" class="dark-light" src="../_images/ring.svg" width="250" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.8 </span><span class="caption-text">Ring geometry</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+<tr class="row-even"><td><figure class="align-center" id="id7">
+<a class="dark-light reference internal image-reference" href="../_images/rectangle.svg"><img alt="../_images/rectangle.svg" class="dark-light" src="../_images/rectangle.svg" width="250" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.9 </span><span class="caption-text">Rectangle geometry</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+<td><figure class="align-center" id="id8">
+<a class="dark-light reference internal image-reference" href="../_images/slit.svg"><img alt="../_images/slit.svg" class="dark-light" src="../_images/slit.svg" width="250" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.10 </span><span class="caption-text">Slit geometry</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A circle/disc of radius 3.5 is created by:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">Disc</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>When constructing a ring surface an additional inner radius <span class="math notranslate nohighlight">\(0 &lt; r_\text{i} &lt; r\)</span> is required:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">Ring</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RingSurface</span><span class="p">(</span><span class="n">ri</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The rectangular surface requires a list of two dimensions, that describe the extent in x and y direction.
+For a side length in x-direction of 4 mm and 5 mm in y-direction we write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">Rect</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RectangularSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>The slit surface requires additionally the inner dimensions specified by a parameter <code class="code highlight python docutils literal highlight-python"><span class="n">dimi</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">Slit</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SlitSurface</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">dimi</span><span class="o">=</span><span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="height-surfaces">
+<h2><span class="section-number">4.2.4. </span>Height Surfaces<a class="headerlink" href="#height-surfaces" title="Link to this heading">¶</a></h2>
+<p><strong>Tilted Surface</strong></p>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.tilted_surface.TiltedSurface" title="optrace.tracer.geometry.surface.tilted_surface.TiltedSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">TiltedSurface</span></code></a>
+has a circular projection in the xy-plane, but has a surface normal
+that is not parallel to the optical axis (z-direction).
+It can be used for creating prisms or tilted glass plates.</p>
+<figure class="align-center" id="id9">
+<a class="dark-light reference internal image-reference" href="../_images/tilted_surface.svg"><img alt="../_images/tilted_surface.svg" class="dark-light" src="../_images/tilted_surface.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.11 </span><span class="caption-text">TiltedSurface geometry</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>As for most other surfaces, it is defined by a radius <span class="math notranslate nohighlight">\(r\)</span>. Additionally, a normal vector must be provided.
+This can either be done in the cartesian form, with 3 elements and parameter <code class="code highlight python docutils literal highlight-python"><span class="n">normal</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">]</span></code>
+or using spherical coordinates <code class="code highlight python docutils literal highlight-python"><span class="n">normal_sph</span><span class="o">=</span><span class="p">[</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">]</span></code> with two elements. <code class="code highlight python docutils literal highlight-python"><span class="n">theta</span></code>
+describes the angle between the normal and the optical axis (z-axis), while <code class="code highlight python docutils literal highlight-python"><span class="n">phi</span></code>
+describes the angle in the xy-plane.
+The following examples both describe the same surface:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">TS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TiltedSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">normal</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)])</span>
+</span></pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">TS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">TiltedSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">normal_sph</span><span class="o">=</span><span class="p">[</span><span class="mf">45.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p><strong>Spherical Surface</strong></p>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.spherical_surface.SphericalSurface" title="optrace.tracer.geometry.surface.spherical_surface.SphericalSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SphericalSurface</span></code></a>
+is the most common surface type for lenses.
+It is defined by a curvature radius <span class="math notranslate nohighlight">\(R\)</span>, which is positive when the center of the curvature
+circle lies behind the surface and negative otherwise.
+This is illustrated in figure <a class="reference internal" href="#spherical-surface-fig"><span class="std std-numref">Fig. 4.12</span></a>.</p>
+<figure class="align-center" id="id10">
+<span id="spherical-surface-fig"></span><a class="dark-light reference internal image-reference" href="../_images/spherical_surface.svg"><img alt="../_images/spherical_surface.svg" class="dark-light" src="../_images/spherical_surface.svg" width="750" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.12 </span><span class="caption-text">Spherical surface geometry with a positive and negative curvature radius <span class="math notranslate nohighlight">\(R\)</span></span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Constructing such a surface is done with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">sph</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">SphericalSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">R</span><span class="o">=-</span><span class="mf">12.458</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Conic Surface</strong></p>
+<p>A conic surface is defined by the conic section equation:</p>
+<div class="math-wrapper docutils container" id="equation-conic">
+<div class="math notranslate nohighlight" id="equation-conic">
+<span class="eqno">(4.1)<a class="headerlink" href="#equation-conic" title="Link to this equation">¶</a></span>\[z(r)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}}\]</div>
+</div>
+<p>With the curvature <span class="math notranslate nohighlight">\(\rho = 1/R\)</span> and the conical constant <span class="math notranslate nohighlight">\(k\)</span>.
+Depending on this constant the type of conic section differs:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k&lt;-1\)</span></p></td>
+<td><p>hyperbola</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k=-1\)</span></p></td>
+<td><p>parabola</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(-1 &lt; k &lt; 0\)</span></p></td>
+<td><p>prolate ellipse</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k=0\)</span></p></td>
+<td><p>circle</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k&gt;0\)</span></p></td>
+<td><p>oblate ellipse</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center" id="id11">
+<a class="dark-light reference internal image-reference" href="../_images/conic_surface.svg"><img alt="../_images/conic_surface.svg" class="dark-light" src="../_images/conic_surface.svg" width="800" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.13 </span><span class="caption-text">Conic surface geometry with a different conic constant <span class="math notranslate nohighlight">\(k\)</span> signs.
+An aspheric surface has a small additional rotationally symmetric polynomial added.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Compared to the spherical surface, a <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.conic_surface.ConicSurface" title="optrace.tracer.geometry.surface.conic_surface.ConicSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConicSurface</span></code></a>
+takes another parameter, the conical constant <code class="code highlight python docutils literal highlight-python"><span class="n">k</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">conic</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">ConicSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">23.8</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>A visualization of different conical constants can be found in <a class="footnote-reference brackets" href="#footcite-conicwiki" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p><strong>Aspheric Surface</strong></p>
+<p>An aspheric surface is a conic surface with additional <span class="math notranslate nohighlight">\(m\)</span> even order polynomial components <span class="math notranslate nohighlight">\(a_1, ..., a_m\)</span>.</p>
+<div class="math-wrapper docutils container" id="equation-asphere">
+<div class="math notranslate nohighlight" id="equation-asphere">
+<span class="eqno">(4.2)<a class="headerlink" href="#equation-asphere" title="Link to this equation">¶</a></span>\[z(x,~y)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}} + \sum_{i=1}^{m} a_i \cdot r^{2i}\]</div>
+</div>
+<p>An <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface" title="optrace.tracer.geometry.surface.aspheric_surface.AsphericSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsphericSurface</span></code></a>
+has additional polynomial components <span class="math notranslate nohighlight">\(a_0 r^2 + a_1 r^4 + \dots\)</span>,
+where <span class="math notranslate nohighlight">\(a_0,~a_1,\dots\)</span> are the polynomical coefficients given in powers of millimeters.</p>
+<p>For <span class="math notranslate nohighlight">\(a_0 = 0, ~ a_1 = 10^{-5}, ~a_2 = 3.2 \cdot 10^{-7}\)</span> the surface is created by:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">asph</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">AsphericSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">12.37</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">2.03</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="mf">3.2e-7</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="user-functions">
+<h2><span class="section-number">4.2.5. </span>User Functions<a class="headerlink" href="#user-functions" title="Link to this heading">¶</a></h2>
+<p><strong>Overview</strong></p>
+<p>The <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D" title="optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionSurface2D</span></code></a>
+class allows us to define custom surfaces, defined by a mathematical function depending on x and y.
+For functions with rotational symmetry we can also use the
+<a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D" title="optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionSurface1D</span></code></a> class,
+where the values are only dependent on the radial distance r.</p>
+<figure class="align-center" id="id12">
+<a class="dark-light reference internal image-reference" href="../_images/function_surface.svg"><img alt="../_images/function_surface.svg" class="dark-light" src="../_images/function_surface.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.14 </span><span class="caption-text">Custom function according to <span class="math notranslate nohighlight">\(z_\text{s}(x,~y)\)</span>, which can be a symmetric or asymmetric function or a dataset</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>Simplest case</strong></p>
+<p>As an example we want to create an axicon surface:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">func</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">FunctionSurface1D</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The user defined function must take r-values (as numpy array),
+return a numpy array and is provided as the <code class="code highlight python docutils literal highlight-python"><span class="n">func</span></code> parameter.
+Note that the surface offset at <span class="math notranslate nohighlight">\(r=0\)</span> is irrelevant, as it will be automatically compensated for.</p>
+<p><strong>Providing partial derivatives</strong></p>
+<p>To speed up tracing and enhance numerical precision we can provide the partial derivatives
+of the surface in x and y-direction.
+For our axicon the special case <span class="math notranslate nohighlight">\(r=0\)</span> needs to be handled separately.
+The derivative function is passed with the <code class="code highlight python docutils literal highlight-python"><span class="n">deriv_func</span></code>-parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">def</span><span class="w"> </span><span class="nf">axicon_deriv</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+</span><span data-line="2">    <span class="n">dr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span><span data-line="3">    <span class="n">dr</span><span class="p">[</span><span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span data-line="4">    <span class="k">return</span> <span class="n">dr</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="n">func</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">FunctionSurface1D</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="n">deriv_func</span><span class="o">=</span><span class="n">axicon_deriv</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Function parameters</strong></p>
+<p>The user can provide a dictionary of parameters that will get passed down to the corresponding function.
+For the <code class="code highlight python docutils literal highlight-python"><span class="n">func</span></code> argument the matching parameter would be <code class="code highlight python docutils literal highlight-python"><span class="n">func_args</span></code>.
+For <code class="code highlight python docutils literal highlight-python"><span class="n">deriv_func</span></code> it is <code class="code highlight python docutils literal highlight-python"><span class="n">deriv_args</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">def</span><span class="w"> </span><span class="nf">axicon</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+</span><span data-line="2">    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">r</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="k">def</span><span class="w"> </span><span class="nf">axicon_deriv</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+</span><span data-line="5">    <span class="n">dr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+</span><span data-line="6">    <span class="n">dr</span><span class="p">[</span><span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span data-line="7">    <span class="k">return</span> <span class="n">dr</span>
+</span><span data-line="8">
+</span><span data-line="9"><span class="n">func</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">FunctionSurface1D</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">axicon</span><span class="p">,</span> <span class="n">func_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=-</span><span class="mf">0.3</span><span class="p">),</span>
+</span><span data-line="10">                            <span class="n">deriv_func</span><span class="o">=</span><span class="n">axicon_deriv</span><span class="p">,</span> <span class="n">deriv_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=-</span><span class="mf">0.3</span><span class="p">))</span>
+</span></pre></div>
+</div>
+<p><strong>z-Range</strong></p>
+<p>When initializing a surface, optrace tries to determine the surface extent in z-direction.
+The resulting <code class="code highlight python docutils literal highlight-python"><span class="n">z_min</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">z_max</span></code> values are needed to know the surface bounds,
+which in turn are needed for tracing of the surface.
+While this works automatically in many cases, the user has the option to provide these values manually.
+If these values should largely differ from the automatically estimated values a warning or,
+for a large deviation, an exception is raised.</p>
+<p>For a <code class="code highlight python docutils literal highlight-python"><span class="n">a</span><span class="o">=-</span><span class="mf">0.3</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">r</span><span class="o">=</span><span class="mi">3</span></code> the z-bounds are <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="o">-</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span></code>.
+This can be provided using:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">func</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">FunctionSurface1D</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">z_min</span><span class="o">=-</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">z_max</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Radius of Curvature</strong></p>
+<p>We can also provide a radius of curvature for the paraxial region.
+This will be useful for ray transfer matrix analysis in section <a class="reference internal" href="tma.html#usage-tma"><span class="std std-numref">Section 4.10</span></a>.
+Note that this only makes sense for surfaces with rotational symmetry near the center.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">func</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">FunctionSurface1D</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">parax_roc</span><span class="o">=</span><span class="mf">3.465</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Note that for our axicon example there can be no paraxial radius of curvature defined.</p>
+<p><strong>Mask function</strong></p>
+<p>When defining custom apertures or filters, the <code class="code highlight python docutils literal highlight-python"><span class="n">mask_func</span></code>-parameter comes in handy.
+To define a half circular aperture with radius <span class="math notranslate nohighlight">\(r=0.1\)</span>, one can write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">def</span><span class="w"> </span><span class="nf">mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+</span><span data-line="2">    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">func</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">FunctionSurface2D</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+</span><span data-line="5">                            <span class="n">mask_func</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
+</span></pre></div>
+</div>
+<p>In this case, the <code class="code highlight python docutils literal highlight-python"><span class="n">func</span></code>-parameter is just a plane.
+Note that we need to use the FunctionSurface2D class, as there is no rotational symmetry.</p>
+</section>
+<section id="data-surfaces">
+<h2><span class="section-number">4.2.6. </span>Data Surfaces<a class="headerlink" href="#data-surfaces" title="Link to this heading">¶</a></h2>
+<p><strong>DataSurface2D</strong></p>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D" title="optrace.tracer.geometry.surface.data_surface_2d.DataSurface2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSurface2D</span></code></a>
+is defined by a height dataset in a square matrix.
+This square set is cut into a circular disc after initialization.
+Together with this set, the radius of the disc is required.</p>
+<p>It is recommended to have 200x200 element or even larger matrices.
+Values between data cells are interpolated with a polynomial of forth order for smooth curvature changes.</p>
+<p>The following example creates a lens with direction-dependent curvature and noise/manufacturing errors added:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">r0</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span data-line="2"><span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="n">r0</span><span class="p">:</span><span class="n">r0</span><span class="p">:</span><span class="mi">200</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="n">r0</span><span class="p">:</span><span class="n">r0</span><span class="p">:</span><span class="mi">200</span><span class="n">j</span><span class="p">]</span>
+</span><span data-line="3"><span class="n">H</span> <span class="o">=</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">X</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">Y</span><span class="o">**</span><span class="mi">2</span>
+</span><span data-line="4"><span class="n">H</span> <span class="o">+=</span> <span class="mf">0.005</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="n">data2d</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">DataSurface2D</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="n">r0</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">H</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Note that we can also add the parameters <code class="code highlight python docutils literal highlight-python"><span class="n">z_min</span><span class="o">=...</span></code>, <code class="code highlight python docutils literal highlight-python"><span class="n">z_max</span><span class="o">=</span></code>, <code class="code highlight python docutils literal highlight-python"><span class="n">parax_roc</span></code>,
+as for the FunctionSurface class.</p>
+<p><strong>DataSurface1D</strong></p>
+<p>For a surface with rotational symmetry one radial vector is sufficient.
+For this we utilize the <a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html#optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D" title="optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSurface1D</span></code></a> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">r0</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span data-line="2"><span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</span><span data-line="3"><span class="n">h</span> <span class="o">=</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span>
+</span><span data-line="4"><span class="n">h</span><span class="p">[</span><span class="n">r</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span data-line="5"><span class="n">h</span> <span class="o">+=</span> <span class="mf">0.005</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="n">data1d</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">DataSurface1D</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="n">r0</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">h</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="geometry-properties">
+<h2><span class="section-number">4.2.7. </span>Geometry Properties<a class="headerlink" href="#geometry-properties" title="Link to this heading">¶</a></h2>
+<p>All surface/point/line share the following methods and properties.</p>
+<p><strong>Position</strong></p>
+<p>The position of the surface/point/line is accessed using:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">pos</span> <span class="o">=</span> <span class="n">surf</span><span class="o">.</span><span class="n">pos</span>
+</span></pre></div>
+</div>
+<p>This returns a three element list with x, y, z center coordinates.</p>
+<p><strong>Extent</strong></p>
+<p>The extent box is the smallest encompassing bounding box that includes the surface/point/line.
+The extent property returns a list of coordinate bounds <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">z1</span><span class="p">]</span></code>.
+It is accessed by:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">extent</span> <span class="o">=</span> <span class="n">surf</span><span class="o">.</span><span class="n">extent</span>
+</span></pre></div>
+</div>
+<p><strong>Moving</strong></p>
+<p>Moving/setting its initial position of the surface/point/line is handled by its parent object
+(typically a subclass of <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.element.Element" title="optrace.tracer.geometry.element.Element"><code class="xref py py-class docutils literal notranslate"><span class="pre">Element</span></code></a>, see <a class="reference internal" href="elements.html#usage-elements"><span class="std std-ref">Elements (Lens, Ray Source,  …)</span></a>).</p>
+<p><strong>Rotation</strong></p>
+<p>Using the <code class="code highlight python docutils literal highlight-python"><span class="n">rotate</span></code> function the surface/point/line is rotated by 180 degrees around its
+center around the z-axis.
+The function takes a rotation angle in degrees:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">surf</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Flipping</strong></p>
+<p>Flipping the surface rotates it around an axis parallel to the x-axis passing through its center at <code class="code highlight python docutils literal highlight-python"><span class="n">El</span><span class="o">.</span><span class="n">pos</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">surf</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p><strong>Other</strong></p>
+<p>Below you can find some additional geometrical quantities that are useful when moving surfaces,
+assigning them to lenses or determining the correct thicknesses.</p>
+<figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/surface_geometry_quantities.svg"><img alt="../_images/surface_geometry_quantities.svg" class="dark-light" src="../_images/surface_geometry_quantities.svg" width="600" />
+</a>
+</figure>
+<p><span class="math notranslate nohighlight">\(z_\text{min}\)</span> and <span class="math notranslate nohighlight">\(z_\text{max}\)</span> describe the minimal and maximal z-position on the surface,
+while <span class="math notranslate nohighlight">\(z_0\)</span> is the z-position of the center.
+<span class="math notranslate nohighlight">\(d_\text{s}\)</span> is the difference between <span class="math notranslate nohighlight">\(z_\text{min}\)</span> and <span class="math notranslate nohighlight">\(z_\text{max}\)</span>,
+<span class="math notranslate nohighlight">\(d_\text{p}\)</span> is the difference between <span class="math notranslate nohighlight">\(z_\text{max}\)</span>
+and <span class="math notranslate nohighlight">\(z_0\)</span> and <span class="math notranslate nohighlight">\(d_\text{n}\)</span> the difference between <span class="math notranslate nohighlight">\(z_0\)</span> and <span class="math notranslate nohighlight">\(z_\text{min}\)</span>.</p>
+</section>
+<section id="plotting">
+<h2><span class="section-number">4.2.8. </span>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="plots.html#surface-plotting"><span class="std std-ref">Plotting Surfaces</span></a>.</p>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-conicwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Conic Constant. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Conic_constant">https://en.wikipedia.org/wiki/Conic_constant</a> (visited on 2022-12-21).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="overview.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">4.1. </span>Overview</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="elements.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">4.3. </span>Elements (Lens, Ray Source,  …)</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

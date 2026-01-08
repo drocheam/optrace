@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>5.9. Miscellaneous - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="6. API Reference" href="../reference/index.html" /><link rel="prev" title="5.8. Color Management" href="color.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/details/misc.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/details/misc.html"/>
+  <meta property="og:title" content="5.9. Miscellaneous"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">5. Implementation Details</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html">5.8. Color Management</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#curve-from-abbe-number">5.9.1. Curve from Abbe Number</a></li>
+<li><a class="reference internal" href="#tiltedsurface-equation">5.9.2. TiltedSurface Equation</a></li>
+<li><a class="reference internal" href="#flipping-and-rotation">5.9.3. Flipping and Rotation</a></li>
+<li><a class="reference internal" href="#equal-area-radial-sampling-of-ring-and-circle">5.9.4. Equal Area Radial Sampling of Ring and Circle</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">5. </span>Implementation Details</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">5.9. </span>Miscellaneous</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/details/misc.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/details/misc.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/details/misc.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/misc.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/misc.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="miscellaneous">
+<h1><span class="section-number">5.9. </span>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Link to this heading">¶</a></h1>
+<section id="curve-from-abbe-number">
+<span id="index-from-abbe"></span><h2><span class="section-number">5.9.1. </span>Curve from Abbe Number<a class="headerlink" href="#curve-from-abbe-number" title="Link to this heading">¶</a></h2>
+<p>In many cases, only the refractive index and the Abbe number are known or provided for a material.
+To simulate such materials, a wavelength-dependent model first needs to be established.
+While there are countless potential curves that produce the same parameters,
+it is anticipated that real materials with the same index and Abbe number exhibit only slight variations
+in the visible region, where these parameters are provided.</p>
+<p>We assume a model of the form:</p>
+<div class="math-wrapper docutils container" id="equation-n-from-abbe-base">
+<div class="math notranslate nohighlight" id="equation-n-from-abbe-base">
+<span class="eqno">(5.193)<a class="headerlink" href="#equation-n-from-abbe-base" title="Link to this equation">¶</a></span>\[n(\lambda) = A + \frac{B}{\lambda^2 - d}\]</div>
+</div>
+<p>where <span class="math notranslate nohighlight">\(d=0.014\, \mu\text{m}^2\)</span> serves as a compromise between the Cauchy (<span class="math notranslate nohighlight">\(d=0\)</span>)
+and the Herzberger (<span class="math notranslate nohighlight">\(d=0.028\,\mu\text{m}^2\)</span>) models.</p>
+<p>Given <span class="math notranslate nohighlight">\(n_\text{s}:=n(\lambda_\text{s}),~n_\text{c}:=n(\lambda_\text{c}),~n_\text{l}:=n(\lambda_\text{l})\)</span>
+and the Abbe number equation in <a class="reference internal" href="#equation-n-from-abbe-base">(5.193)</a>, one can solve for <span class="math notranslate nohighlight">\(A,~B\)</span>:</p>
+<div class="math-wrapper docutils container" id="equation-n-from-abbe-solution">
+<div class="math notranslate nohighlight" id="equation-n-from-abbe-solution">
+<span class="eqno">(5.194)<a class="headerlink" href="#equation-n-from-abbe-solution" title="Link to this equation">¶</a></span>\[\begin{split}B =&amp;~ \frac{1}{V}\frac{n_\text{c}-1}{\frac{1}{\lambda^2_\text{s} - d} - \frac{1}{\lambda^2_\text{l}-d}}\\
+A =&amp;~ n_\text{c} - \frac{B}{\lambda^2_\text{c}-d}\end{split}\]</div>
+</div>
+<p>Parameters <span class="math notranslate nohighlight">\(V\)</span>, <span class="math notranslate nohighlight">\(n_\text{c}\)</span> and the spectral lines
+<span class="math notranslate nohighlight">\(\lambda_\text{s},~\lambda_\text{c},~\lambda_\text{l}\)</span> are provided by the user.</p>
+</section>
+<section id="tiltedsurface-equation">
+<h2><span class="section-number">5.9.2. </span>TiltedSurface Equation<a class="headerlink" href="#tiltedsurface-equation" title="Link to this heading">¶</a></h2>
+<p>With the quantities:</p>
+<div class="math-wrapper docutils container" id="equation-details-misc-0">
+<div class="math notranslate nohighlight" id="equation-details-misc-0">
+<span class="eqno">(5.195)<a class="headerlink" href="#equation-details-misc-0" title="Link to this equation">¶</a></span>\[\begin{split}\text{normal vector:}~~~~   \vec{n} &amp;= (n_x, n_y, n_z)\\
+\text{surface center vector:}~~~~ \vec{q} &amp;= (x_0, y_0, z_0)\\
+\text{point on surface:}~~~~ \vec{p} &amp;= (x, y, z)\\\end{split}\]</div>
+</div>
+<p>and the point normal equation for a plane:</p>
+<div class="math-wrapper docutils container" id="equation-plane-normal-eq-tilted-surface">
+<div class="math notranslate nohighlight" id="equation-plane-normal-eq-tilted-surface">
+<span class="eqno">(5.196)<a class="headerlink" href="#equation-plane-normal-eq-tilted-surface" title="Link to this equation">¶</a></span>\[(\vec{p} - \vec{q})\cdot \vec{n} = 0\]</div>
+</div>
+<p>which is equivalent to:</p>
+<div class="math-wrapper docutils container" id="equation-tilted-surface0">
+<div class="math notranslate nohighlight" id="equation-tilted-surface0">
+<span class="eqno">(5.197)<a class="headerlink" href="#equation-tilted-surface0" title="Link to this equation">¶</a></span>\[(x - x_0) \cdot n_x + (y- y_0) \cdot n_y + (z-z_0)\cdot n_z = 0\]</div>
+</div>
+<p>Everything be rearranged to yield the surface function for <span class="math notranslate nohighlight">\(n_z \neq 0\)</span>:</p>
+<div class="math-wrapper docutils container" id="equation-tilted-surface">
+<div class="math notranslate nohighlight" id="equation-tilted-surface">
+<span class="eqno">(5.198)<a class="headerlink" href="#equation-tilted-surface" title="Link to this equation">¶</a></span>\[z(x, y) = z_0 - (x - x_0) \cdot \frac{n_x}{n_z} - (y- y_0) \cdot \frac{n_y}{n_z}\]</div>
+</div>
+</section>
+<section id="flipping-and-rotation">
+<h2><span class="section-number">5.9.3. </span>Flipping and Rotation<a class="headerlink" href="#flipping-and-rotation" title="Link to this heading">¶</a></h2>
+<p>Flipping a surface is implemented as a 180-degree rotation around the x-axis.
+This transformation is equivalent to negating its relative shape <span class="math notranslate nohighlight">\(z_r\)</span> with respect to an offset <span class="math notranslate nohighlight">\(z_0\)</span>
+and mirroring the y-component: <span class="math notranslate nohighlight">\(z_0 + z_r(x, y) \Rightarrow z_0 - z(x, -y)\)</span>.
+For a surface with rotational symmetry, this simplifies to <span class="math notranslate nohighlight">\(z_0 + z_r(r) \Rightarrow z_0 - z(r)\)</span>.
+Rotation is achieved by altering the accessing coordinates through a rotation of the coordinate system:</p>
+<div class="math-wrapper docutils container" id="equation-details-misc-1">
+<div class="math notranslate nohighlight" id="equation-details-misc-1">
+<span class="eqno">(5.199)<a class="headerlink" href="#equation-details-misc-1" title="Link to this equation">¶</a></span>\[z(x, y) \Rightarrow z(x_0 + r \cos \alpha, y_0 + r \sin \alpha)\]</div>
+</div>
+<p>where <span class="math notranslate nohighlight">\(r = \sqrt{(x-x_0)^2 + (y-y_0)^2}\)</span>.
+Here, <span class="math notranslate nohighlight">\(x_0\)</span> and <span class="math notranslate nohighlight">\(y_0\)</span> are the rotation center coordinates, and <span class="math notranslate nohighlight">\(\alpha\)</span> is the rotation angle.</p>
+<p>By simply adjusting the value of the rotation angle,
+the surface values can be rotated without actually rotating the surface object.</p>
+</section>
+<section id="equal-area-radial-sampling-of-ring-and-circle">
+<span id="ring-sampling"></span><span id="circle-sampling"></span><h2><span class="section-number">5.9.4. </span>Equal Area Radial Sampling of Ring and Circle<a class="headerlink" href="#equal-area-radial-sampling-of-ring-and-circle" title="Link to this heading">¶</a></h2>
+<p>An area element of a circle in polar coordinates can be represented as:</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-area-element">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-area-element">
+<span class="eqno">(5.200)<a class="headerlink" href="#equation-ring-sampling-area-element" title="Link to this equation">¶</a></span>\[\text{d}A = \text{d}r  ~\text{d}\phi\]</div>
+</div>
+<p><span class="math notranslate nohighlight">\(\text{d}\phi\)</span> can be rewritten as a circle segment:</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-area-element2">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-area-element2">
+<span class="eqno">(5.201)<a class="headerlink" href="#equation-ring-sampling-area-element2" title="Link to this equation">¶</a></span>\[\text{d}A = \text{d}r  ~\frac{2 \pi}{N} r\]</div>
+</div>
+<p>with <span class="math notranslate nohighlight">\(N\)</span> being the number of segments.
+Let us define a function <span class="math notranslate nohighlight">\(r(u)\)</span> which provides radial values, and its derivative outputs radial spacing values.</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-area-element-diff-eq">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-area-element-diff-eq">
+<span class="eqno">(5.202)<a class="headerlink" href="#equation-ring-sampling-area-element-diff-eq" title="Link to this equation">¶</a></span>\[\text{d}A = r'(u)  ~\frac{2 \pi}{N} r(u)\]</div>
+</div>
+<p>For uniformly sampled data, <span class="math notranslate nohighlight">\(\text{d}A\)</span> must remain constant concerning a uniform variable <span class="math notranslate nohighlight">\(u\)</span>.
+This requirement corresponds to the condition <span class="math notranslate nohighlight">\(\frac{\text{d}A}{\text{d}u} = 0\)</span>.</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-area-element-diff-eq2">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-area-element-diff-eq2">
+<span class="eqno">(5.203)<a class="headerlink" href="#equation-ring-sampling-area-element-diff-eq2" title="Link to this equation">¶</a></span>\[\frac{\text{d}A}{\text{d}u} = \frac{2\pi}{N} \frac{\text{d}}{\text{d}u} r'(u)  r(u) = r''(u) r(u) + (r'(u))^2 = 0\]</div>
+</div>
+<p>The solutions to this second-order, nonlinear differential equation take the form:</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-area-element-diff-eq-solution">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-area-element-diff-eq-solution">
+<span class="eqno">(5.204)<a class="headerlink" href="#equation-ring-sampling-area-element-diff-eq-solution" title="Link to this equation">¶</a></span>\[r(u) = \sqrt{c_1 + c_2 u}\]</div>
+</div>
+<p>For convenience, we set the constants to <span class="math notranslate nohighlight">\(c_1 = 0\)</span> and <span class="math notranslate nohighlight">\(c_2=1\)</span>.
+To obtain output values in the range <span class="math notranslate nohighlight">\([r_i, ~R]\)</span>, the corresponding input values are <span class="math notranslate nohighlight">\([r^2_i, ~R^2]\)</span>.
+By treating <span class="math notranslate nohighlight">\(r\)</span> and <span class="math notranslate nohighlight">\(u\)</span> as random variables, we arrive at:</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-r">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-r">
+<span class="eqno">(5.205)<a class="headerlink" href="#equation-ring-sampling-r" title="Link to this equation">¶</a></span>\[\mathcal{R} = \sqrt{\mathcal{U}_{[r^2_\text{i}, R^2]}}\]</div>
+</div>
+<p>The polar angle is uniformly spaced</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-phi">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-phi">
+<span class="eqno">(5.206)<a class="headerlink" href="#equation-ring-sampling-phi" title="Link to this equation">¶</a></span>\[\Phi = \mathcal{U}_{[0, 2\pi]}\]</div>
+</div>
+<p>Resulting 3D positions are then</p>
+<div class="math-wrapper docutils container" id="equation-ring-sampling-xyz">
+<div class="math notranslate nohighlight" id="equation-ring-sampling-xyz">
+<span class="eqno">(5.207)<a class="headerlink" href="#equation-ring-sampling-xyz" title="Link to this equation">¶</a></span>\[\begin{split}x =&amp;~ x_0 + \mathcal{R} \cos \Phi\\
+y =&amp;~ y_0 + \mathcal{R} \sin \Phi\\
+z =&amp;~ z_0\end{split}\]</div>
+</div>
+<p>Circle sampling is implemented as a ring with <span class="math notranslate nohighlight">\(r_\text{i} = 0\)</span>.
+Related: <a class="footnote-reference brackets" href="#footcite-wolframdiskpicking" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>Due to artifacts are different sampling technique is employed in optrace, as outlined in <a class="reference internal" href="sampling.html#disc-mapping"><span class="std std-numref">Section 5.1.6</span></a>.</p>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-wolframdiskpicking" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Wolfram MathWorld. Disk Point Picking. 2022. URL: <a class="reference external" href="https://mathworld.wolfram.com/DiskPointPicking.html">https://mathworld.wolfram.com/DiskPointPicking.html</a> (visited on 2022-12-01).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="color.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">5.8. </span>Color Management</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../reference/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">6. </span>API Reference</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

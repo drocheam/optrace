@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>4.4. Geometry Groups - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.5. Raytracer" href="raytracer.html" /><link rel="prev" title="4.3. Elements (Lens, Ray Source, …)" href="elements.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/usage/group.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/usage/group.html"/>
+  <meta property="og:title" content="4.4. Geometry Groups"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">4. User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#group">4.4.1. Group</a><ul>
+<li><a class="reference internal" href="#overview">4.4.1.1. Overview</a></li>
+<li><a class="reference internal" href="#geometry-properties">4.4.1.2. Geometry properties</a></li>
+<li><a class="reference internal" href="#example">4.4.1.3. Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#loading-zemax-opticstudio-geometries-zmx">4.4.2. Loading ZEMAX OpticStudio Geometries (.zmx)</a></li>
+<li><a class="reference internal" href="#geometry-presets">4.4.3. Geometry Presets</a><ul>
+<li><a class="reference internal" href="#ideal-camera">4.4.3.1. Ideal Camera</a></li>
+<li><a class="reference internal" href="#legrand-paraxial-eye-model">4.4.3.2. LeGrand Paraxial Eye Model</a></li>
+<li><a class="reference internal" href="#arizona-eye-model">4.4.3.3. Arizona Eye Model</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">4. </span>User Guide</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">4.4. </span>Geometry Groups</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/usage/group.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/usage/group.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/usage/group.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/group.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/usage/group.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="geometry-groups">
+<h1><span class="section-number">4.4. </span>Geometry Groups<a class="headerlink" href="#geometry-groups" title="Link to this heading">¶</a></h1>
+<section id="group">
+<h2><span class="section-number">4.4.1. </span>Group<a class="headerlink" href="#group" title="Link to this heading">¶</a></h2>
+<section id="overview">
+<h3><span class="section-number">4.4.1.1. </span>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a> is a container of several elements.</p>
+<p>It contains the following functionality:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-left">
+<colgroup>
+<col style="width: 54.5%" />
+<col style="width: 45.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Functionality</p></th>
+<th class="head"><p>Example</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Adding and removing one or more elements:</p></td>
+<td><div class="line-block">
+<div class="line"><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></code></div>
+<div class="line"><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></code></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Emptying all elements:</p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>check if an element is included:</p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>move all elements at once:</p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">move_to</span><span class="p">([</span><span class="mf">5.3</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">12.3</span><span class="p">])</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>rotate or flip all elements:</p></td>
+<td><div class="line-block">
+<div class="line"><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">)</span></code></div>
+<div class="line"><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span></code></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>create a ray transfer matrix of the whole group:</p></td>
+<td><p><code class="code highlight python docutils literal highlight-python"><span class="n">G</span><span class="o">.</span><span class="n">tma</span><span class="p">()</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a> object stores all elements in their own class lists:
+<code class="code highlight python docutils literal highlight-python"><span class="n">lenses</span><span class="p">,</span> <span class="n">ray_sources</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">markers</span><span class="p">,</span> <span class="n">filters</span><span class="p">,</span> <span class="n">apertures</span><span class="p">,</span> <span class="n">volumes</span></code>.
+Where <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a> and <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.lens.Lens" title="optrace.tracer.geometry.lens.Lens"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> are included in the same list, all marker types are included in <code class="code highlight python docutils literal highlight-python"><span class="n">markers</span></code>
+and all volume types in <code class="code highlight python docutils literal highlight-python"><span class="n">volumes</span></code>.</p>
+<p>When adding objects, the order of objects remains the same.
+Thus <code class="code highlight python docutils literal highlight-python"><span class="n">lenses</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></code> denotes the lens that was added third (counting starts at 0).
+For clarity, it is recommended to add objects in their correct z-order.</p>
+</section>
+<section id="geometry-properties">
+<h3><span class="section-number">4.4.1.2. </span>Geometry properties<a class="headerlink" href="#geometry-properties" title="Link to this heading">¶</a></h3>
+<p>A group shares the same functions for geometry properties and manipulations as an element,
+see <a class="reference internal" href="elements.html#element-geometry-props"><span class="std std-ref">Shared Functions/Properties</span></a>. There are three main differences:</p>
+<p><strong>Position</strong></p>
+<p>The position property describes the position of the first element (smallest z-position).</p>
+<p><strong>Flipping</strong></p>
+<p>When flipping, additional parameters <code class="code highlight python docutils literal highlight-python"><span class="n">y0</span></code>, <code class="code highlight python docutils literal highlight-python"><span class="n">z0</span></code> can be provided to define a rotation axis.
+By default, <code class="code highlight python docutils literal highlight-python"><span class="n">y0</span> <span class="o">=</span> <span class="mi">0</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">z0</span></code> are the center of the extent of the group.
+See <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.flip" title="optrace.tracer.geometry.group.Group.flip"><code class="xref py py-func docutils literal notranslate"><span class="pre">Group.flip</span></code></a> for details.</p>
+<p><strong>Rotation</strong></p>
+<p>For rotation, parameters <code class="code highlight python docutils literal highlight-python"><span class="n">x0</span></code>, <code class="code highlight python docutils literal highlight-python"><span class="n">y0</span></code> can be additionally provided,
+which also describe a position of the rotation axis.
+By default, both are zero.
+See <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group.rotate" title="optrace.tracer.geometry.group.Group.rotate"><code class="xref py py-func docutils literal notranslate"><span class="pre">Group.rotate</span></code></a>.</p>
+</section>
+<section id="example">
+<h3><span class="section-number">4.4.1.3. </span>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<p>The following example creates a Group consisting of an <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.ideal_lens.IdealLens" title="optrace.tracer.geometry.ideal_lens.IdealLens"><code class="xref py py-class docutils literal notranslate"><span class="pre">IdealLens</span></code></a> and
+an <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.aperture.Aperture" title="optrace.tracer.geometry.aperture.Aperture"><code class="xref py py-class docutils literal notranslate"><span class="pre">Aperture</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">IL</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">IdealLens</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">D</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">F</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Aperture</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">RingSurface</span><span class="p">(</span><span class="n">ri</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">])</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">G</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Group</span><span class="p">([</span><span class="n">IL</span><span class="p">,</span> <span class="n">F</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>Next, we flip the group, reversing the z-order of the elements and flipping each element
+around its x-axis through the center. Since all elements are rotationally symmetric, this just reorders them.
+After flipping we move the group to a new position. This position is the new position for the first element
+(which after flipping is the filter), whereas all relative distances to all other elements are kept equal.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">G</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+</span><span data-line="2"><span class="n">G</span><span class="o">.</span><span class="n">move_to</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<p>The filter is the first element and has the same position as we moved the group to.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">apertures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span>
+</span><span data-line="2"><span class="go">array([0., 1., 0.])</span>
+</span></pre></div>
+</div>
+<p>The lens has the same relative distance of <span class="math notranslate nohighlight">\(\Delta z = 20\)</span> mm relative to the Filter,
+but in a different absolute position and now behind the filter.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">lenses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span>
+</span><span data-line="2"><span class="go">array([ 0.,  1., 20.])</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="loading-zemax-opticstudio-geometries-zmx">
+<h2><span class="section-number">4.4.2. </span>Loading ZEMAX OpticStudio Geometries (.zmx)<a class="headerlink" href="#loading-zemax-opticstudio-geometries-zmx" title="Link to this heading">¶</a></h2>
+<p>It is possible to load <code class="docutils literal notranslate"><span class="pre">.zmx</span></code> geometries into optrace.
+The following example loads a geometry from file <code class="docutils literal notranslate"><span class="pre">setup.zmx</span></code> into the raytracer:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">])</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">RS</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">RaySource</span><span class="p">(</span><span class="n">ot</span><span class="o">.</span><span class="n">CircularSurface</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">0.05</span><span class="p">),</span>
+</span><span data-line="4">                  <span class="n">spectrum</span><span class="o">=</span><span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">light_spectrum</span><span class="o">.</span><span class="n">d65</span><span class="p">,</span>
+</span><span data-line="5">                  <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">])</span>
+</span><span data-line="6"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">RS</span><span class="p">)</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="n">n_schott</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">load_agf</span><span class="p">(</span><span class="s2">&quot;schott.agf&quot;</span><span class="p">)</span>
+</span><span data-line="9"><span class="n">G</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">load_zmx</span><span class="p">(</span><span class="s2">&quot;setup.zmx&quot;</span><span class="p">,</span> <span class="n">n_dict</span><span class="o">=</span><span class="n">n_schott</span><span class="p">)</span>
+</span><span data-line="10"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="n">RT</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>For the materials to be loaded correctly all mentioned names in the <code class="docutils literal notranslate"><span class="pre">.zmx</span></code>
+file need to be included in the <code class="code highlight python docutils literal highlight-python"><span class="n">n_dict</span></code> dictionary.
+You can either load them from a <code class="docutils literal notranslate"><span class="pre">.agf</span></code> catalogue like in <a class="reference internal" href="refraction_index.html#agf-load"><span class="std std-numref">Section 4.6.4</span></a> or create the dictionary manually.</p>
+<p>A list of exemplary <code class="docutils literal notranslate"><span class="pre">.zmx</span></code> files can be found in the following
+<a class="reference external" href="https://github.com/nzhagen/LensLibrary/tree/main/zemax_files">repository</a>.</p>
+<p>Unfortunately, the support is only experimental, as there is no official documentation on the file format.
+Additionally, only a subset of all ZEMAX OpticStudio functionality is supported, including:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SEQ</span></code>-mode only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UNIT</span></code> must be <code class="docutils literal notranslate"><span class="pre">MM</span></code></p></li>
+<li><p>only <code class="docutils literal notranslate"><span class="pre">STANDARD</span></code> or <code class="docutils literal notranslate"><span class="pre">EVENASPH</span></code> surfaces, this is equivalent to
+<code class="code highlight python docutils literal highlight-python"><span class="n">RingSurface</span><span class="p">,</span> <span class="n">CircularSurface</span><span class="p">,</span> <span class="n">SphericalSurface</span><span class="p">,</span> <span class="n">ConicSurface</span><span class="p">,</span> <span class="n">AsphericSurface</span></code> in optrace</p></li>
+<li><p>no support for coatings</p></li>
+<li><p>temperature or absorption behavior of the material is neglected</p></li>
+<li><p>only loads lens and aperture geometries, no support for additional objects</p></li>
+</ul>
+<p>Information on the file format can be found in <a class="footnote-reference brackets" href="#footcite-zemax-2000" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>,
+as well as <a class="reference external" href="https://github.com/mjhoptics/ray-optics/blob/master/src/rayoptics/zemax/zmxread.py">here</a>
+and <a class="reference external" href="https://github.com/quartiq/rayopt/blob/master/rayopt/zemax.py">here</a>.</p>
+</section>
+<section id="geometry-presets">
+<h2><span class="section-number">4.4.3. </span>Geometry Presets<a class="headerlink" href="#geometry-presets" title="Link to this heading">¶</a></h2>
+<section id="ideal-camera">
+<h3><span class="section-number">4.4.3.1. </span>Ideal Camera<a class="headerlink" href="#ideal-camera" title="Link to this heading">¶</a></h3>
+<p>An ideal camera preset is included, that provides aberration-free imaging towards a detector.</p>
+<p>The preset is loaded with <a class="reference internal" href="../reference/optrace_tracer_presets.html#optrace.tracer.presets.geometry.ideal_camera" title="optrace.tracer.presets.geometry.ideal_camera"><code class="xref py py-func docutils literal notranslate"><span class="pre">ot.presets.geometry.ideal_camera</span></code></a>
+and returns a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a> object consisting of a lens and a detector.
+Required parameters are the object position <code class="code highlight python docutils literal highlight-python"><span class="n">z_g</span></code> as well as the camera position (the position of the lens)
+<code class="code highlight python docutils literal highlight-python"><span class="n">cam_pos</span></code>, as well as the image distance <code class="code highlight python docutils literal highlight-python"><span class="n">b</span></code>,
+which in this case is just the difference distance between lens and detector.
+A visual presentation of these quantities is shown in the figure below.</p>
+<p>An exemplary call could be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">G</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">ideal_camera</span><span class="p">(</span><span class="n">cam_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">12.3</span><span class="p">],</span>
+</span><span data-line="2">                                     <span class="n">z_g</span><span class="o">=-</span><span class="mf">56.06</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The lens diameter parameter <code class="code highlight python docutils literal highlight-python"><span class="n">r</span></code> and detector radius <code class="code highlight python docutils literal highlight-python"><span class="n">r_det</span></code> are provided by doing the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">G</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">ideal_camera</span><span class="p">(</span><span class="n">cam_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">12.3</span><span class="p">],</span>
+</span><span data-line="2">                                     <span class="n">z_g</span><span class="o">=-</span><span class="mf">56.06</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">r_det</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>The function also supports an infinite position of <code class="code highlight python docutils literal highlight-python"><span class="n">z_g</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span></code>.</p>
+<p>When given a desired object magnification <span class="math notranslate nohighlight">\(m\)</span>, the image distance parameter <span class="math notranslate nohighlight">\(b\)</span> can be calculated with:</p>
+<div class="math-wrapper docutils container" id="equation-usage-group-0">
+<div class="math notranslate nohighlight" id="equation-usage-group-0">
+<span class="eqno">(4.3)<a class="headerlink" href="#equation-usage-group-0" title="Link to this equation">¶</a></span>\[m = \frac{b}{g} \Rightarrow b = m \cdot g\]</div>
+</div>
+<p>Which should be known from the fundamentals of optics.
+Where <span class="math notranslate nohighlight">\(g\)</span> is the object distance, in our example <code class="code highlight python docutils literal highlight-python"><span class="n">z_g</span> <span class="o">-</span> <span class="n">cam_pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></code>.
+Note that <span class="math notranslate nohighlight">\(b, g\)</span>  both need to be positive for this preset to work.</p>
+<figure class="align-center" id="id6">
+<a class="dark-light reference internal image-reference" href="../_images/ideal_camera.svg"><img alt="../_images/ideal_camera.svg" class="dark-light" src="../_images/ideal_camera.svg" width="730" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.17 </span><span class="caption-text">Visualization of the <a class="reference internal" href="../reference/optrace_tracer_presets.html#optrace.tracer.presets.geometry.ideal_camera" title="optrace.tracer.presets.geometry.ideal_camera"><code class="xref py py-func docutils literal notranslate"><span class="pre">ideal_camera</span></code></a> parameters.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="legrand-paraxial-eye-model">
+<h3><span class="section-number">4.4.3.2. </span>LeGrand Paraxial Eye Model<a class="headerlink" href="#legrand-paraxial-eye-model" title="Link to this heading">¶</a></h3>
+<p>The LeGrand full theoretical eye model is a simple model consisting of only spherical surfaces
+and wavelength-independent refractive indices. It models the paraxial behavior of a far-adapted eye.</p>
+<div class="table-wrapper colwidths-given docutils container" id="id7">
+<table class="docutils align-center" id="id7" style="width: 860px">
+<caption><span class="caption-number">Table 4.2 </span><span class="caption-text">LeGrand Full Theoretical Eye Model <a class="footnote-reference brackets" href="#footcite-schwiegerlingoptics" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#id7" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 26.8%" />
+<col style="width: 18.3%" />
+<col style="width: 18.3%" />
+<col style="width: 18.3%" />
+<col style="width: 18.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Surface</p></th>
+<th class="head"><p>Radius in mm</p></th>
+<th class="head"><p>Conic Constant</p></th>
+<th class="head"><p>Refraction Index to next surface</p></th>
+<th class="head"><p>Thickness (mm) (to next surface)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Cornea Anterior</p></td>
+<td><p>7.80</p></td>
+<td><p>0</p></td>
+<td><p>1.3771</p></td>
+<td><p>0.5500</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cornea Posterior</p></td>
+<td><p>6.50</p></td>
+<td><p>0</p></td>
+<td><p>1.3374</p></td>
+<td><p>3.0500</p></td>
+</tr>
+<tr class="row-even"><td><p>Lens Anterior</p></td>
+<td><p>10.20</p></td>
+<td><p>0</p></td>
+<td><p>1.4200</p></td>
+<td><p>4.0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Lens Posterior</p></td>
+<td><p>-6.00</p></td>
+<td><p>0</p></td>
+<td><p>1.3360</p></td>
+<td><p>16.5966</p></td>
+</tr>
+<tr class="row-even"><td><p>Retina</p></td>
+<td><p>-13.40</p></td>
+<td><p>0</p></td>
+<td><p><cite>-</cite></p></td>
+<td><p><cite>-</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The preset <a class="reference internal" href="../reference/optrace_tracer_presets.html#optrace.tracer.presets.geometry.legrand_eye" title="optrace.tracer.presets.geometry.legrand_eye"><code class="xref py py-func docutils literal notranslate"><span class="pre">legrand_eye</span></code></a> is located in
+<a class="reference internal" href="../reference/optrace_tracer_presets.html#module-optrace.tracer.presets.geometry" title="optrace.tracer.presets.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ot.presets.geometry</span></code></a> and is called as a function.
+It returns a <a class="reference internal" href="../reference/optrace_tracer_geometry.html#optrace.tracer.geometry.group.Group" title="optrace.tracer.geometry.group.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a> object that can be added to a <a class="reference internal" href="../reference/optrace_tracer.html#optrace.tracer.raytracer.Raytracer" title="optrace.tracer.raytracer.Raytracer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Raytracer</span></code></a>. Provide a <code class="code highlight python docutils literal highlight-python"><span class="n">pos</span></code> parameter
+to position it at an other position than <code class="code highlight python docutils literal highlight-python"><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">eye_model</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">legrand_eye</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">])</span>
+</span><span data-line="3"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eye_model</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Optional parameters include a pupil diameter and a lateral detector (retina) radius, both provided in millimeters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">eye_model</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">legrand_eye</span><span class="p">(</span><span class="n">pupil</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">r_det</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">])</span>
+</span></pre></div>
+</div>
+</section>
+<section id="arizona-eye-model">
+<h3><span class="section-number">4.4.3.3. </span>Arizona Eye Model<a class="headerlink" href="#arizona-eye-model" title="Link to this heading">¶</a></h3>
+<p>A more advanced model is the <a class="reference internal" href="../reference/optrace_tracer_presets.html#optrace.tracer.presets.geometry.arizona_eye" title="optrace.tracer.presets.geometry.arizona_eye"><code class="xref py py-func docutils literal notranslate"><span class="pre">arizona_eye</span></code></a> model,
+which tries to match clinical levels of aberration for different adaption levels.
+It consists of conic surfaces, dispersive media and adaptation dependent parameters.</p>
+<div class="table-wrapper colwidths-given docutils container" id="id8">
+<table class="docutils align-center" id="id8" style="width: 860px">
+<caption><span class="caption-number">Table 4.3 </span><span class="caption-text">Arizona Eye Model <a class="footnote-reference brackets" href="#footcite-schwiegerlingoptics" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#id8" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Surface</p></th>
+<th class="head"><p>Radius in mm</p></th>
+<th class="head"><p>Conic Constant</p></th>
+<th class="head"><p>Refraction Index to next surface</p></th>
+<th class="head"><p>Abbe Number</p></th>
+<th class="head"><p>Thickness (mm) (to next surface)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Cornea Anterior</p></td>
+<td><p>7.80</p></td>
+<td><p>-0.25</p></td>
+<td><p>1.377</p></td>
+<td><p>57.1</p></td>
+<td><p>0.55</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cornea Posterior</p></td>
+<td><p>6.50</p></td>
+<td><p>-0.25</p></td>
+<td><p>1.337</p></td>
+<td><p>61.3</p></td>
+<td><p><span class="math notranslate nohighlight">\(t_\text{aq}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Lens Anterior</p></td>
+<td><p><span class="math notranslate nohighlight">\(R_\text{ant}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(K_\text{ant}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(n_\text{lens}\)</span></p></td>
+<td><p>51.9</p></td>
+<td><p><span class="math notranslate nohighlight">\(t_\text{lens}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Lens Posterior</p></td>
+<td><p><span class="math notranslate nohighlight">\(R_\text{post}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(K_\text{post}\)</span></p></td>
+<td><p>1.336</p></td>
+<td><p>61.1</p></td>
+<td><p>16.713</p></td>
+</tr>
+<tr class="row-even"><td><p>Retina</p></td>
+<td><p>-13.40</p></td>
+<td><p>0</p></td>
+<td><p><cite>-</cite></p></td>
+<td><p><cite>-</cite></p></td>
+<td><p><cite>-</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>With an accommodation level <span class="math notranslate nohighlight">\(A\)</span> in dpt the missing parameters
+are calculated using: <a class="footnote-reference brackets" href="#footcite-schwiegerlingoptics" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
+<div class="math-wrapper docutils container" id="equation-usage-group-1">
+<div class="math notranslate nohighlight" id="equation-usage-group-1">
+<span class="eqno">(4.4)<a class="headerlink" href="#equation-usage-group-1" title="Link to this equation">¶</a></span>\[\begin{split}\begin{array}{ll}
+    R_{\text {ant }}=12.0-0.4 A &amp; K_{\text {ant }}=-7.518749+1.285720 A \\
+    R_{\text {post }}=-5.224557+0.2 A &amp; K_{\text {post }}=-1.353971-0.431762 A \\
+    t_{\text {aq }}=2.97-0.04 A &amp; t_{\text {lens }}=3.767+0.04 A \\
+    n_{\text {lens }}=1.42+0.00256 A-0.00022 A^2
+\end{array}\end{split}\]</div>
+</div>
+<p>Accessing and adding the group works the same as for the
+<a class="reference internal" href="../reference/optrace_tracer_presets.html#optrace.tracer.presets.geometry.legrand_eye" title="optrace.tracer.presets.geometry.legrand_eye"><code class="xref py py-func docutils literal notranslate"><span class="pre">legrand_eye</span></code></a> preset.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">RT</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">Raytracer</span><span class="p">(</span><span class="n">outline</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+</span><span data-line="2"><span class="n">eye_model</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">arizona_eye</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">])</span>
+</span><span data-line="3"><span class="n">RT</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eye_model</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>As for the <a class="reference internal" href="../reference/optrace_tracer_presets.html#optrace.tracer.presets.geometry.legrand_eye" title="optrace.tracer.presets.geometry.legrand_eye"><code class="xref py py-func docutils literal notranslate"><span class="pre">legrand_eye</span></code></a>, we have the parameters
+<code class="code highlight python docutils literal highlight-python"><span class="n">pupil</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">r_det</span></code>. Additionally there is an <code class="code highlight python docutils literal highlight-python"><span class="n">adaptation</span></code>
+parameter specified in diopters, which defaults to 0 dpt.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">eye_model</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">presets</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">arizona_eye</span><span class="p">(</span><span class="n">adaptation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pupil</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">r_det</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<figure class="align-center" id="id9">
+<a class="dark-light reference internal image-reference" href="../_images/example_arizona_eye_scene.png"><img alt="../_images/example_arizona_eye_scene.png" class="dark-light" src="../_images/example_arizona_eye_scene.png" width="730" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4.18 </span><span class="caption-text">Eye model in the <a class="reference internal" href="../examples.html#example-arizona-eye-model"><span class="std std-ref">Arizona Eye Model</span></a> example script.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id5">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-zemax-2000" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Focus Software, Incorporated. Zemax® optical design program user’s guide version 9.0, chapter 29: the zmx file format. 2000. URL: <a class="reference external" href="https://pdfcoffee.com/zemaxmanual-pdf-free.html">https://pdfcoffee.com/zemaxmanual-pdf-free.html</a> (visited on 2024-04-09).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-schwiegerlingoptics" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id4">3</a>)</span>
+<p>Jim Schwiegerling. <em>Field Guide to Visual and Ophthalmic Optics</em>. SPIE, 2004. URL: <a class="reference external" href="https://doi.org/10.1117/3.592975">https://doi.org/10.1117/3.592975</a>, <a class="reference external" href="https://doi.org/10.1117/3.592975">doi:10.1117/3.592975</a>.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="elements.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">4.3. </span>Elements (Lens, Ray Source,  …)</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="raytracer.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">4.5. </span>Raytracer</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

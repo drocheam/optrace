@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>5.8. Color Management - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="5.9. Miscellaneous" href="misc.html" /><link rel="prev" title="5.7. Focus Methods" href="focus.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/details/color.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/details/color.html"/>
+  <meta property="og:title" content="5.8. Color Management"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">5. Implementation Details</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#xyz-color-space">5.8.1. XYZ Color Space</a></li>
+<li><a class="reference internal" href="#xyy-color-space">5.8.2. xyY Color Space</a></li>
+<li><a class="reference internal" href="#srgb-color-space">5.8.3. sRGB Color Space</a></li>
+<li><a class="reference internal" href="#cieluv-color-space">5.8.4. CIELUV Color Space</a></li>
+<li><a class="reference internal" href="#srgb-spectral-upsampling">5.8.5. sRGB Spectral Upsampling</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">5. </span>Implementation Details</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">5.8. </span>Color Management</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/details/color.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/details/color.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/details/color.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/color.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/color.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="color-management">
+<span id="id1"></span><h1><span class="section-number">5.8. </span>Color Management<a class="headerlink" href="#color-management" title="Link to this heading">¶</a></h1>
+<section id="xyz-color-space">
+<span id="id2"></span><h2><span class="section-number">5.8.1. </span>XYZ Color Space<a class="headerlink" href="#xyz-color-space" title="Link to this heading">¶</a></h2>
+<p>Color perception, unlike spectral wavelengths, is not a directly measurable physical property.
+Instead, it arises from the physiological characteristics of the human visual system, making it inherently subjective.</p>
+<p>Human vision is mediated by five types of photoreceptors. Retinal ganglion cells regulate circadian rhythms,
+rod cells (neuron bacilliferum) enable night vision (scotopic vision). Cone cells (neuron coniferum)
+are responsible for color perception and daytime vision (photopic vision). Of these, the three types of cone cells
+are most relevant in color management. Each type exhibits a distinct spectral sensitivity curve, which describes
+how it responds to different wavelengths of light. When light strikes the retina, the incident spectrum is filtered
+through these sensitivities to produce receptor-specific stimuli.</p>
+<p>These three cone sensitivities are commonly referred to as L (long), M (medium), and S (short).
+The resulting signals define the LMS color space.</p>
+<p>However, in practice, the XYZ color space is typically used. It is derived through a linear transformation
+of the L, M, and S components. The XYZ values, also known as tristimulus values, are capable of representing
+the entire range of colors visible to the average human observer.
+It is important to note that spectral sensitivity can vary slightly from person to person and may be influenced
+by additional factors. The figure <a class="reference internal" href="#cie-cmf"><span class="std std-numref">Fig. 5.22</span></a> illustrates the standard color matching functions, which
+represent the average sensitivities measured from a group of observers for a 2° field of view. These measurements
+were conducted in 1928 and 1931 and form the basis of the CIE 1931 2° Standard Observer. These functions remain
+the most widely used reference for color conversion and management.</p>
+<figure class="align-center" id="id24">
+<span id="cie-cmf"></span><a class="dark-light reference internal image-reference" href="../_images/cie_cmf.svg"><img alt="../_images/cie_cmf.svg" class="dark-light" src="../_images/cie_cmf.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.22 </span><span class="caption-text">CIE 1931 2° color matching functions</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Using a spectral power distribution <span class="math notranslate nohighlight">\(P(\lambda)\)</span> and the three color matching functions shown in
+<a class="reference internal" href="#cie-cmf"><span class="std std-numref">Fig. 5.22</span></a>, the tristimulus values <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(Y\)</span>, and <span class="math notranslate nohighlight">\(Z\)</span> can be computed as follows:</p>
+<div class="math-wrapper docutils container" id="equation-xyz-calc">
+<div class="math notranslate nohighlight" id="equation-xyz-calc">
+<span class="eqno">(5.169)<a class="headerlink" href="#equation-xyz-calc" title="Link to this equation">¶</a></span>\[\begin{split}X &amp;=\int_{\lambda} P(\lambda) \cdot x(\lambda) ~d \lambda \\
+Y &amp;=\int_{\lambda} P(\lambda) \cdot y(\lambda) ~d \lambda \\
+Z &amp;=\int_{\lambda} P(\lambda) \cdot z(\lambda) ~d \lambda\end{split}\]</div>
+</div>
+<p>Among these, the <span class="math notranslate nohighlight">\(Y\)</span> component corresponds to the perceived brightness of the stimulus.
+To convert this value into the luminous flux <span class="math notranslate nohighlight">\(\Phi_v\)</span>, commonly used in photometry,
+a simple scaling by the luminous efficacy constant is applied:</p>
+<div class="math-wrapper docutils container" id="equation-luminous-flux">
+<div class="math notranslate nohighlight" id="equation-luminous-flux">
+<span class="eqno">(5.170)<a class="headerlink" href="#equation-luminous-flux" title="Link to this equation">¶</a></span>\[\Phi_v = 683 \frac{\text{lm}}{\text{W}} ~Y\]</div>
+</div>
+<p>It is important to note that the formula in <a class="reference internal" href="#equation-luminous-flux">(5.170)</a> and the interpretation
+of <span class="math notranslate nohighlight">\(Y\)</span> as a luminance are only valid under conditions of photopic (daylight) vision.
+For mesopic (twilight) or scotopic (night) vision, different luminous efficiency functions
+must be used to account for the varying sensitivity of the visual system.</p>
+</section>
+<section id="xyy-color-space">
+<h2><span class="section-number">5.8.2. </span>xyY Color Space<a class="headerlink" href="#xyy-color-space" title="Link to this heading">¶</a></h2>
+<p>Until now, each of the three tristimulus values contained a mixture of color and brightness information.
+The CIE xyY color space offers a more convenient representation by separating chromaticity (color information)
+into the two-dimensional <em>xy</em> components and luminance (brightness) into the <em>Y</em> component.
+The reference point for neutral color, known as the white point, is defined by the chromaticity coordinates
+of the D65 standard illuminant. The spectral power distribution of D65 is designed to approximate average midday
+daylight in open air in Europe.</p>
+<p>The resulting chromaticity diagram, including the D65 white point, is shown in <a class="reference internal" href="#chroma-1931"><span class="std std-numref">Fig. 5.23</span></a>.
+The spectral locus, representing monochromatic light at each visible wavelength, forms the outer boundary of the gamut,
+which encompasses all colors that can be represented within this system.</p>
+<figure class="align-center" id="id25">
+<span id="chroma-1931"></span><a class="dark-light reference internal image-reference" href="../_images/chroma_1931.svg"><img alt="../_images/chroma_1931.svg" class="dark-light" src="../_images/chroma_1931.svg" width="700" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.23 </span><span class="caption-text">xy chromaticity diagram with sRGB Gamut</span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>XYZ to xyY</strong></p>
+<p>The following transformations convert CIE XYZ tristimulus values to CIE xyY color space components.
+These formulas are valid for <span class="math notranslate nohighlight">\(X,~Y,~Z &gt; 0\)</span>. If any of these values are not strictly positive,
+the chromaticity coordinates are set to the white point coordinates (<span class="math notranslate nohighlight">\(x=x_r,~y=y_r\)</span>) and <span class="math notranslate nohighlight">\(Y\)</span> is set to 0.
+The white point coordinates are typically those of the D65 standard illuminant,
+where <span class="math notranslate nohighlight">\(x_r=0.31272\)</span> and <span class="math notranslate nohighlight">\(y_r=0.32903\)</span> (see CIE Colorimetry, 3rd Edition, 2004, Table 11.3).</p>
+<div class="math-wrapper docutils container" id="equation-eq-xyz-xyy">
+<div class="math notranslate nohighlight" id="equation-eq-xyz-xyy">
+<span class="eqno">(5.171)<a class="headerlink" href="#equation-eq-xyz-xyy" title="Link to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+x &amp;= \frac{X}{X + Y + Z} \\
+y &amp;= \frac{Y}{X + Y + Z} \\
+z &amp;= \frac{Z}{X + Y + Z} = 1 - x - y\\
+Y &amp;= Y
+\end{aligned}\end{split}\]</div>
+</div>
+<p>Note that the <span class="math notranslate nohighlight">\(z\)</span> component is often omitted as its value is implicitly determined by <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>
+through the relationship <span class="math notranslate nohighlight">\(x+y+z=1\)</span>.</p>
+<p><strong>xyY to XYZ</strong></p>
+<p>The inverse transformation from CIE xyY to CIE XYZ is given by:</p>
+<div class="math-wrapper docutils container" id="equation-eq-xyy-xyz">
+<div class="math notranslate nohighlight" id="equation-eq-xyy-xyz">
+<span class="eqno">(5.172)<a class="headerlink" href="#equation-eq-xyy-xyz" title="Link to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+X &amp;= x \cdot \frac{Y}{y} \\
+Y &amp;= Y\\
+Z &amp;= z \cdot \frac{Y}{y} \\
+\end{aligned}\end{split}\]</div>
+</div>
+</section>
+<section id="srgb-color-space">
+<h2><span class="section-number">5.8.3. </span>sRGB Color Space<a class="headerlink" href="#srgb-color-space" title="Link to this heading">¶</a></h2>
+<p>The standard RGB (sRGB) color space serves as the most common color space for digital media.
+Its color gamut is defined by a triangle, where any color within this triangle can be represented by a combination
+of its three primary colors: red, green, and blue, located at the triangle’s vertices.
+Given that digital monitors also typically employ three distinct light emitters per pixel,
+the utility of such a three-primary system becomes apparent.</p>
+<p>sRGB utilizes the D65 white point, defined by the CIE XYZ coordinates
+<span class="math notranslate nohighlight">\(X=0.95047,~Y=1,~Z=1.08883\)</span> (<a class="footnote-reference brackets" href="#footcite-wikid65" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>).
+It’s important to note that the sRGB gamut does not encompass the entire spectrum of visible colors,
+particularly lacking highly saturated colors.
+The sRGB gamut’s position within the broader color space is visualized in <a class="reference internal" href="#chroma-1931"><span class="std std-numref">Fig. 5.23</span></a>.</p>
+<p>Color information in sRGB is typically stored with three values per pixel,
+each corresponding to one of the red, green, or blue channels.
+With a common bit depth of 8 bits per channel, the intensity range for each primary is limited to 256 discrete values.
+However, human perception of luminance is non-linear.
+Directly encoding linear intensity values within this limited range would result in a
+disproportionate allocation of bits, leading to fine intensity steps in some regions and coarse steps in others,
+potentially causing visual banding artifacts.</p>
+<p>To mitigate this issue, sRGB values undergo a <em>gamma correction</em>. This non-linear transformation approximates the
+human eye’s luminance sensitivity, effectively distributing the available digital values more uniformly
+according to perceived brightness and minimizing banding.</p>
+<p><strong>Conversion XYZ to sRGB</strong></p>
+<p>The linear sRGB values, before gamma correction, are obtained through a linear transformation of
+the CIE XYZ tristimulus values. The conversion from CIE XYZ to linear sRGB is defined by the following
+matrix multiplication <a class="footnote-reference brackets" href="#footcite-bloommatrices" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-srgbwiki" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-xyz2rgb">
+<div class="math notranslate nohighlight" id="equation-xyz2rgb">
+<span class="eqno">(5.173)<a class="headerlink" href="#equation-xyz2rgb" title="Link to this equation">¶</a></span>\[\begin{split}\left[\begin{array}{l}
+            R_{\text {linear}} \\
+            G_{\text {linear}} \\
+            B_{\text {linear}}
+    \end{array}\right]=\left[\begin{array}{ccc}
+    +3.2404542 &amp; -1.5371385 &amp; -0.4985314 \\
+    -0.9692660 &amp; +1.8760108 &amp; +0.0415560 \\
+    +0.0556434 &amp; -0.2040259 &amp; +1.0572252
+    \end{array}\right]\left[\begin{array}{c}
+            X_\text{D65} \\
+            Y_\text{D65} \\
+            Z_\text{D65}
+    \end{array}\right]\end{split}\]</div>
+</div>
+<p>Applying the gamma correction results in:</p>
+<div class="math-wrapper docutils container" id="equation-gamma-correction">
+<div class="math notranslate nohighlight" id="equation-gamma-correction">
+<span class="eqno">(5.174)<a class="headerlink" href="#equation-gamma-correction" title="Link to this equation">¶</a></span>\[\begin{split}C_{\text {sRGB}}= \begin{cases}12.92\cdot C_{\text {linear}}, &amp; C_{\text {linear}} \leq 0.0031308 \\[1.5ex]
+1.055\cdot C_{\text {linear}}^{1 / 2.4}-0.055, &amp; C_{\text {linear}}&gt;0.0031308\end{cases}\end{split}\]</div>
+</div>
+<p><strong>Conversion sRGB to XYZ</strong></p>
+<p>The inverse transformation from sRGB to XYZ is performed as follows <a class="footnote-reference brackets" href="#footcite-bloommatrices" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-srgbwiki" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-gamma-correction-reverse">
+<div class="math notranslate nohighlight" id="equation-gamma-correction-reverse">
+<span class="eqno">(5.175)<a class="headerlink" href="#equation-gamma-correction-reverse" title="Link to this equation">¶</a></span>\[\begin{split}C_{\text {linear }}=
+\begin{cases}\displaystyle\frac{C_{\text {sRGB}}}{12.92}, &amp; C_{\text {sRGB}} \leq 0.04045 \\[1.5ex]
+    \displaystyle\left(\frac{C_{\text {sRGB}}+0.55}{1.055}\right)^{2.4}, &amp; C_{\text {sRGB}}&gt;0.04045\end{cases}\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-rgb2xyz">
+<div class="math notranslate nohighlight" id="equation-rgb2xyz">
+<span class="eqno">(5.176)<a class="headerlink" href="#equation-rgb2xyz" title="Link to this equation">¶</a></span>\[\begin{split}\left[\begin{array}{l}
+                    X_{\text {D65}} \\
+                    Y_{\text {D65}} \\
+                    Z_{\text {D65}}
+            \end{array}\right]=\left[\begin{array}{ccc}
+        0.4124564 &amp; 0.3575761 &amp; 0.1804375\\
+        0.2126729 &amp; 0.7151522 &amp; 0.0721750\\
+        0.0193339 &amp; 0.1191920 &amp; 0.9503041
+            \end{array}\right]\left[\begin{array}{c}
+                    R_{\text{linear}} \\
+                    G_{\text{linear}} \\
+                    B_{\text{linear}}
+    \end{array}\right]\end{split}\]</div>
+</div>
+<p><strong>Rendering Intents</strong></p>
+<p>As illustrated in <a class="reference internal" href="#chroma-1931"><span class="std std-numref">Fig. 5.23</span></a>, the sRGB color gamut does not encompass the entirety of humanly visible colors.
+Various approaches exist to handle colors that fall outside this gamut.
+The simplest is to simply clamp any negative sRGB values to zero, often resulting in inaccurate color and brightness
+representation. This approach is still commonly found, possibly
+due to its ease of implementation or a lack of awareness of better methods</p>
+<p><a class="footnote-reference brackets" href="#footcite-ottossonclipping" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> presents several more sophisticated <em>gamut clipping</em> techniques designed
+to minimize the visual artifacts.</p>
+<figure class="align-center" id="id26">
+<a class="dark-light reference internal image-reference" href="../_images/rendering_intents.svg"><img alt="../_images/rendering_intents.svg" class="dark-light" src="../_images/rendering_intents.svg" width="550" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.24 </span><span class="caption-text">Absolute and perceptual colorimetric rendering intent in the CIE 1976 chromaticity diagram.</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Implemented Rendering Intents:</p>
+<ol class="arabic simple">
+<li><p><strong>Ignore</strong>: This intent leaves out-of-gamut color values unmodified,
+delegating their handling to subsequent processing stages. Typically, this results in these values being clamped
+by other methods, which can introduce significant inaccuracies in hue, saturation, and brightness.</p></li>
+<li><p><strong>Absolute Colorimetric</strong>: Colors that fall within the target gamut are left unchanged. Colors outside the gamut
+are projected onto the gamut boundary along a straight line directed towards the white point.
+This method is equivalent to chroma clipping in the CIE 1931 xy chromaticity diagram.</p></li>
+<li><p><strong>Perceptual Colorimetric</strong>: This intent identifies the most saturated color that lies outside the target gamut.
+It then rescales the saturation of all colors in the image proportionally, such that this most saturated
+out-of-gamut color is brought within the gamut boundary. This technique, equivalent to chroma rescaling,
+is typically performed in the CIE 1976 uv chromaticity diagram, as this color space is designed such
+that Euclidean distances correlate well with perceived color differences.</p></li>
+</ol>
+<p>The gamut boundary intersection for the <em>Absolute Colorimetric</em> mode is calculated within the CIE 1931 xy
+chromaticity diagram, with the projection direction determined by the white point of the D65 standard illuminant.
+The determination and rescaling of chroma in the <em>Perceptual Colorimetric</em> mode are performed in the CIE 1976 uv
+chromaticity diagram to better align numerical color differences with perceptual uniformity.</p>
+<p>In its default configuration, the Perceptual Colorimetric rendering intent scales the chroma of all colors to
+ensure they fall within the target gamut. Alternatively, a fixed rescaling factor (within the range 0 to 1) can be
+supplied via the <code class="code highlight python docutils literal highlight-python"><span class="n">chroma_scale</span></code> parameter. This allows for consistent scaling, which can be beneficial when
+comparing different images. In the adaptive scaling scenario, an additional <code class="code highlight python docutils literal highlight-python"><span class="n">L_th</span></code> parameter can be specified.
+This parameter represents a relative luminance threshold: colors with luminance below this threshold are excluded from
+the calculation of the scaling factor. This can be useful for disregarding dark but saturated image regions that might
+otherwise influence the overall chroma scaling. For more detailed information, refer to <a class="reference internal" href="../usage/advanced.html#usage-color"><span class="std std-ref">Color Conversions</span></a>.</p>
+<p>The effect of different rendering intents is illustrated in the next figures.
+The rendered images were created using the <a class="reference internal" href="../examples.html#example-prism"><span class="std std-ref">Prism</span></a>.
+Since all spectral wavelengths create colors beyond the sRGB gamut, this leads to an extreme case.
+In the first image the lightness component is pictured, the following images should be the colored version of
+this lightness image. With the Absolute Colorimetric rendering intent, one can see not only the colors having different
+saturation, but the lightness gradient is different compared to the first image. This can especially be seen around
+<span class="math notranslate nohighlight">\(x = 1.3\)</span> mm to <span class="math notranslate nohighlight">\(x= 1.4\)</span> mm. While the lightness values were in fact unchanged, this subjective difference
+comes from the Helmholtz-Kohlrausch effect <a class="footnote-reference brackets" href="#footcite-helmkohlwiki" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>, which describes that color saturation can lead to
+higher perceived lightness. Since the saturation was clipped, and the maximum value depends on the spectral wavelength,
+saturation ratios are falsified, leading to this effect behaving differently for every color.
+The third image shows the Perceptual Colorimetric rendering intent.
+One can clearly see a decreased saturation for all colors.
+However, the saturation ratios are kept, and the lightness gradient matches the lightness image.</p>
+<p>The effect of different rendering intents is illustrated in the following figures,
+generated using the <a class="reference internal" href="../examples.html#example-prism"><span class="std std-ref">Prism</span></a>.This scenario represents an extreme case, since all spectral
+wavelengths produce colors exceeding the sRGB gamut.</p>
+<p>The first image depicts the lightness component. Subsequent images display the colored versions corresponding
+to this lightness image. Observing the result of the Absolute Colorimetric rendering intent, one can discern not
+only variations in color saturation but also a distinctly different lightness gradient compared to the initial image.
+This difference is particularly noticeable in the region between <span class="math notranslate nohighlight">\(x = 1.3\)</span> mm and <span class="math notranslate nohighlight">\(x= 1.4\)</span> mm.
+While the underlying lightness values remain unchanged, this subjective alteration arises from the
+Helmholtz-Kohlrausch effect <a class="footnote-reference brackets" href="#footcite-helmkohlwiki" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>, which describes how color saturation can enhance
+perceived lightness. As the saturation was clipped and its maximum value is dependent on the spectral wavelength,
+the saturation ratios are distorted, causing this effect to manifest differently for each color.</p>
+<p>The third image demonstrates the Perceptual Colorimetric rendering intent.
+A clear reduction in saturation across all colors is evident.
+However, the chroma ratios are preserved, and the lightness gradient aligns with the original lightness image.</p>
+<div class="table-wrapper table-borderless docutils container" id="id27">
+<span id="color-dispersive1"></span><span id="color-dispersive1"></span><table class="table-borderless docutils align-default" id="id27">
+<caption><span class="caption-number">Table 5.5 </span><span class="caption-text">Difference in different sRGB rendering intents.</span><a class="headerlink" href="#id27" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/color_dispersive1.svg"><img alt="../_images/color_dispersive1.svg" class="dark-light" src="../_images/color_dispersive1.svg" width="400" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/color_dispersive2.svg"><img alt="../_images/color_dispersive2.svg" class="dark-light" src="../_images/color_dispersive2.svg" width="400" />
+</a>
+</figure>
+</td>
+<td><figure class="align-center">
+<a class="dark-light reference internal image-reference" href="../_images/color_dispersive3.svg"><img alt="../_images/color_dispersive3.svg" class="dark-light" src="../_images/color_dispersive3.svg" width="400" />
+</a>
+</figure>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Plenty of negative examples for color representation can be found in literature
+(<a class="reference external" href="https://clarkvision.com/articles/color-cie-chromaticity-and-perception/color-rgb-xy-cie1931-diagram1g1000spjfjl1-1000-ciesrgb-axes-waveticks-c1-srgb-800.jpg">Link1</a>,
+<a class="reference external" href="https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a">Link2</a>,
+<a class="reference external" href="https://www.faes.de/NN_in_der_Farbmetrik/NN_Erklaerung_Farbraum/cie-normfarbtafel.jpg">Link3</a>,
+<a class="reference external" href="https://d1hjkbq40fs2x4.cloudfront.net/2017-06-05/files/perceptual-vs-absolute-rendering-intents_1621-2.jpg">Link4</a>).</p>
+<p>In most cases, negative sRGB values were simply clipped, leading to distortions not only in saturation but also
+in hue and brightness. For example, colors near 510 nm are rendered as deep green instead
+of a more nuanced greenish-cyan. In some instances, even representable colors within the gamut are inaccurate,
+which can be observed as overly saturated colors throughout the diagram.</p>
+<p>Conversely, positive examples can be found at:
+<a class="reference external" href="https://commons.wikimedia.org/wiki/File:CIE1931xy_blank.svg">Link6</a>
+<a class="reference external" href="https://www.wavemetrics.com/sites/www.wavemetrics.com/files/styles/content_body/public/2019-04/Chromaticity_1931.png">Link7</a></p>
+<p>It is important to note that these positive examples utilize a different luminance normalization,
+displaying the colors with increased brightness.</p>
+</section>
+<section id="cieluv-color-space">
+<h2><span class="section-number">5.8.4. </span>CIELUV Color Space<a class="headerlink" href="#cieluv-color-space" title="Link to this heading">¶</a></h2>
+<p>A limitation of the XYZ color space lies in the interdependence of color and brightness.
+Furthermore, the perceived distances in brightness and color are not linear within this space.
+To address these issues, the improved CIE 1976 L, u, v color space (abbreviated as CIELUV) was developed.</p>
+<p>In CIELUV, L represents the lightness component, while u corresponds to the red-green axis
+and v to the blue-yellow axis. The white point can be freely chosen, although the D65 standard
+illuminant is commonly used.</p>
+<p>Analogous to the XYZ color space, a chromaticity diagram can be derived, with coordinates denoted as <span class="math notranslate nohighlight">\(u',~v'\)</span>.
+This diagram is also known as the CIE 1976 UCS (uniform chromaticity scale) diagram and is illustrated in
+Figure <a class="reference internal" href="#chroma-1976"><span class="std std-numref">Fig. 5.25</span></a>. As its name implies, the UCS diagram exhibits uniform geometric distances throughout,
+where equal distances correspond to equal perceived color differences. This uniformity is not present in the
+CIE 1931 chromaticity diagram shown in Figure <a class="reference internal" href="#chroma-1931"><span class="std std-numref">Fig. 5.23</span></a>. Consequently, the UCS diagram is the
+appropriate tool for visualizing the extent of the color ranges absent in the sRGB gamut.</p>
+<figure class="align-center" id="id28">
+<span id="chroma-1976"></span><a class="dark-light reference internal image-reference" href="../_images/chroma_1976.svg"><img alt="../_images/chroma_1976.svg" class="dark-light" src="../_images/chroma_1976.svg" width="700" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.25 </span><span class="caption-text">u’v’ chromaticity diagram with sRGB Gamut</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Another widely adopted CIE model is the CIELAB color space, which employs the same lightness function as
+CIELUV but utilizes different color components. For color mixing and additive color applications, CIELUV is
+generally preferred due to its associated chromaticity diagram (as previously mentioned) and a defined mathematical
+expression for color saturation <a class="footnote-reference brackets" href="#footcite-colorford" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>.</p>
+<p><strong>XYZ to CIELUV</strong></p>
+<p>Conversion formulas are based on <a class="footnote-reference brackets" href="#footcite-bloomxyzluv" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>.
+These equations are valid for <span class="math notranslate nohighlight">\(X, Y, Z &gt; 0\)</span>. Otherwise, we define <span class="math notranslate nohighlight">\(L = 0, ~u=0,~v=0\)</span>.</p>
+<div class="math-wrapper docutils container" id="equation-eq-xyz-luv-eq">
+<div class="math notranslate nohighlight" id="equation-eq-xyz-luv-eq">
+<span class="eqno">(5.177)<a class="headerlink" href="#equation-eq-xyz-luv-eq" title="Link to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+&amp;L= \begin{cases}116 \sqrt[3]{y_r}-16 &amp; \text { if } y_r&gt;\epsilon \\
+\kappa y_r &amp; \text { otherwise }\end{cases} \\
+&amp;u=13 L\left(u^{\prime}-u_r^{\prime}\right) \\
+&amp;v=13 L\left(v^{\prime}-v_r^{\prime}\right)
+\end{aligned}\end{split}\]</div>
+</div>
+<p>With the following parameters:</p>
+<div class="math-wrapper docutils container" id="equation-eq-xyz-luv-pars">
+<div class="math notranslate nohighlight" id="equation-eq-xyz-luv-pars">
+<span class="eqno">(5.178)<a class="headerlink" href="#equation-eq-xyz-luv-pars" title="Link to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+\epsilon &amp;= 0.008856\\
+\kappa &amp;= 903.3\\
+y_r &amp;=\frac{Y}{Y_r} \\
+u^{\prime} &amp;=\frac{4 X}{X+15 Y+3 Z} \\
+v^{\prime} &amp;=\frac{9 Y}{X+15 Y+3 Z}
+\end{aligned}\end{split}\]</div>
+</div>
+<p>Here, <span class="math notranslate nohighlight">\(Y_r\)</span> is derived from the white point coordinates <span class="math notranslate nohighlight">\((X_r,~Y_r,~Z_r)\)</span>,
+typically those of the standard illuminant D65.
+Conversely, <span class="math notranslate nohighlight">\(u'_r\)</span> and <span class="math notranslate nohighlight">\(v'_r\)</span> represent the <span class="math notranslate nohighlight">\(u', ~v'\)</span> values calculated for
+these white point coordinates.</p>
+<p><strong>CIELUV to XYZ</strong></p>
+<p>Conversion formulas are based on <a class="footnote-reference brackets" href="#footcite-bloomluvxyz" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>. Note that some formulas have been reformulated for clarity.
+These equations are valid for <span class="math notranslate nohighlight">\(L &gt; 0\)</span>. If <span class="math notranslate nohighlight">\(L = 0\)</span>, then all values are set to <span class="math notranslate nohighlight">\(X=Y=Z=0\)</span>.</p>
+<div class="math-wrapper docutils container" id="equation-eq-luv-xyz-y">
+<div class="math notranslate nohighlight" id="equation-eq-luv-xyz-y">
+<span class="eqno">(5.179)<a class="headerlink" href="#equation-eq-luv-xyz-y" title="Link to this equation">¶</a></span>\[\begin{split}Y= \begin{cases}\left(\frac{L+16} {116}\right)^3 &amp; \text { if } L&gt;\kappa \epsilon \\
+L / \kappa &amp; \text { otherwise }\end{cases}\end{split}\]</div>
+</div>
+<div class="math-wrapper docutils container" id="equation-eq-luv-xyz-xz">
+<div class="math notranslate nohighlight" id="equation-eq-luv-xyz-xz">
+<span class="eqno">(5.180)<a class="headerlink" href="#equation-eq-luv-xyz-xz" title="Link to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+X &amp;= \frac{9}{4} \cdot \frac{u + 13 L u'_r}{v + 13 L v'_r}\\
+Z &amp;= 3 Y \cdot \left(\frac{13 L}{v + 13 L v'_r}  - \frac{5}{3}\right) - \frac{X}{3}\\
+\end{aligned}\end{split}\]</div>
+</div>
+<p><strong>CIELUV to u’v’L</strong></p>
+<p>For <span class="math notranslate nohighlight">\(L &gt; 0\)</span>, the following equations apply. If <span class="math notranslate nohighlight">\(L = 0\)</span>, we set <span class="math notranslate nohighlight">\(u' = u'_r, ~v' = v'_r\)</span>.</p>
+<div class="math-wrapper docutils container" id="equation-eq-luv-u-v-l">
+<div class="math notranslate nohighlight" id="equation-eq-luv-u-v-l">
+<span class="eqno">(5.181)<a class="headerlink" href="#equation-eq-luv-u-v-l" title="Link to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+L &amp;= L\\
+u' &amp;= u'_r + \frac{u}{13 L}\\
+v' &amp;= v'_r + \frac{v}{13 L}\\
+\end{aligned}\end{split}\]</div>
+</div>
+<p><strong>CIELUV Chroma</strong></p>
+<p>Chroma calculation based on <a class="footnote-reference brackets" href="#footcite-schwiegerlingoptics" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-eq-luv-chroma">
+<div class="math notranslate nohighlight" id="equation-eq-luv-chroma">
+<span class="eqno">(5.182)<a class="headerlink" href="#equation-eq-luv-chroma" title="Link to this equation">¶</a></span>\[C = \sqrt{u^2 + v^2}\]</div>
+</div>
+<p><strong>CIELUV Hue</strong></p>
+<p>Hue calculation based on <a class="footnote-reference brackets" href="#footcite-schwiegerlingoptics" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-eq-luv-hue">
+<div class="math notranslate nohighlight" id="equation-eq-luv-hue">
+<span class="eqno">(5.183)<a class="headerlink" href="#equation-eq-luv-hue" title="Link to this equation">¶</a></span>\[H = \text{arctan2}(v, u)\]</div>
+</div>
+<p><strong>CIELUV Saturation</strong></p>
+<p>Saturation calculation based on <a class="footnote-reference brackets" href="#footcite-colorfulnesswiki" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a>:
+These equations are valid for <span class="math notranslate nohighlight">\(L &gt; 0\)</span>. If <span class="math notranslate nohighlight">\(L = 0\)</span>, we set <span class="math notranslate nohighlight">\(S=0\)</span>.</p>
+<div class="math-wrapper docutils container" id="equation-eq-luv-saturation">
+<div class="math notranslate nohighlight" id="equation-eq-luv-saturation">
+<span class="eqno">(5.184)<a class="headerlink" href="#equation-eq-luv-saturation" title="Link to this equation">¶</a></span>\[S = \frac{C}{L}\]</div>
+</div>
+</section>
+<section id="srgb-spectral-upsampling">
+<span id="random-srgb"></span><h2><span class="section-number">5.8.5. </span>sRGB Spectral Upsampling<a class="headerlink" href="#srgb-spectral-upsampling" title="Link to this heading">¶</a></h2>
+<p>While the conversion of a physical light spectrum to coordinates within a human vision color model is a frequent task,
+the reverse process is less common. In our application, this inverse conversion is employed to load digital images
+into the raytracer and propagate spectral wavelengths throughout the tracing geometry.
+Such an implementation facilitates straightforward simulations of diverse light and lighting scenarios.</p>
+<p>This conversion process is commonly known as <em>Spectral Upsampling</em>, <em>Spectral Rendering</em>, or <em>Spectral Synthesis</em>.
+An implementation utilizing real LED spectral curves can be found in <a class="footnote-reference brackets" href="#footcite-10-2312-sr-20221150" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a>,
+while methods for modeling sRGB reflectances are detailed in <a class="footnote-reference brackets" href="#footcite-10-2312-sr-20191216" id="id18" role="doc-noteref"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#footcite-burns-2018" id="id19" role="doc-noteref"><span class="fn-bracket">[</span>13<span class="fn-bracket">]</span></a>.</p>
+<p>It is crucial to recognize that not all chromaticities within human vision, and even the sRGB gamut,
+can be accurately modeled by valid reflectance spectra, as the reflectance range is constrained to <span class="math notranslate nohighlight">\([0,~1]\)</span>.
+However, this limitation does not apply when selecting illuminant curves.</p>
+<p>While the conversion of a spectral distribution to a color is well-defined, going backwards the conversion is not unique
+and simply reversible. Multiple spectral distributions can create the same color stimulus,
+an effect known as <em>metamerism</em>. In fact, there are infinitely many distributions being perceived as the same color.
+With so many possibilities to choose from, we can demand some requirements for our sRGB primaries:</p>
+<p>While the conversion from a spectral distribution to a color is a well-defined process,
+the reverse conversion is neither unique nor simply reversible. Multiple distinct spectral distributions can evoke the
+same color perception, a phenomenon known as <em>metamerism</em>. In fact, an infinite number of spectral distributions can
+be perceived as identical colors. Given this vast number of possibilities, we can establish certain requirements
+for our sRGB primaries:</p>
+<aside class="topic">
+<p class="topic-title">Requirements</p>
+<ol class="arabic simple">
+<li><p>Same color coordinates as the sRGB primaries</p></li>
+<li><p>Same luminance ratios as sRGB primaries</p></li>
+<li><p>Simple, smooth spectral functions</p></li>
+<li><p>Wide spectrum</p></li>
+<li><p>Relatively little light in non-visible regions (infrared and ultraviolet)</p></li>
+</ol>
+</aside>
+<p>Points 1 and 2 simplify the spectral upsampling process because the mixing ratios of the linear sRGB values can be
+directly utilized. Although we could theoretically define a new color space and gamut that encompasses the sRGB gamut
+but is significantly broader, this approach would necessitate additional color space conversions.
+Furthermore, it would result in narrower spectra, which contradicts point 4. It is essential to use linear sRGB values,
+as they are proportional to the physical intensity of the sRGB primaries. In contrast, standard sRGB values are
+gamma-corrected to approximate the non-linear response of human vision.</p>
+<p>Points 3 and 4 are necessary to approximate natural illuminants with a high degree of realism. Superimposing all sRGB
+primaries to generate a white spectrum should ideally cover the entire visible spectral range without any significant
+gaps. Such gaps would reduce the color rendering index (CRI) of the illuminant. The CRI is a metric used to quantify
+how faithfully an object’s colors are rendered when illuminated by a particular light source. For example, a light
+spectrum with a deficiency in the yellow region would fail to render pure yellow colors accurately.</p>
+<p>Point 5 ensures that the majority of the traced light contributes meaningfully to the final rendered image.
+Given that sRGB is a color space designed for human vision, an input color image in sRGB should ideally produce a
+rendered image with colors perceived by humans. Tracing rays with colors far outside the visible spectrum would
+constitute an inefficient use of rendering time.</p>
+<p>In theory, we could derive spectra for the sRGB primaries by combining a D65 white spectrum with the reflectance
+curves described in the previously cited works. However, this approach has drawbacks: the resulting spectra would lack
+smoothness due to the non-smooth nature of the D65 spectrum, and a significant portion of the spectrum would fall
+within the range of human invisibility or near-invisibility. Furthermore, there are no straightforward mathematical
+descriptions for the resulting spectral curves.</p>
+<div class="table-wrapper colwidths-given docutils container" id="id29">
+<table class="docutils align-center" id="id29">
+<caption><span class="caption-number">Table 5.6 </span><span class="caption-text">sRGB primary specification, see <a class="footnote-reference brackets" href="#footcite-srgbwikien" id="id20" role="doc-noteref"><span class="fn-bracket">[</span>14<span class="fn-bracket">]</span></a></span><a class="headerlink" href="#id29" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Color value</p></th>
+<th class="head"><p>Red</p></th>
+<th class="head"><p>Green</p></th>
+<th class="head"><p>Blue</p></th>
+<th class="head"><p>D65</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(x\)</span></p></td>
+<td><p>0.6400</p></td>
+<td><p>0.3000</p></td>
+<td><p>0.1500</p></td>
+<td><p>0.3127</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(y\)</span></p></td>
+<td><p>0.3300</p></td>
+<td><p>0.6000</p></td>
+<td><p>0.0600</p></td>
+<td><p>0.3290</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(z\)</span></p></td>
+<td><p>0.0300</p></td>
+<td><p>0.0100</p></td>
+<td><p>0.7900</p></td>
+<td><p>0.3583</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(Y\)</span></p></td>
+<td><p>0.2127</p></td>
+<td><p>0.7152</p></td>
+<td><p>0.0722</p></td>
+<td><p>1.0000</p></td>
+</tr>
+<tr class="row-even"><td><p>sRGB</p></td>
+<td><p>[1, 0, 0]</p></td>
+<td><p>[0, 1, 0]</p></td>
+<td><p>[0, 0, 1]</p></td>
+<td><p>[1, 1, 1]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Dimensioning</strong></p>
+<p>The mathematical function of choice is a Gaussian function, which is defined as:</p>
+<div class="math-wrapper docutils container" id="equation-gauss-opt">
+<div class="math notranslate nohighlight" id="equation-gauss-opt">
+<span class="eqno">(5.185)<a class="headerlink" href="#equation-gauss-opt" title="Link to this equation">¶</a></span>\[S(\lambda, \mu, \sigma)=\frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \left(-\frac{(\lambda-\mu)^{2}}{2 \sigma^{2}}\right)\]</div>
+</div>
+<p>A Gaussian function presents itself as a suitable choice due to its smooth, bell-shaped curve and its widespread
+application across various fields. Moreover, the principle of maximum entropy <a class="footnote-reference brackets" href="#footcite-wiki-maximum-entropy" id="id21" role="doc-noteref"><span class="fn-bracket">[</span>15<span class="fn-bracket">]</span></a>
+advocates for this type of function when dealing with the two parameters of position and width,
+as it represents the probability distribution that maximizes uncertainty for a given set of constraints.</p>
+<p>Employing optimization methods in Python, the following Gaussian functions were derived,
+exhibiting the same color stimulus as the sRGB primaries:</p>
+<div class="math-wrapper docutils container" id="equation-r0g0b0-curves">
+<div class="math notranslate nohighlight" id="equation-r0g0b0-curves">
+<span class="eqno">(5.186)<a class="headerlink" href="#equation-r0g0b0-curves" title="Link to this equation">¶</a></span>\[\begin{split}r_0(\lambda) =&amp;~  75.1660756583 \cdot \Big[ S(\lambda, 639.854491, 30.0)\\
+             &amp; + 0.0500907584 \cdot S(\lambda, 418.905848, 80.6220465)\Big]\\
+ g_0(\lambda) =&amp;~  83.4999222966 \cdot  S(\lambda, 539.13108974, 33.31164968)\\
+ b_0(\lambda) =&amp;~  47.99521746361 \cdot \Big[ S(\lambda, 454.833119, 20.1460206)\\
+             &amp; + 0.184484176 \cdot S(\lambda, 459.658190, 71.0927568)\Big]\\\end{split}\]</div>
+</div>
+<figure class="align-center" id="rgb-curve1">
+<a class="dark-light reference internal image-reference" href="../_images/rgb_curves1.svg"><img alt="../_images/rgb_curves1.svg" class="dark-light" src="../_images/rgb_curves1.svg" width="600" />
+</a>
+</figure>
+<p>The spectral distribution of the green primary is modeled using a single Gaussian function,
+whereas the red and blue primaries utilize a superposition of two Gaussian functions each.
+This choice is informed by Figure 3a in <a class="footnote-reference brackets" href="#footcite-clarkchromaticity" id="id22" role="doc-noteref"><span class="fn-bracket">[</span>16<span class="fn-bracket">]</span></a>, which demonstrates that the chromaticity
+coordinates of the red primary cannot be accurately reproduced with a single Gaussian curve.
+While it is theoretically possible to represent the blue primary’s chromaticity with a single Gaussian,
+this would only be feasible for narrow illuminants characterized by a small standard deviation.
+To allow for greater flexibility in selecting the spectrum width,
+two Gaussian functions are also employed for the blue primary.</p>
+<p>It is important to note that the initial luminance ratios of these Gaussian approximations differ
+from those of the standard sRGB primaries. To address this discrepancy, we need to rescale the functions to
+match the correct luminance ratios. The scaling factor for the green curve is maintained at a value of 1,
+and the rescaling factors for the red and blue curves are determined as follows:</p>
+<div class="math-wrapper docutils container" id="equation-rgb-curves">
+<div class="math notranslate nohighlight" id="equation-rgb-curves">
+<span class="eqno">(5.187)<a class="headerlink" href="#equation-rgb-curves" title="Link to this equation">¶</a></span>\[\begin{split}r(\lambda) =&amp;~ 0.951190393 \cdot r_0(\lambda)\\
+g(\lambda) =&amp;~ 1.000000000 \cdot g_0(\lambda)\\
+b(\lambda) =&amp;~ 1.163645855 \cdot b_0(\lambda)\\\end{split}\]</div>
+</div>
+<figure class="align-center" id="rgb-curve2">
+<a class="dark-light reference internal image-reference" href="../_images/rgb_curves2.svg"><img alt="../_images/rgb_curves2.svg" class="dark-light" src="../_images/rgb_curves2.svg" width="600" />
+</a>
+</figure>
+<p>The resulting spectrum for sRGB white (with coordinates <span class="math notranslate nohighlight">\([1.0, 1.0, 1.0]\)</span>) is illustrated in <a class="reference internal" href="#rgb-white"><span class="std std-numref">Fig. 5.26</span></a>.</p>
+<figure class="align-center" id="id30">
+<span id="rgb-white"></span><a class="dark-light reference internal image-reference" href="../_images/rgb_white.svg"><img alt="../_images/rgb_white.svg" class="dark-light" src="../_images/rgb_white.svg" width="600" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.26 </span><span class="caption-text">Simulated sRGB white spectrum.</span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<aside class="topic">
+<p class="topic-title">Note</p>
+<p>The Gaussian curves additionally include a cutoff at <span class="math notranslate nohighlight">\(\lambda = 380\,\)</span> nm and <span class="math notranslate nohighlight">\(\lambda = 780\,\)</span> nm.
+This ensures that all derived ratios and constants remain consistent,
+even if the simulated wavelength range is extended beyond these default boundaries.</p>
+</aside>
+<p>In a subsequent step, the spectral distributions of the color channel primaries are treated as
+probability density functions (pdfs). A key property of a pdf is that its integral over the entire domain
+(the area under the curve) must be normalized to unity, representing a total probability of 1.
+This normalization process effectively cancels any multiplicative factors in the channel curves,
+as well as the relative scaling between the channels.
+To compensate for this effect on luminance, the mixing ratio of each channel is rescaled by the area under
+its corresponding spectral curve. Since this area is proportional to the probability ratio,
+this rescaling effectively transfers the information about channel luminance from the absolute magnitudes of the curve
+values to the relative probabilities of the channels.</p>
+<p>The area scaling factors are:</p>
+<div class="math-wrapper docutils container" id="equation-r-g-b-factors">
+<div class="math notranslate nohighlight" id="equation-r-g-b-factors">
+<span class="eqno">(5.188)<a class="headerlink" href="#equation-r-g-b-factors" title="Link to this equation">¶</a></span>\[\begin{split}r_\text{P} = 0.885651229244\\
+ g_\text{P} = 1.000000000000\\
+ b_\text{P} = 0.775993481741\\\end{split}\]</div>
+</div>
+<p>As the calculated rescaling factors indicate, the red and blue channels have smaller factors compared
+to the green channel. This is visually apparent in the preceding figure,
+where the areas under the red and blue primary curves are smaller than that under the green primary curve.</p>
+<p>Following the selection of a color channel based on the linear sRGB mixing ratios
+(which have been scaled by the aforementioned factors), the corresponding channel primary spectral curve
+is then treated as a probability density function.
+A specific wavelength is subsequently sampled from this probability distribution.</p>
+<aside class="topic">
+<p class="topic-title">Example</p>
+<p>Choose random wavelengths from sRGB value <span class="math notranslate nohighlight">\(\text{RGB} = [1.0, 0.5, 0.2]\)</span>.</p>
+<ol class="arabic simple">
+<li><p>Convert to linear sRGB: <span class="math notranslate nohighlight">\([1.000, 0.214, 0.033]\)</span></p></li>
+<li><p>Rescale by area/probability factors <span class="math notranslate nohighlight">\(r_\text{P}, g_\text{p}, b_\text{p}\)</span>:
+We get approximately <span class="math notranslate nohighlight">\([0.886, 0.214, 0.025]\)</span></p></li>
+<li><p>Normalize, so integral equals 1: <span class="math notranslate nohighlight">\([0.788, 0.190, 0.022]\)</span></p></li>
+<li><p>Choose one of the three channels with the values from 3. as the probability:
+The R channel gets randomly chosen.</p></li>
+<li><p>Use the R primary curve as a probability distribution, choose a random wavelength accordingly:
+<span class="math notranslate nohighlight">\(\lambda = 623.91\,\)</span> nm gets chosen.</p></li>
+<li><p>Repeating 4. and 5. by choosing randomly, a spectrum is created,
+that for many rays converges to the correct sRGB color.</p></li>
+</ol>
+</aside>
+<p><strong>Brightness Sampling</strong></p>
+<p>While the previously described procedure ensures accurate color representation,
+it is also crucial to account for the brightness of each pixel in the image.
+To correctly represent the pixel intensity, each pixel is assigned a probability proportional to its intensity.</p>
+<p>This pixel intensity is calculated by first converting the sRGB color values to linear sRGB
+and then multiplying each linear channel value by its corresponding overall power,
+which is proportional to <span class="math notranslate nohighlight">\(r_\text{P}, g_\text{P}, b_\text{P}\)</span>.
+These scaled channel values are then summed together to obtain the pixel intensity.</p>
+<p>Subsequently, each pixel is assigned an intensity weight based on this calculated intensity.
+To ensure proper probabilistic sampling across the entire image,
+these intensity weights are then rescaled so that the sum over all pixels in the image equals 1.</p>
+<aside class="topic">
+<p class="topic-title">Example</p>
+<p>Choose random pixels from the image below</p>
+<div class="math-wrapper docutils container" id="equation-details-color-0">
+<div class="math notranslate nohighlight" id="equation-details-color-0">
+<span class="eqno">(5.189)<a class="headerlink" href="#equation-details-color-0" title="Link to this equation">¶</a></span>\[\begin{split}\text{Image} =
+\begin{bmatrix}
+[1.0, 0.0, 0.2] &amp; [0.0, 0.0, 0.0]\\
+[0.1, 0.5, 1.0] &amp; [1.0, 0.2, 1.0]
+\end{bmatrix}\end{split}\]</div>
+</div>
+<ol class="arabic simple">
+<li><p>Convert to linear sRGB</p></li>
+</ol>
+<div class="math-wrapper docutils container" id="equation-details-color-1">
+<div class="math notranslate nohighlight" id="equation-details-color-1">
+<span class="eqno">(5.190)<a class="headerlink" href="#equation-details-color-1" title="Link to this equation">¶</a></span>\[\begin{split}\begin{bmatrix}
+[1.000, 0.000, 0.033] &amp; [0.000, 0.000, 0.000]\\
+[0.010, 0.214, 1.000] &amp; [1.000, 0.033, 1.000]
+\end{bmatrix}\end{split}\]</div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Multiply by area factors <span class="math notranslate nohighlight">\(r_\text{P}, g_\text{P}, b_\text{P}\)</span> and sum all channels for each pixel</p></li>
+</ol>
+<div class="math-wrapper docutils container" id="equation-details-color-2">
+<div class="math notranslate nohighlight" id="equation-details-color-2">
+<span class="eqno">(5.191)<a class="headerlink" href="#equation-details-color-2" title="Link to this equation">¶</a></span>\[\begin{split}\begin{bmatrix}
+0.911 &amp; 0.000\\
+0.999 &amp; 1.694
+\end{bmatrix}\end{split}\]</div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Normalize weights</p></li>
+</ol>
+<div class="math-wrapper docutils container" id="equation-details-color-3">
+<div class="math notranslate nohighlight" id="equation-details-color-3">
+<span class="eqno">(5.192)<a class="headerlink" href="#equation-details-color-3" title="Link to this equation">¶</a></span>\[\begin{split}\begin{bmatrix}
+0.253 &amp; 0.000\\
+0.277 &amp; 0.470
+\end{bmatrix}\end{split}\]</div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Choose randomly according to the probabilities.</p></li>
+</ol>
+</aside>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id23">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-wikid65" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">1</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Illuminant D65. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Illuminant_D65">https://en.wikipedia.org/wiki/Illuminant_D65</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-bloommatrices" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id6">2</a>)</span>
+<p>Bruce Lindbloom. RGB/XYZ Matrices. 2017. URL: <a class="reference external" href="http://brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html">http://brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-srgbwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id5">1</a>,<a role="doc-backlink" href="#id7">2</a>)</span>
+<p>Wikipedia. sRGB. 2022. URL: <a class="reference external" href="https://de.wikipedia.org/wiki/SRGB">https://de.wikipedia.org/wiki/SRGB</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-ottossonclipping" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">4</a><span class="fn-bracket">]</span></span>
+<p>Björn Ottosson. sRGB gamut clipping. 2021. URL: <a class="reference external" href="https://bottosson.github.io/posts/gamutclipping/">https://bottosson.github.io/posts/gamutclipping/</a> (visited on 2022-12-12).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-helmkohlwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id9">1</a>,<a role="doc-backlink" href="#id10">2</a>)</span>
+<p>Wikipedia. Helmholtz–Kohlrausch effect. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Helmholtz%E2%80%93Kohlrausch_effect">https://en.wikipedia.org/wiki/Helmholtz%E2%80%93Kohlrausch_effect</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-colorford" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">6</a><span class="fn-bracket">]</span></span>
+<p>Adrian Ford and Alan Roberts. Colour space conversions. 1998. URL: <a class="reference external" href="https://poynton.ca/PDFs/coloureq.pdf">https://poynton.ca/PDFs/coloureq.pdf</a> (visited on 2024-09-04).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-bloomxyzluv" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">7</a><span class="fn-bracket">]</span></span>
+<p>Bruce Lindbloom. XYZ to Luv. 2017. URL: <a class="reference external" href="http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_Luv.html">http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_Luv.html</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-bloomluvxyz" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">8</a><span class="fn-bracket">]</span></span>
+<p>Bruce Lindbloom. Luv to XYZ. 2017. URL: <a class="reference external" href="http://www.brucelindbloom.com/index.html?Eqn_Luv_to_XYZ.html">http://www.brucelindbloom.com/index.html?Eqn_Luv_to_XYZ.html</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-schwiegerlingoptics" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id14">1</a>,<a role="doc-backlink" href="#id15">2</a>)</span>
+<p>Jim Schwiegerling. <em>Field Guide to Visual and Ophthalmic Optics</em>. SPIE, 2004. URL: <a class="reference external" href="https://doi.org/10.1117/3.592975">https://doi.org/10.1117/3.592975</a>, <a class="reference external" href="https://doi.org/10.1117/3.592975">doi:10.1117/3.592975</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-colorfulnesswiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id16">10</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Colorfulness. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Colorfulness">https://en.wikipedia.org/wiki/Colorfulness</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-10-2312-sr-20221150" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id17">11</a><span class="fn-bracket">]</span></span>
+<p>Giuseppe Claudio Guarnera, Yuliya Gitlina, Valentin Deschaintre, and Abhijeet Ghosh. Spectral Upsampling Approaches for RGB Illumination. In Abhijeet Ghosh and Li-Yi Wei, editors, <em>Eurographics Symposium on Rendering</em>. The Eurographics Association, 2022. <a class="reference external" href="https://doi.org/10.2312/sr.20221150">doi:10.2312/sr.20221150</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-10-2312-sr-20191216" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id18">12</a><span class="fn-bracket">]</span></span>
+<p>Ian Mallett and Cem Yuksel. Spectral Primary Decomposition for Rendering with sRGB Reflectance. In Tamy Boubekeur and Pradeep Sen, editors, <em>Eurographics Symposium on Rendering - DL-only and Industry Track</em>. The Eurographics Association, 2019. <a class="reference external" href="https://doi.org/10.2312/sr.20191216">doi:10.2312/sr.20191216</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-burns-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id19">13</a><span class="fn-bracket">]</span></span>
+<p>Scott A. Burns. Fast rgb to spectrum conversion for reflectances. <a class="reference external" href="http://scottburns.us/fast-rgb-to-spectrum-conversion-for-reflectances/">http://scottburns.us/fast-rgb-to-spectrum-conversion-for-reflectances/</a>, 2018. Accessed: 2024-11-20.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-srgbwikien" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">14</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. sRGB. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/SRGB">https://en.wikipedia.org/wiki/SRGB</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-wiki-maximum-entropy" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id21">15</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Maximum entropy probability distribution. 2024. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Maximum_entropy_probability_distribution">https://en.wikipedia.org/wiki/Maximum_entropy_probability_distribution</a> (visited on 2024-11-21).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-clarkchromaticity" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id22">16</a><span class="fn-bracket">]</span></span>
+<p>Roger N. Clark.  Color Part 1: - CIE Chromaticity and Perception. 2020. URL: <a class="reference external" href="https://clarkvision.com/articles/color-cie-chromaticity-and-perception/">https://clarkvision.com/articles/color-cie-chromaticity-and-perception/</a> (visited on 2022-12-12).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="focus.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">5.7. </span>Focus Methods</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="misc.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">5.9. </span>Miscellaneous</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

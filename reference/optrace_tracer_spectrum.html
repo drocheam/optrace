@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>6.8. tracer.spectrum Submodule - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="6.9. tracer.presets Submodule" href="optrace_tracer_presets.html" /><link rel="prev" title="6.7. tracer.image Submodule" href="optrace_tracer_image.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/reference/optrace_tracer_spectrum.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/reference/optrace_tracer_spectrum.html"/>
+  <meta property="og:title" content="6.8. tracer.spectrum Submodule"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">6. API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#module-optrace.tracer.spectrum.light_spectrum">6.8.1. tracer.spectrum.light_spectrum</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.render"><code class="docutils literal notranslate">render()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.__call__"><code class="docutils literal notranslate">__call__()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength"><code class="docutils literal notranslate">centroid_wavelength()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.color"><code class="docutils literal notranslate">color()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.complementary_wavelength"><code class="docutils literal notranslate">complementary_wavelength()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.dominant_wavelength"><code class="docutils literal notranslate">dominant_wavelength()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.fwhm"><code class="docutils literal notranslate">fwhm()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.luminous_power"><code class="docutils literal notranslate">luminous_power()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak"><code class="docutils literal notranslate">peak()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak_wavelength"><code class="docutils literal notranslate">peak_wavelength()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.power"><code class="docutils literal notranslate">power()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.random_wavelengths"><code class="docutils literal notranslate">random_wavelengths()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.xyz"><code class="docutils literal notranslate">xyz()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.spectrum_types"><code class="docutils literal notranslate">spectrum_types</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.spectrum.spectrum">6.8.2. tracer.spectrum.spectrum</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.spectrum.Spectrum"><code class="docutils literal notranslate"><span class="pre">Spectrum</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.spectrum.Spectrum.__call__"><code class="docutils literal notranslate">__call__()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.spectrum.Spectrum.get_desc"><code class="docutils literal notranslate">get_desc()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.spectrum.Spectrum.is_continuous"><code class="docutils literal notranslate">is_continuous()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.spectrum.Spectrum.quantity"><code class="docutils literal notranslate">quantity</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.spectrum.Spectrum.spectrum_types"><code class="docutils literal notranslate">spectrum_types</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.spectrum.Spectrum.unit"><code class="docutils literal notranslate">unit</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-optrace.tracer.spectrum.transmission_spectrum">6.8.3. tracer.spectrum.transmission_spectrum</a><ul>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum"><code class="docutils literal notranslate"><span class="pre">TransmissionSpectrum</span></code></a><ul>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.__call__"><code class="docutils literal notranslate">__call__()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.color"><code class="docutils literal notranslate">color()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.xyz"><code class="docutils literal notranslate">xyz()</span></code></a></li>
+<li><a class="reference internal" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.spectrum_types"><code class="docutils literal notranslate">spectrum_types</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">6. </span>API Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">6.8. </span>tracer.spectrum Submodule</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_spectrum.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_spectrum.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/reference/optrace_tracer_spectrum.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer_spectrum.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/optrace_tracer_spectrum.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="module-optrace.tracer.spectrum">
+<span id="tracer-spectrum-submodule"></span><h1><span class="section-number">6.8. </span>tracer.spectrum Submodule<a class="headerlink" href="#module-optrace.tracer.spectrum" title="Link to this heading">¶</a></h1>
+<section id="module-optrace.tracer.spectrum.light_spectrum">
+<span id="tracer-spectrum-light-spectrum"></span><h2><span class="section-number">6.8.1. </span>tracer.spectrum.light_spectrum<a class="headerlink" href="#module-optrace.tracer.spectrum.light_spectrum" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.spectrum.light_spectrum.</span></span><span class="sig-name descname"><span class="pre">LightSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Blackbody'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5500</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Create a LightSpectrum, compared to the Spectrum parent class this provides
+rendering of spectra and the generation of random wavelengths.
+As well as two additional types (Blackbody and Histogram)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – spectrum type, one of “spectrum_types”</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – blackbody temperature in Kelvin</p></li>
+<li><p><strong>sargs</strong></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.render">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.render" title="Link to this definition">¶</a></dt>
+<dd><p>Render a LightSpectrum from a list of wavelengths and powers.
+The resulting LightSpectrum has type “Histogram” and unit W/nm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – wavelength array</p></li>
+<li><p><strong>w</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – weight array</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments when creating the LightSpectrum</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the LightSpectrum object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>Get the spectrum values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – wavelength array</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>values at provided wavelengths</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength">
+<span class="sig-name descname"><span class="pre">centroid_wavelength</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.centroid_wavelength" title="Link to this definition">¶</a></dt>
+<dd><p>The centroid wavelength. This is the center of mass wavelength according to its spectral power.
+Another name would be “power-weighted average wavelength”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>centroid wavelength in nm</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.color">
+<span class="sig-name descname"><span class="pre">color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rendering_intent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Ignore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chroma_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.color" title="Link to this definition">¶</a></dt>
+<dd><p>Get the sRGB color of the spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rendering_intent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – rendering intent for the sRGB conversion</p></li>
+<li><p><strong>clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if values are clipped to the [0, 1] data range</p></li>
+<li><p><strong>L_th</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>chroma_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of 3 sRGB values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.complementary_wavelength">
+<span class="sig-name descname"><span class="pre">complementary_wavelength</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.complementary_wavelength" title="Link to this definition">¶</a></dt>
+<dd><p>Complementary wavelength of the spectrum, that is the wavelength with the opposite hue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>complementary wavelength in nm if any exists, else np.nan</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.dominant_wavelength">
+<span class="sig-name descname"><span class="pre">dominant_wavelength</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.dominant_wavelength" title="Link to this definition">¶</a></dt>
+<dd><p>Dominant wavelength of the spectrum, that is the wavelength with the same hue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dominant wavelength in nm if any exists, else np.nan</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.fwhm">
+<span class="sig-name descname"><span class="pre">fwhm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.fwhm" title="Link to this definition">¶</a></dt>
+<dd><p>Return the full width half maximum (FWHM).
+The smallest distance to the half height is calculated on both sides of the highest peak in the spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>FWHM</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.luminous_power">
+<span class="sig-name descname"><span class="pre">luminous_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.luminous_power" title="Link to this definition">¶</a></dt>
+<dd><p>Luminous power in lm of the spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>luminous power</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak">
+<span class="sig-name descname"><span class="pre">peak</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak" title="Link to this definition">¶</a></dt>
+<dd><p>Peak value of the spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>peak value in self.unit</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak_wavelength">
+<span class="sig-name descname"><span class="pre">peak_wavelength</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.peak_wavelength" title="Link to this definition">¶</a></dt>
+<dd><p>Peak wavelength of the spectrum. 
+For a spectrum with a constant maximum region (Constant, Rectangle)
+or multiple maxima the first one is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>peak wavelength in nm</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.power">
+<span class="sig-name descname"><span class="pre">power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.power" title="Link to this definition">¶</a></dt>
+<dd><p>Power in W of the spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>power</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.random_wavelengths">
+<span class="sig-name descname"><span class="pre">random_wavelengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.random_wavelengths" title="Link to this definition">¶</a></dt>
+<dd><p>Generate random wavelengths following the spectral distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of wavelengths</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>wavelength array, shape (N,)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.xyz">
+<span class="sig-name descname"><span class="pre">xyz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.xyz" title="Link to this definition">¶</a></dt>
+<dd><p>Get the XYZ color of the spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>3 element array of XYZ values</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.light_spectrum.LightSpectrum.spectrum_types">
+<span class="sig-name descname"><span class="pre">spectrum_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Monochromatic',</span> <span class="pre">'Constant',</span> <span class="pre">'Data',</span> <span class="pre">'Lines',</span> <span class="pre">'Rectangle',</span> <span class="pre">'Gaussian',</span> <span class="pre">'Function',</span> <span class="pre">'Blackbody',</span> <span class="pre">'Histogram']</span></span><a class="headerlink" href="#optrace.tracer.spectrum.light_spectrum.LightSpectrum.spectrum_types" title="Link to this definition">¶</a></dt>
+<dd><p>possible spectrum types</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.spectrum.spectrum">
+<span id="tracer-spectrum-spectrum"></span><h2><span class="section-number">6.8.2. </span>tracer.spectrum.spectrum<a class="headerlink" href="#module-optrace.tracer.spectrum.spectrum" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.spectrum.Spectrum">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">Spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_vals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">550.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wl0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wl1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">600.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">550.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.spectrum.Spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Create a Spectrum object. 
+Most of the time this class isn’t used, as there are specific subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – one of “spectrum_types”</p></li>
+<li><p><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – factor for types “Rectangle”, “Constant”, “Gaussian” etc.</p></li>
+<li><p><strong>lines</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – line wavelengths for “Lines” type</p></li>
+<li><p><strong>line_vals</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – line values for “Lines” type</p></li>
+<li><p><strong>wl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – wavelength for “Monochromatic” type</p></li>
+<li><p><strong>wl0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – lower wavelength for “Rectangle” type</p></li>
+<li><p><strong>wl1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – upper wavelength for “Rectangle” type</p></li>
+<li><p><strong>wls</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – wavelength list for “List” type</p></li>
+<li><p><strong>vals</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – values for “List” type</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – center wavelength for “Gaussian” type</p></li>
+<li><p><strong>sig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – standard deviation for “Gaussian” type</p></li>
+<li><p><strong>unit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – unit string</p></li>
+<li><p><strong>quantity</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – quantity string</p></li>
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em>) – spectrum function, must take a wavelength vector and return float values</p></li>
+<li><p><strong>func_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – dict of optional keyword arguments for func</p></li>
+<li><p><strong>kwargs</strong> – additional keyword arguments for the parent class</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.spectrum.Spectrum.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.spectrum.Spectrum.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>get spectrum values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – wavelength array</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>values at provided wavelengths</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.spectrum.Spectrum.get_desc">
+<span class="sig-name descname"><span class="pre">get_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.spectrum.Spectrum.get_desc" title="Link to this definition">¶</a></dt>
+<dd><p>get description
+:param fallback: unused parameter
+:return:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fallback</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.spectrum.Spectrum.is_continuous">
+<span class="sig-name descname"><span class="pre">is_continuous</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.spectrum.Spectrum.is_continuous" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>if the spectrum is continuous, thus not discrete</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.spectrum.Spectrum.quantity">
+<span class="sig-name descname"><span class="pre">quantity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#optrace.tracer.spectrum.spectrum.Spectrum.quantity" title="Link to this definition">¶</a></dt>
+<dd><p>spectrum quantity</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.spectrum.Spectrum.spectrum_types">
+<span class="sig-name descname"><span class="pre">spectrum_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Monochromatic',</span> <span class="pre">'Constant',</span> <span class="pre">'Data',</span> <span class="pre">'Lines',</span> <span class="pre">'Rectangle',</span> <span class="pre">'Gaussian',</span> <span class="pre">'Function']</span></span><a class="headerlink" href="#optrace.tracer.spectrum.spectrum.Spectrum.spectrum_types" title="Link to this definition">¶</a></dt>
+<dd><p>possible spectrum types. Can be changed by subclasses</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.spectrum.Spectrum.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#optrace.tracer.spectrum.spectrum.Spectrum.unit" title="Link to this definition">¶</a></dt>
+<dd><p>spectrum unit</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optrace.tracer.spectrum.transmission_spectrum">
+<span id="tracer-spectrum-transmission-spectrum"></span><h2><span class="section-number">6.8.3. </span>tracer.spectrum.transmission_spectrum<a class="headerlink" href="#module-optrace.tracer.spectrum.transmission_spectrum" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">optrace.tracer.spectrum.transmission_spectrum.</span></span><span class="sig-name descname"><span class="pre">TransmissionSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Define a TransmissionSpectrum object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – spectrum type, one of spectrum_types</p></li>
+<li><p><strong>inverse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if the function is inversed, meaning subtracted from 1. 
+A transmittance function becomes an absorptance function.</p></li>
+<li><p><strong>sargs</strong> – additional parameters (See the Spectrum() constuctor)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.__call__" title="Link to this definition">¶</a></dt>
+<dd><p>Get the spectrum values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wl</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – wavelength array</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>values at provided wavelengths</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.color">
+<span class="sig-name descname"><span class="pre">color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rendering_intent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Absolute'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chroma_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.color" title="Link to this definition">¶</a></dt>
+<dd><p>Get the Spectrum sRGB color and the opacity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rendering_intent</strong> – rendering_intent for sRGB conversion</p></li>
+<li><p><strong>clip</strong> – if values are clipped towards the sRGB data range</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of R, G, B, and the opacity, all with data range  [0, 1]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.xyz">
+<span class="sig-name descname"><span class="pre">xyz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.xyz" title="Link to this definition">¶</a></dt>
+<dd><p>Get the Spectrum XYZ Color under daylight D65</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>3 element XYZ color array</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.spectrum_types">
+<span class="sig-name descname"><span class="pre">spectrum_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Constant',</span> <span class="pre">'Data',</span> <span class="pre">'Rectangle',</span> <span class="pre">'Gaussian',</span> <span class="pre">'Function']</span></span><a class="headerlink" href="#optrace.tracer.spectrum.transmission_spectrum.TransmissionSpectrum.spectrum_types" title="Link to this definition">¶</a></dt>
+<dd><p>possible spectrum types. Can be changed by subclasses</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="optrace_tracer_image.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">6.7. </span>tracer.image Submodule</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="optrace_tracer_presets.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">6.9. </span>tracer.presets Submodule</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>

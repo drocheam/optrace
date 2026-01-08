@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>5.4. Image and Spectrum Rendering - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="5.5. Ray Transfer Matrix Analysis" href="matrix_analysis.html" /><link rel="prev" title="5.3. Heisenberg Uncertainty Ray Bending" href="hurb.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/details/image_spectrum.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/details/image_spectrum.html"/>
+  <meta property="og:title" content="5.4. Image and Spectrum Rendering"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">5. Implementation Details</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">6. API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/structure.html">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#image-rendering">5.4.1. Image Rendering</a></li>
+<li><a class="reference internal" href="#sphere-projections">5.4.2. Sphere Projections</a></li>
+<li><a class="reference internal" href="#spectrum-rendering">5.4.3. Spectrum Rendering</a></li>
+<li><a class="reference internal" href="#spectrum-color">5.4.4. Spectrum Color</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">5. </span>Implementation Details</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">5.4. </span>Image and Spectrum Rendering</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/details/image_spectrum.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/details/image_spectrum.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/details/image_spectrum.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/image_spectrum.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/details/image_spectrum.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="image-and-spectrum-rendering">
+<h1><span class="section-number">5.4. </span>Image and Spectrum Rendering<a class="headerlink" href="#image-and-spectrum-rendering" title="Link to this heading">¶</a></h1>
+<section id="image-rendering">
+<h2><span class="section-number">5.4.1. </span>Image Rendering<a class="headerlink" href="#image-rendering" title="Link to this heading">¶</a></h2>
+<p>Image rendering consists of two main stages:</p>
+<ol class="arabic simple">
+<li><p>Hit detection with the detector</p></li>
+<li><p>Image calculation from ray position and weights</p></li>
+</ol>
+<p>Determining hits for a detector is more complex than for a standard surface,
+as there are no specific constraints on the detector’s position.
+Consequently, the detector can potentially be located within other surfaces.</p>
+<p>Rather than calculating a single surface hit, intersections are computed for all sections of a ray
+that lie within the detector’s z-range.
+Once the coordinates of a potential hit are determined,
+it is necessary to verify if these coordinates fall within the defined region of the ray section,
+thereby confirming a valid hit.
+In some cases, only the virtual extension of the ray section may intersect with the surface,
+while the ray itself may have altered its direction due to the refraction on an adjacent surface.</p>
+<p>To enhance efficiency, these calculations are executed in parallel threads,
+with each thread processing a subset of rays.
+Rays that do not reach the detector, whether because they begin ahead of it or are absorbed prior to reaching it,
+are filtered out as early as possible in the process.</p>
+<p>Upon completing the procedure, it becomes clear whether each ray impacts the detector
+and the specific location of this impact.
+If the user specifies an extent option, only rays falling within this extent are selected.
+Otherwise, an automatic rectangular extent is calculated based on the outermost ray intersections.</p>
+<p>If the detector is non-planar (e.g., a section of a sphere), the coordinates are initially mapped using
+a projection method as described in <a class="reference internal" href="#sphere-projections"><span class="std std-numref">Section 5.4.2</span></a>.
+For all intersecting rays, a two-dimensional histogram is generated based on a predefined pixel size.
+The pixel count exceeds the requested amount because each image is rendered at a higher resolution,
+allowing for resolution adjustments post-rendering, as detailed in <a class="reference internal" href="../usage/image.html#rimage-rendering"><span class="std std-numref">Section 4.8.3</span></a>.</p>
+<p>Image rendering is performed using parallel threads.
+The generated <cite>RenderImage</cite> object comprises images for the three tristimulus values X, Y, and Z,
+which can represent the full spectrum of human-visible colors.
+An illuminance image is directly derivable from the Y component and the pixel size,
+negating the need for explicit rendering of this image.
+The fourth image is an irradiance image, calculated from the ray powers and pixel sizes.
+Each thread is assigned one of these four images to process.</p>
+<p>Following image rendering, the final image may be optionally filtered with an Airy-disk resolution filter
+(see <a class="reference internal" href="../usage/image.html#image-airy-filter"><span class="std std-numref">Section 4.8.7</span></a>) and then rescaled to the desired resolution.</p>
+<figure class="align-center" id="id7">
+<a class="dark-light reference internal image-reference" href="../_images/DetectorPAP.svg"><img alt="../_images/DetectorPAP.svg" class="dark-light" src="../_images/DetectorPAP.svg" width="400" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.18 </span><span class="caption-text">Detector intersection and image rendering flowchart.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="sphere-projections">
+<span id="id1"></span><h2><span class="section-number">5.4.2. </span>Sphere Projections<a class="headerlink" href="#sphere-projections" title="Link to this heading">¶</a></h2>
+<p>The use of sphere projections and example images are illustrated in <a class="reference internal" href="../usage/image.html#image-sphere-projections"><span class="std std-numref">Section 4.8.6</span></a>.
+The relative distance to the center <span class="math notranslate nohighlight">\(r\)</span>
+and the z-position of the opposite end of the sphere <span class="math notranslate nohighlight">\(z_m\)</span> are calculated as:</p>
+<div class="math-wrapper docutils container" id="equation-sph-projections-pars">
+<div class="math notranslate nohighlight" id="equation-sph-projections-pars">
+<span class="eqno">(5.89)<a class="headerlink" href="#equation-sph-projections-pars" title="Link to this equation">¶</a></span>\[\begin{split}r &amp;= \sqrt{(x-x_0)^2  + (y - y_0)^2}\\
+z_m &amp;= z_0 + R\end{split}\]</div>
+</div>
+<p><strong>Equidistant</strong></p>
+<p>The following equation is an adaptation from <a class="footnote-reference brackets" href="#footcite-equidistantprojwiki" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-equidistant-proj-pars">
+<div class="math notranslate nohighlight" id="equation-equidistant-proj-pars">
+<span class="eqno">(5.90)<a class="headerlink" href="#equation-equidistant-proj-pars" title="Link to this equation">¶</a></span>\[\begin{split}\theta &amp;= \arctan\left(\frac{r}{z-z_m}\right)\\
+\phi &amp;= \text{arctan2}(y-y_0, ~x-x_0)\\\end{split}\]</div>
+</div>
+<p>The projected coordinates are given by:</p>
+<div class="math-wrapper docutils container" id="equation-equidistant-proj-eq">
+<div class="math notranslate nohighlight" id="equation-equidistant-proj-eq">
+<span class="eqno">(5.91)<a class="headerlink" href="#equation-equidistant-proj-eq" title="Link to this equation">¶</a></span>\[\begin{split}x_p &amp;= -\theta \cdot \text{sgn}(R) \cos(\phi)\\
+y_p &amp;= -\theta \cdot \text{sgn}(R) \sin(\phi)\\\end{split}\]</div>
+</div>
+<p><strong>Orthographic</strong></p>
+<p>The hit coordinates <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> remain unchanged.
+For further reference, see <a class="footnote-reference brackets" href="#footcite-orthographicprojwiki" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<p><strong>Stereographic</strong></p>
+<p>The following formulation is adapted from <a class="footnote-reference brackets" href="#footcite-steographicprojwiki" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>:</p>
+<div class="math-wrapper docutils container" id="equation-stereographic-proj-pars">
+<div class="math notranslate nohighlight" id="equation-stereographic-proj-pars">
+<span class="eqno">(5.92)<a class="headerlink" href="#equation-stereographic-proj-pars" title="Link to this equation">¶</a></span>\[\begin{split}\theta &amp;= \frac{\pi}{2} - \arctan\left(\frac{r}{z-z_m}\right)\\
+\phi &amp;= \text{arctan2}(y-y_0, ~x-x_0)\\
+r &amp;= 2 \tan\left(\frac{\pi}{4} - \frac{\theta}{2}\right)\\\end{split}\]</div>
+</div>
+<p>The projected coordinates are given by:</p>
+<div class="math-wrapper docutils container" id="equation-stereographic-proj-eq">
+<div class="math notranslate nohighlight" id="equation-stereographic-proj-eq">
+<span class="eqno">(5.93)<a class="headerlink" href="#equation-stereographic-proj-eq" title="Link to this equation">¶</a></span>\[\begin{split}x_p &amp;= -r \cdot  \text{sgn}(R) \cos(\phi)\\
+y_p &amp;= -r \cdot \text{sgn}(R) \sin(\phi)\\\end{split}\]</div>
+</div>
+<p><strong>Equal-Area</strong></p>
+<p>This equation, adapted from <a class="footnote-reference brackets" href="#footcite-equalareaprojwiki" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>, is as follows:</p>
+<div class="math-wrapper docutils container" id="equation-equal-area-proj-pars">
+<div class="math notranslate nohighlight" id="equation-equal-area-proj-pars">
+<span class="eqno">(5.94)<a class="headerlink" href="#equation-equal-area-proj-pars" title="Link to this equation">¶</a></span>\[\begin{split}x_r = \frac{x - x_0} {\lvert R \rvert}\\
+y_r = \frac{y - y_0} {\lvert R \rvert}\\
+z_r = \frac{z - z_m} {R}\\\end{split}\]</div>
+</div>
+<p>The projected coordinates are given by:</p>
+<div class="math-wrapper docutils container" id="equation-equal-area-proj-eq">
+<div class="math notranslate nohighlight" id="equation-equal-area-proj-eq">
+<span class="eqno">(5.95)<a class="headerlink" href="#equation-equal-area-proj-eq" title="Link to this equation">¶</a></span>\[\begin{split}x_p = \sqrt{\frac{2}{1-z_r} x_r}\\
+y_p = \sqrt{\frac{2}{1-z_r} y_r}\\\end{split}\]</div>
+</div>
+</section>
+<section id="spectrum-rendering">
+<h2><span class="section-number">5.4.3. </span>Spectrum Rendering<a class="headerlink" href="#spectrum-rendering" title="Link to this heading">¶</a></h2>
+<p>Spectrum rendering operates in a similar way to image rendering.
+Ray intersections are computed, and only rays that successfully intersect are selected for rendering into a histogram.
+Unlike a conventional image, this process generates a spectral histogram within a specified wavelength range,
+derived from the wavelengths and powers of the rays.</p>
+<p>In place of a <a class="reference internal" href="../reference/optrace_tracer_image.html#optrace.tracer.image.render_image.RenderImage" title="optrace.tracer.image.render_image.RenderImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RenderImage</span></code></a>,
+a <a class="reference internal" href="../reference/optrace_tracer_spectrum.html#optrace.tracer.spectrum.light_spectrum.LightSpectrum" title="optrace.tracer.spectrum.light_spectrum.LightSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightSpectrum</span></code></a> object is instantiated,
+with its spectral type set to <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;Histogram&quot;</span></code>.</p>
+<p>The number of bins for the histogram is determined by the equation:</p>
+<div class="math-wrapper docutils container" id="equation-details-image-spectrum-0">
+<div class="math notranslate nohighlight" id="equation-details-image-spectrum-0">
+<span class="eqno">(5.96)<a class="headerlink" href="#equation-details-image-spectrum-0" title="Link to this equation">¶</a></span>\[N_\text{b} = 1 + 2 \; \text{floor} \left(\frac{ \text{max}\left( 51, \frac{\sqrt{N}}{2}\right)} {2}\right)\]</div>
+</div>
+<p>This formula ensures that <span class="math notranslate nohighlight">\(N_\text{b}\)</span> is odd, thereby providing a well-defined center.
+Regardless of the number of rays <span class="math notranslate nohighlight">\(N\)</span>, the minimum number of bins is fixed at 51,
+with the count scaling according to the square root of <span class="math notranslate nohighlight">\(N\)</span> beyond a certain threshold.
+This scaling is necessary because the Signal-to-Noise Ratio (SNR) of the mean increases proportionally
+with <span class="math notranslate nohighlight">\(\sqrt{N}\)</span> in the presence of normally distributed noise.
+Consequently, the number of bins is adjusted to maintain a consistent SNR while enhancing the spectrum’s resolution.</p>
+</section>
+<section id="spectrum-color">
+<h2><span class="section-number">5.4.4. </span>Spectrum Color<a class="headerlink" href="#spectrum-color" title="Link to this heading">¶</a></h2>
+<p>Analogous to <a class="reference internal" href="color.html#xyz-color-space"><span class="std std-numref">Section 5.8.1</span></a>, the tristimulus values for the light spectrum <span class="math notranslate nohighlight">\(S(\lambda)\)</span>
+can be calculated using the following integrals:</p>
+<div class="math-wrapper docutils container" id="equation-xyz-calc-spectrum">
+<div class="math notranslate nohighlight" id="equation-xyz-calc-spectrum">
+<span class="eqno">(5.97)<a class="headerlink" href="#equation-xyz-calc-spectrum" title="Link to this equation">¶</a></span>\[\begin{split}X &amp;=\int_{\lambda} S(\lambda) x(\lambda) ~d \lambda \\
+Y &amp;=\int_{\lambda} S(\lambda) y(\lambda) ~d \lambda \\
+Z &amp;=\int_{\lambda} S(\lambda) z(\lambda) ~d \lambda\end{split}\]</div>
+</div>
+<p>Subsequent to this calculation, typical color model conversions can be carried out.</p>
+<hr class="docutils" />
+<p><strong>References</strong></p>
+<div class="docutils container" id="id6">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-equidistantprojwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Azimuthal equidistant projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection">https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-orthographicprojwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Orthographic map projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Orthographic_map_projection">https://en.wikipedia.org/wiki/Orthographic_map_projection</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-steographicprojwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Stereographic map projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Stereographic_map_projection">https://en.wikipedia.org/wiki/Stereographic_map_projection</a> (visited on 2022-12-01).</p>
+</aside>
+<aside class="footnote brackets" id="footcite-equalareaprojwiki" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">4</a><span class="fn-bracket">]</span></span>
+<p>Wikipedia. Lambert azimuthal equal-area projection. 2022. URL: <a class="reference external" href="https://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection">https://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection</a> (visited on 2022-12-01).</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="hurb.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">5.3. </span>Heisenberg Uncertainty Ray Bending</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="matrix_analysis.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">5.5. </span>Ray Transfer Matrix Analysis</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script>
+      <script>window.MathJax = {"loader": {"load": ["ui/lazy"]}, "options": {"lazyMargin": "400px", "lazyAlwaysTypeset": null}}</script>
+      <script defer="defer" src="../_static/mathjax/tex-chtml.js"></script></body>
+</html>

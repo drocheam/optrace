@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>6.1. Library Structure - optrace 1.7.5 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="6.2. Global Module" href="optrace.html" /><link rel="prev" title="6. API Reference" href="index.html" />
+      <link rel="canonical" href="https://drocheam.github.io/optrace/reference/structure.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=a318c5d4" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=81da21d3" />
+    <!--intentionally blank so there are no external fonts loaded-->
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://drocheam.github.io/optrace/reference/structure.html"/>
+  <meta property="og:title" content="6.1. Library Structure"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>optrace</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link"><a href=".././examples.html">Examples</a></li><li class="link"><a href=".././installation.html">Installation</a></li><li class="link"><a href=".././usage/index.html">User Guide</a></li><li class="link">
+          <a href="https://github.com/drocheam/optrace">
+            <span>GitHub Repo</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><!--custom github logo so we don't need to connect to some icon provider-->
+<div class="sy-head-socials"><a href="https://github.com/drocheam/optrace" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+  <a href="https://github.com/drocheam/optrace/releases" aria-label="Releases">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+  </a>
+</div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">1. Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">4. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/overview.html">4.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/surfaces.html">4.2. Base Shapes (Surface, Line, Point)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/elements.html">4.3. Elements (Lens, Ray Source,  …)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/group.html">4.4. Geometry Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/raytracer.html">4.5. Raytracer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/refraction_index.html">4.6. Refractive Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/spectrum.html">4.7. Spectrum Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">4.8. Image Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/focus.html">4.9. Focus Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/tma.html">4.10. Paraxial Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/convolve.html">4.11. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/plots.html">4.12. Plotting Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui.html">4.13. GUI Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/gui_automation.html">4.14. GUI Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/advanced.html">4.15. Advanced Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../details/index.html">5. Implementation Details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../details/sampling.html">5.1. Property Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/tracing.html">5.2. Tracing Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/hurb.html">5.3. Heisenberg Uncertainty Ray Bending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/image_spectrum.html">5.4. Image and Spectrum Rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/matrix_analysis.html">5.5. Ray Transfer Matrix Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/convolution.html">5.6. PSF Convolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/focus.html">5.7. Focus Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/color.html">5.8. Color Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../details/misc.html">5.9. Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">6. API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.1. Library Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace.html">6.2. Global Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer.html">6.3. tracer Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_color.html">6.4. tracer.color Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry.html">6.5. tracer.geometry Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_geometry_surface.html">6.6. tracer.geometry.surface Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_image.html">6.7. tracer.image Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_spectrum.html">6.8. tracer.spectrum Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_tracer_presets.html">6.9. tracer.presets Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_plots.html">6.10. plots Submodule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optrace_gui.html">6.11. gui Submodule</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">7. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development/testing.html">7.1. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/documentation.html">7.2. Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/packaging.html">7.3. Packaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/notes.html">7.4. Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development/changelog.html">7.5. Changelog</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">optrace</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name"><span class="section-number">6. </span>API Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name"><span class="section-number">6.1. </span>Library Structure</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://drocheam.github.io/optrace/_sources/reference/structure.rst.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://drocheam.github.io/optrace/_sources/reference/structure.rst.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://drocheam.github.io/optrace/_sources/reference/structure.rst.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:code-slash"></iconify-icon>
+            <span>View Source</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/structure.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//drocheam.github.io/optrace/_sources/reference/structure.rst.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue" role="main">
+          <section id="library-structure">
+<h1><span class="section-number">6.1. </span>Library Structure<a class="headerlink" href="#library-structure" title="Link to this heading">¶</a></h1>
+<p><strong>Library Structure</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span data-line="1">./optrace
+</span><span data-line="2">├── __init__.py
+</span><span data-line="3">├── global_options.py
+</span><span data-line="4">├── gui
+</span><span data-line="5">│   ├── __init__.py
+</span><span data-line="6">│   ├── _scene_plotting.py
+</span><span data-line="7">│   ├── command_window.py
+</span><span data-line="8">│   ├── property_browser.py
+</span><span data-line="9">│   └── trace_gui.py
+</span><span data-line="10">├── metadata.py
+</span><span data-line="11">├── plots
+</span><span data-line="12">│   ├── __init__.py
+</span><span data-line="13">│   ├── chromaticity_plots.py
+</span><span data-line="14">│   ├── image_plots.py
+</span><span data-line="15">│   ├── init.py
+</span><span data-line="16">│   ├── misc_plots.py
+</span><span data-line="17">│   └── spectrum_plots.py
+</span><span data-line="18">├── progress_bar.py
+</span><span data-line="19">├── property_checker.py
+</span><span data-line="20">├── resources
+</span><span data-line="21">│   ├── SOURCE.txt
+</span><span data-line="22">│   ├── illuminants.csv
+</span><span data-line="23">│   ├── images
+</span><span data-line="24">│   │   ├── ETDRS_chart.png
+</span><span data-line="25">│   │   ├── ETDRS_chart_inverted.png
+</span><span data-line="26">│   │   ├── SOURCE.txt
+</span><span data-line="27">│   │   ├── cell.webp
+</span><span data-line="28">│   │   ├── color_checker.webp
+</span><span data-line="29">│   │   ├── documents.webp
+</span><span data-line="30">│   │   ├── eye_test_vintage.webp
+</span><span data-line="31">│   │   ├── fruits.webp
+</span><span data-line="32">│   │   ├── group_photo.webp
+</span><span data-line="33">│   │   ├── hong_kong.webp
+</span><span data-line="34">│   │   ├── interior.webp
+</span><span data-line="35">│   │   ├── landscape.webp
+</span><span data-line="36">│   │   ├── siemens_star.png
+</span><span data-line="37">│   │   ├── tv_testcard1.png
+</span><span data-line="38">│   │   └── tv_testcard2.png
+</span><span data-line="39">│   └── observers.csv
+</span><span data-line="40">├── tracer
+</span><span data-line="41">│   ├── __init__.py
+</span><span data-line="42">│   ├── base_class.py
+</span><span data-line="43">│   ├── color
+</span><span data-line="44">│   │   ├── __init__.py
+</span><span data-line="45">│   │   ├── illuminants.py
+</span><span data-line="46">│   │   ├── luv.py
+</span><span data-line="47">│   │   ├── observers.py
+</span><span data-line="48">│   │   ├── srgb.py
+</span><span data-line="49">│   │   ├── tools.py
+</span><span data-line="50">│   │   └── xyz.py
+</span><span data-line="51">│   ├── convolve.py
+</span><span data-line="52">│   ├── geometry
+</span><span data-line="53">│   │   ├── __init__.py
+</span><span data-line="54">│   │   ├── aperture.py
+</span><span data-line="55">│   │   ├── detector.py
+</span><span data-line="56">│   │   ├── element.py
+</span><span data-line="57">│   │   ├── filter.py
+</span><span data-line="58">│   │   ├── group.py
+</span><span data-line="59">│   │   ├── ideal_lens.py
+</span><span data-line="60">│   │   ├── lens.py
+</span><span data-line="61">│   │   ├── line.py
+</span><span data-line="62">│   │   ├── marker
+</span><span data-line="63">│   │   │   ├── __init__.py
+</span><span data-line="64">│   │   │   ├── line_marker.py
+</span><span data-line="65">│   │   │   └── point_marker.py
+</span><span data-line="66">│   │   ├── point.py
+</span><span data-line="67">│   │   ├── ray_source.py
+</span><span data-line="68">│   │   ├── surface
+</span><span data-line="69">│   │   │   ├── __init__.py
+</span><span data-line="70">│   │   │   ├── aspheric_surface.py
+</span><span data-line="71">│   │   │   ├── circular_surface.py
+</span><span data-line="72">│   │   │   ├── conic_surface.py
+</span><span data-line="73">│   │   │   ├── data_surface_1d.py
+</span><span data-line="74">│   │   │   ├── data_surface_2d.py
+</span><span data-line="75">│   │   │   ├── function_surface_1d.py
+</span><span data-line="76">│   │   │   ├── function_surface_2d.py
+</span><span data-line="77">│   │   │   ├── rectangular_surface.py
+</span><span data-line="78">│   │   │   ├── ring_surface.py
+</span><span data-line="79">│   │   │   ├── slit_surface.py
+</span><span data-line="80">│   │   │   ├── spherical_surface.py
+</span><span data-line="81">│   │   │   ├── surface.py
+</span><span data-line="82">│   │   │   └── tilted_surface.py
+</span><span data-line="83">│   │   └── volume
+</span><span data-line="84">│   │       ├── __init__.py
+</span><span data-line="85">│   │       ├── box_volume.py
+</span><span data-line="86">│   │       ├── cylinder_volume.py
+</span><span data-line="87">│   │       ├── sphere_volume.py
+</span><span data-line="88">│   │       └── volume.py
+</span><span data-line="89">│   ├── image
+</span><span data-line="90">│   │   ├── __init__.py
+</span><span data-line="91">│   │   ├── base_image.py
+</span><span data-line="92">│   │   ├── grayscale_image.py
+</span><span data-line="93">│   │   ├── render_image.py
+</span><span data-line="94">│   │   ├── rgb_image.py
+</span><span data-line="95">│   │   └── scalar_image.py
+</span><span data-line="96">│   ├── load.py
+</span><span data-line="97">│   ├── misc.py
+</span><span data-line="98">│   ├── presets
+</span><span data-line="99">│   │   ├── __init__.py
+</span><span data-line="100">│   │   ├── geometry.py
+</span><span data-line="101">│   │   ├── image.py
+</span><span data-line="102">│   │   ├── light_spectrum.py
+</span><span data-line="103">│   │   ├── psf.py
+</span><span data-line="104">│   │   ├── refraction_index.py
+</span><span data-line="105">│   │   ├── spectral_lines.py
+</span><span data-line="106">│   │   └── spectrum.py
+</span><span data-line="107">│   ├── random.py
+</span><span data-line="108">│   ├── ray_storage.py
+</span><span data-line="109">│   ├── raytracer.py
+</span><span data-line="110">│   ├── refraction_index.py
+</span><span data-line="111">│   ├── spectrum
+</span><span data-line="112">│   │   ├── __init__.py
+</span><span data-line="113">│   │   ├── light_spectrum.py
+</span><span data-line="114">│   │   ├── spectrum.py
+</span><span data-line="115">│   │   └── transmission_spectrum.py
+</span><span data-line="116">│   └── transfer_matrix_analysis.py
+</span><span data-line="117">└── warnings.py
+</span><span data-line="118">
+</span><span data-line="119">14 directories, 103 files
+</span></pre></div>
+</div>
+<p><strong>Example Structure</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span data-line="1">./examples
+</span><span data-line="2">├── IOL_pinhole_imaging.py
+</span><span data-line="3">├── IOL_target_imaging.py
+</span><span data-line="4">├── achromat.py
+</span><span data-line="5">├── arizona_eye_model.py
+</span><span data-line="6">├── astigmatism.py
+</span><span data-line="7">├── brewster_polarizer.py
+</span><span data-line="8">├── cosine_surfaces.py
+</span><span data-line="9">├── double_gauss.py
+</span><span data-line="10">├── gui_automation.py
+</span><span data-line="11">├── hurb_apertures.py
+</span><span data-line="12">├── image_render.py
+</span><span data-line="13">├── image_render_many_rays.py
+</span><span data-line="14">├── keratoconus.py
+</span><span data-line="15">├── legrand_eye_model.py
+</span><span data-line="16">├── microscope.py
+</span><span data-line="17">├── prism.py
+</span><span data-line="18">├── psf_imaging.py
+</span><span data-line="19">├── refraction_index_presets.py
+</span><span data-line="20">├── resources
+</span><span data-line="21">│   ├── eyepiece
+</span><span data-line="22">│   │   ├── LICENSE.txt
+</span><span data-line="23">│   │   ├── SOURCE.txt
+</span><span data-line="24">│   │   └── UK565851-1.zmx
+</span><span data-line="25">│   ├── materials
+</span><span data-line="26">│   │   ├── LICENSE.txt
+</span><span data-line="27">│   │   ├── SOURCE.txt
+</span><span data-line="28">│   │   ├── hikari.agf
+</span><span data-line="29">│   │   ├── hoya.agf
+</span><span data-line="30">│   │   ├── ohara.agf
+</span><span data-line="31">│   │   └── schott.agf
+</span><span data-line="32">│   └── microscope
+</span><span data-line="33">│       ├── LICENSE.txt
+</span><span data-line="34">│       ├── Nikon_1p25NA_60x_US7889433B2_MultiConfig_v2.zmx
+</span><span data-line="35">│       └── SOURCE.txt
+</span><span data-line="36">├── spectrum_presets.py
+</span><span data-line="37">├── sphere_projections.py
+</span><span data-line="38">└── spherical_aberration.py
+</span><span data-line="39">
+</span><span data-line="40">5 directories, 33 files
+</span></pre></div>
+</div>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title"><span class="section-number">6. </span>API Reference</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="optrace.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title"><span class="section-number">6.2. </span>Global Module</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+      &copy; 2026, Damian Mendroch &nbsp;  &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Impressum</a>
+      &nbsp; &nbsp; 
+      <a href="../impressum.html" style="color: var(--pst-color-text-muted)">Legal Notice</a>
+      <br>
+  
+    </div>
+    <div class="sy-foot-copyright">
+      <p>
+        Made with
+    
+        <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+        <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+      </p>
+    </div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5b045848"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+</html>
