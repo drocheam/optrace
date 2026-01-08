@@ -31,8 +31,8 @@ jobs:
 
     # offscreen rendering (MacOS)
     - name: Force offscreen render for macOS
-        if: runner.os == 'macOS'
-        run: |
+      if: runner.os == 'macOS'
+      run: |
           echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
           echo "VTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=1" >> $GITHUB_ENV
           echo "LIBGL_ALWAYS_SOFTWARE=1" >> $GITHUB_ENV
