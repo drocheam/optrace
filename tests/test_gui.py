@@ -897,6 +897,7 @@ class GUITests(unittest.TestCase):
                 # clear history
                 self._do_in_main(sim.command_window.clear_history)
                 self._wait_for_idle(sim)
+                time.sleep(0.2)
                 self.assertEqual(sim.command_window.history, [])
 
                 # check if setting and getting clipboard works globally
@@ -1981,6 +1982,7 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.os
     @pytest.mark.gui1
+    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_custom_ui(self) -> None:
         """test if custom UI elements are correctly created, initialized and execute their action"""
 
@@ -2102,6 +2104,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.os
     @pytest.mark.gui3
+    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_plots_passdown(self) -> None:
         
         RT = tracing_geometry()

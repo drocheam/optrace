@@ -409,7 +409,7 @@ class TracerTests(unittest.TestCase):
         RT.add(L1)
 
         # trace and find focus        
-        RT.trace(1000000)
+        RT.trace(2000000)
         res1, _ = RT.focus_search("Image Sharpness", z_start=30)
         res2, _ = RT.focus_search("Image Center Sharpness", z_start=30)
 
