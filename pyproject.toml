@@ -9,8 +9,9 @@ keywords = ["simulation", "optics", "raytracing"]
 readme = "ReadMe.md"
 license = {text = "MIT License"}
 requires-python = ">=3.11,<3.14"
-dependencies = ["numpy>2", "chardet", "scipy", "opencv-python-headless", "pyqtdarktheme-fork", "pyside6", 
-"matplotlib", "tqdm", "mayavi @ git+https://github.com/drocheam/mayavi.git@merged-fixes", "vtk < 9.5"] 
+dependencies = ["numpy>2,<2.4", "chardet", "scipy", "opencv-python-headless", "pyqtdarktheme-fork", "pyside6", 
+"matplotlib", "tqdm", "mayavi @ git+https://github.com/drocheam/mayavi.git@merged-fixes", "vtk < 9.5"]
+# NOTE some vtk functions call numpy.in1d, which has been removed in 2.4
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
