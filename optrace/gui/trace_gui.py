@@ -12,11 +12,12 @@ from pyface.qt import QtGui, QtCore  # closing UI elements
 
 # traits types and UI elements
 from traitsui.api import Group as TGroup
-from traitsui.api import View, Item, HSplit, CheckListEditor, TextEditor, RangeEditor
+from traitsui.api import View, Item, UItem, HSplit, CheckListEditor, TextEditor, RangeEditor, Editor, BasicEditorFactory
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool, String
 from traits.observation.api import TraitChangeEvent
 
-from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
+import pyvista as pv
+from pyvistaqt import QtInteractor
 
 # provides types and plotting functionality
 from ..tracer import *
@@ -31,12 +32,41 @@ from ..warnings import warning
 from ..global_options import global_options
 from .. import metadata
 
+# TODO inc_status and dec_status thread_safe?
 
+class _PyVistaEditor(Editor):
+    """
+    Qt-based editor that embeds PyVistaQt.
+    """
+    def init(self, parent):
+        """
+        Create the QtInteractor control and link it to the TraitsUI system.
+        """
+        # Create the PyVistaQt widget
+        self.control = QtInteractor(parent.parentWidget(), auto_update=False)
+        
+        # Assign the created plotter to the Trait on the TraceGUI instance
+        self.value = self.control
+
+        # close all windows if the scene gets destroyed
+        self.control.destroyed.connect(QtGui.QApplication.closeAllWindows)
+
+    def set_size_policy(self, *args):
+        pass
+
+class PyVistaEditor(BasicEditorFactory):
+    """
+    The Factory class used in the View definition: editor=PyVistaEditor()
+    """
+    klass = _PyVistaEditor
+
+
+# TODO ray update is flickering (run self.replot, rays get updated two times) -> smart_replot replots rays
 
 class TraceGUI(HasTraits):
 
-    scene: Instance = Instance(MlabSceneModel, args=())
-    """the mayavi scene"""
+    scene: Instance = Instance(QtInteractor)
+    """the pyvista vtk scene"""
 
     # Ranges
 
@@ -274,7 +304,7 @@ class TraceGUI(HasTraits):
                 HSplit(
                     TGroup(  # additional group so scene-sidebar ratio stays the same on windows resizing
                         TGroup(
-                            Item('scene', editor=SceneEditor(scene_class=MayaviScene), resizable=True,
+                            UItem('scene', editor=PyVistaEditor(), resizable=True,
                                  height=_scene_size0[1], width=_scene_size0[0], show_label=False),
                              ),
                         layout="split",
@@ -523,6 +553,7 @@ class TraceGUI(HasTraits):
 
             super().__init__(**kwargs)
 
+
     def __setattr__(self, key: str, val: Any) -> None:
         """
         assigns the value of an attribute
@@ -554,6 +585,29 @@ class TraceGUI(HasTraits):
             yield
         finally:
             self._no_trait_action_flag = False
+
+    @observe('scene', dispatch="ui")
+    def init_scene(self, event=None):
+        """Initialize the PyVista scene settings."""
+        if self.scene is None:
+            return
+
+        self._plot.scene = self.scene
+        self._plot.set_colors()
+
+        self._plot.plot_orientation_axes()  # before init_keyboard_shortcuts so i-shortcut gets deleted
+        self._plot.init_ray_info()
+        self._plot.init_status_info()
+        
+        self.scene.set_background(self._plot._background_color)
+        self.scene.enable_3_lights()
+        self.scene.enable_anti_aliasing("fxaa")
+
+        self.replot()
+        self._plot.set_initial_camera()  # this needs to be called after replot, which defines the visual scope
+        self._plot.init_resizing_event()
+        self._plot.init_keyboard_shortcuts()  # do last so element shortcuts get overwritten
+        self._dec_status("InitScene", notify=True)
     
     @contextmanager
     def smart_replot(self, automatic_replot: bool = True) -> None:
@@ -632,7 +686,7 @@ class TraceGUI(HasTraits):
         """sets GUILoaded Status. Exits GUI if self.exit set."""
 
         self.process()
-        self._status["DisplayingGUI"] = 0
+        self._dec_status("DisplayingGUI", notify=False)
 
         if self._exit:
             pyface_gui.invoke_later(self.close)
@@ -641,16 +695,17 @@ class TraceGUI(HasTraits):
     # Interface functions
     ####################################################################################################################
 
-    def screenshot(self, path: str, **kwargs) -> None:
+    def screenshot(self, path: str = None, **kwargs) -> np.ndarray:
         """
-        Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
-        See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
+        Save a screenshot of the scene. Passes the parameters down to the pyvista.Plotter.screenshot function.
+        The function returns a numpy array for the image, which also can be saved by providing the path parameter.
         """
-        pc.check_type("path", path, str)
+        pc.check_type("path", path, str | None)
        
-        self._status["Screenshot"] += 1
-        self._plot.screenshot(path, **kwargs)
-        self._status["Screenshot"] -= 1
+        self._inc_status("Screenshot", notify=False)
+        result = self._plot.screenshot(path, **kwargs)
+        self._dec_status("Screenshot", notify=False)
+        return result
 
     def set_camera(self, 
                    center:      np.ndarray = None, 
@@ -670,7 +725,7 @@ class TraceGUI(HasTraits):
          (direction of vector perpendicular to your monitor and in your viewing direction)
         :param roll: absolute camera roll angle
         """
-        pc.check_type("center", center, list | np.ndarray | None)
+        pc.check_type("center", center, list | np.ndarray | None | tuple)
         pc.check_type("height", height, float | int | None)
         pc.check_type("direction", direction, list | np.ndarray | None)
         pc.check_type("roll", roll, float | int | None)
@@ -678,9 +733,9 @@ class TraceGUI(HasTraits):
         if height is not None:
             pc.check_above("height", height, 0)
 
-        self._status["Drawing"] += 1
+        self._inc_status("Drawing", notify=False)
         self._plot.set_camera(center, height, direction, roll)
-        self._status["Drawing"] -= 1
+        self._dec_status("Drawing", notify=True)
     
     def get_camera(self) -> tuple[np.ndarray, float, np.ndarray, float]:
         """
@@ -715,10 +770,10 @@ class TraceGUI(HasTraits):
         pc.check_type("index", index, int | np.int64)
         pc.check_type("section", section, int | np.int64 | None)
 
-        self._status["Drawing"] += 1
+        self._inc_status("Drawing", notify=False)
         with self._try():
             self._plot.pick_ray_section(index, section, detailed)
-        self._status["Drawing"] -= 1
+        self._dec_status("Drawing", notify=False)
     
     def reset_picking(self) -> None:
         """
@@ -726,9 +781,9 @@ class TraceGUI(HasTraits):
         Hides the ray info text, ray highlight and crosshair that have been created
         with TraceGUI.pick_ray or TraceGUI.pick_ray_section
         """
-        self._status["Drawing"] += 1
+        self._inc_status("Drawing", notify=False)
         self._plot.reset_picking()
-        self._status["Drawing"] -= 1
+        self._dec_status("Drawing", notify=True)
 
     def replot(self, change: dict = None) -> None:
         """
@@ -743,98 +798,91 @@ class TraceGUI(HasTraits):
         if not all_ and not change["Any"]:
             return
 
-        self._status["Drawing"] += 1
+        self._inc_status("Drawing", notify=False)
         self.process()
-        self.scene.disable_render = True
 
-        with self._plot.constant_camera():
+        # RaySources need to be plotted first, since plotRays() colors them
+        if all_ or change["RaySources"]:
+            self._plot.plot_ray_sources()
+            self._init_source_list()
 
-            # RaySources need to be plotted first, since plotRays() colors them
-            if all_ or change["RaySources"]:
-                self._plot.plot_ray_sources()
-                self._init_source_list()
+            # restore selected RaySource. If it is missing, default to 0.
+            if self._source_ind >= len(self.raytracer.ray_sources):
+                self._source_ind = 0
+            if len(self.raytracer.ray_sources):
+                self.source_selection = self.source_names[self._source_ind]
 
-                # restore selected RaySource. If it is missing, default to 0.
-                if self._source_ind >= len(self.raytracer.ray_sources):
-                    self._source_ind = 0
-                if len(self.raytracer.ray_sources):
-                    self.source_selection = self.source_names[self._source_ind]
+        # if GUILoaded Status should be reset in this function
+        rdh = not bool(self.raytracer.ray_sources)
+        
+        if all_ or change["Filters"]:
+            self._plot.plot_filters()
 
-            # if GUILoaded Status should be reset in this function
-            rdh = not bool(self.raytracer.ray_sources)
-            
-            if all_ or change["Filters"]:
-                self._plot.plot_filters()
+        if all_ or change["Lenses"]:
+            self._plot.plot_lenses()
 
-            if all_ or change["Lenses"]:
-                self._plot.plot_lenses()
+        if all_ or change["Apertures"]:
+            self._plot.plot_apertures()
+        
+        if all_ or change["Volumes"]:
+            self._plot.plot_volumes()
 
-            if all_ or change["Apertures"]:
-                self._plot.plot_apertures()
-            
-            if all_ or change["Volumes"]:
-                self._plot.plot_volumes()
+        if all_ or change["Markers"]:
+            self._plot.plot_point_markers()
+            self._plot.plot_line_markers()
+        
+        if all_ or change["Detectors"]:
+            # no threading and __detector_lock here, since we're only updating the list
+            self._plot.plot_detectors()
+            self._init_detector_list()
 
-            if all_ or change["Markers"]:
-                self._plot.plot_point_markers()
-                self._plot.plot_line_markers()
-            
-            if all_ or change["Detectors"]:
-                # no threading and __detector_lock here, since we're only updating the list
-                self._plot.plot_detectors()
-                self._init_detector_list()
+            # restore selected Detector. If it is missing, default to 0.
+            if self._det_ind >= len(self.raytracer.detectors):
+                self._det_ind = 0
 
-                # restore selected Detector. If it is missing, default to 0.
-                if self._det_ind >= len(self.raytracer.detectors):
-                    self._det_ind = 0
+            if len(self.raytracer.detectors):
+                self.detector_selection = self.detector_names[self._det_ind]
 
-                if len(self.raytracer.detectors):
-                    self.detector_selection = self.detector_names[self._det_ind]
+        if all_ or change["Ambient"]:
+            self._plot.plot_index_boxes()
+            self._plot.plot_outline()
+            self._plot.plot_axes()
 
-            if all_ or change["Ambient"]:
-                self._plot.plot_index_boxes()
-                self._plot.plot_axes()
-                self._plot.plot_outline()
+            # minimal/maximal z-positions of Detector_obj
+            self._z_det_min = self.raytracer.outline[4]
+            self._z_det_max = self.raytracer.outline[5]
+        
+        if (all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
+                or change["RaySources"] or change["TraceSettings"]) and not rdh:
 
-                # minimal/maximal z-positions of Detector_obj
-                self._z_det_min = self.raytracer.outline[4]
-                self._z_det_max = self.raytracer.outline[5]
-            
-            if (all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
-                    or change["RaySources"] or change["TraceSettings"]) and not rdh:
-
-                # when initializing the scene, don't retrace when the raytracer already has rays stored, 
-                # there are no geometry errors and the ray_count parameter for the TraceGUI is not explicitely set
-                # and the scene did not change since the last trace
-                if self._status["DisplayingGUI"] and self.raytracer.rays.N and not self._init_forced_ray_count\
-                        and not self.raytracer.geometry_error and self.raytracer.check_if_rays_are_current():
-                    with self._no_trait_action():
-                        self.ray_count = self.raytracer.rays.N
-                    self.replot_rays()
-                else:
-                    self.retrace()
-
-            elif all_ or change["Rays"]:
+            # when initializing the scene, don't retrace when the raytracer already has rays stored, 
+            # there are no geometry errors and the ray_count parameter for the TraceGUI is not explicitely set
+            # and the scene did not change since the last trace
+            if self._status["DisplayingGUI"] and self.raytracer.rays.N and not self._init_forced_ray_count\
+                    and not self.raytracer.geometry_error and self.raytracer.check_if_rays_are_current():
+                with self._no_trait_action():
+                    self.ray_count = self.raytracer.rays.N
                 self.replot_rays()
+            else:
+                self.retrace()
 
-        self.scene.disable_render = False
-        self.scene.render()
-        self.process()
+        elif all_ or change["Rays"]:
+            self.replot_rays()
 
         if rdh and self._status["DisplayingGUI"]:  # reset initial loading flag
             # this only gets invoked after raytracing, but with no sources we need to do it here
             pyface_gui.invoke_later(self._set_gui_loaded)
 
-        self._status["Drawing"] -= 1
-        self.process()  # needed so rays are displayed in replot() 
-        # with _sequential=True (e.g. in TraceGUI.control())
+        self._dec_status("Drawing", notify=False)
+        self.process()  # needed for final update 
+        self.scene.render()
 
     @property
     def busy(self) -> bool:
         """busy state flag of TraceGUI"""
-        # currently I see no way to check with 100% certainty if the TraceGUI is actually idle
-        # it could also be in some trait_handlers or functions from other classes
-        return self.scene.busy or any(val > 0 for val in self._status.values())
+        is_interacting = self.scene is None or self.scene.interactor.GetInteractorStyle().GetState() != 0
+        is_rendering = self.scene is None or self.scene.render_window.CheckInRenderStatus()
+        return any(val > 0 for val in self._status.values()) or is_interacting or is_rendering 
 
     def debug(self, func: Callable, args: tuple = (), kwargs: dict = {}) -> None:
         """
@@ -885,20 +933,14 @@ class TraceGUI(HasTraits):
         """Run the TraceGUI"""
         self.configure_traits()
 
-    @observe('scene:closing', dispatch="ui")  # needed so this gets also called when clicking x on main window
     def close(self, event: TraitChangeEvent = None) -> None:
         """
         Close the whole application.
         
         :param event: optional trait change event
         """
-        if self._property_browser_view is not None and self._property_browser_view.control is not None:
-            self._property_browser_view.control.window().close()
-
-        if self._command_window_view is not None and self._command_window_view.control is not None:
-            self._command_window_view.control.window().close()
-        
-        pyface_gui.invoke_later(QtGui.QApplication.closeAllWindows)  # close remaining Qt windows
+        self.scene.close()
+        QtGui.QApplication.instance().quit()
 
     def add_custom_checkbox(self, name: str, val: bool, function: Callable = None) -> None:
         """
@@ -964,6 +1006,7 @@ class TraceGUI(HasTraits):
            warning("All selection slots are taken")
            return
 
+        # TODO use setattribute
         with self._no_trait_action():
             self.__dict__[f"_custom_selection_{n+1}_visible"] = True
             self.__dict__[f"_custom_selection_{n+1}"] = list_
@@ -986,7 +1029,7 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Trait handlers.
 
-    @observe('custom_checkbox_1, custom_checkbox_2, custom_checkbox_3', dispatch="ui")
+    @observe('custom_checkbox_1, custom_checkbox_2, custom_checkbox_3', dispatch="ui", post_init=True)
     def _handle_custom_checkboxes(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the checkbox.
@@ -998,15 +1041,15 @@ class TraceGUI(HasTraits):
 
             with self.smart_replot():
                 self._sequential = True
-                self._status["RunningCommand"] += 1
+                self._inc_status("RunningCommand", notify=False)
 
                 if (func := self._custom_checkbox_functions[box - 1]) is not None:
                     func(bool(self.__dict__[f"custom_checkbox_{box}"]))
 
-                self._status["RunningCommand"] -= 1
+                self._dec_status("RunningCommand", notify=False)
                 self._sequential = False
     
-    @observe('_custom_button_1, _custom_button_2, _custom_button_3', dispatch="ui")
+    @observe('_custom_button_1, _custom_button_2, _custom_button_3', dispatch="ui", post_init=True)
     def _handle_custom_buttons(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the button.
@@ -1017,12 +1060,12 @@ class TraceGUI(HasTraits):
 
             with self.smart_replot():
                 self._sequential = True
-                self._status["RunningCommand"] += 1
+                self._inc_status("RunningCommand", notify=False)
                 self._custom_button_functions[button - 1]()
-                self._status["RunningCommand"] -= 1
+                self._dec_status("RunningCommand", notify=False)
                 self._sequential = False
     
-    @observe('custom_value_1, custom_value_2, custom_value_3', dispatch="ui")
+    @observe('custom_value_1, custom_value_2, custom_value_3', dispatch="ui", post_init=True)
     def _handle_custom_values(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the value field.
@@ -1033,15 +1076,15 @@ class TraceGUI(HasTraits):
 
             with self.smart_replot():
                 self._sequential = True
-                self._status["RunningCommand"] += 1
+                self._inc_status("RunningCommand", notify=False)
 
                 if (func := self._custom_value_functions[val - 1]) is not None:
                     func(event.new)
 
-                self._status["RunningCommand"] -= 1
+                self._dec_status("RunningCommand", notify=False)
                 self._sequential = False
 
-    @observe('custom_selection_1, custom_selection_2, custom_selection_3', dispatch="ui")
+    @observe('custom_selection_1, custom_selection_2, custom_selection_3', dispatch="ui", post_init=True)
     def _handle_custom_selections(self, event: TraitChangeEvent = None) -> None:
         """
         Run the action associated with the selection field.
@@ -1053,26 +1096,26 @@ class TraceGUI(HasTraits):
 
             with self.smart_replot():
                 self._sequential = True
-                self._status["RunningCommand"] += 1
+                self._inc_status("RunningCommand", notify=False)
 
                 if (func := self._custom_selection_functions[sel - 1]) is not None:
                     func(event.new)
 
-                self._status["RunningCommand"] -= 1
+                self._dec_status("RunningCommand", notify=False)
                 self._sequential = False
 
-    @observe('high_contrast', dispatch="ui")
+    @observe('high_contrast', dispatch="ui", post_init=True)
     def _change_contrast(self, event: TraitChangeEvent = None) -> None:
         """
         change the high contrast mode
 
         :param event: optional trait change event
         """
-        self._status["Drawing"] += 1
+        self._inc_status("Drawing", notify=False)
         self._plot.change_contrast()
-        self._status["Drawing"] -= 1
+        self._dec_status("Drawing", notify=True)
 
-    @observe('rays_visible', dispatch="ui")
+    @observe('rays_visible', dispatch="ui", post_init=True)
     def replot_rays(self, event: TraitChangeEvent = None, mask: np.ndarray = None, max_show: int = None) -> None:
         """
         choose a subset of all raytracer rays and plot them with :`TraceGUI._plot_rays`.
@@ -1089,12 +1132,12 @@ class TraceGUI(HasTraits):
         if not self._no_trait_action_flag and not self._status["Tracing"]: 
             # don't do while tracing, RayStorage rays are still being generated
 
-            self._status["Drawing"] += 1
+            self._inc_status("Drawing", notify=False)
             self.process()
 
             if not self.raytracer.ray_sources or not self.raytracer.rays.N:
                 self._plot.remove_rays()
-                self._status["Drawing"] -= 1
+                self._dec_status("Drawing", notify=True)
                 return
 
             def background():
@@ -1112,9 +1155,10 @@ class TraceGUI(HasTraits):
 
                         self._plot.assign_ray_properties()
 
-                        with self._plot.constant_camera():
-                            self._plot.plot_rays(*res)
-                            self._change_ray_and_source_colors()
+                        # with self._plot.constant_camera():
+                        self._plot.plot_rays(*res)
+                        self._plot.color_rays()
+                        self._plot.color_ray_sources()
 
                         # reset picker text, highlight plot and crosshair
                         self._plot.clear_ray_text()
@@ -1126,7 +1170,7 @@ class TraceGUI(HasTraits):
                             with self._no_trait_action():
                                 self.rays_visible = np.count_nonzero(self.ray_selection)
 
-                    self._status["Drawing"] -= 1
+                    self._dec_status("Drawing", notify=True)
 
                     # gets unset on first run
                     if self._status["DisplayingGUI"]:
@@ -1157,7 +1201,7 @@ class TraceGUI(HasTraits):
         """:return: boolean array for which of the traced rays in TraceGUI.raytracer.rays are displayed currently"""
         return self._plot.ray_selection
 
-    @observe('ray_count', dispatch="ui")
+    @observe('ray_count', dispatch="ui", post_init=True)
     def retrace(self, event: TraitChangeEvent = None) -> None:
         """
         raytrace in separate thread, after that call `TraceGUI.replot_rays`.
@@ -1183,7 +1227,7 @@ class TraceGUI(HasTraits):
                 pyface_gui.process_events()
                 return
 
-            self._status["Tracing"] += 1
+            self._inc_status("Tracing", notify=True)
 
             # run this in background thread
             def background() -> None:
@@ -1208,7 +1252,7 @@ class TraceGUI(HasTraits):
                         if self.raytracer.geometry_error and self.raytracer.fault_pos.shape[0]:
                             self._plot.set_fault_markers()
 
-                        self._status["Tracing"] -= 1
+                        self._dec_status("Tracing", notify=True)
 
                         # gets unset on first run
                         if self._status["DisplayingGUI"]:
@@ -1216,7 +1260,7 @@ class TraceGUI(HasTraits):
 
                     else:
                         self._plot.remove_fault_markers()
-                        self._status["Tracing"] -= 1
+                        self._dec_status("Tracing", notify=False)  # TODO there is a gap for busyness between Tracing=Off and Drawing=On
                         self.replot_rays()
 
                 pyface_gui.invoke_later(on_finish)
@@ -1225,7 +1269,7 @@ class TraceGUI(HasTraits):
         else:
             pyface_gui.invoke_later(self._set_gui_loaded)
 
-    @observe('ray_opacity', dispatch="ui")
+    @observe('ray_opacity', dispatch="ui", post_init=True)
     def _change_ray_opacity(self, event: TraitChangeEvent = None) -> None:
         """
         change opacity of visible rays.
@@ -1233,8 +1277,9 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
         self._plot.set_ray_opacity()
+        self.scene.render()
 
-    @observe("coloring_mode", dispatch="ui")
+    @observe("coloring_mode", dispatch="ui", post_init=True)
     def _change_ray_and_source_colors(self, event: TraitChangeEvent = None) -> None:
         """
         change ray coloring mode.
@@ -1243,8 +1288,9 @@ class TraceGUI(HasTraits):
         """
         self._plot.color_rays()
         self._plot.color_ray_sources()
+        self.scene.render()
 
-    @observe("plotting_mode", dispatch="ui")
+    @observe("plotting_mode", dispatch="ui", post_init=True)
     def _change_ray_representation(self, event: TraitChangeEvent = None) -> None:
         """
         change ray view to connected lines or points only.
@@ -1252,8 +1298,9 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
         self._plot.set_ray_representation()
+        self.scene.render()
 
-    @observe('detector_selection', dispatch="ui")
+    @observe('detector_selection', dispatch="ui", post_init=True)
     def _change_detector(self, event: TraitChangeEvent = None) -> None:
         """
         change detector selection
@@ -1263,7 +1310,7 @@ class TraceGUI(HasTraits):
 
         if not self._no_trait_action_flag and self.raytracer.detectors:
 
-            self._status["ChangingDetector"] += 1
+            self._inc_status("ChangingDetector", notify=False)
 
             def background():
 
@@ -1276,14 +1323,14 @@ class TraceGUI(HasTraits):
                     self.projection_method_enabled = \
                         isinstance(self.raytracer.detectors[self._det_ind].surface, SphericalSurface)
                     self.__detector_lock.release()
-                    self._status["ChangingDetector"] -= 1
+                    self._dec_status("ChangingDetector", notify=True)
 
                 self.__detector_lock.acquire()
                 pyface_gui.invoke_later(on_finish)
 
             self._start_action(background)
 
-    @observe('z_det', dispatch="ui")
+    @observe('z_det', dispatch="ui", post_init=True)
     def _move_detector(self, event: TraitChangeEvent = None) -> None:
         """
         Move current detector.
@@ -1292,7 +1339,7 @@ class TraceGUI(HasTraits):
         """
         if not self._no_trait_action_flag and self.raytracer.detectors:
 
-            self._status["ChangingDetector"] += 1
+            self._inc_status("ChangingDetector", notify=True)
 
             def background():
 
@@ -1309,14 +1356,14 @@ class TraceGUI(HasTraits):
                         self.detector_selection = self.detector_names[self._det_ind]
 
                     self.__detector_lock.release()
-                    self._status["ChangingDetector"] -= 1
+                    self._dec_status("ChangingDetector", notify=True)
 
                 self.__detector_lock.acquire()
                 pyface_gui.invoke_later(on_finish)
 
             self._start_action(background)
 
-    @observe('_detector_profile_button', dispatch="ui")
+    @observe('_detector_profile_button', dispatch="ui", post_init=True)
     def detector_profile(self, event = None, extent: list | np.ndarray = None, **kwargs) -> None:
         """
         Plot a detector image profile.
@@ -1327,7 +1374,7 @@ class TraceGUI(HasTraits):
         """
         self.detector_image(event, profile=True, extent=extent, **kwargs)
 
-    @observe('_detector_image_button', dispatch="ui")
+    @observe('_detector_image_button', dispatch="ui", post_init=True)
     def detector_image(self,
                        event        = None,
                        profile:         bool = False,
@@ -1345,7 +1392,7 @@ class TraceGUI(HasTraits):
 
         if self.raytracer.detectors and self.raytracer.rays.N:
 
-            self._status["DetectorImage"] += 1
+            self._inc_status("DetectorImage", notify=True)
 
             def background() -> None:
             
@@ -1394,13 +1441,13 @@ class TraceGUI(HasTraits):
                                 image_profile_plot(img, log=bool(self.log_image),
                                                    flip=bool(self.flip_detector_image), **cut_args, **kwargs)
 
-                    self._status["DetectorImage"] -= 1
+                    self._dec_status("DetectorImage", notify=True)
 
                 pyface_gui.invoke_later(on_finish)
 
             self._start_action(background)
 
-    @observe('_detector_spectrum_button', dispatch="ui")
+    @observe('_detector_spectrum_button', dispatch="ui", post_init=True)
     def detector_spectrum(self, event: TraitChangeEvent = None, extent: list | np.ndarray = None, **kwargs) -> None:
         """
         Render a Detector Spectrum for the chosen Source, uses a separate thread.
@@ -1412,7 +1459,7 @@ class TraceGUI(HasTraits):
 
         if self.raytracer.detectors and self.raytracer.rays.N:
 
-            self._status["DetectorSpectrum"] += 1
+            self._inc_status("DetectorSpectrum", notify=True)
             self._spectrum_information = ""
 
             def background() -> None:
@@ -1432,13 +1479,13 @@ class TraceGUI(HasTraits):
                             spectrum_plot(Det_Spec, **kwargs)
                         self._spectrum_information = self._get_spectrum_information(Det_Spec)
 
-                    self._status["DetectorSpectrum"] -= 1
+                    self._dec_status("DetectorSpectrum", notify=True)
 
                 pyface_gui.invoke_later(on_finish)
 
             self._start_action(background)
 
-    @observe('_source_profile_button', dispatch="ui")
+    @observe('_source_profile_button', dispatch="ui", post_init=True)
     def source_profile(self, event = None, **kwargs) -> None:
         """
         Plot a source image profile.
@@ -1466,7 +1513,7 @@ class TraceGUI(HasTraits):
 
         return stats
 
-    @observe('_source_spectrum_button', dispatch="ui")
+    @observe('_source_spectrum_button', dispatch="ui", post_init=True)
     def source_spectrum(self, event: TraitChangeEvent = None, **kwargs) -> None:
         """
         render a Source Spectrum for the chosen Source, uses a separate thread.
@@ -1477,8 +1524,8 @@ class TraceGUI(HasTraits):
 
         if self.raytracer.ray_sources and self.raytracer.rays.N:
 
-            self._status["SourceSpectrum"] += 1
             self._spectrum_information = ""
+            self._inc_status("SourceSpectrum", notify=True)
 
             def background() -> None:
 
@@ -1494,13 +1541,13 @@ class TraceGUI(HasTraits):
                             spectrum_plot(RS_Spec, **kwargs)
                         self._spectrum_information = self._get_spectrum_information(RS_Spec)
 
-                    self._status["SourceSpectrum"] -= 1
+                    self._dec_status("SourceSpectrum", notify=True)
 
                 pyface_gui.invoke_later(on_finish)
 
             self._start_action(background)
 
-    @observe('_source_image_button', dispatch="ui")
+    @observe('_source_image_button', dispatch="ui", post_init=True)
     def source_image(self, event = None, profile: bool = False, **kwargs) -> None:
         """
         Render a source image for the chosen Source, uses a separate thread
@@ -1512,7 +1559,7 @@ class TraceGUI(HasTraits):
 
         if self.raytracer.ray_sources and self.raytracer.rays.N:
 
-            self._status["SourceImage"] += 1
+            self._inc_status("SourceImage", notify=True)
 
             def background() -> None:
 
@@ -1551,13 +1598,13 @@ class TraceGUI(HasTraits):
                                 cut_args = {self.profile_position_dimension : self.profile_position}
                                 image_profile_plot(img, log=bool(self.log_image), **cut_args, **kwargs)
 
-                    self._status["SourceImage"] -= 1
+                    self._dec_status("SourceImage", notify=True)
 
                 pyface_gui.invoke_later(on_finish)
 
             self._start_action(background)
 
-    @observe('_focus_search_button', dispatch="ui")
+    @observe('_focus_search_button', dispatch="ui", post_init=True)
     def move_to_focus(self, event: TraitChangeEvent = None, **kwargs) -> None:
         """
         Find a Focus.
@@ -1571,7 +1618,7 @@ class TraceGUI(HasTraits):
 
         if self.raytracer.detectors and self.raytracer.ray_sources and self.raytracer.rays.N:
 
-            self._status["Focussing"] += 1
+            self._inc_status("Focussing", notify=True)
             self._focus_search_information = ""
 
             def background() -> None:
@@ -1614,39 +1661,37 @@ class TraceGUI(HasTraits):
                             f"Used {N} Rays for Focus Search\n"\
                             f"Ignoring Filters and Apertures\n\nOptimizeResult:\n{res}"
 
-                    self._status["Focussing"] -= 1
+                    self._dec_status("Focussing", notify=True)
 
                 pyface_gui.invoke_later(on_finish)
 
             self._start_action(background)
 
-    @observe('scene:activated', dispatch="ui")
-    def _plot_scene(self, event: TraitChangeEvent = None) -> None:
+    def _inc_status(self, key: str, notify: bool = False) -> None:
         """
-        Initialize the GUI. Inits a variety of things.
+        Increment the status counter
 
-        :param event: optional trait change event
+        :param key: status name from _status
+        :param notify: if scene.render() should be called
         """
-        self._plot.init_crosshair()
-        self._plot.init_ray_info()
-        self._plot.init_status_info()
-        self._plot.init_keyboard_shortcuts()
-
-        self._plot.plot_orientation_axes()
-        self.replot()
-        self._plot.set_initial_camera()  # this needs to be called after replot, which defines the visual scope
-        self._status["InitScene"] = 0
-        
-    @observe('_status:items', dispatch="ui")
-    def _change_status(self, event: TraitChangeEvent = None) -> None:
-        """
-        Update the status info text.
-
-        :param event: optional trait change event
-        """
+        self._status[key] += 1
         self._plot.set_status(self._status)
+        if notify:
+            self.scene.render()
+    
+    def _dec_status(self, key: str, notify: bool = True) -> None:
+        """
+        Decrement the status counter
 
-    @observe('minimalistic_view', dispatch="ui")
+        :param key: status name from _status
+        :param notify: if scene.render() should be called
+        """
+        self._status[key] -= 1
+        self._plot.set_status(self._status)
+        if notify:
+            self.scene.render()
+
+    @observe('minimalistic_view', dispatch="ui", post_init=True)
     def _change_minimalistic_view(self, event: TraitChangeEvent = None) -> None:
         """
         change the minimalistic ui view option.
@@ -1654,11 +1699,11 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
         if not self._status["InitScene"]:
-            self._status["Drawing"] += 1
+            self._inc_status("Drawing", notify=False)
             self._plot.change_minimalistic_view()
-            self._status["Drawing"] -= 1
+            self._dec_status("Drawing", notify=True)
     
-    @observe('hide_labels', dispatch="ui")
+    @observe('hide_labels', dispatch="ui", post_init=True)
     def _change_hide_labels(self, event: TraitChangeEvent = None) -> None:
         """
         Hide or show object labels.
@@ -1666,22 +1711,22 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
         if not self._status["InitScene"]:
-            self._status["Drawing"] += 1
+            self._inc_status("Drawing", notify=False)
             self._plot.change_label_visibility()
-            self._status["Drawing"] -= 1
+            self._dec_status("Drawing", notify=True)
 
-    @observe('vertical_labels', dispatch="ui")
+    @observe('vertical_labels', dispatch="ui", post_init=True)
     def _change_label_orientation(self, event: TraitChangeEvent = None) -> None:
         """
         Make element labels horizontal or vertical
 
         :param event: optional trait change event
         """
-        self._status["Drawing"] += 1
+        self._inc_status("Drawing", notify=False)
         self._plot.change_label_orientation()
-        self._status["Drawing"] -= 1
+        self._dec_status("Drawing", notify=True)
 
-    @observe("maximize_scene", dispatch="ui")
+    @observe("maximize_scene", dispatch="ui", post_init=True)
     def _change_maximize_scene(self, event: TraitChangeEvent = None) -> None:
         """
         change maximize scene, hide side menu and toolbar"
@@ -1689,9 +1734,9 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
         self._scene_not_maximized = not bool(self.maximize_scene)
-        self.scene.scene_editor._tool_bar.setVisible(self._scene_not_maximized)
+        # self.scene.scene_editor._tool_bar.setVisible(self._scene_not_maximized)
 
-    @observe('ray_width', dispatch="ui")
+    @observe('ray_width', dispatch="ui", post_init=True)
     def _change_ray_width(self, event: TraitChangeEvent = None) -> None:
         """
         set the ray width for the visible rays.
@@ -1699,8 +1744,9 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
         self._plot.set_ray_width()
+        self.scene.render()
 
-    @observe('source_selection', dispatch="ui")
+    @observe('source_selection', dispatch="ui", post_init=True)
     def _change_selected_ray_source(self, event: TraitChangeEvent = None) -> None:
         """
         Updates the Detector Selection and the corresponding properties.
@@ -1710,7 +1756,7 @@ class TraceGUI(HasTraits):
         if self.raytracer.ray_sources:
             self._source_ind = int(self.source_selection.split(":", 1)[0].split("RS")[1])
 
-    @observe('_command_window_button', dispatch="ui")
+    @observe('_command_window_button', dispatch="ui", post_init=True)
     def open_command_window(self, event: TraitChangeEvent = None) -> None:
         """
         Open the command window for executing code.
@@ -1729,7 +1775,7 @@ class TraceGUI(HasTraits):
         self._command_window_view.control.window().\
                 setStyleSheet(f"QAbstractScrollArea{{font-family: monospace; background-color: {bgcolor}; color: black}}")
     
-    @observe('_help_button', dispatch="ui")
+    @observe('_help_button', dispatch="ui", post_init=True)
     def open_documentation(self, event: TraitChangeEvent = None) -> None:
         """
         Open the online documentation `<https://drocheam.github.io/optrace>`_ in a browser
@@ -1738,7 +1784,7 @@ class TraceGUI(HasTraits):
         """
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(metadata.documentation))
 
-    @observe('_property_browser_button', dispatch="ui")
+    @observe('_property_browser_button', dispatch="ui", post_init=True)
     def open_property_browser(self, event: TraitChangeEvent = None) -> None:
         """
         Open a property browser for the gui, the scene, the raytracer, shown rays and cardinal points.
@@ -1762,31 +1808,18 @@ class TraceGUI(HasTraits):
             warning("Other actions running, try again when the program is idle.")
             return
 
-        self._sequential = True
-        self._status["RunningCommand"] += 1
+        self._inc_status("RunningCommand", notify=True)
 
         # make this dict also available to control()
-        dict_ = dict(mlab=self.scene.mlab, engine=self.scene.engine, scene=self.scene,
-                     camera=self.scene.camera, GUI=self, RT=self.raytracer, LL=self.raytracer.lenses, 
+        dict_ = dict(scene=self.scene, camera=self.scene.camera, GUI=self, RT=self.raytracer, LL=self.raytracer.lenses, 
                      FL=self.raytracer.filters, APL=self.raytracer.apertures, RSL=self.raytracer.ray_sources,
                      DL=self.raytracer.detectors, ML=self.raytracer.markers, VL=self.raytracer.volumes)
 
         with self.smart_replot(self.command_window.automatic_replot):
+            self._sequential = True
             with self._try():
                 exec(cmd, locals() | dict_, globals())
+            self._sequential = False
 
-        self._status["RunningCommand"] -= 1
-        self._sequential = False
+        self._dec_status("RunningCommand", notify=True)
 
-    # rescale axes texts when the scene was resized
-    # (for some reasons these are the only ones having no text_scaling_mode = 'none' option)
-    # this is the only trait so far that does not work with @observe, like:
-    # unfortunately size:items:value does not work, this way it gets called for every assignment of size
-    @observe("scene:_renwin:size", dispatch="ui")
-    def _resize_scene_elements(self, event: TraitChangeEvent = None) -> None:
-        """
-        Handles GUI window size changes. Fixes incorrect scaling by mayavi.
-
-        :param event: optional trait change event
-        """
-        self._plot.resize_scene_elements()

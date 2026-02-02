@@ -32,6 +32,7 @@ class PropertyBrowser(HasTraits):
 
 
     _scene_dict:     Dict = Dict()
+    _actor_dict:     Dict = Dict()
     _trace_gui_dict: Dict = Dict()
     _raytracer_dict: Dict = Dict()
     _ray_dict:       Dict = Dict()
@@ -72,6 +73,10 @@ class PropertyBrowser(HasTraits):
                         Item('_scene_dict', editor=ValueEditor(), show_label=False),
                         label="TraceGUI.scene",
                     ),
+                    Group(
+                        Item('_actor_dict', editor=ValueEditor(), show_label=False),
+                        label="scene.actors",
+                    ),
                     layout="tabbed",
                 ),
                 resizable=True,
@@ -86,7 +91,6 @@ class PropertyBrowser(HasTraits):
         :param gui: reference to the TraceGUI
         """
         self.gui = gui
-        self.scene = gui.scene
         self.raytracer = gui.raytracer
 
         super().__init__()
@@ -100,7 +104,8 @@ class PropertyBrowser(HasTraits):
         """
         self._raytracer_dict    = self._gen_dict_repr(self.raytracer.__dict__)
         self._ray_dict          = self._gen_dict_repr(self.gui._plot._ray_property_dict)
-        self._scene_dict        = self._gen_dict_repr(self.scene.trait_get())
+        self._scene_dict        = self._gen_dict_repr(self.gui.scene.__dict__)
+        self._actor_dict        = self._gen_dict_repr(self.gui.scene.actors)
         self._trace_gui_dict    = self._gen_dict_repr(self.gui.trait_get())
         self._card_dict         = self._gen_dict_repr(self._gen_cardinals())
         self._preset_dict       = self._gen_dict_repr(self._gen_pdict())
@@ -132,6 +137,9 @@ class PropertyBrowser(HasTraits):
 
         elif isinstance(val, tuple):
             return tuple([self._gen_dict_repr(el, rec+1) for el in val])
+        
+        # elif isinstance(val, pv.plotting.actor.Actor | pv.plotting.actor):
+            # return {key: self._gen_dict_repr(val_, rec+1) for key, val_ in val.__dict__.items()}
 
         elif isinstance(val, dict):
             return {key: self._gen_dict_repr(val_, rec+1) for key, val_ in val.items()}

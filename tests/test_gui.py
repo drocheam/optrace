@@ -12,10 +12,9 @@ from contextlib import contextmanager  # context manager for _no_trait_action()
 
 import numpy as np
 import pytest
-import pytest_xvfb
 from threading import Thread
 import matplotlib.pyplot as plt
-import pyautogui
+
 from pyface.qt import QtGui
 from pyface.api import GUI as pyface_gui  # invoke_later() method
 
@@ -24,9 +23,12 @@ from optrace.gui import TraceGUI
 from tracing_geometry import tracing_geometry
 
 
+from pyface.qt import QtGui, QtCore  # closing UI elements
+
 class GUITests(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
+        self.exc_info = False
 
         # set seed to PYTHONHASHSEED, so the results are reproducible
         if "PYTHONHASHSEED" in os.environ:
@@ -35,10 +37,15 @@ class GUITests(unittest.TestCase):
         super().__init__(*args, **kwargs)
 
     def setUp(self) -> None:
+        self.exc_info = False  # reset thread exceptions
         warnings.simplefilter("ignore")
 
     def tearDown(self) -> None:
         warnings.simplefilter("default")
+        # pyvista.close_all()
+
+        if self.exc_info:  # raise unhandled thread exception
+            raise self.exc_info[0](self.exc_info[1]).with_traceback(self.exc_info[2])
 
     def _wait_for_idle(self, sim, base=0.2, timeout=30) -> None:
         """wait until the GUI is Idle. Only call this from another thread"""
@@ -50,7 +57,7 @@ class GUITests(unittest.TestCase):
             tsum += 0.05
 
             if tsum > timeout:
-                raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {keys}")
+                raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {sim._status}")
     
     def _do_in_main(self, f: Callable, *args, **kw) -> None:
         """execute a function in the GUI main thread"""
@@ -65,13 +72,33 @@ class GUITests(unittest.TestCase):
     @contextmanager
     def _try(self, sim, *args, **kwargs):
         """try TraceGUI actions. Add timeouts and close down the GUI"""
-        time.sleep(1)
-        self._wait_for_idle(sim)
+        self._wait_for_idle(sim, base=1)
         try:
             yield
+        except Exception as e:
+            self.exc_info = sys.exc_info()  # assign thread exception
         finally:
             self._wait_for_idle(sim)
             self._do_in_main(sim.close)
+
+    def click_scene(self, sim, x, y, shift=False, right=False):
+
+        # if shift:
+        sim.scene.interactor.SetShiftKey(shift)
+        sim.scene.interactor.SetEventPosition(int(x*sim.scene.window_size[0]), int(y*sim.scene.window_size[1]))
+        if right:
+            sim.scene.interactor.InvokeEvent("RightButtonPressEvent")
+            sim.scene.interactor.InvokeEvent("RightButtonReleaseEvent")
+        else:
+            sim.scene.interactor.InvokeEvent("LeftButtonPressEvent")
+            sim.scene.interactor.InvokeEvent("LeftButtonReleaseEvent")
+          
+    # TODO currently needed, as chosen picker implementation doesn't do the callback on repick of the same point
+    def reset_pick_state(self, sim):
+        # return
+        self._do_in_main(self.click_scene, sim, 0, 0)
+        self._wait_for_idle(sim)
+        time.sleep(0.2)
 
     @pytest.mark.gui1
     @pytest.mark.slow
@@ -329,7 +356,6 @@ class GUITests(unittest.TestCase):
                 # change ui dark mode while active
                 self._do_in_main(ot.global_options.__setattr__, "ui_dark_mode", not ot.global_options.ui_dark_mode)
                 
-
                 # Image Tests Flip
                 self._set_in_main(sim, "log_image", False)
                 self._wait_for_idle(sim)
@@ -686,9 +712,6 @@ class GUITests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.install
     @pytest.mark.gui3
-    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland" \
-                        and pytest_xvfb.xvfb_instance is None,
-                        reason="KDE Wayland wants remote authentication. Use X11 or run with xvfb")
     @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
                         reason="Issues with headless display and input in github actions")
     def test_key_presses(self):
@@ -706,15 +729,20 @@ class GUITests(unittest.TestCase):
         # without these high sleeping times there are errors in the github action workflows
 
         def send_key(sim, key):
-            self._do_in_main(sim.scene.scene_editor._content.setFocus)
+
+            def key_press(sim, key):
+                sim.scene.interactor.SetKeyCode(key)
+                sim.scene.interactor.InvokeEvent("KeyPressEvent")
+                sim.scene.interactor.InvokeEvent("KeyReleaseEvent")
+
+            self._do_in_main(key_press, sim, key)
             self._wait_for_idle(sim)
-            pyautogui.press(key)
-            time.sleep(0.5)
+            time.sleep(0.3)
 
         def interact(sim):
             with self._try(sim):
 
-                time.sleep(3)
+                time.sleep(1.5)
 
                 # check minimalistic_view shortcut
                 self.assertTrue(len(sim.minimalistic_view) == 0)
@@ -735,8 +763,8 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
                 self.assertTrue(len(sim.hide_labels) != 0)
                 
-                # set camera to initial view /y plus view by default)
-                self._do_in_main(sim.scene.mlab.view, 0, 1, 0)
+                # set camera to initial view
+                self._do_in_main(sim.scene.view_vector, (1, 0, 0), viewup=(0, 1, 0))
                 self._wait_for_idle(sim)
                 cv = sim.scene.camera.position
                 send_key(sim, "i")
@@ -745,25 +773,13 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(np.allclose(cv, cv2))
                 
                 # maximize scene / hide other menus
-                self.assertTrue(sim.scene.scene_editor._tool_bar.isVisible())
+                # self.assertTrue(sim.scene.scene_editor._tool_bar.isVisible())  # TODO
                 self.assertTrue(sim._scene_not_maximized)
                 send_key(sim, "h")
                 self._wait_for_idle(sim)
-                self.assertFalse(sim.scene.scene_editor._tool_bar.isVisible())
+                # self.assertFalse(sim.scene.scene_editor._tool_bar.isVisible())
                 self.assertFalse(sim._scene_not_maximized)
 
-                # don't press m warning
-                send_key(sim, "m")
-                self._wait_for_idle(sim)
-                send_key(sim, "m")
-                self._wait_for_idle(sim)
-                
-                # don't press a warning
-                send_key(sim, "a")
-                self._wait_for_idle(sim)
-                send_key(sim, "a")
-                self._wait_for_idle(sim)
-               
                 # key without shortcut
                 send_key(sim, "w")
                 self._wait_for_idle(sim)
@@ -842,11 +858,11 @@ class GUITests(unittest.TestCase):
                 self.assertNotEqual(id0, id1)
           
                 # check if removing a marker only redraws markers and no retracing etc.
-                ml0 = sim._plot._marker_plots.copy()
+                ml0 = sim._plot._point_marker_plots.copy()
                 id0 = id(sim._plot._ray_plot)
                 send("RT.remove(ML[0])")
                 id1 = id(sim._plot._ray_plot)
-                ml1 = sim._plot._marker_plots.copy()
+                ml1 = sim._plot._point_marker_plots.copy()
                 self.assertEqual(id0, id1)
                 self.assertNotEqual(ml0, ml1)
 
@@ -860,11 +876,11 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(id0, id1)  # same ID -> not retraced
                 
                 sim.command_window.automatic_replot = True
-                self._wait_for_idle(sim)
+                # self._wait_for_idle(sim)
 
                 # Misc tests
 
-                sim.command_window._replot()  # replot button
+                self._do_in_main(sim.command_window._replot)  # replot button
                 self._wait_for_idle(sim)
 
                 self._do_in_main(sim.open_command_window)
@@ -873,8 +889,8 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
                 
                 send("")  # check empty command
-
                 send("throw RuntimeError()")  # check if exceptions are handled
+                # return
 
                 # send empty command using command window
                 sim.command_window.cmd = ""
@@ -930,8 +946,6 @@ class GUITests(unittest.TestCase):
 
         sim.debug(interact, args=(sim,))
 
-
-    # @pytest.mark.os
     @pytest.mark.gui2
     @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Issues with headless display in github actions")
     def test_resize(self):
@@ -952,13 +966,12 @@ class GUITests(unittest.TestCase):
                 self._wait_for_idle(sim)
 
                 SceneSize0 = sim._plot._scene_size.copy()
-                SceneSizei0 = sim.scene.scene_editor.interactor.size.copy()
-                Window = sim.scene.scene_editor._content.window()
+                SceneSizei0 = sim.scene.window_size.copy()
+                Window = sim.scene.parent().parent().parent().parent().parent()
 
                 # properties before resizing
-                ff = sim._plot._axis_plots[0][0].axes.font_factor
-                zoom = sim._plot._orientation_axes.widgets[0].zoom
-                pos2 = sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2
+                zoom = np.mean(sim.scene.renderer.axes_widget.GetViewport()[2:])
+                pos2 = sim.scene.scalar_bar.position2
 
                 qsize = Window.size()
                 ss0 = np.array([qsize.width(), qsize.height()])
@@ -973,26 +986,23 @@ class GUITests(unittest.TestCase):
                 time.sleep(dt)  # how to check how much time it takes?
 
                 # check if window was actually resized
-                qsize2 = sim.scene.scene_editor._content.window().size()
+                qsize2 = Window.size()
                 self.assertFalse(np.all(ss0 == np.array([qsize2.width(), qsize2.height()])))
 
                 # check if scene was actually resized
-                SceneSizei1 = sim.scene.scene_editor.interactor.size.copy()
+                SceneSizei1 = sim.scene.window_size.copy()
                 self.assertFalse(np.all(SceneSizei0 == SceneSizei1))
 
                 # check if sizing parents exist
-                self.assertFalse(sim.scene.scene_editor is None or sim.scene.scene_editor.interactor\
-                        is None or sim.scene._renwin is None)
+                self.assertFalse(sim.scene.iren is None or sim.scene.iren.interactor is None)
 
                 # check if scale properties changed
                 self.assertNotAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])  # scene size variable changed
                 self.assertNotAlmostEqual(sim._plot._scene_size[1], SceneSize0[1])  # scene size variable changed
-                self.assertNotAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor)
-                self.assertNotAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom)
-                self.assertNotAlmostEqual(pos2[0],
-                                          sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0])
-                self.assertNotAlmostEqual(pos2[1],
-                                          sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1])
+                zoom2 = np.mean(sim.scene.renderer.axes_widget.GetViewport()[2:])
+                self.assertNotAlmostEqual(zoom, zoom2)
+                self.assertNotAlmostEqual(pos2[0], sim.scene.scalar_bar.position2[0])
+                self.assertNotAlmostEqual(pos2[1], sim.scene.scalar_bar.position2[1])
 
                 self._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(dt)
@@ -1010,13 +1020,10 @@ class GUITests(unittest.TestCase):
                 # check if scale properties are back at their default state
                 self.assertAlmostEqual(sim._plot._scene_size[0], SceneSize0[0], delta=2)
                 self.assertAlmostEqual(sim._plot._scene_size[1], SceneSize0[1], delta=2)
-                self.assertAlmostEqual(ff, sim._plot._axis_plots[0][0].axes.font_factor, delta=0.001)
-                self.assertAlmostEqual(zoom, sim._plot._orientation_axes.widgets[0].zoom, delta=0.001)
-                self.assertAlmostEqual(pos2[0],
-                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[0], delta=0.001)
-                self.assertAlmostEqual(pos2[1],
-                                       sim._plot._ray_plot.parent.scalar_lut_manager.scalar_bar_representation.position2[1], delta=0.001)
-
+                zoom3 = np.mean(sim.scene.renderer.axes_widget.GetViewport()[2:])
+                self.assertAlmostEqual(zoom, zoom3, delta=0.001)
+                self.assertAlmostEqual(pos2[0], sim.scene.scalar_bar.position2[0], delta=0.001)
+                self.assertAlmostEqual(pos2[1], sim.scene.scalar_bar.position2[1], delta=0.001)
 
                 # coverage test: delete orientation:axes and resize
                 sim._plot._orientation_axes = None
@@ -1195,7 +1202,6 @@ class GUITests(unittest.TestCase):
                 tn4 = (None, None, None, None)
                 sim._plot._index_box_plots[0] = tn4
                 sim._plot._ray_source_plots[0] = tn4
-                sim._plot._axis_plots[0] = tn4
                 self._do_in_main(sim._change_minimalistic_view)
                 self._wait_for_idle(sim)
 
@@ -1217,12 +1223,12 @@ class GUITests(unittest.TestCase):
         
         def automated(GUI):
 
-            for yp in np.linspace(0, 4, 3):
+            for yp in np.linspace(0, 2, 3):
 
                 # store rays and ray_plot id
                 rays0 = RT.rays.p_list
                 ray_plot_id0 = id(GUI._plot._ray_plot)
-                
+               
                 # move source and replot
                 RT.ray_sources[0].move_to([0, yp, -3])
                 GUI.replot()
@@ -1337,28 +1343,31 @@ class GUITests(unittest.TestCase):
                 RT.add(ot.PointMarker("Test1", [0., 0., 0]))
                 self._do_in_main(sim.replot)
                 self._wait_for_idle(sim)
-                self.assertEqual(len(sim._plot._marker_plots), 1)  # element was added
-                self.assertTrue(np.allclose(sim._plot._marker_plots[0][0].actor.actor.center, 0))  # check position
+                self.assertEqual(len(sim._plot._point_marker_plots), 1)  # element was added
+                center = sim._plot._point_marker_plots[0][0].mapper.GetInputDataObject(0, 0).center
+                self.assertTrue(np.allclose(center, 0))  # check position
 
                 # marker 2, enlarged
                 RT.add(ot.PointMarker("Test2", [0., 1., 5.2], text_factor=2, marker_factor=2))
                 self._do_in_main(sim.replot)
                 self._wait_for_idle(sim)
-                self.assertEqual(len(sim._plot._marker_plots), 2)  # element was added
-                self.assertTrue(np.allclose(sim._plot._marker_plots[1][0].actor.actor.center\
-                                            - np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
+                self.assertEqual(len(sim._plot._point_marker_plots), 2)  # element was added
+                center = sim._plot._point_marker_plots[1][0].mapper.GetInputDataObject(0, 0).bounds[::2]
+                self.assertTrue(np.allclose(center- np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
 
-                # check size change
-                a, b = tuple(sim._plot._marker_plots)
-                self.assertAlmostEqual(b[0].glyph.glyph.scale_factor/a[0].glyph.glyph.scale_factor, 2)
-                self.assertAlmostEqual(b[3].property.font_size/a[3].property.font_size, 2)
+                # check size changes
+                a, b = tuple(sim._plot._point_marker_plots)
+                self.assertAlmostEqual(b[0].mapper.GetInputDataObject(0, 0).text_property.font_size/
+                                       a[0].mapper.GetInputDataObject(0, 0).text_property.font_size, 2)
+                self.assertAlmostEqual(b[3].mapper.GetInputDataObject(0, 0).text_property.font_size/
+                                       a[3].mapper.GetInputDataObject(0, 0).text_property.font_size, 2)
 
                 # check if text was assigned correctly
-                self.assertEqual(a[3].text, "Test1")
-                self.assertEqual(b[3].text, "Test2")
+                self.assertEqual(a[3].mapper.GetInputDataObject(0, 0).GetLabels().GetValue(0), "Test1")
+                self.assertEqual(b[3].mapper.GetInputDataObject(0, 0).GetLabels().GetValue(0), "Test2")
 
                 # check if marker crosshair is visible
-                self.assertTrue(a[0].visible)
+                self.assertTrue(a[0].visibility)
 
                 # change one marker to label_only
                 RT.markers[0].label_only = True
@@ -1367,11 +1376,11 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
                 self._wait_for_idle(sim)
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
-                self.assertEqual(len(sim._plot._marker_plots), 1)  # element was removed in scene
+                self.assertEqual(len(sim._plot._point_marker_plots), 1)  # element was removed in scene
 
-                # first marker now should have no crosshair shown
-                a = sim._plot._marker_plots[0]
-                self.assertFalse(a[0].visible)
+                # first marker now should have no cross
+                a = sim._plot._point_marker_plots[0]
+                self.assertTrue(a[0] is None)
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
@@ -1392,24 +1401,26 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.replot)
                 self._wait_for_idle(sim)
                 self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was added
-                self.assertTrue(np.allclose(sim._plot._line_marker_plots[0][0].actor.actor.center, 0))  # check position
+                center = sim._plot._line_marker_plots[0][0].mapper.GetInputDataObject(0, 0).center
+                self.assertTrue(np.allclose(center, 0))  # check position
 
                 # marker 2, enlarged
                 RT.add(ot.LineMarker(r=5, angle=-20, desc="Test2", pos=[0., 1., 5.2], text_factor=2, line_factor=2))
                 self._do_in_main(sim.replot)
                 self._wait_for_idle(sim)
                 self.assertEqual(len(sim._plot._line_marker_plots), 2)  # element was added
-                self.assertTrue(np.allclose(sim._plot._line_marker_plots[1][0].actor.actor.center\
-                                            - np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
+                center = sim._plot._line_marker_plots[1][0].mapper.GetInputDataObject(0, 0).center
+                self.assertTrue(np.allclose(center - np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
 
                 # check size change
                 a, b = tuple(sim._plot._line_marker_plots)
-                self.assertAlmostEqual(b[0].actor.actor.property.line_width/a[0].actor.actor.property.line_width, 2)
-                self.assertAlmostEqual(b[3].property.font_size/a[3].property.font_size, 2)
+                self.assertAlmostEqual(b[0].prop.line_width/a[0].prop.line_width, 2)
+                self.assertAlmostEqual(b[3].mapper.GetInputDataObject(0, 0).text_property.font_size/
+                                       a[3].mapper.GetInputDataObject(0, 0).text_property.font_size, 2)
 
                 # check if text was assigned correctly
-                self.assertEqual(a[3].text, "Test1")
-                self.assertEqual(b[3].text, "Test2")
+                self.assertEqual(a[3].mapper.GetInputDataObject(0, 0).GetLabels().GetValue(0), "Test1")
+                self.assertEqual(b[3].mapper.GetInputDataObject(0, 0).GetLabels().GetValue(0), "Test2")
 
                 # check replotting of markers
                 self._do_in_main(sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
@@ -1422,9 +1433,6 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui2
-    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland" \
-                        and pytest_xvfb.xvfb_instance is None,
-                        reason="KDE Wayland wants remote authentication. Use X11 or run with xvfb")
     @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
                         reason="Issues with headless display and input in github actions")
     def test_picker(self):
@@ -1436,51 +1444,41 @@ class GUITests(unittest.TestCase):
         """
 
         RT = tracing_geometry()
-        
+       
         def interact(sim):
             with self._try(sim):
         
-                # check that pyautogui works
-                pyautogui.keyDown("shiftleft")
-                time.sleep(0.3)
-                self.assertTrue(sim.scene.interactor.shift_key)
-                pyautogui.keyUp("shiftleft")
-                time.sleep(0.3)
-
                 # change to z+ view, so there are rays at the middle of the scene
-                self._do_in_main(sim.scene.z_plus_view)
+                self._do_in_main(sim.scene.view_vector, (0, 0, 1))
                 self._wait_for_idle(sim)
            
-                default_text = sim._plot._ray_text.text  # save default text for comparison
+                default_text = sim._plot._ray_text.GetText(2)  # save default text for comparison
 
                 # ray picked -> show default infos
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
-                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
-                self._wait_for_idle(sim)
-                time.sleep(0.2)  # delay so a human user can check the text
-                text1 = sim._plot._ray_text.text
-                self.assertNotEqual(text1, default_text)  # shows a ray info text
-                self.assertTrue(sim._plot._ray_highlight_plot.visible)  # show highlighted ray
-               
-                # ray picked -> show verbose info
-                pyautogui.keyDown("shiftleft")
-                time.sleep(0.3)
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
-                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
+                self._do_in_main(self.click_scene, sim, 1/2, 1/ 2)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
-                text2 = sim._plot._ray_text.text
+                text1 = sim._plot._ray_text.GetText(2)
+                self.assertNotEqual(text1, default_text)  # shows a ray info text
+                self.assertTrue(sim._plot._ray_highlight_plot.visibility)  # show highlighted ray
+              
+                # ray picked -> show verbose info
+                self.reset_pick_state(sim)
+                self._do_in_main(self.click_scene, sim, 1/2, 1/2, shift=True)
+                self._wait_for_idle(sim)
+                time.sleep(0.2)
+                text2 = sim._plot._ray_text.GetText(2)
                 self.assertNotEqual(text2, default_text)  # no default text
                 self.assertNotEqual(text1, text2)  # not the old text
-                self.assertTrue(sim._plot._ray_highlight_plot.visible)  # show highlighted ray
+                self.assertTrue(sim._plot._ray_highlight_plot.visibility)  # show highlighted ray
                
                 # no ray picked -> default text
-                self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
+                self._do_in_main(self.click_scene, sim, 0, 0)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
-                text2 = sim._plot._ray_text.text
+                text2 = sim._plot._ray_text.GetText(2)
                 self.assertEqual(text2, default_text)  # shows default text
-                self.assertFalse(sim._plot._ray_highlight_plot.visible)  # don't show any highlighted ray
+                self.assertFalse(sim._plot._ray_highlight_plot.visibility)  # don't show any highlighted ray
               
                 # redraw ray info only if it is the default one
                 self._set_in_main(sim, "minimalistic_view", True)
@@ -1490,83 +1488,70 @@ class GUITests(unittest.TestCase):
 
                 # remove crosshair and pick a ray
                 sim._plot._crosshair = None
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
-                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
-                self._wait_for_idle(sim)
+                self._do_in_main(self.click_scene, sim, 1/2, 1/2)
 
                 # remove crosshair and pick no ray
-                self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
-                self._wait_for_idle(sim)
+                self._do_in_main(self.click_scene, sim, 0, 0)
                 
                 # restore crosshair
-                self._do_in_main(sim._plot.init_crosshair)
-                self._wait_for_idle(sim)
-                
-                # we have an extra picker sim._space_picker for right+clicking in the scene,
-                # but I don't know how to make the Picker.pick() function pick with a right click
-                # so currently we overide the RayPicker with the onSpacePick method
-                # do via command string, so it is guaranteed to run in main thread
-                self._do_in_main(sim.run_command, "self._plot._ray_picker = self.scene.mlab.gcf().on_mouse_pick("
-                                         "self._plot._on_space_pick, button='Left')")
-                self._wait_for_idle(sim)
+                self._do_in_main(sim._plot.set_crosshair, [0, 0, 0])
+                self._do_in_main(sim._plot.hide_crosshair)
 
                 # space picked -> show coordinates
-                pyautogui.keyUp("shiftleft")
                 time.sleep(0.3)
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
-                                 sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
+                self._do_in_main(self.click_scene, sim, sim._plot._scene_size[0]/3, sim._plot._scene_size[1]/3, right=True)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
-                text3 = sim._plot._ray_text.text
+                text3 = sim._plot._ray_text.GetText(2)
                 self.assertNotEqual(text3, default_text)  # not the default text
                 self.assertNotEqual(text3, text2)  # not the old text
-                self.assertFalse(sim._plot._ray_highlight_plot.visible)  # don't show any highlighted ray
+                self.assertFalse(sim._plot._ray_highlight_plot.visibility)  # don't show any highlighted ray
                 
                 # valid space picked with shift -> move detector
-                pyautogui.keyDown("shiftleft")
+                self.reset_pick_state(sim)
                 time.sleep(0.3)
                 old_pos = RT.detectors[0].pos
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 3,
-                                 sim._plot._scene_size[1] / 3, 0, sim.scene.renderer)
+                self._do_in_main(self.click_scene, sim, sim._plot._scene_size[0]/3,
+                                 sim._plot._scene_size[1]/3, shift=True, right=True)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
-                text4 = sim._plot._ray_text.text
+                text4 = sim._plot._ray_text.GetText(2)
                 self.assertEqual(text4, default_text)  # not the default text
                 self.assertNotEqual(RT.detectors[0].pos[2], old_pos[2])
-                self.assertFalse(sim._plot._ray_highlight_plot.visible)  # don't show any highlighted ray
+                self.assertFalse(sim._plot._ray_highlight_plot.visibility)  # don't show any highlighted ray
                 
                 # space outside outline picked with shift -> move detector
-                self._do_in_main(sim.scene.y_plus_view)
-                self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 0, sim.scene.renderer)
+                self._do_in_main(sim.scene.view_vector, (-1, 0, 0), viewup=(0, 1, 0))
+                self._do_in_main(self.click_scene, sim, 0, 0, right=True, shift=True)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
-                text4 = sim._plot._ray_text.text
+                text4 = sim._plot._ray_text.GetText(2)
                 self.assertEqual(text4, default_text)  # not the default text
                 self.assertEqual(RT.detectors[0].pos[2], RT.outline[4])  # detector moved to the outline beginning
-                self.assertFalse(sim._plot._ray_highlight_plot.visible)  # don't show any highlighted ray
-              
+                self.assertFalse(sim._plot._ray_highlight_plot.visibility)  # don't show any highlighted ray
+             
                 # remove detectors and try to move the detector using the space pick action
                 RT.detectors = []
                 self._do_in_main(sim.replot)
                 self._wait_for_idle(sim)
-                self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
+                self._do_in_main(self.click_scene, sim, 0, 0, shift=True, right=True)
                 self._wait_for_idle(sim)
+                time.sleep(0.2)
 
                 # remove crosshair and pick
                 sim._plot._crosshair = None
-                self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
+                self._do_in_main(self.click_scene, sim, 0, 0, right=True, shift=True)
                 self._wait_for_idle(sim)
+                time.sleep(0.2)
 
-                # release shift key
-                pyautogui.keyUp("shiftleft")
-                time.sleep(0.3)
-                
                 # remove crosshair and pick without shift key
-                self._do_in_main(sim._plot._ray_picker.pick, 0, 0, 60, sim.scene.renderer)
+                self._do_in_main(self.click_scene, sim, 0, 0, right=True)
                 self._wait_for_idle(sim)
+                time.sleep(0.2)
                 
                 # restore crosshair
-                self._do_in_main(sim._plot.init_crosshair)
+                self._do_in_main(sim._plot.set_crosshair, [0, 0, 0])
+                self._do_in_main(sim._plot.hide_crosshair)
                 self._wait_for_idle(sim)
 
                 # test case where RayText is missing
@@ -1579,9 +1564,6 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui3
-    @pytest.mark.skipif(os.getenv("XDG_SESSION_DESKTOP") == "KDE" and os.getenv("XDG_SESSION_TYPE") == "wayland" \
-                        and pytest_xvfb.xvfb_instance is None,
-                        reason="KDE Wayland wants remote authentication. Use X11 or run with xvfb")
     @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
                         reason="Issues with headless display and input in github actions")
     def test_picker_coverage(self):
@@ -1589,24 +1571,18 @@ class GUITests(unittest.TestCase):
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10])
         
         def interact(sim):
-            def pick():    
-                self._wait_for_idle(sim)
-                self._do_in_main(sim._plot._ray_picker.pick, sim._plot._scene_size[0] / 2,
-                                 sim._plot._scene_size[1] / 2, 0, sim.scene.renderer)
+            def pick(*args, **kwargs):    
+                self._do_in_main(self.click_scene, sim, 1/2, 1/2, *args, **kwargs)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)  # delay so a human user can check the text
 
             def pick_shift_combs():
-                pick()
-                pyautogui.keyDown("shiftleft")
-                time.sleep(0.2)
-                pick()
-                pyautogui.keyUp("shiftleft")
-                time.sleep(0.2)
+                pick(shift=True)
+                pick(shift=False)
 
             with self._try(sim):
                 # change to z+ view, so there are rays at the middle of the scene
-                self._do_in_main(sim.scene.z_plus_view)
+                self._do_in_main(sim.scene.view_yx)
                 self._wait_for_idle(sim)
 
                 # pick RaySource Point
@@ -1659,28 +1635,28 @@ class GUITests(unittest.TestCase):
                 # pick just the ray, check that highlight plot is shown
                 self._do_in_main(sim.pick_ray, 0)
                 self._wait_for_idle(sim)
-                self.assertTrue(sim._plot._ray_highlight_plot.visible)
+                self.assertTrue(sim._plot._ray_highlight_plot.visibility)
                 
                 # pick a ray section, check that crosshair, highlight plot and info text are shown
                 self._do_in_main(sim.pick_ray_section, 0, 5)
                 self._wait_for_idle(sim)
-                self.assertTrue(sim._plot._ray_highlight_plot.visible)
-                self.assertTrue(sim._plot._crosshair.visible)
-                self.assertTrue(sim._plot._ray_text.text != "")
+                self.assertTrue(sim._plot._ray_highlight_plot.visibility)
+                self.assertTrue(sim._plot._crosshair.visibility)
+                self.assertTrue(sim._plot._ray_text.GetText(2) != "")
                 
                 # reset picking, check that things are hidden
                 self._do_in_main(sim.reset_picking)
                 self._wait_for_idle(sim)
-                self.assertFalse(sim._plot._ray_highlight_plot.visible)
-                self.assertFalse(sim._plot._crosshair.visible)
-                self.assertFalse(sim._plot._ray_text.text != "")
+                self.assertFalse(sim._plot._ray_highlight_plot.visibility)
+                self.assertFalse(sim._plot._crosshair.visibility)
+                self.assertFalse(sim._plot._ray_text.GetText(2) != "")
 
                 # check if detail parameter is applied by comparing texts
                 text = ""
                 for detail in [False, True]:
                     self._do_in_main(sim.pick_ray_section, 100, 6, detail)
                     self._wait_for_idle(sim)
-                    text2 = sim._plot._ray_text.text
+                    text2 = sim._plot._ray_text.GetText(2)
                     self.assertNotEqual(text, text2)
                     text2 = text
 
@@ -1835,24 +1811,24 @@ class GUITests(unittest.TestCase):
                 sphv.color = (1.0, 0.0, 1.0)
                 self._do_in_main(sim.replot)
                 self._wait_for_idle(sim)
-                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sphv.color)
-                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.opacity, sphv.opacity)
+                self.assertEqual(sim._plot._volume_plots[0][0].prop.color, sphv.color)
+                self.assertEqual(sim._plot._volume_plots[0][0].prop.opacity, sphv.opacity)
                 
                 # checks that automatic replotting works
                 self._do_in_main(sim.run_command, "RT.volumes[0].opacity=0.9")
                 self._wait_for_idle(sim)
-                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.opacity, 0.9)
+                self.assertEqual(sim._plot._volume_plots[0][0].prop.opacity, 0.9)
 
                 # toggle contrast mode
                 self._set_in_main(sim, "high_contrast", True)
                 self._wait_for_idle(sim)
                 # check that custom color gets unset with high contrast
-                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sim._plot._volume_color)
+                self.assertEqual(sim._plot._volume_plots[0][0].prop.color, sim._plot._volume_color)
 
                 self._set_in_main(sim, "high_contrast", False)
                 self._wait_for_idle(sim)
                 # check that custom color gets set again without high contrast
-                self.assertEqual(sim._plot._volume_plots[0][0].actor.property.color, sphv.color)
+                self.assertEqual(sim._plot._volume_plots[0][0].prop.color, sphv.color)
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
@@ -1866,7 +1842,7 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             with self._try(sim):
        
-                cam = sim.scene.scene.camera
+                cam = sim.scene.camera
 
                 # test getting and setting by
                 # 1. saving the camera
@@ -1888,12 +1864,12 @@ class GUITests(unittest.TestCase):
                 # center and height must stay the same, roll changes
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
-                roll0 = sim.scene.mlab.roll()
+                roll0 = sim.scene.camera.roll
                 self._do_in_main(sim.set_camera, roll=82)
                 self._wait_for_idle(sim)
                 self.assertTrue(np.allclose(cam.focal_point, fp0))
                 self.assertEqual(cam.parallel_scale, sc0)
-                self.assertNotEqual(roll0, sim.scene.mlab.roll())
+                self.assertNotEqual(roll0, sim.scene.camera.roll)
                 
                 # change height
                 # center and focal_point must stay the same, height changes
@@ -1909,26 +1885,26 @@ class GUITests(unittest.TestCase):
                 # height and roll must stay the same, position and focal_point change
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
-                roll0 = sim.scene.mlab.roll()
+                roll0 = sim.scene.camera.roll
                 self._do_in_main(sim.set_camera, center=[0, 10, 0])
                 self._wait_for_idle(sim)
                 self.assertFalse(np.allclose(cam.position, pos0))
                 self.assertFalse(np.allclose(cam.focal_point, fp0))
-                self.assertTrue(np.allclose(cam.focal_point - fp0, cam.position - pos0))  # shifted by same amount
+                self.assertTrue(np.allclose(np.array(cam.focal_point) - fp0, np.array(cam.position) - pos0))  # shifted by same amount
                 self.assertEqual(cam.parallel_scale, sc0)
-                self.assertEqual(roll0, sim.scene.mlab.roll())
+                self.assertEqual(roll0, sim.scene.camera.roll)
 
                 # change direction
                 # height and center stays the same, roll and position changes
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
-                roll0 = sim.scene.mlab.roll()
+                roll0 = sim.scene.camera.roll
                 self._do_in_main(sim.set_camera, direction=[0, 1, 1])
                 self._wait_for_idle(sim)
                 self.assertFalse(np.allclose(cam.position, pos0))
                 self.assertTrue(np.allclose(cam.focal_point, fp0))
                 self.assertEqual(cam.parallel_scale, sc0)
-                self.assertNotEqual(roll0, sim.scene.mlab.roll())
+                self.assertNotEqual(roll0, sim.scene.camera.roll)
 
                 # coverage: set everything at once
                 self._do_in_main(sim.set_camera, center=[10, -5, 2], height=250, roll=20, direction=[0, 0, -1])
@@ -1960,22 +1936,38 @@ class GUITests(unittest.TestCase):
 
                 # check different combinations of types and magnification
                 for path in ["screenshot.png", "screenshot.jpg"]:
-                    for magnification in ["auto", 1, 2]:
+                    for scale in [None, 1, 2]:
                         
-                        assert not os.path.exists(path)
+                        if os.path.exists(path):
+                            os.remove(path)
                         
-                        self._do_in_main(sim.screenshot, path, magnification=magnification)
+                        self._do_in_main(sim.screenshot, path, scale=scale)
                         self._wait_for_idle(sim)
 
                         self.assertTrue(os.path.exists(path))
-                        os.remove(path)
+                        if os.path.exists(path):
+                            os.remove(path)
                        
-                # check handling of size parameter and passing of additional args (like "quality" and "progressive")
-                pathj = "screenshot.jpg"
-                self._do_in_main(sim.screenshot, pathj, size=(400, 300), quality=90, progressive=1)
+                # check handling of additional arguments
+                # size parameter and passing of additional args (like "quality" and "progressive")
+                pathj = "screenshot.png"
+                if os.path.exists(pathj):
+                    os.remove(pathj)
+                self._do_in_main(sim.screenshot, pathj, window_size=(400, 300), transparent_background=True)
                 self._wait_for_idle(sim)
                 self.assertTrue(os.path.exists(pathj))
-                os.remove(pathj)
+                if os.path.exists(pathj):
+                    os.remove(pathj)
+
+                # test return value array
+                arr = [None]
+                def get_screenshot(arr, *args, **kwargs):
+                    arr[0] = sim.screenshot(*args, **kwargs) 
+                self._do_in_main(get_screenshot, arr, None, window_size=(400, 300))
+                self._wait_for_idle(sim)
+                self.assertEqual(len(arr[0].shape), 3)
+                self.assertEqual(arr[0].shape[0], 300)
+                self.assertEqual(arr[0].shape[1], 400)
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))

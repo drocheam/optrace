@@ -2,18 +2,16 @@ from __future__ import annotations
 from contextlib import contextmanager  # context manager for _no_trait_action()
 from typing import assert_never
 
-import numpy as np  # calculations
+import numpy as np
 import copy
 import matplotlib.pyplot as plt 
-import mayavi.modules.text  # Text type
-from mayavi.sources.parametric_surface import ParametricSurface  # provides outline and axes
+
+import pyvista as pv
 
 from ..tracer.geometry import Surface, Element
 from ..tracer import *
 from ..warnings import warning
 from ..global_options import global_options as go
-
-from ..property_checker import PropertyChecker as pc
 from ..tracer.misc import masked_assign
 
 
@@ -49,22 +47,22 @@ class ScenePlotting:
 
         :param ui: TraceGUI
         :param raytracer: raytracer (the same that the TraceGUI uses)
-        :param initial_camera: keyword dictionary for set_camer()
+        :param initial_camera: keyword dictionary for set_camera()
         """
         self.ui = ui
         self._scene_size = np.array(ui._scene_size0)
         self._scene_size0 = self._scene_size.copy()
-        self.scene = ui.scene
+        self.scene = self.ui.scene
         self.raytracer = raytracer
 
         # plot object lists
         self._lens_plots = []
-        self._axis_plots = []
+        self._axes_labels = []
         self._filter_plots = []
         self._aperture_plots = []
         self._detector_plots = []
         self._ray_source_plots = []
-        self._marker_plots = []
+        self._point_marker_plots = []
         self._line_marker_plots = []
         self._index_box_plots = []
         self._volume_plots = []
@@ -87,53 +85,37 @@ class ScenePlotting:
         self._ray_property_dict = {}  # properties of shown rays, set after tracing
         self.ray_selection = None
         
-        # pickers
-        self._ray_picker = None
-        self._space_picker = None
-
-        # assign scene background color
-        self.set_colors()
-
     # Helper Functions
     ###################################################################################################################
 
     def __remove_objects(self, objs: list) -> None:
         """remove visual objects from raytracer geometry"""
 
-        # try to delete objects in pipeline while iterating over its parents and grandparents
         for obj in objs:
             for obji in obj[:4]:
                 if obji is not None:
-                    for i in range(4):
-                        if obji.parent in self.scene.mayavi_scene.children:
-                            obji.parent.remove()
-                        obji = obji.parent
+                    self.scene.remove_actor(obji, render=False)
 
         objs[:] = []
     
-    @contextmanager
-    def constant_camera(self, *args, **kwargs) -> None:
-        """context manager the saves and restores the camera view"""
-        cc_traits_org = {}
-
-        if self.scene is not None and self.scene.camera is not None:
-            cc_traits_org = self.scene.camera.trait_get("position", "focal_point", "view_up", "view_angle",
-                                                        "clipping_range", "parallel_scale")
-        try:
-            yield
-
-        finally:
-            if self.scene is not None and self.scene.camera is not None:
-                self.scene.camera.trait_set(**cc_traits_org)
-    
-    def screenshot(self, path: str, **kwargs) -> None:
+    @staticmethod
+    def apply_prop(prop, **kwargs):
+        for key, val in kwargs.items():
+            if hasattr(prop, key):
+                setattr(prop, key, val)
+   
+    def screenshot(self, path: str = None, **kwargs) -> np.ndarray:
         """
-        Save a screenshot of the scene. Passes the parameters down to the mlab.savefig function.
-        See `https://docs.enthought.com/mayavi/mayavi/auto/mlab_figure.html#savefig` for parameters.
+        Save a screenshot of the scene. Passes the parameters down to the pyvista.Plotter.screenshot function.
+        The function returns a numpy array for the image, which also can be saved by providing the path parameter.
         """
-        self._status_text.visible = False  # temporarily hide status text so it won't be on the screenshot
-        self.scene.mlab.savefig(path, **kwargs)
-        self._status_text.visible = True
+        self._status_text.SetVisibility(False)  # temporarily hide status text so it won't be on the screenshot
+        arr = self.scene.screenshot(path, **kwargs)
+        self._status_text.SetVisibility(True)
+        return arr
+
+    def init_resizing_event(self):
+        self.scene.render_window.AddObserver("WindowResizeEvent", self._resize_scene_elements)
 
     def get_camera(self) -> tuple[np.ndarray, float, np.ndarray, float]:
         """
@@ -141,13 +123,13 @@ class ScenePlotting:
 
         :return: Return the current camera parameters (center, height, direction, roll)
         """
-        cam = self.scene.scene.camera
-        normal = (cam.focal_point - cam.position) / cam.distance 
+        cam = self.scene.camera
+        normal = (np.array(cam.focal_point) - cam.position) / cam.distance 
     
         return cam.focal_point,\
                cam.parallel_scale,\
                normal,\
-               self.scene.mlab.roll()\
+               cam.roll\
 
     def set_camera(self, 
                    center:          np.ndarray = None, 
@@ -169,13 +151,13 @@ class ScenePlotting:
         self.scene.parallel_projection = True
        
         # calculate vector between camera and focal point
-        cam = self.scene.scene.camera
+        cam = self.scene.camera
         normal = np.asarray(direction, dtype=np.float64) if direction is not None\
-                else (cam.focal_point - cam.position) / cam.distance
+                else (np.array(cam.focal_point) - cam.position) / cam.distance
         dist_vec = cam.distance * normal / (np.linalg.norm(normal) + 1e-12) 
 
         # old cross product of direction and view_up
-        rev = np.cross(cam.focal_point - cam.position, cam.view_up)
+        rev = np.cross(np.array(cam.focal_point) - cam.position, cam.up)
 
         if center is not None:
             cam.focal_point = center
@@ -187,17 +169,16 @@ class ScenePlotting:
         cam.position = cam.focal_point - dist_vec
 
         # update view_up from new normal and old cross product of direction and view_up 
-        cam.view_up = np.cross(cam.focal_point - cam.position, -rev)
+        cam.up = np.cross(np.array(cam.focal_point) - cam.position, -rev)
 
         # absolute roll angle
         if roll is not None:
-            self.scene.mlab.roll(roll)
+            cam.roll = roll
         
         # render
-        cam.compute_view_plane_normal()
-        self.scene.scene._renderer.reset_camera_clipping_range()
-        self.scene.scene.render()
-
+        cam.ComputeViewPlaneNormal()
+        cam.reset_clipping_range()  # TODO needed?
+        # self.scene.render()
 
     def set_initial_camera(self) -> None:
         """
@@ -206,11 +187,8 @@ class ScenePlotting:
         When parameter initial_camera is not set, it is a y-side view with all elements inside the viewable range
         When it is set, the camera properties are applied.
         """
-        self.scene.parallel_projection = True
-        self.scene._def_pos = 1  # for some reason it is set to None
-        self.scene.y_plus_view()
-        self.scene.scene_editor.camera.parallel_scale *= 0.85
-        
+        self.scene.view_vector((-1, 0, 0), viewup=(0, 1, 0), render=False)
+        self.scene.camera.parallel_scale *= 0.90
         self.set_camera(**self._initial_camera)
 
     # Element Plotting
@@ -241,7 +219,7 @@ class ScenePlotting:
             fcolor = F.color()
             alpha = 0.1 + 0.899*fcolor[3]  # offset in both directions, ensures visibility and see-through
 
-            t = self.plot_element(F, num, fcolor[:3] if not self.ui.high_contrast else self.scene.foreground, alpha)
+            t = self.plot_element(F, num, fcolor[:3] if not self.ui.high_contrast else self._foreground_color, alpha)
             self._filter_plots.append(t)
 
     def plot_detectors(self) -> None:
@@ -257,100 +235,118 @@ class ScenePlotting:
         self.__remove_objects(self._ray_source_plots)
 
         for num, RS in enumerate(self.raytracer.ray_sources):
-            t = self.plot_element(RS, num, (1, 1, 1), self._raysource_alpha, spec=False, light=False)
+            t = self.plot_element(RS, num, (1., 1., 1.), self._raysource_alpha, spec=False, light=False)
             self._ray_source_plots.append(t)
 
     def plot_outline(self) -> None:
         """replot the raytracer outline"""
 
         if self._outline is not None:
-            self._outline.remove()
+            self.scene.remove_actor(self._outline, render=False)
 
-        self.scene.engine.add_source(ParametricSurface(name="Outline"), self.scene)
-        self._outline = self.scene.mlab.outline(extent=self.raytracer.outline.copy(), color=self._outline_color)
-        self._outline.actor.actor.pickable = False  # only rays should be pickable
+        outline_mesh = pv.Box(bounds=self.raytracer.outline.copy())
+        self._outline = self.scene.add_mesh(outline_mesh, color=self._outline_color, style='wireframe', lighting=False,
+                                            name="Outline", pickable=False, line_width=1, render=False)
 
     def plot_orientation_axes(self) -> None:
         """plot orientation axes"""
 
         if self._orientation_axes is not None:
-            self._orientation_axes.remove()
+            self.scene.remove_actor(self._orientation_axes, render=False)
 
-        self.scene.engine.add_source(ParametricSurface(name="Orientation Axes"), self.scene)
+        # show axes
+        self._orientation_axes = self.scene.add_axes(interactive=False, viewport=(0, 0, 0.09, 0.12),
+                                                     color=self._foreground_color)
+        self._orientation_axes.visibility = not bool(self.ui.minimalistic_view)
 
-        # show axes indicator
-        self._orientation_axes = self.scene.mlab.orientation_axes()
-        self._orientation_axes.text_property.trait_set(**self.LABEL_STYLE)
-        self._orientation_axes.marker.interactive = 0  # make orientation axes non-interactive
-        self._orientation_axes.widgets[0].viewport = [0, 0, 0.1, 0.15]
-        self._orientation_axes.axes.visibility = not bool(self.ui.minimalistic_view)
+        # set text style
+        for actor in [self._orientation_axes.GetXAxisCaptionActor2D().text_actor, 
+                      self._orientation_axes.GetYAxisCaptionActor2D().text_actor, 
+                      self._orientation_axes.GetZAxisCaptionActor2D().text_actor]:
 
-        # turn of text scaling of orientation_axes
-        mark = self._orientation_axes.widgets[0].orientation_marker
-        mark.x_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
-        mark.y_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
-        mark.z_axis_caption_actor2d.text_actor.text_scale_mode = 'none'
+            actor.text_scale_mode = 0
+            self.apply_prop(actor.text_property, **(self.LABEL_STYLE | dict(font_family=1)))
+
+    @staticmethod
+    def calculate_labels(x0, x1, min_s, max_s):
+
+        # NOTE min_s and max_s should be in the range 3-50
+
+        # desired spacings sp and subjective weights spw (e.g. spacing of 0.25 is more natural than 0.4)
+        sp = np.array([0.2, 0.25, 0.4, 0.5, 0.75, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 3.75, 4, 5, 6, 6.25, 
+                       7.5, 8, 10, 12.5, 15, 20, 25, 40])
+        spw = np.array([1, 2, 0.8, 2, 0.5, 0.6, 2, 1, 1, 2, 1, 0.8, 0.5, 1, 2, 0.5, 0.5, 0.5, 1, 2, 1, 1, 2, 2, 1])
+        
+        # range normalization so (x1-x0)*norm is in range [10, 100]
+        norm = 10 ** -np.floor(np.log10(x1-x0)-1)
+       
+        # get label counts of normalized numbers x0*norm and x1*norm
+        lf0 = np.ceil(x0*norm/sp).astype(int)  # label factor for smallest element
+        lf1 = np.floor(x1*norm/sp).astype(int)  # label factor for largest element
+        ln = lf1 - lf0  # label count
+
+        # product of spacing weights and label counts in valid range by [min_s, max_s]
+        w = ((ln >= min_s) & (ln <= max_s))*spw 
+
+        # find element with highest weight
+        if np.any(w > 0):
+            ind = np.argmax(w)
+            return np.arange(lf0[ind], lf1[ind]+1)*sp[ind]/norm
+
+        # return linspace of full range with maximum label count
+        return np.linspace(x0, x1, max_s+1)
+
 
     def plot_axes(self) -> None:
         """plot cartesian axes"""
 
-        # save old font factor. This is the one we adapted constantly in self._resizeSceneElements()
-        ff_old = self._axis_plots[0][0].axes.font_factor if self._axis_plots else 0.75
-
-        self.__remove_objects(self._axis_plots)
-
-        # find label number for axis so that step size is an int*10^k
-        # or any of [0.25, 0.5, 0.75, 1.25, 2.5]*10^k with k being an integer
-        # label number needs to be in range [min_s, max_s]
-        def get_label_num(num: float, min_s: int, max_s: int) -> int:
-
-            norm = 10 ** -np.floor(np.log10(num)-1)
-            num_norm = num*norm  # normalize num so that 10 <= num < 100
-
-            for i in np.arange(max_s, min_s-1, -1):
-                if num_norm/i in [0.2, 0.25, 0.4, 0.5, 0.75, 0.8, 1,
-                                  1.25, 1.5, 2, 2.5, 3, 3.75, 4, 5, 6, 6.25, 7.5, 8, 10]:
-                    return i+1  # increment since there are n+1 labels for n steps
-
-            return max_s+1
-
-        def draw_axis(objs, ext: list, lnum: int, name: str, lform: str,
-                      vis_x: bool, vis_y: bool, vis_z: bool):
-
-            self.scene.engine.add_source(ParametricSurface(name=f"{name}-Axis"), self.scene)
-
-            a = self.scene.mlab.axes(extent=ext, nb_labels=lnum, x_axis_visibility=vis_x,
-                                     y_axis_visibility=vis_y, z_axis_visibility=vis_z, color=self._outline_color)
-
-            label = f"{name} / mm"
-            a.axes.trait_set(font_factor=ff_old, fly_mode='none', label_format=lform, x_label=label,
-                             y_label=label, z_label=label, layer_number=1)
-
-            a.title_text_property.trait_set(**self.LABEL_STYLE, color=self._axis_color, opacity=self._axis_alpha)
-            a.label_text_property.trait_set(**self.LABEL_STYLE, color=self._axis_color, opacity=self._axis_alpha)
-            a.visible = not bool(self.ui.minimalistic_view)
-            a.actors[0].pickable = False
-
-            objs.append((a,))
-
-        # place axes at outline
+   
+        def add_point_labels(x, y, name="", orientation=0, **kwargs):
+            i = 0
+            el = []
+            for xi, yi in zip(x, y):
+                ax = self.scene.add_point_labels([xi], [yi], name=f"{name}{i}", **kwargs)
+                ax.GetMapper().Update()  # update so we can set text properties
+                ax.GetMapper().GetInputDataObject(0, 0).GetTextProperty().SetOrientation(orientation)
+                ax.visibility = not self.ui.minimalistic_view
+                el.append(ax)
+                i += 1
+            
+            return el
+        
         ext = self.raytracer.outline
+        args = dict(font_size=11, bold=True, font_family="courier", pickable=False, fill_shape=False, render=False, 
+                    justification_horizontal="center", justification_vertical="center", always_visible=True, 
+                    text_color=self._axis_color, show_points=False, shadow=not self.ui.high_contrast, shape_opacity=0.)
 
-        # enforce placement of x- and z-axis at y=ys (=RT.outline[2]) by shrinking extent
-        ext_ys = ext.copy()
-        ext_ys[3] = ext_ys[2]
+        # X
+        lx = self.calculate_labels(ext[0], ext[1], 4, 16)
+        Lx = np.vstack((lx, np.repeat(ext[2], len(lx)), np.repeat(ext[4], len(lx)))).T
+        Lxs = [f"{lxi:.6g} –" for lxi in lx]
+        axes_x = add_point_labels(Lx, Lxs, name=f"Labels x", **(args | dict(justification_horizontal="right")))
+        axes_x2 = add_point_labels([[(ext[0]+ext[1])/2, ext[2], ext[4]]], ["\nx / mm" + len(Lxs[len(Lxs)//2])*2*" "],
+                                   name=f"Title x", **(args | dict(justification_horizontal="right")))
+       
+        # Y
+        ly = self.calculate_labels(ext[2], ext[3], 4, 16)
+        Ly = np.vstack((np.repeat(ext[0], len(ly)), ly, np.repeat(ext[4], len(ly)))).T
+        Lys = [f"{lyi:.6g} –" for lyi in ly] 
+        axes_y = add_point_labels(Ly, Lys, name=f"Labels y", **(args | dict(justification_horizontal="right")))
+        axes_y2 = add_point_labels([[ext[0], (ext[2]+ext[3])/2, ext[4]]], ["y / mm" + len(Lys[len(Lys)//2])*2*" "], 
+                                   name=f"Title y",  **(args | dict(justification_horizontal="right")))
+        
+        # Z
+        lz = self.calculate_labels(ext[4], ext[5], 5, 24)
+        Lz = np.vstack((np.repeat(ext[0], len(lz)), np.repeat(ext[2], len(lz)), lz)).T
+        Lzs = [f"\n\n{lzi:.6g}" for lzi in lz] 
+        axes_z = add_point_labels(Lz, Lzs, name=f"Labels z", **args)
+        axes_z2 = add_point_labels(Lz, ["–"]*len(Lzs), name=f"Ticks z", orientation=90, 
+                                   **(args | dict(justification_horizontal="right")))
+        axes_z3 = add_point_labels([[ext[0], ext[2], (ext[4]+ext[5])/2]], ["\n\nz / mm"], name=f"Title z", 
+                       **(args | dict(justification_vertical="top")))
+        
+        self._axes_labels = [*axes_x, *axes_x2, *axes_y, *axes_y2, *axes_z, *axes_z2, *axes_z3]
 
-        # X-Axis
-        lnum = get_label_num(ext[1] - ext[0], 5, 16)
-        draw_axis(self._axis_plots, ext_ys, lnum, "x", '%-#.4g', True, False, False)
-
-        # Y-Axis
-        lnum = get_label_num(ext[3] - ext[2], 5, 16)
-        draw_axis(self._axis_plots, ext.copy(), lnum, "y", '%-#.4g', False, True, False)
-
-        # Z-Axis
-        lnum = get_label_num(ext[5] - ext[4], 5, 24)
-        draw_axis(self._axis_plots, ext_ys, lnum, "z", '%-#.5g', False, False, True)
 
     def plot_index_boxes(self) -> None:
         """plot outlines for ambient refraction index regions"""
@@ -394,12 +390,11 @@ class ScenePlotting:
         for i in range(len(BoundList)-1):
 
             # plot outline
-            self.scene.engine.add_source(ParametricSurface(name=f"Refraction Index Outline {i}"), self.scene)
-            outline = self.scene.mlab.outline(extent=[*self.raytracer.outline[:4], BoundList[i][1], BoundList[i + 1][0]],
-                                              color=self._outline_color)
-            outline.outline_mode = 'cornered'
-            outline.actor.actor.pickable = False  # only rays should be pickable
-            outline.outline_filter.corner_factor = 0.1
+            outline_mesh = pv.Box(bounds=[*self.raytracer.outline[:4], BoundList[i][1], BoundList[i + 1][0]])
+            outline_corners = outline_mesh.outline_corners(factor=0.1)
+            outline = self.scene.add_mesh(outline_corners, color=self._outline_color, style='wireframe', lighting=False,
+                                          name=f"Refraction Index Outline {i}", pickable=False, 
+                                          line_width=1, render=False)
 
             # label position
             y_pos = self.raytracer.outline[2] + (self.raytracer.outline[3] - self.raytracer.outline[2]) * 0.05
@@ -408,20 +403,13 @@ class ScenePlotting:
 
             # plot label
             label = (f"ambient\n" if not self.ui.minimalistic_view else "")  + "n=" + nList[i].get_desc()
-            text = self.scene.mlab.text(x_pos, y_pos, z=z_pos, text=label, name="Label")
-            text.actor.text_scale_mode = 'none'
-            text.visible = not bool(self.ui.hide_labels)
-            text.property.trait_set(**self.LABEL_STYLE, frame=True, frame_color=self._subtle_color, 
-                                    color=self._axis_color, opacity=self._axis_alpha)
-
-            if not self.ui.vertical_labels:
-                text.property.trait_set(justification="center", bold=False)
-            else:
-                text.property.trait_set(justification="left", orientation=90, bold=False,
-                                        vertical_justification="center")
+            text = self._plot_label([x_pos, y_pos, z_pos], label, f"Refraction Index Outline Label {i}",
+                                    text_color=self._axis_color, shadow=not self.ui.high_contrast, bold=False,
+                                    background_opacity=0,
+                                    map_args=dict(frame_color=self._subtle_color, show_frame=True))
 
             # append plot objects
-            self._index_box_plots.append((outline, text, None))
+            self._index_box_plots.append((outline, None, None, text, None))
 
     def plot_element(self,
                      obj:           Element,
@@ -435,49 +423,41 @@ class ScenePlotting:
         """plotting of a Element. Gets called from plotting for Lens, Filter, Detector, RaySource. """
 
         def plot(C, surf_type):
-            # plot surface
-            a = self.scene.mlab.mesh(C[0], C[1], C[2], color=color, opacity=alpha,
-                                     name=f"{type(obj).__name__} {num} {surf_type} surface")
 
-            # make non-pickable, so it does not interfere with our ray picker
-            a.actor.actor.pickable = False
-            a.actor.property.representation = "surface"
-
-            a.actor.actor.property.lighting = light
-            if spec:
-                a.actor.property.trait_set(specular=0.5, ambient=0.25)
-                if self.ui.high_contrast:
-                    a.actor.property.trait_set(specular_color=(0.15, 0.15, 0.15),
-                                               diffuse_color=(0.12, 0.12, 0.12))
-                a.actor.property.color = color  # reassign color
-
-            return a
+            grid = pv.StructuredGrid(C[0], C[1], C[2])
+            name = f"{type(obj).__name__} {num} {surf_type} surface"
+            
+            # Determine material properties
+            p_specular = 0.25 if spec else 0.0
+            p_ambient = 0.4 if spec else 0.1
+            
+            actor = self.scene.add_mesh(grid, color=color, opacity=alpha, name=name, render=False, 
+                                        show_scalar_bar=False, pickable=False, lighting=light, 
+                                        specular=p_specular, ambient=p_ambient, style='surface')
+            
+            return actor
 
         # decide what to plot
         plotFront = isinstance(obj.front, Surface)
         plotCyl = plotFront
         plotBack = obj.back is not None and isinstance(obj.back, Surface)
 
-        # Element consisting only of Point or Line: nothing plotted except label -> add parent object
-        if not (plotFront or plotCyl or plotBack):
-            self.scene.engine.add_source(ParametricSurface(name=f"{type(obj).__name__} {num}"), self.scene)
-
         # plot front
         nres = self.SURFACE_RES if not plotFront or not isinstance(obj.front, RectangularSurface) else 10
         a = plot(obj.front.plotting_mesh(N=nres), "front") if plotFront else None
 
-        # cylinder between surfaces
+        # # cylinder between surfaces
         b = plot(obj.cylinder_surface(nc=2 * self.SURFACE_RES), "cylinder") if plotCyl else None
 
-        # adapt cylinder opacity
+        # # adapt cylinder opacity
         if plotCyl and isinstance(obj, Lens):
-            b.actor.property.trait_set(opacity=self._cylinder_opacity)
+            b.prop.opacity = self._cylinder_opacity
 
-        # use wireframe mode, so edge is always visible, even if it is infinitesimal small
+        # # use wireframe mode, so edge is always visible, even if it is infinitesimal small
         if plotCyl and (not obj.has_back() or (obj.extent[5] - obj.extent[4] < 0.05)):
-            b.actor.property.trait_set(representation="wireframe", lighting=False, line_width=1.75, opacity=alpha/1.5)
+            self.apply_prop(b.prop, style='wireframe', lighting=False, line_width=1.75, opacity=alpha/1.5)
 
-        # calculate middle center z-position
+        # # calculate middle center z-position
         if obj.has_back():
             zl = (obj.front.values(np.array([obj.front.pos[0]]), np.array([obj.front.extent[3]]))[0] \
                   + obj.back.values(np.array([obj.back.pos[0]]), np.array([obj.back.extent[3]]))[0]) / 2
@@ -485,30 +465,42 @@ class ScenePlotting:
             # 0/40 values in [0, 2pi] -> z - value at 0 deg relative to x axis in xy plane
             zl = obj.front.edge(40)[2][0] if isinstance(obj.front, Surface) else obj.pos[2]
 
+        # Handle Labels
+        text_actor = None
+
         if not no_label:
-            # object label
-            label = f"{obj.abbr}{num}"
+            label_str = f"{obj.abbr}{num}"
+            if obj.desc != "" and not bool(self.ui.minimalistic_view):
+                label_str += f": {obj.desc}"
 
-            # add description if any exists. But only if we are not in "minimalistic_view" displaying mode
-            label = label if obj.desc == "" or bool(self.ui.minimalistic_view) else label + ": " + obj.desc
-            text = self.scene.mlab.text(x=obj.pos[0], y=obj.extent[3], z=zl, text=label, name="Label")
-            text.actor.text_scale_mode = 'none'
-            text.visible = not bool(self.ui.hide_labels)
-
-            if not self.ui.vertical_labels:
-                text.property.trait_set(**self.LABEL_STYLE, justification="center", vertical_justification="bottom", 
-                                        orientation=0, background_opacity=0.5, background_color=self.scene.background)
-            else:
-                text.property.trait_set(**self.LABEL_STYLE, justification="left", orientation=90, 
-                                        vertical_justification="center", background_opacity=0.5, 
-                                        background_color=self.scene.background)
-        else:
-            text = None
+            # Using add_point_labels for 3D placement that stays visible
+            text_pos = [obj.pos[0], obj.extent[3], zl]
+            text_actor = self._plot_label(text_pos, label_str, f"Label_{obj.abbr}{num}", text_color=self._foreground_color,
+                                          background_opacity=self._info_opacity, background_color=self._info_frame_color)
 
         # plot BackSurface if one exists
         c = plot(obj.back.plotting_mesh(N=self.SURFACE_RES), "back") if plotBack else None
 
-        return a, b, c, text, obj
+        return a, b, c, text_actor, obj
+
+    @staticmethod
+    def mesh_from_points(x, y, z, u, v, w, s):
+        
+        # point array
+        nodes = np.empty((2 * len(x), 3))
+        nodes[0::2] = np.column_stack((x, y, z))
+        nodes[1::2] = np.column_stack((x + u, y + v, z + w))
+
+        # line connectivity
+        connectivity = np.empty(3 * len(x), dtype=np.int32)
+        connectivity[0::3] = 2
+        connectivity[1::3] = np.arange(0, 2 * len(x), 2)
+        connectivity[2::3] = np.arange(1, 2 * len(x), 2)
+
+        # construct PolyData
+        ray_mesh = pv.PolyData(nodes, lines=connectivity)
+        ray_mesh.point_data["scalars"] = np.repeat(s, 2)
+        return ray_mesh
 
     def plot_rays(self, 
                   x:    np.ndarray, 
@@ -522,19 +514,17 @@ class ScenePlotting:
         """plot a subset of traced rays"""
 
         if self._ray_plot is not None:
-            self._ray_plot.parent.parent.remove()
+            self.scene.remove_actor(self._ray_plot, render=False)
 
-        self._ray_plot = self.scene.mlab.quiver3d(x, y, z, u, v, w, scalars=s,
-                                                  scale_mode="vector", scale_factor=1, colormap="Greys", mode="2ddash")
+        ray_mesh = self.mesh_from_points(x, y, z, u, v, w, s)
 
-        self._ray_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True,
-                                                      opacity=self.ui.ray_opacity)
-
-        self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width, point_size=self.ui.ray_width)
-
-        self._ray_plot.glyph.color_mode = "color_by_scalar"
-        self._ray_plot.parent.parent.name = "Rays"
-        self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_mode == 'Points' else 'surface'
+        # toggle between points and lines
+        style = 'points' if self.ui.plotting_mode == 'Points' else 'wireframe'
+       
+        # add to scene
+        self._ray_plot = self.scene.add_mesh(ray_mesh, scalars="scalars", cmap="Greys", opacity=self.ui.ray_opacity,
+            line_width=self.ui.ray_width, point_size=self.ui.ray_width, style=style, lighting=False, name=f"Rays",
+            render_points_as_spheres=True, pickable=True, render=False, scalar_bar_args=dict(render=False))
 
     def set_ray_highlight(self, index: int) -> None:
         """
@@ -548,51 +538,68 @@ class ScenePlotting:
         u, v, w = s_un[index, :, 0].flatten(), s_un[index, :, 1].flatten(), s_un[index, :, 2].flatten()
 
         if self._ray_highlight_plot is not None:
-            self._ray_highlight_plot.parent.parent.remove()
+            self.scene.remove_actor(self._ray_highlight_plot, render=False)
 
-        self._ray_highlight_plot = self.scene.mlab.quiver3d(x, y, z, u, v, w,
-                                                            scale_mode="vector", scale_factor=1, 
-                                                            colormap="Reds", mode="2ddash", line_width=2)
-        
-        self._ray_highlight_plot.actor.actor.pickable = False  # only rays should be pickable
-        self._ray_highlight_plot.actor.property.color = self._crosshair_color
-        self._ray_highlight_plot.actor.actor.property.trait_set(lighting=False, render_points_as_spheres=True)
+        lt = pv.LookupTable(values=[np.array([*self._crosshair_color, 1.])*255])
+        ray_mesh = self.mesh_from_points(x, y, z, u, v, w, np.ones(x.shape[:2]))
 
-        self._ray_highlight_plot.glyph.color_mode = "color_by_scalar"
-        self._ray_highlight_plot.parent.parent.name = "Ray Highlight"
-        self._ray_highlight_plot.visible = True
+        # add to scene
+        self._ray_highlight_plot = self.scene.add_mesh(ray_mesh, scalars="scalars", cmap=lt, opacity=1,
+            line_width=self.ui.ray_width, point_size=self.ui.ray_width, style="wireframe", render=False, 
+            lighting=False, name="Ray Highlight", render_points_as_spheres=True, pickable=False, show_scalar_bar=False)
 
     def plot_point_markers(self) -> None:
         """plot point markers inside the scene"""
-        self.__remove_objects(self._marker_plots)
+        self.__remove_objects(self._point_marker_plots)
 
         for num, mark in enumerate(self.raytracer.markers):
-            if isinstance(mark, PointMarker):
 
-                dy, dx = 0.2 * mark.marker_factor, 0
+            if not isinstance(mark, PointMarker):
+                continue
+                
+            dy, dx = 0.2 * mark.marker_factor, 0
 
-                m = self.scene.mlab.points3d(*mark.pos, mode="axes", color=self._marker_color)
-                m.actor.actor.property.trait_set(lighting=False, line_width=5, representation="wireframe")
+            if not mark.label_only:
+                actor = self.scene.add_point_labels([mark.pos], ["+"], font_family="times",
+                                                    name=f"Marker Cross {num}", render=False, pickable=False,
+                                                    font_size=int(15*mark.marker_factor),
+                                                    text_color=self._marker_color, show_points=False, shape_opacity=0,
+                                                    justification_horizontal="center", justification_vertical="center",
+                                                    always_visible=True)
+            else:
+                actor = None
 
-                m.visible = not mark.label_only
-                m.glyph.glyph.scale_factor = dy
-                m.parent.parent.name = f"Marker {num}"
-                m.actor.actor.trait_set(pickable=False, force_translucent=True)
+            text_actor = self._plot_label([mark.pos[0]+dx, mark.pos[1]+dy, mark.pos[2]], mark.desc, 
+                                          f"Marker Label {num}", text_color=self._foreground_color,
+                                          background_opacity=self._info_opacity,
+                                          background_color=self._info_frame_color, font_size=int(10*mark.text_factor))
+                
+            self._point_marker_plots.append((actor, None, None, text_actor, mark))
+   
+    def _plot_label(self, pos, label, name, map_args = None, **kwargs):
+                
+        pargs = dict(render=False, text_color=self._foreground_color, show_points=False, shape_opacity=0,
+                     background_opacity=self._info_opacity, background_color=self._info_frame_color, always_visible=True)
+
+        text_actor = self.scene.add_point_labels([pos], [label], name=name, **(pargs | self.LABEL_STYLE | kwargs))
             
-                text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
-                                            text=mark.desc, name="Label")
+        text_actor.GetMapper().Update()  # update so we can set text properties
+        tprop = text_actor.mapper.GetInputDataObject(0, 0).text_property
 
-                tprop = dict(justification="center") if not self.ui.vertical_labels\
-                        else dict(justification="left", orientation=90, vertical_justification="center")
+        if self.ui.vertical_labels:
+            self.apply_prop(tprop, orientation=90, justification_horizontal="left", 
+                            justification_vertical="center")
+        else:
+            self.apply_prop(tprop, justification_horizontal="center", justification_vertical="bottom")
 
-                text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
-                                        background_color=self.scene.background, **tprop)
-                text.property.font_size = int(8.4 * mark.text_factor)
-                text.actor.text_scale_mode = 'none'
-                text.visible = not bool(self.ui.hide_labels)
+        if map_args is not None:
+            self.apply_prop(tprop, **map_args)
 
-                self._marker_plots.append((m, None, None, text, mark))
-    
+        if self.ui.hide_labels:
+            text_actor.visibility = False
+
+        return text_actor
+
     def plot_line_markers(self) -> None:
         """plot line markers inside the scene"""
         self.__remove_objects(self._line_marker_plots)
@@ -602,27 +609,19 @@ class ScenePlotting:
 
                 drx = mark.front.r * np.cos(np.radians(mark.front.angle))
                 dry = mark.front.r * np.sin(np.radians(mark.front.angle))
-
                 dx, dy = mark.pos[0]+drx, mark.pos[1]+dry
-                m = self.scene.mlab.plot3d([mark.pos[0]-drx, mark.pos[0]+drx], [mark.pos[1]-dry, mark.pos[1]+dry],
-                                           [mark.pos[2], mark.pos[2]], tube_radius=0, color=self._line_marker_color)
 
-                m.parent.parent.parent.parent.name = f"Marker {num}"
-                m.actor.actor.trait_set(pickable=False, force_translucent=True)
-                m.actor.actor.property.trait_set(lighting=False, line_width=mark.line_factor,
-                                                 representation="wireframe")
-            
-                text = self.scene.mlab.text(x=mark.pos[0]+dx, y=mark.pos[1]+dy, z=mark.pos[2], 
-                                            text=mark.desc, name="Label")
+                grid = pv.PolyData(np.array([[mark.pos[0]-drx, mark.pos[1]-dry, mark.pos[2]],
+                                             [mark.pos[0]+drx, mark.pos[1]+dry, mark.pos[2]]]), lines=[2, 0, 1])
 
-                tprop = dict(justification="center") if not self.ui.vertical_labels\
-                        else dict(justification="left", orientation=90, vertical_justification="center")
+                m = self.scene.add_mesh(grid, color=self._line_marker_color, name=f"Line Marker {num}", render=False, 
+                                        show_scalar_bar=False, pickable=False, lighting=False, style='wireframe',
+                                        line_width=mark.line_factor)
 
-                text.property.trait_set(**self.LABEL_STYLE, background_opacity=0.5, 
-                                        background_color=self.scene.background, **tprop)
-                text.property.font_size = int(8.4 * mark.text_factor)
-                text.actor.text_scale_mode = 'none'
-                text.visible = not bool(self.ui.hide_labels)
+                text = self._plot_label([mark.pos[0]+dx, mark.pos[1]+dy, mark.pos[2]], mark.desc, 
+                        f"Line Marker Label {num}", text_color=self._foreground_color,
+                                        background_opacity=self._info_opacity,
+                                        background_color=self._info_frame_color, font_size=int(10*mark.text_factor))
 
                 self._line_marker_plots.append((m, None, None, text, mark))
 
@@ -631,7 +630,7 @@ class ScenePlotting:
         self.__remove_objects(self._volume_plots)
 
         for num, V in enumerate(self.raytracer.volumes):
-            color = self._volume_color if (V.color is None or self.ui.high_contrast) else V.color
+            color = self._volume_color if (V.color is None or self.ui.high_contrast) else np.array(V.color)
             t = self.plot_element(V, num, color, V.opacity, no_label=True, spec=False)
             self._volume_plots.append(t)
 
@@ -647,43 +646,32 @@ class ScenePlotting:
         self._detector_alpha =      0.99
         self._raysource_alpha =     0.55
         self._info_opacity =        0.2
-        self._aperture_color =      (0, 0, 0)
-        self._crosshair_color =     (1, 0, 0)
-        self.scene.background =     (0.2, 0.2, 0.2)      if not high_contrast else (1, 1, 1)
-        self.scene.foreground =     (1, 1, 1)            if not high_contrast else (0, 0, 0)
-        self._lens_color =          (0.63, 0.79, 1.00)   if not high_contrast else self.scene.foreground
-        self._detector_color =      (0.0, 0.0, 0.0)      if not high_contrast else self.scene.foreground
+        self._aperture_color =      (0., 0., 0.)
+        self._crosshair_color =     (1., 0., 0.)
+        self._background_color =    (0.2, 0.2, 0.2)      if not high_contrast else (1., 1., 1.)
+        self._foreground_color =    (1., 1., 1.)         if not high_contrast else (0., 0., 0.)
+        self._lens_color =          (0.63, 0.79, 1.00)   if not high_contrast else self._foreground_color
+        self._detector_color =      (0.0, 0.0, 0.0)      if not high_contrast else self._foreground_color
         self._subtle_color =        (0.3, 0.3, 0.3)      if not high_contrast else (0.7, 0.7, 0.7)
-        self._marker_color =        (0, 1, 0)            if not high_contrast else self.scene.foreground
-        self._line_marker_color =   (0.8, 0, 0.8)        if not high_contrast else self.scene.foreground
+        self._marker_color =        (0., 1., 0.)         if not high_contrast else self._foreground_color
+        self._line_marker_color =   (0.8, 0, 0.8)        if not high_contrast else self._foreground_color
         self._outline_color =       (0.5, 0.5, 0.5)      if not high_contrast else (0.8, 0.8, 0.8)
-        self._axis_color =          (1, 1, 1)            if not high_contrast else (0.5, 0.5, 0.5)
-        self._info_frame_color =    (0, 0, 0)            if not high_contrast else (1, 1, 1)
-        self._volume_color =        (0.45, 0.45, 0.45)   if not high_contrast else (1, 1, 1)
-        self._axis_alpha =          0.55                 if not high_contrast else 0.35
+        self._axis_color =          (0.5, 0.5, 0.5)      if not high_contrast else (0.7, 0.7, 0.7)
+        self._info_frame_color =    (0., 0., 0.)         if not high_contrast else (1., 1., 1.)
+        self._volume_color =        (0.45, 0.45, 0.45)   if not high_contrast else (1., 1., 1.)
         self._cylinder_opacity =    self._lens_alpha     if not high_contrast else 0.6
 
     def init_keyboard_shortcuts(self) -> None:
         """init keyboard shortcut detection inside the scene"""
-
-        # also see already available shortcuts
-        # https://docs.enthought.com/mayavi/mayavi/application.html#keyboard-interaction
+        # TODO pressing arrows moves scene around, pressing with shift+arrows rotates
 
         def keyrelease(vtk_obj, event):
-
-            match vtk_obj.GetKeyCode():
-
-                # it seems like pressing "m" in the scene does something,
-                # although i can't find any documentation on this
-                # a side effect is deactivating the mouse pickers, to reactivate we need to press "m" another time
-                case "m":
-                    warning("Avoid pressing 'm' in the scene because it interferes with mouse picking handlers.")
                 
-                case "a":
-                    warning("Avoid pressing 'a' as it is a mayavi shortcut for actor mode, where rays can be moved.")
+            match vtk_obj.GetKeyCode():
 
                 case "i":  # reset view
                     self.set_initial_camera()
+                    self.scene.render()
 
                 case "h":  # hide/show side menu and toolbar
                     self.ui.maximize_scene = bool(self.ui._scene_not_maximized)  # toggle value
@@ -700,60 +688,85 @@ class ScenePlotting:
                 case "d":  # render DetectorImage
                     self.ui.detector_image()
                
-                # q does not seem to be registered anymore. Is it already used by vtk for something? 
-                # Use 0 as key instead
                 case "0":  # close all pyplots
                     plt.close("all")
 
                 case "n":  # reselect and replot rays
-                    self.scene.disable_render = True
                     self.ui.replot_rays()
-                    self.scene.disable_render = False
+                
+                case _ if vtk_obj.GetKeySym() == "plus":
+                    self.scene.camera.zoom(1.1)
+                    self.scene.render()
 
-                # Unfortunately this does not work as special keys don't seem to be correctly checked
-                # after pressing F11 then Esc also triggers this
-                # case "" if vtk_obj.GetKeySym() == "F11":
-                    # self.scene.scene_editor._full_screen_fired()
-        
-        self.scene.interactor.add_observer('KeyPressEvent', keyrelease)  # calls keyrelease() in main thread
+                case _ if vtk_obj.GetKeySym() == "minus":
+                    self.scene.camera.zoom(0.9)
+                    self.scene.render()
 
-    def init_crosshair(self) -> None:
-        """init a crosshair for the picker"""
+        # remove default shortcuts from vtk and pyvistaqr
+        # self.scene.iren.remove_observers('CharEvent')
+        # self.scene.iren.remove_observers('KeyPressEvent')
+        # self.scene.iren.remove_observers('KeyReleaseEvent')
+        self.scene.iren.interactor.RemoveObservers('CharEvent')
+        self.scene.iren.interactor.RemoveObservers('KeyPressEvent')
+        self.scene.iren.interactor.RemoveObservers('KeyReleaseEvent')
 
-        self.scene.engine.add_source(ParametricSurface(name="Crosshair"), self.scene)
-
-        self._crosshair = self.scene.mlab.text(x=0, y=0, z=0, text="+", name="Label")
-        self._crosshair.actor.text_scale_mode = 'none'
-        self._crosshair.visible = False
-        self._crosshair.property.trait_set(font_size=32, justification="center", vertical_justification="center", 
-                                           orientation=0, bold=True, font_family="times", 
-                                           color=self._crosshair_color, use_tight_bounding_box=True)
+        # add own
+        self.scene.iren.interactor.AddObserver('KeyPressEvent', keyrelease)
 
     def init_ray_info(self) -> None:
         """init detection of ray point clicks and the info display"""
 
-        self._ray_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_ray_pick, button='Left')
-        self._ray_picker.tolerance = 0.0025  # it seems tolerance can only be set for all pickers at once
+        # https://github.com/enthought/mayavi/blob/2cf91a40fb4d584a454e3b9f1c9fb6a7d9fed2e5/mayavi/core/mouse_pick_dispatcher.py
 
-        # add ray info text
-        self.scene.engine.add_source(ParametricSurface(name="Ray Info Text"), self.scene)
-        self._ray_text = self.scene.mlab.text(0.02, 0.97, "")
-        self._ray_text.actor.text_scale_mode = 'none'
-        self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
-                                          opacity=1, color=self.scene.foreground, vertical_justification="top",
-                                          background_color=self._info_frame_color)
+        self._mm = 0
+        self._mmb = False
+
+        def on_mouse_move(a, b):
+            self._mm = True
+
+        def on_button_press(a, b):
+            self._mm = False
+            self._mmb = True
+
+        def on_button_release(a, b):
+
+            if not self._mm:
+                if self._mmb:
+                    x, y = a.GetEventPosition()
+                    self.scene.picker.Pick(x, y, 0, self.scene.renderer)
+
+            self._mm = False
+            self._mmb = False
+
+        self.scene.camera.AddObserver("ModifiedEvent", on_mouse_move)
+        self.scene.interactor.AddObserver("EndInteractionEvent", on_button_release)
+        self.scene.interactor.AddObserver("LeftButtonPressEvent", on_button_press)
+        self.scene.picker.AddObserver("EndPickEvent", self._on_ray_pick)
+
+        # self.scene.track_click_position(callback=self._on_ray_pick, side='left')
+        # self.scene.enable_point_picking(callback=self._on_ray_pick, left_clicking=True, show_message=False, show_point=True, clear_on_no_selection=True, picker="point")
+        self.scene.picker.tolerance = 0.0025
+
+        self._ray_text = self.scene.add_text("", position="upper_left", name="Ray Info Text", render=False)
+        
+        self._ray_text.SetMinimumFontSize(self.INFO_STYLE["font_size"])
+        self._ray_text.SetMaximumFontSize(self.INFO_STYLE["font_size"])
+        self.apply_prop(self._ray_text.prop, **self.INFO_STYLE)
+        self.apply_prop(self._ray_text.prop, background_opacity=self._info_opacity,
+                        opacity=1, color=self._foreground_color, vertical_justification="top",
+                        background_color=self._info_frame_color)
 
     def init_status_info(self) -> None:
         """init GUI status text display"""
 
-        self._space_picker = self.scene.mlab.gcf().on_mouse_pick(self._on_space_pick, button='Right')
-        self._space_picker.tolerance = 0.0025  # it seems tolerance can only be set for all pickers at once
+        self.scene.track_click_position(callback=self._on_space_pick, side='right')
+        self.scene.picker.tolerance = 0.0025
 
-        # add status text
-        self.scene.engine.add_source(ParametricSurface(name="Status Info Text"), self.scene)
-        self._status_text = self.scene.mlab.text(0.97, 0.01, "")
-        self._status_text.actor.text_scale_mode = 'none'
-        self._status_text.property.trait_set(**self.INFO_STYLE, justification="right")
+        self._status_text = self.scene.add_text("", position="lower_right", name="Status Info Text", render=False)
+        
+        self._status_text.SetMinimumFontSize(self.INFO_STYLE["font_size"])
+        self._status_text.SetMaximumFontSize(self.INFO_STYLE["font_size"])
+        self.apply_prop(self._status_text.prop, **(self.INFO_STYLE | dict(color=self._foreground_color)))
 
     # Scene Changes
     ###################################################################################################################
@@ -761,29 +774,33 @@ class ScenePlotting:
     def change_label_orientation(self) -> None:
         """Set labels of Elements to vertical or horizontal depending on option vertical_labels"""
        
-        opts = dict(justification="center", vertical_justification="bottom", orientation=0) \
-            if not self.ui.vertical_labels\
-            else dict(justification="left", orientation=90, vertical_justification="center")
+        if self.ui.vertical_labels:
+            opts = dict(justification_horizontal="left", orientation=90, justification_vertical="center")
+        else:
+            opts = dict(justification_horizontal="center", justification_vertical="bottom", orientation=0) \
 
         for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
-                     self._marker_plots, self._line_marker_plots, self._index_box_plots, self._ray_source_plots]:
-
+                     self._index_box_plots, self._point_marker_plots, self._line_marker_plots, self._ray_source_plots,
+                     self._index_box_plots]:
             for obj in objs:
-                for obji in obj:
-                    if isinstance(obji, mayavi.modules.text.Text):
-                        obji.property.trait_set(**opts)
+                if obj[3] is not None:
+                    self.apply_prop(obj[3].mapper.GetInputDataObject(0, 0).text_property, **opts)
 
     def change_minimalistic_view(self) -> None:
         """Hide long labels, orientation axes and normal axes depending on if option minimalistic_view is set"""
 
         show = not bool(self.ui.minimalistic_view)
 
+        # hide orientation axes
         if self._orientation_axes is not None:
-            self._orientation_axes.axes.visibility = show
+            self._orientation_axes.visibility = show
 
+        # shorten index plot description
         for rio in self._index_box_plots:
-            if rio[1] is not None:
-                rio[1].text = rio[1].text.replace("ambient\n", "") if not show else ("ambient\n" + rio[1].text)
+            if rio[3] is not None:
+                label = rio[3].mapper.GetInputDataObject(0, 0).labels
+                text = label.GetValue(0)
+                label.SetValue(0, text.replace("ambient\n", "") if not show else ("ambient\n" + text))
 
         # remove descriptions from labels in minimalistic_view
         for Objects in [self._ray_source_plots, self._lens_plots, self._volume_plots, 
@@ -792,134 +809,128 @@ class ScenePlotting:
                 if obj[3] is not None and obj[4] is not None:
                     label = f"{obj[4].abbr}{num}"
                     label = label if obj[4].desc == "" or not show else label + ": " + obj[4].desc
-                    obj[3].text = label
+                    obj[3].mapper.GetInputDataObject(0, 0).labels.SetValue(0, label)
 
-        for ax in self._axis_plots:
-            if ax[0] is not None:
-                ax[0].visible = show
+        for ax in self._axes_labels:
+            ax.visibility = show
            
 
     def change_label_visibility(self) -> None:
         """Hide/show labels depending on value of option 'hide_labels'"""
-        
-        show = not bool(self.ui.hide_labels)
 
-        for rio in self._index_box_plots:
-            if rio[1] is not None:
-                rio[1].visible = show
-        
         # remove descriptions from labels in minimalistic_view
-        for Objects in [self._ray_source_plots, self._lens_plots, self._marker_plots, self._volume_plots, 
-                        self._line_marker_plots, self._filter_plots, self._aperture_plots, self._detector_plots]:
+        for Objects in [self._ray_source_plots, self._lens_plots, self._point_marker_plots, self._volume_plots,
+                        self._index_box_plots, self._line_marker_plots, self._filter_plots,
+                        self._aperture_plots, self._detector_plots]:
             for num, obj in enumerate(Objects):
                 if obj[3] is not None:
-                    obj[3].visible = show
-
+                    obj[3].visibility = not bool(self.ui.hide_labels)
 
     def change_contrast(self) -> None:
         """Normal or high contrast scene mode depending on state of option 'high_contrast'"""
 
         self.set_colors()
+        self.scene.set_background(self._background_color)
         high_contrast = self.ui.high_contrast
 
         # update filter color
         for F in self._filter_plots:
             for Fi in F[:2]:
                 if Fi is not None and F[4] is not None:
-                    Fi.actor.property.color = F[4].color()[:3] if not high_contrast else self.scene.foreground
+                    Fi.prop.color = np.array(F[4].color()[:3]) if not high_contrast else self._foreground_color
         
         # update volume colors
         for V in self._volume_plots:
             for Vi in V[:3]:
-                Vi.actor.property.color = self._volume_color if V[4].color is None or high_contrast else V[4].color
+                Vi.prop.color = self._volume_color if V[4].color is None or high_contrast else np.array(V[4].color)
 
         # update misc color
-        for color, objs in zip([self._lens_color, self._detector_color, self._aperture_color, self._marker_color,
+        for color, objs in zip([self._lens_color, self._detector_color, self._aperture_color, 
                                 self._line_marker_color, self._outline_color],
                                [self._lens_plots, self._detector_plots, self._aperture_plots,
-                                self._marker_plots, self._line_marker_plots, [[self._outline]]]):
+                                self._line_marker_plots, [[self._outline]]]):
             for obj in objs:
                 for el in obj[:3]:
-                    if el is not None:
-                        el.actor.property.trait_set(color=color)
-                        if high_contrast and el is not self._outline:
-                            el.actor.property.trait_set(specular_color=(0.15, 0.15, 0.15),
-                                                        diffuse_color=(0.12, 0.12, 0.12))
+                    if el is not None and hasattr(el, "prop"):
+                        el.prop.color = color
+
+        # special case: point marker plots are just labels
+        for el in self._point_marker_plots:
+            if el[0] is not None:
+                el[0].mapper.GetInputDataObject(0, 0).text_property.color = self._marker_color
 
         # update background colors of labels
-        for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots, 
-                     self._marker_plots, self._line_marker_plots, self._volume_plots, self._ray_source_plots]:
+        for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
+                     self._point_marker_plots, self._line_marker_plots, self._volume_plots, self._ray_source_plots]:
             for obj in objs:
                 if len(obj) > 3 and obj[3] is not None:
-                    obj[3].property.background_color = self.scene.background
-
-        if self._crosshair is not None:
-            self._crosshair.property.color = self._crosshair_color
+                    obj[3].mapper.GetInputDataObject(0, 0).text_property.background_color = self._background_color
+                    obj[3].mapper.GetInputDataObject(0, 0).text_property.color = self._foreground_color
 
         # change lens cylinder visibility
         for lens in self._lens_plots:
             if lens[1] is not None:
-                lens[1].actor.property.trait_set(opacity=self._cylinder_opacity)
+                lens[1].prop.opacity = self._cylinder_opacity
+
+        # update orientation axes color
+        if self._orientation_axes is not None:
+            for actor in [self._orientation_axes.GetXAxisCaptionActor2D().text_actor, 
+                          self._orientation_axes.GetYAxisCaptionActor2D().text_actor, 
+                          self._orientation_axes.GetZAxisCaptionActor2D().text_actor]:
+                actor.text_property.color = self._foreground_color
 
         # update axes color
-        for ax in self._axis_plots:
-            for el in ax:
-                if el is not None:
-                    el.axes.property.color = self._outline_color
-                    el.label_text_property.opacity = self._axis_alpha
-                    el.title_text_property.opacity = self._axis_alpha
+        for ax in self._axes_labels:
+            ax.mapper.GetInputDataObject(0, 0).text_property.color = self._axis_color
+            ax.mapper.GetInputDataObject(0, 0).text_property.SetShadow(not high_contrast)
 
         # change index plot objects
         for obj in self._index_box_plots:
-
-            if obj[1] is not None:
-                obj[1].property.color = self._axis_color
-                obj[1].property.frame_color = self._subtle_color
+    
+            if obj[3] is not None:
+                tprop = obj[3].mapper.GetInputDataObject(0, 0).text_property
+                tprop.frame_color = self._subtle_color
+                tprop.color = self._axis_color
+                tprop.SetShadow(not high_contrast)
 
             if obj[0] is not None:
-                obj[0].actor.property.color = self._outline_color
+                obj[0].prop.color = self._outline_color
 
         # reassign ray source colors
         self.color_ray_sources()
 
-        if self._ray_highlight_plot is not None:
-            self._ray_highlight_plot.actor.property.color = self._crosshair_color
-
         # in coloring type Plain the ray color is changed from white to a bright orange
         if self.ui.coloring_mode == "Plain" and self._ray_plot is not None:
-            self._ray_plot.parent.scalar_lut_manager.lut_mode = "Greys" if not high_contrast else "Wistia"
-            self._ray_plot.parent.scalar_lut_manager.reverse_lut = bool(high_contrast)
+            vals = [255, 255, 255, 255] if not bool(self.ui.high_contrast) else [255, 132, 0, 255] 
+            self._ray_plot.mapper.lookup_table.SetTable(pv.convert_array(np.array([vals], dtype=np.uint8)))
 
-        if self._ray_text is not None:
-            self._ray_text.property.background_color = self._info_frame_color
+        # update status and ray text
+        for text in [self._status_text, self._ray_text]:
+            if text is not None:
+                text.prop.background_color = self._info_frame_color
+                text.prop.color = self._foreground_color
+
+        # change scalar bar
+        if len(self.scene.scalar_bars):
+            self.scene.scalar_bar.GetTitleTextProperty().color = self._foreground_color
+            self.scene.scalar_bar.GetLabelTextProperty().color = self._foreground_color
             
-    def resize_scene_elements(self) -> None:
-        """
-        When resizing the scene window, some object sizes change. This function compensates for these changes.
-        It is called from within the TraceGUI
-        """
+    def _resize_scene_elements(self, a, b) -> None:
+        """When resizing the scene window, some object sizes change. This function compensates for these changes."""
+        if self.scene.iren is not None and self.scene.iren.interactor is not None:
+            scene_size = self.scene.window_size
 
-        if self.scene._renwin is not None and self.scene.scene_editor._interactor is not None:
-            scene_size = self.scene.scene_editor._interactor.size
-
-            if scene_size[0]*scene_size[1] > 0 and\
-                (self._scene_size[0] != scene_size[0] or self._scene_size[1] != scene_size[1]):
-
-                # average of x and y size for former and current scene size
-                ch1 = (self._scene_size[0] + self._scene_size[1]) / 2
-                ch2 = (scene_size[0] + scene_size[1]) / 2
-
-                # update font factor so font size stays the same
-                for ax in self._axis_plots:
-                    ax[0].axes.font_factor *= ch1/ch2
+            if scene_size[0]*scene_size[1] > 0 and np.any(self._scene_size != scene_size):
 
                 # rescale orientation axes
-                if self._orientation_axes is not None:
-                    self._orientation_axes.widgets[0].zoom *= ch1 / ch2
+                if self.scene.renderer.axes_widget is not None:
+                    vp = self.scene.renderer.axes_widget.GetViewport()
+                    factor = np.mean(self._scene_size)/np.mean(scene_size)
+                    self.scene.renderer.axes_widget.SetViewport(0, 0, vp[2]*factor, vp[3]*factor)
 
                 if self._ray_plot is not None:
-                    bar = self._ray_plot.parent.scalar_lut_manager.scalar_bar_representation
-                    bar.position2 = bar.position2 * self._scene_size / scene_size
+                    bar = self.scene.scalar_bar
+                    bar.position2 = np.array(bar.position2) * self._scene_size / scene_size
                     bar.position = [bar.position[0], (1-bar.position2[1])/2]
 
                 # set current window size
@@ -928,17 +939,18 @@ class ScenePlotting:
     def set_ray_opacity(self) -> None:
         """change the ray opacity"""
         if self._ray_plot is not None:
-            self._ray_plot.actor.property.opacity = self.ui.ray_opacity
+            self._ray_plot.prop.opacity = self.ui.ray_opacity
     
     def set_ray_representation(self) -> None:
         """change the ray representation between 'points' and 'surface'"""
         if self._ray_plot is not None:
-            self._ray_plot.actor.property.representation = 'points' if self.ui.plotting_mode == 'Points' else 'surface'
+            self._ray_plot.prop.style = 'points' if self.ui.plotting_mode == 'Points' else 'wireframe'
 
     def set_ray_width(self) -> None:
         """change the ray width"""
         if self._ray_plot is not None:
-            self._ray_plot.actor.property.trait_set(line_width=self.ui.ray_width, point_size=self.ui.ray_width)
+            self._ray_plot.prop.line_width = self.ui.ray_width
+            self._ray_plot.prop.point_size = self.ui.ray_width
 
     def set_status(self, _status: dict[str]) -> None:
         """sets the status in the status text depending on the _status dictionary"""
@@ -956,11 +968,13 @@ class ScenePlotting:
        
         # print messages to scene
         if not _status["InitScene"] and self._status_text is not None:
-            self._status_text.text = ""
+            text = ""
 
             for key, val in msgs.items():
                 if _status[key]:
-                    self._status_text.text += msgs[key] + "...\n"
+                    text += msgs[key] + "...\n"
+                    
+            self._status_text.SetText(1, text)
 
     def set_fault_markers(self) -> None:
         """calculate and plot fault markers marking geometry collisions"""
@@ -987,34 +1001,37 @@ class ScenePlotting:
 
     def move_detector_diff(self, ind: int, diff: float) -> None:
         """
-        move the detector plot with index 'ind' differentially
+        move the detector plot with index 'ind' differentially in z-direction
 
         :param ind: detector index
         :param movement: moving distance
         """
         if ind < len(self._detector_plots):
-            # change relative actor position without touching the underlying mlab_source array
-            # some time ago we change the data with mlab_source.z, but this lead to issues
-            # for flat surfaces that weren't moved at all for some reason
             det = self._detector_plots[ind]
-            # v--- don't use += here, as changes won't be correctly detected
-            det[0].actor.actor.position = det[0].actor.actor.position + [0, 0, diff]
-            det[1].actor.actor.position = det[1].actor.actor.position + [0, 0, diff]
-            self._detector_plots[ind][3].z_position += diff
+
+            # move surfaces
+            det[0].position = np.array(det[0].position) + [0, 0, diff]
+            det[1].position = np.array(det[1].position) + [0, 0, diff]
+
+            # move label
+            dataset = det[3].GetMapper().GetInputAlgorithm().GetInput()
+            vtk_pts = dataset.GetPoints()
+            vtk_pts.SetPoint(0, np.array(vtk_pts.GetPoint(0))+[0, 0, diff])
+            det[3].GetMapper().Modified()  # notify for replot
 
     def clear_ray_text(self) -> None:
         """clear the ray info text"""
-        self._ray_text.text = ""
+        self._ray_text.SetText(2, "")
 
     def hide_crosshair(self) -> None:
         """Hide the crosshair if it still/already exists"""
         if self._crosshair is not None:
-            self._crosshair.visible = False
+            self._crosshair.visibility = False
 
     def hide_ray_highlight(self) -> None:
         """Hide the ray highlight plot if it still/already exists"""
         if self._ray_highlight_plot is not None:
-            self._ray_highlight_plot.visible = False
+            self._ray_highlight_plot.visibility = False
 
     def set_crosshair(self, pos: np.ndarray) -> None:
         """
@@ -1022,9 +1039,10 @@ class ScenePlotting:
         
         :param pos: array with three elements (x, y, z)
         """
-        if self._crosshair is not None:
-            self._crosshair.trait_set(x_position=pos[0], y_position=pos[1], 
-                                      z_position=pos[2], visible=True)
+        self._crosshair = self.scene.add_point_labels(pos, ["+"], name=f"Crosshair", 
+                               font_size=32, bold=True, font_family="times", render=False, always_visible=True, 
+                               justification_horizontal="center", justification_vertical="center", pickable=False,
+                               text_color=self._crosshair_color, show_points=False, shape_opacity=0.)
 
     # Ray and RaySource plotting
     ###################################################################################################################
@@ -1032,7 +1050,7 @@ class ScenePlotting:
     def color_rays(self) -> None:
         """color the plotted rays in the scene depending on the coloring mode"""
 
-        if self._ray_plot is None:
+        if self._ray_plot is None or not len(self.scene.scalar_bars):
             return
 
         rp = self._ray_property_dict
@@ -1088,49 +1106,47 @@ class ScenePlotting:
                 cm = "Greys" if not self.ui.high_contrast else "Wistia"
                 title = "None"
 
-        self._ray_plot.mlab_source.trait_set(scalars=s)
+        self._ray_plot.mapper.dataset.point_data['scalars'] = np.repeat(s, 2)  # or 'cell_data' depending on your mesh
+        lutm = self._ray_plot.mapper.lookup_table
+        bar = self.scene.scalar_bar
+        self._ray_plot.mapper.SetScalarRange(np.min(s), np.max(s))
+        lutm.apply_cmap(cm)
+        table = pv.pyvista_ndarray(lutm.GetTable())
 
-        # lut legend settings
-        lutm = self._ray_plot.parent.scalar_lut_manager
-        lutm.trait_set(use_default_range=True, show_scalar_bar=True, use_default_name=False,
-                       show_legend=self.ui.coloring_mode != "Plain", lut_mode=cm, reverse_lut=False)
-
-        # lut visibility and title
-        lutm.scalar_bar.trait_set(title=title, unconstrained_font_size=True)
-        lutm.label_text_property.trait_set(**self.LABEL_STYLE)
-        lutm.title_text_property.trait_set(**self.INFO_STYLE)
+        self.apply_prop(bar, title=title, orientation=1, number_of_labels=11, label_format="%-6.3f", 
+                        visibility=self.ui.coloring_mode != "Plain")
+        self.apply_prop(bar.GetTitleTextProperty(), **(self.INFO_STYLE | dict(font_family=1, color=self._foreground_color)))
+        self.apply_prop(bar.GetLabelTextProperty(), **(self.LABEL_STYLE | dict(font_family=1, color=self._foreground_color)))
 
         # lut position and size
+        # force maximum size so window changes don't affect scalar bar size
         hr, vr = tuple(self._scene_size0/self._scene_size)  # horizontal and vertical size ratio
-        lutm.scalar_bar_representation.position = np.array([0.92, (1-0.6*vr)/2])
-        lutm.scalar_bar_representation.position2 = np.array([0.06*hr, 0.6*vr])
-
-        # misc lutm props
-        lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-#6.3g"
-        lutm.scalar_bar_representation.border_thickness = 0  # no ugly borders
-        lutm.scalar_bar_widget.process_events = False  # make non-interactive
-        lutm.number_of_labels = 11
+        bar.position = np.array([0.92, (1-0.6*vr)/2])
+        bar.position2 = np.array([0.06*hr, 0.6*vr])
 
         match self.ui.coloring_mode:
 
             case 'Wavelength':
                 spectral_colormap = go.spectral_colormap if go.spectral_colormap is not None\
                                     else color.spectral_colormap
-                lutm.lut.table = 255*spectral_colormap(color.wavelengths(255))
-                lutm.data_range = go.wavelength_range 
-                lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-6.0f"
+                table = 255*spectral_colormap(color.wavelengths(255))
+                lutm.SetTable(pv.convert_array(table.astype(np.uint8)))
+                self._ray_plot.mapper.SetScalarRange(go.wavelength_range)
+                self.scene.scalar_bar.label_format = "%-6.0f"
 
             case ('Polarization xz' | "Polarization yz"):
-                lutm.data_range = [0.0, 1.0]
+                self._ray_plot.mapper.SetScalarRange(0.0, 1.0)
 
             case 'Source':
-                lutm.number_of_labels = len(self.raytracer.ray_sources)
-                lutm.scalar_bar_widget.scalar_bar_actor.label_format = "%-6.0f"
-                if lutm.number_of_labels > 1:
-                    lutm.lut.table = 255*color.spectral_colormap(np.linspace(440, 620, lutm.number_of_labels))
+                bar.number_of_labels = len(self.raytracer.ray_sources)
+                bar.label_format = "%-6.0f"
+                if len(self.raytracer.ray_sources) > 1:
+                    table = 255*color.spectral_colormap(np.linspace(440, 620, bar.number_of_labels))
+                    lutm.SetTable(pv.convert_array(table.astype(np.uint8)))
 
             case 'Plain':
-                lutm.reverse_lut = bool(self.ui.high_contrast)
+                vals = [255, 255, 255, 255] if not bool(self.ui.high_contrast) else [255, 132, 0, 255] 
+                lutm.SetTable(pv.convert_array(np.array([vals], dtype=np.uint8)))
             
             case ('Power' | 'Refractive Index'):
                 pass
@@ -1144,12 +1160,13 @@ class ScenePlotting:
         if self._ray_plot is None:
             return
 
-        lutm = self._ray_plot.parent.scalar_lut_manager
+        lutm = self._ray_plot.mapper.lookup_table
+        table = pv.pyvista_ndarray(lutm.GetTable())
 
         match self.ui.coloring_mode:
 
             case ("Plain" | "Refractive Index"):
-                RSColor = [self.scene.foreground for RSp in self._ray_source_plots]
+                RSColor = [self._foreground_color for RSp in self._ray_source_plots]
 
             case 'Wavelength':
                 RSColor = [RS.color(rendering_intent="Absolute", clip=True) for RS in self.raytracer.ray_sources]
@@ -1172,17 +1189,17 @@ class ScenePlotting:
                                 assert_never(RS.polarization)
                     
                         proj = np.sin(pol_ang) if self.ui.coloring_mode == "Polarization yz" else np.cos(pol_ang)
-                        col = np.array(lutm.lut.table[int(proj*255)])
+                        col = np.array(table[int(proj*255)])
                         RSColor.append(col[:3]/255.)
                     else:
                         RSColor.append(np.ones(3))
 
             case 'Source':
-                RSColor = [np.array(lutm.lut.table[i][:3]) / 255. for i, _ in enumerate(self._ray_source_plots)]
+                RSColor = [np.array(table[i][:3]) / 255. for i, _ in enumerate(self._ray_source_plots)]
 
             case 'Power':
                 # set to maximum ray power, this is the same for all sources
-                RSColor = [np.array(lutm.lut.table[-1][:3]) / 255. for RSp in self._ray_source_plots]
+                RSColor = [np.array(table[-1][:3]) / 255. for RSp in self._ray_source_plots]
 
             case _:
                 assert_never(self.ui.coloring_mode)
@@ -1191,7 +1208,7 @@ class ScenePlotting:
             for color, RSp in zip(RSColor, self._ray_source_plots):
                 for RSpi in RSp[:2]:
                     if RSpi is not None:
-                        RSpi.actor.actor.property.trait_set(color=tuple(color))
+                        RSpi.prop.color = tuple(color)
         else:
             warning("Number of RaySourcePlots differs from actual Sources. "
                     "Maybe the GUI was not updated properly?")
@@ -1243,9 +1260,8 @@ class ScenePlotting:
         self._ray_property_dict = {}
 
         if self._ray_plot is not None:
-            with self.constant_camera():
-                self._ray_plot.parent.parent.remove()
-                self._ray_plot = None
+            self.scene.remove_actor(self._ray_plot, render=False)
+            self._ray_plot = None
 
     def select_rays(self, mask: np.ndarray, max_show: int = None) -> None:
         """
@@ -1301,14 +1317,13 @@ class ScenePlotting:
     # Picking Handler
     ###################################################################################################################
 
-    def _on_space_pick(self, picker_obj: tvtk.tvtk_classes.point_picker.PointPicker) -> None:
+    def _on_space_pick(self, picker_obj) -> None:
         """
         3D Space Clicking Handler. Shows Click Coordinates or moves Detector to this position when Shift is pressed.
 
         :param picker_obj:
         """
-
-        pos = picker_obj.pick_position
+        pos = self.scene.picker.GetPickPosition()
 
         # differentiate between Click and Shift+Click
         if self.scene.interactor.shift_key:
@@ -1321,13 +1336,13 @@ class ScenePlotting:
                 self.reset_picking()
         else:
             r, ang = np.hypot(pos[0], pos[1]), np.rad2deg(np.arctan2(pos[1], pos[0]))
-            self._ray_text.text = f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, "\
+            self._ray_text.SetText(2, f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, "\
                                   f"{pos[2]:>9.6g} mm)\n"\
-                                  f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)"
+                                  f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)")
 
             self.set_crosshair(pos)
 
-    def _on_ray_pick(self, picker_obj: tvtk.tvtk_classes.point_picker.PointPicker = None) -> None:
+    def _on_ray_pick(self, picker_obj = None, a = None) -> None:
         """
         Ray Picking Handler. Shows ray properties in the scene.
 
@@ -1336,16 +1351,10 @@ class ScenePlotting:
         if self._ray_text is None:
             return
 
-        # it seems that picker_obj.point_id is only present for the first element in the picked list,
-        # so we only can use it when the RayPlot is first in the list
-        # see https://github.com/enthought/mayavi/issues/906
-        if picker_obj is not None and len(picker_obj.actors) != 0 \
-           and picker_obj.actors[0]._vtk_obj is self._ray_plot.actor.actor._vtk_obj:
-
-            a = self._ray_property_dict["p"].shape[1]  # number of points per ray plotted
-            b = picker_obj.point_id  # point id of the ray point
+        if (b := self.scene.picker.GetPointId()) >= 0:
 
             # calculate ray index (i0) and section index (i1)
+            a = self._ray_property_dict["p"].shape[1]  # number of points per ray plotted
             i0, i1 = np.divmod(b, 2*a)
             i1 = min(1 + (i1-1)//2, a - 1)
 
@@ -1389,8 +1398,8 @@ class ScenePlotting:
         if section is not None and not (0 <= section < Nt):
             raise ValueError(f"Rays have only {Nt} sections, {section} is an invalid section number.")
 
-        with self.constant_camera():
-            self.set_ray_highlight(index)
+        # with self.constant_camera():
+        self.set_ray_highlight(index)
         
         if section is None:
             return
@@ -1486,8 +1495,9 @@ class ScenePlotting:
             text += f"Pick using Shift+Left Mouse Button for more info"
 
         # apply text
-        self._ray_text.text = text.replace("nan", " - ")
-        self._ray_text.property.trait_set(**self.INFO_STYLE, background_opacity=self._info_opacity,
-                                          opacity=1, color=self.scene.foreground)
+        self._ray_text.SetText(2, text.replace("nan", " - "))
+        self.apply_prop(self._ray_text.prop, **self.INFO_STYLE)
+        self.apply_prop(self._ray_text.prop, background_opacity=self._info_opacity,
+                        opacity=1, color=self._foreground_color)  # these parts required?
 
         self.set_crosshair(p)

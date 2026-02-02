@@ -51,7 +51,6 @@ def automated(GUI):
 
         # replot/retrace things that changed automaticalyy
         with GUI.smart_replot():
-
             time.sleep(sleeping_time)
             RT.ray_sources[0].move_to([0, yp, -15])
         

@@ -83,3 +83,8 @@ def tracing_geometry() -> ot.Raytracer:
 
     return RT
 
+
+if __name__ == '__main__':
+    from optrace.gui import TraceGUI
+    TG = TraceGUI(tracing_geometry())
+    TG.run()
