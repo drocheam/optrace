@@ -16,7 +16,6 @@ from traitsui.api import View, Item, UItem, HSplit, CheckListEditor, TextEditor,
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool, String
 from traits.observation.api import TraitChangeEvent
 
-import pyvista as pv
 from pyvistaqt import QtInteractor
 
 # provides types and plotting functionality

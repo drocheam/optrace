@@ -98,7 +98,6 @@ class GUITests(unittest.TestCase):
 
     def click_scene(self, sim, x, y, shift=False, right=False):
 
-        # if shift:
         sim.scene.interactor.SetShiftKey(shift)
         sim.scene.interactor.SetEventPosition(int(x*sim.scene.window_size[0]), int(y*sim.scene.window_size[1]))
         if right:
@@ -724,7 +723,6 @@ class GUITests(unittest.TestCase):
         
         sim.debug(interact, args=(sim,))
    
-    # TODO test zoom
     @pytest.mark.slow
     @pytest.mark.install
     @pytest.mark.gui3
@@ -744,14 +742,15 @@ class GUITests(unittest.TestCase):
 
         # without these high sleeping times there are errors in the github action workflows
 
-        def send_key(sim, key):
+        def send_key(sim, key=None, sym=None):
 
-            def key_press(sim, key):
-                sim.scene.interactor.SetKeyCode(key)
+            def key_press(sim, key, sym):
+                sim.scene.interactor.SetKeyCode(key if key is not None else "\0")
+                sim.scene.interactor.SetKeySym(sym)
                 sim.scene.interactor.InvokeEvent("KeyPressEvent")
                 sim.scene.interactor.InvokeEvent("KeyReleaseEvent")
 
-            self._do_in_main(key_press, sim, key)
+            self._do_in_main(key_press, sim, key, sym)
             self._wait_for_idle(sim)
             time.sleep(0.3)
 
@@ -789,13 +788,57 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(np.allclose(cv, cv2))
                 
                 # maximize scene / hide other menus
-                # self.assertTrue(sim.scene.scene_editor._tool_bar.isVisible())  # TODO
                 self.assertTrue(sim._scene_not_maximized)
                 send_key(sim, "h")
                 self._wait_for_idle(sim)
-                # self.assertFalse(sim.scene.scene_editor._tool_bar.isVisible())
                 self.assertFalse(sim._scene_not_maximized)
+                
+                # zooming in and out
+                sc = sim.scene.camera.parallel_scale
+                send_key(sim, "+")
+                self._wait_for_idle(sim)
+                self.assertTrue(sim.scene.camera.parallel_scale < sc)
+                send_key(sim, "-")
+                self._wait_for_idle(sim)
+                self.assertAlmostEqual(sim.scene.camera.parallel_scale, sc)
 
+                # check scene rotation
+                sim.scene.interactor.shift_key = True
+                el = sim.scene.camera.elevation
+                send_key(sim, sym="Up")
+                self._wait_for_idle(sim)
+                self.assertNotAlmostEqual(sim.scene.camera.elevation, el)
+                send_key(sim, sym="Down")
+                self._wait_for_idle(sim)
+                self.assertAlmostEqual(sim.scene.camera.elevation, el)
+                az = sim.scene.camera.azimuth
+                send_key(sim, sym="Left")
+                self._wait_for_idle(sim)
+                self.assertNotAlmostEqual(sim.scene.camera.azimuth, az)
+                send_key(sim, sym="Right")
+                self._wait_for_idle(sim)
+                self.assertAlmostEqual(sim.scene.camera.azimuth, az)
+                sim.scene.interactor.shift_key = False
+
+                # check scene movement
+                cam_pos = np.array(sim.scene.camera.position)
+                send_key(sim, sym="Up")
+                self._wait_for_idle(sim)
+                self.assertFalse(np.allclose(sim.scene.camera.position, cam_pos))
+                self.assertTrue(cam_pos[1] < sim.scene.camera.position[1]-1e-2)  # move camera down in this yz-view
+                self.assertTrue(np.allclose(cam_pos[::2], np.array(sim.scene.camera.position)[::2])) # others unchanged
+                send_key(sim, sym="Down")
+                self._wait_for_idle(sim)
+                self.assertTrue(np.allclose(sim.scene.camera.position, cam_pos))
+                send_key(sim, sym="Left")
+                self._wait_for_idle(sim)
+                self.assertFalse(np.allclose(sim.scene.camera.position, cam_pos))
+                self.assertTrue(cam_pos[2] > sim.scene.camera.position[2]+1e-2)  # move camera right in this yz-view
+                self.assertTrue(np.allclose(cam_pos[:2], np.array(sim.scene.camera.position)[:2])) # others unchanged
+                send_key(sim, sym="Right")
+                self._wait_for_idle(sim)
+                self.assertTrue(np.allclose(sim.scene.camera.position, cam_pos))
+                
                 # key without shortcut
                 send_key(sim, "w")
                 self._wait_for_idle(sim)

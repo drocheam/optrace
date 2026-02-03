@@ -249,22 +249,28 @@ class ScenePlotting:
         if self._orientation_axes is not None:
             return
 
-        self._cams = None
+        self.__oa_cam_props = None
 
+        # store camera props and disable render in the case that a handle is selected
         def _on_orientation_change_start(*args):
             self.scene.interactor.EnableRenderOff()
-            self._cams = self.get_camera()[:2]
-
-        # TODO Sprünge wenn y als Normale liegt
-        def _on_orientation_change_end(*args):
-            normal = self.get_camera()[2]
-            roll = 90 if abs(normal[1]) == 1 else 0
-            self.set_camera(*self._cams, roll=roll)
+            self.__oa_cam_props = self.get_camera()
+       
+        # reenable rendering while interacting with the widget
+        def _on_orientation_change_interact(*args):
             self.scene.interactor.EnableRenderOn()
+        
+        # restore camera center and scale and handle +y and -y views so x points up/downwards
+        def _on_orientation_change_end(axes, *args):
+            if axes.GetRepresentation().IsAnyHandleSelected():
+                normal = self.get_camera()[2]
+                roll = 90 if abs(normal[1]) == 1 else 0
+                self.set_camera(*self.__oa_cam_props[:2], roll=roll)
+                self.scene.interactor.EnableRenderOn()
 
         self._orientation_axes = self.scene.add_camera_orientation_widget(animate=False, n_frames=0)
         self._orientation_axes.AddObserver("StartInteractionEvent", _on_orientation_change_start)
-        self._orientation_axes.AddObserver("InteractionEvent", _on_orientation_change_end)
+        self._orientation_axes.AddObserver("InteractionEvent", _on_orientation_change_interact)
         self._orientation_axes.AddObserver("EndInteractionEvent", _on_orientation_change_end)
 
         self._orientation_axes.GetRepresentation().SetSize(90, 90)
@@ -278,7 +284,7 @@ class ScenePlotting:
             # self._plot._orientation.GetRepresentation().SetZAxisColor(0., 0., 0.7)
 
     @staticmethod
-    def calculate_labels(x0, x1, min_s, max_s):
+    def calculate_labels(x0: float, x1: float, min_s: int, max_s: int) -> np.ndarray:
 
         # NOTE min_s and max_s should be in the range 3-50
 
@@ -673,10 +679,9 @@ class ScenePlotting:
 
     def init_keyboard_shortcuts(self) -> None:
         """init keyboard shortcut detection inside the scene"""
-        # TODO pressing arrows moves scene around, pressing with shift+arrows rotates
 
         def keyrelease(vtk_obj, event):
-               
+              
             match vtk_obj.GetKeyCode():
 
                 case "i":  # reset view
@@ -709,13 +714,52 @@ class ScenePlotting:
                     self.scene.render()
 
                 case "-":  # zoom out
-                    self.scene.camera.zoom(0.9)
+                    self.scene.camera.zoom(1/1.1)
+                    self.scene.render()
+                
+                # move camera (no shift) or rotate view (with shift)
+                case _ if (dir_ := vtk_obj.GetKeySym()) in ("Up", "Down", "Left", "Right"):
+                    
+                    cam = self.scene.camera
+                    right = np.cross(cam.GetDirectionOfProjection(), cam.up)
+
+                    if self.scene.interactor.shift_key:
+
+                        if dir_ == "Up":
+                            cam.elevation = cam.elevation + 5
+
+                        elif dir_ == "Down":
+                            cam.elevation = cam.elevation - 5
+
+                        elif dir_ == "Left":
+                            cam.azimuth = cam.azimuth + 5
+
+                        elif dir_ == "Right":
+                            cam.azimuth = cam.azimuth - 5
+
+                    else:
+
+                        if dir_ == "Up":
+                            dvec = np.array(cam.up)*cam.parallel_scale/20
+                        
+                        elif dir_ == "Down":
+                            dvec = -np.array(cam.up)*cam.parallel_scale/20
+                        
+                        elif dir_ == "Right":
+                            dvec = np.array(right)*cam.parallel_scale/15
+                        
+                        elif dir_ == "Left":
+                            dvec = -np.array(right)*cam.parallel_scale/15
+
+                        cam.position = cam.position + dvec
+                        cam.focal_point = cam.focal_point + dvec
+
+                    # recalculate up view and reset camera clipping range
+                    cam.up = np.cross(cam.GetDirectionOfProjection(), -right)
+                    cam.reset_clipping_range()
                     self.scene.render()
 
         # remove default shortcuts from vtk and pyvistaqr
-        # self.scene.iren.remove_observers('CharEvent')
-        # self.scene.iren.remove_observers('KeyPressEvent')
-        # self.scene.iren.remove_observers('KeyReleaseEvent')
         self.scene.iren.interactor.RemoveObservers('CharEvent')
         self.scene.iren.interactor.RemoveObservers('KeyPressEvent')
         self.scene.iren.interactor.RemoveObservers('KeyReleaseEvent')
