@@ -586,6 +586,10 @@ class TraceGUI(HasTraits):
         finally:
             self._no_trait_action_flag = False
 
+    def invoke_later(self, func, *args, **kwargs) -> None:
+        if QtGui.QApplication.instance() is not None:
+            pyface_gui.invoke_later(func, *args, **kwargs)
+
     @observe('scene', dispatch="ui")
     def init_scene(self, event=None):
         """Initialize the PyVista scene settings."""
@@ -605,7 +609,6 @@ class TraceGUI(HasTraits):
 
         self.replot()
         self._plot.set_initial_camera()  # this needs to be called after replot, which defines the visual scope
-        self._plot.init_resizing_event()
         self._plot.init_keyboard_shortcuts()  # do last so element shortcuts get overwritten
         self._dec_status("InitScene", notify=True)
     
@@ -689,7 +692,7 @@ class TraceGUI(HasTraits):
         self._dec_status("DisplayingGUI", notify=False)
 
         if self._exit:
-            pyface_gui.invoke_later(self.close)
+            self.invoke_later(self.close)
 
     ####################################################################################################################
     # Interface functions
@@ -871,7 +874,7 @@ class TraceGUI(HasTraits):
 
         if rdh and self._status["DisplayingGUI"]:  # reset initial loading flag
             # this only gets invoked after raytracing, but with no sources we need to do it here
-            pyface_gui.invoke_later(self._set_gui_loaded)
+            self.invoke_later(self._set_gui_loaded)
 
         self._dec_status("Drawing", notify=False)
         self.process()  # needed for final update 
@@ -922,7 +925,7 @@ class TraceGUI(HasTraits):
                 func(*args, **kwargs)
                 self._sequential = False
             
-            pyface_gui.invoke_later(func3, *args, **kwargs)
+            self.invoke_later(func3, *args, **kwargs)
 
         th = Thread(target=func2, args=args, kwargs=kwargs, daemon=True)
         th.start()
@@ -1174,9 +1177,9 @@ class TraceGUI(HasTraits):
 
                     # gets unset on first run
                     if self._status["DisplayingGUI"]:
-                        pyface_gui.invoke_later(self._set_gui_loaded)
+                        self.invoke_later(self._set_gui_loaded)
             
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
             
             self._start_action(background)
 
@@ -1256,18 +1259,18 @@ class TraceGUI(HasTraits):
 
                         # gets unset on first run
                         if self._status["DisplayingGUI"]:
-                            pyface_gui.invoke_later(self._set_gui_loaded)
+                            self.invoke_later(self._set_gui_loaded)
 
                     else:
                         self._plot.remove_fault_markers()
                         self._dec_status("Tracing", notify=False)  # TODO there is a gap for busyness between Tracing=Off and Drawing=On
                         self.replot_rays()
 
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
         else:
-            pyface_gui.invoke_later(self._set_gui_loaded)
+            self.invoke_later(self._set_gui_loaded)
 
     @observe('ray_opacity', dispatch="ui", post_init=True)
     def _change_ray_opacity(self, event: TraitChangeEvent = None) -> None:
@@ -1326,7 +1329,7 @@ class TraceGUI(HasTraits):
                     self._dec_status("ChangingDetector", notify=True)
 
                 self.__detector_lock.acquire()
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
 
@@ -1359,7 +1362,7 @@ class TraceGUI(HasTraits):
                     self._dec_status("ChangingDetector", notify=True)
 
                 self.__detector_lock.acquire()
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
 
@@ -1443,7 +1446,7 @@ class TraceGUI(HasTraits):
 
                     self._dec_status("DetectorImage", notify=True)
 
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
 
@@ -1481,7 +1484,7 @@ class TraceGUI(HasTraits):
 
                     self._dec_status("DetectorSpectrum", notify=True)
 
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
 
@@ -1543,7 +1546,7 @@ class TraceGUI(HasTraits):
 
                     self._dec_status("SourceSpectrum", notify=True)
 
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
 
@@ -1600,7 +1603,7 @@ class TraceGUI(HasTraits):
 
                     self._dec_status("SourceImage", notify=True)
 
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
 
@@ -1663,7 +1666,7 @@ class TraceGUI(HasTraits):
 
                     self._dec_status("Focussing", notify=True)
 
-                pyface_gui.invoke_later(on_finish)
+                self.invoke_later(on_finish)
 
             self._start_action(background)
 

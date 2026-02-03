@@ -7,6 +7,7 @@ import unittest
 import warnings
 import time
 
+import logging
 from typing import Callable, Any
 from contextlib import contextmanager  # context manager for _no_trait_action()
 
@@ -16,14 +17,27 @@ from threading import Thread
 import matplotlib.pyplot as plt
 
 from pyface.qt import QtGui
-from pyface.api import GUI as pyface_gui  # invoke_later() method
+from pyface.api import GUI as pyface_gui
+from pyface.qt import QtGui, QtCore
 
 import optrace as ot
 from optrace.gui import TraceGUI
 from tracing_geometry import tracing_geometry
 
 
-from pyface.qt import QtGui, QtCore  # closing UI elements
+# detecting traitsui exceptions, otherwise there aren't raised
+class TraitsCaptureHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        self.exceptions = []
+
+    def emit(self, record):
+        if record.levelno >= logging.ERROR and record.exc_info:
+            etype, value, tb = record.exc_info
+            raise value.with_traceback(tb)
+
+logging.getLogger("traits").addHandler(TraitsCaptureHandler())
+
 
 class GUITests(unittest.TestCase):
 
@@ -42,7 +56,6 @@ class GUITests(unittest.TestCase):
 
     def tearDown(self) -> None:
         warnings.simplefilter("default")
-        # pyvista.close_all()
 
         if self.exc_info:  # raise unhandled thread exception
             raise self.exc_info[0](self.exc_info[1]).with_traceback(self.exc_info[2])
@@ -72,13 +85,15 @@ class GUITests(unittest.TestCase):
     @contextmanager
     def _try(self, sim, *args, **kwargs):
         """try TraceGUI actions. Add timeouts and close down the GUI"""
+
         self._wait_for_idle(sim, base=1)
         try:
             yield
+            self._wait_for_idle(sim)
+
         except Exception as e:
             self.exc_info = sys.exc_info()  # assign thread exception
         finally:
-            self._wait_for_idle(sim)
             self._do_in_main(sim.close)
 
     def click_scene(self, sim, x, y, shift=False, right=False):
@@ -709,6 +724,7 @@ class GUITests(unittest.TestCase):
         
         sim.debug(interact, args=(sim,))
    
+    # TODO test zoom
     @pytest.mark.slow
     @pytest.mark.install
     @pytest.mark.gui3
@@ -949,12 +965,7 @@ class GUITests(unittest.TestCase):
     @pytest.mark.gui2
     @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Issues with headless display in github actions")
     def test_resize(self):
-        """
-        this test checks if
-        * some UI properties get resized correctly
-        * no exceptions while doing so
-        * resizing to initial state resizes everything back to normal
-        """
+        """check if the application allows rescaling and no exceptions occur while rescaling"""
 
         RT = tracing_geometry()
         sim = TraceGUI(RT)
@@ -968,10 +979,6 @@ class GUITests(unittest.TestCase):
                 SceneSize0 = sim._plot._scene_size.copy()
                 SceneSizei0 = sim.scene.window_size.copy()
                 Window = sim.scene.parent().parent().parent().parent().parent()
-
-                # properties before resizing
-                zoom = np.mean(sim.scene.renderer.axes_widget.GetViewport()[2:])
-                pos2 = sim.scene.scalar_bar.position2
 
                 qsize = Window.size()
                 ss0 = np.array([qsize.width(), qsize.height()])
@@ -993,17 +1000,7 @@ class GUITests(unittest.TestCase):
                 SceneSizei1 = sim.scene.window_size.copy()
                 self.assertFalse(np.all(SceneSizei0 == SceneSizei1))
 
-                # check if sizing parents exist
-                self.assertFalse(sim.scene.iren is None or sim.scene.iren.interactor is None)
-
-                # check if scale properties changed
-                self.assertNotAlmostEqual(sim._plot._scene_size[0], SceneSize0[0])  # scene size variable changed
-                self.assertNotAlmostEqual(sim._plot._scene_size[1], SceneSize0[1])  # scene size variable changed
-                zoom2 = np.mean(sim.scene.renderer.axes_widget.GetViewport()[2:])
-                self.assertNotAlmostEqual(zoom, zoom2)
-                self.assertNotAlmostEqual(pos2[0], sim.scene.scalar_bar.position2[0])
-                self.assertNotAlmostEqual(pos2[1], sim.scene.scalar_bar.position2[1])
-
+                # check some resizing constellations
                 self._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(dt)
                 self._do_in_main(Window.showFullScreen)
@@ -1015,19 +1012,6 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(Window.showNormal)
                 time.sleep(dt)
                 self._do_in_main(Window.resize, *ss0.astype(int))
-                time.sleep(dt)
-               
-                # check if scale properties are back at their default state
-                self.assertAlmostEqual(sim._plot._scene_size[0], SceneSize0[0], delta=2)
-                self.assertAlmostEqual(sim._plot._scene_size[1], SceneSize0[1], delta=2)
-                zoom3 = np.mean(sim.scene.renderer.axes_widget.GetViewport()[2:])
-                self.assertAlmostEqual(zoom, zoom3, delta=0.001)
-                self.assertAlmostEqual(pos2[0], sim.scene.scalar_bar.position2[0], delta=0.001)
-                self.assertAlmostEqual(pos2[1], sim.scene.scalar_bar.position2[1], delta=0.001)
-
-                # coverage test: delete orientation:axes and resize
-                sim._plot._orientation_axes = None
-                self._do_in_main(Window.resize, *ss2.astype(int))
                 time.sleep(dt)
                 
         sim.debug(interact, args=(sim,))

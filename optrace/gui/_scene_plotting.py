@@ -7,6 +7,7 @@ import copy
 import matplotlib.pyplot as plt 
 
 import pyvista as pv
+import vtk
 
 from ..tracer.geometry import Surface, Element
 from ..tracer import *
@@ -114,22 +115,16 @@ class ScenePlotting:
         self._status_text.SetVisibility(True)
         return arr
 
-    def init_resizing_event(self):
-        self.scene.render_window.AddObserver("WindowResizeEvent", self._resize_scene_elements)
-
     def get_camera(self) -> tuple[np.ndarray, float, np.ndarray, float]:
         """
         Get the camera parameters that can be passed down to set_camera()
 
         :return: Return the current camera parameters (center, height, direction, roll)
         """
-        cam = self.scene.camera
-        normal = (np.array(cam.focal_point) - cam.position) / cam.distance 
-    
-        return cam.focal_point,\
-               cam.parallel_scale,\
-               normal,\
-               cam.roll\
+        return self.scene.camera.focal_point,\
+               self.scene.camera.parallel_scale,\
+               np.array(self.scene.camera.GetDirectionOfProjection()),\
+               self.scene.camera.roll\
 
     def set_camera(self, 
                    center:          np.ndarray = None, 
@@ -153,11 +148,11 @@ class ScenePlotting:
         # calculate vector between camera and focal point
         cam = self.scene.camera
         normal = np.asarray(direction, dtype=np.float64) if direction is not None\
-                else (np.array(cam.focal_point) - cam.position) / cam.distance
+                else np.array(cam.GetDirectionOfProjection())
         dist_vec = cam.distance * normal / (np.linalg.norm(normal) + 1e-12) 
 
         # old cross product of direction and view_up
-        rev = np.cross(np.array(cam.focal_point) - cam.position, cam.up)
+        right = np.cross(cam.GetDirectionOfProjection(), cam.up)
 
         if center is not None:
             cam.focal_point = center
@@ -169,14 +164,14 @@ class ScenePlotting:
         cam.position = cam.focal_point - dist_vec
 
         # update view_up from new normal and old cross product of direction and view_up 
-        cam.up = np.cross(np.array(cam.focal_point) - cam.position, -rev)
+        cam.up = np.cross(cam.GetDirectionOfProjection(), -right)
 
         # absolute roll angle
         if roll is not None:
             cam.roll = roll
         
         # render
-        cam.ComputeViewPlaneNormal()
+        #cam.ComputeViewPlaneNormal()
         cam.reset_clipping_range()  # TODO needed?
         # self.scene.render()
 
@@ -252,20 +247,35 @@ class ScenePlotting:
         """plot orientation axes"""
 
         if self._orientation_axes is not None:
-            self.scene.remove_actor(self._orientation_axes, render=False)
+            return
 
-        # show axes
-        self._orientation_axes = self.scene.add_axes(interactive=False, viewport=(0, 0, 0.09, 0.12),
-                                                     color=self._foreground_color)
-        self._orientation_axes.visibility = not bool(self.ui.minimalistic_view)
+        self._cams = None
 
-        # set text style
-        for actor in [self._orientation_axes.GetXAxisCaptionActor2D().text_actor, 
-                      self._orientation_axes.GetYAxisCaptionActor2D().text_actor, 
-                      self._orientation_axes.GetZAxisCaptionActor2D().text_actor]:
+        def _on_orientation_change_start(*args):
+            self.scene.interactor.EnableRenderOff()
+            self._cams = self.get_camera()[:2]
 
-            actor.text_scale_mode = 0
-            self.apply_prop(actor.text_property, **(self.LABEL_STYLE | dict(font_family=1)))
+        # TODO Sprünge wenn y als Normale liegt
+        def _on_orientation_change_end(*args):
+            normal = self.get_camera()[2]
+            roll = 90 if abs(normal[1]) == 1 else 0
+            self.set_camera(*self._cams, roll=roll)
+            self.scene.interactor.EnableRenderOn()
+
+        self._orientation_axes = self.scene.add_camera_orientation_widget(animate=False, n_frames=0)
+        self._orientation_axes.AddObserver("StartInteractionEvent", _on_orientation_change_start)
+        self._orientation_axes.AddObserver("InteractionEvent", _on_orientation_change_end)
+        self._orientation_axes.AddObserver("EndInteractionEvent", _on_orientation_change_end)
+
+        self._orientation_axes.GetRepresentation().SetSize(90, 90)
+        self._orientation_axes.GetRepresentation().AnchorToLowerLeft()
+        self._orientation_axes.GetRepresentation().SetVisibility(not bool(self.ui.minimalistic_view))
+        
+        # optional: adapt colors. Only supported from vtk>=9.6
+        # if hasattr(self._plot._orientation.GetRepresentation(), "SetXAxisColor"):
+            # self._plot._orientation.GetRepresentation().SetXAxisColor(0.7, 0., 0.)
+            # self._plot._orientation.GetRepresentation().SetYAxisColor(0., 0.7, 0.)
+            # self._plot._orientation.GetRepresentation().SetZAxisColor(0., 0., 0.7)
 
     @staticmethod
     def calculate_labels(x0, x1, min_s, max_s):
@@ -666,7 +676,7 @@ class ScenePlotting:
         # TODO pressing arrows moves scene around, pressing with shift+arrows rotates
 
         def keyrelease(vtk_obj, event):
-                
+               
             match vtk_obj.GetKeyCode():
 
                 case "i":  # reset view
@@ -694,11 +704,11 @@ class ScenePlotting:
                 case "n":  # reselect and replot rays
                     self.ui.replot_rays()
                 
-                case _ if vtk_obj.GetKeySym() == "plus":
+                case "+":  # zoom in
                     self.scene.camera.zoom(1.1)
                     self.scene.render()
 
-                case _ if vtk_obj.GetKeySym() == "minus":
+                case "-":  # zoom out
                     self.scene.camera.zoom(0.9)
                     self.scene.render()
 
@@ -793,7 +803,7 @@ class ScenePlotting:
 
         # hide orientation axes
         if self._orientation_axes is not None:
-            self._orientation_axes.visibility = show
+            self._orientation_axes.GetRepresentation().SetVisibility(show)
 
         # shorten index plot description
         for rio in self._index_box_plots:
@@ -872,13 +882,6 @@ class ScenePlotting:
             if lens[1] is not None:
                 lens[1].prop.opacity = self._cylinder_opacity
 
-        # update orientation axes color
-        if self._orientation_axes is not None:
-            for actor in [self._orientation_axes.GetXAxisCaptionActor2D().text_actor, 
-                          self._orientation_axes.GetYAxisCaptionActor2D().text_actor, 
-                          self._orientation_axes.GetZAxisCaptionActor2D().text_actor]:
-                actor.text_property.color = self._foreground_color
-
         # update axes color
         for ax in self._axes_labels:
             ax.mapper.GetInputDataObject(0, 0).text_property.color = self._axis_color
@@ -914,27 +917,6 @@ class ScenePlotting:
         if len(self.scene.scalar_bars):
             self.scene.scalar_bar.GetTitleTextProperty().color = self._foreground_color
             self.scene.scalar_bar.GetLabelTextProperty().color = self._foreground_color
-            
-    def _resize_scene_elements(self, a, b) -> None:
-        """When resizing the scene window, some object sizes change. This function compensates for these changes."""
-        if self.scene.iren is not None and self.scene.iren.interactor is not None:
-            scene_size = self.scene.window_size
-
-            if scene_size[0]*scene_size[1] > 0 and np.any(self._scene_size != scene_size):
-
-                # rescale orientation axes
-                if self.scene.renderer.axes_widget is not None:
-                    vp = self.scene.renderer.axes_widget.GetViewport()
-                    factor = np.mean(self._scene_size)/np.mean(scene_size)
-                    self.scene.renderer.axes_widget.SetViewport(0, 0, vp[2]*factor, vp[3]*factor)
-
-                if self._ray_plot is not None:
-                    bar = self.scene.scalar_bar
-                    bar.position2 = np.array(bar.position2) * self._scene_size / scene_size
-                    bar.position = [bar.position[0], (1-bar.position2[1])/2]
-
-                # set current window size
-                self._scene_size = scene_size.copy()
 
     def set_ray_opacity(self) -> None:
         """change the ray opacity"""
@@ -1118,11 +1100,21 @@ class ScenePlotting:
         self.apply_prop(bar.GetTitleTextProperty(), **(self.INFO_STYLE | dict(font_family=1, color=self._foreground_color)))
         self.apply_prop(bar.GetLabelTextProperty(), **(self.LABEL_STYLE | dict(font_family=1, color=self._foreground_color)))
 
-        # lut position and size
-        # force maximum size so window changes don't affect scalar bar size
-        hr, vr = tuple(self._scene_size0/self._scene_size)  # horizontal and vertical size ratio
-        bar.position = np.array([0.92, (1-0.6*vr)/2])
-        bar.position2 = np.array([0.06*hr, 0.6*vr])
+        # right edge anchor at half height
+        right_anchor = vtk.vtkCoordinate()
+        right_anchor.SetCoordinateSystemToNormalizedViewport()
+        right_anchor.SetValue(1.0, 0.5)
+
+        # set distance to edge in pixels relative to anchor
+        pos = bar.GetPositionCoordinate()
+        pos.SetReferenceCoordinate(right_anchor)
+        pos.SetCoordinateSystemToDisplay()
+        pos.SetValue(-120, -250)
+
+        # set bar width and height in pixels
+        pos2 = bar.GetPosition2Coordinate()
+        pos2.SetCoordinateSystemToDisplay()
+        pos2.SetValue(80, 500)
 
         match self.ui.coloring_mode:
 
