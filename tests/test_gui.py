@@ -1019,7 +1019,6 @@ class GUITests(unittest.TestCase):
                 self._set_in_main(sim, "coloring_mode", "Power")  # shows a side bar, that also needs to be rescaled
                 self._wait_for_idle(sim)
 
-                SceneSize0 = sim._plot._scene_size.copy()
                 SceneSizei0 = sim.scene.window_size.copy()
                 Window = sim.scene.parent().parent().parent().parent().parent()
 
@@ -1526,7 +1525,8 @@ class GUITests(unittest.TestCase):
 
                 # space picked -> show coordinates
                 time.sleep(0.3)
-                self._do_in_main(self.click_scene, sim, sim._plot._scene_size[0]/3, sim._plot._scene_size[1]/3, right=True)
+                self._do_in_main(self.click_scene, sim, sim.scene.window_size[0]/3, 
+                                 sim.scene.window_size[1]/3, right=True)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
                 text3 = sim._plot._ray_text.GetText(2)
@@ -1538,8 +1538,8 @@ class GUITests(unittest.TestCase):
                 self.reset_pick_state(sim)
                 time.sleep(0.3)
                 old_pos = RT.detectors[0].pos
-                self._do_in_main(self.click_scene, sim, sim._plot._scene_size[0]/3,
-                                 sim._plot._scene_size[1]/3, shift=True, right=True)
+                self._do_in_main(self.click_scene, sim, sim.scene.window_size[0]/3,
+                                 sim.scene.window_size[1]/3, shift=True, right=True)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
                 text4 = sim._plot._ray_text.GetText(2)

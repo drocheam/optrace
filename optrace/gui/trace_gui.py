@@ -16,13 +16,12 @@ from traitsui.api import View, Item, UItem, HSplit, CheckListEditor, TextEditor,
 from traits.api import HasTraits, Range, Instance, observe, Str, Button, Enum, List, Dict, Float, Bool, String
 from traits.observation.api import TraitChangeEvent
 
-from pyvistaqt import QtInteractor
-
 # provides types and plotting functionality
 from ..tracer import *
-from ..plots import image_plot, image_profile_plot, focus_search_cost_plot, spectrum_plot  # different plots
+from ..plots import image_plot, image_profile_plot, focus_search_cost_plot, spectrum_plot
 
-from .property_browser import PropertyBrowser  # dictionary browser
+from .pyvista_editor import PyVistaEditor, SceneInstance
+from .property_browser import PropertyBrowser
 from .command_window import CommandWindow
 from ._scene_plotting import ScenePlotting
 
@@ -31,40 +30,10 @@ from ..warnings import warning
 from ..global_options import global_options
 from .. import metadata
 
-# TODO inc_status and dec_status thread_safe?
-
-class _PyVistaEditor(Editor):
-    """
-    Qt-based editor that embeds PyVistaQt.
-    """
-    def init(self, parent):
-        """
-        Create the QtInteractor control and link it to the TraitsUI system.
-        """
-        # Create the PyVistaQt widget
-        self.control = QtInteractor(parent.parentWidget(), auto_update=False)
-        
-        # Assign the created plotter to the Trait on the TraceGUI instance
-        self.value = self.control
-
-        # close all windows if the scene gets destroyed
-        self.control.destroyed.connect(QtGui.QApplication.closeAllWindows)
-
-    def set_size_policy(self, *args):
-        pass
-
-class PyVistaEditor(BasicEditorFactory):
-    """
-    The Factory class used in the View definition: editor=PyVistaEditor()
-    """
-    klass = _PyVistaEditor
-
-
-# TODO ray update is flickering (run self.replot, rays get updated two times) -> smart_replot replots rays
 
 class TraceGUI(HasTraits):
 
-    scene: Instance = Instance(QtInteractor)
+    scene: Instance = SceneInstance
     """the pyvista vtk scene"""
 
     # Ranges
@@ -291,9 +260,6 @@ class TraceGUI(HasTraits):
 
     _status: Dict = Dict(Str())
 
-    # size of the mlab scene
-    _scene_size0 = np.array([1100, 800], dtype=np.int64)  # default size
-
     _bool_list_elements = []
 
     ####################################################################################################################
@@ -304,7 +270,7 @@ class TraceGUI(HasTraits):
                     TGroup(  # additional group so scene-sidebar ratio stays the same on windows resizing
                         TGroup(
                             UItem('scene', editor=PyVistaEditor(), resizable=True,
-                                 height=_scene_size0[1], width=_scene_size0[0], show_label=False),
+                                 height=800, width=1100, show_label=False),
                              ),
                         layout="split",
                     ),
@@ -524,9 +490,6 @@ class TraceGUI(HasTraits):
         # default value for image_pixels
         self.image_pixels = 189
 
-        # set the properties after this without leading to a re-draw
-        self._no_trait_action_flag = False
-       
         # these properties should not be set, since they have to be initialized first
         # and setting as inits them would lead to issues
         forbidden = ["source_selection", "detector_selection", "z_det"]
@@ -538,19 +501,18 @@ class TraceGUI(HasTraits):
                                     and self._trait(el, 0).editor is not None and\
                                     (len(self._trait(el, 0).editor.values) == 1)]
 
-        with self._no_trait_action():
+        # convert bool values to list entries for List()
+        for key, val in kwargs.items():
+            if key in self._bool_list_elements and isinstance(val, bool):
+                kwargs[key] = [self._trait(key, 0).editor.values[0]] if val else []
 
-            # convert bool values to list entries for List()
-            for key, val in kwargs.items():
-                if key in self._bool_list_elements and isinstance(val, bool):
-                    kwargs[key] = [self._trait(key, 0).editor.values[0]] if val else []
+        # define Status dict
+        self._status.update(dict(InitScene=1, DisplayingGUI=1, Tracing=0, Drawing=0, Focussing=0,
+                                 DetectorImage=0, SourceImage=0, ChangingDetector=0, SourceSpectrum=0,
+                                 DetectorSpectrum=0, Screenshot=0, RunningCommand=0))
 
-            # define Status dict
-            self._status.update(dict(InitScene=1, DisplayingGUI=1, Tracing=0, Drawing=0, Focussing=0,
-                                     DetectorImage=0, SourceImage=0, ChangingDetector=0, SourceSpectrum=0,
-                                     DetectorSpectrum=0, Screenshot=0, RunningCommand=0))
-
-            super().__init__(**kwargs)
+        self.trait_set(trait_change_notify=False, **kwargs)
+        super().__init__()
 
 
     def __setattr__(self, key: str, val: Any) -> None:
@@ -576,16 +538,8 @@ class TraceGUI(HasTraits):
     ####################################################################################################################
     # Helpers
 
-    @contextmanager
-    def _no_trait_action(self) -> None:
-        """context manager that sets and resets the _no_trait_action_flag"""
-        self._no_trait_action_flag = True
-        try:
-            yield
-        finally:
-            self._no_trait_action_flag = False
-
     def invoke_later(self, func, *args, **kwargs) -> None:
+        """run function in main thread if application still exists"""
         if QtGui.QApplication.instance() is not None:
             pyface_gui.invoke_later(func, *args, **kwargs)
 
@@ -862,8 +816,8 @@ class TraceGUI(HasTraits):
             # and the scene did not change since the last trace
             if self._status["DisplayingGUI"] and self.raytracer.rays.N and not self._init_forced_ray_count\
                     and not self.raytracer.geometry_error and self.raytracer.check_if_rays_are_current():
-                with self._no_trait_action():
-                    self.ray_count = self.raytracer.rays.N
+
+                self.trait_set(ray_count=self.raytracer.rays.N, trait_change_notify=False)
                 self.replot_rays()
             else:
                 self.retrace()
@@ -956,11 +910,10 @@ class TraceGUI(HasTraits):
            warning("All checkbox slots are taken")
            return
 
-        with self._no_trait_action():
-            self._trait(f"custom_checkbox_{n+1}", 0).editor.values = [name]
-            self.__dict__[f"_custom_checkbox_{n+1}_visible"] = True
-            self.__dict__[f"custom_checkbox_{n+1}"] = [name] if val else []
-            self._custom_checkbox_functions += [function]
+        self._trait(f"custom_checkbox_{n+1}", 0).editor.values = [name]
+        self.trait_set(**{f"custom_checkbox_{n+1}": [name] if val else []}, trait_change_notify=False)
+        setattr(self, f"_custom_checkbox_{n+1}_visible", True)
+        self._custom_checkbox_functions += [function]
     
     def add_custom_button(self, name: str, function: Callable) -> None:
         """
@@ -973,8 +926,8 @@ class TraceGUI(HasTraits):
            warning("All button slots are taken")
            return
 
-        self.__dict__[f"_custom_button_{n+1}_visible"] = True
-        self.__dict__[f"_custom_button_{n+1}_name"] = name
+        setattr(self, f"_custom_button_{n+1}_visible", False)
+        setattr(self, f"_custom_button_{n+1}_name", name)
         self._custom_button_functions += [function]
     
     def add_custom_value(self, name: str, val: float, function: Callable = None) -> None:
@@ -989,11 +942,10 @@ class TraceGUI(HasTraits):
            warning("All value slots are taken")
            return
 
-        with self._no_trait_action():
-            self.__dict__[f"_custom_value_{n+1}_visible"] = True
-            self.__dict__[f"custom_value_{n+1}"] = val
-            self.__dict__[f"_custom_value_{n+1}_name"] = name
-            self._custom_value_functions += [function]
+        self.trait_set(**{f"custom_value_{n+1}": val}, trait_change_notify=False)
+        setattr(self, f"_custom_value_{n+1}_visible", True)
+        setattr(self, f"_custom_value_{n+1}_name", name)
+        self._custom_value_functions += [function]
     
     def add_custom_selection(self, name: str, list_: list[str], val: str, function: Callable = None) -> None:
         """
@@ -1008,13 +960,11 @@ class TraceGUI(HasTraits):
            warning("All selection slots are taken")
            return
 
-        # TODO use setattribute
-        with self._no_trait_action():
-            self.__dict__[f"_custom_selection_{n+1}_visible"] = True
-            self.__dict__[f"_custom_selection_{n+1}"] = list_
-            self.__dict__[f"custom_selection_{n+1}"] = val
-            self.__dict__[f"_custom_selection_{n+1}_name"] = name
-            self._custom_selection_functions += [function]
+        self.trait_set(**{f"_custom_selection_{n+1}": list_}, trait_change_notify=False)
+        self.trait_set(**{f"custom_selection_{n+1}": val}, trait_change_notify=False)
+        setattr(self, f"_custom_selection_{n+1}_name", name)
+        setattr(self, f"_custom_selection_{n+1}_visible", True)
+        self._custom_selection_functions += [function]
     
     def custom_button_action_1(self) -> Callable:
         """:return: function assigned with custom button 1"""
@@ -1038,15 +988,14 @@ class TraceGUI(HasTraits):
 
         :param event: optional trait change event
         """
-        if ((box := int(float(event.name[-1]))) < len(self._custom_checkbox_functions)+1
-                and not self._no_trait_action_flag):
+        if ((box := int(float(event.name[-1]))) < len(self._custom_checkbox_functions)+1):
 
             with self.smart_replot():
                 self._sequential = True
                 self._inc_status("RunningCommand", notify=False)
 
                 if (func := self._custom_checkbox_functions[box - 1]) is not None:
-                    func(bool(self.__dict__[f"custom_checkbox_{box}"]))
+                    func(bool(getattr(self, f"custom_checkbox_{box}")))
 
                 self._dec_status("RunningCommand", notify=False)
                 self._sequential = False
@@ -1074,7 +1023,7 @@ class TraceGUI(HasTraits):
 
         :param event: optional trait change event
         """
-        if (val := int(float(event.name[-1]))) < len(self._custom_value_functions)+1 and not self._no_trait_action_flag:
+        if (val := int(float(event.name[-1]))) < len(self._custom_value_functions)+1:
 
             with self.smart_replot():
                 self._sequential = True
@@ -1093,8 +1042,7 @@ class TraceGUI(HasTraits):
 
         :param event: optional trait change event
         """
-        if ((sel := int(float(event.name[-1]))) < len(self._custom_selection_functions)+1 and
-                not self._no_trait_action_flag):
+        if ((sel := int(float(event.name[-1]))) < len(self._custom_selection_functions)+1):
 
             with self.smart_replot():
                 self._sequential = True
@@ -1131,7 +1079,7 @@ class TraceGUI(HasTraits):
         :param max_show: maximum number of rays to display
         """
 
-        if not self._no_trait_action_flag and not self._status["Tracing"]: 
+        if not self._status["Tracing"]: 
             # don't do while tracing, RayStorage rays are still being generated
 
             self._inc_status("Drawing", notify=False)
@@ -1169,8 +1117,7 @@ class TraceGUI(HasTraits):
                    
                         # if a custom selection was provided, we need to update the number of displayed rays
                         if mask is not None:
-                            with self._no_trait_action():
-                                self.rays_visible = np.count_nonzero(self.ray_selection)
+                            self.trait_set(rays_visible=np.count_nonzero(self.ray_selection), trait_change_notify=False)
 
                     self._dec_status("Drawing", notify=True)
 
@@ -1211,10 +1158,7 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
 
-        if self._no_trait_action_flag:
-            return
-
-        elif self.raytracer.ray_sources:
+        if self.raytracer.ray_sources:
 
             nt = len(self.raytracer.tracing_surfaces) + 2
             if self.raytracer.rays.storage_size(self.ray_count, nt, self.raytracer.rays.no_pol)\
@@ -1262,7 +1206,8 @@ class TraceGUI(HasTraits):
 
                     else:
                         self._plot.remove_fault_markers()
-                        self._dec_status("Tracing", notify=False)  # TODO there is a gap for busyness between Tracing=Off and Drawing=On
+                        self._dec_status("Tracing", notify=False)  
+                        # TODO there is a gap for busyness between Tracing=Off and Drawing=On
                         self.replot_rays()
 
                 self.invoke_later(on_finish)
@@ -1310,7 +1255,7 @@ class TraceGUI(HasTraits):
         :param event: optional trait change event
         """
 
-        if not self._no_trait_action_flag and self.raytracer.detectors:
+        if self.raytracer.detectors:
 
             self._inc_status("ChangingDetector", notify=False)
 
@@ -1318,9 +1263,9 @@ class TraceGUI(HasTraits):
 
                 def on_finish():
 
-                    with self._no_trait_action():
-                        self._det_ind = int(self.detector_selection.split(":", 1)[0].split("DET")[1])
-                        self.z_det = self.raytracer.detectors[self._det_ind].pos[2]
+                    self.trait_set(_det_ind=int(self.detector_selection.split(":", 1)[0].split("DET")[1]),
+                                   trait_change_notify=False)
+                    self.trait_set(z_det=self.raytracer.detectors[self._det_ind].pos[2], trait_change_notify=False)
 
                     self.projection_method_enabled = \
                         isinstance(self.raytracer.detectors[self._det_ind].surface, SphericalSurface)
@@ -1339,7 +1284,7 @@ class TraceGUI(HasTraits):
 
         :param event: optional trait change event
         """
-        if not self._no_trait_action_flag and self.raytracer.detectors:
+        if self.raytracer.detectors:
 
             self._inc_status("ChangingDetector", notify=True)
 
@@ -1354,8 +1299,7 @@ class TraceGUI(HasTraits):
 
                     # reinit detectors and Selection to update z_pos in detector name
                     self._init_detector_list()
-                    with self._no_trait_action():
-                        self.detector_selection = self.detector_names[self._det_ind]
+                    self.trait_set(detector_selection=self.detector_names[self._det_ind], trait_change_notify=False)
 
                     self.__detector_lock.release()
                     self._dec_status("ChangingDetector", notify=True)

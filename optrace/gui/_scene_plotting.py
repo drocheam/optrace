@@ -51,8 +51,6 @@ class ScenePlotting:
         :param initial_camera: keyword dictionary for set_camera()
         """
         self.ui = ui
-        self._scene_size = np.array(ui._scene_size0)
-        self._scene_size0 = self._scene_size.copy()
         self.scene = self.ui.scene
         self.raytracer = raytracer
 
