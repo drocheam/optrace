@@ -103,6 +103,20 @@ class RayStorage(BaseClass):
         fpol = f32*N*nt*3 if not no_pol else f64
         return N*nt*3*f64 + N*3*f64 + fpol + N*nt*f32 + N*nt*f64 + N*f32
 
+    @staticmethod
+    def max_rays_for_size(size: int, nt: int, no_pol: bool) -> int:
+        """
+        Calculate allowed number of rays before 'size' bytes are used.
+        Rough approximation.
+
+        :param size: size in Bytes
+        :param nt: number of sections per ray
+        :param no_pol: polarization calculation turned off
+        :return: number of rays
+        """
+        N0 = 100000
+        return size // (RayStorage.storage_size(N0, nt, no_pol) / N0)
+
     @property
     def N(self) -> int:
         """number of rays"""

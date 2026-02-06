@@ -168,6 +168,7 @@ class TracerMiscTests(unittest.TestCase):
         mask = (x >= ext2[0]) & (x <= ext2[1]) & (y >= ext2[2]) & (y <= ext2[3])
         self.assertEqual(np.sum(w[mask]), np.sum(wm))
 
+    # TODO test max_rays_for_size
     @pytest.mark.os
     def test_ray_storage(self):
 

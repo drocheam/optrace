@@ -421,8 +421,7 @@ class RaySource(Element):
 
                 # sqrt(s0**2 + s1**2) equals sqrt(1-s2**2) for a unity vector
                 # don't mask out sz = 1, as masking is more expensive than correcting afterwards
-                with np.errstate(divide="ignore"):
-                    fa = 1 / np.sqrt(1 - s[:, 2]**2)
+                fa = 1 / (np.sqrt(1 - s[:, 2]**2) + 1e-16)
                 ps = np.zeros_like(s, dtype=np.float64, order='F')
                 ps[:, 0] = s[:, 1] * fa
                 ps[:, 1] = -s[:, 0] * fa

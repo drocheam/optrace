@@ -38,7 +38,7 @@ class TraceGUI(HasTraits):
 
     # Ranges
 
-    ray_count: Range = Range(1, 50000000, 200000, desc='Number of rays for Simulation', enter_set=True,
+    ray_count: Range = Range(1, '_ray_count_max', 200000, desc='Number of rays for Simulation', enter_set=True,
                              auto_set=False, label="Rays", mode='spinner')
     """Number of rays for raytracing"""
     
@@ -464,6 +464,9 @@ class TraceGUI(HasTraits):
         self._z_det_min = self.raytracer.outline[4]
         self._z_det_max = self.raytracer.outline[5]
 
+        # set ray limit given by ray size from raytracer.MAX_RAY_STORAGE_RAM
+        self._update_ray_limit()
+
         self._det_ind = 0
         if len(self.raytracer.detectors):
             self.z_det = self.raytracer.detectors[self._det_ind].pos[2]
@@ -511,7 +514,7 @@ class TraceGUI(HasTraits):
                                  DetectorImage=0, SourceImage=0, ChangingDetector=0, SourceSpectrum=0,
                                  DetectorSpectrum=0, Screenshot=0, RunningCommand=0))
 
-        self.trait_set(trait_change_notify=False, **kwargs)
+        self.trait_setq(**kwargs)
         super().__init__()
 
 
@@ -810,6 +813,9 @@ class TraceGUI(HasTraits):
         
         if (all_ or change["Filters"] or change["Lenses"] or change["Apertures"] or change["Ambient"]\
                 or change["RaySources"] or change["TraceSettings"]) and not rdh:
+           
+            # set ray limit given by ray size from raytracer.MAX_RAY_STORAGE_RAM
+            self._update_ray_limit()
 
             # when initializing the scene, don't retrace when the raytracer already has rays stored, 
             # there are no geometry errors and the ray_count parameter for the TraceGUI is not explicitely set
@@ -817,7 +823,7 @@ class TraceGUI(HasTraits):
             if self._status["DisplayingGUI"] and self.raytracer.rays.N and not self._init_forced_ray_count\
                     and not self.raytracer.geometry_error and self.raytracer.check_if_rays_are_current():
 
-                self.trait_set(ray_count=self.raytracer.rays.N, trait_change_notify=False)
+                self.trait_setq(ray_count=self.raytracer.rays.N)
                 self.replot_rays()
             else:
                 self.retrace()
@@ -911,7 +917,7 @@ class TraceGUI(HasTraits):
            return
 
         self._trait(f"custom_checkbox_{n+1}", 0).editor.values = [name]
-        self.trait_set(**{f"custom_checkbox_{n+1}": [name] if val else []}, trait_change_notify=False)
+        self.trait_setq(**{f"custom_checkbox_{n+1}": [name] if val else []})
         setattr(self, f"_custom_checkbox_{n+1}_visible", True)
         self._custom_checkbox_functions += [function]
     
@@ -942,7 +948,7 @@ class TraceGUI(HasTraits):
            warning("All value slots are taken")
            return
 
-        self.trait_set(**{f"custom_value_{n+1}": val}, trait_change_notify=False)
+        self.trait_setq(**{f"custom_value_{n+1}": val})
         setattr(self, f"_custom_value_{n+1}_visible", True)
         setattr(self, f"_custom_value_{n+1}_name", name)
         self._custom_value_functions += [function]
@@ -960,8 +966,8 @@ class TraceGUI(HasTraits):
            warning("All selection slots are taken")
            return
 
-        self.trait_set(**{f"_custom_selection_{n+1}": list_}, trait_change_notify=False)
-        self.trait_set(**{f"custom_selection_{n+1}": val}, trait_change_notify=False)
+        self.trait_setq(**{f"_custom_selection_{n+1}": list_})
+        self.trait_setq(**{f"custom_selection_{n+1}": val})
         setattr(self, f"_custom_selection_{n+1}_name", name)
         setattr(self, f"_custom_selection_{n+1}_visible", True)
         self._custom_selection_functions += [function]
@@ -1117,7 +1123,7 @@ class TraceGUI(HasTraits):
                    
                         # if a custom selection was provided, we need to update the number of displayed rays
                         if mask is not None:
-                            self.trait_set(rays_visible=np.count_nonzero(self.ray_selection), trait_change_notify=False)
+                            self.trait_setq(rays_visible=np.count_nonzero(self.ray_selection))
 
                     self._dec_status("Drawing", notify=True)
 
@@ -1150,6 +1156,12 @@ class TraceGUI(HasTraits):
         """:return: boolean array for which of the traced rays in TraceGUI.raytracer.rays are displayed currently"""
         return self._plot.ray_selection
 
+    def _update_ray_limit(self) -> None:
+        """set ray limit given by ray size from raytracer.MAX_RAY_STORAGE_RAM to UI field"""
+        self._ray_count_max = self.raytracer.rays.max_rays_for_size(self.raytracer.MAX_RAY_STORAGE_RAM, 
+                                                                    len(self.raytracer.tracing_surfaces) + 2, 
+                                                                    self.raytracer.no_pol)
+
     @observe('ray_count', dispatch="ui", post_init=True)
     def retrace(self, event: TraitChangeEvent = None) -> None:
         """
@@ -1159,19 +1171,6 @@ class TraceGUI(HasTraits):
         """
 
         if self.raytracer.ray_sources:
-
-            nt = len(self.raytracer.tracing_surfaces) + 2
-            if self.raytracer.rays.storage_size(self.ray_count, nt, self.raytracer.rays.no_pol)\
-                    > self.raytracer.MAX_RAY_STORAGE_RAM:
-                warning(f"Resetting the ray_count number since more than {self.raytracer.MAX_RAY_STORAGE_RAM*1e-9:.1f}"
-                        " GB RAM requested. Either decrease the number of rays, surfaces or do an iterative render. "
-                        "If your system can handle"
-                        " more RAM usage, increase the Raytracer.MAX_RAY_STORAGE_RAM parameter.")
-                # set the ray_count to old value, as it could be set in the textfield
-                # textfield value seems to only be updated by using set_trait_later
-                pyface_gui.set_trait_later(self, "ray_count", event.old)
-                pyface_gui.process_events()
-                return
 
             self._inc_status("Tracing", notify=True)
 
@@ -1263,9 +1262,8 @@ class TraceGUI(HasTraits):
 
                 def on_finish():
 
-                    self.trait_set(_det_ind=int(self.detector_selection.split(":", 1)[0].split("DET")[1]),
-                                   trait_change_notify=False)
-                    self.trait_set(z_det=self.raytracer.detectors[self._det_ind].pos[2], trait_change_notify=False)
+                    self.trait_setq(_det_ind=int(self.detector_selection.split(":", 1)[0].split("DET")[1]))
+                    self.trait_setq(z_det=self.raytracer.detectors[self._det_ind].pos[2])
 
                     self.projection_method_enabled = \
                         isinstance(self.raytracer.detectors[self._det_ind].surface, SphericalSurface)
@@ -1299,7 +1297,7 @@ class TraceGUI(HasTraits):
 
                     # reinit detectors and Selection to update z_pos in detector name
                     self._init_detector_list()
-                    self.trait_set(detector_selection=self.detector_names[self._det_ind], trait_change_notify=False)
+                    self.trait_setq(detector_selection=self.detector_names[self._det_ind])
 
                     self.__detector_lock.release()
                     self._dec_status("ChangingDetector", notify=True)

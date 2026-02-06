@@ -15,10 +15,10 @@ from ..warnings import warning
 from ..global_options import global_options as go
 from ..tracer.misc import masked_assign
 
+from .interactors import Picker, CameraOrientationWidgetFixes, KeyboardShortcuts
 
 
 class ScenePlotting:
-
     """
     This class provides the functionality for plotting elements and rays of the raytracer inside a mayavi scene.
     It uses properties and settings from a TraceGUI.
@@ -99,6 +99,7 @@ class ScenePlotting:
     
     @staticmethod
     def apply_prop(prop, **kwargs):
+        """apply properties to object prop"""
         for key, val in kwargs.items():
             if hasattr(prop, key):
                 setattr(prop, key, val)
@@ -168,10 +169,8 @@ class ScenePlotting:
         if roll is not None:
             cam.roll = roll
         
-        # render
-        #cam.ComputeViewPlaneNormal()
-        cam.reset_clipping_range()  # TODO needed?
-        # self.scene.render()
+        # reset clipping
+        cam.reset_clipping_range()
 
     def set_initial_camera(self) -> None:
         """
@@ -247,29 +246,10 @@ class ScenePlotting:
         if self._orientation_axes is not None:
             return
 
-        self.__oa_cam_props = None
-
-        # store camera props and disable render in the case that a handle is selected
-        def _on_orientation_change_start(*args):
-            self.scene.interactor.EnableRenderOff()
-            self.__oa_cam_props = self.get_camera()
-       
-        # reenable rendering while interacting with the widget
-        def _on_orientation_change_interact(*args):
-            self.scene.interactor.EnableRenderOn()
-        
-        # restore camera center and scale and handle +y and -y views so x points up/downwards
-        def _on_orientation_change_end(axes, *args):
-            if axes.GetRepresentation().IsAnyHandleSelected():
-                normal = self.get_camera()[2]
-                roll = 90 if abs(normal[1]) == 1 else 0
-                self.set_camera(*self.__oa_cam_props[:2], roll=roll)
-                self.scene.interactor.EnableRenderOn()
-
+        # create Orientation Widget and apply fixes
         self._orientation_axes = self.scene.add_camera_orientation_widget(animate=False, n_frames=0)
-        self._orientation_axes.AddObserver("StartInteractionEvent", _on_orientation_change_start)
-        self._orientation_axes.AddObserver("InteractionEvent", _on_orientation_change_interact)
-        self._orientation_axes.AddObserver("EndInteractionEvent", _on_orientation_change_end)
+        fixes = CameraOrientationWidgetFixes(self, self.scene, self._orientation_axes)
+        fixes.activate()
 
         self._orientation_axes.GetRepresentation().SetSize(90, 90)
         self._orientation_axes.GetRepresentation().AnchorToLowerLeft()
@@ -489,8 +469,10 @@ class ScenePlotting:
 
             # Using add_point_labels for 3D placement that stays visible
             text_pos = [obj.pos[0], obj.extent[3], zl]
-            text_actor = self._plot_label(text_pos, label_str, f"Label_{obj.abbr}{num}", text_color=self._foreground_color,
-                                          background_opacity=self._info_opacity, background_color=self._info_frame_color)
+            text_actor = self._plot_label(text_pos, label_str, f"Label_{obj.abbr}{num}", 
+                                          text_color=self._foreground_color,
+                                          background_opacity=self._info_opacity, 
+                                          background_color=self._info_frame_color)
 
         # plot BackSurface if one exists
         c = plot(obj.back.plotting_mesh(N=self.SURFACE_RES), "back") if plotBack else None
@@ -498,7 +480,9 @@ class ScenePlotting:
         return a, b, c, text_actor, obj
 
     @staticmethod
-    def mesh_from_points(x, y, z, u, v, w, s):
+    def mesh_from_points(x: np.ndarray, y: np.ndarray, z: np.ndarray, 
+                         u: np.ndarray, v: np.ndarray, w: np.ndarray, s: np.ndarray) -> pyvista.core.pointset.PolyData:
+        """create PolyData from point coordinates"""
         
         # point array
         nodes = np.empty((2 * len(x), 3))
@@ -537,8 +521,9 @@ class ScenePlotting:
        
         # add to scene
         self._ray_plot = self.scene.add_mesh(ray_mesh, scalars="scalars", cmap="Greys", opacity=self.ui.ray_opacity,
-            line_width=self.ui.ray_width, point_size=self.ui.ray_width, style=style, lighting=False, name=f"Rays",
-            render_points_as_spheres=True, pickable=True, render=False, scalar_bar_args=dict(render=False))
+                                             line_width=self.ui.ray_width, point_size=self.ui.ray_width, 
+                                             style=style, lighting=False, name=f"Rays", render_points_as_spheres=True, 
+                                             pickable=True, render=False, scalar_bar_args=dict(render=False))
 
     def set_ray_highlight(self, index: int) -> None:
         """
@@ -559,8 +544,10 @@ class ScenePlotting:
 
         # add to scene
         self._ray_highlight_plot = self.scene.add_mesh(ray_mesh, scalars="scalars", cmap=lt, opacity=1,
-            line_width=self.ui.ray_width, point_size=self.ui.ray_width, style="wireframe", render=False, 
-            lighting=False, name="Ray Highlight", render_points_as_spheres=True, pickable=False, show_scalar_bar=False)
+                                                       line_width=self.ui.ray_width, point_size=self.ui.ray_width, 
+                                                       style="wireframe", render=False, lighting=False, 
+                                                       name="Ray Highlight", render_points_as_spheres=True, 
+                                                       pickable=False, show_scalar_bar=False)
 
     def plot_point_markers(self) -> None:
         """plot point markers inside the scene"""
@@ -590,10 +577,12 @@ class ScenePlotting:
                 
             self._point_marker_plots.append((actor, None, None, text_actor, mark))
    
-    def _plot_label(self, pos, label, name, map_args = None, **kwargs):
-                
-        pargs = dict(render=False, text_color=self._foreground_color, show_points=False, shape_opacity=0,
-                     background_opacity=self._info_opacity, background_color=self._info_frame_color, always_visible=True)
+    def _plot_label(self, pos: list, label: str, name: str, map_args: dict = None, **kwargs)\
+            -> vtkmodules.vtkRenderingCore.vtkActor2D:
+        """plot a scene label that reacts to changes of hide_label, minimal_scene, vertical_labels and high_contrast"""    
+        pargs = dict(render=False, text_color=self._foreground_color, show_points=False, 
+                     shape_opacity=0, background_opacity=self._info_opacity, 
+                     background_color=self._info_frame_color, always_visible=True)
 
         text_actor = self.scene.add_point_labels([pos], [label], name=name, **(pargs | self.LABEL_STYLE | kwargs))
             
@@ -678,126 +667,14 @@ class ScenePlotting:
     def init_keyboard_shortcuts(self) -> None:
         """init keyboard shortcut detection inside the scene"""
 
-        def keyrelease(vtk_obj, event):
-              
-            match vtk_obj.GetKeyCode():
-
-                case "i":  # reset view
-                    self.set_initial_camera()
-                    self.scene.render()
-
-                case "h":  # hide/show side menu and toolbar
-                    self.ui.maximize_scene = bool(self.ui._scene_not_maximized)  # toggle value
-
-                case "v":  # toggle minimalistic_view
-                    self.ui.minimalistic_view = not bool(self.ui.minimalistic_view)
-                
-                case "c":  # high_contrast
-                    self.ui.high_contrast = not bool(self.ui.high_contrast)
-
-                case "b":  # toggle label visibility
-                    self.ui.hide_labels = not bool(self.ui.hide_labels)
-                
-                case "d":  # render DetectorImage
-                    self.ui.detector_image()
-               
-                case "0":  # close all pyplots
-                    plt.close("all")
-
-                case "n":  # reselect and replot rays
-                    self.ui.replot_rays()
-                
-                case "+":  # zoom in
-                    self.scene.camera.zoom(1.1)
-                    self.scene.render()
-
-                case "-":  # zoom out
-                    self.scene.camera.zoom(1/1.1)
-                    self.scene.render()
-                
-                # move camera (no shift) or rotate view (with shift)
-                case _ if (dir_ := vtk_obj.GetKeySym()) in ("Up", "Down", "Left", "Right"):
-                    
-                    cam = self.scene.camera
-                    right = np.cross(cam.GetDirectionOfProjection(), cam.up)
-
-                    if self.scene.interactor.shift_key:
-
-                        if dir_ == "Up":
-                            cam.elevation = cam.elevation + 5
-
-                        elif dir_ == "Down":
-                            cam.elevation = cam.elevation - 5
-
-                        elif dir_ == "Left":
-                            cam.azimuth = cam.azimuth + 5
-
-                        elif dir_ == "Right":
-                            cam.azimuth = cam.azimuth - 5
-
-                    else:
-
-                        if dir_ == "Up":
-                            dvec = np.array(cam.up)*cam.parallel_scale/20
-                        
-                        elif dir_ == "Down":
-                            dvec = -np.array(cam.up)*cam.parallel_scale/20
-                        
-                        elif dir_ == "Right":
-                            dvec = np.array(right)*cam.parallel_scale/15
-                        
-                        elif dir_ == "Left":
-                            dvec = -np.array(right)*cam.parallel_scale/15
-
-                        cam.position = cam.position + dvec
-                        cam.focal_point = cam.focal_point + dvec
-
-                    # recalculate up view and reset camera clipping range
-                    cam.up = np.cross(cam.GetDirectionOfProjection(), -right)
-                    cam.reset_clipping_range()
-                    self.scene.render()
-
-        # remove default shortcuts from vtk and pyvistaqr
-        self.scene.iren.interactor.RemoveObservers('CharEvent')
-        self.scene.iren.interactor.RemoveObservers('KeyPressEvent')
-        self.scene.iren.interactor.RemoveObservers('KeyReleaseEvent')
-
-        # add own
-        self.scene.iren.interactor.AddObserver('KeyPressEvent', keyrelease)
+        shortcuts = KeyboardShortcuts(self, self.ui, self.scene)
+        shortcuts.activate()
 
     def init_ray_info(self) -> None:
         """init detection of ray point clicks and the info display"""
 
-        # https://github.com/enthought/mayavi/blob/2cf91a40fb4d584a454e3b9f1c9fb6a7d9fed2e5/mayavi/core/mouse_pick_dispatcher.py
-
-        self._mm = 0
-        self._mmb = False
-
-        def on_mouse_move(a, b):
-            self._mm = True
-
-        def on_button_press(a, b):
-            self._mm = False
-            self._mmb = True
-
-        def on_button_release(a, b):
-
-            if not self._mm:
-                if self._mmb:
-                    x, y = a.GetEventPosition()
-                    self.scene.picker.Pick(x, y, 0, self.scene.renderer)
-
-            self._mm = False
-            self._mmb = False
-
-        self.scene.camera.AddObserver("ModifiedEvent", on_mouse_move)
-        self.scene.interactor.AddObserver("EndInteractionEvent", on_button_release)
-        self.scene.interactor.AddObserver("LeftButtonPressEvent", on_button_press)
-        self.scene.picker.AddObserver("EndPickEvent", self._on_ray_pick)
-
-        # self.scene.track_click_position(callback=self._on_ray_pick, side='left')
-        # self.scene.enable_point_picking(callback=self._on_ray_pick, left_clicking=True, show_message=False, show_point=True, clear_on_no_selection=True, picker="point")
-        self.scene.picker.tolerance = 0.0025
+        picker = Picker(self.scene, self._on_ray_pick, right_button=False)
+        picker.activate()
 
         self._ray_text = self.scene.add_text("", position="upper_left", name="Ray Info Text", render=False)
         
@@ -811,8 +688,8 @@ class ScenePlotting:
     def init_status_info(self) -> None:
         """init GUI status text display"""
 
-        self.scene.track_click_position(callback=self._on_space_pick, side='right')
-        self.scene.picker.tolerance = 0.0025
+        picker = Picker(self.scene, self._on_space_pick, right_button=True)
+        picker.activate()
 
         self._status_text = self.scene.add_text("", position="lower_right", name="Status Info Text", render=False)
         
@@ -866,7 +743,6 @@ class ScenePlotting:
         for ax in self._axes_labels:
             ax.visibility = show
            
-
     def change_label_visibility(self) -> None:
         """Hide/show labels depending on value of option 'hide_labels'"""
 
@@ -1063,10 +939,11 @@ class ScenePlotting:
         
         :param pos: array with three elements (x, y, z)
         """
-        self._crosshair = self.scene.add_point_labels(pos, ["+"], name=f"Crosshair", 
-                               font_size=32, bold=True, font_family="times", render=False, always_visible=True, 
-                               justification_horizontal="center", justification_vertical="center", pickable=False,
-                               text_color=self._crosshair_color, show_points=False, shape_opacity=0.)
+        self._crosshair = self.scene.add_point_labels(pos, ["+"], name=f"Crosshair", font_size=32, bold=True, 
+                                                      font_family="times", render=False, always_visible=True, 
+                                                      justification_horizontal="center", shape_opacity=0.,
+                                                      justification_vertical="center", pickable=False,
+                                                      text_color=self._crosshair_color, show_points=False)
 
     # Ray and RaySource plotting
     ###################################################################################################################
@@ -1139,8 +1016,9 @@ class ScenePlotting:
 
         self.apply_prop(bar, title=title, orientation=1, number_of_labels=11, label_format="%-6.3f", 
                         visibility=self.ui.coloring_mode != "Plain")
-        self.apply_prop(bar.GetTitleTextProperty(), **(self.INFO_STYLE | dict(font_family=1, color=self._foreground_color)))
-        self.apply_prop(bar.GetLabelTextProperty(), **(self.LABEL_STYLE | dict(font_family=1, color=self._foreground_color)))
+        text_style = self.INFO_STYLE | dict(font_family=1, color=self._foreground_color) 
+        self.apply_prop(bar.GetTitleTextProperty(), **text_style)
+        self.apply_prop(bar.GetLabelTextProperty(), **text_style)
 
         # right edge anchor at half height
         right_anchor = vtk.vtkCoordinate()
@@ -1158,6 +1036,7 @@ class ScenePlotting:
         pos2.SetCoordinateSystemToDisplay()
         pos2.SetValue(80, 500)
 
+        # apply colormap options
         match self.ui.coloring_mode:
 
             case 'Wavelength':
@@ -1351,7 +1230,7 @@ class ScenePlotting:
     # Picking Handler
     ###################################################################################################################
 
-    def _on_space_pick(self, picker_obj) -> None:
+    def _on_space_pick(self, picker_obj: vtkmodules.vtkRenderingCore.vtkPointPicker, event: str) -> None:
         """
         3D Space Clicking Handler. Shows Click Coordinates or moves Detector to this position when Shift is pressed.
 
@@ -1373,15 +1252,12 @@ class ScenePlotting:
             self._ray_text.SetText(2, f"Pick Position (x, y, z):    ({pos[0]:>9.6g} mm, {pos[1]:>9.6g} mm, "\
                                   f"{pos[2]:>9.6g} mm)\n"\
                                   f"Relative to Axis (r, phi):  ({r:>9.6g} mm, {ang:>9.3f} °)")
-
+            
+            self.hide_ray_highlight()
             self.set_crosshair(pos)
 
-    def _on_ray_pick(self, picker_obj = None, a = None) -> None:
-        """
-        Ray Picking Handler. Shows ray properties in the scene.
-
-        :param picker_obj:
-        """
+    def _on_ray_pick(self, picker_obj: vtkmodules.vtkRenderingCore.vtkPointPicker, event: str) -> None:
+        """Ray Picking Handler. Shows ray properties in the scene."""
         if self._ray_text is None:
             return
 

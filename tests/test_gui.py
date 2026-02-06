@@ -25,6 +25,9 @@ from optrace.gui import TraceGUI
 from tracing_geometry import tracing_geometry
 
 
+# TODO test calculate_labels()
+
+
 # detecting traitsui exceptions, otherwise there aren't raised
 class TraitsCaptureHandler(logging.Handler):
     def __init__(self):
@@ -107,13 +110,6 @@ class GUITests(unittest.TestCase):
             sim.scene.interactor.InvokeEvent("LeftButtonPressEvent")
             sim.scene.interactor.InvokeEvent("LeftButtonReleaseEvent")
           
-    # TODO currently needed, as chosen picker implementation doesn't do the callback on repick of the same point
-    def reset_pick_state(self, sim):
-        # return
-        self._do_in_main(self.click_scene, sim, 0, 0)
-        self._wait_for_idle(sim)
-        time.sleep(0.2)
-
     @pytest.mark.gui1
     @pytest.mark.slow
     def test_gui_inits(self) -> None:
@@ -422,11 +418,17 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.open_property_browser)
                 self._wait_for_idle(sim)
 
+                # check ray number maximum
+                max_ = sim.raytracer.rays.max_rays_for_size(sim.raytracer.MAX_RAY_STORAGE_RAM, 
+                                                            sim.raytracer.rays.Nt, sim.raytracer.no_pol)
+                self.assertEqual(max_, sim._ray_count_max)
+                
+                # TODO how to test this?
                 # try setting many rays
-                rc0 = sim.ray_count
-                self._set_in_main(sim, "ray_count", 50000000-1)
-                self._wait_for_idle(sim, base=0.5)
-                self.assertEqual(rc0, sim.ray_count)
+                # rc0 = sim.ray_count
+                # self._set_in_main(sim, "ray_count", 50000000-1)
+                # self._wait_for_idle(sim, base=0.5)
+                # self.assertEqual(rc0, sim.ray_count)
 
         RT = tracing_geometry()
         sim = TraceGUI(RT)
@@ -1489,7 +1491,6 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(sim._plot._ray_highlight_plot.visibility)  # show highlighted ray
               
                 # ray picked -> show verbose info
-                self.reset_pick_state(sim)
                 self._do_in_main(self.click_scene, sim, 1/2, 1/2, shift=True)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)
@@ -1535,7 +1536,6 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(sim._plot._ray_highlight_plot.visibility)  # don't show any highlighted ray
                 
                 # valid space picked with shift -> move detector
-                self.reset_pick_state(sim)
                 time.sleep(0.3)
                 old_pos = RT.detectors[0].pos
                 self._do_in_main(self.click_scene, sim, sim.scene.window_size[0]/3,
@@ -1583,7 +1583,7 @@ class GUITests(unittest.TestCase):
 
                 # test case where RayText is missing
                 sim._plot._ray_text = None
-                self._do_in_main(sim._plot._on_ray_pick)
+                self._do_in_main(sim._plot._on_ray_pick, None, None)
                 self._wait_for_idle(sim)
 
         sim = TraceGUI(RT)

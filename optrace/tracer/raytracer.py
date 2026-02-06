@@ -34,7 +34,7 @@ class Raytracer(Group):
     """HURB uncertainty factor. Scales the tangent uncertainty expression. Original sources use 1, 
     but sqrt(2) matches the envelope better. See the documentation for details."""
 
-    MAX_RAY_STORAGE_RAM: int = 8000000000
+    MAX_RAY_STORAGE_RAM: int = 6000000000
     """ Maximum available RAM for the stored rays """
 
     ITER_RAYS_STEP: int = 1000000
