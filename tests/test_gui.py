@@ -23,12 +23,9 @@ from pyface.qt import QtGui, QtCore
 import optrace as ot
 from optrace.gui import TraceGUI
 from tracing_geometry import tracing_geometry
+from optrace.gui._scene_plotting import ScenePlotting
 
-
-# TODO test calculate_labels()
-
-
-# detecting traitsui exceptions, otherwise there aren't raised
+# detecting traitsui exceptions, otherwise these aren't raised
 class TraitsCaptureHandler(logging.Handler):
     def __init__(self):
         super().__init__()
@@ -418,17 +415,21 @@ class GUITests(unittest.TestCase):
                 self._do_in_main(sim.open_property_browser)
                 self._wait_for_idle(sim)
 
-                # check ray number maximum
+                # check that the ray number maximum has been set in the TraceGUI
                 max_ = sim.raytracer.rays.max_rays_for_size(sim.raytracer.MAX_RAY_STORAGE_RAM, 
                                                             sim.raytracer.rays.Nt, sim.raytracer.no_pol)
                 self.assertEqual(max_, sim._ray_count_max)
                 
-                # TODO how to test this?
-                # try setting many rays
-                # rc0 = sim.ray_count
-                # self._set_in_main(sim, "ray_count", 50000000-1)
-                # self._wait_for_idle(sim, base=0.5)
-                # self.assertEqual(rc0, sim.ray_count)
+                # try setting too many rays, the TraceGUI should not change
+                # temporarily bypass the exception handling, 
+                # as the error would be raised in the Qt event loop outside this scope
+                rc0 = sim.ray_count
+                excepthook_old = sys.excepthook
+                sys.excepthook = lambda a, b, c: 0
+                self._set_in_main(sim, "ray_count", max_+10)
+                self._wait_for_idle(sim, base=0.5)
+                sys.excepthook = excepthook_old
+                self.assertEqual(rc0, sim.ray_count)
 
         RT = tracing_geometry()
         sim = TraceGUI(RT)
@@ -2119,6 +2120,25 @@ class GUITests(unittest.TestCase):
         sim.add_custom_selection("Selection 3", ["g", "h", "i"], "i", set_val3)
         
         sim.debug(interact, args=(sim,))
+
+    @pytest.mark.gui2
+    def test_calculate_label_positions(self) -> None:
+        """
+        Test automatic label position calculations. 
+        Check equal spacing and count for different ranges and parameter constellations.
+        """
+
+        for min_s, max_s in zip([5, 3, 3, 40, 17, 3], [20, 50, 50, 50, 23, 3]):
+            for x0 in [-101.254485, 2, 0.5, 0]:
+                for dx in [0.1, 10, 5.326546, 2000, 0.00001]:
+
+                    labels = ScenePlotting.calculate_label_positions(x0, x0+dx, min_s, max_s)
+
+                    self.assertTrue(min_s <= labels.shape[0] <= max_s+1)  # bin number inside range
+                    self.assertTrue(np.all(np.diff(labels) > 0))  # increasing bin edges
+                    self.assertAlmostEqual(np.std(np.diff(labels)), 0, delta=1e-10)  # equal spacing
+                    self.assertTrue(labels[0] >= x0) # first bin edge at least x0
+                    self.assertTrue(labels[-1] <= x0+dx)  # last edge at most x1
 
     @pytest.mark.slow
     @pytest.mark.os

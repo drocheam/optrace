@@ -186,31 +186,45 @@ class Surface(BaseClass):
         if N < 10:
             raise ValueError("Expected at least N=10.")
 
-        # rectangular grid
-        Y, X = np.mgrid[-self.r:self.r:N*1j, -self.r:self.r:N*1j]
+        if self.rotational_symmetry:
+            R, Phi = np.mgrid[0:self.r:N*1j, 0:2*np.pi:N*1j]
+            R = np.sqrt(R/self.r)*self.r  # rescale for equal-area sampling
 
-        # convert to polar coordinates
-        R = np.sqrt(X**2 + Y**2)
-        Phi = np.arctan2(Y, X)
+            # more values towards the edge and center by using a chosen scaling function
+            # https://www.wolframalpha.com/input?i=plot+x+and+%28%281-%28%282*x-1%29%29%5E6%29*%282*x-1%29+%2B+%28%282*x-1%29%29%5E6*tanh%28%282*x-1%29*4%29%2Ftanh%284%29%2B1%29%2F2+from+0+to+1
+            rs = R/self.r*2 - 1
+            R = (((1-rs**6)*rs + rs**6*np.tanh(4*rs)/np.tanh(4)) + 1)/2*self.r
+            
+            X = R*np.cos(Phi)
+            Y = R*np.sin(Phi)
+            z = self._values(X.ravel(), Y.ravel()).copy()
 
-        # masks for values outside of circular area
-        r = self.r
-        mask = R.ravel() >= r
-        mask2 = R >= r
+        else:
+            # rectangular grid
+            Y, X = np.mgrid[-self.r:self.r:N*1j, -self.r:self.r:N*1j]
+
+            # convert to polar coordinates
+            R = np.sqrt(X**2 + Y**2)
+            Phi = np.arctan2(Y, X)
+
+            # masks for values outside of circular area
+            r = self.r
+            mask = R.ravel() >= r
+            mask2 = R >= r
         
-        # values inside circular area
-        z = np.zeros(mask.shape, dtype=np.float64)
-        z[~mask] = self._values(X[~mask2].ravel(), Y[~mask2].ravel())
+            # values inside circular area
+            z = np.zeros(mask.shape, dtype=np.float64)
+            z[~mask] = self._values(X[~mask2].ravel(), Y[~mask2].ravel())
 
-        # move values outside surface to the surface edge
-        # this defines the edge with more points, making it more circular instead of step-like
-        z[mask] = self._values(r * np.cos(Phi.ravel()[mask]), r * np.sin(Phi.ravel()[mask]))
-        X[mask2] = r*np.cos(Phi[mask2])
-        Y[mask2] = r*np.sin(Phi[mask2])
+            # move values outside surface to the surface edge
+            # this defines the edge with more points, making it more circular instead of step-like
+            z[mask] = self._values(r * np.cos(Phi.ravel()[mask]), r * np.sin(Phi.ravel()[mask]))
+            X[mask2] = r*np.cos(Phi[mask2])
+            Y[mask2] = r*np.sin(Phi[mask2])
 
-        # plot nan values inside
-        mask3 = self.mask(X.ravel() + self.pos[0], Y.ravel() + self.pos[1])  # mask has absolute coordinates
-        z[~mask3] = np.nan
+        # plot nan values
+        mask = self.mask(X.ravel() + self.pos[0], Y.ravel() + self.pos[1])  # mask has absolute coordinates
+        z[~mask] = np.nan
 
         # make 2D
         Z = z.reshape(X.shape)

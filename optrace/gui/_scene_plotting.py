@@ -262,8 +262,22 @@ class ScenePlotting:
             # self._plot._orientation.GetRepresentation().SetZAxisColor(0., 0., 0.7)
 
     @staticmethod
-    def calculate_labels(x0: float, x1: float, min_s: int, max_s: int) -> np.ndarray:
+    def calculate_label_positions(x0: float, x1: float, min_s: int, max_s: int) -> np.ndarray:
+        """
+        Calculate appropriate label positions for a given interval [x0, x1]. 
+        Chooses the steps to be a natural size such as 1, 0.25 or 20.
+        'min_s' and 'max_s' provide the minimum and maximum number of gaps between labels (label spacings) between
+        the first and last label.
+        Note that the first and last label don't have to lie at x0 and x1.
+        If no appropriate step size is found, the function returns np.linspace(x0, x1, max_s+1)
 
+        :param x0: start position of interval
+        :param x1: end position of interval
+        :param min_s: minimum number of label spacings
+        :param max_s: maximum number of label spacings
+        :return: label positions
+        """
+        # min_s and max_s provides the range of bins, the function returns the bin edges
         # NOTE min_s and max_s should be in the range 3-50
 
         # desired spacings sp and subjective weights spw (e.g. spacing of 0.25 is more natural than 0.4)
@@ -314,7 +328,7 @@ class ScenePlotting:
                     text_color=self._axis_color, show_points=False, shadow=not self.ui.high_contrast, shape_opacity=0.)
 
         # X
-        lx = self.calculate_labels(ext[0], ext[1], 4, 16)
+        lx = self.calculate_label_positions(ext[0], ext[1], 4, 16)
         Lx = np.vstack((lx, np.repeat(ext[2], len(lx)), np.repeat(ext[4], len(lx)))).T
         Lxs = [f"{lxi:.6g} –" for lxi in lx]
         axes_x = add_point_labels(Lx, Lxs, name=f"Labels x", **(args | dict(justification_horizontal="right")))
@@ -322,7 +336,7 @@ class ScenePlotting:
                                    name=f"Title x", **(args | dict(justification_horizontal="right")))
        
         # Y
-        ly = self.calculate_labels(ext[2], ext[3], 4, 16)
+        ly = self.calculate_label_positions(ext[2], ext[3], 4, 16)
         Ly = np.vstack((np.repeat(ext[0], len(ly)), ly, np.repeat(ext[4], len(ly)))).T
         Lys = [f"{lyi:.6g} –" for lyi in ly] 
         axes_y = add_point_labels(Ly, Lys, name=f"Labels y", **(args | dict(justification_horizontal="right")))
@@ -330,7 +344,7 @@ class ScenePlotting:
                                    name=f"Title y",  **(args | dict(justification_horizontal="right")))
         
         # Z
-        lz = self.calculate_labels(ext[4], ext[5], 5, 24)
+        lz = self.calculate_label_positions(ext[4], ext[5], 5, 24)
         Lz = np.vstack((np.repeat(ext[0], len(lz)), np.repeat(ext[2], len(lz)), lz)).T
         Lzs = [f"\n\n{lzi:.6g}" for lzi in lz] 
         axes_z = add_point_labels(Lz, Lzs, name=f"Labels z", **args)

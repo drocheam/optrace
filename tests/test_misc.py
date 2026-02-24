@@ -168,7 +168,6 @@ class TracerMiscTests(unittest.TestCase):
         mask = (x >= ext2[0]) & (x <= ext2[1]) & (y >= ext2[2]) & (y <= ext2[3])
         self.assertEqual(np.sum(w[mask]), np.sum(wm))
 
-    # TODO test max_rays_for_size
     @pytest.mark.os
     def test_ray_storage(self):
 
@@ -182,8 +181,10 @@ class TracerMiscTests(unittest.TestCase):
         RS_ = ot.RaySource(ot.Point())
 
         for nt in [2, 3, 8, 17]:
-            for N in [1, 101, 2000, 10101, 321455]:
-                for pol in [False, True]:
+            for pol in [False, True]:
+           
+                # check storage_size()
+                for N in [1, 101, 2000, 10101, 321455]:
                     RS.init([RS_], N, nt, pol)
 
                     calculated = RayStorage.storage_size(RS.N, RS.Nt, RS.no_pol)
@@ -192,7 +193,15 @@ class TracerMiscTests(unittest.TestCase):
                     measured += RS.pol_list.base.nbytes if RS.pol_list.base is not None else RS.pol_list.nbytes
 
                     self.assertEqual(measured, calculated)
-        
+
+                # check max_rays_for_size()
+                for max_size in [1000, 46570689, ot.Raytracer.MAX_RAY_STORAGE_RAM]:
+                    Nmax = RayStorage.max_rays_for_size(max_size, nt, pol)
+                    size_calculated = RayStorage.storage_size(Nmax, nt, pol)
+                    size_per_ray = size_calculated / Nmax
+                    self.assertLess(max_size-size_calculated, size_per_ray)
+                    # deviation by up to "size_per_ray", as max_rays_for_size truncates the count
+
         # actual tests are done with tracing in tracer test file
 
     def test_base_class(self):

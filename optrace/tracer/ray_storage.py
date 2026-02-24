@@ -106,16 +106,20 @@ class RayStorage(BaseClass):
     @staticmethod
     def max_rays_for_size(size: int, nt: int, no_pol: bool) -> int:
         """
-        Calculate allowed number of rays before 'size' bytes are used.
-        Rough approximation.
+        Calculate allowed number of rays before 'size' bytes are allocated.
 
         :param size: size in Bytes
         :param nt: number of sections per ray
         :param no_pol: polarization calculation turned off
-        :return: number of rays
+        :return: maximum number of rays
         """
-        N0 = 100000
-        return size // (RayStorage.storage_size(N0, nt, no_pol) / N0)
+        f16, f32, f64 = 2, 4, 8
+        # check storage_size for equations for 'size'
+
+        if no_pol:
+            return (size-f64) // (nt*3*f64 + 3*f64 + nt*f32 + nt*f64 + f32) 
+        
+        return size // (nt*3*f64 + 3*f64 + f32*nt*3 + nt*f32 + nt*f64 + f32)
 
     @property
     def N(self) -> int:
