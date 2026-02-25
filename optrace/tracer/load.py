@@ -41,9 +41,12 @@ def _read_lines(path: str) -> list[str]:
     # open in binary mode to check for encoding
     with open(path, "rb") as f:
         resp = chardet.detect(f.read())
+
+    # if detection fails, it's most probably some lesser used 1 Byte encoding. Just set it to Windows-1252
+    encoding = resp["encoding"] or "Windows-1252"
     
     # read using detected encoding
-    with open(path, "r", encoding=resp["encoding"]) as f:
+    with open(path, "r", encoding=encoding) as f:
         return f.readlines()
 
 
