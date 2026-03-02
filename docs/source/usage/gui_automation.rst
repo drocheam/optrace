@@ -186,7 +186,7 @@ The :meth:`TraceGUI.screenshot <optrace.gui.trace_gui.TraceGUI.screenshot>` func
 A path string is required for this function.
 The file type is determined automatically from the file name.
 
-Internally, the :obj:`mayavi.mlab.savefig` function from `mayavi <https://docs.enthought.com/mayavi/mayavi>`__ is utilized, therefore supporting this function's additional parameters.
+Internally, the :obj:`pyvista.Plotter.screenshot` function from `pyvista <https://docs.pyvista.org>`__ is utilized, therefore supporting this function's additional parameters.
 
 .. code-block:: python
 

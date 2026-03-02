@@ -121,7 +121,7 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/', None),
                        'traits': ('https://docs.enthought.com/traits/', None),
                        'matplotlib': ('http://matplotlib.org/stable', None),
-                       'mayavi': ('https://docs.enthought.com/mayavi/mayavi', None)}
+                       'pyvista': ('https://docs.pyvista.org', None)}
 
 autodoc_default_options = {
 	'members': True,
@@ -157,23 +157,7 @@ sitemap_excludes = [
 # -- Misc Options -------------------------------------------------
 
 # ignore links that seemingly only work in a browser and not in automated tests
-linkcheck_ignore = [
-    'https://doi.org/10.1002/9783527648962.app1',
-    'https://www.publicdomainpictures.net/en/view-image.php',
-    'https://www.pexels.com/photo/sliced-fruits-on-tray-1132047/',
-    'https://www.pexels.com/photo/photo-of-people-standing-near-blackboard-3184393/',
-    'https://www.pexels.com/photo/green-island-in-the-middle-of-the-lake-during-daytime-724963/',
-    'https://www.pexels.com/photo/green-2-seat-sofa-1918291/',
-    'https://www.pexels.com/photo/documents-on-wooden-surface-95916/',
-    'https://www.pexels.com/photo/cars-on-street-during-night-time-3158562/',
-    'https://stackoverflow.com/questions/40065321/how-to-include-git-dependencies-in-setup-py-for-pip-installation',
-    'https://www.edmundoptics.com/knowledge-center/tech-tools/focal-length/',
-    'https://doi.org/10.1080/713818864',
-    'https://doi.org/10.1167/8.2.13',
-    'https://doi.org/10.1080/10867651.1997.10487479',
-    'https://stackoverflow.com/questions/68073819/pypi-install-requires-direct-links',
-    'https://eyewiki.org/Lens_Material_Properties',
-]
+linkcheck_ignore = []
 
 linkcheck_timeout = 15
 linkcheck_workers = 3

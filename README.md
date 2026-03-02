@@ -104,6 +104,6 @@ This project is published under the [MIT License](https://github.com/drocheam/op
    * [prysm](https://prysm.readthedocs.io/en/stable/index.html) by Brandon Dube. Interferometer and diffraction calculations.
 
 - Geometrical + Wave Optics
-   * [opticspy](http://opticspy.org/) by Xing Fan. Tracing, wave optics, aberration and Zernike polynomial analysis.
+   * [opticspy](https://github.com/Sterncat/opticspy) by Xing Fan. Tracing, wave optics, aberration and Zernike polynomial analysis.
    * [raypier](https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model) by Bryan Cole. Raytracing and beamlet propagation with 3D viewer.
 

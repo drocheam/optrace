@@ -110,22 +110,33 @@ Scene
 
 **Overview**
 
-Details on the scene navigation are available in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>` under "Mouse Interaction".
-Inside the scene in the bottom left you can find orientation axes, that display the directions of the cartesian axes in the 3D view. 
-When an action/tasks is running, you are informed by a status text in the bottom right.
-A list of keyboard shortcuts is provided below.
+An overview of the mouse navigation and a list of keyboard shortcuts is provided below.
 
-.. list-table:: Available keyboards shortcuts inside the scene
+.. list-table:: Available mouse and keyboards shortcuts inside the scene
    :header-rows: 1
    :align: center
    :widths: 100 300
 
    * - Shortcut
      - Function
+   * - Mouse drag
+     - Rotate the camera view
+   * - Mouse wheel
+     - Zoom in or out
+   * - Shift + Mouse drag
+     - Move the camera view
+   * - Ctrl + Mouse drag
+     - Rotate the camera view around the center of the scene window
+   * - ``+`` and ``-``
+     - Zoom in or out
+   * - arrow keys
+     - move the camera view
+   * - shift + arrow keys
+     - rotate the camera view around the left-right or top-bottom axis of the scene
    * - ``i``
-     - sets the scene view to default view set by GUI parameter `initial_camera` or the y-side view if not provided
+     - sets the scene view to default view set by GUI parameter :python:`initial_camera` or the y-side view if not provided
    * - ``h``
-     - maximize scene (hide toolbar and sidebar)
+     - maximize scene (hides the sidebar)
    * - ``v``
      - toggle minimalistic view option
    * - ``c``
@@ -134,19 +145,14 @@ A list of keyboard shortcuts is provided below.
      - toggle label visibility
    * - ``d``
      - render detector image with the current settings
-   * - ``q``
+   * - ``0``
      - close all open pyplot plots
    * - ``n``
      - randomly re-chose the plotted rays
-   * - ``s``
-     - save a screenshot of the scene
-   * - ``f``
-     - | set the camera focal point to the position of the mouse. 
-       | Useful for scene rotations, since the geometry is rotated around this point.
-   * - ``l``
-     - change lighting properties
-   * - ``3``
-     - anaglyph view (view for red-cyan 3D glasses)
+
+Inside the scene in the bottom left you can find orientation axes, that display the directions of the cartesian axes in the 3D view. 
+The labels on the handles are clickable and set the camera to the corresponding view.
+When an action/tasks is running, you are informed by a status text in the bottom right of the scene.
 
 **Picking and Clicking**
 
@@ -169,13 +175,6 @@ This is useful when creating scene views for academic output, as the background 
 
   With :python:`plot_dark_mode` enabled.
    
-
-Toolbar
-######################
-
-The mayavi scene toolbar is positioned above the scene. 
-It includes buttons for the pipeline view window, different perspectives, fullscreen, screenshot saving and scene settings. 
-Details are available in the mayavi documentation :ref:`here <mayavi:interaction-with-the-scene>`.
 
 Sidebar
 ######################
@@ -201,7 +200,6 @@ The sidebar is positioned at the right side of the scene and consists of multipl
 The UI elements will be discussed in the following sections.
 
 .. list-table::
-   :align: center
    :class: table-borderless
 
    * - .. figure:: ../images/ui_main_tab.png
@@ -221,7 +219,6 @@ The UI elements will be discussed in the following sections.
 
 
 .. list-table::
-   :align: center
    :class: table-borderless
 
    * - .. figure:: ../images/ui_focus_tab.png
@@ -250,12 +247,6 @@ These will be discussed in :numref:`gui_windows`, but a quick overview is provid
    * - Window
      - Access
      - Function
-   * - Pipeline View
-     - Leftmost button in the toolbar
-     - Access to viewing and editing the mayavi graphical elements
-   * - Scene Settings
-     - Rightmost button in the toolbar
-     - mayavi settings, including lighting and scene properties
    * - Command Window
      - button at the bottom of the main tab in the sidebar
      - command execution and history for controlling the GUI and raytracer
@@ -585,24 +576,6 @@ Accessing or assigning these properties at runtime is described in :numref:`gui_
 Additional Windows
 ____________________
 
-Pipeline View
-#######################
-
-The pipeline of the mayavi scene allows for the viewing and alteration of different geometry objects of the visible scene. 
-For instance, you can change the colors or representation of different elements.
-Note that editing the visualization objects inside the scene is 
-different from changing the geometry objects inside the |Raytracer|.
-The former does not update the underlying geometry and does not update the rays.
-
-A more detailed information about the `pipeline view <https://docs.enthought.com/mayavi/mayavi/pipeline.html>`__ 
-and the `different objects populating the view <https://docs.enthought.com/mayavi/mayavi/mayavi_objects.html>`__ 
-are available in the mayavi documentation.
-
-.. figure:: ../images/ui_pipeline.png
-   :align: center
-   :width: 600
-   :class: dark-light
-
 .. _property_viewer:
 
 Property Viewer
@@ -665,6 +638,10 @@ There are multiple object aliases available to simplify coding inside the comman
      - Reference
    * - :python:`GUI`
      - the TraceGUI object (same as :python:`self`)
+   * - :python:`scene`
+     - the pyvista scene
+   * - :python:`camera`
+     - the camera of the pyvista scene
    * - :python:`RT`
      - the raytracer used
    * - :python:`LL`

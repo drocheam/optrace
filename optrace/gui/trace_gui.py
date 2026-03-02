@@ -48,7 +48,7 @@ class TraceGUI(HasTraits):
 
     rays_visible: Range = Range(1, ScenePlotting.MAX_RAYS_SHOWN, 2000, desc='the number of rays which is drawn', 
                                 enter_set=False, auto_set=False, label="Count", mode='logslider')
-    """Number of rays shown in mayavi scene"""
+    """Number of rays shown in scene"""
 
     z_det: Range = Range(low='_z_det_min', high='_z_det_max', value='_z_det_max', mode='text',
                          desc='z-Position of the Detector', enter_set=True, auto_set=True, label="z_det")

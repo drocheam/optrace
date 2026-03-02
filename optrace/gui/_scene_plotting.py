@@ -20,7 +20,7 @@ from .interactors import Picker, CameraOrientationWidgetFixes, KeyboardShortcuts
 
 class ScenePlotting:
     """
-    This class provides the functionality for plotting elements and rays of the raytracer inside a mayavi scene.
+    This class provides the functionality for plotting elements and rays of the raytracer inside a pyvista scene.
     It uses properties and settings from a TraceGUI.
     """
 
@@ -33,7 +33,7 @@ class ScenePlotting:
     LABEL_STYLE: dict = dict(font_size=12, bold=True, font_family="courier", shadow=True, italic=False)
     """Standard Text Style. Used for object labels, legends and axes"""
 
-    INFO_STYLE: dict = dict(font_size=14, bold=True, font_family="courier", shadow=True, italic=False)
+    INFO_STYLE: dict = dict(font_size=13, bold=True, font_family="courier", shadow=True, italic=False)
     """Info Text Style. Used for status messages and interaction overlay"""
 
     ##########
@@ -251,7 +251,7 @@ class ScenePlotting:
         fixes = CameraOrientationWidgetFixes(self, self.scene, self._orientation_axes)
         fixes.activate()
 
-        self._orientation_axes.GetRepresentation().SetSize(90, 90)
+        self._orientation_axes.GetRepresentation().SetSize(85, 85)
         self._orientation_axes.GetRepresentation().AnchorToLowerLeft()
         self._orientation_axes.GetRepresentation().SetVisibility(not bool(self.ui.minimalistic_view))
         
@@ -557,8 +557,9 @@ class ScenePlotting:
         ray_mesh = self.mesh_from_points(x, y, z, u, v, w, np.ones(x.shape[:2]))
 
         # add to scene
-        self._ray_highlight_plot = self.scene.add_mesh(ray_mesh, scalars="scalars", cmap=lt, opacity=1,
-                                                       line_width=self.ui.ray_width, point_size=self.ui.ray_width, 
+        self._ray_highlight_plot = self.scene.add_mesh(ray_mesh, scalars="scalars", cmap=lt, opacity=1.,
+                                                       line_width=self.ui.ray_width*1.5, 
+                                                       point_size=self.ui.ray_width*1.5, 
                                                        style="wireframe", render=False, lighting=False, 
                                                        name="Ray Highlight", render_points_as_spheres=True, 
                                                        pickable=False, show_scalar_bar=False)
@@ -1032,7 +1033,7 @@ class ScenePlotting:
                         visibility=self.ui.coloring_mode != "Plain")
         text_style = self.INFO_STYLE | dict(font_family=1, color=self._foreground_color) 
         self.apply_prop(bar.GetTitleTextProperty(), **text_style)
-        self.apply_prop(bar.GetLabelTextProperty(), **text_style)
+        self.apply_prop(bar.GetLabelTextProperty(), **(text_style | dict(font_size=12)))
 
         # right edge anchor at half height
         right_anchor = vtk.vtkCoordinate()

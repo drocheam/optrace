@@ -75,7 +75,7 @@ Wave Optics
    Interferometer and diffraction calculations.
    
 Geometrical + Wave Optics
- * `opticspy <http://opticspy.org/>`__ by Xing Fan. 
+ * `opticspy <https://github.com/Sterncat/opticspy>`__ by Xing Fan. 
    Tracing, wave optics, aberration and Zernike polynomial analysis.
  * `raypier <https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model>`__ by Bryan Cole. 
    Raytracing and beamlet propagation with 3D viewer.
