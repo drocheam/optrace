@@ -665,8 +665,6 @@ class GUITests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.install
     @pytest.mark.gui3
-    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
-                        reason="Issues with headless display and input in github actions")
     def test_key_presses(self):
         """test keyboard shortcuts inside the scene while simulating key presses"""
 
@@ -791,7 +789,6 @@ class GUITests(unittest.TestCase):
     @pytest.mark.install
     @pytest.mark.slow
     @pytest.mark.gui1
-    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_run_command(self):
         """test command setting and sending as well as automatic replotting (also tests TraceGUI.smart_replot()"""
 
@@ -911,7 +908,6 @@ class GUITests(unittest.TestCase):
         sim.debug(interact, args=(sim,))
 
     @pytest.mark.gui2
-    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", reason="Issues with headless display in github actions")
     def test_resize(self):
         """check if the application allows rescaling and no exceptions occur while rescaling"""
 
@@ -1314,8 +1310,6 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui2
-    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
-                        reason="Issues with headless display and input in github actions")
     def test_picker(self):
         """
         test picker interaction in the scene
@@ -1429,8 +1423,6 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.gui3
-    @pytest.mark.skipif(os.getenv("GITHUB_ACTIONS") == "true", 
-                        reason="Issues with headless display and input in github actions")
     def test_picker_coverage(self):
 
         RT = ot.Raytracer(outline=[-10, 10, -10, 10, 0, 10])
@@ -1763,7 +1755,6 @@ class GUITests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.os
     @pytest.mark.gui2
-    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_screenshot(self) -> None:
         
         RT = tracing_geometry()
@@ -1813,7 +1804,6 @@ class GUITests(unittest.TestCase):
 
     @pytest.mark.os
     @pytest.mark.gui1
-    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_custom_ui(self) -> None:
         """test if custom UI elements are correctly created, initialized and execute their action"""
 
@@ -1942,7 +1932,6 @@ class GUITests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.os
     @pytest.mark.gui3
-    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_plots_passdown(self) -> None:
         
         RT = tracing_geometry()
