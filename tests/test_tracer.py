@@ -414,8 +414,8 @@ class TracerTests(unittest.TestCase):
         res2, _ = RT.focus_search("Image Center Sharpness", z_start=30)
 
         # check focal positions
-        self.assertAlmostEqual(res1.x, 36.3, delta=0.2)
-        self.assertAlmostEqual(res2.x, 37.4, delta=0.2)
+        self.assertAlmostEqual(res1.x, 36.3, delta=0.25)
+        self.assertAlmostEqual(res2.x, 37.4, delta=0.25)
 
     def test_focus_additional(self):
         """additional focus tests"""

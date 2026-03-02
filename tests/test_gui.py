@@ -6,6 +6,7 @@ import copy
 import unittest
 import warnings
 import time
+import threading
 
 import logging
 from typing import Callable, Any
@@ -24,6 +25,7 @@ import optrace as ot
 from optrace.gui import TraceGUI
 from tracing_geometry import tracing_geometry
 from optrace.gui._scene_plotting import ScenePlotting
+
 
 # detecting traitsui exceptions, otherwise these aren't raised
 class TraitsCaptureHandler(logging.Handler):
@@ -72,15 +74,33 @@ class GUITests(unittest.TestCase):
             if tsum > timeout:
                 raise TimeoutError(f"Timeout while waiting for other actions to finish. Blocking actions: {sim._status}")
     
-    def _do_in_main(self, f: Callable, *args, **kw) -> None:
-        """execute a function in the GUI main thread"""
-        pyface_gui.invoke_later(f, *args, **kw)
-        pyface_gui.process_events()
+    def _set_in_main(self, sim, trait, val, wait=True):
+        """execute a function in the GUI main thread and wait for the result"""
+        done = threading.Event()
 
-    def _set_in_main(self, sim, trait: str, val: Any) -> None:
-        """assign a property in the GUI main thread"""
-        pyface_gui.set_trait_later(sim, trait, val)
-        pyface_gui.process_events()
+        def do_set():
+            setattr(sim, trait, val)
+            done.set()  # signal when done
+
+        pyface_gui.invoke_later(do_set)
+        done.wait(timeout=30)  # wait until GUI thread finishes
+
+        if wait:
+            self._wait_for_idle(sim, 0)
+    
+    def _do_in_main(self, sim, f: Callable, *args, wait=True, **kw):
+        """assign a property in the GUI main thread and wait for the result"""
+        done = threading.Event()
+
+        def do():
+            f(*args, **kw)
+            done.set()  # signal when done
+
+        pyface_gui.invoke_later(do)
+        done.wait(timeout=30)  # wait until GUI thread finishes
+
+        if wait:
+            self._wait_for_idle(sim, 0)
 
     @contextmanager
     def _try(self, sim, *args, **kwargs):
@@ -94,7 +114,7 @@ class GUITests(unittest.TestCase):
         except Exception as e:
             self.exc_info = sys.exc_info()  # assign thread exception
         finally:
-            self._do_in_main(sim.close)
+            self._do_in_main(sim, sim.close)
 
     def click_scene(self, sim, x, y, shift=False, right=False):
 
@@ -208,7 +228,6 @@ class GUITests(unittest.TestCase):
                     # change detector
                     dname0 = sim.detector_selection
                     self._set_in_main(sim, "detector_selection", sim.detector_names[i])
-                    self._wait_for_idle(sim)
 
                     dname1 = sim.detector_names[i]
                     if i:  # check if detector name changed from initial
@@ -220,123 +239,92 @@ class GUITests(unittest.TestCase):
                    
                     # change detector position
                     self._set_in_main(sim, "z_det", z0)
-                    self._wait_for_idle(sim)
                     dname2 = sim.detector_selection
                     self.assertEqual(sim.z_det, RT.detectors[i].pos[2])  # position updated
                     self.assertNotEqual(dname1, sim.detector_names[i])  # name updated after position change
                     self.assertEqual(dname2, sim.detector_names[i])  # name updated after position change
                     
                 # Source Image Tests
-                self._do_in_main(sim.source_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.source_image)
                 self._set_in_main(sim, "source_selection", sim.source_names[1])
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.source_image)
                 
                 # Detector Image Tests
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
-                self._wait_for_idle(sim)
                 self.assertTrue(sim._det_ind == 1)
                 self.assertTrue(sim.z_det == sim.raytracer.detectors[1].pos[2])
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
 
                 # detector profile and image with extent provided
                 extent = [-1, 1, -1, 1]
-                self._do_in_main(sim.detector_image, extent=extent)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image, extent=extent)
                 self.assertTrue(np.all(sim.last_det_image.extent == extent))
                 extent = [-1.2, 1, -1.2, 1]
-                self._do_in_main(sim.detector_profile, extent=extent)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_profile, extent=extent)
                 self.assertTrue(np.all(sim.last_det_image.extent == extent))
 
                 # Image Type Tests standard
                 for mode in ot.RenderImage.image_modes:
                     self._set_in_main(sim, "image_mode", mode)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.detector_image)
-                    self._wait_for_idle(sim)
-                self._do_in_main(plt.close, "all")
+                    self._do_in_main(sim, sim.detector_image)
+                self._do_in_main(sim, plt.close, "all")
 
                 # Image Tests Higher Res
                 self._set_in_main(sim, "image_pixels", 315)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
 
                 self._set_in_main(sim, "maximize_scene", True)
-                self._wait_for_idle(sim)
 
                 # Image Test Source, but actually we should test all parameter combinations,
-                self._do_in_main(sim.source_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.source_image)
 
                 # Focus Tests
                 pos0 = sim.raytracer.detectors[1].pos
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
-                self._wait_for_idle(sim)
 
                 for mode in ot.Raytracer.focus_search_methods:
                     self._set_in_main(sim, "focus_search_method", mode)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.move_to_focus)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim.move_to_focus)
                     self._set_in_main(sim, "z_det", pos0[2])
-                    self._wait_for_idle(sim)
 
                 # Focus Test 4, show Debug Plot
                 self._set_in_main(sim, "plot_cost_function", True)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.move_to_focus)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.move_to_focus)
 
                 # Focus Test 5, one source only
                 self._set_in_main(sim, "plot_cost_function", False)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "z_det", pos0[2])
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "focus_search_single_source", True)
-                self._do_in_main(sim.move_to_focus)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.move_to_focus)
                 
                 # Ray Coloring Tests
                 for type_ in sim.coloring_modes:
                     self._set_in_main(sim, "coloring_mode", type_)
-                    self._wait_for_idle(sim)
 
                 # special case: user defined spectral colormap
                 ot.global_options.spectral_colormap = lambda wl: plt.cm.viridis(wl/780)
                 self._set_in_main(sim, "coloring_mode", "Wavelength")
-                self._wait_for_idle(sim)
                 ot.global_options.spectral_colormap = None
 
                 # plotting_type Tests
                 for type_ in sim.plotting_modes:
                     self._set_in_main(sim, "plotting_mode", type_)
-                    self._wait_for_idle(sim)
              
                 # open documentation
-                self._do_in_main(sim.open_documentation)
+                self._do_in_main(sim, sim.open_documentation)
 
                 # retrace Tests
                 self._set_in_main(sim, "ray_count", 100000)
-                self._wait_for_idle(sim)
-                
                 self._set_in_main(sim, "rays_visible", 50)
-                self._wait_for_idle(sim)
-
                 self._set_in_main(sim, "rays_visible", 500)
 
         RT = tracing_geometry()
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
 
-    @pytest.mark.gui2
     @pytest.mark.slow
+    @pytest.mark.gui2
     def test_interaction2(self) -> None:
 
         def interact2(sim):
@@ -347,73 +335,55 @@ class GUITests(unittest.TestCase):
                 # display all image modes with log
                 for mode in ot.RenderImage.image_modes:
                     self._set_in_main(sim, "image_mode", mode)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.detector_image)
-                    self._wait_for_idle(sim)
-                self._do_in_main(plt.close, "all")
+                    self._do_in_main(sim, sim.detector_image)
+                self._do_in_main(sim, plt.close, "all")
 
                 # images with filter
                 self._set_in_main(sim, "filter_constant", 10)
                 self._set_in_main(sim, "activate_filter", True)
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
+                self._do_in_main(sim, sim.source_image)
 
                 # change ui dark mode while active
-                self._do_in_main(ot.global_options.__setattr__, "ui_dark_mode", not ot.global_options.ui_dark_mode)
+                self._do_in_main(sim, ot.global_options.__setattr__, "ui_dark_mode", not ot.global_options.ui_dark_mode)
                 
                 # Image Tests Flip
                 self._set_in_main(sim, "log_image", False)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "flip_detector_image", True)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
 
                 # one source only
                 self._set_in_main(sim, "detector_image_single_source", True)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
 
                 # make labels vertical
                 self._set_in_main(sim, "vertical_labels", True)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "vertical_labels", False)
-                self._wait_for_idle(sim)
                 
                 # change ui dark mode while active
-                self._do_in_main(ot.global_options.__setattr__, "ui_dark_mode", not ot.global_options.ui_dark_mode)
+                self._do_in_main(sim, ot.global_options.__setattr__, "ui_dark_mode", not ot.global_options.ui_dark_mode)
 
                 # high contrast mode
                 self._set_in_main(sim, "high_contrast", True)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "high_contrast", False)
-                self._wait_for_idle(sim)
 
                 # test different projection methods
                 self._set_in_main(sim, "detector_selection", sim.detector_names[1])
-                self._wait_for_idle(sim)
-                self._do_in_main(plt.close, "all")
+                self._do_in_main(sim, plt.close, "all")
                 for pm in ot.SphericalSurface.sphere_projection_methods:
                     self._set_in_main(sim, "projection_method", pm)
-                    self._do_in_main(sim.detector_image)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.detector_profile)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim.detector_image)
+                    self._do_in_main(sim, sim.detector_profile)
                     self.assertEqual(sim.last_det_image.projection, pm)
                 
                 # open browser light mode
-                self._do_in_main(ot.global_options.__setattr__, "ui_dark_mode", False)
-                self._do_in_main(sim.open_property_browser)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, ot.global_options.__setattr__, "ui_dark_mode", False)
+                self._do_in_main(sim, sim.open_property_browser)
                 # time.sleep(2)  # wait some time so windows can be seen by a human user
                
                 # open browser dark mode
-                self._do_in_main(ot.global_options.__setattr__, "ui_dark_mode", True)
-                self._do_in_main(sim.open_property_browser)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, ot.global_options.__setattr__, "ui_dark_mode", True)
+                self._do_in_main(sim, sim.open_property_browser)
 
                 # check that the ray number maximum has been set in the TraceGUI
                 max_ = sim.raytracer.rays.max_rays_for_size(sim.raytracer.MAX_RAY_STORAGE_RAM, 
@@ -421,14 +391,9 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(max_, sim._ray_count_max)
                 
                 # try setting too many rays, the TraceGUI should not change
-                # temporarily bypass the exception handling, 
-                # as the error would be raised in the Qt event loop outside this scope
+                # do with run_command so the traits exception is caught
                 rc0 = sim.ray_count
-                excepthook_old = sys.excepthook
-                sys.excepthook = lambda a, b, c: 0
-                self._set_in_main(sim, "ray_count", max_+10)
-                self._wait_for_idle(sim, base=0.5)
-                sys.excepthook = excepthook_old
+                self._do_in_main(sim, sim.run_command, f"self.ray_count = {max_+10}")
                 self.assertEqual(rc0, sim.ray_count)
 
         RT = tracing_geometry()
@@ -444,33 +409,23 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
                 
                 # test source and detector spectrum
-                self._do_in_main(sim.source_spectrum)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_spectrum)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.source_spectrum)
+                self._do_in_main(sim, sim.detector_spectrum)
                 self._set_in_main(sim, "detector_spectrum_single_source", True)
-                self._do_in_main(sim.detector_spectrum)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_spectrum)
 
                 # test image profiles
-                self._do_in_main(sim.source_profile)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.source_profile)
                 self._set_in_main(sim, "detector_image_single_source", True)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_profile)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_profile)
                 self._set_in_main(sim, "profile_position_dimension", "x")
-                self._do_in_main(sim.detector_profile)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_profile)
                 self._set_in_main(sim, "profile_position_dimension", "y")
-                self._do_in_main(sim.detector_profile)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_profile)
                 self._set_in_main(sim, "profile_position", 0)  # exists inside image
-                self._do_in_main(sim.detector_profile)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_profile)
                 self._set_in_main(sim, "profile_position", 100)  # does not exist inside image
-                self._do_in_main(sim.detector_profile)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_profile)
 
         RT = tracing_geometry()
         sim = TraceGUI(RT)
@@ -487,44 +442,28 @@ class GUITests(unittest.TestCase):
 
             def interact(sim):
                 with self._try(sim):
-                    self._do_in_main(sim.detector_image)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.move_to_focus)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim.detector_image)
+                    self._do_in_main(sim, sim.move_to_focus)
                     self._set_in_main(sim, "z_det", 10.)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.source_image)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim.source_image)
                     self._set_in_main(sim, "ray_opacity", 0.07)
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "ray_width", 5)
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "ray_count", 100000)
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "rays_visible", 4000)
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "minimalistic_view", True)
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "coloring_mode", "Power")
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "hide_labels", True)
-                    self._wait_for_idle(sim)
                     self._set_in_main(sim, "plotting_mode", "Points")
 
                     self._set_in_main(sim, "high_contrast", True)
-                    self._wait_for_idle(sim)
                     
-                    self._do_in_main(sim._change_selected_ray_source)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim._change_detector)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim._change_selected_ray_source)
+                    self._do_in_main(sim, sim._change_detector)
                     
-                    self._do_in_main(sim.source_spectrum)
-                    self._wait_for_idle(sim)
-                    self._do_in_main(sim.detector_spectrum)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim.source_spectrum)
+                    self._do_in_main(sim, sim.detector_spectrum)
 
-                    self._do_in_main(sim.replot)
+                    self._do_in_main(sim, sim.replot)
 
             sim.debug(interact, args=(sim,))
             time.sleep(1)
@@ -564,35 +503,35 @@ class GUITests(unittest.TestCase):
             
             with self._try(sim):
                 N0 = sim.ray_count
-                self._set_in_main(sim, "ray_count", int(N0*1.3))
-                self._set_in_main(sim, "focus_search_method", "Image Sharpness")
-                self._do_in_main(sim.detector_image)
-                self._do_in_main(sim.source_image)
-                self._do_in_main(sim.move_to_focus)
+                self._set_in_main(sim, "ray_count", int(N0*1.3), wait=False)
+                self._set_in_main(sim, "focus_search_method", "Image Sharpness", wait=False)
+                self._do_in_main(sim, sim.detector_image, wait=False)
+                self._do_in_main(sim, sim.source_image, wait=False)
+                self._do_in_main(sim, sim.move_to_focus, wait=False)
 
                 time.sleep(0.01)
-                self._set_in_main(sim, "ray_count", int(N0/1.3))
-                self._set_in_main(sim, "z_det", (RT.outline[5] - RT.outline[4])/2)
-                self._do_in_main(sim.source_profile)
-                self._do_in_main(sim.move_to_focus)
-                self._set_in_main(sim, "detector_selection", sim.detector_names[1])
-                self._do_in_main(sim.detector_image)
-                self._do_in_main(sim.replot_rays)
-                self._do_in_main(sim.source_image)
+                self._set_in_main(sim, "ray_count", int(N0/1.3), wait=False)
+                self._set_in_main(sim, "z_det", (RT.outline[5] - RT.outline[4])/2, wait=False)
+                self._do_in_main(sim, sim.source_profile, wait=False)
+                self._do_in_main(sim, sim.move_to_focus, wait=False)
+                self._set_in_main(sim, "detector_selection", sim.detector_names[1], wait=False)
+                self._do_in_main(sim, sim.detector_image, wait=False)
+                self._do_in_main(sim, sim.replot_rays, wait=False)
+                self._do_in_main(sim, sim.source_image, wait=False)
 
                 time.sleep(0.1)
-                self._do_in_main(sim.replot_rays)
-                self._do_in_main(sim.run_command, "GUI.replot()")
-                self._do_in_main(sim.detector_image)
-                self._do_in_main(sim.screenshot, "tmp.png") 
-                self._set_in_main(sim, "detector_selection", sim.detector_names[1])
+                self._do_in_main(sim, sim.replot_rays, wait=False)
+                self._do_in_main(sim, sim.run_command, "GUI.replot()", wait=False)
+                self._do_in_main(sim, sim.detector_image, wait=False)
+                self._do_in_main(sim, sim.screenshot, "tmp.png", wait=False) 
+                self._set_in_main(sim, "detector_selection", sim.detector_names[1], wait=False)
 
-                self._set_in_main(sim, "ray_count", 1000000)
-                self._do_in_main(sim.replot_rays)
-                self._do_in_main(sim.set_camera, [5, 10, 3], 30)
-                self._set_in_main(sim, "detector_selection", sim.detector_names[1])
-                self._do_in_main(sim.move_to_focus)
-                self._do_in_main(sim.source_spectrum)
+                self._set_in_main(sim, "ray_count", 1000000, wait=False)
+                self._do_in_main(sim, sim.replot_rays, wait=False)
+                self._do_in_main(sim, sim.set_camera, [5, 10, 3], 30, wait=False)
+                self._set_in_main(sim, "detector_selection", sim.detector_names[1], wait=False)
+                self._do_in_main(sim, sim.move_to_focus, wait=False)
+                self._do_in_main(sim, sim.source_spectrum, wait=False)
                 
                 self._wait_for_idle(sim, timeout=45)
 
@@ -615,13 +554,11 @@ class GUITests(unittest.TestCase):
                 # check if replot actually removes old plot elements
                 L0id = id(sim._plot._lens_plots[0][0])
                 F0id = id(sim._plot._filter_plots[0][0])
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertNotEqual(L0id, id(sim._plot._lens_plots[0][0]))
                 self.assertNotEqual(F0id, id(sim._plot._filter_plots[0][0]))
 
                 self._set_in_main(sim, "ray_count", 20000)  # fewer rays so tracing is faster
-                self._wait_for_idle(sim)
 
                 rtp = RT.property_snapshot()
                 cmp = RT.compare_property_snapshot(rtp, rtp)
@@ -637,8 +574,7 @@ class GUITests(unittest.TestCase):
 
                     cmp["Any"] = any_
 
-                    self._do_in_main(sim.replot, cmp)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim.replot, cmp)
 
         sim.debug(interact, args=(sim,))
 
@@ -687,42 +623,42 @@ class GUITests(unittest.TestCase):
 
                     match np.random.randint(0, 13):
                         case 0:
-                            self._do_in_main(np.random.choice(funcs))
+                            self._do_in_main(sim, np.random.choice(funcs), wait=False)
                         case 1 | 11:
                             ch = np.random.randint(0, len(props))
-                            self._set_in_main(sim, *props[ch])
+                            self._set_in_main(sim, *props[ch], wait=False)
                         case 2:
-                            self._set_in_main(sim, "coloring_mode", np.random.choice(sim.coloring_modes))
+                            self._set_in_main(sim, "coloring_mode", np.random.choice(sim.coloring_modes), wait=False)
                         case 3:
                             # only every second time, otherwise this would happen to often
                             if np.random.randint(0, 2):
-                                self._set_in_main(sim, "ray_count", np.random.randint(10000, 500000))
+                                self._set_in_main(sim, "ray_count", np.random.randint(10000, 500000), wait=False)
                         case 4:
-                            self._set_in_main(sim, "focus_search_method", np.random.choice(RT.focus_search_methods))
+                            self._set_in_main(sim, "focus_search_method", np.random.choice(RT.focus_search_methods), wait=False)
                         case 5:
-                            self._set_in_main(sim, "image_mode", np.random.choice(ot.RenderImage.image_modes))
+                            self._set_in_main(sim, "image_mode", np.random.choice(ot.RenderImage.image_modes), wait=False)
                         case 6:
-                            self._set_in_main(sim, "detector_selection", np.random.choice(sim.detector_names))
+                            self._set_in_main(sim, "detector_selection", np.random.choice(sim.detector_names), wait=False)
                         case 7:
-                            self._set_in_main(sim, "source_selection", np.random.choice(sim.source_names))
+                            self._set_in_main(sim, "source_selection", np.random.choice(sim.source_names), wait=False)
                         case 8:
-                            self._set_in_main(sim, "z_det", np.random.uniform(RT.outline[4], RT.outline[5]))
+                            self._set_in_main(sim, "z_det", np.random.uniform(RT.outline[4], RT.outline[5]), wait=False)
                         case 9:
-                            self._set_in_main(sim, "image_pixels", np.random.choice(ot.RenderImage.SIZES))
+                            self._set_in_main(sim, "image_pixels", np.random.choice(ot.RenderImage.SIZES), wait=False)
                         case 10:
                             cmds = ['GUI.replot()', 'scene.render()', 'scene.z_minus_view()']
                             cmd = np.random.choice(cmds)
-                            self._do_in_main(sim.run_command, cmd)
+                            self._do_in_main(sim, sim.run_command, cmd, wait=False)
                         case 12:
                             if isinstance(sim.raytracer.detectors[sim._det_ind].front, ot.SphericalSurface):
                                 self._set_in_main(sim, "projection_method", 
-                                                 np.random.choice(ot.SphericalSurface.sphere_projection_methods))
+                                                 np.random.choice(ot.SphericalSurface.sphere_projection_methods), wait=False)
 
                     # self._wait_for_idle(sim)
 
                     # close plots from time to time
                     if i % 20 == 0:
-                        self._do_in_main(plt.close, "all")
+                        self._do_in_main(sim, plt.close, "all")
         
         sim.debug(interact, args=(sim,))
    
@@ -753,9 +689,8 @@ class GUITests(unittest.TestCase):
                 sim.scene.interactor.InvokeEvent("KeyPressEvent")
                 sim.scene.interactor.InvokeEvent("KeyReleaseEvent")
 
-            self._do_in_main(key_press, sim, key, sym)
-            self._wait_for_idle(sim)
-            time.sleep(0.3)
+            self._do_in_main(sim, key_press, sim, key, sym)
+            self._wait_for_idle(sim, base=0.3)
 
         def interact(sim):
             with self._try(sim):
@@ -765,91 +700,73 @@ class GUITests(unittest.TestCase):
                 # check minimalistic_view shortcut
                 self.assertTrue(len(sim.minimalistic_view) == 0)
                 send_key(sim, "v")
-                self._wait_for_idle(sim)
                 warnings.warn(str(sim._status))
                 self.assertTrue(len(sim.minimalistic_view) != 0)
                 
                 # check high_contrast shortcut
                 self.assertTrue(len(sim.high_contrast) == 0)
                 send_key(sim, "c")
-                self._wait_for_idle(sim)
                 self.assertTrue(len(sim.high_contrast) != 0)
                 
                 # check hide_labels shortcut
                 self.assertTrue(len(sim.hide_labels) == 0)
                 send_key(sim, "b")
-                self._wait_for_idle(sim)
                 self.assertTrue(len(sim.hide_labels) != 0)
                 
                 # set camera to initial view
-                self._do_in_main(sim.scene.view_vector, (1, 0, 0), viewup=(0, 1, 0))
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.scene.view_vector, (1, 0, 0), viewup=(0, 1, 0))
                 cv = sim.scene.camera.position
                 send_key(sim, "i")
-                self._wait_for_idle(sim)
                 cv2 = sim.scene.camera.position
                 self.assertFalse(np.allclose(cv, cv2))
                 
                 # maximize scene / hide other menus
                 self.assertTrue(sim._scene_not_maximized)
                 send_key(sim, "h")
-                self._wait_for_idle(sim)
                 self.assertFalse(sim._scene_not_maximized)
                 
                 # zooming in and out
                 sc = sim.scene.camera.parallel_scale
                 send_key(sim, "+")
-                self._wait_for_idle(sim)
                 self.assertTrue(sim.scene.camera.parallel_scale < sc)
                 send_key(sim, "-")
-                self._wait_for_idle(sim)
                 self.assertAlmostEqual(sim.scene.camera.parallel_scale, sc)
 
                 # check scene rotation
                 sim.scene.interactor.shift_key = True
                 el = sim.scene.camera.elevation
                 send_key(sim, sym="Up")
-                self._wait_for_idle(sim)
                 self.assertNotAlmostEqual(sim.scene.camera.elevation, el)
                 send_key(sim, sym="Down")
-                self._wait_for_idle(sim)
                 self.assertAlmostEqual(sim.scene.camera.elevation, el)
                 az = sim.scene.camera.azimuth
                 send_key(sim, sym="Left")
-                self._wait_for_idle(sim)
                 self.assertNotAlmostEqual(sim.scene.camera.azimuth, az)
                 send_key(sim, sym="Right")
-                self._wait_for_idle(sim)
                 self.assertAlmostEqual(sim.scene.camera.azimuth, az)
                 sim.scene.interactor.shift_key = False
 
                 # check scene movement
                 cam_pos = np.array(sim.scene.camera.position)
                 send_key(sim, sym="Up")
-                self._wait_for_idle(sim)
                 self.assertFalse(np.allclose(sim.scene.camera.position, cam_pos))
                 self.assertTrue(cam_pos[1] < sim.scene.camera.position[1]-1e-2)  # move camera down in this yz-view
                 self.assertTrue(np.allclose(cam_pos[::2], np.array(sim.scene.camera.position)[::2])) # others unchanged
                 send_key(sim, sym="Down")
-                self._wait_for_idle(sim)
                 self.assertTrue(np.allclose(sim.scene.camera.position, cam_pos))
                 send_key(sim, sym="Left")
-                self._wait_for_idle(sim)
                 self.assertFalse(np.allclose(sim.scene.camera.position, cam_pos))
                 self.assertTrue(cam_pos[2] > sim.scene.camera.position[2]+1e-2)  # move camera right in this yz-view
                 self.assertTrue(np.allclose(cam_pos[:2], np.array(sim.scene.camera.position)[:2])) # others unchanged
                 send_key(sim, sym="Right")
-                self._wait_for_idle(sim)
                 self.assertTrue(np.allclose(sim.scene.camera.position, cam_pos))
                 
                 # key without shortcut
                 send_key(sim, "w")
-                self._wait_for_idle(sim)
                 
                 # replot rays
                 id0 = id(sim._plot._ray_property_dict["p"])
                 send_key(sim, "n")
-                self._wait_for_idle(sim)
                 self.assertNotEqual(id0, id(sim._plot._ray_property_dict["p"]))  # array changed, therefore the id too
              
                 # check if pyplot closing works.
@@ -857,7 +774,6 @@ class GUITests(unittest.TestCase):
                 # we will close a pyplot that was created before the gui
                 wlen = len(plt.get_fignums())
                 send_key(sim, "0")
-                self._wait_for_idle(sim)
                 wlen2 = len(plt.get_fignums())
                 self.assertNotEqual(wlen, wlen2)
                 
@@ -866,7 +782,6 @@ class GUITests(unittest.TestCase):
                 # check DetectorImage shortcut
                 self.assertTrue(sim.last_det_image is None)
                 send_key(sim, "d")
-                self._wait_for_idle(sim)
                 self.assertTrue(sim.last_det_image is not None)
 
         sim.debug(interact, args=(sim,))
@@ -885,7 +800,7 @@ class GUITests(unittest.TestCase):
 
         def send(cmd):
             sim.command_window.cmd = cmd
-            self._do_in_main(sim.command_window.send_command)
+            self._do_in_main(sim, sim.command_window.send_command)
             self._wait_for_idle(sim)
 
         def interact(sim):
@@ -929,7 +844,7 @@ class GUITests(unittest.TestCase):
                 self.assertNotEqual(ml0, ml1)
 
                 # check if automatic replot/retrace setting is applied
-                self._do_in_main(sim.open_command_window)
+                self._do_in_main(sim, sim.open_command_window)
                 sim.command_window.automatic_replot = False
                 id0 = id(sim._plot._ray_property_dict["p"])
                 send("RT.remove(LL[0])")
@@ -938,17 +853,12 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(id0, id1)  # same ID -> not retraced
                 
                 sim.command_window.automatic_replot = True
-                # self._wait_for_idle(sim)
 
                 # Misc tests
 
-                self._do_in_main(sim.command_window._replot)  # replot button
-                self._wait_for_idle(sim)
-
-                self._do_in_main(sim.open_command_window)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.open_command_window)  # reopen
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window._replot)  # replot button
+                self._do_in_main(sim, sim.open_command_window)
+                self._do_in_main(sim, sim.open_command_window)  # reopen
                 
                 send("")  # check empty command
                 send("throw RuntimeError()")  # check if exceptions are handled
@@ -956,25 +866,21 @@ class GUITests(unittest.TestCase):
 
                 # send empty command using command window
                 sim.command_window.cmd = ""
-                self._do_in_main(sim.command_window.send_command)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window.send_command)
 
                 # send actual command using command window
                 sim.command_window.cmd = "self.replot()"
-                self._do_in_main(sim.command_window.send_command)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window.send_command)
 
                 # resend command, history does not get updated with same command
-                self._do_in_main(sim.command_window.send_command)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window.send_command)
               
                 # toggle dark mode
-                self._do_in_main(ot.global_options.__setattr__, "ui_dark_mode", not ot.global_options.ui_dark_mode)
+                self._do_in_main(sim, ot.global_options.__setattr__, "ui_dark_mode", not ot.global_options.ui_dark_mode)
                 time.sleep(0.5)
 
                 # clear history
-                self._do_in_main(sim.command_window.clear_history)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window.clear_history)
                 time.sleep(0.2)
                 self.assertEqual(sim.command_window.history, [])
 
@@ -988,20 +894,16 @@ class GUITests(unittest.TestCase):
                     warnings.warn("Copying to clipboard failed. Can by a system or library issue.")
                 
                 # check that empty strings are copied correctly in the command window
-                self._do_in_main(sim.command_window.copy_history)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window.copy_history)
                 if can_copy:
                     self.assertEqual(clipboard.text(), "")
                    
                 # check if full history is copied
                 sim.command_window.cmd = "self.replot()"
-                self._do_in_main(sim.command_window.send_command)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window.send_command)
                 sim.command_window.cmd = "a=5"
-                self._do_in_main(sim.command_window.send_command)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.command_window.copy_history)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.command_window.send_command)
+                self._do_in_main(sim, sim.command_window.copy_history)
                 time.sleep(0.5)  # somehow needed, maybe system handles clipboard with delay
                 if can_copy:
                     self.assertEqual(clipboard.text(), "self.replot()\na=5\n")
@@ -1020,7 +922,6 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
 
                 self._set_in_main(sim, "coloring_mode", "Power")  # shows a side bar, that also needs to be rescaled
-                self._wait_for_idle(sim)
 
                 SceneSizei0 = sim.scene.window_size.copy()
                 Window = sim.scene.parent().parent().parent().parent().parent()
@@ -1034,7 +935,7 @@ class GUITests(unittest.TestCase):
                 dt = 0.5
 
                 # enlarge
-                self._do_in_main(Window.resize, *ss1.astype(int))
+                self._do_in_main(sim, Window.resize, *ss1.astype(int))
                 time.sleep(dt)  # how to check how much time it takes?
 
                 # check if window was actually resized
@@ -1046,17 +947,17 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(np.all(SceneSizei0 == SceneSizei1))
 
                 # check some resizing constellations
-                self._do_in_main(Window.resize, *ss2.astype(int))
+                self._do_in_main(sim, Window.resize, *ss2.astype(int))
                 time.sleep(dt)
-                self._do_in_main(Window.showFullScreen)
+                self._do_in_main(sim, Window.showFullScreen)
                 time.sleep(dt)
-                self._do_in_main(Window.showMaximized)
+                self._do_in_main(sim, Window.showMaximized)
                 time.sleep(dt)
-                self._do_in_main(Window.showMinimized)
+                self._do_in_main(sim, Window.showMinimized)
                 time.sleep(dt)
-                self._do_in_main(Window.showNormal)
+                self._do_in_main(sim, Window.showNormal)
                 time.sleep(dt)
-                self._do_in_main(Window.resize, *ss0.astype(int))
+                self._do_in_main(sim, Window.resize, *ss0.astype(int))
                 time.sleep(dt)
                 
         sim.debug(interact, args=(sim,))
@@ -1069,7 +970,7 @@ class GUITests(unittest.TestCase):
         works correctly
         """
        
-       # make raytracer
+        # make raytracer
         RT = ot.Raytracer(outline=[-5, 5, -5, 5, -5, 60])
 
         # add Raysource
@@ -1089,10 +990,8 @@ class GUITests(unittest.TestCase):
         def interact(sim):
             with self._try(sim):
                 self._set_in_main(sim, "coloring_mode", "Wavelength")
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "plotting_mode", "Points")
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.replot)
+                self._do_in_main(sim, sim.replot)
 
         sim.debug(interact, args=(sim,))
 
@@ -1108,40 +1007,32 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
                 # check handling of profile values outside the image
                 self._set_in_main(sim, "profile_position", 500)
-                self._do_in_main(sim.source_profile)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_profile)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.source_profile)
+                self._do_in_main(sim, sim.source_profile)
 
                 # refraction index box replotting with vertical labels
                 self._set_in_main(sim, "vertical_labels", True)
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
 
                 # mock no_pol mode, check if coloring type handles this
                 RT.no_pol = True
                 self._set_in_main(sim, "coloring_mode", "Polarization yz")
-                self._wait_for_idle(sim)
 
                 # make sure x polarization gets plotted at least once
                 RT.no_pol = False
                 RT.ray_sources[0].polarization = "x"
                 self._set_in_main(sim, "coloring_mode", "Polarization yz")
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.retrace)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.retrace)
 
                 # skip on InitScene
                 sim._status["InitScene"] = 1
-                self._do_in_main(sim._change_minimalistic_view)
+                self._do_in_main(sim, sim._change_minimalistic_view, wait=False)
                 time.sleep(2)  # make sure it gets executed, can't call wait_for_idle since we set InitScene
                 sim._status["InitScene"] = 0
-                self._wait_for_idle(sim)
 
                 # check if rays are removed correctly in replot()
                 assert len(RT.ray_sources) and RT.rays.N and sim._plot._ray_plot is not None
-                self._do_in_main(sim.run_command, "RT.clear()")
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.run_command, "RT.clear()")
                 self.assertTrue(sim._plot._ray_plot is None)
                 self.assertFalse(sim._plot._ray_property_dict)
 
@@ -1160,39 +1051,32 @@ class GUITests(unittest.TestCase):
 
                 # delete one raysource plot but still try to color it
                 sim._plot._ray_source_plots = sim._plot._ray_source_plots[:-1]
-                self._do_in_main(sim.retrace)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.retrace)
 
                 # only time replotting the orientation axes, since normally they don't need to change
-                self._do_in_main(sim._plot.plot_orientation_axes)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim._plot.plot_orientation_axes)
 
                 # assign some weird outline so plot axes finds no optimal number of labels 
                 RT.outline = [-123., 10*np.pi, -12, 12.468786, -500.46504654065/np.pi, 124.456]
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
 
                 # open property browser with cardinal points, although we now don't have rotational symmetry
                 RT.lenses[0].move_to([0, 0.02, 2])
                 # coverage for property browser: must unroll single ndarray element
                 sim.abc = np.array([1.]) 
-                self._do_in_main(sim.open_property_browser)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.open_property_browser) # reopen
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.open_property_browser)
+                self._do_in_main(sim, sim.open_property_browser) # reopen
 
                 # special case where we don't need to retrace or redraw the rays
                 h = RT.property_snapshot()
                 cmp = RT.compare_property_snapshot(h, h)
                 cmp["Any"] = True
                 cmp["Detectors"] = True
-                self._do_in_main(sim.replot, cmp)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot, cmp)
               
                 sim._plot._filter_plots[0] = (sim._plot._filter_plots[0][0], None, None, None,
                                         sim._plot._filter_plots[0][4])
                 sim._plot._aperture_plots[0] = (sim._plot._aperture_plots[0][0], None, None, None, None)
-                self._wait_for_idle(sim)
 
                 # check exception handling of raytracer actions
                 # for this we assign wrong detector and source indices
@@ -1203,27 +1087,19 @@ class GUITests(unittest.TestCase):
                 sim._source_ind = 50
                 self._set_in_main(sim, "focus_search_single_source", True)
                 self._set_in_main(sim, "detector_image_single_source", True)
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_profile)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_spectrum)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_image)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_profile)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_spectrum)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.move_to_focus)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
+                self._do_in_main(sim, sim.detector_profile)
+                self._do_in_main(sim, sim.detector_spectrum)
+                self._do_in_main(sim, sim.source_image)
+                self._do_in_main(sim, sim.source_profile)
+                self._do_in_main(sim, sim.source_spectrum)
+                self._do_in_main(sim, sim.move_to_focus)
                 sim._det_ind = 0
                 sim._source_ind = 0
 
                 # remove old ray plot when an error tracing occurred
                 RT.lenses[0].move_to(RT.lenses[1].pos)
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertTrue(sim._plot._ray_plot is None)
                 
                 # still works when some objects are none
@@ -1231,8 +1107,7 @@ class GUITests(unittest.TestCase):
                 tn4 = (None, None, None, None)
                 sim._plot._index_box_plots[0] = tn4
                 sim._plot._ray_source_plots[0] = tn4
-                self._do_in_main(sim._change_minimalistic_view)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim._change_minimalistic_view)
 
         sim.debug(interact, args=(sim,))
 
@@ -1312,45 +1187,28 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(len(RT.markers) > 0)  # fault markers in RT
 
                 # retrace and print error message
-                self._do_in_main(sim.retrace)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.retrace)
 
                 # try actions with missing rays
-                self._do_in_main(sim.detector_image)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.move_to_focus)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_image)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.detector_image)
+                self._do_in_main(sim, sim.move_to_focus)
+                self._do_in_main(sim, sim.source_image)
                 self._set_in_main(sim, "ray_opacity", 0.05)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "ray_width", 5)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "ray_count", 100000)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "rays_visible", 3000)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "minimalistic_view", True)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "coloring_mode", "Power")
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "plotting_mode", "Points")
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.source_spectrum)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.detector_spectrum)
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.open_property_browser)  # should lead to collision error
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.source_spectrum)
+                self._do_in_main(sim, sim.detector_spectrum)
+                self._do_in_main(sim, sim.open_property_browser)  # should lead to collision error
+                self._do_in_main(sim, sim.replot)
 
                 # leave only one lens, now it can be traced
                 # this also removes the old fault markers
                 RT.remove(RT.lenses[1:])
-                self._do_in_main(sim.replot)
-                time.sleep(0.5)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertTrue(RT.rays.N > 0)  # rays traced
                 self.assertEqual(len(sim._plot._fault_markers), 0)  # no fault_marker in GUI
                 self.assertEqual(len(RT.markers), 0)  # no fault markers in RT
@@ -1370,16 +1228,14 @@ class GUITests(unittest.TestCase):
 
                 # marker 1, default size
                 RT.add(ot.PointMarker("Test1", [0., 0., 0]))
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertEqual(len(sim._plot._point_marker_plots), 1)  # element was added
                 center = sim._plot._point_marker_plots[0][0].mapper.GetInputDataObject(0, 0).center
                 self.assertTrue(np.allclose(center, 0))  # check position
 
                 # marker 2, enlarged
                 RT.add(ot.PointMarker("Test2", [0., 1., 5.2], text_factor=2, marker_factor=2))
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertEqual(len(sim._plot._point_marker_plots), 2)  # element was added
                 center = sim._plot._point_marker_plots[1][0].mapper.GetInputDataObject(0, 0).bounds[::2]
                 self.assertTrue(np.allclose(center- np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
@@ -1402,8 +1258,7 @@ class GUITests(unittest.TestCase):
                 RT.markers[0].label_only = True
 
                 # check replotting of markers
-                self._do_in_main(sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
                 self.assertEqual(len(sim._plot._point_marker_plots), 1)  # element was removed in scene
 
@@ -1427,16 +1282,14 @@ class GUITests(unittest.TestCase):
 
                 # marker 1, default size
                 RT.add(ot.LineMarker(r=5, desc="Test1", pos=[0., 0., 0]))
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was added
                 center = sim._plot._line_marker_plots[0][0].mapper.GetInputDataObject(0, 0).center
                 self.assertTrue(np.allclose(center, 0))  # check position
 
                 # marker 2, enlarged
                 RT.add(ot.LineMarker(r=5, angle=-20, desc="Test2", pos=[0., 1., 5.2], text_factor=2, line_factor=2))
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertEqual(len(sim._plot._line_marker_plots), 2)  # element was added
                 center = sim._plot._line_marker_plots[1][0].mapper.GetInputDataObject(0, 0).center
                 self.assertTrue(np.allclose(center - np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
@@ -1452,8 +1305,7 @@ class GUITests(unittest.TestCase):
                 self.assertEqual(b[3].mapper.GetInputDataObject(0, 0).GetLabels().GetValue(0), "Test2")
 
                 # check replotting of markers
-                self._do_in_main(sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
                 self.assertEqual(len(RT.markers), 1)  # element was removed in raytracer
                 self.assertEqual(len(sim._plot._line_marker_plots), 1)  # element was removed in scene
 
@@ -1478,22 +1330,19 @@ class GUITests(unittest.TestCase):
             with self._try(sim):
         
                 # change to z+ view, so there are rays at the middle of the scene
-                self._do_in_main(sim.scene.view_vector, (0, 0, 1))
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.scene.view_vector, (0, 0, 1))
            
                 default_text = sim._plot._ray_text.GetText(2)  # save default text for comparison
 
                 # ray picked -> show default infos
-                self._do_in_main(self.click_scene, sim, 1/2, 1/ 2)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, self.click_scene, sim, 1/2, 1/ 2)
                 time.sleep(0.2)
                 text1 = sim._plot._ray_text.GetText(2)
                 self.assertNotEqual(text1, default_text)  # shows a ray info text
                 self.assertTrue(sim._plot._ray_highlight_plot.visibility)  # show highlighted ray
               
                 # ray picked -> show verbose info
-                self._do_in_main(self.click_scene, sim, 1/2, 1/2, shift=True)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, self.click_scene, sim, 1/2, 1/2, shift=True)
                 time.sleep(0.2)
                 text2 = sim._plot._ray_text.GetText(2)
                 self.assertNotEqual(text2, default_text)  # no default text
@@ -1501,8 +1350,7 @@ class GUITests(unittest.TestCase):
                 self.assertTrue(sim._plot._ray_highlight_plot.visibility)  # show highlighted ray
                
                 # no ray picked -> default text
-                self._do_in_main(self.click_scene, sim, 0, 0)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, self.click_scene, sim, 0, 0)
                 time.sleep(0.2)
                 text2 = sim._plot._ray_text.GetText(2)
                 self.assertEqual(text2, default_text)  # shows default text
@@ -1510,26 +1358,23 @@ class GUITests(unittest.TestCase):
               
                 # redraw ray info only if it is the default one
                 self._set_in_main(sim, "minimalistic_view", True)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "minimalistic_view", False)
-                self._wait_for_idle(sim)
 
                 # remove crosshair and pick a ray
                 sim._plot._crosshair = None
-                self._do_in_main(self.click_scene, sim, 1/2, 1/2)
+                self._do_in_main(sim, self.click_scene, sim, 1/2, 1/2)
 
                 # remove crosshair and pick no ray
-                self._do_in_main(self.click_scene, sim, 0, 0)
+                self._do_in_main(sim, self.click_scene, sim, 0, 0)
                 
                 # restore crosshair
-                self._do_in_main(sim._plot.set_crosshair, [0, 0, 0])
-                self._do_in_main(sim._plot.hide_crosshair)
+                self._do_in_main(sim, sim._plot.set_crosshair, [0, 0, 0])
+                self._do_in_main(sim, sim._plot.hide_crosshair)
 
                 # space picked -> show coordinates
                 time.sleep(0.3)
-                self._do_in_main(self.click_scene, sim, sim.scene.window_size[0]/3, 
+                self._do_in_main(sim, self.click_scene, sim, sim.scene.window_size[0]/3, 
                                  sim.scene.window_size[1]/3, right=True)
-                self._wait_for_idle(sim)
                 time.sleep(0.2)
                 text3 = sim._plot._ray_text.GetText(2)
                 self.assertNotEqual(text3, default_text)  # not the default text
@@ -1539,9 +1384,8 @@ class GUITests(unittest.TestCase):
                 # valid space picked with shift -> move detector
                 time.sleep(0.3)
                 old_pos = RT.detectors[0].pos
-                self._do_in_main(self.click_scene, sim, sim.scene.window_size[0]/3,
+                self._do_in_main(sim, self.click_scene, sim, sim.scene.window_size[0]/3,
                                  sim.scene.window_size[1]/3, shift=True, right=True)
-                self._wait_for_idle(sim)
                 time.sleep(0.2)
                 text4 = sim._plot._ray_text.GetText(2)
                 self.assertEqual(text4, default_text)  # not the default text
@@ -1549,9 +1393,8 @@ class GUITests(unittest.TestCase):
                 self.assertFalse(sim._plot._ray_highlight_plot.visibility)  # don't show any highlighted ray
                 
                 # space outside outline picked with shift -> move detector
-                self._do_in_main(sim.scene.view_vector, (-1, 0, 0), viewup=(0, 1, 0))
-                self._do_in_main(self.click_scene, sim, 0, 0, right=True, shift=True)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.scene.view_vector, (-1, 0, 0), viewup=(0, 1, 0))
+                self._do_in_main(sim, self.click_scene, sim, 0, 0, right=True, shift=True)
                 time.sleep(0.2)
                 text4 = sim._plot._ray_text.GetText(2)
                 self.assertEqual(text4, default_text)  # not the default text
@@ -1560,32 +1403,26 @@ class GUITests(unittest.TestCase):
              
                 # remove detectors and try to move the detector using the space pick action
                 RT.detectors = []
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
-                self._do_in_main(self.click_scene, sim, 0, 0, shift=True, right=True)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
+                self._do_in_main(sim, self.click_scene, sim, 0, 0, shift=True, right=True)
                 time.sleep(0.2)
 
                 # remove crosshair and pick
                 sim._plot._crosshair = None
-                self._do_in_main(self.click_scene, sim, 0, 0, right=True, shift=True)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, self.click_scene, sim, 0, 0, right=True, shift=True)
                 time.sleep(0.2)
 
                 # remove crosshair and pick without shift key
-                self._do_in_main(self.click_scene, sim, 0, 0, right=True)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, self.click_scene, sim, 0, 0, right=True)
                 time.sleep(0.2)
                 
                 # restore crosshair
-                self._do_in_main(sim._plot.set_crosshair, [0, 0, 0])
-                self._do_in_main(sim._plot.hide_crosshair)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim._plot.set_crosshair, [0, 0, 0])
+                self._do_in_main(sim, sim._plot.hide_crosshair)
 
                 # test case where RayText is missing
                 sim._plot._ray_text = None
-                self._do_in_main(sim._plot._on_ray_pick, None, None)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim._plot._on_ray_pick, None, None)
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
@@ -1600,7 +1437,7 @@ class GUITests(unittest.TestCase):
         
         def interact(sim):
             def pick(*args, **kwargs):    
-                self._do_in_main(self.click_scene, sim, 1/2, 1/2, *args, **kwargs)
+                self._do_in_main(sim, self.click_scene, sim, 1/2, 1/2, *args, **kwargs)
                 self._wait_for_idle(sim)
                 time.sleep(0.2)  # delay so a human user can check the text
 
@@ -1610,24 +1447,23 @@ class GUITests(unittest.TestCase):
 
             with self._try(sim):
                 # change to z+ view, so there are rays at the middle of the scene
-                self._do_in_main(sim.scene.view_yx)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.scene.view_yx)
 
                 # pick RaySource Point
                 RT.add(ot.RaySource(ot.Point(), pos=[0, 0, 0], s_sph=[20, 0]))
-                self._do_in_main(sim.replot)
+                self._do_in_main(sim, sim.replot)
                 pick_shift_combs()
 
                 # pick RaySource Surface
                 RT.remove(RT.ray_sources[0])
                 RT.add(ot.RaySource(ot.CircularSurface(r=0.1), pos=[0, 0, 0], s_sph=[20, 0]))
-                self._do_in_main(sim.replot)
+                self._do_in_main(sim, sim.replot)
                 pick_shift_combs()
 
                 # pick last ray section point (at outline)
                 RT.remove(RT.ray_sources[0])
                 RT.add(ot.RaySource(ot.Point(), pos=[-5, 0, 0], s=[5, 0, 10]))
-                self._do_in_main(sim.replot)
+                self._do_in_main(sim, sim.replot)
                 pick_shift_combs()
                 
                 # pick element in between
@@ -1635,7 +1471,7 @@ class GUITests(unittest.TestCase):
                 RT.add(ot.RaySource(ot.Point(), pos=[-5, 0, 0], s=[10, 0, 10]))
                 RT.add(ot.Filter(ot.CircularSurface(r=0.1), pos=[0, 0, 5], 
                                  spectrum=ot.TransmissionSpectrum("Constant", val=1)))
-                self._do_in_main(sim.replot)
+                self._do_in_main(sim, sim.replot)
                 pick_shift_combs()
 
         sim = TraceGUI(RT)
@@ -1661,20 +1497,17 @@ class GUITests(unittest.TestCase):
                 self.assertRaises(ValueError, sim._plot.pick_ray_section, 0, 20000000)  # section too large
 
                 # pick just the ray, check that highlight plot is shown
-                self._do_in_main(sim.pick_ray, 0)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.pick_ray, 0)
                 self.assertTrue(sim._plot._ray_highlight_plot.visibility)
                 
                 # pick a ray section, check that crosshair, highlight plot and info text are shown
-                self._do_in_main(sim.pick_ray_section, 0, 5)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.pick_ray_section, 0, 5)
                 self.assertTrue(sim._plot._ray_highlight_plot.visibility)
                 self.assertTrue(sim._plot._crosshair.visibility)
                 self.assertTrue(sim._plot._ray_text.GetText(2) != "")
                 
                 # reset picking, check that things are hidden
-                self._do_in_main(sim.reset_picking)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.reset_picking)
                 self.assertFalse(sim._plot._ray_highlight_plot.visibility)
                 self.assertFalse(sim._plot._crosshair.visibility)
                 self.assertFalse(sim._plot._ray_text.GetText(2) != "")
@@ -1682,24 +1515,20 @@ class GUITests(unittest.TestCase):
                 # check if detail parameter is applied by comparing texts
                 text = ""
                 for detail in [False, True]:
-                    self._do_in_main(sim.pick_ray_section, 100, 6, detail)
-                    self._wait_for_idle(sim)
+                    self._do_in_main(sim, sim.pick_ray_section, 100, 6, detail)
                     text2 = sim._plot._ray_text.GetText(2)
                     self.assertNotEqual(text, text2)
                     text2 = text
 
                 # coverage: select section and change contrast (affects crosshair and rayhighlight plot)
-                self._do_in_main(sim.pick_ray_section, 0, 5)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.pick_ray_section, 0, 5)
                 self._set_in_main(sim, "high_contrast", True)
-                self._wait_for_idle(sim)
                 self._set_in_main(sim, "high_contrast", False)
-                self._wait_for_idle(sim)
 
                 # coverage: pick but ray property dict missing
                 # raises exception, but gets caught
                 sim._plot._ray_property_dict = []
-                self._do_in_main(sim.pick_ray_section, 0, 5)
+                self._do_in_main(sim, sim.pick_ray_section, 0, 5)
 
         sim = TraceGUI(RT)
         sim.debug(interact, args=(sim,))
@@ -1743,8 +1572,7 @@ class GUITests(unittest.TestCase):
                 # test case 1: mask provided, but number of displayed rays is limited
                 mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 750)
                 assert np.count_nonzero(mask) > sim._plot.MAX_RAYS_SHOWN
-                sim.select_rays(mask) # no max_show provided, but might be limited by this function
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.select_rays, mask) # no max_show provided, but might be limited by this function
                 self.assertEqual(np.count_nonzero(sim.ray_selection), sim._plot.MAX_RAYS_SHOWN)
                 self.assertEqual(sim.rays_visible, sim._plot.MAX_RAYS_SHOWN)
                 id2 = id(sim._plot._ray_plot)
@@ -1752,8 +1580,7 @@ class GUITests(unittest.TestCase):
 
                 # test case 2: mask and max_show provided
                 mask = sim.raytracer.rays.p_list[:, :, 0] > 0
-                sim.select_rays(mask[:, 0], 2000) 
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.select_rays, mask[:, 0], 2000)
                 self.assertEqual(np.count_nonzero(sim.ray_selection), 2000)
                 self.assertEqual(sim.rays_visible, 2000)
                 id3 = id(sim._plot._ray_plot)
@@ -1762,8 +1589,7 @@ class GUITests(unittest.TestCase):
                 # test case 3: mask provided, number of selected rays is below limit
                 mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 405)
                 assert np.count_nonzero(mask) < sim._plot.MAX_RAYS_SHOWN
-                sim.select_rays(mask)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.select_rays, mask)
                 self.assertEqual(np.count_nonzero(sim.ray_selection), np.count_nonzero(mask))
                 self.assertEqual(sim.rays_visible, np.count_nonzero(mask))
                 id4 = id(sim._plot._ray_plot)
@@ -1772,8 +1598,7 @@ class GUITests(unittest.TestCase):
                 # test case 4: mask provided, max_show above limit
                 mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 750)
                 assert np.count_nonzero(mask) > sim._plot.MAX_RAYS_SHOWN
-                sim.select_rays(mask, sim._plot.MAX_RAYS_SHOWN+5)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.select_rays, mask, sim._plot.MAX_RAYS_SHOWN+5)
                 self.assertEqual(np.count_nonzero(sim.ray_selection), sim._plot.MAX_RAYS_SHOWN)
                 self.assertEqual(sim.rays_visible, sim._plot.MAX_RAYS_SHOWN)
                 id5 = id(sim._plot._ray_plot)
@@ -1782,23 +1607,21 @@ class GUITests(unittest.TestCase):
                 # test case 5: max_show above true number of set values
                 mask = (sim.raytracer.rays.wl_list >= 400) & (sim.raytracer.rays.wl_list <= 405)
                 assert np.count_nonzero(mask) < sim._plot.MAX_RAYS_SHOWN
-                sim.select_rays(mask, sim._plot.MAX_RAYS_SHOWN)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.select_rays, mask, sim._plot.MAX_RAYS_SHOWN)
                 self.assertEqual(np.count_nonzero(sim.ray_selection), np.count_nonzero(mask))
                 self.assertEqual(sim.rays_visible, np.count_nonzero(mask))
                 id6 = id(sim._plot._ray_plot)
                 self.assertNotEqual(id5, id6)
                 
                 # coverage: trace and try applying a selection
-                self._set_in_main(sim, "ray_count", 1000000)
+                self._set_in_main(sim, "ray_count", 1000000, wait=False)
                 while(not sim._status["Tracing"]):
                     time.sleep(0.01)
-                sim.select_rays(np.zeros(10, dtype=bool))
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.select_rays, np.zeros(10, dtype=bool))
 
                 # coverage: try selecting rays while tracing
                 sim._status["Tracing"] = 1
-                sim.select_rays(mask)
+                self._do_in_main(sim, sim.select_rays, mask, wait=False)
                 sim._status["Tracing"] = 0
         
         sim = TraceGUI(RT)
@@ -1829,32 +1652,27 @@ class GUITests(unittest.TestCase):
                 RT.add(vol)
 
                 # replot
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim, base=1)
+                self._do_in_main(sim, sim.replot)
                 self.assertEqual(len(sim._plot._volume_plots), 4)  # elements were added
                 self.assertTrue(sim._plot._volume_plots[0][3] is None)  # no text label for volumes
 
                 # tests that opacity and color is assigned correctly
                 sphv.opacity = 0.1
                 sphv.color = (1.0, 0.0, 1.0)
-                self._do_in_main(sim.replot)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.replot)
                 self.assertEqual(sim._plot._volume_plots[0][0].prop.color, sphv.color)
                 self.assertEqual(sim._plot._volume_plots[0][0].prop.opacity, sphv.opacity)
                 
                 # checks that automatic replotting works
-                self._do_in_main(sim.run_command, "RT.volumes[0].opacity=0.9")
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.run_command, "RT.volumes[0].opacity=0.9")
                 self.assertEqual(sim._plot._volume_plots[0][0].prop.opacity, 0.9)
 
                 # toggle contrast mode
                 self._set_in_main(sim, "high_contrast", True)
-                self._wait_for_idle(sim)
                 # check that custom color gets unset with high contrast
                 self.assertEqual(sim._plot._volume_plots[0][0].prop.color, sim._plot._volume_color)
 
                 self._set_in_main(sim, "high_contrast", False)
-                self._wait_for_idle(sim)
                 # check that custom color gets set again without high contrast
                 self.assertEqual(sim._plot._volume_plots[0][0].prop.color, sphv.color)
 
@@ -1880,10 +1698,8 @@ class GUITests(unittest.TestCase):
                 #                   b) set_camera applies the values c) correct view is restored
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
-                self._do_in_main(sim.set_camera, center=[10, -5, 2], height=250, roll=20, direction=[0, 0, -1])
-                self._wait_for_idle(sim)
-                self._do_in_main(sim.set_camera, *view)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.set_camera, center=[10, -5, 2], height=250, roll=20, direction=[0, 0, -1])
+                self._do_in_main(sim, sim.set_camera, *view)
                 self.assertTrue(np.allclose(cam.position, pos0))
                 self.assertTrue(np.allclose(cam.focal_point, fp0))
                 self.assertEqual(cam.parallel_scale, sc0)
@@ -1893,8 +1709,7 @@ class GUITests(unittest.TestCase):
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
                 roll0 = sim.scene.camera.roll
-                self._do_in_main(sim.set_camera, roll=82)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.set_camera, roll=82)
                 self.assertTrue(np.allclose(cam.focal_point, fp0))
                 self.assertEqual(cam.parallel_scale, sc0)
                 self.assertNotEqual(roll0, sim.scene.camera.roll)
@@ -1903,8 +1718,7 @@ class GUITests(unittest.TestCase):
                 # center and focal_point must stay the same, height changes
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
-                self._do_in_main(sim.set_camera, height=2)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.set_camera, height=2)
                 self.assertTrue(np.allclose(cam.position, pos0))
                 self.assertTrue(np.allclose(cam.focal_point, fp0))
                 self.assertNotEqual(sc0, cam.parallel_scale)
@@ -1914,8 +1728,7 @@ class GUITests(unittest.TestCase):
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
                 roll0 = sim.scene.camera.roll
-                self._do_in_main(sim.set_camera, center=[0, 10, 0])
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.set_camera, center=[0, 10, 0])
                 self.assertFalse(np.allclose(cam.position, pos0))
                 self.assertFalse(np.allclose(cam.focal_point, fp0))
                 self.assertTrue(np.allclose(np.array(cam.focal_point) - fp0, np.array(cam.position) - pos0))  # shifted by same amount
@@ -1927,16 +1740,14 @@ class GUITests(unittest.TestCase):
                 view = sim.get_camera()
                 pos0, fp0, sc0 = cam.position, cam.focal_point, cam.parallel_scale
                 roll0 = sim.scene.camera.roll
-                self._do_in_main(sim.set_camera, direction=[0, 1, 1])
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.set_camera, direction=[0, 1, 1])
                 self.assertFalse(np.allclose(cam.position, pos0))
                 self.assertTrue(np.allclose(cam.focal_point, fp0))
                 self.assertEqual(cam.parallel_scale, sc0)
                 self.assertNotEqual(roll0, sim.scene.camera.roll)
 
                 # coverage: set everything at once
-                self._do_in_main(sim.set_camera, center=[10, -5, 2], height=250, roll=20, direction=[0, 0, -1])
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.set_camera, center=[10, -5, 2], height=250, roll=20, direction=[0, 0, -1])
 
                 # exceptions
                 self.assertRaises(TypeError, sim.set_camera, center=5)
@@ -1969,7 +1780,7 @@ class GUITests(unittest.TestCase):
                         if os.path.exists(path):
                             os.remove(path)
                         
-                        self._do_in_main(sim.screenshot, path, scale=scale)
+                        self._do_in_main(sim, sim.screenshot, path, scale=scale)
                         self._wait_for_idle(sim)
 
                         self.assertTrue(os.path.exists(path))
@@ -1981,7 +1792,7 @@ class GUITests(unittest.TestCase):
                 pathj = "screenshot.png"
                 if os.path.exists(pathj):
                     os.remove(pathj)
-                self._do_in_main(sim.screenshot, pathj, window_size=(400, 300), transparent_background=True)
+                self._do_in_main(sim, sim.screenshot, pathj, window_size=(400, 300), transparent_background=True)
                 self._wait_for_idle(sim)
                 self.assertTrue(os.path.exists(pathj))
                 if os.path.exists(pathj):
@@ -1991,7 +1802,7 @@ class GUITests(unittest.TestCase):
                 arr = [None]
                 def get_screenshot(arr, *args, **kwargs):
                     arr[0] = sim.screenshot(*args, **kwargs) 
-                self._do_in_main(get_screenshot, arr, None, window_size=(400, 300))
+                self._do_in_main(sim, get_screenshot, arr, None, window_size=(400, 300))
                 self._wait_for_idle(sim)
                 self.assertEqual(len(arr[0].shape), 3)
                 self.assertEqual(arr[0].shape[0], 300)
@@ -2037,46 +1848,34 @@ class GUITests(unittest.TestCase):
 
                 # check setting of boxes by toggling them
                 self._set_in_main(sim, "custom_checkbox_1", False)
-                self._wait_for_idle(sim)
                 self.assertEqual(val1[0], False)
                 self._set_in_main(sim, "custom_checkbox_2", True)
-                self._wait_for_idle(sim)
                 self.assertEqual(val2[0], True)
                 self._set_in_main(sim, "custom_checkbox_3", False)
-                self._wait_for_idle(sim)
                 self.assertEqual(val3[0], False)
 
                 # check value setting
                 self._set_in_main(sim, "custom_value_1", 2.3)
-                self._wait_for_idle(sim)
                 self.assertEqual(val1[0], 2.3)
                 self._set_in_main(sim, "custom_value_2", -0.34)
-                self._wait_for_idle(sim)
                 self.assertEqual(val2[0], -0.34)
                 self._set_in_main(sim, "custom_value_3", 12.23)
-                self._wait_for_idle(sim)
                 self.assertEqual(val3[0], 12.23)
 
                 # check selection setting
                 self._set_in_main(sim, "custom_selection_1", "b")
-                self._wait_for_idle(sim)
                 self.assertEqual(val1[0], "b")
                 self._set_in_main(sim, "custom_selection_2", "d")
-                self._wait_for_idle(sim)
                 self.assertEqual(val2[0], "d")
                 self._set_in_main(sim, "custom_selection_3", "g")
-                self._wait_for_idle(sim)
                 self.assertEqual(val3[0], "g")
 
                 # check button actions
-                self._do_in_main(sim.custom_button_action_1)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.custom_button_action_1)
                 self.assertEqual(val1[0], 1)
-                self._do_in_main(sim.custom_button_action_2)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.custom_button_action_2)
                 self.assertEqual(val1[0], 2)
-                self._do_in_main(sim.custom_button_action_3)
-                self._wait_for_idle(sim)
+                self._do_in_main(sim, sim.custom_button_action_3)
                 self.assertEqual(val1[0], 3)
 
                 # set bound functions to None. Handling should still work
@@ -2166,7 +1965,7 @@ class GUITests(unittest.TestCase):
 
                         assert not os.path.exists(path)
                         
-                        self._do_in_main(plot, path=path, sargs=dict(dpi=120))
+                        self._do_in_main(sim, plot, path=path, sargs=dict(dpi=120))
                         time.sleep(0.05)
                         self._wait_for_idle(sim)
 

@@ -842,8 +842,10 @@ class TraceGUI(HasTraits):
     @property
     def busy(self) -> bool:
         """busy state flag of TraceGUI"""
-        is_interacting = self.scene is None or self.scene.interactor.GetInteractorStyle().GetState() != 0
-        is_rendering = self.scene is None or self.scene.render_window.CheckInRenderStatus()
+        is_interacting = self.scene is None or (hasattr(self.scene.interactor, "GetInteractorStyle") and\
+                                                self.scene.interactor.GetInteractorStyle().GetState() != 0)
+        is_rendering = self.scene is None or (hasattr(self.scene.render_window, "CheckInRenderStatus") and\
+                                              self.scene.render_window.CheckInRenderStatus())
         return any(val > 0 for val in self._status.values()) or is_interacting or is_rendering 
 
     def debug(self, func: Callable, args: tuple = (), kwargs: dict = {}) -> None:
