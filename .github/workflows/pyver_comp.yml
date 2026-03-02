@@ -1,4 +1,4 @@
-name: Python 3.11 - 3.12 Compatibility
+name: Python 3.11 - 3.12, 3.14 Compatibility
 
 # do testing on commits, but only if python files changed
 # and files are not in examples/ or tests/
@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.11', '3.12']
+        python-version: ['3.11', '3.12', '3.14']
       fail-fast: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 12
