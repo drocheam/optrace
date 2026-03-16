@@ -121,6 +121,8 @@ intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/', None),
                        'traits': ('https://docs.enthought.com/traits/', None),
                        'matplotlib': ('http://matplotlib.org/stable', None),
+                       'pyvistaqt': ('https://qtdocs.pyvista.org/', None),
+                       'vtk': ('https://docs.vtk.org/en/latest', None),
                        'pyvista': ('https://docs.pyvista.org', None)}
 
 autodoc_default_options = {

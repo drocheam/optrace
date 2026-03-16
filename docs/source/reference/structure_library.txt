@@ -3,7 +3,9 @@
 ├── gui
 │   ├── command_window.py
 │   ├── __init__.py
+│   ├── interactors.py
 │   ├── property_browser.py
+│   ├── pyvista_editor.py
 │   ├── _scene_plotting.py
 │   └── trace_gui.py
 ├── __init__.py
@@ -116,4 +118,4 @@
 │   └── transfer_matrix_analysis.py
 └── warnings.py
 
-14 directories, 103 files
+14 directories, 105 files

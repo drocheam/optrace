@@ -138,7 +138,7 @@ class ScenePlotting:
         :param center: 3D coordinates of center of view in mm
         :param height: half of vertical height in mm
         :param direction: camera view direction vector 
-        (direction of vector perpendicular to your monitor and in your viewing direction)
+            (direction of vector perpendicular to your monitor and in your viewing direction)
         :param roll: absolute camera roll angle in degrees
         """
         # force parallel projection

@@ -1,7 +1,7 @@
 # optrace
 
 [![Version](https://img.shields.io/github/v/tag/drocheam/optrace?label=version)](https://github.com/drocheam/optrace/releases/latest)
-[![Python 3.11, 3.12, 3.13](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://github.com/drocheam/optrace/blob/main/pyproject.toml)
+[![Python 3.11, 3.12, 3.13, 3.14](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://github.com/drocheam/optrace/blob/main/pyproject.toml)
 [![Windows Linux Mac](https://shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/drocheam/optrace/blob/main/pyproject.toml)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/drocheam/optrace/blob/main/LICENSE)
 
@@ -68,7 +68,7 @@ range of applications.
 
 **Installing the latest official release**
 
-1. Make sure python and pip are installed
+1. Make sure Python and pip are installed
 2. Download the optrace-xxxx.tar.gz archive from the [latest release](https://github.com/drocheam/optrace/releases/latest)
 3. Open a terminal and run `pip install <archive>`, where `<archive>` is the path to the downloaded file
 

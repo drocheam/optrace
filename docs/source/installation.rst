@@ -12,7 +12,7 @@ Installation
   :language: bash
   :class: highlight
 
-Make sure Python 3.11, 3.12 or 3.13 and pip are installed on your system
+Make sure Python 3.11, 3.12, 3.13 or 3.14 and pip are installed on your system
 
 **Installing the latest official release**
 
