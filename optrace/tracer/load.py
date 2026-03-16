@@ -40,14 +40,18 @@ def _read_lines(path: str) -> list[str]:
 
     # open in binary mode to check for encoding
     with open(path, "rb") as f:
-        resp = chardet.detect(f.read())
+        resp = chardet.detect(f.read(), encoding_era=chardet.EncodingEra.MODERN_WEB)
+        # TODO chardet bug: without MODERN_WEB some ASCII gets detected as UTF7
 
-    # if detection fails, it's most probably some lesser used 1 Byte encoding. Just set it to Windows-1252
-    encoding = resp["encoding"] or "Windows-1252"
-    
     # read using detected encoding
-    with open(path, "r", encoding=encoding) as f:
-        return f.readlines()
+    with open(path, "r", encoding=resp["encoding"]) as f:
+        lines = f.readlines()
+
+    # TODO chardet bug? In some cases BOM of \ufeff remains in string
+    if resp["encoding"] in ["utf-16-le", "utf-32-le"] and len(lines) and len(lines[0]) and lines[0][0] == "\ufeff":
+        lines[0] = lines[0][1:]
+
+    return lines
 
 
 def load_agf(path: str) -> dict:
