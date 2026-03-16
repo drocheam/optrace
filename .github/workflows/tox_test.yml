@@ -39,7 +39,7 @@ jobs:
       uses: lsst-sqre/run-tox@v1
       with:
         python-version: ${{ matrix.python-version }}
-        tox-envs: "py313"
+        tox-envs: "py314"
         tox-plugins: "tox-gh-actions"
         cache-key-prefix: ".tox"
 
