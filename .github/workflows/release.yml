@@ -41,7 +41,7 @@ jobs:
         run: echo "COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.VERSION }}
